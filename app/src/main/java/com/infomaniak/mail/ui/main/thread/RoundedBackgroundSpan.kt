@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,5 +95,7 @@ class RoundedBackgroundSpan(
         private const val LEFT_MARGIN = 4
         private const val PADDING = 16
         private const val VERTICAL_OFFSET = 4
+
+        fun getTotalHorizontalSpace(): Int = PADDING * 2 + LEFT_MARGIN
     }
 }

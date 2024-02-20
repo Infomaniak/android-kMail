@@ -258,7 +258,7 @@ class ThreadListAdapter @Inject constructor(
             tag = thread.folderName,
             tagColor = TagColor(R.color.folderTagBackground, R.color.folderTagTextColor),
             ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
-                maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize).toInt(),
+                maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize),
                 truncateAt = TruncateAt.END,
             ),
         )

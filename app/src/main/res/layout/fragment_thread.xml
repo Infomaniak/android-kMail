@@ -93,7 +93,6 @@
                         tools:text="@tools:sample/lorem[7]" />
 
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
-
             </com.google.android.material.appbar.AppBarLayout>
 
             <androidx.core.widget.NestedScrollView
