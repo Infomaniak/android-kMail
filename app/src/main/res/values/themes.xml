@@ -105,6 +105,16 @@
 
     <style name="AppThemeLock" parent="AppThemeLockBase" />
 
+    <!-- UpdateRequired -->
+
+    <style name="AppThemeUpdateRequiredBase" parent="AppTheme.Pink">
+        <item name="illustration">@drawable/illu_update_required</item>
+        <item name="titleStyle">@style/H2</item>
+        <item name="descriptionStyle">@style/Body.Secondary</item>
+    </style>
+
+    <style name="AppThemeUpdateRequired" parent="AppThemeUpdateRequiredBase" />
+
     <!-- Login -->
 
     <style name="AppThemeLoginBase" parent="AppTheme.Pink">
