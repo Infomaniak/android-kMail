@@ -105,13 +105,13 @@ class SubjectFormatter @Inject constructor(private val context: Context) {
 
     private fun getEllipsizeConfiguration(tag: String): EllipsizeConfiguration? {
         val paddingsInPixels = (context.resources.getDimension(R.dimen.threadHorizontalMargin) * 2).toInt()
-        val width = Resources.getSystem().displayMetrics.widthPixels - paddingsInPixels
+        val widthInPixels = Resources.getSystem().displayMetrics.widthPixels - paddingsInPixels
 
         val tagTextPaint = getTagsPaint(context)
-        val layoutWithTag = StaticLayout.Builder.obtain(tag, 0, tag.length, tagTextPaint, width).build()
+        val layoutWithTag = StaticLayout.Builder.obtain(tag, 0, tag.length, tagTextPaint, widthInPixels).build()
 
         return layoutWithTag.takeIf { it.lineCount > 1 }?.let {
-            EllipsizeConfiguration(width, TruncateAt.MIDDLE, withNewLine = true)
+            EllipsizeConfiguration(widthInPixels, TruncateAt.MIDDLE, withNewLine = true)
         }
     }
 
