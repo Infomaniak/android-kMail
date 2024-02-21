@@ -21,6 +21,8 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.os.Build
+import android.text.Spannable
+import android.text.TextUtils.TruncateAt
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -46,13 +48,13 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity.LARGE
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
@@ -94,6 +96,7 @@ class ThreadListAdapter @Inject constructor(
     private var folderRole: FolderRole? = null
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
+    private var isFolderNameVisible: Boolean = false
 
     //region Tablet mode
     private var openedThreadPosition: Int? = null
@@ -108,10 +111,12 @@ class ThreadListAdapter @Inject constructor(
         folderRole: FolderRole?,
         onSwipeFinished: (() -> Unit)? = null,
         multiSelection: MultiSelectionListener<Thread>? = null,
+        isFolderNameVisible: Boolean = false,
     ) {
         this.folderRole = folderRole
         this.onSwipeFinished = onSwipeFinished
         this.multiSelection = multiSelection
+        this.isFolderNameVisible = isFolderNameVisible
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -188,6 +193,8 @@ class ThreadListAdapter @Inject constructor(
         setupThreadDensityDependentUi()
         displayAvatar(thread)
 
+        displayFolderName(thread)
+
         with(thread) {
             expeditor.text = formatRecipientNames(computeDisplayedRecipients())
             mailSubject.text = context.formatSubject(subject)
@@ -224,6 +231,37 @@ class ThreadListAdapter @Inject constructor(
         }
 
         updateSelectedUi(thread)
+    }
+
+    private fun CardviewThreadItemBinding.displayFolderName(thread: Thread) {
+        val isCompactMode = localSettings.threadDensity == ThreadDensity.COMPACT
+
+        fun setFolderNameVisibility(isVisible: Boolean) {
+            folderNameExpandMode.isVisible = !isCompactMode && isVisible
+            folderNameCompactMode.isVisible = isCompactMode && isVisible
+        }
+
+        val folderNameView = if (isCompactMode) folderNameCompactMode else folderNameExpandMode
+
+        if (shouldDisplayFolderName(thread.folderName)) {
+            folderNameView.text = computeFolderName(thread)
+            setFolderNameVisibility(isVisible = true)
+        } else {
+            setFolderNameVisibility(isVisible = false)
+        }
+    }
+
+    private fun shouldDisplayFolderName(folderName: String) = isFolderNameVisible && folderName.isNotEmpty()
+
+    private fun CardviewThreadItemBinding.computeFolderName(thread: Thread): Spannable {
+        return context.postfixWithTag(
+            tag = thread.folderName,
+            tagColor = TagColor(R.color.folderTagBackground, R.color.folderTagTextColor),
+            ellipsizeConfiguration = SubjectFormatter.EllipsizeConfiguration(
+                maxWidth = context.resources.getDimension(R.dimen.folderNameTagMaxSize),
+                truncateAt = TruncateAt.END,
+            ),
+        )
     }
 
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
@@ -302,27 +340,27 @@ class ThreadListAdapter @Inject constructor(
 
         multiSelection?.let {
             with(localSettings) {
-                expeditorAvatar.isVisible = !isMultiSelected && threadDensity == LARGE
+                expeditorAvatar.isVisible = !isMultiSelected && threadDensity == ThreadDensity.LARGE
                 checkMarkLayout.isVisible = it.isEnabled
                 checkedState.isVisible = isMultiSelected
-                uncheckedState.isVisible = !isMultiSelected && threadDensity != LARGE
+                uncheckedState.isVisible = !isMultiSelected && threadDensity != ThreadDensity.LARGE
             }
         }
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() = with(localSettings) {
-        val margin = if (threadDensity == COMPACT) threadMarginCompact else threadMarginOther
+        val margin = if (threadDensity == ThreadDensity.COMPACT) threadMarginCompact else threadMarginOther
         threadCard.setMarginsRelative(top = margin, bottom = margin)
 
-        expeditorAvatar.isVisible = threadDensity == LARGE
-        mailBodyPreview.isGone = threadDensity == COMPACT
+        expeditorAvatar.isVisible = threadDensity == ThreadDensity.LARGE
+        mailBodyPreview.isGone = threadDensity == ThreadDensity.COMPACT
 
         checkMarkBackground.reshapeToDensity()
         uncheckedState.reshapeToDensity()
     }
 
     private fun ImageView.reshapeToDensity() {
-        val checkMarkSize = if (localSettings.threadDensity == LARGE) checkMarkSizeLarge else checkMarkSizeOther
+        val checkMarkSize = if (localSettings.threadDensity == ThreadDensity.LARGE) checkMarkSizeLarge else checkMarkSizeOther
         layoutParams.apply {
             width = checkMarkSize
             height = checkMarkSize
@@ -542,7 +580,7 @@ class ThreadListAdapter @Inject constructor(
             add(folderRole)
         }
 
-        if (threadDensity == COMPACT) {
+        if (threadDensity == ThreadDensity.COMPACT) {
             if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
                 multiSelection?.selectedItems?.removeAll { !threads.contains(it) }
             }

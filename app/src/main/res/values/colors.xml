@@ -164,6 +164,10 @@
     <color name="calendarHeaderBackground">@color/polar_bear</color>
     <color name="manyAvatarsAdditionalPeopleBackground">@color/iconColorSecondaryText</color>
 
+    <!-- Thread -->
+    <color name="folderTagTextColor">@color/elephant</color>
+    <color name="folderTagBackground">@color/polar_bear</color>
+
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
     <color name="swipeMove">@color/fougere_light</color>

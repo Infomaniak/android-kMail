@@ -143,7 +143,7 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun setupAdapter() {
-        threadListAdapter(folderRole = null)
+        threadListAdapter(folderRole = null, isFolderNameVisible = true)
     }
 
     private fun setupListeners() = with(binding) {

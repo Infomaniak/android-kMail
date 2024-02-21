@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
@@ -44,6 +45,7 @@ import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 class ThreadController @Inject constructor(
+    private val context: Context,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -110,12 +112,18 @@ class ThreadController @Inject constructor(
 
         return@withContext mailboxContentRealm().writeBlocking {
             val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
+            val cachedFolderIds = mutableMapOf<String, String>()
+
             remoteThreads.map { remoteThread ->
                 ensureActive()
+
                 remoteThread.isFromSearch = true
 
+                // If we only have 1 Message, we want to display its Folder name.
                 val folderId = if (remoteThread.messages.count() == 1) {
-                    remoteThread.messages.single().folderId
+                    val firstMessageFolderId = remoteThread.messages.single().folderId
+                    setFolderName(firstMessageFolderId, remoteThread, cachedFolderIds)
+                    firstMessageFolderId
                 } else {
                     filterFolder!!.id
                 }
@@ -126,6 +134,19 @@ class ThreadController @Inject constructor(
                 return@map remoteThread
             }.also(searchFolder.threads::addAll)
         }
+    }
+
+    private fun MutableRealm.setFolderName(
+        firstMessageFolderId: String,
+        remoteThread: Thread,
+        cachedFolderIds: MutableMap<String, String>,
+    ) {
+        val folderName = cachedFolderIds[firstMessageFolderId]
+            ?: FolderController.getFolder(firstMessageFolderId, this)
+                ?.getLocalizedName(context)
+                ?.also { cachedFolderIds[firstMessageFolderId] = it }
+
+        folderName?.let { remoteThread.folderName = it }
     }
     //endregion
 

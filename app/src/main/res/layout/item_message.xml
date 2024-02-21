@@ -31,7 +31,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginHorizontal="@dimen/threadHorizontalMargin"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -190,7 +190,7 @@
                 style="@style/BodySmall.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginStart="@dimen/threadHorizontalMargin"
                 android:text="@string/fromTitle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -214,7 +214,7 @@
                 style="@style/BodySmall.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginStart="@dimen/threadHorizontalMargin"
                 android:layout_marginTop="@dimen/marginStandardSmall"
                 android:text="@string/toTitle"
                 app:layout_constraintStart_toStartOf="parent"
@@ -239,7 +239,7 @@
                 style="@style/BodySmall.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginStart="@dimen/threadHorizontalMargin"
                 android:layout_marginTop="@dimen/marginStandardSmall"
                 android:text="@string/ccTitle"
                 app:layout_constraintStart_toStartOf="parent"
@@ -264,7 +264,7 @@
                 style="@style/BodySmall.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginStart="@dimen/threadHorizontalMargin"
                 android:layout_marginTop="@dimen/marginStandardSmall"
                 android:text="@string/bccTitle"
                 app:layout_constraintStart_toStartOf="parent"
@@ -288,7 +288,7 @@
                 android:id="@+id/detailedMessagePrefix"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginStart="@dimen/threadHorizontalMargin"
                 android:layout_marginTop="@dimen/marginStandardSmall"
                 android:contentDescription="@string/dateTitle"
                 android:src="@drawable/ic_calendar"
@@ -401,7 +401,7 @@
             android:id="@+id/calendarEvent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginHorizontal="@dimen/threadHorizontalMargin"
             android:paddingBottom="@dimen/marginStandardMedium"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
@@ -427,6 +427,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone"
+            android:layout_marginHorizontal="@dimen/threadHorizontalMargin"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -436,7 +437,6 @@
                 style="@style/Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 android:maxWidth="900dp" />
 
@@ -444,7 +444,6 @@
                 style="@style/Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 android:maxWidth="900dp" />
 
@@ -452,7 +451,6 @@
                 style="@style/Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 android:maxWidth="900dp" />
 
@@ -460,7 +458,6 @@
                 style="@style/Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 android:maxWidth="900dp" />
 
@@ -468,7 +465,6 @@
                 style="@style/Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 android:maxWidth="200dp" />
         </LinearLayout>
@@ -487,7 +483,7 @@
                 android:id="@+id/failedLoadingErrorMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/marginStandardMedium"
+                android:layout_margin="@dimen/threadHorizontalMargin"
                 android:drawablePadding="@dimen/marginStandardSmall"
                 android:fontFamily="@font/suisseintl_regular_italic"
                 android:text="@string/errorLoadingMessage"

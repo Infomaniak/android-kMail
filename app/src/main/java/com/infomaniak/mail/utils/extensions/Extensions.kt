@@ -31,6 +31,7 @@ import android.os.Build
 import android.text.Html
 import android.text.Spannable
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.style.ClickableSpan
 import android.util.Patterns
 import android.view.View
@@ -84,9 +85,13 @@ import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguration
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import io.realm.kotlin.MutableRealm
@@ -494,28 +499,49 @@ val TextInputEditText.trimmedText inline get() = text?.trim().toString()
 fun Context.postfixWithTag(
     original: CharSequence,
     @StringRes tagRes: Int,
-    @ColorRes backgroundColorRes: Int,
-    @ColorRes textColorRes: Int,
+    tagColor: TagColor,
+    ellipsizeConfiguration: EllipsizeConfiguration? = null,
     onClicked: (() -> Unit)? = null,
-) = postfixWithTag(original, getString(tagRes), backgroundColorRes, textColorRes, onClicked)
+) = postfixWithTag(
+    original = original,
+    tag = getString(tagRes),
+    tagColor = tagColor,
+    ellipsizeConfiguration = ellipsizeConfiguration,
+    onClicked = onClicked,
+)
 
 /**
  * Do not forget to set `movementMethod = LinkMovementMethod.getInstance()` on a TextView to make the tag clickable
  */
 fun Context.postfixWithTag(
-    original: CharSequence,
+    original: CharSequence = "",
     tag: String,
-    @ColorRes backgroundColorRes: Int,
-    @ColorRes textColorRes: Int,
+    tagColor: TagColor,
+    ellipsizeConfiguration: EllipsizeConfiguration? = null,
     onClicked: (() -> Unit)? = null,
 ): Spannable {
-    val postfixed = "${original}${Utils.TAG_SEPARATOR}${tag}"
 
-    return postfixed.toSpannable().apply {
-        val startIndex = original.length + Utils.TAG_SEPARATOR.length
-        val endIndex = startIndex + tag.length
+    fun getEllipsizedTagContent(): String {
+        return ellipsizeConfiguration?.let {
+            TextUtils.ellipsize(
+                tag,
+                getTagsPaint(this),
+                ellipsizeConfiguration.maxWidth,
+                ellipsizeConfiguration.truncateAt
+            ).toString()
+        } ?: tag
+    }
 
-        setTagSpan(this@postfixWithTag, startIndex, endIndex, backgroundColorRes, textColorRes)
+    val ellipsizedTagContent = getEllipsizedTagContent()
+    val postFixed = TextUtils.concat(original, TAG_SEPARATOR, ellipsizedTagContent)
+
+    return postFixed.toSpannable().apply {
+        val startIndex = original.length + TAG_SEPARATOR.length
+        val endIndex = startIndex + ellipsizedTagContent.length
+
+        with(tagColor) {
+            setTagSpan(this@postfixWithTag, startIndex, endIndex, backgroundColorRes, textColorRes)
+        }
         onClicked?.let { setClickableSpan(startIndex, endIndex, it) }
     }
 }
@@ -530,13 +556,14 @@ private fun Spannable.setTagSpan(
     val backgroundColor = context.getColor(backgroundColorRes)
     val textColor = context.getColor(textColorRes)
     val textTypeface = ResourcesCompat.getFont(context, R.font.tag_font)!!
-    val textSize = context.resources.getDimensionPixelSize(R.dimen.externalTagTextSize).toFloat()
+    val textSize = context.resources.getDimensionPixelSize(R.dimen.tagTextSize).toFloat()
     setSpan(
         RoundedBackgroundSpan(
             backgroundColor = backgroundColor,
             textColor = textColor,
             textTypeface = textTypeface,
             fontSize = textSize,
+            cornerRadius = context.resources.getDimension(R.dimen.tagRadius),
         ),
         startIndex,
         endIndex,

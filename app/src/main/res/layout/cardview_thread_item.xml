@@ -221,24 +221,27 @@
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintEnd_toStartOf="@id/folderNameCompactMode"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/expeditor"
                     tools:text="@tools:sample/lorem[10]" />
 
-                <ImageView
-                    android:id="@+id/iconCalendar"
-                    android:layout_width="@dimen/mediumIconSize"
-                    android:layout_height="@dimen/mediumIconSize"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:contentDescription="@string/contentDescriptionIconCalendar"
-                    android:src="@drawable/ic_calendar"
+                <TextView
+                    android:id="@+id/folderNameCompactMode"
+                    style="@style/BodySmall.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/iconFavorite"
-                    app:layout_constraintEnd_toStartOf="@id/iconFavorite"
-                    app:layout_constraintStart_toEndOf="@id/iconAttachment"
-                    app:layout_constraintTop_toTopOf="@id/iconFavorite"
-                    app:tint="@color/iconColorPrimaryText"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@id/mailSubject"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
+                    tools:textColor="@color/folderTagTextColor"
+                    tools:background="@color/folderTagBackground"
+                    tools:gravity="center"
+                    tools:text="Folder name"
                     tools:visibility="visible" />
 
                 <ImageView
@@ -249,10 +252,25 @@
                     android:contentDescription="@string/contentDescriptionIconAttachments"
                     android:src="@drawable/ic_attachment"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/iconFavorite"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toStartOf="@id/iconCalendar"
-                    app:layout_constraintStart_toEndOf="@id/mailSubject"
-                    app:layout_constraintTop_toTopOf="@id/iconFavorite"
+                    app:layout_constraintStart_toEndOf="@id/folderNameCompactMode"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
+                    app:tint="@color/iconColorPrimaryText"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/iconCalendar"
+                    android:layout_width="@dimen/mediumIconSize"
+                    android:layout_height="@dimen/mediumIconSize"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:contentDescription="@string/contentDescriptionIconCalendar"
+                    android:src="@drawable/ic_calendar"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/iconFavorite"
+                    app:layout_constraintStart_toEndOf="@id/iconAttachment"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
                     app:tint="@color/iconColorPrimaryText"
                     tools:visibility="visible" />
 
@@ -273,16 +291,33 @@
                 <TextView
                     android:id="@+id/mailBodyPreview"
                     style="@style/BodySmall.Secondary"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/folderNameExpandMode"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/mailSubject"
                     tools:text="@tools:sample/lorem/random" />
+
+                <TextView
+                    android:id="@+id/folderNameExpandMode"
+                    style="@style/BodySmall.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/mailBodyPreview"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintTop_toTopOf="@id/mailBodyPreview"
+                    tools:textColor="@color/folderTagTextColor"
+                    tools:background="@color/folderTagBackground"
+                    tools:gravity="center"
+                    tools:text="Folder name"
+                    tools:visibility="gone" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

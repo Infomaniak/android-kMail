@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,17 +26,16 @@ import android.text.style.LineHeightSpan
 import android.text.style.ReplacementSpan
 
 /**
- * A span to create a rounded background on a text.
- *
- * If radius is set, it generates a rounded background.
- * If radius is null, it generates a circle background.
+ * A span to create a rounded background with the specified radius on a text.
  */
 class RoundedBackgroundSpan(
     private val backgroundColor: Int,
     private val textColor: Int,
     private val textTypeface: Typeface,
     private val fontSize: Float,
+    private val cornerRadius: Float,
 ) : ReplacementSpan(), LineHeightSpan {
+
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: FontMetricsInt?): Int {
         paint.setGivenTextStyle()
         return (LEFT_MARGIN + PADDING + paint.measureText(text, start, end) + PADDING).toInt()
@@ -64,7 +63,7 @@ class RoundedBackgroundSpan(
         )
 
         paint.color = backgroundColor
-        canvas.drawRoundRect(rect, CORNER_RADIUS, CORNER_RADIUS, paint)
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
 
         paint.setGivenTextStyle()
         canvas.drawText(
@@ -96,6 +95,7 @@ class RoundedBackgroundSpan(
         private const val LEFT_MARGIN = 4
         private const val PADDING = 16
         private const val VERTICAL_OFFSET = 4
-        private const val CORNER_RADIUS = 6.0f
+
+        fun getTotalHorizontalSpace(): Int = PADDING * 2 + LEFT_MARGIN
     }
 }

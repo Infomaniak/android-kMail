@@ -45,7 +45,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
-import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
@@ -56,7 +55,6 @@ import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
@@ -72,7 +70,6 @@ import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialo
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
-import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.extensions.*
@@ -109,6 +106,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var permissionUtils: PermissionUtils
+
+    @Inject
+    lateinit var subjectFormatter: SubjectFormatter
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -405,22 +405,30 @@ class ThreadFragment : Fragment() {
     private fun observeSubjectUpdateTriggers() = with(binding) {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
 
-            val (subject, spannedSubject) = computeSubject(
-                thread = result.thread ?: return@observe,
-                emailDictionary = result.mergedContacts ?: emptyMap(),
-                aliases = result.mailbox?.aliases ?: emptyList(),
-                externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
-            )
+            val (subjectWithoutTags, subjectWithTags) = subjectFormatter.generateSubjectContent(
+                subjectData = SubjectFormatter.SubjectData(
+                    thread = result.thread ?: return@observe,
+                    emailDictionary = result.mergedContacts ?: emptyMap(),
+                    aliases = result.mailbox?.aliases ?: emptyList(),
+                    externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
+                ),
+            ) { description ->
+                informationDialog.show(
+                    title = R.string.externalDialogTitleExpeditor,
+                    description = description,
+                    confirmButtonText = R.string.externalDialogConfirmButton,
+                )
+            }
 
-            threadSubject.text = spannedSubject
-            toolbarSubject.text = subject
+            toolbarSubject.text = subjectWithoutTags
+            threadSubject.text = subjectWithTags
 
             threadSubject.setOnLongClickListener {
-                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
+                context.copyStringToClipboard(subjectWithoutTags, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
                 true
             }
             toolbarSubject.setOnLongClickListener {
-                context.copyStringToClipboard(subject, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
+                context.copyStringToClipboard(subjectWithoutTags, R.string.snackbarSubjectCopiedToClipboard, snackbarManager)
                 true
             }
         }
@@ -580,42 +588,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
-
-    private fun computeSubject(
-        thread: Thread,
-        emailDictionary: MergedContactDictionary,
-        aliases: List<String>,
-        externalMailFlagEnabled: Boolean,
-    ): Pair<String, CharSequence> = with(binding) {
-        val subject = context.formatSubject(thread.subject)
-        if (!externalMailFlagEnabled) return subject to subject
-
-        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(emailDictionary, aliases)
-        if (externalRecipientQuantity == 0) return subject to subject
-
-        val spannedSubject = requireContext().postfixWithTag(
-            subject,
-            R.string.externalTag,
-            R.color.externalTagBackground,
-            R.color.externalTagOnBackground,
-        ) {
-            trackExternalEvent("threadTag")
-
-            val description = resources.getQuantityString(
-                R.plurals.externalDialogDescriptionExpeditor,
-                externalRecipientQuantity,
-                externalRecipientEmail,
-            )
-
-            informationDialog.show(
-                title = R.string.externalDialogTitleExpeditor,
-                description = description,
-                confirmButtonText = R.string.externalDialogConfirmButton,
-            )
-        }
-
-        return subject to spannedSubject
-    }
 
     fun getAnchor(): View? = _binding?.quickActionBar
 

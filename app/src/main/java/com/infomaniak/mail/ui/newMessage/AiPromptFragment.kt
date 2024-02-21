@@ -34,6 +34,7 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.utils.extensions.postfixWithTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -83,10 +84,9 @@ class AiPromptFragment : Fragment() {
         setCorrectSheetMargins()
 
         aiPromptTitle.text = requireContext().postfixWithTag(
-            getString(R.string.aiPromptTitle),
-            R.string.aiPromptTag,
-            R.color.aiBetaTagBackground,
-            R.color.aiBetaTagTextColor,
+            original = getString(R.string.aiPromptTitle),
+            tagRes = R.string.aiPromptTag,
+            tagColor = TagColor(R.color.aiBetaTagBackground, R.color.aiBetaTagTextColor),
         )
 
         prompt.showKeyboard()
