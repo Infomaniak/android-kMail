@@ -87,10 +87,10 @@ class ThreadViewModel @Inject constructor(
     private var cachedSplitBodies = mutableMapOf<String, SplitBody>()
 
     //region Super Collapsed Block
+    var hasUserClickedTheSuperCollapsedBlock = false
     private var hasMarkedThreadAsSeen: Boolean = false
     private var superCollapsedBlock: MutableSet<String>? = null
     private var shouldDisplaySuperCollapsedBlock: Boolean? = null
-    var hasUserClickedTheSuperCollapsedBlock = false
     //endregion
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
@@ -102,10 +102,10 @@ class ThreadViewModel @Inject constructor(
 
     fun resetMessagesCache() {
         cachedSplitBodies = mutableMapOf()
+        hasUserClickedTheSuperCollapsedBlock = false
         hasMarkedThreadAsSeen = false
         superCollapsedBlock = null
         shouldDisplaySuperCollapsedBlock = null
-        hasUserClickedTheSuperCollapsedBlock = false
     }
 
     fun reassignThreadLive(threadUid: String) {
@@ -146,19 +146,13 @@ class ThreadViewModel @Inject constructor(
         suspend fun mapListWithNewSuperCollapsedBlock() {
             messages.forEachIndexed { index, message ->
                 when (index) {
-                    0 -> { // First Message
-                        addMessage(message)
-                    }
-                    in 1..<firstIndexAfterBlock -> { // All Messages that should go in block
-                        superCollapsedBlock!!.add(message.uid)
-                    }
+                    0 -> addMessage(message) // First Message
+                    in 1..<firstIndexAfterBlock -> superCollapsedBlock!!.add(message.uid) // All Messages that should go in block
                     firstIndexAfterBlock -> { // First Message not in block
                         items += SuperCollapsedBlock(superCollapsedBlock!!)
                         addMessage(message.apply { shouldHideDivider = true })
                     }
-                    else -> { // All following Messages
-                        addMessage(message)
-                    }
+                    else -> addMessage(message) // All following Messages
                 }
             }
         }
@@ -172,20 +166,14 @@ class ThreadViewModel @Inject constructor(
 
             messages.forEachIndexed { index, message ->
                 when {
-                    index == 0 -> { // First Message
-                        addMessage(message)
-                    }
-                    previousBlock.contains(message.uid) && isStillInBlock -> { // All Messages already in block
-                        superCollapsedBlock!!.add(message.uid)
-                    }
+                    index == 0 -> addMessage(message) // First Message
+                    previousBlock.contains(message.uid) && isStillInBlock -> superCollapsedBlock!!.add(message.uid) // All Messages already in block
                     !previousBlock.contains(message.uid) && isStillInBlock -> { // First Message not in block
                         isStillInBlock = false
                         items += SuperCollapsedBlock(superCollapsedBlock!!)
                         addMessage(message.apply { shouldHideDivider = true })
                     }
-                    else -> { // All following Messages
-                        addMessage(message)
-                    }
+                    else -> addMessage(message) // All following Messages
                 }
             }
         }
@@ -209,9 +197,11 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun computeFirstIndexAfterBlock(thread: Thread, list: RealmResults<Message>): Int {
+
         val firstDefaultIndex = list.count() - 2
         val firstUnreadIndex = if (thread.unseenMessagesCount > 0) list.indexOfFirstOrNull { !it.isSeen } else null
         val notNullFirstUnreadIndex = firstUnreadIndex ?: firstDefaultIndex
+
         return minOf(notNullFirstUnreadIndex, firstDefaultIndex)
     }
 
