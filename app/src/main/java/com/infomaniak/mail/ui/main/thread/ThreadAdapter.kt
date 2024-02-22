@@ -685,7 +685,13 @@ class ThreadAdapter(
         SUPER_COLLAPSED_BLOCK(R.layout.item_super_collapsed_block),
     }
 
-    data class SuperCollapsedBlock(val messagesUids: Set<String>)
+    data class SuperCollapsedBlock(
+        var shouldBeDisplayed: Boolean = true,
+        var hasBeenClicked: Boolean = false,
+        val messagesUids: MutableSet<String> = mutableSetOf(),
+    ) {
+        fun isFirstTime() = shouldBeDisplayed && messagesUids.isEmpty()
+    }
 
     abstract class ThreadAdapterViewHolder(open val binding: ViewBinding) : ViewHolder(binding.root)
 

@@ -86,12 +86,9 @@ class ThreadViewModel @Inject constructor(
 
     private var cachedSplitBodies = mutableMapOf<String, SplitBody>()
 
-    //region Super Collapsed Block
-    var hasUserClickedTheSuperCollapsedBlock = false
     var shouldMarkThreadAsSeen: Boolean = false
-    private var superCollapsedBlock: MutableSet<String>? = null
-    private var shouldDisplaySuperCollapsedBlock: Boolean? = null
-    //endregion
+
+    var block: SuperCollapsedBlock? = null
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -102,10 +99,8 @@ class ThreadViewModel @Inject constructor(
 
     fun resetMessagesCache() {
         cachedSplitBodies = mutableMapOf()
-        hasUserClickedTheSuperCollapsedBlock = false
         shouldMarkThreadAsSeen = false
-        superCollapsedBlock = null
-        shouldDisplaySuperCollapsedBlock = null
+        block = null
     }
 
     fun reassignThreadLive(threadUid: String) {
@@ -129,13 +124,13 @@ class ThreadViewModel @Inject constructor(
         threadUid: String,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
+        if (block == null) block = SuperCollapsedBlock()
+
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
         val thread = messages.firstOrNull()?.threads?.firstOrNull { it.uid == threadUid } ?: return items to messagesToFetch
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
-        shouldDisplaySuperCollapsedBlock = shouldSuperCollapsedBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
-        val shouldCreateSuperCollapsedBlock = shouldDisplaySuperCollapsedBlock == true && superCollapsedBlock == null
-        if (shouldCreateSuperCollapsedBlock) superCollapsedBlock = mutableSetOf()
+        block!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
 
         suspend fun addMessage(message: Message) {
             splitBody(message).let {
@@ -144,13 +139,13 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        suspend fun mapListWithNewSuperCollapsedBlock() {
+        suspend fun mapListWithNewBlock() {
             messages.forEachIndexed { index, message ->
                 when (index) {
                     0 -> addMessage(message) // First Message
-                    in 1..<firstIndexAfterBlock -> superCollapsedBlock!!.add(message.uid) // All Messages that should go in block
+                    in 1..<firstIndexAfterBlock -> block!!.messagesUids.add(message.uid) // All Messages that should go in block
                     firstIndexAfterBlock -> { // First Message not in block
-                        items += SuperCollapsedBlock(superCollapsedBlock!!)
+                        items += block!!
                         addMessage(message.apply { shouldHideDivider = true })
                     }
                     else -> addMessage(message) // All following Messages
@@ -158,20 +153,20 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        suspend fun mapListWithExistingSuperCollapsedBlock() {
+        suspend fun mapListWithExistingBlock() {
 
             var isStillInBlock = true
-            val previousBlock = superCollapsedBlock!!.toSet()
+            val previousBlock = block!!.messagesUids.toSet()
 
-            superCollapsedBlock!!.clear()
+            block!!.messagesUids.clear()
 
             messages.forEachIndexed { index, message ->
                 when {
                     index == 0 -> addMessage(message) // First Message
-                    previousBlock.contains(message.uid) && isStillInBlock -> superCollapsedBlock!!.add(message.uid) // All Messages already in block
+                    previousBlock.contains(message.uid) && isStillInBlock -> block!!.messagesUids.add(message.uid) // All Messages already in block
                     !previousBlock.contains(message.uid) && isStillInBlock -> { // First Message not in block
                         isStillInBlock = false
-                        items += SuperCollapsedBlock(superCollapsedBlock!!)
+                        items += block!!
                         addMessage(message.apply { shouldHideDivider = true })
                     }
                     else -> addMessage(message) // All following Messages
@@ -183,8 +178,8 @@ class ThreadViewModel @Inject constructor(
             messages.forEach { addMessage(it) }
         }
 
-        if (shouldDisplaySuperCollapsedBlock == true) {
-            if (shouldCreateSuperCollapsedBlock) mapListWithNewSuperCollapsedBlock() else mapListWithExistingSuperCollapsedBlock()
+        if (block!!.shouldBeDisplayed) {
+            if (block!!.isFirstTime()) mapListWithNewBlock() else mapListWithExistingBlock()
         } else {
             mapFullList()
         }
@@ -206,15 +201,14 @@ class ThreadViewModel @Inject constructor(
      * - The 1st Message will always be displayed.
      * - The last 2 Messages will always be displayed.
      * - If there's any unread Message in between, it will be displayed (hence, all following Messages will be displayed too).
-     * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the SuperCollapsedBlock.
+     * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the Block.
      */
-    private fun shouldSuperCollapsedBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean {
+    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean {
 
-        if (shouldDisplaySuperCollapsedBlock == false) return false
-
-        return messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
-                firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT && // At least 2 Messages in the SuperCollapsedBlock
-                !hasUserClickedTheSuperCollapsedBlock // SuperCollapsedBlock hasn't been expanded by the user
+        return block?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
+                block?.hasBeenClicked == false && // Block hasn't been expanded by the user
+                messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
+                firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
     }
 
     private suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {

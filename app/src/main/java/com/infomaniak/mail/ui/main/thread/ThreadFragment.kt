@@ -592,7 +592,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun expandSuperCollapsedBlock() = with(threadViewModel) {
-        hasUserClickedTheSuperCollapsedBlock = true
+        block?.hasBeenClicked = true
         reassignMessagesLive(twoPaneViewModel.currentThreadUid.value!!)
     }
 
