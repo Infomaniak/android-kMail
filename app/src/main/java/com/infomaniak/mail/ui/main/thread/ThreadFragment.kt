@@ -364,6 +364,11 @@ class ThreadFragment : Fragment() {
         messagesLive.observe(viewLifecycleOwner) { (items, messagesToFetch) ->
             SentryLog.i("UI", "Received ${items.count()} messages")
 
+            if (shouldMarkThreadAsSeen) {
+                shouldMarkThreadAsSeen = false
+                markThreadAsSeen()
+            }
+
             if (items.isEmpty()) {
                 mainViewModel.deletedMessages.value = deletedMessagesUids
                 twoPaneViewModel.closeThread()

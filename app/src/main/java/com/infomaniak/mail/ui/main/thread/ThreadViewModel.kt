@@ -88,7 +88,7 @@ class ThreadViewModel @Inject constructor(
 
     //region Super Collapsed Block
     var hasUserClickedTheSuperCollapsedBlock = false
-    private var hasMarkedThreadAsSeen: Boolean = false
+    var shouldMarkThreadAsSeen: Boolean = false
     private var superCollapsedBlock: MutableSet<String>? = null
     private var shouldDisplaySuperCollapsedBlock: Boolean? = null
     //endregion
@@ -103,7 +103,7 @@ class ThreadViewModel @Inject constructor(
     fun resetMessagesCache() {
         cachedSplitBodies = mutableMapOf()
         hasUserClickedTheSuperCollapsedBlock = false
-        hasMarkedThreadAsSeen = false
+        shouldMarkThreadAsSeen = false
         superCollapsedBlock = null
         shouldDisplaySuperCollapsedBlock = null
     }
@@ -189,11 +189,6 @@ class ThreadViewModel @Inject constructor(
             mapFullList()
         }
 
-        if (thread.unseenMessagesCount > 0 && !hasMarkedThreadAsSeen) {
-            hasMarkedThreadAsSeen = true
-            sharedUtils.markAsSeen(mailbox, listOf(thread))
-        }
-
         return items to messagesToFetch
     }
 
@@ -255,7 +250,13 @@ class ThreadViewModel @Inject constructor(
             isThemeTheSameMap[message.uid] = true
         }
 
+        shouldMarkThreadAsSeen = thread.unseenMessagesCount > 0
+
         emit(OpenThreadResult(thread, isExpandedMap, initialSetOfExpandedMessagesUids, isThemeTheSameMap))
+    }
+
+    fun markThreadAsSeen() = viewModelScope.launch(ioCoroutineContext) {
+        threadLive.value?.let { sharedUtils.markAsSeen(mailbox, listOf(it)) }
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
