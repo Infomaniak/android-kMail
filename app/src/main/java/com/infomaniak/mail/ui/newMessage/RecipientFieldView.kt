@@ -357,7 +357,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
     ) {
 
-        val margin = context.resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding).toPx()
+        val margin = context.resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
         val divider = DividerItemDecorator(InsetDrawable(UiUtils.dividerDrawable(context), margin, 0, margin, 0))
 
         autoCompletedContacts = autoComplete
