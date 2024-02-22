@@ -124,7 +124,7 @@ class ThreadViewModel @Inject constructor(
         threadUid: String,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
-        if (superCollapsedBlock == null) superCollapsedBlock = SuperCollapsedBlock()
+        superCollapsedBlock = superCollapsedBlock ?: SuperCollapsedBlock()
 
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
