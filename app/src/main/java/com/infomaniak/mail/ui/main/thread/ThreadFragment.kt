@@ -313,7 +313,7 @@ class ThreadFragment : Fragment() {
 
         twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
 
-            resetMessagesCache()
+            resetMessagesRelatedCache()
             displayThreadView()
 
             openThread(threadUid).observe(viewLifecycleOwner) { result ->

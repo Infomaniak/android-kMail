@@ -75,8 +75,10 @@ class ThreadViewModel @Inject constructor(
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
+    //region Calendar Events
     private val treatedMessagesForCalendarEvent = mutableSetOf<String>()
     val isCalendarEventExpandedMap = mutableMapOf<String, Boolean>()
+    //endregion
 
     var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
@@ -84,7 +86,7 @@ class ThreadViewModel @Inject constructor(
     val threadLive = MutableLiveData<Thread?>()
     val messagesLive = MutableLiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>()
 
-    private var cachedSplitBodies = mutableMapOf<String, SplitBody>()
+    private val cachedSplitBodies = mutableMapOf<String, SplitBody>()
 
     var shouldMarkThreadAsSeen: Boolean = false
 
@@ -97,8 +99,10 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    fun resetMessagesCache() {
-        cachedSplitBodies = mutableMapOf()
+    fun resetMessagesRelatedCache() {
+        treatedMessagesForCalendarEvent.clear()
+        isCalendarEventExpandedMap.clear()
+        cachedSplitBodies.clear()
         shouldMarkThreadAsSeen = false
         superCollapsedBlock = null
     }
@@ -393,8 +397,6 @@ class ThreadViewModel @Inject constructor(
             }
         }
     }
-
-    fun getCalendarEventTreatedMessageCount(): Int = treatedMessagesForCalendarEvent.count()
 
     fun replyToCalendarEvent(attendanceState: AttendanceState, message: Message) = liveData(ioCoroutineContext) {
         val calendarEventResponse = message.latestCalendarEventResponse!!
