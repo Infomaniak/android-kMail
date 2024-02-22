@@ -99,7 +99,7 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    fun resetMessagesCache() {
+    fun resetMessagesRelatedCache() {
         treatedMessagesForCalendarEvent.clear()
         isCalendarEventExpandedMap.clear()
         cachedSplitBodies.clear()
