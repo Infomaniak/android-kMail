@@ -88,7 +88,7 @@ class ThreadViewModel @Inject constructor(
 
     var shouldMarkThreadAsSeen: Boolean = false
 
-    var block: SuperCollapsedBlock? = null
+    var superCollapsedBlock: SuperCollapsedBlock? = null
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -100,7 +100,7 @@ class ThreadViewModel @Inject constructor(
     fun resetMessagesCache() {
         cachedSplitBodies = mutableMapOf()
         shouldMarkThreadAsSeen = false
-        block = null
+        superCollapsedBlock = null
     }
 
     fun reassignThreadLive(threadUid: String) {
@@ -124,13 +124,13 @@ class ThreadViewModel @Inject constructor(
         threadUid: String,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
-        if (block == null) block = SuperCollapsedBlock()
+        if (superCollapsedBlock == null) superCollapsedBlock = SuperCollapsedBlock()
 
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
         val thread = messages.firstOrNull()?.threads?.firstOrNull { it.uid == threadUid } ?: return items to messagesToFetch
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
-        block!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
+        superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
 
         suspend fun addMessage(message: Message) {
             splitBody(message).let {
@@ -142,13 +142,19 @@ class ThreadViewModel @Inject constructor(
         suspend fun mapListWithNewBlock() {
             messages.forEachIndexed { index, message ->
                 when (index) {
-                    0 -> addMessage(message) // First Message
-                    in 1..<firstIndexAfterBlock -> block!!.messagesUids.add(message.uid) // All Messages that should go in block
+                    0 -> { // First Message
+                        addMessage(message)
+                    }
+                    in 1..<firstIndexAfterBlock -> { // All Messages that should go in block
+                        superCollapsedBlock!!.messagesUids.add(message.uid)
+                    }
                     firstIndexAfterBlock -> { // First Message not in block
-                        items += block!!
+                        items += superCollapsedBlock!!
                         addMessage(message.apply { shouldHideDivider = true })
                     }
-                    else -> addMessage(message) // All following Messages
+                    else -> { // All following Messages
+                        addMessage(message)
+                    }
                 }
             }
         }
@@ -156,20 +162,26 @@ class ThreadViewModel @Inject constructor(
         suspend fun mapListWithExistingBlock() {
 
             var isStillInBlock = true
-            val previousBlock = block!!.messagesUids.toSet()
+            val previousBlock = superCollapsedBlock!!.messagesUids.toSet()
 
-            block!!.messagesUids.clear()
+            superCollapsedBlock!!.messagesUids.clear()
 
             messages.forEachIndexed { index, message ->
                 when {
-                    index == 0 -> addMessage(message) // First Message
-                    previousBlock.contains(message.uid) && isStillInBlock -> block!!.messagesUids.add(message.uid) // All Messages already in block
+                    index == 0 -> { // First Message
+                        addMessage(message)
+                    }
+                    previousBlock.contains(message.uid) && isStillInBlock -> { // All Messages already in block
+                        superCollapsedBlock!!.messagesUids.add(message.uid)
+                    }
                     !previousBlock.contains(message.uid) && isStillInBlock -> { // First Message not in block
                         isStillInBlock = false
-                        items += block!!
+                        items += superCollapsedBlock!!
                         addMessage(message.apply { shouldHideDivider = true })
                     }
-                    else -> addMessage(message) // All following Messages
+                    else -> { // All following Messages
+                        addMessage(message)
+                    }
                 }
             }
         }
@@ -178,8 +190,8 @@ class ThreadViewModel @Inject constructor(
             messages.forEach { addMessage(it) }
         }
 
-        if (block!!.shouldBeDisplayed) {
-            if (block!!.isFirstTime()) mapListWithNewBlock() else mapListWithExistingBlock()
+        if (superCollapsedBlock!!.shouldBeDisplayed) {
+            if (superCollapsedBlock!!.isFirstTime()) mapListWithNewBlock() else mapListWithExistingBlock()
         } else {
             mapFullList()
         }
@@ -205,8 +217,8 @@ class ThreadViewModel @Inject constructor(
      */
     private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean {
 
-        return block?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
-                block?.hasBeenClicked == false && // Block hasn't been expanded by the user
+        return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
+                superCollapsedBlock?.hasBeenClicked == false && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
     }
