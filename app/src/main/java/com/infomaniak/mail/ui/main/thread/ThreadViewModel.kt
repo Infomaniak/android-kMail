@@ -134,7 +134,8 @@ class ThreadViewModel @Inject constructor(
         val thread = messages.firstOrNull()?.threads?.firstOrNull { it.uid == threadUid } ?: return items to messagesToFetch
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
         shouldDisplaySuperCollapsedBlock = shouldSuperCollapsedBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
-        val shouldCreateSuperCollapsedBlock = shouldSuperCollapsedBlockBeCreated()
+        val shouldCreateSuperCollapsedBlock = shouldDisplaySuperCollapsedBlock == true && superCollapsedBlock == null
+        if (shouldCreateSuperCollapsedBlock) superCollapsedBlock = mutableSetOf()
 
         suspend fun addMessage(message: Message) {
             splitBody(message).let {
@@ -219,12 +220,6 @@ class ThreadViewModel @Inject constructor(
         return messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT && // At least 2 Messages in the SuperCollapsedBlock
                 !hasUserClickedTheSuperCollapsedBlock // SuperCollapsedBlock hasn't been expanded by the user
-    }
-
-    private fun shouldSuperCollapsedBlockBeCreated(): Boolean {
-        return (shouldDisplaySuperCollapsedBlock == true && superCollapsedBlock == null).also {
-            if (it) superCollapsedBlock = mutableSetOf()
-        }
     }
 
     private suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
