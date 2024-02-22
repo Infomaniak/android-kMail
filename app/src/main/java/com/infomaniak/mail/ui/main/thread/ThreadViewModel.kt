@@ -34,19 +34,25 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.context
 import com.infomaniak.mail.utils.extensions.getUids
+import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.query.RealmResults
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.collections.set
+
+typealias ThreadAdapterItems = List<Any>
+typealias MessagesWithoutHeavyData = List<Message>
 
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
@@ -76,7 +82,13 @@ class ThreadViewModel @Inject constructor(
     val failedMessagesUids = SingleLiveEvent<List<String>>()
 
     val threadLive = MutableLiveData<Thread?>()
-    val messagesLive = MutableLiveData<List<Message>>()
+    val messagesLive = MutableLiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>()
+
+    private var cachedSplitBodies = mutableMapOf<String, SplitBody>()
+
+    var shouldMarkThreadAsSeen: Boolean = false
+
+    var superCollapsedBlock: SuperCollapsedBlock? = null
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -84,6 +96,12 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
+
+    fun resetMessagesCache() {
+        cachedSplitBodies = mutableMapOf()
+        shouldMarkThreadAsSeen = false
+        superCollapsedBlock = null
+    }
 
     fun reassignThreadLive(threadUid: String) {
         threadLiveJob?.cancel()
@@ -95,27 +113,128 @@ class ThreadViewModel @Inject constructor(
     fun reassignMessagesLive(threadUid: String) {
         messagesLiveJob?.cancel()
         messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
-
-            val cachedSplitBodies = mutableMapOf<String, SplitBody>()
-
-            suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
-                if (message.body == null) return@withContext message
-
-                message.apply {
-                    body?.let {
-                        val isNotAlreadySplit = !cachedSplitBodies.contains(message.uid)
-                        if (isNotAlreadySplit) cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                        splitBody = cachedSplitBodies[message.uid]
-                    }
-                }
-
-                return@withContext message
-            }
-
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-                ?.map { results -> results.list.map { splitBody(it) } }
+                ?.map { mapRealmMessagesResult(it.list, threadUid) }
                 ?.collect(messagesLive::postValue)
         }
+    }
+
+    private suspend fun mapRealmMessagesResult(
+        messages: RealmResults<Message>,
+        threadUid: String,
+    ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+
+        superCollapsedBlock = superCollapsedBlock ?: SuperCollapsedBlock()
+
+        val items = mutableListOf<Any>()
+        val messagesToFetch = mutableListOf<Message>()
+        val thread = messages.firstOrNull()?.threads?.firstOrNull { it.uid == threadUid } ?: return items to messagesToFetch
+        val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
+        superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
+
+        suspend fun addMessage(message: Message) {
+            splitBody(message).let {
+                items += it
+                if (!it.isFullyDownloaded()) messagesToFetch += it
+            }
+        }
+
+        suspend fun mapListWithNewBlock() {
+            messages.forEachIndexed { index, message ->
+                when (index) {
+                    0 -> { // First Message
+                        addMessage(message)
+                    }
+                    in 1..<firstIndexAfterBlock -> { // All Messages that should go in block
+                        superCollapsedBlock!!.messagesUids.add(message.uid)
+                    }
+                    firstIndexAfterBlock -> { // First Message not in block
+                        items += superCollapsedBlock!!
+                        addMessage(message.apply { shouldHideDivider = true })
+                    }
+                    else -> { // All following Messages
+                        addMessage(message)
+                    }
+                }
+            }
+        }
+
+        suspend fun mapListWithExistingBlock() {
+
+            var isStillInBlock = true
+            val previousBlock = superCollapsedBlock!!.messagesUids.toSet()
+
+            superCollapsedBlock!!.messagesUids.clear()
+
+            messages.forEachIndexed { index, message ->
+                when {
+                    index == 0 -> { // First Message
+                        addMessage(message)
+                    }
+                    previousBlock.contains(message.uid) && isStillInBlock -> { // All Messages already in block
+                        superCollapsedBlock!!.messagesUids.add(message.uid)
+                    }
+                    !previousBlock.contains(message.uid) && isStillInBlock -> { // First Message not in block
+                        isStillInBlock = false
+                        items += superCollapsedBlock!!
+                        addMessage(message.apply { shouldHideDivider = true })
+                    }
+                    else -> { // All following Messages
+                        addMessage(message)
+                    }
+                }
+            }
+        }
+
+        suspend fun mapFullList() {
+            messages.forEach { addMessage(it) }
+        }
+
+        if (superCollapsedBlock!!.shouldBeDisplayed) {
+            if (superCollapsedBlock!!.isFirstTime()) mapListWithNewBlock() else mapListWithExistingBlock()
+        } else {
+            mapFullList()
+        }
+
+        return items to messagesToFetch
+    }
+
+    private fun computeFirstIndexAfterBlock(thread: Thread, list: RealmResults<Message>): Int {
+
+        val firstDefaultIndex = list.count() - 2
+        val firstUnreadIndex = if (thread.unseenMessagesCount > 0) list.indexOfFirstOrNull { !it.isSeen } else null
+        val notNullFirstUnreadIndex = firstUnreadIndex ?: firstDefaultIndex
+
+        return minOf(notNullFirstUnreadIndex, firstDefaultIndex)
+    }
+
+    /**
+     * Before trying to create the SuperCollapsedBlock, we need these required Messages that will be displayed:
+     * - The 1st Message will always be displayed.
+     * - The last 2 Messages will always be displayed.
+     * - If there's any unread Message in between, it will be displayed (hence, all following Messages will be displayed too).
+     * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the Block.
+     */
+    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean {
+
+        return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
+                superCollapsedBlock?.hasBeenClicked == false && // Block hasn't been expanded by the user
+                messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
+                firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
+    }
+
+    private suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
+        if (message.body == null) return@withContext message
+
+        message.apply {
+            body?.let {
+                val isNotAlreadySplit = !cachedSplitBodies.contains(message.uid)
+                if (isNotAlreadySplit) cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
+                splitBody = cachedSplitBodies[message.uid]
+            }
+        }
+
+        return@withContext message
     }
 
     fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
@@ -137,9 +256,13 @@ class ThreadViewModel @Inject constructor(
             isThemeTheSameMap[message.uid] = true
         }
 
-        emit(OpenThreadResult(thread, isExpandedMap, initialSetOfExpandedMessagesUids, isThemeTheSameMap))
+        shouldMarkThreadAsSeen = thread.unseenMessagesCount > 0
 
-        if (thread.unseenMessagesCount > 0) sharedUtils.markAsSeen(mailbox, listOf(thread))
+        emit(OpenThreadResult(thread, isExpandedMap, initialSetOfExpandedMessagesUids, isThemeTheSameMap))
+    }
+
+    fun markThreadAsSeen() = viewModelScope.launch(ioCoroutineContext) {
+        threadLive.value?.let { sharedUtils.markAsSeen(mailbox, listOf(it)) }
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
@@ -218,11 +341,11 @@ class ThreadViewModel @Inject constructor(
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
-    fun fetchCalendarEvents(messages: List<Message>, forceFetch: Boolean = false) {
+    fun fetchCalendarEvents(items: List<Any>, forceFetch: Boolean = false) {
         fetchCalendarEventJob?.cancel()
         fetchCalendarEventJob = viewModelScope.launch(ioCoroutineContext) {
             mailboxContentRealm().writeBlocking {
-                messages.forEach { message -> fetchCalendarEvent(message, forceFetch) }
+                items.forEach { item -> if (item is Message) fetchCalendarEvent(item, forceFetch) }
             }
         }
     }
@@ -304,4 +427,9 @@ class ThreadViewModel @Inject constructor(
         val message: Message,
         val menuId: Int,
     )
+
+    companion object {
+        private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
+        private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
+    }
 }

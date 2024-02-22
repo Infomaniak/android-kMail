@@ -608,3 +608,8 @@ fun ViewPager2.removeOverScrollForApiBelow31() {
         (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 }
+
+fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean): Int? {
+    val index = indexOfFirst(predicate)
+    return if (index == -1) null else index
+}

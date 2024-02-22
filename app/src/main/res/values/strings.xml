@@ -498,6 +498,7 @@
     <string name="spamFolder">Spam</string>
     <string name="startActivityCantHandleAction">No application has been found to handle this action</string>
     <string name="subjectTitle">Subject:</string>
+    <string name="superCollapsedBlock">See all (%d)</string>
     <string name="syncCalendarsAndContactsDescription">View your contacts and calendar directly from your device.</string>
     <string name="syncCalendarsAndContactsTitle">Calendar and contact synchronization</string>
     <string name="syncFragmentTitle">Synchronize your calendars and contacts</string>

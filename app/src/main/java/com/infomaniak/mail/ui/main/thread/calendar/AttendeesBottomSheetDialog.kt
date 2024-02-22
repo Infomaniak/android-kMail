@@ -48,9 +48,8 @@ class AttendeesBottomSheetDialog : BottomSheetDialogFragment() {
         root.title = context.getString(R.string.attendeesListTitle, attendees.count())
         attendeeRecyclerView.adapter = AttendeesAdapter(attendees)
 
-        val dividerItemDecorator = DividerItemDecorator(
-            InsetDrawable(UiUtils.dividerDrawable(context), 16.toPx(), 0, 16.toPx(), 0)
-        )
-        attendeeRecyclerView.addItemDecoration(dividerItemDecorator)
+        val margin = context.resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
+        val divider = DividerItemDecorator(InsetDrawable(UiUtils.dividerDrawable(context), margin, 0, margin, 0))
+        attendeeRecyclerView.addItemDecoration(divider)
     }
 }

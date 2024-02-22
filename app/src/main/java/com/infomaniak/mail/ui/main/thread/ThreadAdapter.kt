@@ -33,7 +33,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.recyclerview.widget.RecyclerView.*
+import androidx.viewbinding.ViewBinding
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.context
@@ -45,8 +46,9 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.databinding.ItemMessageBinding
-import com.infomaniak.mail.ui.main.thread.ThreadAdapter.MessageViewHolder
+import com.infomaniak.mail.data.models.message.Message.*
+import com.infomaniak.mail.databinding.*
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
@@ -70,9 +72,9 @@ class ThreadAdapter(
     private val isForPrinting: Boolean = false,
     private val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf(),
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
-) : ListAdapter<Message, MessageViewHolder>(MessageDiffCallback()) {
+) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
 
-    inline val messages: MutableList<Message> get() = currentList
+    inline val items: MutableList<Any> get() = currentList
 
     var isExpandedMap = mutableMapOf<String, Boolean>()
 
@@ -105,50 +107,87 @@ class ThreadAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { messages.count() }.getOrDefault(0)
+    override fun getItemCount(): Int = runCatchingRealm { items.count() }.getOrDefault(0)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        return MessageViewHolder(
-            ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            shouldLoadDistantResources,
-            threadAdapterCallbacks?.onContactClicked,
-            threadAdapterCallbacks?.onAttachmentClicked,
-            threadAdapterCallbacks?.onAttachmentOptionsClicked,
-        )
+    override fun getItemViewType(position: Int): Int = runCatchingRealm {
+        return when (items[position]) {
+            is Message -> DisplayType.MAIL.layout
+            else -> DisplayType.SUPER_COLLAPSED_BLOCK.layout
+        }
+    }.getOrDefault(super.getItemViewType(position))
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadAdapterViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        return if (viewType == DisplayType.MAIL.layout) {
+            MessageViewHolder(
+                ItemMessageBinding.inflate(layoutInflater, parent, false),
+                shouldLoadDistantResources,
+                threadAdapterCallbacks?.onContactClicked,
+                threadAdapterCallbacks?.onAttachmentClicked,
+                threadAdapterCallbacks?.onAttachmentOptionsClicked,
+            )
+        } else {
+            SuperCollapsedBlockViewHolder(ItemSuperCollapsedBlockBinding.inflate(layoutInflater, parent, false))
+        }
     }
 
-    override fun onBindViewHolder(holder: MessageViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-        with(holder.binding) {
-            val payload = payloads.firstOrNull()
-            if (payload !is NotifyType) {
-                super.onBindViewHolder(holder, position, payloads)
-                return@runCatchingRealm
-            }
+    override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
 
-            val message = messages[position]
+        val payload = payloads.firstOrNull()
+        if (payload !is NotifyType) {
+            super.onBindViewHolder(holder, position, payloads)
+            return@runCatchingRealm
+        }
 
+        val item = items[position]
+        if (item is Message && holder is MessageViewHolder) with(holder.binding) {
             when (payload) {
                 NotifyType.TOGGLE_LIGHT_MODE -> {
-                    isThemeTheSameMap[message.uid] = !isThemeTheSameMap[message.uid]!!
-                    holder.toggleContentAndQuoteTheme(message.uid)
+                    isThemeTheSameMap[item.uid] = !isThemeTheSameMap[item.uid]!!
+                    holder.toggleContentAndQuoteTheme(item.uid)
                 }
                 NotifyType.RE_RENDER -> reloadVisibleWebView()
                 NotifyType.FAILED_MESSAGE -> {
                     messageLoader.isGone = true
                     failedLoadingErrorMessage.isVisible = true
-                    if (isExpandedMap[message.uid] == true) onExpandedMessageLoaded(message.uid)
+                    if (isExpandedMap[item.uid] == true) onExpandedMessageLoaded(item.uid)
                 }
                 NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> {
-                    val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees ?: emptyList()
+                    val attendees = item.latestCalendarEventResponse?.calendarEvent?.attendees ?: emptyList()
                     holder.binding.calendarEvent.onlyUpdateAttendance(attendees)
                 }
             }
         }
     }.getOrDefault(Unit)
 
-    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) = with(holder) {
-        val message = messages[position]
+    override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {
 
+        val item = items[position]
+
+        holder.binding.root.tag = if (item is SuperCollapsedBlock || (item is Message && item.shouldHideDivider)) {
+            IGNORE_DIVIDER_TAG
+        } else {
+            null
+        }
+
+        if (item is Message) {
+            (holder as MessageViewHolder).bindMail(item, position)
+        } else {
+            (holder as SuperCollapsedBlockViewHolder).bindSuperCollapsedBlock(item as SuperCollapsedBlock)
+        }
+    }
+
+    private fun SuperCollapsedBlockViewHolder.bindSuperCollapsedBlock(
+        item: SuperCollapsedBlock,
+    ) = with(binding.superCollapsedBlock) {
+        text = context.getString(R.string.superCollapsedBlock, item.messagesUids.count())
+        setOnClickListener {
+            text = context.getString(R.string.loadingText)
+            threadAdapterCallbacks?.onSuperCollapsedBlockClicked?.invoke()
+        }
+    }
+
+    private fun MessageViewHolder.bindMail(message: Message, position: Int) {
         initMapForNewMessage(message, position)
 
         bindHeader(message)
@@ -197,7 +236,7 @@ class ThreadAdapter(
 
     private fun initMapForNewMessage(message: Message, position: Int) {
         if (isExpandedMap[message.uid] == null) {
-            isExpandedMap[message.uid] = message.shouldBeExpanded(position, messages.lastIndex)
+            isExpandedMap[message.uid] = message.shouldBeExpanded(position, items.lastIndex)
         }
 
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
@@ -255,7 +294,7 @@ class ThreadAdapter(
     private fun WebView.processMailDisplay(styledBody: String, uid: String, isForPrinting: Boolean): String {
         val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true && !isForPrinting
         return if (isForPrinting) {
-            webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, messages.first()))
+            webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, items.first() as Message))
         } else {
             webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark)
         }
@@ -534,7 +573,7 @@ class ThreadAdapter(
     fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessageUids.contains(messageUid)
 
     fun toggleLightMode(message: Message) {
-        val index = messages.indexOf(message)
+        val index = items.indexOf(message)
         notifyItemChanged(index, NotifyType.TOGGLE_LIGHT_MODE)
     }
 
@@ -544,7 +583,7 @@ class ThreadAdapter(
 
     fun updateFailedMessages(uids: List<String>) {
         uids.forEach { uid ->
-            val index = messages.indexOfFirst { it.uid == uid }
+            val index = items.indexOfFirst { it is Message && it.uid == uid }
             notifyItemChanged(index, NotifyType.FAILED_MESSAGE)
         }
     }
@@ -554,7 +593,7 @@ class ThreadAdapter(
     }
 
     fun undoUserAttendanceClick(message: Message) {
-        val indexOfMessage = messages.indexOfFirst { it.uid == message.uid }.takeIf { it >= 0 }
+        val indexOfMessage = items.indexOfFirst { it is Message && it.uid == message.uid }.takeIf { it >= 0 }
         indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
     }
 
@@ -571,34 +610,53 @@ class ThreadAdapter(
         PHONE,
     }
 
-    class MessageDiffCallback : DiffUtil.ItemCallback<Message>() {
-        override fun areItemsTheSame(oldMessage: Message, newMessage: Message): Boolean {
-            return oldMessage.uid == newMessage.uid
+    class MessageDiffCallback : DiffUtil.ItemCallback<Any>() {
+
+        override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+            return when (oldItem) {
+                is Message -> newItem is Message && newItem.uid == oldItem.uid
+                is SuperCollapsedBlock -> newItem is SuperCollapsedBlock
+                else -> false
+            }
         }
 
-        override fun areContentsTheSame(oldMessage: Message, newMessage: Message): Boolean {
-            return areMessageContentsTheSameExceptCalendar(oldMessage, newMessage) &&
-                    newMessage.latestCalendarEventResponse == oldMessage.latestCalendarEventResponse
+        override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+            return when (oldItem) {
+                is Message -> {
+                    newItem is Message &&
+                            areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
+                            newItem.latestCalendarEventResponse == oldItem.latestCalendarEventResponse
+                }
+                is SuperCollapsedBlock -> {
+                    newItem is SuperCollapsedBlock &&
+                            newItem.messagesUids.count() == oldItem.messagesUids.count()
+                }
+                else -> false
+            }
         }
 
-        override fun getChangePayload(oldItem: Message, newItem: Message): Any? {
+        override fun getChangePayload(oldItem: Any, newItem: Any): Any? {
+
+            if (oldItem !is Message || newItem !is Message) return null
+
             // If everything but Attendees is the same, then we know the only thing that could've changed is Attendees.
             return if (everythingButAttendeesIsTheSame(oldItem, newItem)) NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE else null
         }
 
         companion object {
-            fun everythingButAttendeesIsTheSame(oldItem: Message, newItem: Message): Boolean {
-                val newCalendarEventResponse = newItem.latestCalendarEventResponse
-                val oldCalendarEventResponse = oldItem.latestCalendarEventResponse
+            fun everythingButAttendeesIsTheSame(oldMessage: Message, newMessage: Message): Boolean {
+                val newCalendarEventResponse = newMessage.latestCalendarEventResponse
+                val oldCalendarEventResponse = oldMessage.latestCalendarEventResponse
 
-                return (areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
+                return (areMessageContentsTheSameExceptCalendar(oldMessage, newMessage) &&
                         !(newCalendarEventResponse == null && oldCalendarEventResponse == null)
                         && newCalendarEventResponse?.everythingButAttendeesIsTheSame(oldCalendarEventResponse) == true)
             }
 
             private fun areMessageContentsTheSameExceptCalendar(oldMessage: Message, newMessage: Message): Boolean {
                 return newMessage.body?.value == oldMessage.body?.value &&
-                        newMessage.splitBody == oldMessage.splitBody
+                        newMessage.splitBody == oldMessage.splitBody &&
+                        newMessage.shouldHideDivider == oldMessage.shouldHideDivider
             }
         }
     }
@@ -614,6 +672,7 @@ class ThreadAdapter(
         var onReplyClicked: ((Message) -> Unit)? = null,
         var onMenuClicked: ((Message) -> Unit)? = null,
         var onAllExpandedMessagesLoaded: (() -> Unit)? = null,
+        var onSuperCollapsedBlockClicked: (() -> Unit)? = null,
         var navigateToNewMessageActivity: ((Uri) -> Unit)? = null,
         var navigateToAttendeeBottomSheet: ((List<Attendee>) -> Unit)? = null,
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
@@ -621,13 +680,32 @@ class ThreadAdapter(
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
     )
 
-    class MessageViewHolder(
-        val binding: ItemMessageBinding,
+    private enum class DisplayType(val layout: Int) {
+        MAIL(R.layout.item_message),
+        SUPER_COLLAPSED_BLOCK(R.layout.item_super_collapsed_block),
+    }
+
+    data class SuperCollapsedBlock(
+        var shouldBeDisplayed: Boolean = true,
+        var hasBeenClicked: Boolean = false,
+        val messagesUids: MutableSet<String> = mutableSetOf(),
+    ) {
+        fun isFirstTime() = shouldBeDisplayed && messagesUids.isEmpty()
+    }
+
+    abstract class ThreadAdapterViewHolder(open val binding: ViewBinding) : ViewHolder(binding.root)
+
+    private class SuperCollapsedBlockViewHolder(
+        override val binding: ItemSuperCollapsedBlockBinding,
+    ) : ThreadAdapterViewHolder(binding)
+
+    private class MessageViewHolder(
+        override val binding: ItemMessageBinding,
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
         onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?,
-    ) : ViewHolder(binding.root) {
+    ) : ThreadAdapterViewHolder(binding) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
@@ -696,6 +774,8 @@ class ThreadAdapter(
     }
 
     companion object {
+
+        const val IGNORE_DIVIDER_TAG = "ignoreDividerTag"
 
         private val contextMenuTypeForHitTestResultType = mapOf(
             HitTestResult.PHONE_TYPE to ContextMenuType.PHONE,

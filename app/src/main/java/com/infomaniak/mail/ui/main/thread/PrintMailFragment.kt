@@ -30,6 +30,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentPrintMailBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,8 +56,8 @@ class PrintMailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(threadViewModel) {
         super.onViewCreated(view, savedInstanceState)
         setupAdapter()
-        messagesLive.observe(viewLifecycleOwner) { messages ->
-            threadAdapter.submitList(messages.filter { it.uid == navigationArgs.messageUid })
+        messagesLive.observe(viewLifecycleOwner) { (items, _) ->
+            threadAdapter.submitList(items.filter { it is Message && it.uid == navigationArgs.messageUid })
         }
         navigationArgs.openThreadUid?.let {
             reassignThreadLive(it)
