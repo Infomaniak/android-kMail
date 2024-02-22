@@ -118,9 +118,9 @@ class ThreadAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadAdapterViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        return if (viewType == R.layout.item_message) {
+        return if (viewType == DisplayType.MAIL.layout) {
             MessageViewHolder(
-                ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                ItemMessageBinding.inflate(layoutInflater, parent, false),
                 shouldLoadDistantResources,
                 threadAdapterCallbacks?.onContactClicked,
                 threadAdapterCallbacks?.onAttachmentClicked,
