@@ -241,8 +241,8 @@ class MainActivity : BaseActivity() {
 
     private fun observeDraftWorkerResults() {
         WorkerUtils.flushWorkersBefore(context = this, lifecycleOwner = this) {
-            val treatedWorkInfoUuids = mutableSetOf<UUID>()
 
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
             draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
@@ -255,7 +255,6 @@ class MainActivity : BaseActivity() {
             }
 
             val treatedFailedWorkInfoUuids = mutableSetOf<UUID>()
-
             draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(this) {
                 it.forEach { workInfo ->
                     if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach

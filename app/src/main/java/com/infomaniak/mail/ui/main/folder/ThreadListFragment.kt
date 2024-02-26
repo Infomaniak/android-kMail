@@ -102,7 +102,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
-    private var canRefreshThreads = false
+    private var isFirstTimeRefreshingThreads = true
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -234,16 +234,20 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         super.onResume()
         refreshThreadsIfNotificationsAreDisabled()
         updateSwipeActionsAccordingToSettings()
-        canRefreshThreads = true
     }
 
     private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {
-        val areGoogleServicesDisabled = !playServicesUtils.areGooglePlayServicesAvailable()
-        val areAppNotifsDisabled = !notificationManagerCompat.areNotificationsEnabled()
-        val areMailboxNotifsDisabled = currentMailbox.value?.notificationsIsDisabled(notificationManagerCompat) == true
-        val shouldRefreshThreads = areGoogleServicesDisabled || areAppNotifsDisabled || areMailboxNotifsDisabled
 
-        if (shouldRefreshThreads && canRefreshThreads) forceRefreshThreads()
+        if (!isFirstTimeRefreshingThreads) {
+            val areGoogleServicesDisabled = !playServicesUtils.areGooglePlayServicesAvailable()
+            val areAppNotifsDisabled = !notificationManagerCompat.areNotificationsEnabled()
+            val areMailboxNotifsDisabled = currentMailbox.value?.notificationsIsDisabled(notificationManagerCompat) == true
+            val shouldRefreshThreads = areGoogleServicesDisabled || areAppNotifsDisabled || areMailboxNotifsDisabled
+
+            if (shouldRefreshThreads) forceRefreshThreads()
+        }
+
+        isFirstTimeRefreshingThreads = false
     }
 
     private fun updateSwipeActionsAccordingToSettings() = with(binding.threadsList) {
