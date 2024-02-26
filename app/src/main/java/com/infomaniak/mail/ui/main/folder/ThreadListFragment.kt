@@ -234,16 +234,20 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         super.onResume()
         refreshThreadsIfNotificationsAreDisabled()
         updateSwipeActionsAccordingToSettings()
-        canRefreshThreads = true
     }
 
     private fun refreshThreadsIfNotificationsAreDisabled() = with(mainViewModel) {
-        val areGoogleServicesDisabled = !playServicesUtils.areGooglePlayServicesAvailable()
-        val areAppNotifsDisabled = !notificationManagerCompat.areNotificationsEnabled()
-        val areMailboxNotifsDisabled = currentMailbox.value?.notificationsIsDisabled(notificationManagerCompat) == true
-        val shouldRefreshThreads = areGoogleServicesDisabled || areAppNotifsDisabled || areMailboxNotifsDisabled
 
-        if (shouldRefreshThreads && canRefreshThreads) forceRefreshThreads()
+        if (canRefreshThreads) {
+            val areGoogleServicesDisabled = !playServicesUtils.areGooglePlayServicesAvailable()
+            val areAppNotifsDisabled = !notificationManagerCompat.areNotificationsEnabled()
+            val areMailboxNotifsDisabled = currentMailbox.value?.notificationsIsDisabled(notificationManagerCompat) == true
+            val shouldRefreshThreads = areGoogleServicesDisabled || areAppNotifsDisabled || areMailboxNotifsDisabled
+
+            if (shouldRefreshThreads) forceRefreshThreads()
+        }
+
+        canRefreshThreads = true
     }
 
     private fun updateSwipeActionsAccordingToSettings() = with(binding.threadsList) {
