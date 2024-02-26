@@ -26,7 +26,6 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -80,7 +79,6 @@ class MainViewModel @Inject constructor(
     avatarMergedContactData: AvatarMergedContactData,
     private val addressBookController: AddressBookController,
     private val folderController: FolderController,
-    private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
