@@ -661,7 +661,13 @@ class MainViewModel @Inject constructor(
         if (isSeen) {
             markAsUnseen(mailbox, threads, message)
         } else {
-            sharedUtils.markAsSeen(mailbox, threads, message, RefreshCallbacks(::onDownloadStart, ::onDownloadStop))
+            sharedUtils.markAsSeen(
+                mailbox = mailbox,
+                threads = threads,
+                message = message,
+                currentFolderId = currentFolderId,
+                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
+            )
         }
     }
 
@@ -888,7 +894,7 @@ class MainViewModel @Inject constructor(
         destinationFolderId: String? = null,
         callbacks: RefreshCallbacks? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, callbacks)
+        sharedUtils.refreshFolders(mailbox, messagesFoldersIds, destinationFolderId, currentFolderId, callbacks)
     }
 
     private fun onDownloadStart() {
