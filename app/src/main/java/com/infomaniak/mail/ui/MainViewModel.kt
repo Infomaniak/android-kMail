@@ -984,7 +984,6 @@ class MainViewModel @Inject constructor(
                 mailbox = currentMailbox.value!!,
                 folder = folder,
                 realm = mailboxContentRealm(),
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         }
     }
