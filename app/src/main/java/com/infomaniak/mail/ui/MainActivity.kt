@@ -330,10 +330,10 @@ class MainActivity : BaseActivity() {
      * We want to scheduleWork after a delay in the off chance where we came back from NewMessageActivity while an Activity
      * recreation got triggered.
      *
-     * We need to give time to the NewMessageActivity to save the last state of the draft in realm and then scheduleWork on its
-     * own. Not waiting would scheduleWork before NewMessageActivity has time to write to realm and schedule its own worker. This
-     * would result in an attempt to save any temporary draft saved to realm because of saveDraftDebouncing() effectively sending
-     * a second unwanted draft.
+     * We need to give time to the NewMessageActivity to save the last state of the draft in Realm and then scheduleWork on its
+     * own. Not waiting would scheduleWork before NewMessageActivity has time to write to Realm and schedule its own worker. This
+     * would result in an attempt to save any temporary Draft saved to Realm because of saveDraftDebouncing() effectively sending
+     * a second unwanted Draft.
      */
     private fun scheduleDraftActionsWorkWithDelay() = lifecycleScope.launch(Dispatchers.IO) {
         delay(1_000L)
