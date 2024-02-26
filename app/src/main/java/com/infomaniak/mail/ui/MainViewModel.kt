@@ -842,7 +842,6 @@ class MainViewModel @Inject constructor(
                     mailbox = mailbox,
                     messagesFoldersIds = foldersIds,
                     destinationFolderId = destinationFolderId,
-                    callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
                 )
                 R.string.snackbarMoveCancelled
             } else {
