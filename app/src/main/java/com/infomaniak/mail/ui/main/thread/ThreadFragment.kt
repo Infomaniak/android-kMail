@@ -158,6 +158,7 @@ class ThreadFragment : Fragment() {
         mainViewModel.createThreadBackup(
             isExpandedMap = isExpandedMap,
             initialSetOfExpandedMessagesUids = isExpandedMap.filter { it.value }.keys.toMutableSet(),
+            isThemeTheSameMap = isThemeTheSameMap,
         )
 
         super.onStop()

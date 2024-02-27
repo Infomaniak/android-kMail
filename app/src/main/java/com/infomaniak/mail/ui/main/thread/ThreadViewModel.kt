@@ -260,6 +260,7 @@ class ThreadViewModel @Inject constructor(
         if (threadBackup != null) {
             isExpandedMap = threadBackup.isExpandedMapBackup
             initialSetOfExpandedMessagesUids = threadBackup.initialSetOfExpandedMessagesUidsBackup.toMutableSet()
+            isThemeTheSameMap = threadBackup.isThemeTheSameMapBackup
         } else {
             thread.messages.forEachIndexed { index, message ->
                 isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex).also {

@@ -607,6 +607,7 @@ class ThreadAdapter(
     fun useThreadBackup(threadBackup: ThreadBackup) = with(threadBackup) {
         isExpandedMap = isExpandedMapBackup
         initialSetOfExpandedMessagesUids = initialSetOfExpandedMessagesUidsBackup
+        isThemeTheSameMap = isThemeTheSameMapBackup
     }
 
     private enum class NotifyType {

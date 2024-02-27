@@ -212,15 +212,18 @@ class MainViewModel @Inject constructor(
     data class ThreadBackup(
         val isExpandedMapBackup: MutableMap<String, Boolean>,
         val initialSetOfExpandedMessagesUidsBackup: Set<String>,
+        val isThemeTheSameMapBackup: MutableMap<String, Boolean>,
     )
 
     fun createThreadBackup(
         isExpandedMap: MutableMap<String, Boolean>,
         initialSetOfExpandedMessagesUids: Set<String>,
+        isThemeTheSameMap: MutableMap<String, Boolean>,
     ) {
         threadBackup = ThreadBackup(
             isExpandedMap,
             initialSetOfExpandedMessagesUids,
+            isThemeTheSameMap,
         )
     }
 
