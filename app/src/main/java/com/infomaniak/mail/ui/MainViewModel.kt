@@ -206,6 +206,26 @@ class MainViewModel @Inject constructor(
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
     //endregion
 
+    //region Restore Thread state after going to MoveFragment or somewhere else, and then coming back to ThreadFragment.
+    var threadBackup: ThreadBackup? = null
+
+    data class ThreadBackup(
+        // TODO
+    )
+
+    fun createThreadBackup(
+        // TODO
+    ) {
+        threadBackup = ThreadBackup(
+            // TODO
+        )
+    }
+
+    fun deleteThreadBackup() {
+        threadBackup = null
+    }
+    //endregion
+
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Update user info")
         updateAddressBooks()

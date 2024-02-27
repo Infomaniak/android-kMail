@@ -133,13 +133,18 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    fun navigateToThread(thread: Thread) = with(twoPaneViewModel) {
+    fun navigateToThread(thread: Thread) {
         if (thread.isOnlyOneDraft) {
             trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-            openDraft(thread)
+            twoPaneViewModel.openDraft(thread)
         } else {
-            openThread(thread.uid)
+            openThreadAndDeleteBackup(thread.uid)
         }
+    }
+
+    fun openThreadAndDeleteBackup(threadUid: String) {
+        mainViewModel.deleteThreadBackup()
+        twoPaneViewModel.openThread(threadUid)
     }
 
     private fun resetPanes() {

@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.MainViewModel.ThreadBackup
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
@@ -243,7 +244,7 @@ class ThreadViewModel @Inject constructor(
         return@withContext message
     }
 
-    fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
+    fun openThread(threadUid: String, threadBackup: ThreadBackup?) = liveData(ioCoroutineContext) {
 
         val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
@@ -252,14 +253,19 @@ class ThreadViewModel @Inject constructor(
 
         sendMatomoAndSentryAboutThreadMessagesCount(thread)
 
-        val isExpandedMap = mutableMapOf<String, Boolean>()
-        val isThemeTheSameMap = mutableMapOf<String, Boolean>()
-        val initialSetOfExpandedMessagesUids = mutableSetOf<String>()
-        thread.messages.forEachIndexed { index, message ->
-            isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex).also {
-                if (it) initialSetOfExpandedMessagesUids.add(message.uid)
+        var isExpandedMap = mutableMapOf<String, Boolean>()
+        var initialSetOfExpandedMessagesUids = mutableSetOf<String>()
+        var isThemeTheSameMap = mutableMapOf<String, Boolean>()
+
+        if (threadBackup != null) {
+            // TODO
+        } else {
+            thread.messages.forEachIndexed { index, message ->
+                isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex).also {
+                    if (it) initialSetOfExpandedMessagesUids.add(message.uid)
+                }
+                isThemeTheSameMap[message.uid] = true
             }
-            isThemeTheSameMap[message.uid] = true
         }
 
         shouldMarkThreadAsSeen = thread.unseenMessagesCount > 0

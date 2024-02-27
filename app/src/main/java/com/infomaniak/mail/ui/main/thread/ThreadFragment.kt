@@ -153,6 +153,15 @@ class ThreadFragment : Fragment() {
         updateNavigationIcon()
     }
 
+    override fun onStop() = with(threadAdapter) {
+
+        mainViewModel.createThreadBackup(
+            // TODO
+        )
+
+        super.onStop()
+    }
+
     override fun onDestroyView() {
         threadAdapter.resetCallbacks()
         super.onDestroyView()
@@ -302,6 +311,7 @@ class ThreadFragment : Fragment() {
 
         recycledViewPool.setMaxRecycledViews(0, 0)
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        mainViewModel.threadBackup?.let(threadAdapter::useThreadBackup)
     }
 
     private fun setupDialogs() {
@@ -318,7 +328,7 @@ class ThreadFragment : Fragment() {
             resetMessagesRelatedCache()
             displayThreadView()
 
-            openThread(threadUid).observe(viewLifecycleOwner) { result ->
+            openThread(threadUid, mainViewModel.threadBackup).observe(viewLifecycleOwner) { result ->
 
                 if (result == null) {
                     twoPaneViewModel.closeThread()

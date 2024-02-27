@@ -48,6 +48,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.databinding.*
+import com.infomaniak.mail.ui.MainViewModel.ThreadBackup
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
@@ -601,6 +602,10 @@ class ThreadAdapter(
     fun undoUserAttendanceClick(message: Message) {
         val indexOfMessage = items.indexOfFirst { it is Message && it.uid == message.uid }.takeIf { it >= 0 }
         indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
+    }
+
+    fun useThreadBackup(threadBackup: ThreadBackup) = with(threadBackup) {
+        // TODO
     }
 
     private enum class NotifyType {
