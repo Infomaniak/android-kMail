@@ -74,8 +74,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     fun getFavoriteMessages(thread: Thread): List<Message> {
-        val isFavorite = "${Message::isFavorite.name} == true"
-        return getMessagesAndDuplicates(thread, "$isFavorite AND $isNotDraft")
+        return getMessagesAndDuplicates(thread, "${Message::isFavorite.name} == true")
     }
 
     fun getMovableMessages(thread: Thread): List<Message> {
