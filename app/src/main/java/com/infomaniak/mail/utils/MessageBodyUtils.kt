@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,9 @@ object MessageBodyUtils {
 
     private val quoteDescriptors = arrayOf(
         "blockquote[type=cite]", // macOS and iOS mail client
-        "#divRplyFwdMsg", // Microsoft Outlook
+        // The reply and forward #divRplyFwdMsg div only contains the header, the previous message body is written right next to
+        // this div and can't be detected
+        // "#divRplyFwdMsg", // Microsoft Outlook
         "#isForwardContent",
         "#isReplyContent",
         "#mailcontent:not(table)",
