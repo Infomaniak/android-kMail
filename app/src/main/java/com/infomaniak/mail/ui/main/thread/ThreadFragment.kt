@@ -198,6 +198,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupAdapter() = with(binding.messagesList) {
+
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
@@ -298,6 +299,7 @@ class ThreadFragment : Fragment() {
                 shouldIgnoreView = { view -> view.tag == ThreadAdapter.IGNORE_DIVIDER_TAG },
             ),
         )
+
         recycledViewPool.setMaxRecycledViews(0, 0)
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }

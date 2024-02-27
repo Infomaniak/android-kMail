@@ -47,7 +47,7 @@ class SwitchUserViewModel @Inject constructor(
     fun switchAccount(user: User) = viewModelScope.launch(ioDispatcher) {
         if (user.id != AccountUtils.currentUserId) {
             context.trackAccountEvent("switch")
-            RealmDatabase.backUpPreviousRealms()
+            RealmDatabase.backupPreviousRealms()
             AccountUtils.currentUser = user
             AccountUtils.currentMailboxId = mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()
