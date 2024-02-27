@@ -160,6 +160,7 @@ class ThreadFragment : Fragment() {
             initialSetOfExpandedMessagesUids = isExpandedMap.filter { it.value }.keys.toMutableSet(),
             isThemeTheSameMap = isThemeTheSameMap,
             hasSuperCollapsedBlockBeenClicked = threadViewModel.superCollapsedBlock?.hasBeenClicked ?: false,
+            verticalScroll = binding.messagesListNestedScrollView.scrollY,
         )
 
         super.onStop()
@@ -578,32 +579,35 @@ class ThreadFragment : Fragment() {
 
     private fun scrollToFirstUnseenMessage() = with(binding) {
 
-        fun scrollToBottom() {
-            messagesListNestedScrollView.scrollY = messagesListNestedScrollView.maxScrollAmount
-        }
+        fun getBottomY(): Int = messagesListNestedScrollView.maxScrollAmount
 
-        val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && threadAdapter.isExpandedMap[it.uid] == true }
+        val scrollY = mainViewModel.threadBackup?.verticalScroll ?: run {
 
-        // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
-        // we want to automatically scroll to the very bottom.
-        if (indexToScroll == -1) {
-            scrollToBottom()
-        } else {
-            val targetChild = messagesList.getChildAt(indexToScroll)
-            if (targetChild == null) {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.WARNING
-                    scope.setExtra("indexToScroll", indexToScroll.toString())
-                    scope.setExtra("messageCount", threadAdapter.items.count().toString())
-                    scope.setExtra("isExpandedMap", threadAdapter.isExpandedMap.toString())
-                    scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
-                    Sentry.captureMessage("Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom")
-                }
-                scrollToBottom()
+            val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && threadAdapter.isExpandedMap[it.uid] == true }
+
+            // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
+            // we want to automatically scroll to the very bottom.
+            if (indexToScroll == -1) {
+                getBottomY()
             } else {
-                messagesListNestedScrollView.scrollY = targetChild.top
+                val targetChild = messagesList.getChildAt(indexToScroll)
+                if (targetChild == null) {
+                    Sentry.withScope { scope ->
+                        scope.level = SentryLevel.ERROR
+                        scope.setExtra("indexToScroll", indexToScroll.toString())
+                        scope.setExtra("messageCount", threadAdapter.items.count().toString())
+                        scope.setExtra("isExpandedMap", threadAdapter.isExpandedMap.toString())
+                        scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
+                        Sentry.captureMessage("Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom")
+                    }
+                    getBottomY()
+                } else {
+                    targetChild.top
+                }
             }
         }
+
+        messagesListNestedScrollView.scrollY = scrollY
     }
 
     private fun expandSuperCollapsedBlock() = with(threadViewModel) {
