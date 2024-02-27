@@ -159,6 +159,7 @@ class ThreadFragment : Fragment() {
             isExpandedMap = isExpandedMap,
             initialSetOfExpandedMessagesUids = isExpandedMap.filter { it.value }.keys.toMutableSet(),
             isThemeTheSameMap = isThemeTheSameMap,
+            hasSuperCollapsedBlockBeenClicked = threadViewModel.superCollapsedBlock?.hasBeenClicked ?: false,
         )
 
         super.onStop()

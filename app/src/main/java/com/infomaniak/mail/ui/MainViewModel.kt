@@ -213,17 +213,20 @@ class MainViewModel @Inject constructor(
         val isExpandedMapBackup: MutableMap<String, Boolean>,
         val initialSetOfExpandedMessagesUidsBackup: Set<String>,
         val isThemeTheSameMapBackup: MutableMap<String, Boolean>,
+        val hasSuperCollapsedBlockBeenClicked: Boolean,
     )
 
     fun createThreadBackup(
         isExpandedMap: MutableMap<String, Boolean>,
         initialSetOfExpandedMessagesUids: Set<String>,
         isThemeTheSameMap: MutableMap<String, Boolean>,
+        hasSuperCollapsedBlockBeenClicked: Boolean,
     ) {
         threadBackup = ThreadBackup(
             isExpandedMap,
             initialSetOfExpandedMessagesUids,
             isThemeTheSameMap,
+            hasSuperCollapsedBlockBeenClicked,
         )
     }
 

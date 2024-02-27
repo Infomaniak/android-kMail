@@ -261,6 +261,7 @@ class ThreadViewModel @Inject constructor(
             isExpandedMap = threadBackup.isExpandedMapBackup
             initialSetOfExpandedMessagesUids = threadBackup.initialSetOfExpandedMessagesUidsBackup.toMutableSet()
             isThemeTheSameMap = threadBackup.isThemeTheSameMapBackup
+            if (threadBackup.hasSuperCollapsedBlockBeenClicked) superCollapsedBlock = SuperCollapsedBlock(hasBeenClicked = true)
         } else {
             thread.messages.forEachIndexed { index, message ->
                 isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex).also {
