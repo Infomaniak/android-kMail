@@ -156,7 +156,7 @@ class ThreadFragment : Fragment() {
     override fun onStop() = with(threadAdapter) {
 
         mainViewModel.createThreadBackup(
-            // TODO
+            isExpandedMap = isExpandedMap,
         )
 
         super.onStop()

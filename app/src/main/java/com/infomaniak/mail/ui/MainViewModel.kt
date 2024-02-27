@@ -210,14 +210,14 @@ class MainViewModel @Inject constructor(
     var threadBackup: ThreadBackup? = null
 
     data class ThreadBackup(
-        // TODO
+        val isExpandedMapBackup: MutableMap<String, Boolean>,
     )
 
     fun createThreadBackup(
-        // TODO
+        isExpandedMap: MutableMap<String, Boolean>,
     ) {
         threadBackup = ThreadBackup(
-            // TODO
+            isExpandedMap,
         )
     }
 
