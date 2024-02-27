@@ -34,7 +34,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.ui.MainViewModel.ThreadBackup
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
@@ -92,6 +91,38 @@ class ThreadViewModel @Inject constructor(
     var shouldMarkThreadAsSeen: Boolean = false
 
     var superCollapsedBlock: SuperCollapsedBlock? = null
+
+    //region Restore Thread state after going to MoveFragment or somewhere else, and then coming back to ThreadFragment.
+    var threadBackup: ThreadBackup? = null
+
+    data class ThreadBackup(
+        val isExpandedMapBackup: MutableMap<String, Boolean>,
+        val initialSetOfExpandedMessagesUidsBackup: Set<String>,
+        val isThemeTheSameMapBackup: MutableMap<String, Boolean>,
+        val hasSuperCollapsedBlockBeenClicked: Boolean,
+        val verticalScroll: Int,
+    )
+
+    fun createThreadBackup(
+        isExpandedMap: MutableMap<String, Boolean>,
+        initialSetOfExpandedMessagesUids: Set<String>,
+        isThemeTheSameMap: MutableMap<String, Boolean>,
+        hasSuperCollapsedBlockBeenClicked: Boolean,
+        verticalScroll: Int,
+    ) {
+        threadBackup = ThreadBackup(
+            isExpandedMap,
+            initialSetOfExpandedMessagesUids,
+            isThemeTheSameMap,
+            hasSuperCollapsedBlockBeenClicked,
+            verticalScroll,
+        )
+    }
+
+    fun deleteThreadBackup() {
+        threadBackup = null
+    }
+    //endregion
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 

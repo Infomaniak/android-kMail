@@ -48,8 +48,8 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.*
 import com.infomaniak.mail.databinding.*
-import com.infomaniak.mail.ui.MainViewModel.ThreadBackup
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadBackup
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate

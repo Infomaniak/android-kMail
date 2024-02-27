@@ -45,7 +45,7 @@ import javax.inject.Inject
 abstract class TwoPaneFragment : Fragment() {
 
     val mainViewModel: MainViewModel by activityViewModels()
-    protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
+    private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
     // TODO: When we'll update DragDropSwipeRecyclerViewLib, we'll need to make the adapter nullable.
     //  For now it causes a memory leak, because we can't remove the strong reference
@@ -143,7 +143,7 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     fun openThreadAndDeleteBackup(threadUid: String) {
-        mainViewModel.deleteThreadBackup()
+        getRightPane()?.getFragment<ThreadFragment?>()?.threadViewModel?.deleteThreadBackup()
         twoPaneViewModel.openThread(threadUid)
     }
 

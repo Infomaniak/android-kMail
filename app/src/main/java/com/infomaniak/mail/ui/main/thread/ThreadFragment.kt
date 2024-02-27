@@ -118,7 +118,7 @@ class ThreadFragment : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
-    private val threadViewModel: ThreadViewModel by viewModels()
+    val threadViewModel: ThreadViewModel by viewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -155,7 +155,7 @@ class ThreadFragment : Fragment() {
 
     override fun onStop() = with(threadAdapter) {
 
-        mainViewModel.createThreadBackup(
+        threadViewModel.createThreadBackup(
             isExpandedMap = isExpandedMap,
             initialSetOfExpandedMessagesUids = isExpandedMap.filter { it.value }.keys.toMutableSet(),
             isThemeTheSameMap = isThemeTheSameMap,
@@ -315,7 +315,7 @@ class ThreadFragment : Fragment() {
 
         recycledViewPool.setMaxRecycledViews(0, 0)
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        mainViewModel.threadBackup?.let(threadAdapter::useThreadBackup)
+        threadViewModel.threadBackup?.let(threadAdapter::useThreadBackup)
     }
 
     private fun setupDialogs() {
@@ -332,7 +332,7 @@ class ThreadFragment : Fragment() {
             resetMessagesRelatedCache()
             displayThreadView()
 
-            openThread(threadUid, mainViewModel.threadBackup).observe(viewLifecycleOwner) { result ->
+            openThread(threadUid, threadBackup).observe(viewLifecycleOwner) { result ->
 
                 if (result == null) {
                     twoPaneViewModel.closeThread()
@@ -581,7 +581,7 @@ class ThreadFragment : Fragment() {
 
         fun getBottomY(): Int = messagesListNestedScrollView.maxScrollAmount
 
-        val scrollY = mainViewModel.threadBackup?.verticalScroll ?: run {
+        val scrollY = threadViewModel.threadBackup?.verticalScroll ?: run {
 
             val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && threadAdapter.isExpandedMap[it.uid] == true }
 
