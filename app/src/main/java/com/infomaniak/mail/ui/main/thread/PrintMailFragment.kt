@@ -59,12 +59,11 @@ class PrintMailFragment : Fragment() {
         setupAdapter()
 
         messagesLive.observe(viewLifecycleOwner) { (items, _) ->
-            threadAdapter.submitList(items.filter { it is Message && it.uid == navigationArgs.messageUid })
+            threadAdapter.submitList(listOf(items.single { it is Message && it.uid == navigationArgs.messageUid }))
         }
 
         navigationArgs.openThreadUid?.let {
-            reassignThreadLive(it)
-            reassignMessagesLive(it)
+            reassignMessagesLive(it, withSuperCollapsedBlock = false)
         }
     }
 
@@ -79,11 +78,12 @@ class PrintMailFragment : Fragment() {
     }
 
     private fun startPrintingView() {
-        threadViewModel.threadLive.value?.subject?.let { subject ->
-            printMailViewModel.startPrintingService(requireActivity(), subject, getWebViewToPrint()) {
-                findNavController().popBackStack()
-            }
-        }
+        printMailViewModel.startPrintingService(
+            activityContext = requireActivity(),
+            subject = (threadAdapter.items.single() as Message).subject,
+            webView = getWebViewToPrint(),
+            onFinish = findNavController()::popBackStack,
+        )
     }
 
     private fun getWebViewToPrint(): WebView = with(binding.messagesList[0]) { findViewById(R.id.bodyWebView) }

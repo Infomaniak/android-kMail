@@ -114,11 +114,11 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun reassignMessagesLive(threadUid: String) {
+    fun reassignMessagesLive(threadUid: String, withSuperCollapsedBlock: Boolean = true) {
         messagesLiveJob?.cancel()
         messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-                ?.map { mapRealmMessagesResult(it.list, threadUid) }
+                ?.map { mapRealmMessagesResult(it.list, threadUid, withSuperCollapsedBlock) }
                 ?.collect(messagesLive::postValue)
         }
     }
@@ -126,6 +126,7 @@ class ThreadViewModel @Inject constructor(
     private suspend fun mapRealmMessagesResult(
         messages: RealmResults<Message>,
         threadUid: String,
+        withSuperCollapsedBlock: Boolean,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
         superCollapsedBlock = superCollapsedBlock ?: SuperCollapsedBlock()
@@ -134,7 +135,8 @@ class ThreadViewModel @Inject constructor(
         val messagesToFetch = mutableListOf<Message>()
         val thread = messages.firstOrNull()?.threads?.firstOrNull { it.uid == threadUid } ?: return items to messagesToFetch
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
-        superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
+        superCollapsedBlock!!.shouldBeDisplayed =
+            shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock, withSuperCollapsedBlock)
 
         suspend fun addMessage(message: Message) {
             splitBody(message).let {
@@ -219,9 +221,9 @@ class ThreadViewModel @Inject constructor(
      * - If there's any unread Message in between, it will be displayed (hence, all following Messages will be displayed too).
      * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the Block.
      */
-    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean {
-
-        return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
+    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int, withSuperCollapsedBlock: Boolean): Boolean {
+        return withSuperCollapsedBlock && // When we want to print a mail, we need the full list of Messages
+                superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
                 superCollapsedBlock?.hasBeenClicked == false && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
