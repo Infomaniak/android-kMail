@@ -159,7 +159,7 @@ class ThreadViewModel @Inject constructor(
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
         superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
 
-        suspend fun mapListWithNewBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+        suspend fun formatListWithNewBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
             return formatLists(messages) { index, _ ->
                 when (index) {
                     0 -> MessageBehavior.DISPLAYED // First Message
@@ -170,7 +170,7 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        suspend fun mapListWithExistingBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+        suspend fun formatListWithExistingBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
             var isStillInBlock = true
             val previousBlock = superCollapsedBlock!!.messagesUids.toSet()
@@ -191,7 +191,7 @@ class ThreadViewModel @Inject constructor(
         }
 
         return if (superCollapsedBlock!!.shouldBeDisplayed) {
-            if (superCollapsedBlock!!.isFirstTime()) mapListWithNewBlock() else mapListWithExistingBlock()
+            if (superCollapsedBlock!!.isFirstTime()) formatListWithNewBlock() else formatListWithExistingBlock()
         } else {
             formatLists(messages) { _, _ -> MessageBehavior.DISPLAYED }
         }
