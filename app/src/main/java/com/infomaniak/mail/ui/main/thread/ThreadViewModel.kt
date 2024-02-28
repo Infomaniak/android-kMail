@@ -90,38 +90,13 @@ class ThreadViewModel @Inject constructor(
 
     var shouldMarkThreadAsSeen: Boolean = false
 
-    var superCollapsedBlock: SuperCollapsedBlock? = null
+    private var superCollapsedBlock: SuperCollapsedBlock? = null
 
     //region Restore Thread state after going to MoveFragment or somewhere else, and then coming back to ThreadFragment.
-    var threadBackup: ThreadBackup? = null
-
-    data class ThreadBackup(
-        val isExpandedMapBackup: MutableMap<String, Boolean>,
-        val initialSetOfExpandedMessagesUidsBackup: Set<String>,
-        val isThemeTheSameMapBackup: MutableMap<String, Boolean>,
-        val hasSuperCollapsedBlockBeenClicked: Boolean,
-        val verticalScroll: Int,
-    )
-
-    fun createThreadBackup(
-        isExpandedMap: MutableMap<String, Boolean>,
-        initialSetOfExpandedMessagesUids: Set<String>,
-        isThemeTheSameMap: MutableMap<String, Boolean>,
-        hasSuperCollapsedBlockBeenClicked: Boolean,
-        verticalScroll: Int,
-    ) {
-        threadBackup = ThreadBackup(
-            isExpandedMap,
-            initialSetOfExpandedMessagesUids,
-            isThemeTheSameMap,
-            hasSuperCollapsedBlockBeenClicked,
-            verticalScroll,
-        )
-    }
-
-    fun deleteThreadBackup() {
-        threadBackup = null
-    }
+    var isExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
+    var isThemeTheSameMap: MutableMap<String, Boolean> = mutableMapOf()
+    var hasSuperCollapsedBlockBeenClicked: Boolean = false
+    var verticalScroll: Int? = null
     //endregion
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
@@ -130,6 +105,13 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
+
+    fun resetThreadBackupCache() {
+        isExpandedMap = mutableMapOf()
+        isThemeTheSameMap = mutableMapOf()
+        hasSuperCollapsedBlockBeenClicked = false
+        verticalScroll = null
+    }
 
     fun resetMessagesRelatedCache() {
         treatedMessagesForCalendarEvent.clear()
@@ -256,7 +238,7 @@ class ThreadViewModel @Inject constructor(
     private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int, withSuperCollapsedBlock: Boolean): Boolean {
         return withSuperCollapsedBlock && // When we want to print a mail, we need the full list of Messages
                 superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
-                superCollapsedBlock?.hasBeenClicked == false && // Block hasn't been expanded by the user
+                !hasSuperCollapsedBlockBeenClicked && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
     }
@@ -275,7 +257,7 @@ class ThreadViewModel @Inject constructor(
         return@withContext message
     }
 
-    fun openThread(threadUid: String, threadBackup: ThreadBackup?) = liveData(ioCoroutineContext) {
+    fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
 
         val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
@@ -284,27 +266,17 @@ class ThreadViewModel @Inject constructor(
 
         sendMatomoAndSentryAboutThreadMessagesCount(thread)
 
-        var isExpandedMap = mutableMapOf<String, Boolean>()
-        var initialSetOfExpandedMessagesUids = mutableSetOf<String>()
-        var isThemeTheSameMap = mutableMapOf<String, Boolean>()
-
-        if (threadBackup != null) {
-            isExpandedMap = threadBackup.isExpandedMapBackup
-            initialSetOfExpandedMessagesUids = threadBackup.initialSetOfExpandedMessagesUidsBackup.toMutableSet()
-            isThemeTheSameMap = threadBackup.isThemeTheSameMapBackup
-            if (threadBackup.hasSuperCollapsedBlockBeenClicked) superCollapsedBlock = SuperCollapsedBlock(hasBeenClicked = true)
-        } else {
+        // These 2 will always be empty or not all together at the same time.
+        if (isExpandedMap.isEmpty() || isThemeTheSameMap.isEmpty()) {
             thread.messages.forEachIndexed { index, message ->
-                isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex).also {
-                    if (it) initialSetOfExpandedMessagesUids.add(message.uid)
-                }
+                isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
                 isThemeTheSameMap[message.uid] = true
             }
         }
 
         shouldMarkThreadAsSeen = thread.unseenMessagesCount > 0
 
-        emit(OpenThreadResult(thread, isExpandedMap, initialSetOfExpandedMessagesUids, isThemeTheSameMap))
+        emit(thread)
     }
 
     fun markThreadAsSeen() = viewModelScope.launch(ioCoroutineContext) {
@@ -457,13 +429,6 @@ class ThreadViewModel @Inject constructor(
         val thread: Thread?,
         val mergedContacts: MergedContactDictionary?,
         val mailbox: Mailbox?,
-    )
-
-    data class OpenThreadResult(
-        val thread: Thread,
-        val isExpandedMap: MutableMap<String, Boolean>,
-        val initialSetOfExpandedMessagesUids: Set<String>,
-        val isThemeTheSameMap: MutableMap<String, Boolean>,
     )
 
     data class QuickActionBarResult(

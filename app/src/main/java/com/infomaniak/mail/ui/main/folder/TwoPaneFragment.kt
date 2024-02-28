@@ -143,7 +143,7 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     fun openThreadAndDeleteBackup(threadUid: String) {
-        getRightPane()?.getFragment<ThreadFragment?>()?.threadViewModel?.deleteThreadBackup()
+        getRightPane()?.getFragment<ThreadFragment?>()?.threadViewModel?.resetThreadBackupCache()
         twoPaneViewModel.openThread(threadUid)
     }
 
