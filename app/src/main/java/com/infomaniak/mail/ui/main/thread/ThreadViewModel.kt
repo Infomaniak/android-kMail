@@ -137,7 +137,7 @@ class ThreadViewModel @Inject constructor(
 
     fun reassignMessagesLiveWithoutSuperCollapsedBlock(messageUid: String) {
         reassignMessages {
-            messageController.getMessagesAsync(messageUid).map { mapRealmMessagesResult(it.list) }
+            messageController.getMessagesAsync(messageUid).map { mapRealmMessagesResultWithoutSuperCollapsedBlock(it.list) }
         }
     }
 
@@ -148,21 +148,6 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    private suspend fun mapRealmMessagesResult(messages: RealmResults<Message>): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
-
-        val items = mutableListOf<Any>()
-        val messagesToFetch = mutableListOf<Message>()
-
-        messages.forEach { message ->
-            splitBody(message).let {
-                items += it
-                if (!it.isFullyDownloaded()) messagesToFetch += it
-            }
-        }
-
-        return items to messagesToFetch
-    }
-
     private suspend fun mapRealmMessagesResult(
         messages: RealmResults<Message>,
         threadUid: String,
@@ -170,77 +155,52 @@ class ThreadViewModel @Inject constructor(
 
         superCollapsedBlock = superCollapsedBlock ?: SuperCollapsedBlock()
 
-        val items = mutableListOf<Any>()
-        val messagesToFetch = mutableListOf<Message>()
-        val thread = messages.firstOrNull()?.threads?.firstOrNull { it.uid == threadUid } ?: return items to messagesToFetch
+        val thread = messages.first().threads.single { it.uid == threadUid }
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
         superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
 
-        suspend fun addMessage(message: Message) {
-            splitBody(message).let {
-                items += it
-                if (!it.isFullyDownloaded()) messagesToFetch += it
-            }
-        }
-
-        suspend fun mapListWithNewBlock() {
-            messages.forEachIndexed { index, message ->
+        suspend fun mapListWithNewBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+            return formatLists(messages) { index, _ ->
                 when (index) {
-                    0 -> { // First Message
-                        addMessage(message)
-                    }
-                    in 1..<firstIndexAfterBlock -> { // All Messages that should go in block
-                        superCollapsedBlock!!.messagesUids.add(message.uid)
-                    }
-                    firstIndexAfterBlock -> { // First Message not in block
-                        items += superCollapsedBlock!!
-                        addMessage(message.apply { shouldHideDivider = true })
-                    }
-                    else -> { // All following Messages
-                        addMessage(message)
-                    }
+                    0 -> MessageBehavior.DISPLAYED // First Message
+                    in 1 until firstIndexAfterBlock -> MessageBehavior.COLLAPSED // All Messages that should go in block
+                    firstIndexAfterBlock -> MessageBehavior.FIRST_AFTER_BLOCK // First Message not in block
+                    else -> MessageBehavior.DISPLAYED // All following Messages
                 }
             }
         }
 
-        suspend fun mapListWithExistingBlock() {
+        suspend fun mapListWithExistingBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
             var isStillInBlock = true
             val previousBlock = superCollapsedBlock!!.messagesUids.toSet()
 
             superCollapsedBlock!!.messagesUids.clear()
 
-            messages.forEachIndexed { index, message ->
+            return formatLists(messages) { index, messageUid ->
                 when {
-                    index == 0 -> { // First Message
-                        addMessage(message)
-                    }
-                    previousBlock.contains(message.uid) && isStillInBlock -> { // All Messages already in block
-                        superCollapsedBlock!!.messagesUids.add(message.uid)
-                    }
-                    !previousBlock.contains(message.uid) && isStillInBlock -> { // First Message not in block
+                    index == 0 -> MessageBehavior.DISPLAYED // First Message
+                    previousBlock.contains(messageUid) && isStillInBlock -> MessageBehavior.COLLAPSED // All Messages already in block
+                    !previousBlock.contains(messageUid) && isStillInBlock -> { // First Message not in block
                         isStillInBlock = false
-                        items += superCollapsedBlock!!
-                        addMessage(message.apply { shouldHideDivider = true })
+                        MessageBehavior.FIRST_AFTER_BLOCK
                     }
-                    else -> { // All following Messages
-                        addMessage(message)
-                    }
+                    else -> MessageBehavior.DISPLAYED // All following Messages
                 }
             }
         }
 
-        suspend fun mapFullList() {
-            messages.forEach { addMessage(it) }
-        }
-
-        if (superCollapsedBlock!!.shouldBeDisplayed) {
+        return if (superCollapsedBlock!!.shouldBeDisplayed) {
             if (superCollapsedBlock!!.isFirstTime()) mapListWithNewBlock() else mapListWithExistingBlock()
         } else {
-            mapFullList()
+            formatLists(messages) { _, _ -> MessageBehavior.DISPLAYED }
         }
+    }
 
-        return items to messagesToFetch
+    private suspend fun mapRealmMessagesResultWithoutSuperCollapsedBlock(
+        messages: RealmResults<Message>,
+    ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+        return formatLists(messages) { _, _ -> MessageBehavior.DISPLAYED }
     }
 
     private fun computeFirstIndexAfterBlock(thread: Thread, list: RealmResults<Message>): Int {
@@ -264,6 +224,40 @@ class ThreadViewModel @Inject constructor(
                 !hasSuperCollapsedBlockBeenClicked && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
+    }
+
+    // If we add a fourth case in the `when`, don't forget to add a fourth 'o' in the function name.
+    private suspend fun formatLists(
+        messages: List<Message>,
+        computeBehavior: (Int, String) -> MessageBehavior,
+    ): Pair<MutableList<Any>, MutableList<Message>> {
+
+        val items = mutableListOf<Any>()
+        val messagesToFetch = mutableListOf<Message>()
+
+        suspend fun addMessage(message: Message) {
+            splitBody(message).let {
+                items += it
+                if (!it.isFullyDownloaded()) messagesToFetch += it
+            }
+        }
+
+        messages.forEachIndexed { index, message ->
+            when (computeBehavior(index, message.uid)) {
+                MessageBehavior.DISPLAYED -> {
+                    addMessage(message)
+                }
+                MessageBehavior.COLLAPSED -> {
+                    superCollapsedBlock!!.messagesUids.add(message.uid)
+                }
+                MessageBehavior.FIRST_AFTER_BLOCK -> {
+                    items += superCollapsedBlock!!
+                    addMessage(message.apply { shouldHideDivider = true })
+                }
+            }
+        }
+
+        return items to messagesToFetch
     }
 
     private suspend fun splitBody(message: Message): Message = withContext(ioDispatcher) {
@@ -459,6 +453,12 @@ class ThreadViewModel @Inject constructor(
         val message: Message,
         val menuId: Int,
     )
+
+    private enum class MessageBehavior {
+        DISPLAYED,
+        COLLAPSED,
+        FIRST_AFTER_BLOCK,
+    }
 
     companion object {
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
