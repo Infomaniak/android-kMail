@@ -128,11 +128,17 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun reassignMessagesLive(threadUid: String, withSuperCollapsedBlock: Boolean = true) {
+    fun reassignMessagesLive(threadUid: String, messageUid: String? = null, withSuperCollapsedBlock: Boolean = true) {
         messagesLiveJob?.cancel()
         messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
-            messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-                ?.map { mapRealmMessagesResult(it.list, threadUid, withSuperCollapsedBlock) }
+
+            val flow = if (messageUid == null) {
+                messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
+            } else {
+                messageController.getMessagesAsync(messageUid)
+            }
+
+            flow?.map { mapRealmMessagesResult(it.list, threadUid, withSuperCollapsedBlock) }
                 ?.collect(messagesLive::postValue)
         }
     }
