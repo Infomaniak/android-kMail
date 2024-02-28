@@ -39,7 +39,7 @@ class AppVersionCheckingTest {
     private val greatVersion = "1.2.2"
     private val greaterVersion = "1.3.0"
     private val invalidCommaVersion = "1.2,9"
-    private val invalidParseVersion = "toto"
+    private val invalidParseVersion = "invalid_parse_version"
     private val invalidEmptyVersion = ""
 
     private val defaultAppVersion = AppVersion(

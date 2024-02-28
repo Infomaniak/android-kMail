@@ -17,19 +17,17 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class AttachmentActionsViewModel @Inject constructor(
-    application: Application,
     attachmentController: AttachmentController,
     private val savedStateHandle: SavedStateHandle,
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val attachmentResource
         inline get() = savedStateHandle.get<String>(AttachmentActionsBottomSheetDialogArgs::attachmentResource.name)!!

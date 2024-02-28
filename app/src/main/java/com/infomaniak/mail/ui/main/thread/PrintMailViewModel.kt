@@ -18,7 +18,6 @@
 
 package com.infomaniak.mail.ui.main.thread
 
-import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import android.os.CancellationSignal
@@ -28,33 +27,37 @@ import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintManager
 import android.webkit.WebView
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class PrintMailViewModel(application: Application) : AndroidViewModel(application) {
+class PrintMailViewModel : ViewModel() {
 
-    fun startPrintingService(activityContext: Context, subject: String?, webView: WebView, onFinish: () -> Unit) {
-        viewModelScope.launch(Dispatchers.Main) {
-            subject?.let { subject ->
-                val webViewPrintAdapter = PrintAdapterWrapper(webView.createPrintDocumentAdapter(subject), onFinish)
-                val printManager = activityContext.getSystemService(Context.PRINT_SERVICE) as PrintManager
-                printManager.print(subject, webViewPrintAdapter, null)
-            }
+    fun startPrintingService(
+        activityContext: Context,
+        subject: String?,
+        webView: WebView,
+        onFinish: () -> Unit,
+    ) = viewModelScope.launch(Dispatchers.Main) {
+        subject?.let { subject ->
+            val webViewPrintAdapter = PrintAdapterWrapper(webView.createPrintDocumentAdapter(subject), onFinish)
+            val printManager = activityContext.getSystemService(Context.PRINT_SERVICE) as PrintManager
+            printManager.print(subject, webViewPrintAdapter, null)
         }
     }
 
     private class PrintAdapterWrapper(
         private val printAdapter: PrintDocumentAdapter,
-        private val onFinish: () -> Unit
+        private val onFinish: () -> Unit,
     ) : PrintDocumentAdapter() {
+
         override fun onLayout(
             oldAttributes: PrintAttributes?,
             newAttributes: PrintAttributes?,
             cancellationSignal: CancellationSignal?,
             callback: LayoutResultCallback?,
-            extras: Bundle?
+            extras: Bundle?,
         ) {
             printAdapter.onLayout(oldAttributes, newAttributes, cancellationSignal, callback, extras)
         }
@@ -63,7 +66,7 @@ class PrintMailViewModel(application: Application) : AndroidViewModel(applicatio
             pages: Array<out PageRange>?,
             destination: ParcelFileDescriptor?,
             cancellationSignal: CancellationSignal?,
-            callback: WriteResultCallback?
+            callback: WriteResultCallback?,
         ) {
             printAdapter.onWrite(pages, destination, cancellationSignal, callback)
         }
