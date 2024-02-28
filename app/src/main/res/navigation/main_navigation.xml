@@ -573,22 +573,14 @@
             android:id="@+id/action_attachmentActionsBottomSheetDialog_to_downloadAttachmentProgressDialog"
             app:destination="@id/downloadAttachmentProgressDialog" />
     </dialog>
+
     <fragment
         android:id="@+id/printMailFragment"
         android:name="com.infomaniak.mail.ui.main.thread.PrintMailFragment"
         android:label="PrintMailFragment">
-
-        <argument
-            android:name="openThreadUid"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-
         <argument
             android:name="messageUid"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
+            app:argType="string" />
     </fragment>
 
     <dialog

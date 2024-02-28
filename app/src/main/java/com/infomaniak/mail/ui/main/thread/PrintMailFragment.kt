@@ -53,7 +53,7 @@ class PrintMailFragment : Fragment() {
         return FragmentPrintMailBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(navigationArgs) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapter()
@@ -62,9 +62,7 @@ class PrintMailFragment : Fragment() {
             threadAdapter.submitList(items)
         }
 
-        openThreadUid?.let {
-            threadViewModel.reassignMessagesLive(it, messageUid, withSuperCollapsedBlock = false)
-        }
+        threadViewModel.reassignMessagesLiveWithoutSuperCollapsedBlock(navigationArgs.messageUid)
     }
 
     private fun setupAdapter() {

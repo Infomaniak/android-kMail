@@ -47,6 +47,7 @@ import io.realm.kotlin.query.RealmResults
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.collections.set
@@ -128,25 +129,43 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun reassignMessagesLive(threadUid: String, messageUid: String? = null, withSuperCollapsedBlock: Boolean = true) {
+    fun reassignMessagesLive(threadUid: String) {
+        reassignMessages {
+            messageController.getSortedAndNotDeletedMessagesAsync(threadUid)?.map { mapRealmMessagesResult(it.list, threadUid) }
+        }
+    }
+
+    fun reassignMessagesLiveWithoutSuperCollapsedBlock(messageUid: String) {
+        reassignMessages {
+            messageController.getMessagesAsync(messageUid).map { mapRealmMessagesResult(it.list) }
+        }
+    }
+
+    private fun reassignMessages(messagesFlow: (() -> Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>?)) {
         messagesLiveJob?.cancel()
         messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
-
-            val flow = if (messageUid == null) {
-                messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-            } else {
-                messageController.getMessagesAsync(messageUid)
-            }
-
-            flow?.map { mapRealmMessagesResult(it.list, threadUid, withSuperCollapsedBlock) }
-                ?.collect(messagesLive::postValue)
+            messagesFlow()?.collect(messagesLive::postValue)
         }
+    }
+
+    private suspend fun mapRealmMessagesResult(messages: RealmResults<Message>): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+
+        val items = mutableListOf<Any>()
+        val messagesToFetch = mutableListOf<Message>()
+
+        messages.forEach { message ->
+            splitBody(message).let {
+                items += it
+                if (!it.isFullyDownloaded()) messagesToFetch += it
+            }
+        }
+
+        return items to messagesToFetch
     }
 
     private suspend fun mapRealmMessagesResult(
         messages: RealmResults<Message>,
         threadUid: String,
-        withSuperCollapsedBlock: Boolean,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
 
         superCollapsedBlock = superCollapsedBlock ?: SuperCollapsedBlock()
@@ -155,8 +174,7 @@ class ThreadViewModel @Inject constructor(
         val messagesToFetch = mutableListOf<Message>()
         val thread = messages.firstOrNull()?.threads?.firstOrNull { it.uid == threadUid } ?: return items to messagesToFetch
         val firstIndexAfterBlock = computeFirstIndexAfterBlock(thread, messages)
-        superCollapsedBlock!!.shouldBeDisplayed =
-            shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock, withSuperCollapsedBlock)
+        superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
 
         suspend fun addMessage(message: Message) {
             splitBody(message).let {
@@ -241,9 +259,8 @@ class ThreadViewModel @Inject constructor(
      * - If there's any unread Message in between, it will be displayed (hence, all following Messages will be displayed too).
      * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the Block.
      */
-    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int, withSuperCollapsedBlock: Boolean): Boolean {
-        return withSuperCollapsedBlock && // When we want to print a mail, we need the full list of Messages
-                superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
+    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean {
+        return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
                 !hasSuperCollapsedBlockBeenClicked && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
