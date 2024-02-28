@@ -117,7 +117,7 @@ class ThreadFragment : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
-    val threadViewModel: ThreadViewModel by viewModels()
+    private val threadViewModel: ThreadViewModel by viewModels()
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -156,6 +156,10 @@ class ThreadFragment : Fragment() {
         threadAdapter.resetCallbacks()
         super.onDestroyView()
         _binding = null
+    }
+
+    fun resetThreadBackupCache() {
+        threadViewModel.resetThreadBackupCache()
     }
 
     private fun setupUi() = with(binding) {
