@@ -68,8 +68,11 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
+import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -121,6 +124,7 @@ class NewMessageViewModel @Inject constructor(
     var shouldExecuteDraftActionWhenStopping = true
 
     private var snapshot: DraftSnapshot? = null
+        get() = field ?: savedStateHandle.get<String>("snapshot")?.let(Json.Default::decodeFromString)
 
     private var isNewMessage = false
 
@@ -153,6 +157,11 @@ class NewMessageViewModel @Inject constructor(
         emit(list to arrangeMergedContacts(list))
     }
 
+    private fun saveDraftInitState() {
+        savedStateHandle[NewMessageActivityArgs::arrivedFromExistingDraft.name] = true
+        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = draft.localUuid
+    }
+
     fun initDraftAndViewModel(
         intent: Intent,
         navArgs: NewMessageActivityArgs,
@@ -163,13 +172,15 @@ class NewMessageViewModel @Inject constructor(
         val isSuccess = runCatching {
 
             signatures = SignatureController.getAllSignatures(realm)
-            if (signatures.isEmpty()) return@runCatching false
+            if (signatures.isEmpty()) {
+                return@runCatching false
+            }
 
             val draftExists = arrivedFromExistingDraft
             draft = if (draftExists) {
-                getExistingDraft(realm) ?: return@runCatching false
+                getExistingDraft(realm) ?: run { return@runCatching false }
             } else {
-                getNewDraft(signatures, realm) ?: return@runCatching false
+                getNewDraft(signatures, realm) ?: run { return@runCatching false }
             }
 
             // We need `draft` to be assigned before calling this function (because `saveDraftToLocal()` needs it)
@@ -177,6 +188,7 @@ class NewMessageViewModel @Inject constructor(
 
             true
         }.getOrElse {
+            Sentry.captureException(it)
             false
         }
 
@@ -186,6 +198,8 @@ class NewMessageViewModel @Inject constructor(
             selectedSignatureId = draft.identityId!!.toInt()
             flagRecipientsAsAutomaticallyEntered()
             saveDraftSnapshot()
+            saveDraftInitState()
+
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
@@ -711,6 +725,7 @@ class NewMessageViewModel @Inject constructor(
         fun strictlyGreaterThan(other: SignatureScore): Boolean = weight > other.weight
     }
 
+    @Serializable
     private data class DraftSnapshot(
         val identityId: String?,
         val to: Set<Recipient>,

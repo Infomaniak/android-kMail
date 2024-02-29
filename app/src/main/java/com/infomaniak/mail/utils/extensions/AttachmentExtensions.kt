@@ -27,6 +27,7 @@ import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
@@ -111,6 +112,13 @@ object AttachmentExtensions {
         ).toBundle()
     }
     //endregion
+
+    fun List<Attachment>.filterExisting(existingAttachments: List<Attachment>, filterInline: Boolean): List<Attachment> {
+        return filter { newAttachment ->
+            (!filterInline || newAttachment.disposition != AttachmentDisposition.INLINE) &&
+                    existingAttachments.none { it.uploadLocalUri == newAttachment.uploadLocalUri }
+        }
+    }
 
     enum class AttachmentIntentType {
         OPEN_WITH, SAVE_TO_DRIVE

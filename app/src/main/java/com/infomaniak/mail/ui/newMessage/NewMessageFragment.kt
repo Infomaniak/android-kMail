@@ -53,7 +53,6 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
-import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
@@ -280,6 +279,7 @@ class NewMessageFragment : Fragment() {
         ).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
                 showKeyboardInCorrectView()
+                attachmentAdapter.setAttachments(newMessageViewModel.draft.attachments)
             } else {
                 requireActivity().apply {
                     showToast(R.string.failToOpenDraft)
@@ -339,7 +339,7 @@ class NewMessageFragment : Fragment() {
 
         subjectTextField.setText(draft.subject)
 
-        attachmentAdapter.addAll(draft.attachments.filterNot { it.disposition == INLINE })
+        attachmentAdapter.addAll(draft.attachments)
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
         bodyText.setText(draft.uiBody)
@@ -468,10 +468,14 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeNewAttachments() = with(binding) {
-        newMessageViewModel.importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
-            attachmentAdapter.addAll(attachments)
-            attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
+    private fun observeNewAttachments() = with(newMessageViewModel) {
+        importedAttachments.observe(viewLifecycleOwner) { (newAttachments, importationResult) ->
+            attachmentAdapter.addAll(newAttachments)
+            newAttachments.filter { newAttachment ->
+                draft.attachments.none { it.uploadLocalUri == newAttachment.uploadLocalUri }
+            }.let(draft.attachments::addAll)
+
+            binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }

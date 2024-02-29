@@ -71,7 +71,10 @@ class NewMessageEditorManager @Inject constructor(
     fun observeEditorActions() {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
-                EditorAction.ATTACHMENT -> filePicker.open()
+                EditorAction.ATTACHMENT -> {
+                    newMessageViewModel.saveDraftWithoutDebouncing()
+                    filePicker.open()
+                }
                 EditorAction.CAMERA -> fragment.notYetImplemented()
                 EditorAction.LINK -> fragment.notYetImplemented()
                 EditorAction.CLOCK -> fragment.notYetImplemented()
