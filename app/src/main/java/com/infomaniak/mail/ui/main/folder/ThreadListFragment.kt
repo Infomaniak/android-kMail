@@ -75,11 +75,8 @@ import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChange
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
-import io.realm.kotlin.ext.isValid
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import java.util.Date
@@ -106,9 +103,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     @Inject
     lateinit var localSettings: LocalSettings
-
-    @Inject
-    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
@@ -163,7 +157,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeCurrentFolder()
         observeCurrentFolderLive()
         observeUpdatedAtTriggers()
-        observerDraftsActionsCompletedWorks()
         observeFlushFolderTrigger()
         observeUpdateInstall()
     }.getOrDefault(Unit)
@@ -615,19 +608,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun observeUpdatedAtTriggers() {
         threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }
-    }
-
-    private fun observerDraftsActionsCompletedWorks() {
-
-        fun observeDraftsActions() {
-            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
-                mainViewModel.currentFolder.value?.let { folder ->
-                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
-                }
-            }
-        }
-
-        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner, ::observeDraftsActions)
     }
 
     private fun observeFlushFolderTrigger() {
