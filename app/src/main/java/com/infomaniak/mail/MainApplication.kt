@@ -38,6 +38,7 @@ import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.networking.HttpClientConfig
 import com.infomaniak.lib.core.utils.CoilUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
@@ -117,6 +118,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     override fun onCreate() {
         super<Application>.onCreate()
+
+        HttpClientConfig.cacheDir = applicationContext.cacheDir
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
@@ -215,10 +218,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureHttpClient() {
         AccountUtils.onRefreshTokenError = refreshTokenError
-        HttpClient.apply {
-            init(tokenInterceptorListener())
-            customInterceptor = listOf(UrlTraceInterceptor())
-        }
+        HttpClientConfig.customInterceptors = listOf(UrlTraceInterceptor())
+        HttpClient.init(tokenInterceptorListener())
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
