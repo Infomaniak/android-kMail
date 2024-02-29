@@ -29,6 +29,7 @@ import android.print.PrintManager
 import android.webkit.WebView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.utils.extensions.formatSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -40,11 +41,10 @@ class PrintMailViewModel : ViewModel() {
         webView: WebView,
         onFinish: () -> Unit,
     ) = viewModelScope.launch(Dispatchers.Main) {
-        subject?.let { subject ->
-            val webViewPrintAdapter = PrintAdapterWrapper(webView.createPrintDocumentAdapter(subject), onFinish)
-            val printManager = activityContext.getSystemService(Context.PRINT_SERVICE) as PrintManager
-            printManager.print(subject, webViewPrintAdapter, null)
-        }
+        val protectedSubject = activityContext.formatSubject(subject)
+        val webViewPrintAdapter = PrintAdapterWrapper(webView.createPrintDocumentAdapter(protectedSubject), onFinish)
+        val printManager = activityContext.getSystemService(Context.PRINT_SERVICE) as PrintManager
+        printManager.print(protectedSubject, webViewPrintAdapter, null)
     }
 
     private class PrintAdapterWrapper(
