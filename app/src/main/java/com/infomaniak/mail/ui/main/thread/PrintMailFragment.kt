@@ -65,15 +65,16 @@ class PrintMailFragment : Fragment() {
         threadViewModel.reassignMessagesLiveWithoutSuperCollapsedBlock(navigationArgs.messageUid)
     }
 
-    private fun setupAdapter() {
+    private fun setupAdapter() = with(threadViewModel) {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = true,
             isForPrinting = true,
             threadAdapterState = object : ThreadAdapterState {
-                override var isExpandedMap by threadViewModel::isExpandedMap
-                override var isThemeTheSameMap by threadViewModel::isThemeTheSameMap
-                override var hasSuperCollapsedBlockBeenClicked by threadViewModel::hasSuperCollapsedBlockBeenClicked
-                override var verticalScroll by threadViewModel::verticalScroll
+                override val isExpandedMap by threadState::isExpandedMap
+                override val isThemeTheSameMap by threadState::isThemeTheSameMap
+                override val hasSuperCollapsedBlockBeenClicked by threadState::hasSuperCollapsedBlockBeenClicked
+                override val verticalScroll by threadState::verticalScroll
+                override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
             threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onBodyWebViewFinishedLoading = { startPrintingView() },
