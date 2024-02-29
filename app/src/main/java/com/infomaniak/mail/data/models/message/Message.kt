@@ -31,7 +31,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import com.infomaniak.mail.utils.extensions.toShortUid
 import io.realm.kotlin.ext.*
@@ -143,7 +143,7 @@ class Message : RealmObject {
     // correctly, as the relationship between Body and Message relies on a Realm query.
     @Transient
     @Ignore
-    var splitBody: MessageBodyUtils.SplitBody? = null
+    var splitBody: SplitBody? = null
     @Transient
     @Ignore
     var shouldHideDivider: Boolean = false

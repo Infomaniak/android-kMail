@@ -204,6 +204,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindCalendarEvent(message: Message) {
+
         val calendarAttachment = message.calendarAttachment ?: return
         val calendarEvent = message.latestCalendarEventResponse?.calendarEvent
 

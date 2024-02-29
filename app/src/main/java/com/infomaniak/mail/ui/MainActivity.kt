@@ -103,7 +103,7 @@ class MainActivity : BaseActivity() {
     }
 
     private val showSendingSnackbarTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer(1_000L) { snackbarManager.setValue(getString(R.string.snackbarEmailSending)) }
+        Utils.createRefreshTimer(milliseconds = 1_000L) { snackbarManager.setValue(getString(R.string.snackbarEmailSending)) }
     }
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->

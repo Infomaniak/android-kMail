@@ -163,8 +163,11 @@ class ThreadFragment : Fragment() {
         _binding = null
     }
 
-    fun resetThreadBackupCache() {
-        threadViewModel.resetThreadBackupCache()
+    fun resetThreadState() = with(threadViewModel) {
+        isExpandedMap = mutableMapOf()
+        isThemeTheSameMap = mutableMapOf()
+        hasSuperCollapsedBlockBeenClicked = false
+        verticalScroll = null
     }
 
     private fun setupUi() = with(binding) {
