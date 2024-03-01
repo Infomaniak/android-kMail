@@ -20,25 +20,29 @@ package com.infomaniak.mail.ui.main.folder
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.IdRes
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TwoPaneViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val draftController: DraftController,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
+
+    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     val currentThreadUid: LiveData<String?> = state.getLiveData(CURRENT_THREAD_UID_KEY)
 
@@ -57,16 +61,18 @@ class TwoPaneViewModel @Inject constructor(
         state[CURRENT_THREAD_UID_KEY] = null
     }
 
-    fun openDraft(thread: Thread) {
+    fun openDraft(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
         navigateToSelectedDraft(thread.messages.single())
     }
 
     private fun navigateToSelectedDraft(message: Message) = runCatchingRealm {
-        newMessageArgs.value = NewMessageActivityArgs(
-            arrivedFromExistingDraft = true,
-            draftLocalUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid,
-            draftResource = message.draftResource,
-            messageUid = message.uid,
+        newMessageArgs.postValue(
+            NewMessageActivityArgs(
+                arrivedFromExistingDraft = true,
+                draftLocalUuid = draftController.getDraftByMessageUid(message.uid)?.localUuid,
+                draftResource = message.draftResource,
+                messageUid = message.uid,
+            ),
         )
     }
 
