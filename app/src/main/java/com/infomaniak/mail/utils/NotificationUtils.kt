@@ -25,6 +25,7 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat.NotificationWithIdAndTag
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.pendingIntentFlags
 import com.infomaniak.lib.core.utils.SentryLog
@@ -45,6 +46,7 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import io.realm.kotlin.Realm
 import io.sentry.SentryLevel
+import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -56,6 +58,10 @@ class NotificationUtils @Inject constructor(
     private val localSettings: LocalSettings,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
 ) {
+
+    private val notificationsList = mutableListOf<NotificationWithIdAndTag>()
+
+    private var notificationJob: Job? = null
 
     fun initNotificationChannel() = with(appContext) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -194,8 +200,23 @@ class NotificationUtils @Inject constructor(
 
             SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: $messageUid")
 
+            notificationsList.add(0, NotificationWithIdAndTag(notificationId, build()))
+        }
+
+        showNotification(notificationManagerCompat)
+    }
+
+    private fun showNotification(notificationManagerCompat: NotificationManagerCompat) {
+        notificationJob?.cancel()
+        notificationJob = GlobalScope.launch(Dispatchers.IO) {
+            delay(DELAY_DEBOUNCE_NOTIF_MS)
+            ensureActive()
+
             @Suppress("MissingPermission")
-            notificationManagerCompat.notify(notificationId, build())
+            with(notificationsList) {
+                notificationManagerCompat.notify(this)
+                clear()
+            }
         }
     }
 
@@ -257,12 +278,12 @@ class NotificationUtils @Inject constructor(
     }
 
     companion object : NotificationUtilsCore() {
+        private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
+        private const val DELAY_DEBOUNCE_NOTIF_MS = 500L
 
         private val TAG: String = NotificationUtils::class.java.simpleName
 
         const val DRAFT_ACTIONS_ID = 1
-
-        private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
