@@ -258,7 +258,12 @@ class RefreshController @Inject constructor(
 
         return when (refreshMode) {
             REFRESH_FOLDER_WITH_ROLE -> refreshWithRoleConsideration(scope)
-            REFRESH_FOLDER -> refresh(scope, initialFolder)
+            REFRESH_FOLDER -> {
+                refresh(scope, initialFolder).also {
+                    onStop?.invoke()
+                    clearCallbacks()
+                }
+            }
             ONE_PAGE_OF_OLD_MESSAGES -> {
                 fetchOneOldPage(scope, initialFolder)
                 emptySet()
@@ -269,6 +274,8 @@ class RefreshController @Inject constructor(
     private suspend fun Realm.refreshWithRoleConsideration(scope: CoroutineScope): Set<Thread> {
 
         val impactedThreads = refresh(scope, initialFolder)
+        onStop?.invoke()
+        clearCallbacks()
 
         when (initialFolder.role) {
             FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT)
@@ -839,13 +846,11 @@ class RefreshController @Inject constructor(
     //region Handle errors
     private fun handleAllExceptions(throwable: Throwable) {
 
-        // We force-cancelled, so we need to call the `stopped` callback.
-        if (throwable is ForcedCancellationException) onStop?.invoke()
-
-        // It failed, but not because we cancelled it. Something bad happened, so we call the `stopped` callback.
-        if (throwable !is CancellationException) onStop?.invoke()
-
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
+
+        // This is the end. The `onStop` callback should be called before we are gone.
+        onStop?.invoke()
+        clearCallbacks()
     }
 
     private fun ApiErrorException.handleOtherApiErrors() {

@@ -67,6 +67,7 @@ class SharedUtils @Inject constructor(
         mailbox: Mailbox,
         threads: List<Thread>,
         message: Message? = null,
+        currentFolderId: String? = null,
         callbacks: RefreshCallbacks? = null,
         shouldRefreshThreads: Boolean = true,
     ) {
@@ -82,6 +83,7 @@ class SharedUtils @Inject constructor(
             refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
+                currentFolderId = currentFolderId,
                 callbacks = callbacks,
             )
         }
@@ -96,6 +98,7 @@ class SharedUtils @Inject constructor(
         mailbox: Mailbox,
         messagesFoldersIds: List<String>,
         destinationFolderId: String? = null,
+        currentFolderId: String? = null,
         callbacks: RefreshCallbacks? = null,
     ) {
 
@@ -110,7 +113,7 @@ class SharedUtils @Inject constructor(
                     mailbox = mailbox,
                     folder = folder,
                     realm = mailboxContentRealm(),
-                    callbacks = callbacks,
+                    callbacks = if (folderId == currentFolderId) callbacks else null,
                 )
             }
         }
