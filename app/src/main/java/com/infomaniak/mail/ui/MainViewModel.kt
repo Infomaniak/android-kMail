@@ -346,9 +346,12 @@ class MainViewModel @Inject constructor(
     private fun updateExternalMailInfo(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh External Mail info")
         with(ApiRepository.getExternalMailInfo(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess() && data != null) mailboxController.updateMailbox(mailbox.objectId) {
-                it.externalMailFlagEnabled = data!!.externalMailFlagEnabled
-                it.trustedDomains = data!!.trustedDomains.toRealmList()
+            if (!isSuccess()) return@launch
+            data?.let { externalMailInfo ->
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.externalMailFlagEnabled = externalMailInfo.externalMailFlagEnabled
+                    it.trustedDomains = externalMailInfo.trustedDomains.toRealmList()
+                }
             }
         }
     }
