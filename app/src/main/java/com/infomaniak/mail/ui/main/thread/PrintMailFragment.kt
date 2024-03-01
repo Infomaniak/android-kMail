@@ -55,10 +55,13 @@ class PrintMailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(threadViewModel) {
         super.onViewCreated(view, savedInstanceState)
+
         setupAdapter()
+
         messagesLive.observe(viewLifecycleOwner) { (items, _) ->
             threadAdapter.submitList(items.filter { it is Message && it.uid == navigationArgs.messageUid })
         }
+
         navigationArgs.openThreadUid?.let {
             reassignThreadLive(it)
             reassignMessagesLive(it)

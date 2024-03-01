@@ -756,7 +756,7 @@ class ThreadAdapter(
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                     navigateToNewMessageActivity = navigateToNewMessageActivity,
                     onPageFinished = onPageFinished,
-                    onWebViewFinishedLoading = onWebViewFinishedLoading
+                    onWebViewFinishedLoading = onWebViewFinishedLoading,
                 )
                 _fullMessageWebViewClient = binding.fullMessageWebView.initWebViewClientAndBridge(
                     attachments = message.attachments,
@@ -764,7 +764,7 @@ class ThreadAdapter(
                     shouldLoadDistantResources = shouldLoadDistantResources,
                     onBlockedResourcesDetected = ::promptUserForDistantImages,
                     navigateToNewMessageActivity = navigateToNewMessageActivity,
-                    onWebViewFinishedLoading = onWebViewFinishedLoading
+                    onWebViewFinishedLoading = onWebViewFinishedLoading,
                 )
             }
         }

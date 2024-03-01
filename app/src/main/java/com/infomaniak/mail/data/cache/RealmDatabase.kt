@@ -116,12 +116,12 @@ object RealmDatabase {
     //endregion
 
     //region Reset Realms
-    fun backUpPreviousRealms() {
+    fun backupPreviousRealms() {
         oldUserInfo = WeakReference(_userInfo)
-        backUpPreviousMailboxContent()
+        backupPreviousMailboxContent()
     }
 
-    fun backUpPreviousMailboxContent() {
+    fun backupPreviousMailboxContent() {
         oldMailboxContent = WeakReference(_mailboxContent)
     }
 
