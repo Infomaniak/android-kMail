@@ -73,15 +73,15 @@ class ThreadViewModel @Inject constructor(
     private var fetchMessagesJob: Job? = null
     private var fetchCalendarEventJob: Job? = null
 
-    val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
-
     val threadLive = MutableLiveData<Thread?>()
     val messagesLive = MutableLiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>()
 
-    val threadState = ThreadState()
+    val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
-    var deletedMessagesUids = mutableSetOf<String>()
     val failedMessagesUids = SingleLiveEvent<List<String>>()
+    var deletedMessagesUids = mutableSetOf<String>()
+
+    val threadState = ThreadState()
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
