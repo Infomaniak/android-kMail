@@ -71,21 +71,18 @@ class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
     private val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf(),
+    private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
 
     inline val items: MutableList<Any> get() = currentList
 
-    var isExpandedMap = mutableMapOf<String, Boolean>()
-
     //region Auto-scroll at Thread opening
-    var initialSetOfExpandedMessagesUids = setOf<String>()
     private val currentSetOfLoadedExpandedMessagesUids = mutableSetOf<String>()
     private var hasNotScrolledYet = true
     //endregion
 
     private val manuallyAllowedMessageUids = mutableSetOf<String>()
-    var isThemeTheSameMap = mutableMapOf<String, Boolean>()
 
     private lateinit var recyclerView: RecyclerView
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
@@ -150,7 +147,7 @@ class ThreadAdapter(
         }
     }.getOrDefault(Unit)
 
-    private fun MessageViewHolder.handleToggleLightModePayload(messageUid: String) {
+    private fun MessageViewHolder.handleToggleLightModePayload(messageUid: String) = with(threadAdapterState) {
         isThemeTheSameMap[messageUid] = !isThemeTheSameMap[messageUid]!!
         toggleContentAndQuoteTheme(messageUid)
     }
@@ -158,7 +155,7 @@ class ThreadAdapter(
     private fun ItemMessageBinding.handleFailedMessagePayload(messageUid: String) {
         messageLoader.isGone = true
         failedLoadingErrorMessage.isVisible = true
-        if (isExpandedMap[messageUid] == true) onExpandedMessageLoaded(messageUid)
+        if (threadAdapterState.isExpandedMap[messageUid] == true) onExpandedMessageLoaded(messageUid)
     }
 
     private fun ItemMessageBinding.handleCalendarAttendancePayload(message: Message) {
@@ -194,6 +191,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindMail(message: Message, position: Int) {
+
         initMapForNewMessage(message, position)
 
         bindHeader(message)
@@ -240,7 +238,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun initMapForNewMessage(message: Message, position: Int) {
+    private fun initMapForNewMessage(message: Message, position: Int) = with(threadAdapterState) {
         if (isExpandedMap[message.uid] == null) {
             isExpandedMap[message.uid] = message.shouldBeExpanded(position, items.lastIndex)
         }
@@ -249,7 +247,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.toggleContentAndQuoteTheme(messageUid: String) = with(binding) {
-        val isThemeTheSame = isThemeTheSameMap[messageUid]!!
+        val isThemeTheSame = threadAdapterState.isThemeTheSameMap[messageUid]!!
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
         toggleFrameLayoutsTheme(isThemeTheSame)
@@ -285,7 +283,7 @@ class ThreadAdapter(
 
     private fun WebView.applyWebViewContent(uid: String, bodyWebView: String, type: String) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSameMap[uid]!!)
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, threadAdapterState.isThemeTheSameMap[uid]!!)
         }
 
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
@@ -298,7 +296,8 @@ class ThreadAdapter(
     }
 
     private fun WebView.processMailDisplay(styledBody: String, uid: String, isForPrinting: Boolean): String {
-        val isDisplayedInDark = context.isNightModeEnabled() && isThemeTheSameMap[uid] == true && !isForPrinting
+        val isDisplayedInDark =
+            context.isNightModeEnabled() && threadAdapterState.isThemeTheSameMap[uid] == true && !isForPrinting
         return if (isForPrinting) {
             webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, items.first() as Message))
         } else {
@@ -369,8 +368,8 @@ class ThreadAdapter(
         bccGroup.isVisible = message.bcc.isNotEmpty()
     }
 
-    private fun MessageViewHolder.handleHeaderClick(message: Message) = with(binding) {
-        messageHeader.setOnClickListener {
+    private fun MessageViewHolder.handleHeaderClick(message: Message) = with(threadAdapterState) {
+        binding.messageHeader.setOnClickListener {
             if (isExpandedMap[message.uid] == true) {
                 isExpandedMap[message.uid] = false
                 onExpandOrCollapseMessage(message)
@@ -467,6 +466,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindBody(message: Message, hasQuote: Boolean) = with(binding) {
+
         bodyWebView.setupLinkContextualMenu { data, type ->
             threadAdapterCallbacks?.promptLink?.invoke(data, type)
         }
@@ -536,7 +536,7 @@ class ThreadAdapter(
     private fun onExpandedMessageLoaded(messageUid: String) {
         if (hasNotScrolledYet) {
             currentSetOfLoadedExpandedMessagesUids.add(messageUid)
-            if (currentSetOfLoadedExpandedMessagesUids.containsAll(initialSetOfExpandedMessagesUids)) {
+            if (currentSetOfLoadedExpandedMessagesUids.containsAll(threadAdapterState.isExpandedMap.keys)) {
                 hasNotScrolledYet = false
                 threadAdapterCallbacks?.onAllExpandedMessagesLoaded?.invoke()
             }
@@ -544,7 +544,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
-        val isExpanded = isExpandedMap[message.uid]!!
+        val isExpanded = threadAdapterState.isExpandedMap[message.uid]!!
 
         if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
 
@@ -693,7 +693,6 @@ class ThreadAdapter(
 
     data class SuperCollapsedBlock(
         var shouldBeDisplayed: Boolean = true,
-        var hasBeenClicked: Boolean = false,
         val messagesUids: MutableSet<String> = mutableSetOf(),
     ) {
         fun isFirstTime() = shouldBeDisplayed && messagesUids.isEmpty()

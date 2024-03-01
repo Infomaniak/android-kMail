@@ -191,7 +191,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             }
 
             // If we are coming from a Notification, we need to navigate to ThreadFragment.
-            twoPaneViewModel.openThread(threadUid)
+            openThreadAndResetBackup(threadUid)
         }
     }
 

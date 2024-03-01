@@ -64,7 +64,6 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel.OpenThreadResult
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
@@ -159,6 +158,10 @@ class ThreadFragment : Fragment() {
         _binding = null
     }
 
+    fun resetThreadBackupCache() {
+        threadViewModel.resetThreadBackupCache()
+    }
+
     private fun setupUi() = with(binding) {
 
         updateNavigationIcon()
@@ -202,6 +205,12 @@ class ThreadFragment : Fragment() {
         adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
+            threadAdapterState = object : ThreadAdapterState {
+                override var isExpandedMap by threadViewModel::isExpandedMap
+                override var isThemeTheSameMap by threadViewModel::isThemeTheSameMap
+                override var hasSuperCollapsedBlockBeenClicked by threadViewModel::hasSuperCollapsedBlockBeenClicked
+                override var verticalScroll by threadViewModel::verticalScroll
+            },
             threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onContactClicked = {
                     safeNavigate(
@@ -318,15 +327,14 @@ class ThreadFragment : Fragment() {
             resetMessagesRelatedCache()
             displayThreadView()
 
-            openThread(threadUid).observe(viewLifecycleOwner) { result ->
+            openThread(threadUid).observe(viewLifecycleOwner) { thread ->
 
-                if (result == null) {
+                if (thread == null) {
                     twoPaneViewModel.closeThread()
                     return@observe
                 }
 
-                initUi(threadUid, folderRole = mainViewModel.getActionFolderRole(result.thread))
-                initAdapter(result)
+                initUi(threadUid, folderRole = mainViewModel.getActionFolderRole(thread))
 
                 reassignThreadLive(threadUid)
                 reassignMessagesLive(threadUid)
@@ -503,14 +511,6 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun initAdapter(result: OpenThreadResult) {
-        threadAdapter.apply {
-            isExpandedMap = result.isExpandedMap
-            initialSetOfExpandedMessagesUids = result.initialSetOfExpandedMessagesUids
-            isThemeTheSameMap = result.isThemeTheSameMap
-        }
-    }
-
     private fun scheduleDownloadManager(downloadUrl: String, filename: String) {
 
         fun scheduleDownloadManager() = mainViewModel.scheduleDownload(downloadUrl, filename)
@@ -557,44 +557,47 @@ class ThreadFragment : Fragment() {
             args = MessageActionsBottomSheetDialogArgs(
                 messageUid = uid,
                 threadUid = twoPaneViewModel.currentThreadUid.value ?: return,
-                isThemeTheSame = threadAdapter.isThemeTheSameMap[uid] ?: return,
+                isThemeTheSame = threadViewModel.isThemeTheSameMap[uid] ?: return,
                 shouldLoadDistantResources = shouldLoadDistantResources(uid),
             ).toBundle(),
         )
     }
 
-    private fun scrollToFirstUnseenMessage() = with(binding) {
+    private fun scrollToFirstUnseenMessage() = with(threadViewModel) {
 
-        fun scrollToBottom() {
-            messagesListNestedScrollView.scrollY = messagesListNestedScrollView.maxScrollAmount
-        }
+        fun getBottomY(): Int = binding.messagesListNestedScrollView.maxScrollAmount
 
-        val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && threadAdapter.isExpandedMap[it.uid] == true }
+        val scrollY = verticalScroll ?: run {
 
-        // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
-        // we want to automatically scroll to the very bottom.
-        if (indexToScroll == -1) {
-            scrollToBottom()
-        } else {
-            val targetChild = messagesList.getChildAt(indexToScroll)
-            if (targetChild == null) {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.WARNING
-                    scope.setExtra("indexToScroll", indexToScroll.toString())
-                    scope.setExtra("messageCount", threadAdapter.items.count().toString())
-                    scope.setExtra("isExpandedMap", threadAdapter.isExpandedMap.toString())
-                    scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
-                    Sentry.captureMessage("Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom")
-                }
-                scrollToBottom()
+            val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && isExpandedMap[it.uid] == true }
+
+            // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
+            // we want to automatically scroll to the very bottom.
+            if (indexToScroll == -1) {
+                getBottomY()
             } else {
-                messagesListNestedScrollView.scrollY = targetChild.top
+                val targetChild = binding.messagesList.getChildAt(indexToScroll)
+                if (targetChild == null) {
+                    Sentry.withScope { scope ->
+                        scope.level = SentryLevel.ERROR
+                        scope.setExtra("indexToScroll", indexToScroll.toString())
+                        scope.setExtra("messageCount", threadAdapter.items.count().toString())
+                        scope.setExtra("isExpandedMap", isExpandedMap.toString())
+                        scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
+                        Sentry.captureMessage("Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom")
+                    }
+                    getBottomY()
+                } else {
+                    targetChild.top
+                }
             }
         }
+
+        binding.messagesListNestedScrollView.scrollY = scrollY
     }
 
     private fun expandSuperCollapsedBlock() = with(threadViewModel) {
-        superCollapsedBlock?.hasBeenClicked = true
+        hasSuperCollapsedBlockBeenClicked = true
         reassignMessagesLive(twoPaneViewModel.currentThreadUid.value!!)
     }
 

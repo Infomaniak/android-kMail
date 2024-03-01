@@ -67,10 +67,16 @@ class PrintMailFragment : Fragment() {
         }
     }
 
-    private fun setupAdapter() = with(binding.messagesList) {
-        adapter = ThreadAdapter(
+    private fun setupAdapter() {
+        binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = true,
             isForPrinting = true,
+            threadAdapterState = object : ThreadAdapterState {
+                override var isExpandedMap by threadViewModel::isExpandedMap
+                override var isThemeTheSameMap by threadViewModel::isThemeTheSameMap
+                override var hasSuperCollapsedBlockBeenClicked by threadViewModel::hasSuperCollapsedBlockBeenClicked
+                override var verticalScroll by threadViewModel::verticalScroll
+            },
             threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onBodyWebViewFinishedLoading = { startPrintingView() },
             ),
