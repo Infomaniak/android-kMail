@@ -352,18 +352,13 @@ class ThreadFragment : Fragment() {
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
-    private fun observeThreadLive() = with(threadViewModel) {
+    private fun observeThreadLive() {
 
-        threadLive.observe(viewLifecycleOwner) { thread ->
+        threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
 
             if (thread == null) {
                 twoPaneViewModel.closeThread()
                 return@observe
-            }
-
-            if (threadState.shouldMarkThreadAsSeen == true) {
-                threadState.shouldMarkThreadAsSeen = false
-                markThreadAsSeen(thread)
             }
 
             binding.iconFavorite.apply {

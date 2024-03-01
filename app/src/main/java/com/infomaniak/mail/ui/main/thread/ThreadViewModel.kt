@@ -255,12 +255,15 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        if (threadState.shouldMarkThreadAsSeen == null) threadState.shouldMarkThreadAsSeen = thread.unseenMessagesCount > 0
+        if (!threadState.hasBeenMarkedAsSeen) {
+            threadState.hasBeenMarkedAsSeen = true
+            if (thread.unseenMessagesCount > 0) markThreadAsSeen(thread)
+        }
 
         emit(thread)
     }
 
-    fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
+    private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
 
