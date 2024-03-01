@@ -107,13 +107,6 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    fun resetThreadBackupCache() {
-        isExpandedMap = mutableMapOf()
-        isThemeTheSameMap = mutableMapOf()
-        hasSuperCollapsedBlockBeenClicked = false
-        verticalScroll = null
-    }
-
     fun resetMessagesRelatedCache() {
         treatedMessagesForCalendarEvent.clear()
         isCalendarEventExpandedMap.clear()

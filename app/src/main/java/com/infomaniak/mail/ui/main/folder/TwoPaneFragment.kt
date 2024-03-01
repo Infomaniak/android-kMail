@@ -138,12 +138,12 @@ abstract class TwoPaneFragment : Fragment() {
             trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
             twoPaneViewModel.openDraft(thread)
         } else {
-            openThreadAndResetBackup(thread.uid)
+            openThreadAndResetItsState(thread.uid)
         }
     }
 
-    fun openThreadAndResetBackup(threadUid: String) {
-        getRightPane()?.getFragment<ThreadFragment?>()?.resetThreadBackupCache()
+    fun openThreadAndResetItsState(threadUid: String) {
+        getRightPane()?.getFragment<ThreadFragment?>()?.resetThreadState()
         twoPaneViewModel.openThread(threadUid)
     }
 

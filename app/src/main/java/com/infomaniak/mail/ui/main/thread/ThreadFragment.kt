@@ -163,8 +163,11 @@ class ThreadFragment : Fragment() {
         _binding = null
     }
 
-    fun resetThreadBackupCache() {
-        threadViewModel.resetThreadBackupCache()
+    fun resetThreadState() = with(threadViewModel) {
+        isExpandedMap = mutableMapOf()
+        isThemeTheSameMap = mutableMapOf()
+        hasSuperCollapsedBlockBeenClicked = false
+        verticalScroll = null
     }
 
     private fun setupUi() = with(binding) {
@@ -205,11 +208,11 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun setupAdapter() = with(binding.messagesList) {
+    private fun setupAdapter() = with(threadViewModel) {
 
-        adapter = ThreadAdapter(
+        binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
-            isCalendarEventExpandedMap = threadViewModel.isCalendarEventExpandedMap,
+            isCalendarEventExpandedMap = isCalendarEventExpandedMap,
             threadAdapterState = object : ThreadAdapterState {
                 override var isExpandedMap by threadViewModel::isExpandedMap
                 override var isThemeTheSameMap by threadViewModel::isThemeTheSameMap
@@ -234,7 +237,7 @@ class ThreadFragment : Fragment() {
                 },
                 onDeleteDraftClicked = { message ->
                     trackMessageActionsEvent("deleteDraft")
-                    mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
+                    mainViewModel.currentMailbox.value?.let { mailbox -> deleteDraft(message, mailbox) }
                 },
                 onAttachmentClicked = {
                     trackAttachmentActionsEvent("open")
@@ -276,13 +279,13 @@ class ThreadFragment : Fragment() {
                     navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
                 },
                 replyToCalendarEvent = { attendanceState, message ->
-                    threadViewModel.replyToCalendarEvent(
+                    replyToCalendarEvent(
                         attendanceState,
                         message,
                     ).observe(viewLifecycleOwner) { successfullyUpdated ->
                         if (successfullyUpdated) {
                             snackbarManager.setValue(getString(R.string.snackbarCalendarChoiceSent))
-                            threadViewModel.fetchCalendarEvents(listOf(message), forceFetch = true)
+                            fetchCalendarEvents(listOf(message), forceFetch = true)
                         } else {
                             snackbarManager.setValue(getString(R.string.errorCalendarChoiceCouldNotBeSent))
                             threadAdapter.undoUserAttendanceClick(message)
@@ -307,14 +310,14 @@ class ThreadFragment : Fragment() {
             ),
         )
 
-        addItemDecoration(
+        binding.messagesList.addItemDecoration(
             DividerItemDecorator(
                 divider = InsetDrawable(dividerDrawable(context), 0),
                 shouldIgnoreView = { view -> view.tag == ThreadAdapter.IGNORE_DIVIDER_TAG },
             ),
         )
 
-        recycledViewPool.setMaxRecycledViews(0, 0)
+        binding.messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
