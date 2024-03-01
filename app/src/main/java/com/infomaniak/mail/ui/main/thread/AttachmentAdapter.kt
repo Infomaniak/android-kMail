@@ -77,9 +77,7 @@ class AttachmentAdapter(
 
     override fun getItemCount(): Int = runCatchingRealm { attachments.count() }.getOrDefault(0)
 
-    fun setAttachments(newList: List<Attachment>) = runCatchingRealm {
-        attachments = newList.toMutableList()
-    }
+    fun setAttachments(newList: List<Attachment>) = runCatchingRealm { attachments = newList.toMutableList() }
 
     fun addAll(newAttachments: List<Attachment>) {
         attachments.addAll(newAttachments.filterNot { it.disposition == AttachmentDisposition.INLINE })
