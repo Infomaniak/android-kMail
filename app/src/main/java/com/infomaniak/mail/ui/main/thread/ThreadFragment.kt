@@ -350,18 +350,18 @@ class ThreadFragment : Fragment() {
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
-    private fun observeThreadLive() = with(binding) {
+    private fun observeThreadLive() = with(threadViewModel) {
 
-        threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
+        threadLive.observe(viewLifecycleOwner) { thread ->
 
             if (thread == null) {
                 twoPaneViewModel.closeThread()
                 return@observe
             }
 
-            threadSubject.movementMethod = LinkMovementMethod.getInstance()
+            binding.threadSubject.movementMethod = LinkMovementMethod.getInstance()
 
-            iconFavorite.apply {
+            binding.iconFavorite.apply {
                 setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
                 val color = if (thread.isFavorite) {
                     context.getColor(R.color.favoriteYellow)
