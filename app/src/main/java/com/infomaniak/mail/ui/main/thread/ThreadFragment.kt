@@ -169,6 +169,8 @@ class ThreadFragment : Fragment() {
 
     private fun setupUi() = with(binding) {
 
+        threadSubject.movementMethod = LinkMovementMethod.getInstance()
+
         updateNavigationIcon()
         toolbar.setNavigationOnClickListener { twoPaneViewModel.closeThread() }
 
@@ -358,8 +360,6 @@ class ThreadFragment : Fragment() {
                 twoPaneViewModel.closeThread()
                 return@observe
             }
-
-            binding.threadSubject.movementMethod = LinkMovementMethod.getInstance()
 
             binding.iconFavorite.apply {
                 setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
