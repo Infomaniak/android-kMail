@@ -471,9 +471,7 @@ class NewMessageFragment : Fragment() {
     private fun observeNewAttachments() = with(newMessageViewModel) {
         importedAttachments.observe(viewLifecycleOwner) { (newAttachments, importationResult) ->
             attachmentAdapter.addAll(newAttachments)
-            newAttachments.filter { newAttachment ->
-                draft.attachments.none { it.uploadLocalUri == newAttachment.uploadLocalUri }
-            }.let(draft.attachments::addAll)
+            updateMailAttachment(newAttachments)
 
             binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 

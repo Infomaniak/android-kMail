@@ -572,6 +572,12 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    fun updateMailAttachment(newAttachments: List<Attachment>) {
+        newAttachments.filter { newAttachment ->
+            draft.attachments.none { it.uploadLocalUri == newAttachment.uploadLocalUri }
+        }.let(draft.attachments::addAll)
+    }
+
     // In case the app crashes, the battery dies or any other unexpected situation, we always save every modifications of the draft in realm
     fun saveDraftDebouncing() {
         autoSaveJob?.cancel()
