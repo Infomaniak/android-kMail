@@ -361,6 +361,11 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
+            if (threadState.shouldMarkThreadAsSeen == true) {
+                threadState.shouldMarkThreadAsSeen = false
+                markThreadAsSeen(thread)
+            }
+
             binding.iconFavorite.apply {
                 setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
                 val color = if (thread.isFavorite) {
@@ -377,11 +382,6 @@ class ThreadFragment : Fragment() {
 
         messagesLive.observe(viewLifecycleOwner) { (items, messagesToFetch) ->
             SentryLog.i("UI", "Received ${items.count()} messages")
-
-            if (threadState.shouldMarkThreadAsSeen) {
-                threadState.shouldMarkThreadAsSeen = false
-                markThreadAsSeen()
-            }
 
             if (items.isEmpty()) {
                 mainViewModel.deletedMessages.value = deletedMessagesUids
