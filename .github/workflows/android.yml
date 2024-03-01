@@ -16,17 +16,17 @@ jobs:
     runs-on: [ self-hosted, Android ]
     strategy:
       matrix:
-        api-level: [ 31 ]
+        api-level: [ 34 ]
         target: [ google_apis ]
 
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
+        uses: styfle/cancel-workflow-action@0.12.1
         with:
           access_token: ${{ github.token }}
 
       - name: Checkout the code
-        uses: actions/checkout@v3.5.0
+        uses: actions/checkout@v4.1.1
         with:
           token: ${{ secrets.MY_REPO_PAT }}
           submodules: recursive
