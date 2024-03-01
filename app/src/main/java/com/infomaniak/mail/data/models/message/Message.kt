@@ -300,7 +300,7 @@ class Message : RealmObject {
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
 
     fun toThread() = Thread().apply {
-        uid = this@Message.uid
+        uid = this@Message.uid // TODO: Check if we can use random UUID instead ?
         folderId = this@Message.folderId
         messagesIds += this@Message.messageIds
         messages += this@Message

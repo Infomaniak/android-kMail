@@ -44,7 +44,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             ?.messages?.query("${Message::isDeletedOnApi.name} == false")
             ?.sort(Message::date.name, Sort.ASCENDING)
     }
-
     //endregion
 
     //region Get data
@@ -134,6 +133,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     fun getSortedAndNotDeletedMessagesAsync(threadUid: String): Flow<ResultsChange<Message>>? {
         return getSortedAndNotDeletedMessagesQuery(threadUid)?.asFlow()
     }
+
+    fun getMessagesAsync(messageUid: String): Flow<ResultsChange<Message>> {
+        return getMessagesQuery(messageUid, mailboxContentRealm()).asFlow()
+    }
     //endregion
 
     //region Edit data
@@ -162,8 +165,12 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                 .limit(fibonacci)
         }
 
+        private fun getMessagesQuery(messageUid: String, realm: TypedRealm): RealmQuery<Message> {
+            return realm.query<Message>("${Message::uid.name} == $0", messageUid)
+        }
+
         private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
-            return realm.query<Message>("${Message::uid.name} == $0", uid).first()
+            return getMessagesQuery(uid, realm).first()
         }
         //endregion
 
