@@ -70,7 +70,6 @@ import com.google.android.material.R as RMaterial
 class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
-    private val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf(),
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
@@ -220,7 +219,7 @@ class ThreadAdapter(
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
                     attachment = calendarAttachment,
                     hasAssociatedInfomaniakCalendarEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
-                    shouldStartExpanded = isCalendarEventExpandedMap[message.uid] ?: false,
+                    shouldStartExpanded = threadAdapterState.isCalendarEventExpandedMap[message.uid] ?: false,
                 )
             }
 
@@ -234,7 +233,9 @@ class ThreadAdapter(
                 replyToCalendarEvent = { attendanceState ->
                     threadAdapterCallbacks?.replyToCalendarEvent?.invoke(attendanceState, message)
                 },
-                onAttendeesButtonClicked = { isExpanded -> isCalendarEventExpandedMap[message.uid] = isExpanded },
+                onAttendeesButtonClicked = { isExpanded ->
+                    threadAdapterState.isCalendarEventExpandedMap[message.uid] = isExpanded
+                },
             )
         }
     }

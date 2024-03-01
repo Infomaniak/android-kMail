@@ -36,7 +36,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.context
 import com.infomaniak.mail.utils.extensions.getUids
@@ -74,31 +73,15 @@ class ThreadViewModel @Inject constructor(
     private var fetchMessagesJob: Job? = null
     private var fetchCalendarEventJob: Job? = null
 
-    val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
-
-    //region Calendar Events
-    private val treatedMessagesForCalendarEvent = mutableSetOf<String>()
-    val isCalendarEventExpandedMap = mutableMapOf<String, Boolean>()
-    //endregion
-
-    var deletedMessagesUids = mutableSetOf<String>()
-    val failedMessagesUids = SingleLiveEvent<List<String>>()
-
     val threadLive = MutableLiveData<Thread?>()
     val messagesLive = MutableLiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>()
 
-    private val cachedSplitBodies = mutableMapOf<String, SplitBody>()
+    val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
-    var shouldMarkThreadAsSeen: Boolean = false
+    val failedMessagesUids = SingleLiveEvent<List<String>>()
+    var deletedMessagesUids = mutableSetOf<String>()
 
-    private var superCollapsedBlock: SuperCollapsedBlock? = null
-
-    //region Restore Thread state after going to MoveFragment or somewhere else, and then coming back to ThreadFragment.
-    var isExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
-    var isThemeTheSameMap: MutableMap<String, Boolean> = mutableMapOf()
-    var hasSuperCollapsedBlockBeenClicked: Boolean = false
-    var verticalScroll: Int? = null
-    //endregion
+    val threadState = ThreadState()
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -106,14 +89,6 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
-
-    fun resetMessagesRelatedCache() {
-        treatedMessagesForCalendarEvent.clear()
-        isCalendarEventExpandedMap.clear()
-        cachedSplitBodies.clear()
-        shouldMarkThreadAsSeen = false
-        superCollapsedBlock = null
-    }
 
     fun reassignThreadLive(threadUid: String) {
         threadLiveJob?.cancel()
@@ -144,7 +119,7 @@ class ThreadViewModel @Inject constructor(
     private suspend fun mapRealmMessagesResult(
         messages: RealmResults<Message>,
         threadUid: String,
-    ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
+    ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> = with(threadState) {
 
         superCollapsedBlock = superCollapsedBlock ?: SuperCollapsedBlock()
 
@@ -212,7 +187,7 @@ class ThreadViewModel @Inject constructor(
      * - If there's any unread Message in between, it will be displayed (hence, all following Messages will be displayed too).
      * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the Block.
      */
-    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean {
+    private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean = with(threadState) {
         return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
                 !hasSuperCollapsedBlockBeenClicked && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
@@ -223,7 +198,7 @@ class ThreadViewModel @Inject constructor(
     private suspend fun formatLists(
         messages: List<Message>,
         computeBehavior: (Int, String) -> MessageBehavior,
-    ): Pair<MutableList<Any>, MutableList<Message>> {
+    ): Pair<MutableList<Any>, MutableList<Message>> = with(threadState) {
 
         val items = mutableListOf<Any>()
         val messagesToFetch = mutableListOf<Message>()
@@ -237,12 +212,8 @@ class ThreadViewModel @Inject constructor(
 
         messages.forEachIndexed { index, message ->
             when (computeBehavior(index, message.uid)) {
-                MessageBehavior.DISPLAYED -> {
-                    addMessage(message)
-                }
-                MessageBehavior.COLLAPSED -> {
-                    superCollapsedBlock!!.messagesUids.add(message.uid)
-                }
+                MessageBehavior.DISPLAYED -> addMessage(message)
+                MessageBehavior.COLLAPSED -> superCollapsedBlock!!.messagesUids.add(message.uid)
                 MessageBehavior.FIRST_AFTER_BLOCK -> {
                     items += superCollapsedBlock!!
                     addMessage(message.apply { shouldHideDivider = true })
@@ -258,9 +229,9 @@ class ThreadViewModel @Inject constructor(
 
         message.apply {
             body?.let {
-                val isNotAlreadySplit = !cachedSplitBodies.contains(message.uid)
-                if (isNotAlreadySplit) cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
-                splitBody = cachedSplitBodies[message.uid]
+                val isNotAlreadySplit = !threadState.cachedSplitBodies.contains(message.uid)
+                if (isNotAlreadySplit) threadState.cachedSplitBodies[message.uid] = MessageBodyUtils.splitContentAndQuote(it)
+                splitBody = threadState.cachedSplitBodies[message.uid]
             }
         }
 
@@ -277,14 +248,14 @@ class ThreadViewModel @Inject constructor(
         sendMatomoAndSentryAboutThreadMessagesCount(thread)
 
         // These 2 will always be empty or not all together at the same time.
-        if (isExpandedMap.isEmpty() || isThemeTheSameMap.isEmpty()) {
+        if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
             thread.messages.forEachIndexed { index, message ->
-                isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
-                isThemeTheSameMap[message.uid] = true
+                threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
+                threadState.isThemeTheSameMap[message.uid] = true
             }
         }
 
-        shouldMarkThreadAsSeen = thread.unseenMessagesCount > 0
+        threadState.shouldMarkThreadAsSeen = thread.unseenMessagesCount > 0
 
         emit(thread)
     }
@@ -382,7 +353,7 @@ class ThreadViewModel @Inject constructor(
         if (!message.isFullyDownloaded()) return // Only treat message that have their Attachments downloaded
 
         if (!forceFetch) {
-            val alreadyTreated = !treatedMessagesForCalendarEvent.add(message.uid)
+            val alreadyTreated = !threadState.treatedMessagesForCalendarEvent.add(message.uid)
             if (alreadyTreated) return
         }
 
