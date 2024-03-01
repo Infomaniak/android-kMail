@@ -152,6 +152,11 @@ class ThreadFragment : Fragment() {
         updateNavigationIcon()
     }
 
+    override fun onStop() {
+        threadViewModel.verticalScroll = binding.messagesListNestedScrollView.scrollY
+        super.onStop()
+    }
+
     override fun onDestroyView() {
         threadAdapter.resetCallbacks()
         super.onDestroyView()
