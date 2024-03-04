@@ -88,10 +88,7 @@ class LoginActivity : AppCompatActivity() {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
 
             InfomaniakCore.bearerToken = apiToken.accessToken
-            val userProfileResponse = ApiRepository.getUserProfile(
-                HttpClient.okHttpClientNoTokenInterceptor,
-                ignoreDefaultAvatar = true,
-            )
+            val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor)
 
             if (userProfileResponse.result == ApiResponseStatus.ERROR) return userProfileResponse
             if (userProfileResponse.data == null) return getErrorResponse(RCore.string.anErrorHasOccurred)
