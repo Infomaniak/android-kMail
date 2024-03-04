@@ -59,10 +59,7 @@ import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.invoke
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
@@ -75,6 +72,7 @@ class ThreadListAdapter @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
 ) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
+    private var formatListJob: Job? = null
     private lateinit var recyclerView: RecyclerView
 
     override val realmAsyncListDiffer: AsyncListDiffer<Thread>? = null
@@ -572,7 +570,9 @@ class ThreadListAdapter @Inject constructor(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
-        globalCoroutineScope.launch {
+
+        formatListJob?.cancel()
+        formatListJob = globalCoroutineScope.launch {
 
             val formattedList = runCatchingRealm {
                 formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity).apply {
