@@ -57,11 +57,12 @@ class NotificationUtils @Inject constructor(
     private val appContext: Context,
     private val localSettings: LocalSettings,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
+    private val globalCoroutineScope: CoroutineScope,
 ) {
 
-    private val notificationsList = mutableListOf<NotificationWithIdAndTag>()
+    private val notificationsByMailboxId = mutableMapOf<Int, MutableList<NotificationWithIdAndTag>>()
 
-    private var notificationJob: Job? = null
+    private var notificationsJob: HashMap<Int, Job?>? = hashMapOf()
 
     fun initNotificationChannel() = with(appContext) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -169,7 +170,7 @@ class NotificationUtils @Inject constructor(
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
         initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
-        showNotification(notificationManagerCompat)
+        showNotification(mailboxId, notificationManagerCompat)
     }
 
     private fun getContentIntent(
@@ -215,22 +216,27 @@ class NotificationUtils @Inject constructor(
 
         SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")
 
-        notificationsList.add(0, NotificationWithIdAndTag(payload.notificationId, build()))
+        if (notificationsByMailboxId[mailbox.mailboxId] == null) {
+            notificationsByMailboxId[mailbox.mailboxId] = mutableListOf()
+        }
+        notificationsByMailboxId[mailbox.mailboxId]?.add(0, NotificationWithIdAndTag(payload.notificationId, build()))
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun showNotification(notificationManagerCompat: NotificationManagerCompat) {
-        notificationJob?.cancel()
-        notificationJob = GlobalScope.launch(Dispatchers.IO) {
+    private fun showNotification(
+        mailboxId: Int,
+        notificationManagerCompat: NotificationManagerCompat,
+    ) {
+        notificationsJob?.get(mailboxId)?.cancel()
+        notificationsJob?.set(mailboxId, globalCoroutineScope.launch {
             delay(DELAY_DEBOUNCE_NOTIF_MS)
             ensureActive()
 
             @Suppress("MissingPermission")
-            with(notificationsList) {
-                notificationManagerCompat.notify(this)
-                clear()
+            notificationsByMailboxId[mailboxId]?.let { notifications ->
+                notificationManagerCompat.notify(notifications)
+                notifications.clear()
             }
-        }
+        })
     }
 
     private fun NotificationCompat.Builder.addActions(payload: NotificationPayload) {
