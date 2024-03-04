@@ -62,7 +62,7 @@ class NotificationUtils @Inject constructor(
 
     private val notificationsByMailboxId = mutableMapOf<Int, MutableList<NotificationWithIdAndTag>>()
 
-    private var notificationsJob: HashMap<Int, Job?>? = hashMapOf()
+    private var notificationsJobByMailboxId: HashMap<Int, Job?>? = hashMapOf()
 
     fun initNotificationChannel() = with(appContext) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -226,8 +226,8 @@ class NotificationUtils @Inject constructor(
         mailboxId: Int,
         notificationManagerCompat: NotificationManagerCompat,
     ) {
-        notificationsJob?.get(mailboxId)?.cancel()
-        notificationsJob?.set(mailboxId, globalCoroutineScope.launch {
+        notificationsJobByMailboxId?.get(mailboxId)?.cancel()
+        notificationsJobByMailboxId?.set(mailboxId, globalCoroutineScope.launch {
             delay(DELAY_DEBOUNCE_NOTIF_MS)
             ensureActive()
 
