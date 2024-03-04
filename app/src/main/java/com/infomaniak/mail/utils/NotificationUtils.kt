@@ -163,15 +163,6 @@ class NotificationUtils @Inject constructor(
         showNotification(mailboxId, notificationManagerCompat)
     }
 
-    private fun buildMessageNotification(
-        channelId: String,
-        title: String,
-        description: String?,
-    ): NotificationCompat.Builder {
-        return appContext.buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
-            .setCategory(Notification.CATEGORY_EMAIL)
-    }
-
     private fun getContentIntent(
         payload: NotificationPayload,
         isUndo: Boolean,
@@ -188,6 +179,15 @@ class NotificationUtils @Inject constructor(
             ).toBundle(),
         )
         return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
+    }
+
+    private fun buildMessageNotification(
+        channelId: String,
+        title: String,
+        description: String?,
+    ): NotificationCompat.Builder {
+        return appContext.buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
+            .setCategory(Notification.CATEGORY_EMAIL)
     }
 
     private fun initMessageNotificationContent(
