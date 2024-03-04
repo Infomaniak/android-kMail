@@ -123,15 +123,6 @@ class NotificationUtils @Inject constructor(
         )
     }
 
-    private fun buildMessageNotification(
-        channelId: String,
-        title: String,
-        description: String?,
-    ): NotificationCompat.Builder {
-        return appContext.buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
-            .setCategory(Notification.CATEGORY_EMAIL)
-    }
-
     fun buildDraftActionsNotification(): NotificationCompat.Builder = with(appContext) {
         val channelId = getString(R.string.notification_channel_id_draft_service)
         return NotificationCompat.Builder(this, channelId)
@@ -170,6 +161,15 @@ class NotificationUtils @Inject constructor(
 
         initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
         showNotification(mailboxId, notificationManagerCompat)
+    }
+
+    private fun buildMessageNotification(
+        channelId: String,
+        title: String,
+        description: String?,
+    ): NotificationCompat.Builder {
+        return appContext.buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
+            .setCategory(Notification.CATEGORY_EMAIL)
     }
 
     private fun getContentIntent(
@@ -215,10 +215,8 @@ class NotificationUtils @Inject constructor(
 
         SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")
 
-        if (notificationsByMailboxId[mailbox.mailboxId] == null) {
-            notificationsByMailboxId[mailbox.mailboxId] = mutableListOf()
-        }
-        notificationsByMailboxId[mailbox.mailboxId]?.add(0, NotificationWithIdAndTag(payload.notificationId, build()))
+        val notificationWithIdAndTag = NotificationWithIdAndTag(payload.notificationId, build())
+        notificationsByMailboxId.getOrPut(mailbox.mailboxId) { mutableListOf() }.add(0, notificationWithIdAndTag)
     }
 
     private fun showNotification(
