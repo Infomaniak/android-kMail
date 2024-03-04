@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
-import android.view.WindowManager
+import android.view.WindowManager.LayoutParams
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
@@ -62,7 +62,7 @@ class NewMessageEditorManager @Inject constructor(
         _aiManager = aiManager
         _filePicker = FilePicker(fragment).apply {
             initCallback { uris ->
-                activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                activity.window.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                 newMessageViewModel.importAttachmentsToCurrentDraft(uris)
             }
         }
