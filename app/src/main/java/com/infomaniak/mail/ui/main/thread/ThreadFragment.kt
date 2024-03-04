@@ -352,9 +352,9 @@ class ThreadFragment : Fragment() {
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
-    private fun observeThreadLive() = with(threadViewModel) {
+    private fun observeThreadLive() {
 
-        threadLive.observe(viewLifecycleOwner) { thread ->
+        threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
 
             if (thread == null) {
                 twoPaneViewModel.closeThread()
@@ -377,11 +377,6 @@ class ThreadFragment : Fragment() {
 
         messagesLive.observe(viewLifecycleOwner) { (items, messagesToFetch) ->
             SentryLog.i("UI", "Received ${items.count()} messages")
-
-            if (threadState.shouldMarkThreadAsSeen) {
-                threadState.shouldMarkThreadAsSeen = false
-                markThreadAsSeen()
-            }
 
             if (items.isEmpty()) {
                 mainViewModel.deletedMessages.value = deletedMessagesUids
