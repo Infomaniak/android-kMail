@@ -117,7 +117,7 @@ object AccountUtils : CredentialManager() {
     }
 
     suspend fun updateCurrentUser(okHttpClient: OkHttpClient = HttpClient.okHttpClient) {
-        with(ApiRepository.getUserProfile(okHttpClient, ignoreDefaultAvatar = true)) {
+        with(ApiRepository.getUserProfile(okHttpClient)) {
             if (result != ApiResponseStatus.ERROR) requestUser(remoteUser = data ?: return)
         }
     }
