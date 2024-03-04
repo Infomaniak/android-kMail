@@ -575,7 +575,7 @@ class ThreadListAdapter @Inject constructor(
         formatListJob = globalCoroutineScope.launch {
 
             val formattedList = runCatchingRealm {
-                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity).apply {
+                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, scope = this).apply {
                     // Add "Load more" button
                     if (isLoadMoreDisplayed) add(Unit)
                 }
@@ -590,6 +590,7 @@ class ThreadListAdapter @Inject constructor(
         context: Context,
         folderRole: FolderRole?,
         threadDensity: ThreadDensity,
+        scope: CoroutineScope,
     ) = mutableListOf<Any>().apply {
 
         if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
@@ -598,12 +599,16 @@ class ThreadListAdapter @Inject constructor(
 
         if (threadDensity == ThreadDensity.COMPACT) {
             if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
-                multiSelection?.selectedItems?.removeAll { !threads.contains(it) }
+                multiSelection?.selectedItems?.removeAll {
+                    scope.ensureActive()
+                    !threads.contains(it)
+                }
             }
             addAll(threads)
         } else {
             var previousSectionTitle = ""
             threads.forEach { thread ->
+                scope.ensureActive()
                 val sectionTitle = thread.getSectionTitle(context)
                 when {
                     sectionTitle != previousSectionTitle -> {
