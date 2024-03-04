@@ -142,6 +142,7 @@ class NotificationUtils @Inject constructor(
     }
 
     fun showMessageNotification(
+        coroutineScope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
     ) = with(payload) {
@@ -160,7 +161,7 @@ class NotificationUtils @Inject constructor(
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
         initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
-        showNotifications(mailboxId, notificationManagerCompat)
+        showNotifications(coroutineScope, mailboxId, notificationManagerCompat)
     }
 
     private fun getContentIntent(
@@ -220,11 +221,12 @@ class NotificationUtils @Inject constructor(
     }
 
     private fun showNotifications(
+        coroutineScope: CoroutineScope,
         mailboxId: Int,
         notificationManagerCompat: NotificationManagerCompat,
     ) {
         notificationsJobByMailboxId[mailboxId]?.cancel()
-        notificationsJobByMailboxId[mailboxId] = globalCoroutineScope.launch {
+        notificationsJobByMailboxId[mailboxId] = coroutineScope.launch {
             delay(DELAY_DEBOUNCE_NOTIF_MS)
             ensureActive()
 
