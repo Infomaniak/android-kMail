@@ -160,7 +160,7 @@ class NotificationUtils @Inject constructor(
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
         initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
-        showNotification(mailboxId, notificationManagerCompat)
+        showNotifications(mailboxId, notificationManagerCompat)
     }
 
     private fun getContentIntent(
@@ -219,7 +219,7 @@ class NotificationUtils @Inject constructor(
         notificationsByMailboxId.getOrPut(mailbox.mailboxId) { mutableListOf() }.add(0, notificationWithIdAndTag)
     }
 
-    private fun showNotification(
+    private fun showNotifications(
         mailboxId: Int,
         notificationManagerCompat: NotificationManagerCompat,
     ) {
