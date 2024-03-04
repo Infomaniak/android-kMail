@@ -150,24 +150,28 @@ class NotificationUtils @Inject constructor(
         )
     }
 
+    private fun getContentIntent(
+        payload: NotificationPayload,
+        isUndo: Boolean,
+    ): PendingIntent? = with(payload) {
+
+        if (isUndo) return null
+
+        val intent = Intent(appContext, LaunchActivity::class.java).clearStack().putExtras(
+            LaunchActivityArgs(
+                userId = userId,
+                mailboxId = mailboxId,
+                openThreadUid = if (isSummary) null else threadUid,
+            ).toBundle(),
+        )
+        val requestCode = if (isSummary) mailboxId else threadUid
+        return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
+    }
+
     fun showMessageNotification(
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
     ) = with(payload) {
-
-        fun contentIntent(mailboxUuid: String, isSummary: Boolean, isUndo: Boolean): PendingIntent? {
-            if (isUndo) return null
-
-            val intent = Intent(appContext, LaunchActivity::class.java).clearStack().putExtras(
-                LaunchActivityArgs(
-                    userId = userId,
-                    mailboxId = mailboxId,
-                    openThreadUid = if (isSummary) null else threadUid,
-                ).toBundle(),
-            )
-            val requestCode = if (isSummary) mailboxUuid else threadUid
-            return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
-        }
 
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification(
@@ -180,32 +184,41 @@ class NotificationUtils @Inject constructor(
             return@with
         }
 
-        buildMessageNotification(mailbox.channelId, title, description).apply {
-
-            if (isSummary) {
-                setContentTitle(null)
-                setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-            } else {
-                addActions(payload)
-            }
-
-            setOnlyAlertOnce(true)
-            setSubText(mailbox.email)
-            setContentText(content)
-            setColorized(true)
-            setContentIntent(contentIntent(mailbox.uuid, isSummary, isUndo))
-            setGroup(mailbox.notificationGroupKey)
-            setGroupSummary(isSummary)
-            color = localSettings.accentColor.getPrimary(appContext)
-
-            SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: $messageUid")
-
-            notificationsList.add(0, NotificationWithIdAndTag(notificationId, build()))
-        }
+        val contentIntent = getContentIntent(payload, isUndo)
+        val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
+        initMessageNotificationContent(notificationBuilder, payload, mailbox, contentIntent)
 
         showNotification(notificationManagerCompat)
     }
 
+    private fun initMessageNotificationContent(
+        notificationBuilder: NotificationCompat.Builder,
+        payload: NotificationPayload,
+        mailbox: Mailbox,
+        contentIntent: PendingIntent?,
+    ) = notificationBuilder.apply {
+        if (payload.isSummary) {
+            setContentTitle(null)
+            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+        } else {
+            addActions(payload)
+        }
+
+        setOnlyAlertOnce(true)
+        setSubText(mailbox.email)
+        setContentText(payload.content)
+        setColorized(true)
+        setContentIntent(contentIntent)
+        setGroup(mailbox.notificationGroupKey)
+        setGroupSummary(payload.isSummary)
+        color = localSettings.accentColor.getPrimary(appContext)
+
+        SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")
+
+        notificationsList.add(0, NotificationWithIdAndTag(payload.notificationId, build()))
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
     private fun showNotification(notificationManagerCompat: NotificationManagerCompat) {
         notificationJob?.cancel()
         notificationJob = GlobalScope.launch(Dispatchers.IO) {
