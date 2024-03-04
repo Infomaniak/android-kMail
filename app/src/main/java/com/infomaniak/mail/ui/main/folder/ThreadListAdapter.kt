@@ -373,19 +373,34 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.formatRecipientNames(recipients: List<Recipient>): String {
+
+        fun everyone(): String {
+
+            var everyone = ""
+            var isFirstMe = true
+
+            recipients.forEach { recipient ->
+
+                val name = recipient.displayedName(context)
+
+                val formattedName = when {
+                    recipient.isMe() -> (if (isFirstMe) name else null)?.also { isFirstMe = false }
+                    name.isEmail() -> name.substringBefore("@")
+                    else -> recipient.computeFirstAndLastName().first
+                }
+
+                formattedName?.let {
+                    everyone += if (everyone.isEmpty()) it else ", $it"
+                }
+            }
+
+            return everyone
+        }
+
         return when (recipients.count()) {
             0 -> context.getString(R.string.unknownRecipientTitle)
             1 -> recipients.single().displayedName(context)
-            else -> {
-                recipients.joinToString { recipient ->
-                    val name = recipient.displayedName(context)
-                    when {
-                        recipient.isMe() -> name
-                        name.isEmail() -> name.substringBefore("@")
-                        else -> recipient.computeFirstAndLastName().first
-                    }
-                }
-            }
+            else -> everyone()
         }
     }
 
