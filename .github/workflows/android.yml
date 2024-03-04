@@ -28,7 +28,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v4.1.1
         with:
-          token: ${{ secrets.MY_REPO_PAT }}
+          token: ${{ github.token }}
           submodules: recursive
 
       # Setup Gradle and run Build
