@@ -150,24 +150,6 @@ class NotificationUtils @Inject constructor(
         )
     }
 
-    private fun getContentIntent(
-        payload: NotificationPayload,
-        isUndo: Boolean,
-    ): PendingIntent? = with(payload) {
-
-        if (isUndo) return null
-
-        val intent = Intent(appContext, LaunchActivity::class.java).clearStack().putExtras(
-            LaunchActivityArgs(
-                userId = userId,
-                mailboxId = mailboxId,
-                openThreadUid = if (isSummary) null else threadUid,
-            ).toBundle(),
-        )
-        val requestCode = if (isSummary) mailboxId else threadUid
-        return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
-    }
-
     fun showMessageNotification(
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
@@ -183,20 +165,38 @@ class NotificationUtils @Inject constructor(
             )
             return@with
         }
-
-        val contentIntent = getContentIntent(payload, isUndo)
+        val contentIntent = getContentIntent(payload = this, isUndo)
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
-        initMessageNotificationContent(notificationBuilder, payload, mailbox, contentIntent)
 
+        initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
         showNotification(notificationManagerCompat)
     }
 
-    private fun initMessageNotificationContent(
-        notificationBuilder: NotificationCompat.Builder,
+    private fun getContentIntent(
         payload: NotificationPayload,
+        isUndo: Boolean,
+    ): PendingIntent? = with(payload) {
+
+        if (isUndo) return null
+
+        val requestCode = if (isSummary) mailboxId else threadUid
+        val intent = Intent(appContext, LaunchActivity::class.java).clearStack().putExtras(
+            LaunchActivityArgs(
+                userId = userId,
+                mailboxId = mailboxId,
+                openThreadUid = if (isSummary) null else threadUid,
+            ).toBundle(),
+        )
+        return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
+    }
+
+    private fun initMessageNotificationContent(
         mailbox: Mailbox,
         contentIntent: PendingIntent?,
+        notificationBuilder: NotificationCompat.Builder,
+        payload: NotificationPayload,
     ) = notificationBuilder.apply {
+
         if (payload.isSummary) {
             setContentTitle(null)
             setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
@@ -291,10 +291,11 @@ class NotificationUtils @Inject constructor(
     }
 
     companion object : NotificationUtilsCore() {
-        private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
-        private const val DELAY_DEBOUNCE_NOTIF_MS = 500L
 
         private val TAG: String = NotificationUtils::class.java.simpleName
+
+        private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
+        private const val DELAY_DEBOUNCE_NOTIF_MS = 500L
 
         const val DRAFT_ACTIONS_ID = 1
 
