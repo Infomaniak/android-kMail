@@ -329,6 +329,8 @@ class ThreadFragment : Fragment() {
 
     private fun observeThreadOpening() = with(threadViewModel) {
 
+        // test 1
+
         twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
 
             displayThreadView()
