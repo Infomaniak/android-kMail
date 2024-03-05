@@ -335,6 +335,8 @@ class ThreadFragment : Fragment() {
 
             displayThreadView()
 
+            // test 2
+
             openThread(threadUid).observe(viewLifecycleOwner) { thread ->
 
                 if (thread == null) {
