@@ -37,6 +37,7 @@ import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
 import io.realm.kotlin.Realm
 import io.sentry.SentryLevel
+import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -47,7 +48,16 @@ class FetchMessagesManager @Inject constructor(
     private val refreshController: RefreshController,
 ) {
 
-    suspend fun execute(userId: Int, mailbox: Mailbox, sentryMessageUid: String? = null, mailboxContentRealm: Realm? = null) {
+    private lateinit var coroutineScope: CoroutineScope
+
+    suspend fun execute(
+        scope: CoroutineScope,
+        userId: Int,
+        mailbox: Mailbox,
+        sentryMessageUid: String? = null,
+        mailboxContentRealm: Realm? = null,
+    ) {
+        coroutineScope = scope
 
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
             // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
@@ -203,6 +213,7 @@ class FetchMessagesManager @Inject constructor(
 
         // Show Message notification
         notificationUtils.showMessageNotification(
+            scope = coroutineScope,
             notificationManagerCompat = notificationManagerCompat,
             payload = NotificationPayload(
                 userId = userId,
@@ -224,6 +235,7 @@ class FetchMessagesManager @Inject constructor(
                 unReadThreadsCount,
             )
             notificationUtils.showMessageNotification(
+                scope = coroutineScope,
                 notificationManagerCompat = notificationManagerCompat,
                 payload = NotificationPayload(
                     userId = userId,

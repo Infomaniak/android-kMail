@@ -32,6 +32,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -47,20 +48,20 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseProcessMessageNotificationsWorker(appContext, params) {
 
-    override suspend fun launchWork(): Result = with(ioDispatcher) {
+    override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         SentryLog.i(TAG, "Work started")
 
         val userId = inputData.getIntOrNull(USER_ID_KEY) ?: run {
             SentryDebug.sendFailedNotification("No userId in Notification", SentryLevel.ERROR)
-            return@with Result.success()
+            return@withContext Result.success()
         }
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: run {
             SentryDebug.sendFailedNotification("No mailboxId in Notification", SentryLevel.ERROR, userId)
-            return@with Result.success()
+            return@withContext Result.success()
         }
         val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: run {
             SentryDebug.sendFailedNotification("No messageUid in Notification", SentryLevel.ERROR, userId, mailboxId)
-            return@with Result.success()
+            return@withContext Result.success()
         }
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
             // If the Mailbox doesn't exist in Realm, it's POSSIBLY because the user recently added
@@ -75,7 +76,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
                 mailboxId = mailboxId,
                 messageUid = messageUid,
             )
-            return@with Result.success()
+            return@withContext Result.success()
         }
 
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
@@ -92,13 +93,13 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
                 messageUid = messageUid,
                 mailbox = mailbox,
             )
-            return@with Result.success()
+            return@withContext Result.success()
         }
 
-        fetchMessagesManager.execute(userId, mailbox, messageUid, mailboxContentRealm)
+        fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
 
         SentryLog.i(TAG, "Work finished")
-        Result.success()
+        return@withContext Result.success()
     }
 
     @Singleton

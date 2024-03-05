@@ -25,6 +25,7 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat.NotificationWithIdAndTag
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.pendingIntentFlags
 import com.infomaniak.lib.core.utils.SentryLog
@@ -45,6 +46,7 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import io.realm.kotlin.Realm
 import io.sentry.SentryLevel
+import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -55,7 +57,11 @@ class NotificationUtils @Inject constructor(
     private val appContext: Context,
     private val localSettings: LocalSettings,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
+    private val globalCoroutineScope: CoroutineScope,
 ) {
+
+    private val notificationsByMailboxId = mutableMapOf<Int, MutableList<NotificationWithIdAndTag>>()
+    private val notificationsJobByMailboxId = mutableMapOf<Int, Job?>()
 
     fun initNotificationChannel() = with(appContext) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -117,15 +123,6 @@ class NotificationUtils @Inject constructor(
         )
     }
 
-    private fun buildMessageNotification(
-        channelId: String,
-        title: String,
-        description: String?,
-    ): NotificationCompat.Builder {
-        return appContext.buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
-            .setCategory(Notification.CATEGORY_EMAIL)
-    }
-
     fun buildDraftActionsNotification(): NotificationCompat.Builder = with(appContext) {
         val channelId = getString(R.string.notification_channel_id_draft_service)
         return NotificationCompat.Builder(this, channelId)
@@ -145,23 +142,10 @@ class NotificationUtils @Inject constructor(
     }
 
     fun showMessageNotification(
+        scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
     ) = with(payload) {
-
-        fun contentIntent(mailboxUuid: String, isSummary: Boolean, isUndo: Boolean): PendingIntent? {
-            if (isUndo) return null
-
-            val intent = Intent(appContext, LaunchActivity::class.java).clearStack().putExtras(
-                LaunchActivityArgs(
-                    userId = userId,
-                    mailboxId = mailboxId,
-                    openThreadUid = if (isSummary) null else threadUid,
-                ).toBundle(),
-            )
-            val requestCode = if (isSummary) mailboxUuid else threadUid
-            return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
-        }
 
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification(
@@ -173,29 +157,84 @@ class NotificationUtils @Inject constructor(
             )
             return@with
         }
+        val contentIntent = getContentIntent(payload = this, isUndo)
+        val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
-        buildMessageNotification(mailbox.channelId, title, description).apply {
+        initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
+        showNotifications(scope, mailboxId, notificationManagerCompat)
+    }
 
-            if (isSummary) {
-                setContentTitle(null)
-                setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-            } else {
-                addActions(payload)
-            }
+    private fun getContentIntent(
+        payload: NotificationPayload,
+        isUndo: Boolean,
+    ): PendingIntent? = with(payload) {
 
-            setOnlyAlertOnce(true)
-            setSubText(mailbox.email)
-            setContentText(content)
-            setColorized(true)
-            setContentIntent(contentIntent(mailbox.uuid, isSummary, isUndo))
-            setGroup(mailbox.notificationGroupKey)
-            setGroupSummary(isSummary)
-            color = localSettings.accentColor.getPrimary(appContext)
+        if (isUndo) return null
 
-            SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: $messageUid")
+        val requestCode = if (isSummary) mailboxId else threadUid
+        val intent = Intent(appContext, LaunchActivity::class.java).clearStack().putExtras(
+            LaunchActivityArgs(
+                userId = userId,
+                mailboxId = mailboxId,
+                openThreadUid = if (isSummary) null else threadUid,
+            ).toBundle(),
+        )
+        return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
+    }
+
+    private fun buildMessageNotification(
+        channelId: String,
+        title: String,
+        description: String?,
+    ): NotificationCompat.Builder {
+        return appContext.buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
+            .setCategory(Notification.CATEGORY_EMAIL)
+    }
+
+    private fun initMessageNotificationContent(
+        mailbox: Mailbox,
+        contentIntent: PendingIntent?,
+        notificationBuilder: NotificationCompat.Builder,
+        payload: NotificationPayload,
+    ) = notificationBuilder.apply {
+
+        if (payload.isSummary) {
+            setContentTitle(null)
+            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+        } else {
+            addActions(payload)
+        }
+
+        setOnlyAlertOnce(true)
+        setSubText(mailbox.email)
+        setContentText(payload.content)
+        setColorized(true)
+        setContentIntent(contentIntent)
+        setGroup(mailbox.notificationGroupKey)
+        setGroupSummary(payload.isSummary)
+        color = localSettings.accentColor.getPrimary(appContext)
+
+        SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")
+
+        val notificationWithIdAndTag = NotificationWithIdAndTag(payload.notificationId, build())
+        notificationsByMailboxId.getOrPut(mailbox.mailboxId) { mutableListOf() }.add(index = 0, notificationWithIdAndTag)
+    }
+
+    private fun showNotifications(
+        scope: CoroutineScope,
+        mailboxId: Int,
+        notificationManagerCompat: NotificationManagerCompat,
+    ) {
+        notificationsJobByMailboxId[mailboxId]?.cancel()
+        notificationsJobByMailboxId[mailboxId] = scope.launch {
+            delay(DELAY_DEBOUNCE_NOTIF_MS)
+            ensureActive()
 
             @Suppress("MissingPermission")
-            notificationManagerCompat.notify(notificationId, build())
+            notificationsByMailboxId[mailboxId]?.let { notifications ->
+                notificationManagerCompat.notify(notifications)
+                notifications.clear()
+            }
         }
     }
 
@@ -260,9 +299,10 @@ class NotificationUtils @Inject constructor(
 
         private val TAG: String = NotificationUtils::class.java.simpleName
 
-        const val DRAFT_ACTIONS_ID = 1
-
         private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
+        private const val DELAY_DEBOUNCE_NOTIF_MS = 500L
+
+        const val DRAFT_ACTIONS_ID = 1
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
