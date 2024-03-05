@@ -53,7 +53,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
 
         AccountUtils.getAllUsersSync().forEach { user ->
             mailboxController.getMailboxes(user.id).forEach { mailbox ->
-                fetchMessagesManager.execute(this, user.id, mailbox)
+                fetchMessagesManager.execute(scope = this, user.id, mailbox)
             }
         }
 

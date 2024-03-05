@@ -51,13 +51,13 @@ class FetchMessagesManager @Inject constructor(
     private lateinit var coroutineScope: CoroutineScope
 
     suspend fun execute(
-        coroutineScope: CoroutineScope,
+        scope: CoroutineScope,
         userId: Int,
         mailbox: Mailbox,
         sentryMessageUid: String? = null,
-        mailboxContentRealm: Realm? = null
+        mailboxContentRealm: Realm? = null,
     ) {
-        this.coroutineScope = coroutineScope
+        coroutineScope = scope
 
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
             // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
@@ -213,7 +213,7 @@ class FetchMessagesManager @Inject constructor(
 
         // Show Message notification
         notificationUtils.showMessageNotification(
-            coroutineScope = coroutineScope,
+            scope = coroutineScope,
             notificationManagerCompat = notificationManagerCompat,
             payload = NotificationPayload(
                 userId = userId,
@@ -235,7 +235,7 @@ class FetchMessagesManager @Inject constructor(
                 unReadThreadsCount,
             )
             notificationUtils.showMessageNotification(
-                coroutineScope = coroutineScope,
+                scope = coroutineScope,
                 notificationManagerCompat = notificationManagerCompat,
                 payload = NotificationPayload(
                     userId = userId,

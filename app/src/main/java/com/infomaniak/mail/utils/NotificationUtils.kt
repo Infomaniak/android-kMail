@@ -142,7 +142,7 @@ class NotificationUtils @Inject constructor(
     }
 
     fun showMessageNotification(
-        coroutineScope: CoroutineScope = globalCoroutineScope,
+        scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
     ) = with(payload) {
@@ -161,7 +161,7 @@ class NotificationUtils @Inject constructor(
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
         initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
-        showNotifications(coroutineScope, mailboxId, notificationManagerCompat)
+        showNotifications(scope, mailboxId, notificationManagerCompat)
     }
 
     private fun getContentIntent(
@@ -217,16 +217,16 @@ class NotificationUtils @Inject constructor(
         SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")
 
         val notificationWithIdAndTag = NotificationWithIdAndTag(payload.notificationId, build())
-        notificationsByMailboxId.getOrPut(mailbox.mailboxId) { mutableListOf() }.add(0, notificationWithIdAndTag)
+        notificationsByMailboxId.getOrPut(mailbox.mailboxId) { mutableListOf() }.add(index = 0, notificationWithIdAndTag)
     }
 
     private fun showNotifications(
-        coroutineScope: CoroutineScope,
+        scope: CoroutineScope,
         mailboxId: Int,
         notificationManagerCompat: NotificationManagerCompat,
     ) {
         notificationsJobByMailboxId[mailboxId]?.cancel()
-        notificationsJobByMailboxId[mailboxId] = coroutineScope.launch {
+        notificationsJobByMailboxId[mailboxId] = scope.launch {
             delay(DELAY_DEBOUNCE_NOTIF_MS)
             ensureActive()
 

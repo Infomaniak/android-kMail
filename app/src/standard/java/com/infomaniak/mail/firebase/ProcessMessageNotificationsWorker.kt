@@ -32,7 +32,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -97,10 +96,10 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             return@withContext Result.success()
         }
 
-        fetchMessagesManager.execute(this, userId, mailbox, messageUid, mailboxContentRealm)
+        fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
 
         SentryLog.i(TAG, "Work finished")
-        Result.success()
+        return@withContext Result.success()
     }
 
     @Singleton
