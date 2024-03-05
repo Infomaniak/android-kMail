@@ -672,17 +672,19 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         val thereAreThreads = (currentThreadsCount ?: 0) > 0
         val filterIsEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
         val cursorIsNull = currentFolderCursor == null
-        val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
-        val isBooting = currentThreadsCount == null && !cursorIsNull && isNetworkConnected
-        val shouldDisplayThreadsView = isBooting || thereAreThreads || filterIsEnabled || (cursorIsNull && isNetworkConnected)
+        val networkIsConnected = mainViewModel.isInternetAvailable.value == true
+        val isBooting = currentThreadsCount == null && !cursorIsNull && networkIsConnected
+        val shouldDisplayThreadsView = isBooting || thereAreThreads || filterIsEnabled || (cursorIsNull && networkIsConnected)
 
         when {
             shouldDisplayThreadsView -> {
                 binding.emptyStateView.isGone = true
                 binding.threadsList.isVisible = true
 
-                // TODO: Remove this when https://trello.com/c/f8skqtOL will be fixed.
-                if (!thereAreThreads && !filterIsEnabled) {
+                // TODO: I added the `!isBooting` check, because when the app is booting, we display
+                //  an empty ThreadList before getting 1st Realm results. If the Sentry doesn't
+                //  trigger anymore, it means everything is fine and we can remove it.
+                if (!thereAreThreads && !filterIsEnabled && !isBooting) {
                     val currentFolder = mainViewModel.currentFolder.value
                     Sentry.withScope { scope ->
                         scope.level = SentryLevel.WARNING
