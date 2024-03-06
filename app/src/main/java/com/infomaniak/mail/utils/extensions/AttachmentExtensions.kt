@@ -113,6 +113,7 @@ object AttachmentExtensions {
     //endregion
 
     enum class AttachmentIntentType {
-        OPEN_WITH, SAVE_TO_DRIVE
+        OPEN_WITH,
+        SAVE_TO_DRIVE,
     }
 }

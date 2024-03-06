@@ -19,5 +19,5 @@ package com.infomaniak.mail.data.models
 
 // The field apiName is also used to store the enum in Realm
 enum class FeatureFlag(val apiName: String) {
-    AI("ai-mail-composer")
+    AI("ai-mail-composer"),
 }

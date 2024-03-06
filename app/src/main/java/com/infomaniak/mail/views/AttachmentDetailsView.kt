@@ -86,6 +86,6 @@ class AttachmentDetailsView @JvmOverloads constructor(
             R.dimen.alternativeMargin,
             R.style.Body,
             R.style.Body_Secondary,
-        )
+        ),
     }
 }

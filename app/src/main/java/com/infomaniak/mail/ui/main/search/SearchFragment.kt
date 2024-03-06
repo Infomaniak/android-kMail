@@ -367,7 +367,10 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     enum class VisibilityMode {
-        RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS
+        RECENT_SEARCHES,
+        LOADING,
+        NO_RESULTS,
+        RESULTS,
     }
 
     companion object {
