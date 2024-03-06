@@ -669,12 +669,12 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {
 
-        val thereAreThreads = (currentThreadsCount ?: 0) > 0
-        val filterIsEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
-        val cursorIsNull = currentFolderCursor == null
-        val networkIsConnected = mainViewModel.isInternetAvailable.value == true
-        val isBooting = currentThreadsCount == null && !cursorIsNull && networkIsConnected
-        val shouldDisplayThreadsView = isBooting || thereAreThreads || filterIsEnabled || (cursorIsNull && networkIsConnected)
+        val areThereThreads = (currentThreadsCount ?: 0) > 0
+        val isFilterEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
+        val isCursorNull = currentFolderCursor == null
+        val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
+        val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
+        val shouldDisplayThreadsView = isBooting || areThereThreads || isFilterEnabled || (isCursorNull && isNetworkConnected)
 
         when {
             shouldDisplayThreadsView -> {
@@ -684,7 +684,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 // TODO: I added the `!isBooting` check, because when the app is booting, we display
                 //  an empty ThreadList before getting 1st Realm results. If the Sentry doesn't
                 //  trigger anymore, it means everything is fine and we can remove it.
-                if (!thereAreThreads && !filterIsEnabled && !isBooting) {
+                if (!areThereThreads && !isFilterEnabled && !isBooting) {
                     val currentFolder = mainViewModel.currentFolder.value
                     Sentry.withScope { scope ->
                         scope.level = SentryLevel.WARNING
@@ -696,7 +696,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                     }
                 }
             }
-            cursorIsNull -> setEmptyState(EmptyState.NETWORK)
+            isCursorNull -> setEmptyState(EmptyState.NETWORK)
             isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
             isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
             else -> setEmptyState(EmptyState.FOLDER)
