@@ -395,8 +395,7 @@ class RefreshController @Inject constructor(
         }
 
         val impactedThreads = mutableSetOf<Thread>()
-        val paginationInfo = getPaginationInfo()
-        addSentryBreadcrumbAboutPaginationInfo(info = paginationInfo)
+        val paginationInfo = getPaginationInfo().also(::addSentryBreadcrumbAboutPaginationInfo)
         val newMessages = getNewMessages(paginationInfo)
         val uidsCount = newMessages.addedShortUids.count()
         scope.ensureActive()

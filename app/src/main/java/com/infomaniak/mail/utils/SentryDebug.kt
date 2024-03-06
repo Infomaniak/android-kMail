@@ -168,7 +168,7 @@ object SentryDebug {
     fun sendAlreadyExistingMessage(folder: Folder, message: Message, threadMode: ThreadMode) {
         Sentry.withScope { scope ->
             scope.level = SentryLevel.ERROR
-            scope.setExtra("folder.cursor", folder.cursor ?: "null")
+            scope.setExtra("folder.cursor", "${folder.cursor}")
             scope.setExtra("folder.name", folder.name)
             scope.setExtra("folder.id", folder.id)
             scope.setExtra("threadMode", threadMode.name)
