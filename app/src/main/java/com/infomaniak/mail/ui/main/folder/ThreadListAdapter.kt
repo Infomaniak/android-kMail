@@ -384,14 +384,15 @@ class ThreadListAdapter @Inject constructor(
                 val name = recipient.displayedName(context)
 
                 val formattedName = when {
-                    recipient.isMe() -> (if (isFirstMe) name else null)?.also { isFirstMe = false }
+                    recipient.isMe() -> {
+                        if (isFirstMe) isFirstMe = false else return@forEach
+                        name
+                    }
                     name.isEmail() -> name.substringBefore("@")
                     else -> recipient.computeFirstAndLastName().first
                 }
 
-                formattedName?.let {
-                    everyone += if (everyone.isEmpty()) it else ", $it"
-                }
+                everyone += "${if (everyone.isNotEmpty()) ", " else ""}${formattedName}"
             }
 
             return everyone
