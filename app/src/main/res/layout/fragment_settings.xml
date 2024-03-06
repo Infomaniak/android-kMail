@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2023 Infomaniak Network SA
+  ~ Copyright (C) 2022-2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -94,6 +94,14 @@
                 tools:subtitle="@string/aiEngineFalcon"
                 tools:visibility="visible" />
 
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsExternalContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsExternalContentTitle"
+                tools:subtitle="@string/settingsOptionAskMe" />
+
             <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
             <TextView
@@ -138,14 +146,6 @@
                 app:itemAction="chevron"
                 app:title="@string/settingsThreadModeTitle"
                 tools:subtitle="@string/settingsOptionThreadModeConversation" />
-
-            <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                android:id="@+id/settingsExternalContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:itemAction="chevron"
-                app:title="@string/settingsExternalContentTitle"
-                tools:subtitle="@string/settingsOptionAskMe" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
