@@ -59,19 +59,9 @@ class FetchMessagesManager @Inject constructor(
     ) {
         coroutineScope = scope
 
-        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
-            // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
-            // We can leave safely.
-            SentryDebug.sendFailedNotification(
-                reason = "Notifications are disabled",
-                sentryLevel = SentryLevel.INFO,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
-            return
-        }
+        // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
+        // We can leave safely.
+        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
@@ -89,17 +79,6 @@ class FetchMessagesManager @Inject constructor(
             return
         }
 
-        if (folder.cursor == null) {
-            SentryDebug.sendFailedNotification(
-                reason = "Folder's cursor is null",
-                sentryLevel = SentryLevel.WARNING,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
-            return
-        }
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update Local with Remote
