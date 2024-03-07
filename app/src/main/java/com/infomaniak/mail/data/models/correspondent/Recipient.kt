@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
-import com.infomaniak.mail.utils.extensions.MergedContactDictionary
+import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.extensions.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
@@ -64,13 +64,13 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
 
     // Computes if the Recipient is external, according to the required conditions.
     // Does not tell anything about how to display the Recipient chip when composing a new Message.
-    fun isExternal(emailDictionary: MergedContactDictionary, aliases: List<String>, trustedDomains: List<String>): Boolean {
+    fun isExternal(externalData: ExternalData): Boolean = with(externalData) {
         val isUnknownContact = email !in emailDictionary
-        val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
-        val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
         val isAlias = email in aliases
+        val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
+        val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
 
-        return isUnknownContact && !isMailerDaemon && isUntrustedDomain && !isAlias
+        return@with isUnknownContact && !isAlias && isUntrustedDomain && !isMailerDaemon
     }
 
     fun quotedDisplayName(): String = "${("$name ").ifBlank { "" }}<$email>"
