@@ -245,8 +245,6 @@ class ThreadViewModel @Inject constructor(
             return@liveData
         }
 
-        sendMatomoAndSentryAboutThreadMessagesCount(thread)
-
         // These 2 will always be empty or not all together at the same time.
         if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
             thread.messages.forEachIndexed { index, message ->
@@ -255,8 +253,9 @@ class ThreadViewModel @Inject constructor(
             }
         }
 
-        if (!threadState.hasBeenMarkedAsSeen) {
-            threadState.hasBeenMarkedAsSeen = true
+        if (threadState.isFirstOpening) {
+            threadState.isFirstOpening = false
+            sendMatomoAndSentryAboutThreadMessagesCount(thread)
             if (thread.unseenMessagesCount > 0) markThreadAsSeen(thread)
         }
 

@@ -37,7 +37,7 @@ class ThreadState {
     val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val treatedMessagesForCalendarEvent: MutableSet<String> = mutableSetOf()
     val cachedSplitBodies: MutableMap<String, SplitBody> = mutableMapOf()
-    var hasBeenMarkedAsSeen: Boolean = false
+    var isFirstOpening: Boolean = true
     var superCollapsedBlock: SuperCollapsedBlock? = null
 
     fun reset() {
@@ -48,7 +48,7 @@ class ThreadState {
         isCalendarEventExpandedMap.clear()
         treatedMessagesForCalendarEvent.clear()
         cachedSplitBodies.clear()
-        hasBeenMarkedAsSeen = false
+        isFirstOpening = true
         superCollapsedBlock = null
     }
 }

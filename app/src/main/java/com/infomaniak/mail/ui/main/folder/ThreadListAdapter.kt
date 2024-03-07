@@ -34,6 +34,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -59,10 +60,7 @@ import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.invoke
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
@@ -75,6 +73,7 @@ class ThreadListAdapter @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
 ) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
+    private var formatListJob: Job? = null
     private lateinit var recyclerView: RecyclerView
 
     override val realmAsyncListDiffer: AsyncListDiffer<Thread>? = null
@@ -571,11 +570,13 @@ class ThreadListAdapter @Inject constructor(
 
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
-    override fun updateList(itemList: List<Thread>) {
-        globalCoroutineScope.launch {
+    override fun updateList(itemList: List<Thread>, lifecycleScope: LifecycleCoroutineScope) {
+
+        formatListJob?.cancel()
+        formatListJob = lifecycleScope.launch {
 
             val formattedList = runCatchingRealm {
-                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity).apply {
+                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, scope = this).apply {
                     // Add "Load more" button
                     if (isLoadMoreDisplayed) add(Unit)
                 }
@@ -590,6 +591,7 @@ class ThreadListAdapter @Inject constructor(
         context: Context,
         folderRole: FolderRole?,
         threadDensity: ThreadDensity,
+        scope: CoroutineScope,
     ) = mutableListOf<Any>().apply {
 
         if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
@@ -598,12 +600,16 @@ class ThreadListAdapter @Inject constructor(
 
         if (threadDensity == ThreadDensity.COMPACT) {
             if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
-                multiSelection?.selectedItems?.removeAll { !threads.contains(it) }
+                multiSelection?.selectedItems?.removeAll {
+                    scope.ensureActive()
+                    !threads.contains(it)
+                }
             }
             addAll(threads)
         } else {
             var previousSectionTitle = ""
             threads.forEach { thread ->
+                scope.ensureActive()
                 val sectionTitle = thread.getSectionTitle(context)
                 when {
                     sectionTitle != previousSectionTitle -> {
