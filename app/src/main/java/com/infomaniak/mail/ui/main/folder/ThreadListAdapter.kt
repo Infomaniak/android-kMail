@@ -34,6 +34,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -569,10 +570,10 @@ class ThreadListAdapter @Inject constructor(
 
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
-    override fun updateList(itemList: List<Thread>) {
+    override fun updateList(itemList: List<Thread>, lifecycleScope: LifecycleCoroutineScope) {
 
         formatListJob?.cancel()
-        formatListJob = globalCoroutineScope.launch {
+        formatListJob = lifecycleScope.launch {
 
             val formattedList = runCatchingRealm {
                 formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, scope = this).apply {
