@@ -100,7 +100,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         val apiValue: String,
     ) {
         FALCON(R.string.aiEngineFalcon, R.drawable.ic_ai_engine_falcon, "falcon", "falcon"),
-        CHAT_GPT(R.string.aiEngineChatGpt, R.drawable.ic_ai_engine_chat_gpt, "chatGpt", "gpt"), ;
+        CHAT_GPT(R.string.aiEngineChatGpt, R.drawable.ic_ai_engine_chat_gpt, "chatGpt", "gpt"),
     }
 
     enum class ThreadDensity(@StringRes val localisedNameRes: Int) {
@@ -124,21 +124,9 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         @StyleRes val theme: Int,
         val introTabIndex: Int,
     ) {
-        PINK(
-            R.string.accentColorPinkTitle,
-            R.style.AppTheme_Pink,
-            0,
-        ),
-        BLUE(
-            R.string.accentColorBlueTitle,
-            R.style.AppTheme_Blue,
-            1,
-        ),
-        SYSTEM(
-            R.string.accentColorSystemTitle,
-            R.style.AppTheme,
-            2,
-        );
+        PINK(R.string.accentColorPinkTitle, R.style.AppTheme_Pink, 0),
+        BLUE(R.string.accentColorBlueTitle, R.style.AppTheme_Blue, 1),
+        SYSTEM(R.string.accentColorSystemTitle, R.style.AppTheme, 2);
 
         fun getPrimary(context: Context): Int {
             val baseThemeContext = ContextThemeWrapper(context, theme)
