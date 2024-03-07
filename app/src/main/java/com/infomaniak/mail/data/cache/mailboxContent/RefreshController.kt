@@ -52,6 +52,7 @@ import okhttp3.OkHttpClient
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.abs
 import kotlin.math.max
 
 @Singleton
@@ -516,6 +517,8 @@ class RefreshController @Inject constructor(
         cursor: String,
     ): Set<Thread> {
 
+        val startTime = System.currentTimeMillis()
+
         val logMessage = "Added: ${uids.count()}"
         SentryLog.d("API", "$logMessage | ${folder.name}")
 
@@ -525,9 +528,7 @@ class RefreshController @Inject constructor(
 
         val impactedThreads = mutableSetOf<Thread>()
 
-        val before = System.currentTimeMillis()
         val apiResponse = ApiRepository.getMessagesByUids(mailbox.uuid, folder.id, uids, okHttpClient)
-        val after = System.currentTimeMillis()
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         scope.ensureActive()
 
@@ -558,7 +559,8 @@ class RefreshController @Inject constructor(
              * So we want to be sure that we don't write twice in less than 500 ms.
              * Appreciable side effect: it will also reduce the stress on the API.
              */
-            val delay = Utils.MAX_DELAY_BETWEEN_API_CALLS - (after - before)
+            val duration = abs(System.currentTimeMillis() - startTime)
+            val delay = Utils.MAX_DELAY_BETWEEN_API_CALLS - duration
             if (delay > 0L) {
                 delay(delay)
                 scope.ensureActive()
