@@ -67,7 +67,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     fun isExternal(externalData: ExternalData): Boolean = with(externalData) {
         val isUnknownContact = email !in emailDictionary
         val isAlias = email in aliases
-        val isUntrustedDomain = email.isEmail() && trustedDomains.none { email.endsWith(it) }
+        val isUntrustedDomain = email.isEmail() && trustedDomains.none(email::endsWith)
         val isMailerDaemon = """mailer-daemon@(?:.+\.)?infomaniak\.ch""".toRegex(RegexOption.IGNORE_CASE).matches(email)
 
         return@with isUnknownContact && !isAlias && isUntrustedDomain && !isMailerDaemon

@@ -47,6 +47,7 @@ object ExternalUtils {
         val to = to.onlyAutomaticallyAddedOnes()
         val cc = cc.onlyAutomaticallyAddedOnes()
         val bcc = bcc.onlyAutomaticallyAddedOnes()
+
         return findExternalRecipientInIterables(externalData, to, cc, bcc)
     }
 
