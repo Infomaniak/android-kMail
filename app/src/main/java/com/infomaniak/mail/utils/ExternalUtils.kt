@@ -23,18 +23,16 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 object ExternalUtils {
+
     /**
      * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog messages
      */
-    fun Thread.findExternalRecipients(
-        emailDictionary: MergedContactDictionary,
-        aliases: List<String>,
-    ): Pair<String?, Int> {
+    fun Thread.findExternalRecipients(externalData: ExternalData): Pair<String?, Int> {
         var externalRecipientEmail: String? = null
         var externalRecipientQuantity = 0
 
         messages.forEach { message ->
-            val (singleEmail, quantityForThisMessage) = findExternalRecipientInIterables(emailDictionary, aliases, message.from)
+            val (singleEmail, quantityForThisMessage) = findExternalRecipientInIterables(externalData, message.from)
 
             externalRecipientQuantity += quantityForThisMessage
             if (externalRecipientQuantity > 1) return null to 2
@@ -45,14 +43,12 @@ object ExternalUtils {
         return externalRecipientEmail to externalRecipientQuantity
     }
 
-    fun Draft.findExternalRecipientForNewMessage(
-        aliases: List<String>,
-        emailDictionary: MergedContactDictionary,
-    ): Pair<String?, Int> {
+    fun Draft.findExternalRecipientForNewMessage(externalData: ExternalData): Pair<String?, Int> {
         val to = to.onlyAutomaticallyAddedOnes()
         val cc = cc.onlyAutomaticallyAddedOnes()
         val bcc = bcc.onlyAutomaticallyAddedOnes()
-        return findExternalRecipientInIterables(emailDictionary, aliases, to, cc, bcc)
+
+        return findExternalRecipientInIterables(externalData, to, cc, bcc)
     }
 
     private fun List<Recipient>.onlyAutomaticallyAddedOnes(): List<Recipient> = filter { !it.isManuallyEntered }
@@ -61,8 +57,7 @@ object ExternalUtils {
      * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog messages
      */
     private fun findExternalRecipientInIterables(
-        emailDictionary: MergedContactDictionary,
-        aliases: List<String>,
+        externalData: ExternalData,
         vararg recipientLists: Iterable<Recipient>,
     ): Pair<String?, Int> {
         var externalRecipientEmail: String? = null
@@ -70,7 +65,7 @@ object ExternalUtils {
 
         recipientLists.forEach { recipientList ->
             recipientList.forEach { recipient ->
-                if (recipient.isExternal(emailDictionary, aliases)) {
+                if (recipient.isExternal(externalData)) {
                     if (externalRecipientQuantity++ == 0) {
                         externalRecipientEmail = recipient.email
                     } else {
@@ -82,4 +77,10 @@ object ExternalUtils {
 
         return externalRecipientEmail to externalRecipientQuantity
     }
+
+    data class ExternalData(
+        val emailDictionary: MergedContactDictionary,
+        val aliases: List<String>,
+        val trustedDomains: List<String>,
+    )
 }

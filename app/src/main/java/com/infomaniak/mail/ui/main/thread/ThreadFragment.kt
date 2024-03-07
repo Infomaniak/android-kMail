@@ -62,6 +62,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
+import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
@@ -424,11 +425,12 @@ class ThreadFragment : Fragment() {
         threadViewModel.assembleSubjectData(mainViewModel.mergedContactsLive).observe(viewLifecycleOwner) { result ->
 
             val (subjectWithoutTags, subjectWithTags) = subjectFormatter.generateSubjectContent(
-                subjectData = SubjectFormatter.SubjectData(
+                subjectData = SubjectData(
                     thread = result.thread ?: return@observe,
                     emailDictionary = result.mergedContacts ?: emptyMap(),
                     aliases = result.mailbox?.aliases ?: emptyList(),
                     externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
+                    trustedDomains = result.mailbox?.trustedDomains ?: emptyList(),
                 ),
             ) { description ->
                 informationDialog.show(

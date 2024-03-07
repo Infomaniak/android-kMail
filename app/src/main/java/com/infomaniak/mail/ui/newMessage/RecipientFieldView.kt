@@ -43,8 +43,8 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.isEmail
 import com.infomaniak.mail.utils.extensions.toggleChevron
 import dagger.hilt.android.AndroidEntryPoint
@@ -417,11 +417,11 @@ class RecipientFieldView @JvmOverloads constructor(
         return (if (recipientCount == 1) recipients.single().email else null) to recipientCount
     }
 
-    fun updateExternals(shouldWarnForExternal: Boolean, emailDictionary: MergedContactDictionary, aliases: List<String>) {
+    fun updateExternals(shouldWarnForExternal: Boolean, externalData: ExternalData) {
         for (recipient in contactChipAdapter.getRecipients()) {
             if (recipient.isManuallyEntered) continue
 
-            val shouldDisplayAsExternal = shouldWarnForExternal && recipient.isExternal(emailDictionary, aliases)
+            val shouldDisplayAsExternal = shouldWarnForExternal && recipient.isExternal(externalData)
             recipient.initDisplayAsExternal(shouldDisplayAsExternal)
 
             updateCollapsedChipValues(isSelfCollapsed)

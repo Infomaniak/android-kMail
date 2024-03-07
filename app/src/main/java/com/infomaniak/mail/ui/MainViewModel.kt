@@ -63,6 +63,7 @@ import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -279,6 +280,7 @@ class MainViewModel @Inject constructor(
             updatePermissions(mailbox)
             updateSignatures(mailbox)
             updateFeatureFlag(mailbox)
+            updateExternalMailInfo(mailbox)
 
             // This update is blocking because we need it for the rest of the flow : `selectFolder()` needs the Folders.
             updateFolders(mailbox)
@@ -339,6 +341,19 @@ class MainViewModel @Inject constructor(
     private fun updateFeatureFlag(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Features flags")
         sharedUtils.updateAiFeatureFlag(mailbox.objectId, mailbox.uuid)
+    }
+
+    private fun updateExternalMailInfo(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        SentryLog.d(TAG, "Force refresh External Mail info")
+        with(ApiRepository.getExternalMailInfo(mailbox.hostingId, mailbox.mailboxName)) {
+            if (!isSuccess()) return@launch
+            data?.let { externalMailInfo ->
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.externalMailFlagEnabled = externalMailInfo.externalMailFlagEnabled
+                    it.trustedDomains = externalMailInfo.trustedDomains.toRealmList()
+                }
+            }
+        }
     }
 
     private fun updateFolders(mailbox: Mailbox) {

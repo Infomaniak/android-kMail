@@ -27,6 +27,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipients
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
@@ -56,7 +57,9 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
     ): CharSequence {
         if (!externalMailFlagEnabled) return previousContent
 
-        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(emailDictionary, aliases)
+        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(
+            externalData = ExternalData(emailDictionary, aliases, trustedDomains),
+        )
         if (externalRecipientQuantity == 0) return previousContent
 
         return postFixWithExternal(previousContent, externalRecipientQuantity, externalRecipientEmail, onExternalClicked)
@@ -135,6 +138,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
         val emailDictionary: MergedContactDictionary,
         val aliases: List<String>,
         val externalMailFlagEnabled: Boolean,
+        val trustedDomains: List<String>,
     )
 
     data class EllipsizeConfiguration(
