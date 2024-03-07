@@ -661,7 +661,9 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             val shouldSkipThisMessage = addRemoteMessageToFolder(remoteMessage, folder, folderMessages)
-            if (shouldSkipThisMessage) return@forEach else addedMessagesUids.add(remoteMessage.shortUid)
+            if (shouldSkipThisMessage) return@forEach
+
+            addedMessagesUids.add(remoteMessage.shortUid)
 
             val newThread = if (isConversationMode) {
 
