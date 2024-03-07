@@ -370,9 +370,12 @@ class RefreshController @Inject constructor(
             } else {
                 when (direction) {
                     Direction.IN_THE_PAST -> MessageController.getOldestMessage(folder.id, realm = this)
-                    Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(folder.id, fibonacci, realm = this) {
-                        endOfMessagesReached = true
-                    }
+                    Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(
+                        folderId = folder.id,
+                        fibonacci = fibonacci,
+                        realm = this,
+                        endOfMessagesReached = { endOfMessagesReached = true },
+                    )
                 }?.shortUid?.let { offsetUid ->
                     PaginationInfo(offsetUid, direction.apiCallValue)
                 }
@@ -392,7 +395,7 @@ class RefreshController @Inject constructor(
         }
 
         val impactedThreads = mutableSetOf<Thread>()
-        val paginationInfo = getPaginationInfo()
+        val paginationInfo = getPaginationInfo().also(::addSentryBreadcrumbAboutPaginationInfo)
         val newMessages = getNewMessages(paginationInfo)
         val uidsCount = newMessages.addedShortUids.count()
         scope.ensureActive()
@@ -652,12 +655,15 @@ class RefreshController @Inject constructor(
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
         val folderMessages = folder.messages.associateByTo(mutableMapOf()) { it.uid }
+        val addedMessagesUids = mutableListOf<Int>()
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
 
             val shouldSkipThisMessage = addRemoteMessageToFolder(remoteMessage, folder, folderMessages)
             if (shouldSkipThisMessage) return@forEach
+
+            addedMessagesUids.add(remoteMessage.shortUid)
 
             val newThread = if (isConversationMode) {
 
@@ -687,6 +693,8 @@ class RefreshController @Inject constructor(
 
             folderMessages[remoteMessage.uid] = remoteMessage
         }
+
+        addSentryBreadcrumbForAddedUidsInFolder(addedMessagesUids)
 
         val impactedThreadsUnmanaged = mutableSetOf<Thread>()
         impactedThreadsManaged.forEach {
@@ -893,6 +901,18 @@ class RefreshController @Inject constructor(
         )
     }
 
+    private fun addSentryBreadcrumbAboutPaginationInfo(info: PaginationInfo?) {
+        info?.let {
+            SentryDebug.addThreadsAlgoBreadcrumb(
+                message = "PaginationInfo",
+                data = mapOf(
+                    "direction" to it.direction,
+                    "offsetUid" to it.offsetUid,
+                ),
+            )
+        }
+    }
+
     private fun addSentryBreadcrumbForAddedUids(
         logMessage: String,
         email: String,
@@ -909,6 +929,16 @@ class RefreshController @Inject constructor(
             ),
         )
     }
+
+    private fun addSentryBreadcrumbForAddedUidsInFolder(uids: List<Int>) {
+        SentryDebug.addThreadsAlgoBreadcrumb(
+            message = "Added in Folder",
+            data = mapOf(
+                "uids" to uids,
+            ),
+        )
+    }
+
     //endregion
 
     enum class RefreshMode {
