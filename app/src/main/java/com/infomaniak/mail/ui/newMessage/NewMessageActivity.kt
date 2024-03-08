@@ -42,7 +42,6 @@ import javax.inject.Inject
 class NewMessageActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
-    private val newMessageViewModel: NewMessageViewModel by viewModels()
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.newMessageHostFragment) as NavHostFragment).navController

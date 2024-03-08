@@ -214,7 +214,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun setTextInputListeners() = with(binding.textInput) {
 
         fun performContactSearch(text: CharSequence) {
-            if ((text.trim().count()) > 0) {
+            if (text.isNotEmpty()) {
                 contactAdapter.searchContacts(text)
             } else {
                 contactAdapter.clear()
