@@ -111,7 +111,6 @@
                     </FrameLayout>
 
                     <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/divider1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -138,7 +137,6 @@
                         app:title="@string/toTitle" />
 
                     <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/divider2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -188,7 +186,6 @@
                         app:title="@string/bccTitle" />
 
                     <com.google.android.material.divider.MaterialDivider
-                        android:id="@+id/divider4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
