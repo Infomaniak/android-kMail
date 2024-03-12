@@ -100,9 +100,10 @@ class MessageWebViewClient(
     }
 
     override fun onPageFinished(webView: WebView, url: String?) {
-        webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()}, '$messageUid')")
-        super.onPageFinished(webView, url)
-        onPageFinished?.invoke()
+        runCatchingRealm {
+            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()}, '$messageUid')")
+            onPageFinished?.invoke()
+        }
     }
 
     fun unblockDistantResources() {
