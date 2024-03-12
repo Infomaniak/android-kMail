@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2022-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -73,6 +74,21 @@ class MailboxesAdapter(
         }
     }.getOrDefault(Unit)
 
+    override fun getItemViewType(position: Int): Int = runCatchingRealm {
+        return when {
+            !mailboxes[position].isValid -> DisplayType.INVALID_MAILBOX.layout
+            isInMenuDrawer -> DisplayType.MENU_DRAWER_MAILBOX.layout
+            else -> DisplayType.SIMPLE_MAILBOX.layout
+        }
+    }.getOrDefault(super.getItemViewType(position))
+
+    override fun getItemCount(): Int = runCatchingRealm { mailboxes.count() }.getOrDefault(0)
+
+    fun setMailboxes(newMailboxes: List<Mailbox>) {
+        mailboxes = newMailboxes
+        notifyDataSetChanged()
+    }
+
     private fun ItemSelectableMailboxBinding.displaySimpleMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         displayValidMailbox(mailbox, isCurrentMailbox) { context.trackAccountEvent(SWITCH_MAILBOX_NAME) }
         setSelectedState(isCurrentMailbox)
@@ -92,12 +108,18 @@ class MailboxesAdapter(
     ) {
         text = mailbox.email
 
-        if (!isCurrentMailbox) {
-            setOnClickListener {
-                trackerCallback()
-                onValidMailboxClicked?.invoke(mailbox.mailboxId)
+        fun getClickListener(): OnClickListener? {
+            return if (isCurrentMailbox) {
+                null
+            } else {
+                OnClickListener {
+                    trackerCallback()
+                    onValidMailboxClicked?.invoke(mailbox.mailboxId)
+                }
             }
         }
+
+        setOnClickListener(getClickListener())
     }
 
     private fun ItemInvalidMailboxBinding.displayInvalidMailbox(mailbox: Mailbox) = with(root) {
@@ -115,21 +137,6 @@ class MailboxesAdapter(
             onLockedMailboxClicked = { onLockedMailboxClicked?.invoke(mailbox.email) },
             onInvalidPasswordMailboxClicked = { onInvalidPasswordMailboxClicked?.invoke(mailbox) },
         )
-    }
-
-    override fun getItemViewType(position: Int): Int = runCatchingRealm {
-        return when {
-            !mailboxes[position].isValid -> DisplayType.INVALID_MAILBOX.layout
-            isInMenuDrawer -> DisplayType.MENU_DRAWER_MAILBOX.layout
-            else -> DisplayType.SIMPLE_MAILBOX.layout
-        }
-    }.getOrDefault(super.getItemViewType(position))
-
-    override fun getItemCount(): Int = runCatchingRealm { mailboxes.count() }.getOrDefault(0)
-
-    fun setMailboxes(newMailboxes: List<Mailbox>) {
-        mailboxes = newMailboxes
-        notifyDataSetChanged()
     }
 
     private enum class DisplayType(val layout: Int) {
