@@ -22,7 +22,6 @@ import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as RCore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,7 +44,7 @@ object ActivityModule {
     @Provides
     fun provideInAppReviewManager(activity: FragmentActivity) = InAppReviewManager(
         activity = activity,
-        reviewDialogTheme = RCore.style.DefaultDialogStyle,
+        reviewDialogTheme = R.style.DialogStyle,
         reviewDialogTitleResId = R.string.reviewAlertTitle,
         feedbackUrlResId = R.string.urlUserReportAndroid,
     )
