@@ -18,8 +18,11 @@
 package com.infomaniak.mail.di
 
 import androidx.fragment.app.FragmentActivity
+import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.R
+import com.infomaniak.lib.core.R as RCore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,5 +39,14 @@ object ActivityModule {
         activity = activity,
         appId = BuildConfig.APPLICATION_ID,
         versionCode = BuildConfig.VERSION_CODE,
+    )
+
+    @ActivityScoped
+    @Provides
+    fun provideInAppReviewManager(activity: FragmentActivity) = InAppReviewManager(
+        activity = activity,
+        reviewDialogTheme = RCore.style.DefaultDialogStyle,
+        reviewDialogTitleResId = R.string.reviewAlertTitle,
+        feedbackUrlResId = R.string.urlUserReportAndroid,
     )
 }

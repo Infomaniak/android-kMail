@@ -249,6 +249,10 @@ object MatomoMail : MatomoCore {
         trackEvent("inAppUpdate", name)
     }
 
+    fun Context.trackInAppReviewEvent(name: String) {
+        trackEvent("inAppReview", name)
+    }
+
     fun View.trackCalendarEventEvent(name: String, value: Boolean? = null) {
         context.trackEvent("calendarEvent", name, value = value?.toFloat())
     }

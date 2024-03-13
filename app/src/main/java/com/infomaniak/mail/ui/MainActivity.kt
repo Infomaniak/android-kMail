@@ -46,6 +46,7 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
+import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
@@ -53,6 +54,7 @@ import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
@@ -151,6 +153,9 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
 
+    @Inject
+    lateinit var inAppReviewManager: InAppReviewManager
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
         var hasDragged = false
@@ -212,6 +217,15 @@ class MainActivity : BaseActivity() {
         managePermissionsRequesting()
 
         initAppUpdateManager()
+        initAppReviewManager()
+    }
+
+    private fun initAppReviewManager() {
+        inAppReviewManager.init(
+            onDialogShown = { trackInAppReviewEvent("presentAlert") },
+            onUserWantToReview = { trackInAppReviewEvent("like") },
+            onUserWantToGiveFeedback = { trackInAppReviewEvent("dislike") },
+        )
     }
 
     private fun observeNetworkStatus() {
