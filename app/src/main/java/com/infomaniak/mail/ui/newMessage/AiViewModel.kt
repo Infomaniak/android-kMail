@@ -135,8 +135,8 @@ class AiViewModel @Inject constructor(
         handleAiResult(apiResponse, apiResponse.data?.promptMessage, isUsingPreviousMessageAsContext = false)
     }
 
-    fun updateFeatureFlag(currentMailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.updateAiFeatureFlag(currentMailboxObjectId, mailboxUuid)
+    fun updateFeatureFlag(mailboxObjectId: String, mailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.updateAiFeatureFlag(mailboxObjectId, mailboxUuid)
     }
 
     fun isHistoryEmpty(): Boolean = history.excludingContextMessage().isEmpty()

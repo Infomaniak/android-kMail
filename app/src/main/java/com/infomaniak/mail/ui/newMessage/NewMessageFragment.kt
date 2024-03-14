@@ -305,7 +305,7 @@ class NewMessageFragment : Fragment() {
         bccField.hideLoader()
     }
 
-    private fun showKeyboardInCorrectView() = with(binding) {
+    private fun showKeyboardInCorrectView() {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
             DraftMode.REPLY_ALL -> recipientFieldsManager.focusBodyField()
