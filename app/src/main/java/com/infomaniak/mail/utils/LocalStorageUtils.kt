@@ -78,7 +78,17 @@ object LocalStorageUtils {
     //endregion
 
     //region Upload
-    private fun getAttachmentsUploadDir(
+    private fun getAttachmentUploadDir(
+        context: Context,
+        draftLocalUuid: String,
+        attachmentLocalUuid: String,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId,
+    ): File {
+        return getDraftUploadDir(context, "${draftLocalUuid}/${attachmentLocalUuid}", userId, mailboxId)
+    }
+
+    private fun getDraftUploadDir(
         context: Context,
         draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
@@ -87,10 +97,16 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), draftLocalUuid)
     }
 
-    fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, draftLocalUuid: String): File? {
+    fun saveUploadAttachment(
+        context: Context,
+        uri: Uri,
+        fileName: String,
+        draftLocalUuid: String,
+        attachmentLocalUuid: String,
+    ): File? {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            val attachmentsUploadDir = getAttachmentsUploadDir(context, draftLocalUuid)
-            if (!attachmentsUploadDir.exists()) attachmentsUploadDir.mkdirs()
+            val attachmentsUploadDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid)
+            attachmentsUploadDir.mkdirs()
             val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_$fileName"
             File(attachmentsUploadDir, hashedFileName).also { file ->
                 FileOutputStream(file).use(inputStream::copyTo)
@@ -104,20 +120,36 @@ object LocalStorageUtils {
         }
     }
 
-    fun deleteAttachmentsUploadsDirIfEmpty(
+    fun deleteAttachmentDirIfEmpty(
+        context: Context,
+        draftLocalUuid: String,
+        attachmentLocalUuid: String,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId,
+    ) {
+
+        val attachmentDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid, userId, mailboxId).also {
+            if (!it.exists()) return
+        }
+        if (attachmentDir.hasNoChildren) attachmentDir.delete()
+
+        deleteDraftDirIfEmpty(context, draftLocalUuid, userId, mailboxId)
+    }
+
+    fun deleteDraftDirIfEmpty(
         context: Context,
         draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ) {
-        val attachmentsDir = getAttachmentsUploadDir(context, draftLocalUuid, userId, mailboxId).also {
+        val draftDir = getDraftUploadDir(context, draftLocalUuid, userId, mailboxId).also {
             if (!it.exists()) return
         }
-        val mailboxDir = attachmentsDir.parentFile ?: return
+        val mailboxDir = draftDir.parentFile ?: return
         val userDir = mailboxDir.parentFile ?: return
         val attachmentsRootDir = userDir.parentFile ?: return
 
-        if (attachmentsDir.hasNoChildren) attachmentsDir.delete()
+        if (draftDir.hasNoChildren) draftDir.delete()
         if (mailboxDir.hasNoChildren) mailboxDir.delete()
         if (userDir.hasNoChildren) userDir.delete()
         if (attachmentsRootDir.hasNoChildren) attachmentsRootDir.delete()
