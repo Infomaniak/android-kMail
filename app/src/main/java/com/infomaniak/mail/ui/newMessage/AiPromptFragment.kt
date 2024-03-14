@@ -49,7 +49,6 @@ class AiPromptFragment : Fragment() {
     lateinit var localSettings: LocalSettings
 
     private var binding: FragmentAiPromptBinding by safeBinding()
-    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { AiPromptFragment::class.java.name }
@@ -101,7 +100,6 @@ class AiPromptFragment : Fragment() {
         aiEngineIcon.setImageResource(localSettings.aiEngine.iconRes)
 
         generateButton.setOnClickListener {
-            newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
             newMessageFragment.navigateToPropositionFragment()
         }
 
