@@ -471,6 +471,7 @@ class NewMessageFragment : Fragment() {
             binding.attachmentsRecyclerView.isGone = draft.attachments.isEmpty()
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
+            updateIsSendingAllowed()
         }
     }
 
@@ -519,11 +520,15 @@ class NewMessageFragment : Fragment() {
         }
 
         runCatching {
-            draft.attachments[position].getUploadLocalFile()?.delete()
+            val attachment = draft.attachments[position]
+            attachment.getUploadLocalFile()?.delete()
+            LocalStorageUtils.deleteAttachmentDirIfEmpty(requireContext(), draft.localUuid, attachment.localUuid)
             draft.attachments.removeAt(position)
         }.onFailure { exception ->
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
         }
+
+        newMessageViewModel.updateIsSendingAllowed()
     }
 
     private fun setupSendButton() = with(binding) {
