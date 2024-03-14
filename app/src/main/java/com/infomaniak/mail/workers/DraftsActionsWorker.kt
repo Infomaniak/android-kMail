@@ -280,13 +280,15 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         attachmentsToUpload.forEach { attachment ->
             runCatching {
-                attachment.startUpload(localUuid, attachmentsUris)
+                attachment.startUpload(localUuid)
             }.onFailure { exception ->
                 SentryLog.d(TAG, "${exception.message}", exception)
                 if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
                 throw exception
             }
         }
+
+        LocalStorageUtils.deleteDraftDirIfEmpty(applicationContext, localUuid, userId, mailbox.mailboxId)
 
         return Result.success()
     }
@@ -300,7 +302,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         return localAttachments to attachmentUris
     }
 
-    private fun Attachment.startUpload(draftLocalUuid: String, attachmentsUris: MutableList<String>) {
+    private fun Attachment.startUpload(draftLocalUuid: String) {
         val attachmentFile = getUploadLocalFile().also {
             if (it?.exists() != true) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
@@ -322,17 +324,15 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
-            attachmentsUris.remove(uploadLocalUri)
             updateLocalAttachment(draftLocalUuid, apiResponse.data!!)
-            if (!attachmentsUris.contains(uploadLocalUri)) {
-                attachmentFile.delete()
-                LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(
-                    context = applicationContext,
-                    draftLocalUuid = draftLocalUuid,
-                    userId = userId,
-                    mailboxId = mailbox.mailboxId,
-                )
-            }
+            attachmentFile.delete()
+            LocalStorageUtils.deleteAttachmentDirIfEmpty(
+                context = applicationContext,
+                draftLocalUuid = draftLocalUuid,
+                attachmentLocalUuid = localUuid,
+                userId = userId,
+                mailboxId = mailbox.mailboxId,
+            )
         } else {
             SentryLog.e(
                 tag = ATTACHMENT_TAG,
@@ -347,11 +347,9 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun Attachment.updateLocalAttachment(draftLocalUuid: String, remoteAttachment: Attachment) {
         mailboxContentRealm.writeBlocking {
             draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
+
                 val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
-                SentryLog.d(
-                    ATTACHMENT_TAG,
-                    "When removing just uploaded attachment we found (Uuids to localUris): $uuidToLocalUri"
-                )
+                SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (Uuids to localUris): $uuidToLocalUri")
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
