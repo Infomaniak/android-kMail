@@ -53,7 +53,6 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
-import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
@@ -340,7 +339,7 @@ class NewMessageFragment : Fragment() {
 
         subjectTextField.setText(draft.subject)
 
-        attachmentAdapter.addAll(draft.attachments.filterNot { it.disposition == INLINE })
+        attachmentAdapter.addAll(draft.attachments)
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
         bodyText.setText(draft.uiBody)

@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -79,7 +80,7 @@ class AttachmentAdapter(
     fun setAttachments(newList: List<Attachment>) = runCatchingRealm { attachments = newList.toMutableList() }
 
     fun addAll(newAttachments: List<Attachment>) {
-        attachments.addAll(newAttachments)
+        attachments.addAll(newAttachments.filterNot { it.disposition == AttachmentDisposition.INLINE })
         notifyItemRangeInserted(attachments.lastIndex, newAttachments.count())
     }
 
