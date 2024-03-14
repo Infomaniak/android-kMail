@@ -52,13 +52,13 @@ import okhttp3.OkHttpClient
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.abs
 import kotlin.math.max
 
 @Singleton
 class RefreshController @Inject constructor(
     private val localSettings: LocalSettings,
     private val mailboxController: MailboxController,
+    private val delayApiCallManager: DelayApiCallManager,
 ) {
 
     private var refreshThreadsJob: Job? = null
@@ -517,8 +517,6 @@ class RefreshController @Inject constructor(
         cursor: String,
     ): Set<Thread> {
 
-        val startTime = System.currentTimeMillis()
-
         val logMessage = "Added: ${uids.count()}"
         SentryLog.d("API", "$logMessage | ${folder.name}")
 
@@ -528,7 +526,7 @@ class RefreshController @Inject constructor(
 
         val impactedThreads = mutableSetOf<Thread>()
 
-        val apiResponse = ApiRepository.getMessagesByUids(mailbox.uuid, folder.id, uids, okHttpClient)
+        val apiResponse = delayApiCallManager.getMessagesByUids(scope, mailbox.uuid, folder.id, uids, okHttpClient)
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         scope.ensureActive()
 
@@ -553,19 +551,6 @@ class RefreshController @Inject constructor(
                     impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
                 }
             }
-
-            /**
-             * Realm really doesn't like to be written on too frequently.
-             * So we want to be sure that we don't write twice in less than 500 ms.
-             * Appreciable side effect: it will also reduce the stress on the API.
-             */
-            val duration = abs(System.currentTimeMillis() - startTime)
-            val delay = Utils.MAX_DELAY_BETWEEN_API_CALLS - duration
-            if (delay > 0L) {
-                delay(delay)
-                scope.ensureActive()
-            }
-
         }
 
         return impactedThreads
