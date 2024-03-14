@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
-import android.view.WindowManager
+import android.view.WindowManager.LayoutParams
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
@@ -53,7 +53,6 @@ class NewMessageEditorManager @Inject constructor(
         binding: FragmentNewMessageBinding,
         fragment: NewMessageFragment,
         aiManager: NewMessageAiManager,
-        filePicker: FilePicker,
     ) {
         super.initValues(newMessageViewModel, binding, fragment, freeReferences = {
             _aiManager = null
@@ -61,18 +60,19 @@ class NewMessageEditorManager @Inject constructor(
         })
 
         _aiManager = aiManager
-        _filePicker = filePicker
+
+        _filePicker = FilePicker(fragment).apply {
+            initCallback { uris ->
+                activity.window.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                newMessageViewModel.importAttachmentsToCurrentDraft(uris)
+            }
+        }
     }
 
     fun observeEditorActions() {
-        newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, /*isToggled*/ _) ->
+        newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
-                EditorAction.ATTACHMENT -> {
-                    filePicker.open { uris ->
-                        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        newMessageViewModel.importAttachmentsToCurrentDraft(uris)
-                    }
-                }
+                EditorAction.ATTACHMENT -> filePicker.open()
                 EditorAction.CAMERA -> fragment.notYetImplemented()
                 EditorAction.LINK -> fragment.notYetImplemented()
                 EditorAction.CLOCK -> fragment.notYetImplemented()
