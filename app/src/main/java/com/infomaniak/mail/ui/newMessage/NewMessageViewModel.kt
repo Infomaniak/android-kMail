@@ -625,7 +625,25 @@ class NewMessageViewModel @Inject constructor(
     private fun isSavingDraftWithoutChanges(action: DraftAction) = action == DraftAction.SAVE && snapshot?.hasChanges() != true
 
     fun updateIsSendingAllowed() {
-        isSendingAllowed.value = draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()
+
+        val hasRecipient = draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()
+        if (!hasRecipient) {
+            isSendingAllowed.value = false
+            return
+        }
+
+        var size = 0L
+        var isSizeCorrect = true
+        run breaking@{
+            draft.attachments.forEach {
+                size += it.size
+                if (size > FILE_SIZE_25_MB) {
+                    isSizeCorrect = false
+                    return@breaking
+                }
+            }
+        }
+        isSendingAllowed.value = isSizeCorrect
     }
 
     fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
@@ -656,16 +674,19 @@ class NewMessageViewModel @Inject constructor(
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
 
         val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null
-        if (fileSize > availableSpace) return null to true
+        val attachment = Attachment()
 
-        return LocalStorageUtils.saveUploadAttachment(appContext, uri, fileName, draft.localUuid)?.let { file ->
-            val mimeType = file.path.guessMimeType()
-            Attachment().initLocalValues(fileName, file.length(), mimeType, file.toUri().toString()) to false
-        } ?: (null to false)
+        return LocalStorageUtils.saveUploadAttachment(appContext, uri, fileName, draft.localUuid, attachment.localUuid)
+            ?.let { file ->
+                Pair(
+                    attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
+                    fileSize > availableSpace,
+                )
+            }
     }
 
     override fun onCleared() {
-        LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(appContext, draft.localUuid)
+        LocalStorageUtils.deleteDraftDirIfEmpty(appContext, draft.localUuid)
         super.onCleared()
     }
 
