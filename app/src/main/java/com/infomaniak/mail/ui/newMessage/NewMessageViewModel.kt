@@ -174,7 +174,7 @@ class NewMessageViewModel @Inject constructor(
             }
 
             // We need `draft` to be assigned before calling this function (because `saveDraftToLocal()` needs it)
-            if (!draftExists) draft.populateWithExternalMailDataIfNeeded(intent, navArgs)
+            if (!draftExists) populateWithExternalMailDataIfNeeded(intent, navArgs)
 
             true
         }.getOrElse {
@@ -236,7 +236,7 @@ class NewMessageViewModel @Inject constructor(
         return getLatestLocalDraft(uuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
     }
 
-    private fun Draft.populateWithExternalMailDataIfNeeded(intent: Intent, navArgs: NewMessageActivityArgs) {
+    private fun populateWithExternalMailDataIfNeeded(intent: Intent, navArgs: NewMessageActivityArgs) {
         when (intent.action) {
             Intent.ACTION_SEND -> handleSingleSendIntent(intent)
             Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent(intent)
@@ -250,7 +250,7 @@ class NewMessageViewModel @Inject constructor(
      * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
-    private fun Draft.handleMailTo(uri: Uri?, intent: Intent? = null) {
+    private fun handleMailTo(uri: Uri?, intent: Intent? = null) {
 
         /**
          * Mailto grammar accept 'name_of_recipient<email>' for recipients
@@ -279,22 +279,24 @@ class NewMessageViewModel @Inject constructor(
                 ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
-            to.addAll(splitTo)
-            cc.addAll(splitCc)
-            bcc.addAll(splitBcc)
+            with(draft) {
+                to.addAll(splitTo)
+                cc.addAll(splitCc)
+                bcc.addAll(splitBcc)
 
-            subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+                subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+                uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            }
 
             saveDraftDebouncing()
         }
     }
 
-    private fun Draft.handleSingleSendIntent(intent: Intent) = with(intent) {
+    private fun handleSingleSendIntent(intent: Intent) = with(intent) {
 
         if (hasExtra(Intent.EXTRA_TEXT)) {
-            getStringExtra(Intent.EXTRA_SUBJECT)?.let { subject = it }
-            getStringExtra(Intent.EXTRA_TEXT)?.let { uiBody = it }
+            getStringExtra(Intent.EXTRA_SUBJECT)?.let { draft.subject = it }
+            getStringExtra(Intent.EXTRA_TEXT)?.let { draft.uiBody = it }
         }
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
@@ -304,11 +306,11 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun Draft.handleMultipleSendIntent(intent: Intent) {
+    private fun handleMultipleSendIntent(intent: Intent) {
         intent
             .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
             ?.filterIsInstance<Uri>()
-            ?.let { importAttachments(it) }
+            ?.let(::importAttachments)
     }
 
     /**
@@ -384,7 +386,7 @@ class NewMessageViewModel @Inject constructor(
         else -> value
     }
 
-    private fun Draft.preSelectSignature(message: Message, signatures: List<Signature>) {
+    private fun preSelectSignature(message: Message, signatures: List<Signature>) = with(draft) {
         val mostFittingSignature = guessMostFittingSignature(message, signatures)
         identityId = mostFittingSignature.id.toString()
         body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
@@ -660,13 +662,13 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
-        draft.importAttachments(uris)
+        importAttachments(uris)
     }
 
-    private fun Draft.importAttachments(uris: List<Uri>) = viewModelScope.launch(ioCoroutineContext) {
+    private fun importAttachments(uris: List<Uri>) = viewModelScope.launch(ioCoroutineContext) {
 
         val newAttachments = mutableListOf<Attachment>()
-        var attachmentsSize = attachments.sumOf { it.size }
+        var attachmentsSize = draft.attachments.sumOf { it.size }
 
         uris.forEach { uri ->
             val availableSpace = FILE_SIZE_25_MB - attachmentsSize
@@ -679,7 +681,7 @@ class NewMessageViewModel @Inject constructor(
 
             attachment?.let {
                 newAttachments.add(it)
-                attachments.add(it)
+                draft.attachments.add(it)
                 attachmentsSize += it.size
             }
         }
