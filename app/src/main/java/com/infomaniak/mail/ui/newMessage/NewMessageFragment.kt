@@ -148,10 +148,7 @@ class NewMessageFragment : Fragment() {
         setWebViewReference()
         initUi()
 
-        if (newMessageViewModel.initResult.value == null) {
-            initDraftAndViewModel()
-            updateFeatureFlagIfMailTo()
-        }
+        if (newMessageViewModel.initResult.value == null) initDraftAndViewModel()
 
         handleOnBackPressed()
 
@@ -315,18 +312,6 @@ class NewMessageFragment : Fragment() {
                 } else {
                     recipientFieldsManager.focusBodyField()
                 }
-            }
-        }
-    }
-
-    private fun updateFeatureFlagIfMailTo() {
-        when (requireActivity().intent.action) {
-            Intent.ACTION_SEND,
-            Intent.ACTION_SEND_MULTIPLE,
-            Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO -> {
-                val currentMailbox = newMessageViewModel.currentMailbox
-                aiViewModel.updateFeatureFlag(currentMailbox.objectId, currentMailbox.uuid)
             }
         }
     }
