@@ -54,10 +54,15 @@ class NewMessageEditorManager @Inject constructor(
         fragment: NewMessageFragment,
         aiManager: NewMessageAiManager,
     ) {
-        super.initValues(newMessageViewModel, binding, fragment, freeReferences = {
-            _aiManager = null
-            _filePicker = null
-        })
+        super.initValues(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = fragment,
+            freeReferences = {
+                _aiManager = null
+                _filePicker = null
+            },
+        )
 
         _aiManager = aiManager
 

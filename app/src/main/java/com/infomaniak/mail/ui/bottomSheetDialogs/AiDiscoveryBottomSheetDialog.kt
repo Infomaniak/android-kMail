@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import android.os.Bundle
 import android.view.View
-import android.view.WindowManager
+import android.view.WindowManager.LayoutParams
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
@@ -38,7 +38,7 @@ class AiDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dialog?.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+        dialog?.window?.setFlags(LayoutParams.FLAG_NOT_FOCUSABLE, LayoutParams.FLAG_NOT_FOCUSABLE)
     }
 
     override fun onPositiveButtonClicked() {

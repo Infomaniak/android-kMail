@@ -118,11 +118,11 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun updateAiFeatureFlag(objectId: String, mailboxUuid: String) {
+    fun updateAiFeatureFlag(mailboxObjectId: String, mailboxUuid: String) {
         with(ApiRepository.checkFeatureFlag(FeatureFlag.AI, mailboxUuid)) {
             if (isSuccess()) {
                 val isEnabled = data?.get("is_enabled") == true
-                mailboxController.updateMailbox(objectId) {
+                mailboxController.updateMailbox(mailboxObjectId) {
                     if (isEnabled) it.featureFlags.add(FeatureFlag.AI) else it.featureFlags.remove(FeatureFlag.AI)
                 }
             }
