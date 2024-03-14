@@ -45,13 +45,13 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
     }
 
-    fun getAttachmentsUploadDir(
+    private fun getAttachmentsUploadDir(
         context: Context,
-        localDraftUuid: String,
+        draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
-        return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), localDraftUuid)
+        return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), draftLocalUuid)
     }
 
     fun saveAttachmentToCache(resource: String, cacheFile: File): Boolean {
@@ -82,9 +82,9 @@ object LocalStorageUtils {
         }
     }
 
-    fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, localDraftUuid: String): File? {
+    fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, draftLocalUuid: String): File? {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            val attachmentsUploadDir = getAttachmentsUploadDir(context, localDraftUuid)
+            val attachmentsUploadDir = getAttachmentsUploadDir(context, draftLocalUuid)
             if (!attachmentsUploadDir.exists()) attachmentsUploadDir.mkdirs()
             val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_$fileName"
             File(attachmentsUploadDir, hashedFileName).also { file ->
@@ -103,11 +103,11 @@ object LocalStorageUtils {
 
     fun deleteAttachmentsUploadsDirIfEmpty(
         context: Context,
-        localDraftUuid: String,
+        draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ) {
-        val attachmentsDir = getAttachmentsUploadDir(context, localDraftUuid, userId, mailboxId).also {
+        val attachmentsDir = getAttachmentsUploadDir(context, draftLocalUuid, userId, mailboxId).also {
             if (!it.exists()) return
         }
         val mailboxDir = attachmentsDir.parentFile ?: return

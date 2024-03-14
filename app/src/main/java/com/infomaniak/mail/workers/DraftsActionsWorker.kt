@@ -300,7 +300,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         return localAttachments to attachmentUris
     }
 
-    private fun Attachment.startUpload(localDraftUuid: String, attachmentsUris: MutableList<String>) {
+    private fun Attachment.startUpload(draftLocalUuid: String, attachmentsUris: MutableList<String>) {
         val attachmentFile = getUploadLocalFile().also {
             if (it?.exists() != true) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
@@ -326,12 +326,12 @@ class DraftsActionsWorker @AssistedInject constructor(
                 SentryLog.e(ATTACHMENT_TAG, "Attachment uuid null from API, this should not happen")
             }
             attachmentsUris.remove(uploadLocalUri)
-            updateLocalAttachment(localDraftUuid, apiResponse.data!!)
+            updateLocalAttachment(draftLocalUuid, apiResponse.data!!)
             if (!attachmentsUris.contains(uploadLocalUri)) {
                 attachmentFile.delete()
                 LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(
                     context = applicationContext,
-                    localDraftUuid = localDraftUuid,
+                    draftLocalUuid = draftLocalUuid,
                     userId = userId,
                     mailboxId = mailbox.mailboxId,
                 )
@@ -347,9 +347,9 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
     }
 
-    private fun Attachment.updateLocalAttachment(localDraftUuid: String, remoteAttachment: Attachment) {
+    private fun Attachment.updateLocalAttachment(draftLocalUuid: String, remoteAttachment: Attachment) {
         mailboxContentRealm.writeBlocking {
-            draftController.updateDraft(localDraftUuid, realm = this) { draft ->
+            draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
                 draft.attachments.add(remoteAttachment)
             }
