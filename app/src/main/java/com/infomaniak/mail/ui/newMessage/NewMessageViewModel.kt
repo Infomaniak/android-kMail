@@ -266,30 +266,28 @@ class NewMessageViewModel @Inject constructor(
             if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
         }
 
-        uri?.let { uri ->
-            if (!MailTo.isMailTo(uri)) return
+        if (uri == null || !MailTo.isMailTo(uri)) return
 
-            val mailToIntent = MailTo.parse(uri)
-            val splitTo = mailToIntent.to?.splitToRecipientList()
-                ?: emptyList()
-            val splitCc = mailToIntent.cc?.splitToRecipientList()
-                ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
-                ?: emptyList()
-            val splitBcc = mailToIntent.bcc?.splitToRecipientList()
-                ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
-                ?: emptyList()
+        val mailToIntent = MailTo.parse(uri)
+        val splitTo = mailToIntent.to?.splitToRecipientList()
+            ?: emptyList()
+        val splitCc = mailToIntent.cc?.splitToRecipientList()
+            ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
+            ?: emptyList()
+        val splitBcc = mailToIntent.bcc?.splitToRecipientList()
+            ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
+            ?: emptyList()
 
-            with(draft) {
-                to.addAll(splitTo)
-                cc.addAll(splitCc)
-                bcc.addAll(splitBcc)
+        with(draft) {
+            to.addAll(splitTo)
+            cc.addAll(splitCc)
+            bcc.addAll(splitBcc)
 
-                subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-                uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
-            }
-
-            saveDraftDebouncing()
+            subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+            uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
         }
+
+        saveDraftDebouncing()
     }
 
     private fun handleSingleSendIntent(intent: Intent) = with(intent) {
