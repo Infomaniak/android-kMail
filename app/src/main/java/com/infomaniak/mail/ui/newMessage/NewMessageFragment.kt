@@ -44,7 +44,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.isNightModeEnabled
@@ -192,7 +191,6 @@ class NewMessageFragment : Fragment() {
             binding = binding,
             fragment = this@NewMessageFragment,
             aiManager = aiManager,
-            filePicker = FilePicker(this@NewMessageFragment)
         )
 
         recipientFieldsManager.initValues(
