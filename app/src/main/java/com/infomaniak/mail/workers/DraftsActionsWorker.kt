@@ -267,6 +267,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     private fun Draft.uploadAttachments(): Result {
+
         val (attachmentsToUpload, attachmentsUris) = getNotUploadedAttachments(draft = this)
         val attachmentsToUploadCount = attachmentsToUpload.count()
         if (attachmentsToUploadCount > 0) {

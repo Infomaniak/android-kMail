@@ -185,7 +185,9 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
             flagRecipientsAsAutomaticallyEntered()
+
             saveDraftSnapshot()
+
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
@@ -288,6 +290,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun Draft.handleSingleSendIntent(intent: Intent) = with(intent) {
+
         if (hasExtra(Intent.EXTRA_TEXT)) {
             getStringExtra(Intent.EXTRA_SUBJECT)?.let { subject = it }
             getStringExtra(Intent.EXTRA_TEXT)?.let { uiBody = it }
@@ -521,6 +524,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draft) {
+
         if (type == FieldType.CC || type == FieldType.BCC) otherFieldsAreAllEmpty.value = false
 
         val field = when (type) {
@@ -529,11 +533,13 @@ class NewMessageViewModel @Inject constructor(
             FieldType.BCC -> bcc
         }
         field.add(recipient)
+
         updateIsSendingAllowed()
         saveDraftDebouncing()
     }
 
     fun removeRecipientFromField(recipient: Recipient, type: FieldType) = with(draft) {
+
         val field = when (type) {
             FieldType.TO -> to
             FieldType.CC -> cc
@@ -545,6 +551,7 @@ class NewMessageViewModel @Inject constructor(
 
         updateIsSendingAllowed()
         saveDraftDebouncing()
+
         context.trackNewMessageEvent("deleteRecipient")
         if (recipient.displayAsExternal) context.trackExternalEvent("deleteRecipient")
     }
@@ -592,8 +599,10 @@ class NewMessageViewModel @Inject constructor(
         }
 
         context.trackSendingDraftEvent(action, draft, currentMailbox.externalMailFlagEnabled)
+
         saveDraftToLocal(action)
         showDraftToastToUser(action, isFinishing, isTaskRoot)
+
         startWorkerCallback()
         if (action == DraftAction.SAVE && !isFinishing) {
             isNewMessage = false
@@ -680,6 +689,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
+
         val (fileName, fileSize) = context.getFileNameAndSize(uri) ?: return null
         if (fileSize > availableSpace) return null to true
 
