@@ -113,6 +113,9 @@ class NewMessageViewModel @Inject constructor(
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
+    // Needs to trigger every time the Fragment is recreated
+    val initResult = MutableLiveData<Pair<Boolean, List<Signature>>?>()
+
     val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     val currentMailboxLive = mailboxController.getMailboxAsync(
@@ -125,7 +128,7 @@ class NewMessageViewModel @Inject constructor(
         emit(list to arrangeMergedContacts(list))
     }
 
-    private val draftExists get() =  arrivedFromExistingDraft || draftLocalUuid != null
+    private val draftExists get() = arrivedFromExistingDraft || draftLocalUuid != null
 
     private val arrivedFromExistingDraft
         inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::arrivedFromExistingDraft.name) ?: false
@@ -153,7 +156,7 @@ class NewMessageViewModel @Inject constructor(
     fun recipient() = recipient
     fun shouldLoadDistantResources() = shouldLoadDistantResources
 
-    fun initDraftAndViewModel(intent: Intent): LiveData<Pair<Boolean, List<Signature>>> = liveData(ioCoroutineContext) {
+    fun initDraftAndViewModel(intent: Intent) = viewModelScope.launch(ioCoroutineContext) {
 
         val realm = mailboxContentRealm()
         var signatures = emptyList<Signature>()
@@ -195,7 +198,7 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        emit(isSuccess to signatures)
+        initResult.postValue(isSuccess to signatures)
     }
 
     private fun saveDraftInitState() {
