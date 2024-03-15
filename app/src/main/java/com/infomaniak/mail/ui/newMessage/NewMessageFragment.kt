@@ -65,10 +65,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -266,27 +263,25 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initDraftAndViewModel() {
+    private fun initDraftAndViewModel() = with(newMessageViewModel) {
 
-        newMessageViewModel.initDraftAndViewModel(
-            intent = requireActivity().intent,
-        ).observe(viewLifecycleOwner) { (isSuccess, signatures) ->
+        if (initResult.value == null) initDraftAndViewModel(intent = requireActivity().intent)
+
+        initResult.observeNotNull(viewLifecycleOwner) { (isSuccess, signatures) ->
 
             if (!isSuccess) requireActivity().apply {
                 showToast(R.string.failToOpenDraft)
                 finish()
-                return@observe
+                return@observeNotNull
             }
 
             showKeyboardInCorrectView()
-
             hideLoader()
             populateUiWithViewModel()
             setupFromField(signatures)
             editorManager.setupEditorActions()
             editorManager.setupEditorFormatActionsToggle()
-
-            externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
+            externalsManager.observeExternals(arrivedFromExistingDraft())
         }
     }
 
