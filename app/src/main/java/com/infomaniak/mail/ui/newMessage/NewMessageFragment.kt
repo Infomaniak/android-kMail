@@ -158,6 +158,8 @@ class NewMessageFragment : Fragment() {
         editorManager.observeEditorActions()
         observeNewAttachments()
         observeDraftWorkerResults()
+        aiManager.observeAiPromptStatus()
+        aiManager.observeAiFeatureFlagUpdates()
     }
 
     private fun initManagers() {
@@ -281,7 +283,7 @@ class NewMessageFragment : Fragment() {
             editorManager.setupEditorActions()
             editorManager.setupEditorFormatActionsToggle()
             externalsManager.observeExternals(arrivedFromExistingDraft())
-            aiManager.observeEverything()
+            aiManager.observeAiOutput()
         }
     }
 

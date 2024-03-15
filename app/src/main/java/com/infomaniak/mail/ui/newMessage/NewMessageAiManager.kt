@@ -84,20 +84,14 @@ class NewMessageAiManager @Inject constructor(
         _aiViewModel = aiViewModel
     }
 
-    fun observeEverything() {
-        observeAiOutput()
-        observeAiPromptStatus()
-        observeAiFeatureFlagUpdates()
-    }
-
-    private fun observeAiOutput() = with(binding) {
+    fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
-            subject?.let { subjectTextField.setText(it) }
+            subject?.let(subjectTextField::setText)
             bodyText.setText(content)
         }
     }
 
-    private fun observeAiPromptStatus() {
+    fun observeAiPromptStatus() {
         aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent, becauseOfGeneration) ->
             if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed(becauseOfGeneration)
         }
@@ -202,7 +196,7 @@ class NewMessageAiManager @Inject constructor(
         updateNavigationBarColor()
     }
 
-    private fun observeAiFeatureFlagUpdates() {
+    fun observeAiFeatureFlagUpdates() {
         newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
             val isAiEnabled = mailbox.featureFlags.contains(FeatureFlag.AI)
             binding.editorAi.isVisible = isAiEnabled
