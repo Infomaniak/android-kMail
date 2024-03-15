@@ -39,24 +39,24 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.lib.core.utils.hasPermissions
+import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
-import com.infomaniak.lib.stores.StoreUtils.launchInAppReview
+import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
-import com.infomaniak.mail.MatomoMail.trackAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
@@ -111,7 +111,6 @@ class MainActivity : BaseActivity() {
         if (draftAction == DraftAction.SEND) {
             showEasterXMas()
             showSendingSnackbarTimer.start()
-            showAppReview()
         }
     }
 
@@ -150,6 +149,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
+
+    @Inject
+    lateinit var inAppReviewManager: InAppReviewManager
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -212,6 +214,15 @@ class MainActivity : BaseActivity() {
         managePermissionsRequesting()
 
         initAppUpdateManager()
+        initAppReviewManager()
+    }
+
+    private fun initAppReviewManager() {
+        inAppReviewManager.init(
+            onDialogShown = { trackInAppReviewEvent("presentAlert") },
+            onUserWantToReview = { trackInAppReviewEvent("like") },
+            onUserWantToGiveFeedback = { trackInAppReviewEvent("dislike") },
+        )
     }
 
     private fun observeNetworkStatus() {
@@ -343,11 +354,7 @@ class MainActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
 
-        localSettings.apply {
-            appLaunches++
-            appReviewLaunches--
-        }
-
+        localSettings.appLaunches++
         showSyncDiscovery()
     }
 
@@ -488,25 +495,6 @@ class MainActivity : BaseActivity() {
         if (!showPermissionsOnboarding && showSyncDiscoveryBottomSheet && appLaunches > 1 && !isUserAlreadySynchronized()) {
             showSyncDiscoveryBottomSheet = false
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
-        }
-    }
-
-    private fun showAppReview() = with(localSettings) {
-        if (showAppReviewDialog && appReviewLaunches < 0) {
-            appReviewLaunches = LocalSettings.DEFAULT_APP_REVIEW_LAUNCHES
-            trackAppReviewEvent("presentAlert", TrackerAction.DATA)
-            titleDialog.show(
-                title = R.string.reviewAlertTitle,
-                onPositiveButtonClicked = {
-                    trackAppReviewEvent("like")
-                    showAppReviewDialog = false
-                    launchInAppReview()
-                },
-                onNegativeButtonClicked = {
-                    trackAppReviewEvent("dislike")
-                    openUrl(getString(R.string.urlUserReportAndroid))
-                },
-            )
         }
     }
 

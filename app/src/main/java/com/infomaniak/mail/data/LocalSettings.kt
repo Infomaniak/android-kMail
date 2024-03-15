@@ -62,8 +62,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var aiReplacementDialogVisibility by sharedValue("aiReplacementDialogVisibilityKey", AiReplacementDialogVisibility.SHOW)
     var showAiDiscoveryBottomSheet by sharedValue("showAiDiscoveryBottomSheetKey", true)
     var showSyncDiscoveryBottomSheet by sharedValue("showSyncDiscoveryBottomSheetKey", true)
-    var appReviewLaunches by sharedValue("appReviewLaunchesKey", DEFAULT_APP_REVIEW_LAUNCHES)
-    var showAppReviewDialog by sharedValue("showAppReviewDialogKey", true)
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
@@ -201,8 +199,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
 
         private val TAG = LocalSettings::class.java.simpleName
         private const val SHARED_PREFS_NAME = "LocalSettingsSharedPref"
-
-        const val DEFAULT_APP_REVIEW_LAUNCHES = 50
 
         @Volatile
         private var INSTANCE: LocalSettings? = null
