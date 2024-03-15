@@ -44,9 +44,12 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         fragment: NewMessageFragment,
         externalsManager: NewMessageExternalsManager,
     ) {
-        super.initValues(newMessageViewModel, binding, fragment, freeReferences = {
-            _externalsManager = null
-        })
+        super.initValues(
+            newMessageViewModel,
+            binding,
+            fragment,
+            freeReferences = { _externalsManager = null },
+        )
 
         _externalsManager = externalsManager
     }
