@@ -22,7 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.transition.ChangeBounds
 import android.transition.Fade
-import android.transition.Fade.*
+import android.transition.Fade.IN
 import android.transition.TransitionManager
 import android.transition.TransitionSet
 import android.view.LayoutInflater
@@ -51,8 +51,11 @@ import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.main.MailboxListFragment
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ConfettiUtils
 import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
+import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.toggleChevron
@@ -274,25 +277,26 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     }
 
     private fun observeFoldersLive() = with(mainViewModel) {
-
-        Utils.waitInitMediator(
-            currentFolder,
-            currentDefaultFoldersLive,
-        ).observe(viewLifecycleOwner) { (currentFolder, defaultFolders) ->
-            val newCurrentFolderId = currentFolder?.id ?: return@observe
-            binding.defaultFoldersList.post {
-                defaultFoldersAdapter.setFolders(defaultFolders, newCurrentFolderId)
+        runCatchingRealm {
+            Utils.waitInitMediator(
+                currentFolder,
+                currentDefaultFoldersLive,
+            ).observe(viewLifecycleOwner) { (currentFolder, defaultFolders) ->
+                val newCurrentFolderId = currentFolder?.id ?: return@observe
+                binding.defaultFoldersList.post {
+                    defaultFoldersAdapter.setFolders(defaultFolders, newCurrentFolderId)
+                }
             }
-        }
 
-        Utils.waitInitMediator(
-            currentFolder,
-            currentCustomFoldersLive,
-        ).observe(viewLifecycleOwner) { (currentFolder, customFolders) ->
-            binding.noFolderText.isVisible = customFolders.isEmpty()
-            val newCurrentFolderId = currentFolder?.id ?: return@observe
-            binding.customFoldersList.post {
-                customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
+            Utils.waitInitMediator(
+                currentFolder,
+                currentCustomFoldersLive,
+            ).observe(viewLifecycleOwner) { (currentFolder, customFolders) ->
+                binding.noFolderText.isVisible = customFolders.isEmpty()
+                val newCurrentFolderId = currentFolder?.id ?: return@observe
+                binding.customFoldersList.post {
+                    customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
+                }
             }
         }
     }
