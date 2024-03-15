@@ -24,13 +24,15 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView.*
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.*
-import com.infomaniak.mail.databinding.*
+import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
+import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -177,7 +179,7 @@ class FolderAdapter @Inject constructor(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) {
+    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) = runCatchingRealm {
 
         foldersDiffer.submitList(newFolders)
 
