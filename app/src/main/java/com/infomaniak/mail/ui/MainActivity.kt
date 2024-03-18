@@ -230,11 +230,11 @@ class MainActivity : BaseActivity() {
 
             SentryLog.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
 
-            Sentry.addBreadcrumb(Breadcrumb().apply {
+            Breadcrumb().apply {
                 category = "Network"
                 message = "Internet access is available : $isAvailable"
                 level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
-            })
+            }.also(Sentry::addBreadcrumb)
 
             mainViewModel.isInternetAvailable.value = isAvailable
         }

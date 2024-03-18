@@ -106,12 +106,12 @@ object SentryDebug {
     }
 
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {
-        Sentry.addBreadcrumb(Breadcrumb().apply {
+        Breadcrumb().apply {
             this.category = category
             this.message = message
             data?.let { it.forEach { (key, value) -> this.data[key] = value } }
             this.level = SentryLevel.INFO
-        })
+        }.also(Sentry::addBreadcrumb)
     }
     //endregion
 
