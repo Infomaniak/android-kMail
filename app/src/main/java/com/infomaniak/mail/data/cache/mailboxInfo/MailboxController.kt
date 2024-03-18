@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -44,7 +43,6 @@ import javax.inject.Singleton
 class MailboxController @Inject constructor(
     private val appContext: Context,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
-    private val notificationUtils: NotificationUtils,
 ) {
 
     //region Get data
@@ -98,8 +96,6 @@ class MailboxController @Inject constructor(
 
     //region Edit data
     fun updateMailboxes(remoteMailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId) {
-
-        notificationUtils.initMailNotificationChannel(remoteMailboxes)
 
         val mailboxes = mailboxInfoRealm.writeBlocking {
             return@writeBlocking remoteMailboxes.map { remoteMailbox ->

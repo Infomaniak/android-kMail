@@ -68,6 +68,7 @@ class FetchMessagesManager @Inject constructor(
             // If we can't find the INBOX in Realm, it means the user never opened this Mailbox.
             // We don't want to display Notifications in this case.
             // We can leave safely.
+            // But if a user never opened this Mailbox, we shouldn't have register it to receive Notifications. So this shouldn't happen.
             SentryDebug.sendFailedNotification(
                 reason = "No Folder in Realm",
                 sentryLevel = SentryLevel.WARNING,
@@ -83,6 +84,7 @@ class FetchMessagesManager @Inject constructor(
             // We only want to display Notifications about Mailboxes that the User opened at least one.
             // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
             // We can leave safely.
+            // But if a user never opened this Mailbox, we shouldn't have register it to receive Notifications. So this shouldn't happen.
             SentryDebug.sendFailedNotification(
                 reason = "Folder's cursor is null",
                 sentryLevel = SentryLevel.WARNING,
