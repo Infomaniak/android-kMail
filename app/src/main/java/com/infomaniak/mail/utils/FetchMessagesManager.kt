@@ -79,6 +79,21 @@ class FetchMessagesManager @Inject constructor(
             return
         }
 
+        if (folder.cursor == null) {
+            // We only want to display Notifications about Mailboxes that the User opened at least one.
+            // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
+            // We can leave safely.
+            SentryDebug.sendFailedNotification(
+                reason = "Folder's cursor is null",
+                sentryLevel = SentryLevel.WARNING,
+                userId = userId,
+                mailboxId = mailbox.mailboxId,
+                messageUid = sentryMessageUid,
+                mailbox = mailbox,
+            )
+            return
+        }
+
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update Local with Remote
