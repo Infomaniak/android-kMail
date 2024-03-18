@@ -2,8 +2,6 @@ name: Android CI
 
 on:
   pull_request:
-    branches: [ master ]
-    types: [ synchronize, opened, reopened, ready_for_review ]
 
 concurrency:
   group: ${{ github.head_ref }}
