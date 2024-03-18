@@ -55,6 +55,7 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
         setupListeners()
