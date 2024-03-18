@@ -166,8 +166,6 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun hideLoader() = with(binding) {
         textInput.isVisible = true
-        computeEndIconVisibility()
-
         loader.isGone = true
     }
 
