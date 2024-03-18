@@ -105,7 +105,7 @@ class NewMessageViewModel @Inject constructor(
 
     private var snapshot: DraftSnapshot? = null
 
-    var otherFieldsAreAllEmpty = SingleLiveEvent(true)
+    var otherFieldsAreAllEmpty = MutableLiveData(true)
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
     val importedAttachments = SingleLiveEvent<Pair<MutableList<Attachment>, ImportationResult>>()
     val isSendingAllowed = SingleLiveEvent(false)
