@@ -54,7 +54,7 @@ class AiViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     var aiPrompt = ""
-    private var history = mutableListOf<AiMessage>()
+    private val history = mutableListOf<AiMessage>()
     private var conversationContextId: String? = null
     var aiPromptOpeningStatus = MutableLiveData<AiPromptOpeningStatus>()
     var previousMessageBodyPlainText by aiSharedData::previousMessageBodyPlainText
