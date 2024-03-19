@@ -288,7 +288,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        LocalStorageUtils.deleteDraftDirIfEmpty(applicationContext, localUuid, userId, mailbox.mailboxId)
+        LocalStorageUtils.deleteDraftDir(applicationContext, localUuid, userId, mailbox.mailboxId)
 
         return Result.success()
     }
@@ -326,7 +326,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         if (apiResponse.isSuccess() && apiResponse.data != null) {
             updateLocalAttachment(draftLocalUuid, apiResponse.data!!)
             attachmentFile.delete()
-            LocalStorageUtils.deleteAttachmentDirIfEmpty(
+            LocalStorageUtils.deleteAttachmentDir(
                 context = applicationContext,
                 draftLocalUuid = draftLocalUuid,
                 attachmentLocalUuid = localUuid,
