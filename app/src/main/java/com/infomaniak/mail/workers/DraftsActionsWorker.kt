@@ -272,7 +272,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private fun Draft.uploadAttachments(): Result {
 
-        val (attachmentsToUpload, attachmentsUris) = getNotUploadedAttachments(draft = this)
+        val attachmentsToUpload = getNotUploadedAttachments(draft = this)
         val attachmentsToUploadCount = attachmentsToUpload.count()
         if (attachmentsToUploadCount > 0) {
             SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
@@ -297,14 +297,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private fun getNotUploadedAttachments(draft: Draft): Pair<List<Attachment>, MutableList<String>> {
-        val attachmentUris = mutableListOf<String>()
-        val localAttachments = draft.attachments.filter { attachment ->
-            (attachment.uploadLocalUri != null).also { if (it) attachmentUris.add(attachment.uploadLocalUri!!) }
-        }
-
-        return localAttachments to attachmentUris
-    }
+    private fun getNotUploadedAttachments(draft: Draft): List<Attachment> = draft.attachments.filter { it.uploadLocalUri != null }
 
     private fun Attachment.startUpload(draftLocalUuid: String) {
         val attachmentFile = getUploadLocalFile().also {
