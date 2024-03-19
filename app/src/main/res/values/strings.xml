@@ -368,7 +368,7 @@
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
     <string name="popupDetachMailboxTitle">Detach mailbox</string>
     <string name="recentSearchesTitle">Recent searches</string>
-    <string name="refreshTokenError">You’ve been disconnected due to a problem. Please log in again</string>
+    <string name="refreshTokenError">You have been disconnected</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>
     <string name="reportDisplayProblemTitle">Report a display problem</string>
     <string name="reportPhishingDescription">If this message attempts to steal sensitive information (password, bank details, etc.) and/or impersonates a recognised identity then it is phishing.\n\nBy reporting it to us, you speed up the detection of dangerous messages for all our users.\n\nThe report will be sent to our security team for analysis and action. The email will also be automatically moved to your spam folder.</string>

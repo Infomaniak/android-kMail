@@ -362,7 +362,7 @@
     <string name="popupDetachMailboxDescription">Sei sicuro di voler staccare l’indirizzo %s?</string>
     <string name="popupDetachMailboxTitle">Staccare l’indirizzo</string>
     <string name="recentSearchesTitle">Ricerche recenti</string>
-    <string name="refreshTokenError">Sei stato disconnesso a causa di un problema. Riconnettiti</string>
+    <string name="refreshTokenError">Sei stato disconnesso</string>
     <string name="reportDisplayProblemDescription">Accettate di condividere i vostri dati con i nostri sviluppatori in modo che possano aiutarvi a risolvere il vostro problema?</string>
     <string name="reportDisplayProblemTitle">Segnala un problema di visualizzazione</string>
     <string name="reportPhishingDescription">Se il messaggio tenta di rubare informazioni sensibili (password, dati bancari, ecc.) e/o si spaccia per un’identità riconosciuta, si tratta di phishing.\n\nSegnalandolo a noi, accelererete l’individuazione di messaggi pericolosi per tutti i nostri utenti.\n\nLa segnalazione sarà inviata al nostro team di sicurezza per l’analisi e l’intervento. L’e-mail verrà inoltre spostata automaticamente nella cartella spam.</string>

@@ -362,7 +362,7 @@
     <string name="popupDetachMailboxDescription">Sind Sie sicher, dass Sie die Adresse %s lösen möchten?</string>
     <string name="popupDetachMailboxTitle">Adresse abtrennen</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
-    <string name="refreshTokenError">Sie wurden aufgrund eines Problems getrennt. Bitte verbinden Sie sich erneut.</string>
+    <string name="refreshTokenError">Sie wurden abgemeldet</string>
     <string name="reportDisplayProblemDescription">Sind Sie damit einverstanden, Ihre Daten mit unseren Entwicklern zu teilen, damit diese Ihnen bei Ihrem Problem helfen können?</string>
     <string name="reportDisplayProblemTitle">Ein Anzeigeproblem melden</string>
     <string name="reportPhishingDescription">Wenn diese Nachricht versucht, vertrauliche Informationen (Passwort, Bankdaten usw.) zu stehlen und/oder sich als eine anerkannte Identität ausgibt, handelt es sich um Phishing.\n\nIndem Sie uns diese Nachricht melden, können Sie die Erkennung gefährlicher Nachrichten für alle unsere Nutzer beschleunigen.\n\nDie Meldung wird an unser Sicherheitsteam weitergeleitet, das sie analysiert und Massnahmen ergreift. Die E-Mail wird ausserdem automatisch in Ihren Spam-Ordner verschoben.</string>
