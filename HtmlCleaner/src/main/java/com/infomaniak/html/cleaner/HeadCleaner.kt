@@ -46,24 +46,27 @@ internal class CleaningVisitor(
     private var elementToSkip: Element? = null
 
     override fun head(node: Node, depth: Int) {
+
         if (elementToSkip != null) return
 
-        if (node is Element) {
-            if (isSafeTag(node)) {
-                val sourceTag = node.tagName()
-                val destinationAttributes = node.attributes().clone()
-                val destinationChild = Element(Tag.valueOf(sourceTag), node.baseUri(), destinationAttributes)
-                destination.appendChild(destinationChild)
-                destination = destinationChild
-            } else if (node !== root) {
-                elementToSkip = node
+        when {
+            node is Element -> {
+                if (isSafeTag(node)) {
+                    val sourceTag = node.tagName()
+                    val destinationAttributes = node.attributes().clone()
+                    val destinationChild = Element(Tag.valueOf(sourceTag), node.baseUri(), destinationAttributes)
+                    destination.appendChild(destinationChild)
+                    destination = destinationChild
+                } else if (node !== root) {
+                    elementToSkip = node
+                }
             }
-        } else if (node is TextNode) {
-            val destinationText = TextNode(node.wholeText)
-            destination.appendChild(destinationText)
-        } else if (node is DataNode && isSafeTag(node.parent())) {
-            val destinationData = DataNode(node.wholeData)
-            destination.appendChild(destinationData)
+            node is TextNode -> {
+                destination.appendChild(TextNode(node.wholeText))
+            }
+            node is DataNode && isSafeTag(node.parent()) -> {
+                destination.appendChild(DataNode(node.wholeData))
+            }
         }
     }
 
