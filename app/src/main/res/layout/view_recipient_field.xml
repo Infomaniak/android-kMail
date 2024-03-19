@@ -140,7 +140,7 @@
         app:layout_constraintGuide_end="48dp" />
 
     <FrameLayout
-        android:id="@+id/chevronLoaderVisibilityLayout"
+        android:id="@+id/chevronContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/marginStandardSmall"
