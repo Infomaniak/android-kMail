@@ -522,7 +522,7 @@ class NewMessageFragment : Fragment() {
         runCatching {
             val attachment = draft.attachments[position]
             attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentDir(requireContext(), draft.localUuid, attachment.localUuid)
+            LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draft.localUuid, attachment.localUuid)
             draft.attachments.removeAt(position)
         }.onFailure { exception ->
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
