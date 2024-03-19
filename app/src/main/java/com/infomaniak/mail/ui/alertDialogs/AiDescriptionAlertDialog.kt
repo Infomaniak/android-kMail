@@ -27,5 +27,5 @@ import javax.inject.Inject
 class AiDescriptionAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : DescriptionAlertDialog(activityContext) {
-    override val customThemeRes: Int = R.style.AiCursorAndPrimaryColorTheme
+    override val alertDialog = initDialog(R.style.AiCursorAndPrimaryColorTheme)
 }
