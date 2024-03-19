@@ -82,7 +82,6 @@
     <string name="aiReplaceSubjectDescription">Il soggetto diventerà:\n\n%s</string>
     <string name="aiReplaceSubjectTitle">Sostituire il soggetto attuale con la proposta dell’assistente?</string>
     <string name="aiReplacementDialogDescription">Facendo clic su \"Sostituisci\", il contenuto preesistente andrà perso.</string>
-    <string name="aiReplacementDialogDoNotShowAgain">Non visualizzare più questo messaggio</string>
     <string name="aiReplacementDialogPositiveButton">Sostituisci</string>
     <string name="aiReplacementDialogTitle">Sostituire i contenuti esistenti?</string>
     <string name="alertBlockedImagesDescription">Per la vostra sicurezza abbiamo bloccato alcuni contenuti del vostro messaggio.</string>

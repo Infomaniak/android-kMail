@@ -88,7 +88,6 @@
     <string name="aiReplaceSubjectDescription">The subject will become:\n\n%s</string>
     <string name="aiReplaceSubjectTitle">Replace the current subject with the assistant’s proposal?</string>
     <string name="aiReplacementDialogDescription">By clicking on \"Replace\", pre-existing content will be lost.</string>
-    <string name="aiReplacementDialogDoNotShowAgain">Do not show this again</string>
     <string name="aiReplacementDialogPositiveButton">Replace</string>
     <string name="aiReplacementDialogTitle">Replace already existing content?</string>
     <string name="alertBlockedImagesDescription">For your safety certain contents have been blocked from your message.</string>
