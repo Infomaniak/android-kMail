@@ -632,7 +632,7 @@ class NewMessageViewModel @Inject constructor(
             run breaking@{
                 draft.attachments.forEach {
                     size += it.size
-                    if (size > FILE_SIZE_25_MB) {
+                    if (size > ATTACHMENTS_MAX_SIZE) {
                         isSizeCorrect = false
                         return@breaking
                     }
@@ -657,7 +657,7 @@ class NewMessageViewModel @Inject constructor(
         var result = ImportationResult.SUCCESS
 
         uris.forEach { uri ->
-            val availableSpace = FILE_SIZE_25_MB - attachmentsSize
+            val availableSpace = ATTACHMENTS_MAX_SIZE - attachmentsSize
             val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace) ?: return@forEach
 
             if (hasSizeLimitBeenReached) result = ImportationResult.FILE_SIZE_TOO_BIG
@@ -731,7 +731,7 @@ class NewMessageViewModel @Inject constructor(
 
     companion object {
         private const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 1_000L
-        private const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
+        private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998
     }
 }
