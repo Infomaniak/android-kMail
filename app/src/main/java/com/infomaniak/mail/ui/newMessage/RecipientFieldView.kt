@@ -166,7 +166,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun hideLoader() = with(binding) {
         textInput.isVisible = true
-        chevronLoaderVisibilityLayout.isVisible = true
+        chevronContainer.isVisible = true
 
         loader.isGone = true
     }
