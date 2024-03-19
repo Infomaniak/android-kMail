@@ -46,11 +46,11 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
     }
 
-    fun downloadThenSaveAttachmentToCache(resource: String, cacheFile: File): Boolean {
+    fun downloadThenSaveAttachmentToCacheDir(resource: String, cacheFile: File): Boolean {
         fun Response.saveAttachmentTo(outputFile: File): Boolean {
             if (!isSuccessful) return false
             return body?.byteStream()?.use { inputStream ->
-                saveAttachmentToCache(inputStream, outputFile)
+                saveAttachmentToCacheDir(inputStream, outputFile)
                 true
             } ?: false
         }
@@ -62,7 +62,7 @@ object LocalStorageUtils {
      * Save the Attachment in disk memory.
      * The file remains unreadable as long as it's being processed.
      */
-    fun saveAttachmentToCache(inputStream: InputStream, outputFile: File) = with(outputFile) {
+    fun saveAttachmentToCacheDir(inputStream: InputStream, outputFile: File) = with(outputFile) {
         if (exists()) delete()
         inputStream.buffered().use {
             parentFile?.mkdirs()
@@ -74,7 +74,7 @@ object LocalStorageUtils {
         }
     }
 
-    private fun deleteAttachmentsCache(context: Context) = context.attachmentsCacheRootDir.deleteRecursively()
+    private fun deleteAttachmentsCacheDir(context: Context) = context.attachmentsCacheRootDir.deleteRecursively()
     //endregion
 
     //region Upload
@@ -97,7 +97,7 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), draftLocalUuid)
     }
 
-    fun saveAttachmentToUpload(
+    fun saveAttachmentToUploadDir(
         context: Context,
         uri: Uri,
         fileName: String,
@@ -120,7 +120,7 @@ object LocalStorageUtils {
         }
     }
 
-    fun deleteAttachmentDir(
+    fun deleteAttachmentUploadDir(
         context: Context,
         draftLocalUuid: String,
         attachmentLocalUuid: String,
@@ -135,10 +135,10 @@ object LocalStorageUtils {
         // Only delete a directory if it's empty
         if (attachmentDir.hasNoChildren) attachmentDir.delete()
 
-        deleteDraftDir(context, draftLocalUuid, userId, mailboxId)
+        deleteDraftUploadDir(context, draftLocalUuid, userId, mailboxId)
     }
 
-    fun deleteDraftDir(
+    fun deleteDraftUploadDir(
         context: Context,
         draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
@@ -161,7 +161,7 @@ object LocalStorageUtils {
 
     //region Global
     fun deleteUserData(context: Context, userId: Int) {
-        deleteAttachmentsCache(context)
+        deleteAttachmentsCacheDir(context)
         with(context.attachmentsUploadRootDir) {
             File(this, "$userId").deleteRecursively()
             if (this.listFiles()?.isEmpty() == true) deleteRecursively()
