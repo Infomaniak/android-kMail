@@ -292,8 +292,6 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        LocalStorageUtils.deleteDraftUploadDir(applicationContext, localUuid, userId, mailbox.mailboxId)
-
         return Result.success()
     }
 
