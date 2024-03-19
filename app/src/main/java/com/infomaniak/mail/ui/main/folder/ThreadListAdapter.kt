@@ -52,7 +52,10 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.databinding.*
+import com.infomaniak.mail.databinding.CardviewThreadItemBinding
+import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
+import com.infomaniak.mail.databinding.ItemThreadFlushFolderButtonBinding
+import com.infomaniak.mail.databinding.ItemThreadLoadMoreButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
@@ -84,7 +87,6 @@ class ThreadListAdapter @Inject constructor(
     private val checkMarkSizeOther by lazy { context.resources.getDimension(R.dimen.largeIconSize).toInt() }
 
     private var swipingIsAuthorized: Boolean = true
-    // private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
     private var isLoadMoreDisplayed = false
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
@@ -127,7 +129,6 @@ class ThreadListAdapter @Inject constructor(
             is String -> DisplayType.DATE_SEPARATOR.layout
             is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
             is Unit -> DisplayType.LOAD_MORE_BUTTON.layout
-            // displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout // TODO: Manage this for intelligent mailbox
             else -> DisplayType.THREAD.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -152,7 +153,6 @@ class ThreadListAdapter @Inject constructor(
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_flush_folder_button -> ItemThreadFlushFolderButtonBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
-            R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
 
@@ -180,7 +180,6 @@ class ThreadListAdapter @Inject constructor(
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
             DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
-            DisplayType.SEE_ALL_BUTTON.layout -> (this as ItemThreadSeeAllButtonBinding).displaySeeAllButton(item)
         }
     }
 
@@ -460,12 +459,6 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(item: Any) {
-        // TODO: Implement when we have intelligent mailbox
-        // val threadsNumber = itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER
-        // seeAllText.text = "See all $threadsNumber"
-    }
-
     override fun onSwipeStarted(item: Any, viewHolder: ThreadListViewHolder) {
         (item as Thread).updateDynamicIcons()
     }
@@ -614,7 +607,6 @@ class ThreadListAdapter @Inject constructor(
                         add(sectionTitle)
                         previousSectionTitle = sectionTitle
                     }
-                    // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
                 }
                 add(thread)
             }
@@ -664,7 +656,6 @@ class ThreadListAdapter @Inject constructor(
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         FLUSH_FOLDER_BUTTON(R.layout.item_thread_flush_folder_button),
         LOAD_MORE_BUTTON(R.layout.item_thread_load_more_button),
-        SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
     enum class NotificationType {
