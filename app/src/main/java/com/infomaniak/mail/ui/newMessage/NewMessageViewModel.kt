@@ -590,10 +590,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun showDraftToastToUser(action: DraftAction) = withContext(mainDispatcher) {
-        when (action) {
-            DraftAction.SAVE -> appContext.showToast(R.string.snackbarDraftSaving)
-            DraftAction.SEND -> appContext.showToast(R.string.snackbarEmailSending)
+        val resId = when (action) {
+            DraftAction.SAVE -> R.string.snackbarDraftSaving
+            DraftAction.SEND -> R.string.snackbarEmailSending
         }
+        appContext.showToast(resId)
     }
 
     private fun removeDraftFromRealm() {
