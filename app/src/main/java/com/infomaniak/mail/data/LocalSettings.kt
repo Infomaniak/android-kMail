@@ -59,7 +59,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var recentSearches: List<String> by sharedValue("recentSearchesKey", emptyList())
     var firebaseToken by sharedValueNullable("firebaseTokenKey", null)
     var firebaseRegisteredUsers by sharedValue("firebaseRegisteredUsersKey", emptySet())
-    var aiReplacementDialogVisibility by sharedValue("aiReplacementDialogVisibilityKey", AiReplacementDialogVisibility.SHOW)
     var showAiDiscoveryBottomSheet by sharedValue("showAiDiscoveryBottomSheetKey", true)
     var showSyncDiscoveryBottomSheet by sharedValue("showSyncDiscoveryBottomSheetKey", true)
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
@@ -188,11 +187,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: String) {
         ALWAYS("true", R.string.settingsOptionAlways, "always"),
         ASK_ME("false", R.string.settingsOptionAskMe, "askMe"),
-    }
-
-    enum class AiReplacementDialogVisibility {
-        SHOW,
-        HIDE,
     }
 
     companion object {

@@ -35,7 +35,6 @@ import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.AiReplacementDialogVisibility
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
@@ -118,10 +117,7 @@ class AiPropositionFragment : Fragment() {
         if (!aiViewModel.isHistoryEmpty()) propositionTextView.text = aiViewModel.getLastMessage()
 
         insertPropositionButton.setOnClickListener {
-            val doNotAskAgain = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
-            val body = newMessageViewModel.draft.uiBody
-
-            if (doNotAskAgain || body.isBlank()) {
+            if (newMessageViewModel.draft.uiBody.isBlank()) {
                 choosePropositionAndPopBack()
             } else {
                 trackAiWriterEvent("replacePropositionDialog")
@@ -242,22 +238,10 @@ class AiPropositionFragment : Fragment() {
             dialogDescription.text = getString(R.string.aiReplacementDialogDescription)
         }
 
-        checkbox.apply {
-            isChecked = localSettings.aiReplacementDialogVisibility == AiReplacementDialogVisibility.HIDE
-            setOnCheckedChangeListener { _, isChecked ->
-                localSettings.aiReplacementDialogVisibility = if (isChecked) {
-                    AiReplacementDialogVisibility.HIDE
-                } else {
-                    AiReplacementDialogVisibility.SHOW
-                }
-            }
-        }
-
         MaterialAlertDialogBuilder(requireContext(), R.style.AiCursorAndPrimaryColorTheme)
             .setView(root)
             .setPositiveButton(R.string.aiReplacementDialogPositiveButton) { _, _ -> onPositiveButtonClicked() }
             .setNegativeButton(RCore.string.buttonCancel, null)
-            .setOnDismissListener { if (checkbox.isChecked) trackAiWriterEvent("doNotShowAgain", TrackerAction.DATA) }
             .create()
     }
 
