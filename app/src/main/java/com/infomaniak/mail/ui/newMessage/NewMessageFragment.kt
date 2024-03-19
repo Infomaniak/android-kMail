@@ -269,7 +269,7 @@ class NewMessageFragment : Fragment() {
 
         initResult.observeNotNull(viewLifecycleOwner) { (isSuccess, signatures) ->
 
-            if (!isSuccess) requireActivity().apply {
+            if (!isSuccess) with(requireActivity()) {
                 showToast(R.string.failToOpenDraft)
                 finish()
                 return@observeNotNull
