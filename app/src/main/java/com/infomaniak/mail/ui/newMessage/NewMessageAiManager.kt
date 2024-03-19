@@ -73,13 +73,18 @@ class NewMessageAiManager @Inject constructor(
         newMessageViewModel: NewMessageViewModel,
         binding: FragmentNewMessageBinding,
         fragment: NewMessageFragment,
-        aiViewModel: AiViewModel
+        aiViewModel: AiViewModel,
     ) {
-        super.initValues(newMessageViewModel, binding, fragment, freeReferences = {
-            _aiViewModel = null
-            valueAnimator?.cancel()
-            valueAnimator = null
-        })
+        super.initValues(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = fragment,
+            freeReferences = {
+                _aiViewModel = null
+                valueAnimator?.cancel()
+                valueAnimator = null
+            },
+        )
 
         _aiViewModel = aiViewModel
     }
@@ -92,7 +97,7 @@ class NewMessageAiManager @Inject constructor(
 
     private fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
-            subject?.let { subjectTextField.setText(it) }
+            subject?.let(subjectTextField::setText)
             bodyText.setText(content)
         }
     }

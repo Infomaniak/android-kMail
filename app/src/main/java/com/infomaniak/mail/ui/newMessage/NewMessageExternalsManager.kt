@@ -40,9 +40,12 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
         fragment: NewMessageFragment,
         informationDialog: InformationAlertDialog,
     ) {
-        super.initValues(newMessageViewModel, binding, fragment, freeReferences = {
-            _informationDialog = null
-        })
+        super.initValues(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = fragment,
+            freeReferences = { _informationDialog = null },
+        )
 
         _informationDialog = informationDialog
     }

@@ -274,6 +274,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndViewModel() {
+
         newMessageViewModel.initDraftAndViewModel(
             intent = requireActivity().intent,
             navArgs = newMessageActivityArgs,
@@ -304,7 +305,7 @@ class NewMessageFragment : Fragment() {
         bccField.hideLoader()
     }
 
-    private fun showKeyboardInCorrectView() = with(binding) {
+    private fun showKeyboardInCorrectView() {
         when (newMessageActivityArgs.draftMode) {
             DraftMode.REPLY,
             DraftMode.REPLY_ALL -> recipientFieldsManager.focusBodyField()
@@ -399,6 +400,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
+
         val selectedSignature = with(signatures) {
             find { it.id == newMessageViewModel.selectedSignatureId } ?: find { it.isDefault }!!
         }
@@ -470,6 +472,7 @@ class NewMessageFragment : Fragment() {
 
     private fun observeNewAttachments() = with(binding) {
         newMessageViewModel.importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
+
             attachmentAdapter.addAll(attachments)
             attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
@@ -488,6 +491,7 @@ class NewMessageFragment : Fragment() {
             val isFinishing = requireActivity().isFinishing
             val isTaskRoot = requireActivity().isTaskRoot
             val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
+
             executeDraftActionWhenStopping(
                 action = action,
                 isFinishing = isFinishing,
@@ -520,6 +524,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(binding) {
+
         trackAttachmentActionsEvent("delete")
         val draft = newMessageViewModel.draft
 

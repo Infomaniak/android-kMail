@@ -103,60 +103,61 @@ class NewMessageViewModel @Inject constructor(
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
-    var shouldSendInsteadOfSave = false
-    var otherFieldsAreAllEmpty = SingleLiveEvent(true)
-    var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
-
-    // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
-    val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-
-    // Needs to trigger every time the Fragment is recreated
-    val initResult = MutableLiveData<List<Signature>>()
-
-    val importedAttachments = SingleLiveEvent<Pair<MutableList<Attachment>, ImportationResult>>()
-    val isSendingAllowed = SingleLiveEvent(false)
-    val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
     var isExternalBannerManuallyClosed = false
-
     var shouldExecuteDraftActionWhenStopping = true
+    var shouldSendInsteadOfSave = false
+    private var isNewMessage = false
 
     private var snapshot: DraftSnapshot? = null
 
-    private var isNewMessage = false
+    var otherFieldsAreAllEmpty = SingleLiveEvent(true)
+    var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
+    val importedAttachments = SingleLiveEvent<Pair<MutableList<Attachment>, ImportationResult>>()
+    val isSendingAllowed = SingleLiveEvent(false)
+    val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
+    // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
+    val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
+    // Needs to trigger every time the Fragment is recreated
+    val initResult = MutableLiveData<List<Signature>>()
+
+    val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
-    val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
-
-    private val arrivedFromExistingDraft
-        inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::arrivedFromExistingDraft.name) ?: false
-    private val notificationId
-        inline get() = savedStateHandle.get<Int>(NewMessageActivityArgs::notificationId.name) ?: -1
-    private val draftLocalUuid
-        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::draftLocalUuid.name)
-    private val draftResource
-        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::draftResource.name)
-    private val messageUid
-        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::messageUid.name)
-    private val draftMode
-        inline get() = savedStateHandle.get<DraftMode>(NewMessageActivityArgs::draftMode.name) ?: DraftMode.NEW_MAIL
-    private val previousMessageUid
-        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::previousMessageUid.name)
-    private val recipient
-        inline get() = savedStateHandle.get<Recipient?>(NewMessageActivityArgs::recipient.name)
-
     val mergedContacts = liveData(ioCoroutineContext) {
         val list = mergedContactController.getMergedContacts(sorted = true).copyFromRealm()
         emit(list to arrangeMergedContacts(list))
     }
 
+    private val arrivedFromExistingDraft
+        inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::arrivedFromExistingDraft.name) ?: false
+    private val draftLocalUuid
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::draftLocalUuid.name)
+    private val draftMode
+        inline get() = savedStateHandle.get<DraftMode>(NewMessageActivityArgs::draftMode.name) ?: DraftMode.NEW_MAIL
+    private val draftResource
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::draftResource.name)
+    private val mailToUri
+        inline get() = savedStateHandle.get<Uri?>(NewMessageActivityArgs::mailToUri.name)
+    private val messageUid
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::messageUid.name)
+    private val notificationId
+        inline get() = savedStateHandle.get<Int>(NewMessageActivityArgs::notificationId.name) ?: -1
+    private val previousMessageUid
+        inline get() = savedStateHandle.get<String?>(NewMessageActivityArgs::previousMessageUid.name)
+    private val recipient
+        inline get() = savedStateHandle.get<Recipient?>(NewMessageActivityArgs::recipient.name)
+    private val shouldLoadDistantResources
+        inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::shouldLoadDistantResources.name) ?: false
+
     fun initDraftAndViewModel(
         intent: Intent,
         navArgs: NewMessageActivityArgs,
     ): LiveData<Boolean> = liveData(ioCoroutineContext) {
+
         val realm = mailboxContentRealm()
         var signatures = emptyList<Signature>()
 
@@ -185,7 +186,9 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox, realm)
             selectedSignatureId = draft.identityId!!.toInt()
             flagRecipientsAsAutomaticallyEntered()
+
             saveDraftSnapshot()
+
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
@@ -288,6 +291,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun Draft.handleSingleSendIntent(intent: Intent) = with(intent) {
+
         if (hasExtra(Intent.EXTRA_TEXT)) {
             getStringExtra(Intent.EXTRA_SUBJECT)?.let { subject = it }
             getStringExtra(Intent.EXTRA_TEXT)?.let { uiBody = it }
@@ -521,6 +525,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draft) {
+
         if (type == FieldType.CC || type == FieldType.BCC) otherFieldsAreAllEmpty.value = false
 
         val field = when (type) {
@@ -529,11 +534,13 @@ class NewMessageViewModel @Inject constructor(
             FieldType.BCC -> bcc
         }
         field.add(recipient)
+
         updateIsSendingAllowed()
         saveDraftDebouncing()
     }
 
     fun removeRecipientFromField(recipient: Recipient, type: FieldType) = with(draft) {
+
         val field = when (type) {
             FieldType.TO -> to
             FieldType.CC -> cc
@@ -545,6 +552,7 @@ class NewMessageViewModel @Inject constructor(
 
         updateIsSendingAllowed()
         saveDraftDebouncing()
+
         context.trackNewMessageEvent("deleteRecipient")
         if (recipient.displayAsExternal) context.trackExternalEvent("deleteRecipient")
     }
@@ -592,8 +600,10 @@ class NewMessageViewModel @Inject constructor(
         }
 
         context.trackSendingDraftEvent(action, draft, currentMailbox.externalMailFlagEnabled)
+
         saveDraftToLocal(action)
         showDraftToastToUser(action, isFinishing, isTaskRoot)
+
         startWorkerCallback()
         if (action == DraftAction.SAVE && !isFinishing) {
             isNewMessage = false
@@ -680,6 +690,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
+
         val (fileName, fileSize) = context.getFileNameAndSize(uri) ?: return null
         if (fileSize > availableSpace) return null to true
 
