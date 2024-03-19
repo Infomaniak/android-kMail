@@ -70,7 +70,6 @@ import com.infomaniak.lib.core.R as RCore
 class ThreadListAdapter @Inject constructor(
     @ActivityContext context: Context,
     private val localSettings: LocalSettings,
-    private val globalCoroutineScope: CoroutineScope,
 ) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private var formatListJob: Job? = null
