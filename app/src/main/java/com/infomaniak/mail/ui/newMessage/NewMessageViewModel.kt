@@ -625,25 +625,20 @@ class NewMessageViewModel @Inject constructor(
     private fun isSavingDraftWithoutChanges(action: DraftAction) = action == DraftAction.SAVE && snapshot?.hasChanges() != true
 
     fun updateIsSendingAllowed() {
-
-        val isAllowed = if (draft.hasRecipient()) {
+        isSendingAllowed.value = if (draft.hasRecipient()) {
             var size = 0L
             var isSizeCorrect = true
-            run breaking@{
-                draft.attachments.forEach {
-                    size += it.size
-                    if (size > ATTACHMENTS_MAX_SIZE) {
-                        isSizeCorrect = false
-                        return@breaking
-                    }
+            for (attachment in draft.attachments) {
+                size += attachment.size
+                if (size > ATTACHMENTS_MAX_SIZE) {
+                    isSizeCorrect = false
+                    break
                 }
             }
             isSizeCorrect
         } else {
             false
         }
-
-        isSendingAllowed.value = isAllowed
     }
 
     fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
