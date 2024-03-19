@@ -152,9 +152,9 @@ object LocalStorageUtils {
         val attachmentsRootDir = userDir.parentFile ?: return
 
         // Only delete a directory if it's empty
-        if (draftDir.hasNoChildren) draftDir.delete()
-        if (mailboxDir.hasNoChildren) mailboxDir.delete()
-        if (userDir.hasNoChildren) userDir.delete()
+        if (draftDir.hasNoChildren) draftDir.delete() else return
+        if (mailboxDir.hasNoChildren) mailboxDir.delete() else return
+        if (userDir.hasNoChildren) userDir.delete() else return
         if (attachmentsRootDir.hasNoChildren) attachmentsRootDir.delete()
     }
     //endregion
