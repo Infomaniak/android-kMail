@@ -671,7 +671,7 @@ class NewMessageViewModel @Inject constructor(
         val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null
         val attachment = Attachment()
 
-        return LocalStorageUtils.saveAttachmentToUpload(appContext, uri, fileName, draft.localUuid, attachment.localUuid)
+        return LocalStorageUtils.saveAttachmentToUploadDir(appContext, uri, fileName, draft.localUuid, attachment.localUuid)
             ?.let { file ->
                 Pair(
                     attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
@@ -681,7 +681,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        LocalStorageUtils.deleteDraftDir(appContext, draft.localUuid)
+        LocalStorageUtils.deleteDraftUploadDir(appContext, draft.localUuid)
         super.onCleared()
     }
 
