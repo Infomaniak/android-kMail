@@ -42,6 +42,8 @@ import javax.inject.Inject
 class NewMessageActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
+    private val newMessageViewModel: NewMessageViewModel by viewModels()
+    private val aiViewModel: AiViewModel by viewModels()
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.newMessageHostFragment) as NavHostFragment).navController
@@ -63,6 +65,7 @@ class NewMessageActivity : BaseActivity() {
 
         setupSnackbar()
         setupNavController()
+        setupFeatureFlagIfMailTo()
     }
 
     private fun isAuth(): Boolean {
@@ -86,6 +89,17 @@ class NewMessageActivity : BaseActivity() {
     private fun setupNavController() {
         navController.addOnDestinationChangedListener { _, destination, arguments ->
             onDestinationChanged(destination, arguments)
+        }
+    }
+
+    private fun setupFeatureFlagIfMailTo() {
+        when (intent.action) {
+            Intent.ACTION_SEND,
+            Intent.ACTION_SEND_MULTIPLE,
+            Intent.ACTION_VIEW,
+            Intent.ACTION_SENDTO -> with(newMessageViewModel.currentMailbox) {
+                aiViewModel.updateFeatureFlag(objectId, uuid)
+            }
         }
     }
 
