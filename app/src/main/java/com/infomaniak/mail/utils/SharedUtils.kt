@@ -150,14 +150,15 @@ class SharedUtils @Inject constructor(
     }
 
     companion object {
+
         fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
-            return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
-                if (isSuccess() && data?.signatures?.isNotEmpty() == true) {
+            with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
+                return if (isSuccess() && data?.signatures?.isNotEmpty() == true) {
                     customRealm.writeBlocking { SignatureController.update(data!!.signatures, realm = this) }
-                    return@with null
+                    null
                 } else {
                     Sentry.captureException(getApiException())
-                    return@with translatedError
+                    translatedError
                 }
             }
         }

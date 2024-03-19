@@ -47,7 +47,7 @@ class SignatureSettingViewModel @Inject constructor(
 
     private val mailboxObjectId inline get() = savedStateHandle.get<String>(SignatureSettingFragmentArgs::mailboxObjectId.name)!!
     val mailbox = mailboxController.getMailbox(mailboxObjectId)!!
-    private var customRealm = RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailbox.mailboxId)
+    private val customRealm = RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailbox.mailboxId)
 
     val signaturesLive = SignatureController.getSignaturesAsync(customRealm).asLiveData(coroutineContext)
     val showError = SingleLiveEvent<Int>() // StringRes

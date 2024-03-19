@@ -70,7 +70,6 @@ import com.infomaniak.lib.core.R as RCore
 class ThreadListAdapter @Inject constructor(
     @ActivityContext context: Context,
     private val localSettings: LocalSettings,
-    private val globalCoroutineScope: CoroutineScope,
 ) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private var formatListJob: Job? = null
@@ -85,7 +84,7 @@ class ThreadListAdapter @Inject constructor(
     private val checkMarkSizeOther by lazy { context.resources.getDimension(R.dimen.largeIconSize).toInt() }
 
     private var swipingIsAuthorized: Boolean = true
-    private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
+    // private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
     private var isLoadMoreDisplayed = false
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
@@ -124,12 +123,11 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
-        val item = dataSet[position]
-        return when {
-            item is String -> DisplayType.DATE_SEPARATOR.layout
-            item is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
-            item is Unit -> DisplayType.LOAD_MORE_BUTTON.layout
-            displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
+        return when (dataSet[position]) {
+            is String -> DisplayType.DATE_SEPARATOR.layout
+            is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
+            is Unit -> DisplayType.LOAD_MORE_BUTTON.layout
+            // displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout // TODO: Manage this for intelligent mailbox
             else -> DisplayType.THREAD.layout
         }
     }.getOrDefault(super.getItemViewType(position))
