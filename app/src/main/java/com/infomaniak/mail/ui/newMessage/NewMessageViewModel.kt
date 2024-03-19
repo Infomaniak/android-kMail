@@ -626,8 +626,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun updateIsSendingAllowed() {
 
-        val hasRecipient = draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()
-        if (!hasRecipient) {
+        if (!draft.hasRecipient()) {
             isSendingAllowed.value = false
             return
         }
