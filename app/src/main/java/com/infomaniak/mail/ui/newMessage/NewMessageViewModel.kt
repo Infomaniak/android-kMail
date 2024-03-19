@@ -626,23 +626,24 @@ class NewMessageViewModel @Inject constructor(
 
     fun updateIsSendingAllowed() {
 
-        if (!draft.hasRecipient()) {
-            isSendingAllowed.value = false
-            return
-        }
-
-        var size = 0L
-        var isSizeCorrect = true
-        run breaking@{
-            draft.attachments.forEach {
-                size += it.size
-                if (size > FILE_SIZE_25_MB) {
-                    isSizeCorrect = false
-                    return@breaking
+        val isAllowed = if (draft.hasRecipient()) {
+            var size = 0L
+            var isSizeCorrect = true
+            run breaking@{
+                draft.attachments.forEach {
+                    size += it.size
+                    if (size > FILE_SIZE_25_MB) {
+                        isSizeCorrect = false
+                        return@breaking
+                    }
                 }
             }
+            isSizeCorrect
+        } else {
+            false
         }
-        isSendingAllowed.value = isSizeCorrect
+
+        isSendingAllowed.value = isAllowed
     }
 
     fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
