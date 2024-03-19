@@ -92,23 +92,21 @@ class NotificationUtils @Inject constructor(
         }
     }
 
-    fun initMailNotificationChannel(mailboxes: List<Mailbox>) = with(appContext) {
+    fun initMailNotificationChannel(mailbox: Mailbox) = with(appContext) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val groups = mutableListOf<NotificationChannelGroup>()
             val channels = mutableListOf<NotificationChannel>()
 
-            mailboxes.forEach {
-                val group = NotificationChannelGroup(it.channelGroupId, it.email)
-                groups.add(group)
+            val group = NotificationChannelGroup(mailbox.channelGroupId, mailbox.email)
+            groups.add(group)
 
-                val channel = buildNotificationChannel(
-                    channelId = it.channelId,
-                    name = getString(R.string.notificationNewMessagesChannelName),
-                    importance = NotificationManager.IMPORTANCE_DEFAULT,
-                    groupId = group.id,
-                )
-                channels.add(channel)
-            }
+            val channel = buildNotificationChannel(
+                channelId = mailbox.channelId,
+                name = getString(R.string.notificationNewMessagesChannelName),
+                importance = NotificationManager.IMPORTANCE_DEFAULT,
+                groupId = group.id,
+            )
+            channels.add(channel)
 
             createNotificationChannels(channels, groups)
         }

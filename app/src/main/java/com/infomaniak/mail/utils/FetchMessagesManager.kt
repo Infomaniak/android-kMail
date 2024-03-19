@@ -59,25 +59,16 @@ class FetchMessagesManager @Inject constructor(
     ) {
         coroutineScope = scope
 
-        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
-            // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
-            // We can leave safely.
-            SentryDebug.sendFailedNotification(
-                reason = "Notifications are disabled",
-                sentryLevel = SentryLevel.INFO,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
-            return
-        }
+        // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
+        // We can leave safely.
+        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
             // If we can't find the INBOX in Realm, it means the user never opened this Mailbox.
             // We don't want to display Notifications in this case.
             // We can leave safely.
+            // But if a user never opened this Mailbox, we shouldn't have register it to receive Notifications. So this shouldn't happen.
             SentryDebug.sendFailedNotification(
                 reason = "No Folder in Realm",
                 sentryLevel = SentryLevel.WARNING,
@@ -90,6 +81,10 @@ class FetchMessagesManager @Inject constructor(
         }
 
         if (folder.cursor == null) {
+            // We only want to display Notifications about Mailboxes that the User opened at least one.
+            // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
+            // We can leave safely.
+            // But if a user never opened this Mailbox, we shouldn't have register it to receive Notifications. So this shouldn't happen.
             SentryDebug.sendFailedNotification(
                 reason = "Folder's cursor is null",
                 sentryLevel = SentryLevel.WARNING,
@@ -100,6 +95,7 @@ class FetchMessagesManager @Inject constructor(
             )
             return
         }
+
         val okHttpClient = AccountUtils.getHttpClient(userId)
 
         // Update Local with Remote

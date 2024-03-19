@@ -53,6 +53,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
+import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
@@ -84,6 +85,7 @@ class MainViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
+    private val notificationUtils: NotificationUtils,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
@@ -303,6 +305,7 @@ class MainViewModel @Inject constructor(
             AccountUtils.currentMailboxEmail = mailbox.email
             _currentMailboxObjectId.value = mailbox.objectId
             _currentFolderId.value = null
+            notificationUtils.initMailNotificationChannel(mailbox)
         }
     }
 

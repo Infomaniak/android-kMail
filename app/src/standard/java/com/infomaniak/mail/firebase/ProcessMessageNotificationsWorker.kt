@@ -85,14 +85,6 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             // If the Message is already in Realm, it means we already fetched it when we received a previous Notification.
             // So we've already shown it in a previous batch of Notifications.
             // We can leave safely.
-            SentryDebug.sendFailedNotification(
-                reason = "Message already in Realm",
-                sentryLevel = SentryLevel.WARNING,
-                userId = userId,
-                mailboxId = mailboxId,
-                messageUid = messageUid,
-                mailbox = mailbox,
-            )
             return@withContext Result.success()
         }
 
