@@ -322,9 +322,6 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
-            if (apiResponse.data?.uuid == null) {
-                SentryLog.e(ATTACHMENT_TAG, "Attachment uuid null from API, this should not happen")
-            }
             attachmentsUris.remove(uploadLocalUri)
             updateLocalAttachment(draftLocalUuid, apiResponse.data!!)
             if (!attachmentsUris.contains(uploadLocalUri)) {
