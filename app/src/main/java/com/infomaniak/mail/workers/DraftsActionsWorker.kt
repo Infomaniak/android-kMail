@@ -347,6 +347,13 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun Attachment.updateLocalAttachment(draftLocalUuid: String, remoteAttachment: Attachment) {
         mailboxContentRealm.writeBlocking {
             draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
+                val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
+                SentryLog.d(
+                    ATTACHMENT_TAG,
+                    "When removing just uploaded attachment we found (Uuids to localUris): $uuidToLocalUri"
+                )
+                SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
+
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
                 draft.attachments.add(remoteAttachment)
             }
