@@ -117,7 +117,7 @@ class AiPropositionFragment : Fragment() {
         if (!aiViewModel.isHistoryEmpty()) propositionTextView.text = aiViewModel.getLastMessage()
 
         insertPropositionButton.setOnClickListener {
-            if (newMessageViewModel.draft.uiBody.isBlank()) {
+            if (newMessageViewModel.draftInRAM.uiBody.isBlank()) {
                 choosePropositionAndPopBack()
             } else {
                 trackAiWriterEvent("replacePropositionDialog")
@@ -173,7 +173,7 @@ class AiPropositionFragment : Fragment() {
 
         val (subject, content) = splitBodyAndSubject(getLastMessage())
 
-        if (subject == null || newMessageViewModel.draft.subject.isNullOrBlank()) {
+        if (subject == null || newMessageViewModel.draftInRAM.subject.isNullOrBlank()) {
             applyProposition(subject, content)
         } else {
             trackAiWriterEvent("replaceSubjectDialog")
@@ -197,7 +197,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun trackInsertionType() {
-        val willReplace = newMessageViewModel.draft.uiBody.isNotBlank()
+        val willReplace = newMessageViewModel.draftInRAM.uiBody.isNotBlank()
         if (willReplace) {
             trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
         } else {
@@ -246,7 +246,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun generateNewAiProposition() {
-        val formattedRecipientsString = newMessageViewModel.draft.to.joinToString(", ") { it.name }.takeIf { it.isNotBlank() }
+        val formattedRecipientsString = newMessageViewModel.draftInRAM.to.joinToString(", ") { it.name }.takeIf { it.isNotBlank() }
         val currentMailboxUuid = newMessageViewModel.currentMailbox.uuid
         currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
     }

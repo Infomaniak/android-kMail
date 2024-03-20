@@ -207,10 +207,10 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        newMessageViewModel.draft.uiSignature?.let { _ ->
+        newMessageViewModel.draftInRAM.uiSignature?.let { _ ->
             binding.signatureWebView.reload()
         }
-        newMessageViewModel.draft.uiQuote?.let { _ ->
+        newMessageViewModel.draftInRAM.uiQuote?.let { _ ->
             binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
@@ -304,7 +304,7 @@ class NewMessageFragment : Fragment() {
             DraftMode.REPLY_ALL -> focusBodyField()
             DraftMode.FORWARD -> focusToField()
             DraftMode.NEW_MAIL -> {
-                if (newMessageViewModel.recipient() == null && newMessageViewModel.draft.to.isEmpty()) {
+                if (newMessageViewModel.recipient() == null && newMessageViewModel.draftInRAM.to.isEmpty()) {
                     focusToField()
                 } else {
                     focusBodyField()
@@ -314,7 +314,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun populateUiWithViewModel() = with(binding) {
-        val draft = newMessageViewModel.draft
+        val draft = newMessageViewModel.draftInRAM
         recipientFieldsManager.initRecipients(draft)
 
         newMessageViewModel.updateIsSendingAllowed()
@@ -382,7 +382,7 @@ class NewMessageFragment : Fragment() {
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
-        val selectedSignatureId = newMessageViewModel.draft.identityId?.toInt() ?: -1
+        val selectedSignatureId = newMessageViewModel.draftInRAM.identityId?.toInt() ?: -1
         val selectedSignature = with(signatures) {
             find { it.id == selectedSignatureId } ?: find { it.isDefault }!!
         }
@@ -397,7 +397,7 @@ class NewMessageFragment : Fragment() {
                 updateSelectedSignatureFromField(signatures.count(), newSelectedSignature)
                 updateBodySignature(newSelectedSignature.content)
 
-                newMessageViewModel.draft.identityId = newSelectedSignature.id.toString()
+                newMessageViewModel.draftInRAM.identityId = newSelectedSignature.id.toString()
 
                 addressListPopupWindow?.dismiss()
             },
@@ -427,7 +427,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateBodySignature(signatureContent: String) = with(binding) {
-        newMessageViewModel.draft.uiSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signatureContent)
+        newMessageViewModel.draftInRAM.uiSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signatureContent)
         signatureWebView.loadSignatureContent(signatureContent, signatureGroup)
     }
 
@@ -466,9 +466,9 @@ class NewMessageFragment : Fragment() {
         importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
 
             attachmentAdapter.addAll(attachments)
-            draft.attachments.addAll(attachments)
+            draftInRAM.attachments.addAll(attachments)
 
-            binding.attachmentsRecyclerView.isGone = draft.attachments.isEmpty()
+            binding.attachmentsRecyclerView.isGone = draftInRAM.attachments.isEmpty()
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
             updateIsSendingAllowed()
@@ -506,13 +506,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draft.localUuid)
+        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftInRAM.localUuid)
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
 
         trackAttachmentActionsEvent("delete")
-        val draft = newMessageViewModel.draft
 
         if (itemCountLeft == 0) {
             TransitionManager.beginDelayedTransition(binding.root)
@@ -520,10 +519,10 @@ class NewMessageFragment : Fragment() {
         }
 
         runCatching {
-            val attachment = draft.attachments[position]
+            val attachment = draftInRAM.attachments[position]
             attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draft.localUuid, attachment.localUuid)
-            draft.attachments.removeAt(position)
+            LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draftInRAM.localUuid, attachment.localUuid)
+            draftInRAM.attachments.removeAt(position)
         }.onFailure { exception ->
             // TODO: If we don't see this Sentry after May 2024, we can remove it.
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
@@ -554,7 +553,7 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (newMessageViewModel.draft.subject.isNullOrBlank()) {
+        if (newMessageViewModel.draftInRAM.subject.isNullOrBlank()) {
             trackNewMessageEvent("sendWithoutSubject")
             descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
