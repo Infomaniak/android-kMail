@@ -363,7 +363,7 @@ class NewMessageViewModel @Inject constructor(
 
                         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
                         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!, fullMessage.uid)
-                        if (shouldPreselectSignature) preSelectSignature(previousMessage, signatures)
+                        if (shouldPreselectSignature) preSelectSignature(newDraft = this, previousMessage, signatures)
                     }
             }
         }
@@ -384,7 +384,7 @@ class NewMessageViewModel @Inject constructor(
         else -> value
     }
 
-    private fun preSelectSignature(message: Message, signatures: List<Signature>) = with(draft) {
+    private fun preSelectSignature(newDraft: Draft, message: Message, signatures: List<Signature>) = with(newDraft) {
         val mostFittingSignature = guessMostFittingSignature(message, signatures)
         identityId = mostFittingSignature.id.toString()
         body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
