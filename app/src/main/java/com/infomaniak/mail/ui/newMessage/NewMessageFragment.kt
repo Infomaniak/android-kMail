@@ -65,7 +65,10 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
+import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -158,7 +161,9 @@ class NewMessageFragment : Fragment() {
         editorManager.observeEditorActions()
         observeNewAttachments()
         observeDraftWorkerResults()
+        observeInitResult()
         aiManager.observeEverything()
+        externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
     }
 
     private fun initManagers() {
@@ -264,24 +269,17 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndViewModel() = with(newMessageViewModel) {
-
-        if (initResult.value == null) initDraftAndViewModel(intent = requireActivity().intent)
-
-        initResult.observeNotNull(viewLifecycleOwner) { (isSuccess, signatures) ->
-
-            if (!isSuccess) with(requireActivity()) {
-                showToast(R.string.failToOpenDraft)
-                finish()
-                return@observeNotNull
+        if (initResult.value == null) {
+            initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { isSuccess ->
+                if (isSuccess) {
+                    showKeyboardInCorrectView()
+                } else {
+                    requireActivity().apply {
+                        showToast(R.string.failToOpenDraft)
+                        finish()
+                    }
+                }
             }
-
-            showKeyboardInCorrectView()
-            hideLoader()
-            populateUiWithViewModel()
-            setupFromField(signatures)
-            editorManager.setupEditorActions()
-            editorManager.setupEditorFormatActionsToggle()
-            externalsManager.observeExternals(arrivedFromExistingDraft())
         }
     }
 
@@ -451,6 +449,16 @@ class NewMessageFragment : Fragment() {
     private fun doAfterBodyChange() {
         binding.bodyText.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
+        }
+    }
+
+    private fun observeInitResult() = with(newMessageViewModel) {
+        initResult.observe(viewLifecycleOwner) { signatures ->
+            hideLoader()
+            populateUiWithViewModel()
+            setupFromField(signatures)
+            editorManager.setupEditorActions()
+            editorManager.setupEditorFormatActionsToggle()
         }
     }
 
