@@ -60,10 +60,10 @@ class AttachmentAdapter(
                 setOnClickListener {
                     val index = attachments.indexOf(attachment)
 
-                    // When clicking on the the attachment in order to delete it, we remove the attachment from the list
-                    // successfully which means that during the fade out animation, if we click again on the little cross the
-                    // attachment is not in the list anymore yet the cross has been clicked. This results in a negative index
-                    // which is why this check is for.
+                    // When clicking on the Attachment in order to delete it, we remove it from the list
+                    // successfully, which means that if we click again on the little cross during the
+                    // fade out animation, the Attachment is not in the list anymore yet the cross has
+                    // been clicked. This results in a negative index, which is why this check is for.
                     if (index != -1) {
                         attachments.removeAt(index)
                         notifyItemRemoved(index)
