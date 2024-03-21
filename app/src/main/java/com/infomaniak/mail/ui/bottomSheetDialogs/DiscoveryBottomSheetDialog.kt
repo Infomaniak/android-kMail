@@ -33,7 +33,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
     abstract val trackMatomoWithCategory: (name: String) -> Unit
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         title.setText(titleRes)

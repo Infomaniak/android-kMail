@@ -36,7 +36,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
 
     private val storesViewModel: StoresViewModel by activityViewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         storesViewModel.isUpdateBottomSheetShown = true
