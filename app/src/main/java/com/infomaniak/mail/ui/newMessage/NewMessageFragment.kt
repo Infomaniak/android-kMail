@@ -147,7 +147,7 @@ class NewMessageFragment : Fragment() {
 
         setWebViewReference()
         initUi()
-        initDraftAndViewModel()
+        initializeDraft()
 
         handleOnBackPressed()
 
@@ -268,7 +268,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initDraftAndViewModel() = with(newMessageViewModel) {
+    private fun initializeDraft() = with(newMessageViewModel) {
         if (initResult.value == null) {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
