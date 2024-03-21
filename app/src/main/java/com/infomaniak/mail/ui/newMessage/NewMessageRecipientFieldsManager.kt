@@ -120,7 +120,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
 
     fun observeCcAndBccVisibility() = with(newMessageViewModel) {
         otherFieldsAreAllEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherFieldsVisibility)
-        initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(!it) }
+        initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(isCollapsed = !it) }
     }
 
     fun setOnFocusChangedListeners() = with(binding) {
