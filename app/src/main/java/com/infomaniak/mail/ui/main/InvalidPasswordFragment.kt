@@ -54,7 +54,7 @@ class InvalidPasswordFragment : Fragment() {
         return FragmentInvalidPasswordBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         enterPasswordDescription2.text = getStringWithBoldArg(R.string.enterPasswordDescription2, navigationArgs.mailboxEmail)

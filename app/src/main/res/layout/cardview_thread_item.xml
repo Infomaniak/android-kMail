@@ -238,10 +238,10 @@
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toEndOf="@id/mailSubject"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
-                    tools:textColor="@color/folderTagTextColor"
                     tools:background="@color/folderTagBackground"
                     tools:gravity="center"
                     tools:text="Folder name"
+                    tools:textColor="@color/folderTagTextColor"
                     tools:visibility="visible" />
 
                 <ImageView
@@ -313,10 +313,10 @@
                     app:layout_constraintHorizontal_bias="1"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintTop_toTopOf="@id/mailBodyPreview"
-                    tools:textColor="@color/folderTagTextColor"
                     tools:background="@color/folderTagBackground"
                     tools:gravity="center"
                     tools:text="Folder name"
+                    tools:textColor="@color/folderTagTextColor"
                     tools:visibility="gone" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

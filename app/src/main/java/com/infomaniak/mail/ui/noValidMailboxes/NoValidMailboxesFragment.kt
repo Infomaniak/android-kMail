@@ -54,7 +54,7 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         return FragmentNoValidMailboxesBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
 
         setupAdapters()
         setupListeners()

@@ -81,16 +81,16 @@ import javax.inject.Inject
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
     application: Application,
+    private val savedStateHandle: SavedStateHandle,
+    private val aiSharedData: AiSharedData,
     private val draftController: DraftController,
     private val globalCoroutineScope: CoroutineScope,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val notificationManagerCompat: NotificationManagerCompat,
-    private val savedStateHandle: SavedStateHandle,
     private val sharedUtils: SharedUtils,
     private val signatureUtils: SignatureUtils,
-    private val aiSharedData: AiSharedData,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -120,7 +120,7 @@ class NewMessageViewModel @Inject constructor(
 
     val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
-        AccountUtils.currentMailboxId
+        AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
     val mergedContacts = liveData(ioCoroutineContext) {
@@ -309,10 +309,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun handleMultipleSendIntent(intent: Intent) {
-        intent
-            .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
-            ?.filterIsInstance<Uri>()
-            ?.let(::importAttachments)
+        intent.parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.filterIsInstance<Uri>()?.let(::importAttachments)
     }
 
     /**

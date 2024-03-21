@@ -475,6 +475,20 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun observeDraftWorkerResults() {
+        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner) {
+
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
+            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
+                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
+                }
+            }
+        }
+    }
+
     override fun onStop() = with(newMessageViewModel) {
 
         val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
@@ -493,20 +507,6 @@ class NewMessageFragment : Fragment() {
 
     private fun startWorker() {
         draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draft.localUuid)
-    }
-
-    private fun observeDraftWorkerResults() {
-        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner) {
-
-            val treatedWorkInfoUuids = mutableSetOf<UUID>()
-
-            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
-                it.forEach { workInfo ->
-                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
-                }
-            }
-        }
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(binding) {
