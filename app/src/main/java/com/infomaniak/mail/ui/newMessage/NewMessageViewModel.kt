@@ -114,7 +114,7 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     // Needs to trigger every time the Fragment is recreated
-    val initResult = MutableLiveData<List<Signature>>()
+    val initResult = MutableLiveData<Pair<Draft, List<Signature>>>()
 
     val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -197,7 +197,7 @@ class NewMessageViewModel @Inject constructor(
                 initializeFieldsAsOpen.postValue(true)
             }
 
-            initResult.postValue(signatures)
+            initResult.postValue(draftInRAM to signatures)
         }
 
         emit(isSuccess)
