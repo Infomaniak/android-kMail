@@ -114,7 +114,7 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     // Needs to trigger every time the Fragment is recreated
-    val initResult = MutableLiveData<Pair<Boolean, List<Signature>>?>()
+    val initResult = MutableLiveData<List<Signature>>()
 
     val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -156,7 +156,7 @@ class NewMessageViewModel @Inject constructor(
     fun recipient() = recipient
     fun shouldLoadDistantResources() = shouldLoadDistantResources
 
-    fun initDraftAndViewModel(intent: Intent) = viewModelScope.launch(ioCoroutineContext) {
+    fun initDraftAndViewModel(intent: Intent): LiveData<Boolean> = liveData(ioCoroutineContext) {
 
         val realm = mailboxContentRealm()
         var signatures = emptyList<Signature>()
@@ -196,9 +196,11 @@ class NewMessageViewModel @Inject constructor(
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
             }
+
+            initResult.postValue(signatures)
         }
 
-        initResult.postValue(isSuccess to signatures)
+        emit(isSuccess)
     }
 
     private fun saveDraftInitState() {
@@ -656,11 +658,10 @@ class NewMessageViewModel @Inject constructor(
         val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null
         if (fileSize > availableSpace) return null to true
 
-        return LocalStorageUtils.saveUploadAttachment(appContext, uri, fileName, draft.localUuid)
-            ?.let { file ->
-                val mimeType = file.path.guessMimeType()
-                Attachment().initLocalValues(fileName, file.length(), mimeType, file.toUri().toString()) to false
-            } ?: (null to false)
+        return LocalStorageUtils.saveUploadAttachment(appContext, uri, fileName, draft.localUuid)?.let { file ->
+            val mimeType = file.path.guessMimeType()
+            Attachment().initLocalValues(fileName, file.length(), mimeType, file.toUri().toString()) to false
+        } ?: (null to false)
     }
 
     override fun onCleared() {
