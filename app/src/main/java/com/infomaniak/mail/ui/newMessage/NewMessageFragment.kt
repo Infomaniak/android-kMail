@@ -53,6 +53,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
@@ -313,8 +314,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun populateUiWithViewModel() = with(binding) {
-        val draft = newMessageViewModel.draftInRAM
+    private fun populateUiWithViewModel(draft: Draft) = with(binding) {
         recipientFieldsManager.initRecipients(draft)
 
         newMessageViewModel.updateIsSendingAllowed()
@@ -453,9 +453,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeInitResult() = with(newMessageViewModel) {
-        initResult.observe(viewLifecycleOwner) { signatures ->
+        initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
             hideLoader()
-            populateUiWithViewModel()
+            populateUiWithViewModel(draft)
             setupFromField(signatures)
             editorManager.setupEditorActions()
             editorManager.setupEditorFormatActionsToggle()
