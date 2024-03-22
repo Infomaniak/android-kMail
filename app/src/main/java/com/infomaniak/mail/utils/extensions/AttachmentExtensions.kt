@@ -21,7 +21,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
+import android.provider.MediaStore
+import android.util.Log
 import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.hasSupportedApplications
@@ -32,6 +37,7 @@ import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDial
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
 import io.sentry.Sentry
+import java.util.Date
 
 object AttachmentExtensions {
 
@@ -50,13 +56,54 @@ object AttachmentExtensions {
     }
 
     private fun Attachment.saveToDriveIntent(context: Context): Intent {
-        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
+        val cacheFile = getCacheFile(context)
+
+        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), cacheFile)
+        // context.grantUriPermission()
+        val (fileCreatedAt, fileModifiedAt) = getFileDates(context, uri)
+        Log.e("gibran", "saveToDriveIntent - fileCreatedAt: ${fileCreatedAt}")
+        Log.e("gibran", "saveToDriveIntent - fileModifiedAt: ${fileModifiedAt}")
+
         return Intent().apply {
             component = ComponentName(DRIVE_PACKAGE, SAVE_EXTERNAL_ACTIVITY_CLASS)
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_STREAM, uri)
             setDataAndType(uri, safeMimeType)
+            setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
+    }
+
+    private fun getFileDates(context: Context, uri: Uri): Pair<Date?, Date?> {
+        fun Cursor.isValidDate(index: Int) = index != -1 && this.getLong(index) > 0
+
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                // val (fileCreatedAt, fileModifiedAt) = SyncUtils.getFileDates(cursor)
+                val dateTakenIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_TAKEN)
+                val dateAddedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED)
+
+                val lastModifiedIndex = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_LAST_MODIFIED)
+                val dateModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED)
+
+                val fileCreatedAt = when {
+                    cursor.isValidDate(dateTakenIndex) -> Date(cursor.getLong(dateTakenIndex))
+                    cursor.isValidDate(dateAddedIndex) -> Date(cursor.getLong(dateAddedIndex) * 1000)
+                    else -> null
+                }
+
+                var fileModifiedAt = when {
+                    cursor.isValidDate(lastModifiedIndex) -> Date(cursor.getLong(lastModifiedIndex))
+                    cursor.isValidDate(dateModifiedIndex) -> Date(cursor.getLong(dateModifiedIndex) * 1000)
+                    fileCreatedAt != null -> fileCreatedAt
+                    else -> null
+                }
+
+                Log.e("gibran", "getFileDates - cursor.columnNames.joinToString(): ${cursor.columnNames.joinToString()}")
+
+                return fileCreatedAt to fileModifiedAt
+            }
+        }
+        return null to null
     }
 
     private fun Attachment.openWithIntent(context: Context): Intent {
