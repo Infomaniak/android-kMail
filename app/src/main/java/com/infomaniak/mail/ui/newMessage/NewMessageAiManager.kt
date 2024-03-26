@@ -223,6 +223,7 @@ class NewMessageAiManager @Inject constructor(
     }
 
     fun navigateToPropositionFragment() {
+
         closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
         fragment.safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
