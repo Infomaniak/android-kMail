@@ -525,6 +525,7 @@ class NewMessageFragment : Fragment() {
             LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draft.localUuid, attachment.localUuid)
             draft.attachments.removeAt(position)
         }.onFailure { exception ->
+            // TODO: If we don't see this Sentry after May 2024, we can remove it.
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
         }
 
