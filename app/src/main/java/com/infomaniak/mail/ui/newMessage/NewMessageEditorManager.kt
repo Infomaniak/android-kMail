@@ -89,8 +89,6 @@ class NewMessageEditorManager @Inject constructor(
     fun setupEditorActions() = with(binding) {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
-                // TODO: Don't forget to add in this `if` all actions that make the app go to background.
-                if (action == EditorAction.ATTACHMENT) newMessageViewModel.shouldExecuteDraftActionWhenStopping = false
                 context.trackEvent("editorActions", action.matomoValue)
                 newMessageViewModel.editorAction.value = action to null
             }

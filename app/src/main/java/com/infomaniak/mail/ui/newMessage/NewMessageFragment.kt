@@ -147,8 +147,7 @@ class NewMessageFragment : Fragment() {
 
         setWebViewReference()
         initUi()
-
-        if (newMessageViewModel.initResult.value == null) initDraftAndViewModel()
+        initDraftAndViewModel()
 
         handleOnBackPressed()
 
@@ -164,7 +163,7 @@ class NewMessageFragment : Fragment() {
         observeDraftWorkerResults()
         observeInitResult()
         aiManager.observeEverything()
-        externalsManager.observeExternals(newMessageActivityArgs.arrivedFromExistingDraft)
+        externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
     }
 
     private fun initManagers() {
@@ -269,18 +268,16 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initDraftAndViewModel() {
-
-        newMessageViewModel.initDraftAndViewModel(
-            intent = requireActivity().intent,
-            navArgs = newMessageActivityArgs,
-        ).observe(viewLifecycleOwner) { isSuccess ->
-            if (isSuccess) {
-                showKeyboardInCorrectView()
-            } else {
-                requireActivity().apply {
-                    showToast(R.string.failToOpenDraft)
-                    finish()
+    private fun initDraftAndViewModel() = with(newMessageViewModel) {
+        if (initResult.value == null) {
+            initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { isSuccess ->
+                if (isSuccess) {
+                    showKeyboardInCorrectView()
+                } else {
+                    requireActivity().apply {
+                        showToast(R.string.failToOpenDraft)
+                        finish()
+                    }
                 }
             }
         }
@@ -302,12 +299,12 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun showKeyboardInCorrectView() {
-        when (newMessageActivityArgs.draftMode) {
+        when (newMessageViewModel.draftMode()) {
             DraftMode.REPLY,
             DraftMode.REPLY_ALL -> recipientFieldsManager.focusBodyField()
             DraftMode.FORWARD -> recipientFieldsManager.focusToField()
             DraftMode.NEW_MAIL -> {
-                if (newMessageActivityArgs.recipient == null && newMessageViewModel.draft.to.isEmpty()) {
+                if (newMessageViewModel.recipient() == null && newMessageViewModel.draft.to.isEmpty()) {
                     recipientFieldsManager.focusToField()
                 } else {
                     recipientFieldsManager.focusBodyField()
@@ -356,7 +353,7 @@ class NewMessageFragment : Fragment() {
                 initWebViewClientAndBridge(
                     attachments = draft.attachments,
                     messageUid = "QUOTE-${draft.messageUid}",
-                    shouldLoadDistantResources = alwaysShowExternalContent || newMessageActivityArgs.shouldLoadDistantResources,
+                    shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
                     navigateToNewMessageActivity = null,
                 )
             }
@@ -385,25 +382,26 @@ class NewMessageFragment : Fragment() {
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
+        val selectedSignatureId = newMessageViewModel.draft.identityId?.toInt() ?: -1
         val selectedSignature = with(signatures) {
-            find { it.id == newMessageViewModel.selectedSignatureId } ?: find { it.isDefault }!!
+            find { it.id == selectedSignatureId } ?: find { it.isDefault }!!
         }
         updateSelectedSignatureFromField(signatures.count(), selectedSignature)
 
-        val adapter = SignatureAdapter(signatures, newMessageViewModel.selectedSignatureId) { newSelectedSignature ->
-            trackNewMessageEvent("switchIdentity")
+        val adapter = SignatureAdapter(
+            signatures = signatures,
+            selectedSignatureId = selectedSignatureId,
+            onClickListener = { newSelectedSignature ->
+                trackNewMessageEvent("switchIdentity")
 
-            updateSelectedSignatureFromField(signatures.count(), newSelectedSignature)
-            updateBodySignature(newSelectedSignature.content)
+                updateSelectedSignatureFromField(signatures.count(), newSelectedSignature)
+                updateBodySignature(newSelectedSignature.content)
 
-            newMessageViewModel.apply {
-                selectedSignatureId = newSelectedSignature.id
-                draft.identityId = newSelectedSignature.id.toString()
-                saveDraftDebouncing()
-            }
+                newMessageViewModel.draft.identityId = newSelectedSignature.id.toString()
 
-            addressListPopupWindow?.dismiss()
-        }
+                addressListPopupWindow?.dismiss()
+            },
+        )
 
         fromMailAddress.post {
             runCatching {
@@ -454,11 +452,23 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeNewAttachments() = with(binding) {
-        newMessageViewModel.importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
+    private fun observeInitResult() = with(newMessageViewModel) {
+        initResult.observe(viewLifecycleOwner) { signatures ->
+            hideLoader()
+            populateUiWithViewModel()
+            setupFromField(signatures)
+            editorManager.setupEditorActions()
+            editorManager.setupEditorFormatActionsToggle()
+        }
+    }
+
+    private fun observeNewAttachments() = with(newMessageViewModel) {
+        importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
 
             attachmentAdapter.addAll(attachments)
-            attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
+            draft.attachments.addAll(attachments)
+
+            binding.attachmentsRecyclerView.isGone = draft.attachments.isEmpty()
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
@@ -466,25 +476,16 @@ class NewMessageFragment : Fragment() {
 
     override fun onStop() = with(newMessageViewModel) {
 
-        // TODO:
-        //  Currently, we don't handle the possibility to leave the App during Draft composition.
-        //  If it happens and we do anything in Realm about that, it will desynchronize the UI &
-        //  Realm, and we'll lost some Draft data. A quick fix to get rid of the current bugs is
-        //  to wait the end of Draft composition before starting DraftsActionsWorker.
-        if (shouldExecuteDraftActionWhenStopping) {
-            val isFinishing = requireActivity().isFinishing
-            val isTaskRoot = requireActivity().isTaskRoot
-            val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
+        val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
+        val isFinishing = requireActivity().isFinishing
+        val isTaskRoot = requireActivity().isTaskRoot
 
-            executeDraftActionWhenStopping(
-                action = action,
-                isFinishing = isFinishing,
-                isTaskRoot = isTaskRoot,
-                startWorkerCallback = ::startWorker,
-            )
-        } else {
-            shouldExecuteDraftActionWhenStopping = true
-        }
+        executeDraftActionWhenStopping(
+            action = action,
+            isFinishing = isFinishing,
+            isTaskRoot = isTaskRoot,
+            startWorkerCallback = ::startWorker,
+        )
 
         super.onStop()
     }
@@ -523,8 +524,6 @@ class NewMessageFragment : Fragment() {
         }.onFailure { exception ->
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
         }
-
-        newMessageViewModel.saveDraftWithoutDebouncing()
     }
 
     private fun setupSendButton() = with(binding) {
@@ -568,16 +567,6 @@ class NewMessageFragment : Fragment() {
 
     private fun Activity.finishAppAndRemoveTaskIfNeeded() {
         if (isTaskRoot) finishAndRemoveTask() else finish()
-    }
-
-    private fun observeInitResult() {
-        newMessageViewModel.initResult.observe(viewLifecycleOwner) { signatures ->
-            hideLoader()
-            populateUiWithViewModel()
-            setupFromField(signatures)
-            editorManager.setupEditorActions()
-            editorManager.setupEditorFormatActionsToggle()
-        }
     }
 
     fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
