@@ -90,6 +90,16 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
+    private var addressListPopupWindow: ListPopupWindow? = null
+
+    private var quoteWebView: WebView? = null
+    private var signatureWebView: WebView? = null
+
+    private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
+
+    private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
+    private val webViewUtils by lazy { WebViewUtils(requireContext()) }
+
     @Inject
     lateinit var aiManager: NewMessageAiManager
 
@@ -101,16 +111,6 @@ class NewMessageFragment : Fragment() {
 
     @Inject
     lateinit var recipientFieldsManager: NewMessageRecipientFieldsManager
-
-    private var addressListPopupWindow: ListPopupWindow? = null
-
-    private var quoteWebView: WebView? = null
-    private var signatureWebView: WebView? = null
-
-    private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
-
-    private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
-    private val webViewUtils by lazy { WebViewUtils(requireContext()) }
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -152,18 +152,15 @@ class NewMessageFragment : Fragment() {
 
         handleOnBackPressed()
 
-        recipientFieldsManager.setOnFocusChangedListeners()
-
         doAfterSubjectChange()
         doAfterBodyChange()
 
-        recipientFieldsManager.observeContacts()
-        recipientFieldsManager.observeCcAndBccVisibility()
-        editorManager.observeEditorActions()
         observeNewAttachments()
         observeDraftWorkerResults()
         observeInitResult()
         aiManager.observeEverything()
+        editorManager.observeEditorActions()
+        recipientFieldsManager.observeEverything()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
     }
 
@@ -326,8 +323,6 @@ class NewMessageFragment : Fragment() {
 
         bodyText.setText(draft.uiBody)
 
-        val alwaysShowExternalContent = localSettings.externalContent == ExternalContent.ALWAYS
-
         draft.uiSignature?.let { html ->
             signatureWebView.apply {
                 settings.setupNewMessageWebViewSettings()
@@ -350,6 +345,7 @@ class NewMessageFragment : Fragment() {
             quoteWebView.apply {
                 settings.setupNewMessageWebViewSettings()
                 loadContent(html, quoteGroup)
+                val alwaysShowExternalContent = localSettings.externalContent == ExternalContent.ALWAYS
                 initWebViewClientAndBridge(
                     attachments = draft.attachments,
                     messageUid = "QUOTE-${draft.messageUid}",
@@ -452,8 +448,8 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeInitResult() = with(newMessageViewModel) {
-        initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
+    private fun observeInitResult() {
+        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
             hideLoader()
             populateUiWithViewModel(draft)
             setupFromField(signatures)
@@ -491,14 +487,10 @@ class NewMessageFragment : Fragment() {
 
     override fun onStop() = with(newMessageViewModel) {
 
-        val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
-        val isFinishing = requireActivity().isFinishing
-        val isTaskRoot = requireActivity().isTaskRoot
-
         executeDraftActionWhenStopping(
-            action = action,
-            isFinishing = isFinishing,
-            isTaskRoot = isTaskRoot,
+            action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
+            isFinishing = requireActivity().isFinishing,
+            isTaskRoot = requireActivity().isTaskRoot,
             startWorkerCallback = ::startWorker,
         )
 

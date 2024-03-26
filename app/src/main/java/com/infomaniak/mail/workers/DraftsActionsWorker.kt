@@ -23,6 +23,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import androidx.work.WorkInfo.State
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
@@ -496,15 +497,15 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         fun getCompletedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
-            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.SUCCEEDED))
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.SUCCEEDED))
         }
 
         fun getFailedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
-            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.FAILED))
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.FAILED))
         }
 
         fun getCompletedAndFailedInfoLiveData(): LiveData<MutableList<WorkInfo>> {
-            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(WorkInfo.State.SUCCEEDED, WorkInfo.State.FAILED))
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.SUCCEEDED, State.FAILED))
         }
     }
 

@@ -59,7 +59,6 @@ class SignatureAdapter(
 
             root.apply {
                 setCardBackgroundColor(context.getColor(backgroundColorRes))
-
                 setOnClickListener {
                     onClickListener(signature)
                     updateSelectedSignature(signature.id)

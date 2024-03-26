@@ -54,11 +54,17 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         _externalsManager = externalsManager
     }
 
+    fun observeEverything() {
+        setOnFocusChangedListeners()
+        observeContacts()
+        observeCcAndBccVisibility()
+    }
+
     fun setupAutoCompletionFields() = with(binding) {
         toField.initRecipientField(
             autoComplete = autoCompleteTo,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
+            onContactAddedCallback = { newMessageViewModel.addRecipientToField(recipient = it, type = TO) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
             onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
             gotFocusCallback = { fieldGotFocus(TO) },
@@ -68,7 +74,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         ccField.initRecipientField(
             autoComplete = autoCompleteCc,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
+            onContactAddedCallback = { newMessageViewModel.addRecipientToField(recipient = it, type = CC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
             onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
             gotFocusCallback = { fieldGotFocus(CC) },
@@ -77,7 +83,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         bccField.initRecipientField(
             autoComplete = autoCompleteBcc,
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
-            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
+            onContactAddedCallback = { newMessageViewModel.addRecipientToField(recipient = it, type = BCC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
             onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
             gotFocusCallback = { fieldGotFocus(BCC) },
@@ -118,12 +124,12 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         bcc.isGone = isCollapsed
     }
 
-    fun observeCcAndBccVisibility() = with(newMessageViewModel) {
+    private fun observeCcAndBccVisibility() = with(newMessageViewModel) {
         otherFieldsAreAllEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherFieldsVisibility)
         initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(isCollapsed = !it) }
     }
 
-    fun setOnFocusChangedListeners() = with(binding) {
+    private fun setOnFocusChangedListeners() = with(binding) {
         val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
         subjectTextField.onFocusChangeListener = listener
         bodyText.onFocusChangeListener = listener
@@ -137,7 +143,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         binding.toField.showKeyboardInTextInput()
     }
 
-    fun observeContacts() = with(binding) {
+    private fun observeContacts() = with(binding) {
         newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (sortedContactList, _) ->
             toField.updateContacts(sortedContactList)
             ccField.updateContacts(sortedContactList)
