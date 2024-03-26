@@ -298,16 +298,16 @@ class NewMessageFragment : Fragment() {
         bccField.hideLoader()
     }
 
-    private fun showKeyboardInCorrectView() {
+    private fun showKeyboardInCorrectView() = with(recipientFieldsManager) {
         when (newMessageViewModel.draftMode()) {
             DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> recipientFieldsManager.focusBodyField()
-            DraftMode.FORWARD -> recipientFieldsManager.focusToField()
+            DraftMode.REPLY_ALL -> focusBodyField()
+            DraftMode.FORWARD -> focusToField()
             DraftMode.NEW_MAIL -> {
                 if (newMessageViewModel.recipient() == null && newMessageViewModel.draft.to.isEmpty()) {
-                    recipientFieldsManager.focusToField()
+                    focusToField()
                 } else {
-                    recipientFieldsManager.focusBodyField()
+                    focusBodyField()
                 }
             }
         }
@@ -475,6 +475,20 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun observeDraftWorkerResults() {
+        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner) {
+
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+
+            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
+                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
+                }
+            }
+        }
+    }
+
     override fun onStop() = with(newMessageViewModel) {
 
         val action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE
@@ -495,28 +509,14 @@ class NewMessageFragment : Fragment() {
         draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draft.localUuid)
     }
 
-    private fun observeDraftWorkerResults() {
-        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner) {
-
-            val treatedWorkInfoUuids = mutableSetOf<UUID>()
-
-            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
-                it.forEach { workInfo ->
-                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
-                }
-            }
-        }
-    }
-
-    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(binding) {
+    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
 
         trackAttachmentActionsEvent("delete")
         val draft = newMessageViewModel.draft
 
         if (itemCountLeft == 0) {
             TransitionManager.beginDelayedTransition(binding.root)
-            attachmentsRecyclerView.isGone = true
+            binding.attachmentsRecyclerView.isGone = true
         }
 
         runCatching {
@@ -529,7 +529,7 @@ class NewMessageFragment : Fragment() {
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
         }
 
-        newMessageViewModel.updateIsSendingAllowed()
+        updateIsSendingAllowed()
     }
 
     private fun setupSendButton() = with(binding) {
