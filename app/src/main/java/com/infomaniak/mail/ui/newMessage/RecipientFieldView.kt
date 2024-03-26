@@ -128,7 +128,7 @@ class RecipientFieldView @JvmOverloads constructor(
             }
 
             contactAdapter = ContactAdapter(
-                usedContacts = mutableSetOf(),
+                usedEmails = mutableSetOf(),
                 onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
@@ -252,7 +252,7 @@ class RecipientFieldView @JvmOverloads constructor(
             removeRecipient(popupRecipient)
             if (popupDeletesTheCollapsedChip) {
                 popupDeletesTheCollapsedChip = false
-                updateCollapsedChipValues(true)
+                updateCollapsedChipValues(isCollapsed = true)
             }
             contactPopupWindow.dismiss()
         }
@@ -311,6 +311,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addRecipient(email: String, name: String) {
+
         if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
             snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
             return
@@ -320,6 +321,7 @@ class RecipientFieldView @JvmOverloads constructor(
             expand()
             binding.chipsRecyclerView.isVisible = true
         }
+
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
             val recipient = Recipient().initLocalValues(email, name, displayAsExternal = false)
@@ -376,6 +378,7 @@ class RecipientFieldView @JvmOverloads constructor(
     fun clearField() = binding.textInput.setText("")
 
     fun initRecipients(initialRecipients: List<Recipient>, otherFieldsAreAllEmpty: Boolean = true) {
+
         initialRecipients.forEach { recipient ->
             if (contactChipAdapter.addChip(recipient)) contactAdapter.addUsedContact(recipient.email)
         }
@@ -422,7 +425,7 @@ class RecipientFieldView @JvmOverloads constructor(
             if (recipient.isManuallyEntered) continue
 
             val shouldDisplayAsExternal = shouldWarnForExternal && recipient.isExternal(externalData)
-            recipient.initDisplayAsExternal(shouldDisplayAsExternal)
+            recipient.updateDisplayAsExternal(shouldDisplayAsExternal)
 
             updateCollapsedChipValues(isSelfCollapsed)
         }
