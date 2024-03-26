@@ -53,12 +53,12 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
 
         email?.let { this.email = it }
         name?.let { this.name = it }
-        initDisplayAsExternal(displayAsExternal)
+        updateDisplayAsExternal(displayAsExternal)
 
         return this
     }
 
-    fun initDisplayAsExternal(shouldDisplayAsExternal: Boolean) {
+    fun updateDisplayAsExternal(shouldDisplayAsExternal: Boolean) {
         displayAsExternal = shouldDisplayAsExternal
     }
 
