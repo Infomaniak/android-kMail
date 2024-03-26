@@ -127,7 +127,7 @@
         android:visibility="gone"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
-        app:layout_constraintEnd_toStartOf="@id/chevron"
+        app:layout_constraintEnd_toStartOf="@id/chevronContainer"
         app:layout_constraintStart_toEndOf="@id/plusChip"
         app:layout_constraintTop_toTopOf="@id/singleLineGuide"
         tools:visibility="visible" />
@@ -139,17 +139,25 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="48dp" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/chevron"
-        style="@style/IconButtonSmall"
+    <FrameLayout
+        android:id="@+id/chevronContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/marginStandardSmall"
-        android:contentDescription="@string/contentDescriptionButtonExpandHeader"
         android:visibility="gone"
-        app:icon="@drawable/ic_chevron_down"
         app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/singleLineGuide"
-        tools:visibility="visible" />
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/chevron"
+            style="@style/IconButtonSmall"
+            android:contentDescription="@string/contentDescriptionButtonExpandHeader"
+            android:visibility="gone"
+            app:icon="@drawable/ic_chevron_down"
+            tools:visibility="visible" />
+    </FrameLayout>
 
     <com.infomaniak.lib.core.views.LoaderTextView
         android:id="@+id/loader"
