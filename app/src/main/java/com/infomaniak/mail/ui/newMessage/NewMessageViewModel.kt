@@ -625,7 +625,20 @@ class NewMessageViewModel @Inject constructor(
     private fun isSavingDraftWithoutChanges(action: DraftAction) = action == DraftAction.SAVE && snapshot?.hasChanges() != true
 
     fun updateIsSendingAllowed() {
-        isSendingAllowed.value = draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()
+        isSendingAllowed.value = if (draft.hasRecipient()) {
+            var size = 0L
+            var isSizeCorrect = true
+            for (attachment in draft.attachments) {
+                size += attachment.size
+                if (size > ATTACHMENTS_MAX_SIZE) {
+                    isSizeCorrect = false
+                    break
+                }
+            }
+            isSizeCorrect
+        } else {
+            false
+        }
     }
 
     fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
@@ -639,7 +652,7 @@ class NewMessageViewModel @Inject constructor(
         var result = ImportationResult.SUCCESS
 
         uris.forEach { uri ->
-            val availableSpace = FILE_SIZE_25_MB - attachmentsSize
+            val availableSpace = ATTACHMENTS_MAX_SIZE - attachmentsSize
             val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace) ?: return@forEach
 
             if (hasSizeLimitBeenReached) result = ImportationResult.FILE_SIZE_TOO_BIG
@@ -656,16 +669,19 @@ class NewMessageViewModel @Inject constructor(
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
 
         val (fileName, fileSize) = context.getFileNameAndSize(uri) ?: return null
-        if (fileSize > availableSpace) return null to true
+        val attachment = Attachment()
 
-        return LocalStorageUtils.saveUploadAttachment(context, uri, fileName, draft.localUuid)?.let { file ->
-            val mimeType = file.path.guessMimeType()
-            Attachment().initLocalValues(fileName, file.length(), mimeType, file.toUri().toString()) to false
-        } ?: (null to false)
+        return LocalStorageUtils.saveAttachmentToUploadDir(context, uri, fileName, draft.localUuid, attachment.localUuid)
+            ?.let { file ->
+                Pair(
+                    attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
+                    fileSize > availableSpace,
+                )
+            }
     }
 
     override fun onCleared() {
-        LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(context, draft.localUuid)
+        LocalStorageUtils.deleteDraftUploadDir(context, draft.localUuid)
         super.onCleared()
     }
 
@@ -710,7 +726,7 @@ class NewMessageViewModel @Inject constructor(
 
     companion object {
         private const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 1_000L
-        private const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
+        private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998
     }
 }

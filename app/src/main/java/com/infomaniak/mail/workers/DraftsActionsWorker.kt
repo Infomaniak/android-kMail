@@ -268,7 +268,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private fun Draft.uploadAttachments(): Result {
 
-        val (attachmentsToUpload, attachmentsUris) = getNotUploadedAttachments(draft = this)
+        val attachmentsToUpload = getNotUploadedAttachments(draft = this)
         val attachmentsToUploadCount = attachmentsToUpload.count()
         if (attachmentsToUploadCount > 0) {
             SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
@@ -280,7 +280,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         attachmentsToUpload.forEach { attachment ->
             runCatching {
-                attachment.startUpload(localUuid, attachmentsUris)
+                attachment.startUpload(localUuid)
             }.onFailure { exception ->
                 SentryLog.d(TAG, "${exception.message}", exception)
                 if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
@@ -291,16 +291,9 @@ class DraftsActionsWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private fun getNotUploadedAttachments(draft: Draft): Pair<List<Attachment>, MutableList<String>> {
-        val attachmentUris = mutableListOf<String>()
-        val localAttachments = draft.attachments.filter { attachment ->
-            (attachment.uploadLocalUri != null).also { if (it) attachmentUris.add(attachment.uploadLocalUri!!) }
-        }
+    private fun getNotUploadedAttachments(draft: Draft): List<Attachment> = draft.attachments.filter { it.uploadLocalUri != null }
 
-        return localAttachments to attachmentUris
-    }
-
-    private fun Attachment.startUpload(draftLocalUuid: String, attachmentsUris: MutableList<String>) {
+    private fun Attachment.startUpload(draftLocalUuid: String) {
         val attachmentFile = getUploadLocalFile().also {
             if (it?.exists() != true) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
@@ -322,17 +315,15 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
-            attachmentsUris.remove(uploadLocalUri)
             updateLocalAttachment(draftLocalUuid, apiResponse.data!!)
-            if (!attachmentsUris.contains(uploadLocalUri)) {
-                attachmentFile.delete()
-                LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(
-                    context = applicationContext,
-                    draftLocalUuid = draftLocalUuid,
-                    userId = userId,
-                    mailboxId = mailbox.mailboxId,
-                )
-            }
+            attachmentFile.delete()
+            LocalStorageUtils.deleteAttachmentUploadDir(
+                context = applicationContext,
+                draftLocalUuid = draftLocalUuid,
+                attachmentLocalUuid = localUuid,
+                userId = userId,
+                mailboxId = mailbox.mailboxId,
+            )
         } else {
             SentryLog.e(
                 tag = ATTACHMENT_TAG,
@@ -347,11 +338,9 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun Attachment.updateLocalAttachment(draftLocalUuid: String, remoteAttachment: Attachment) {
         mailboxContentRealm.writeBlocking {
             draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
+
                 val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
-                SentryLog.d(
-                    ATTACHMENT_TAG,
-                    "When removing just uploaded attachment we found (Uuids to localUris): $uuidToLocalUri"
-                )
+                SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (Uuids to localUris): $uuidToLocalUri")
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })

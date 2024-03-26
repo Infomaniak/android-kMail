@@ -61,7 +61,7 @@ class MessageWebViewClient(
                         val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
                         ApiRepository.downloadAttachment(resource)
                     }.getOrNull()?.body?.byteStream()?.readBytes()?.let {
-                        LocalStorageUtils.saveCacheAttachment(it.inputStream(), cacheFile)
+                        LocalStorageUtils.saveAttachmentToCacheDir(it.inputStream(), cacheFile)
                         it.inputStream()
                     }
                 }

@@ -147,7 +147,7 @@ class NewMessageFragment : Fragment() {
 
         setWebViewReference()
         initUi()
-        initDraftAndViewModel()
+        initializeDraft()
 
         handleOnBackPressed()
 
@@ -268,7 +268,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initDraftAndViewModel() = with(newMessageViewModel) {
+    private fun initializeDraft() = with(newMessageViewModel) {
         if (initResult.value == null) {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
@@ -471,6 +471,7 @@ class NewMessageFragment : Fragment() {
             binding.attachmentsRecyclerView.isGone = draft.attachments.isEmpty()
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
+            updateIsSendingAllowed()
         }
     }
 
@@ -519,11 +520,16 @@ class NewMessageFragment : Fragment() {
         }
 
         runCatching {
-            draft.attachments[position].getUploadLocalFile()?.delete()
+            val attachment = draft.attachments[position]
+            attachment.getUploadLocalFile()?.delete()
+            LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draft.localUuid, attachment.localUuid)
             draft.attachments.removeAt(position)
         }.onFailure { exception ->
+            // TODO: If we don't see this Sentry after May 2024, we can remove it.
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
         }
+
+        newMessageViewModel.updateIsSendingAllowed()
     }
 
     private fun setupSendButton() = with(binding) {

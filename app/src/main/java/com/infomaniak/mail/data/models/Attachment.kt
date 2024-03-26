@@ -34,6 +34,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.io.File
+import java.util.UUID
 
 @Serializable
 class Attachment : EmbeddedRealmObject {
@@ -56,6 +57,8 @@ class Attachment : EmbeddedRealmObject {
     //endregion
 
     //region Local data (Transient)
+    @Transient
+    var localUuid: String = UUID.randomUUID().toString()
     @Transient
     var uploadLocalUri: String? = null
     //endregion
