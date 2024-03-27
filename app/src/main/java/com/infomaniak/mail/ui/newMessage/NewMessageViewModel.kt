@@ -100,6 +100,7 @@ class NewMessageViewModel @Inject constructor(
     var draftInRAM: Draft = Draft()
 
     //region UI data
+    val fromLiveData = MutableLiveData<UiFrom>()
     val subjectLiveData = MutableLiveData<String?>()
     val uiBodyLiveData = MutableLiveData<String>()
     val uiSignatureLiveData = MutableLiveData<String?>()
@@ -110,6 +111,7 @@ class NewMessageViewModel @Inject constructor(
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
     var shouldSendInsteadOfSave = false
+    var signaturesCount = 0
 
     private var snapshot: DraftSnapshot? = null
 
@@ -169,7 +171,7 @@ class NewMessageViewModel @Inject constructor(
 
         val draft = runCatching {
 
-            signatures = SignatureController.getAllSignatures(realm)
+            signatures = SignatureController.getAllSignatures(realm).also { signaturesCount = it.count() }
             if (signatures.isEmpty()) return@runCatching null
 
             val draftExists = arrivedFromExistingDraft || draftLocalUuid != null
@@ -197,7 +199,7 @@ class NewMessageViewModel @Inject constructor(
 
             realm.writeBlocking { draftController.upsertDraft(draft, realm = this) }
             draft.saveDraftSnapshot()
-            draft.moveDataFromDraftToLiveData()
+            draft.moveDataFromDraftToLiveData(signatures)
 
             draftInRAM = draft
 
@@ -329,9 +331,16 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.moveDataFromDraftToLiveData() {
+    private fun Draft.moveDataFromDraftToLiveData(signatures: List<Signature>) {
 
         savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
+
+        fromLiveData.postValue(
+            UiFrom(
+                signature = signatures.single { it.id == identityId?.toInt() },
+                shouldUpdateUiSignature = false,
+            ),
+        )
 
         subjectLiveData.postValue(subject)
         uiBodyLiveData.postValue(uiBody)
@@ -653,7 +662,7 @@ class NewMessageViewModel @Inject constructor(
     private fun Draft.updateDraft(draftAction: DraftAction) {
 
         action = draftAction
-        identityId = draftInRAM.identityId
+        identityId = fromLiveData.value?.signature?.id.toString()
 
         to = draftInRAM.to
         cc = draftInRAM.cc
@@ -727,6 +736,11 @@ class NewMessageViewModel @Inject constructor(
     data class InitResult(
         val draft: Draft,
         val signatures: List<Signature>,
+    )
+
+    data class UiFrom(
+        val signature: Signature,
+        val shouldUpdateUiSignature: Boolean = true,
     )
 
     private data class DraftSnapshot(
