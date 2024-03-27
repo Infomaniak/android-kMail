@@ -152,6 +152,7 @@ class NewMessageFragment : Fragment() {
 
         observeNewAttachments()
         observeInitResult()
+        observeUiSignature()
         observeUiQuote()
         editorManager.observeEditorActions()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
@@ -205,7 +206,7 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        newMessageViewModel.draftInRAM.uiSignature?.let { _ ->
+        newMessageViewModel.uiSignatureLiveData.value?.let { _ ->
             binding.signatureWebView.reload()
         }
         newMessageViewModel.uiQuoteLiveData.value?.let { _ ->
@@ -321,23 +322,17 @@ class NewMessageFragment : Fragment() {
         attachmentAdapter.addAll(draft.attachments)
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
-        draft.uiSignature?.let { html ->
-            signatureWebView.apply {
-                settings.setupNewMessageWebViewSettings()
-                loadSignatureContent(html, signatureGroup)
-                initWebViewClientAndBridge(
-                    attachments = emptyList(),
-                    messageUid = "SIGNATURE-${draft.messageUid}",
-                    shouldLoadDistantResources = true,
-                    navigateToNewMessageActivity = null,
-                )
-            }
-            removeSignature.setOnClickListener {
-                trackNewMessageEvent("deleteSignature")
-                draft.uiSignature = null
-                signatureGroup.isGone = true
-            }
+        // Signature
+        signatureWebView.apply {
+            settings.setupNewMessageWebViewSettings()
+            initWebViewClientAndBridge(
+                attachments = emptyList(),
+                messageUid = "SIGNATURE-${draft.messageUid}",
+                shouldLoadDistantResources = true,
+                navigateToNewMessageActivity = null,
+            )
         }
+        removeSignature.setOnClickListener { newMessageViewModel.uiSignatureLiveData.value = null }
 
         // Quote
         quoteWebView.apply {
@@ -417,9 +412,9 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun updateBodySignature(content: String) = with(binding) {
-        newMessageViewModel.draftInRAM.uiSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(content)
-        signatureWebView.loadSignatureContent(content, signatureGroup)
+    private fun updateBodySignature(content: String) {
+        val signature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(content)
+        newMessageViewModel.uiSignatureLiveData.value = signature
     }
 
     private fun updateSelectedSignatureFromField(signaturesCount: Int, signature: Signature) {
@@ -451,6 +446,17 @@ class NewMessageFragment : Fragment() {
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
             updateIsSendingAllowed()
+        }
+    }
+
+    private fun observeUiSignature() = with(binding) {
+        newMessageViewModel.uiSignatureLiveData.observe(viewLifecycleOwner) { signature ->
+            if (signature == null) {
+                trackNewMessageEvent("deleteSignature")
+                signatureGroup.isGone = true
+            } else {
+                signatureWebView.loadSignatureContent(signature, signatureGroup)
+            }
         }
     }
 
