@@ -58,10 +58,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.extensions.context
-import com.infomaniak.mail.utils.extensions.htmlToText
-import com.infomaniak.mail.utils.extensions.isEmail
-import com.infomaniak.mail.utils.extensions.textToHtml
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -101,6 +98,7 @@ class NewMessageViewModel @Inject constructor(
 
     //region UI data
     val fromLiveData = MutableLiveData<UiFrom>()
+    val attachmentsLiveData = MutableLiveData<List<Attachment>>()
     val subjectLiveData = MutableLiveData<String?>()
     val uiBodyLiveData = MutableLiveData<String>()
     val uiSignatureLiveData = MutableLiveData<String?>()
@@ -117,7 +115,7 @@ class NewMessageViewModel @Inject constructor(
 
     var otherFieldsAreAllEmpty = MutableLiveData(true)
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
-    val importedAttachments = SingleLiveEvent<Pair<MutableList<Attachment>, ImportationResult>>()
+    val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
     val isSendingAllowed = SingleLiveEvent(false)
     val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
@@ -327,7 +325,7 @@ class NewMessageViewModel @Inject constructor(
             bcc = bcc.toSet(),
             subject = subject,
             body = uiBody,
-            attachmentsUuids = attachments.map { it.uuid }.toSet(),
+            attachmentsLocalUuids = attachments.map { it.localUuid }.toSet(),
         )
     }
 
@@ -341,6 +339,8 @@ class NewMessageViewModel @Inject constructor(
                 shouldUpdateUiSignature = false,
             ),
         )
+
+        attachmentsLiveData.postValue(attachments)
 
         subjectLiveData.postValue(subject)
         uiBodyLiveData.postValue(uiBody)
@@ -534,17 +534,23 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun importAttachments(uris: List<Uri>, draft: Draft) = viewModelScope.launch(ioCoroutineContext) {
+    /**
+     * If the `draft` parameter is provided, it means we are coming from the initialization. So we use the Draft object.
+     * If the `draft` is null, we are just adding new Attachments via the FilePicker, so we use the LiveData instead.
+     */
+    fun importAttachments(uris: List<Uri>, draft: Draft? = null) = viewModelScope.launch(ioCoroutineContext) {
+
+        val currentAttachments = draft?.attachments ?: attachmentsLiveData.valueOrEmpty()
 
         val newAttachments = mutableListOf<Attachment>()
-        var attachmentsSize = draft.attachments.sumOf { it.size }
+        var attachmentsSize = currentAttachments.sumOf { it.size }
         var result = ImportationResult.SUCCESS
 
         uris.forEach { uri ->
             val availableSpace = ATTACHMENTS_MAX_SIZE - attachmentsSize
-            val (attachment, hasSizeLimitBeenReached) = importAttachment(draft.localUuid, uri, availableSpace) ?: return@forEach
+            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace) ?: return@forEach
 
-            if (hasSizeLimitBeenReached) result = ImportationResult.FILE_SIZE_TOO_BIG
+            if (hasSizeLimitBeenReached) result = ImportationResult.ATTACHMENTS_TOO_BIG
 
             attachment?.let {
                 newAttachments.add(it)
@@ -552,15 +558,21 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        importedAttachments.postValue(newAttachments to result)
+        importAttachmentsResult.postValue(result)
+
+        if (draft == null) {
+            attachmentsLiveData.postValue(currentAttachments + newAttachments)
+        } else {
+            draft.attachments.addAll(newAttachments)
+        }
     }
 
-    private fun importAttachment(localUuid: String, uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
+    private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
 
         val (fileName, fileSize) = context.getFileNameAndSize(uri) ?: return null
         val attachment = Attachment()
 
-        return LocalStorageUtils.saveAttachmentToUploadDir(context, uri, fileName, localUuid, attachment.localUuid)
+        return LocalStorageUtils.saveAttachmentToUploadDir(context, uri, fileName, draftLocalUuid!!, attachment.localUuid)
             ?.let { file ->
                 Pair(
                     attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
@@ -607,11 +619,13 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.displayAsExternal) context.trackExternalEvent("deleteRecipient")
     }
 
-    fun updateIsSendingAllowed() {
+    fun updateIsSendingAllowed(
+        attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty(),
+    ) {
         isSendingAllowed.value = if (draftInRAM.hasRecipient()) {
             var size = 0L
             var isSizeCorrect = true
-            for (attachment in draftInRAM.attachments) {
+            for (attachment in attachments) {
                 size += attachment.size
                 if (size > ATTACHMENTS_MAX_SIZE) {
                     isSizeCorrect = false
@@ -622,10 +636,6 @@ class NewMessageViewModel @Inject constructor(
         } else {
             false
         }
-    }
-
-    fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
-        importAttachments(uris, draftInRAM)
     }
 
     fun executeDraftActionWhenStopping(
@@ -670,7 +680,7 @@ class NewMessageViewModel @Inject constructor(
 
         attachments.apply {
             clear()
-            addAll(draftInRAM.attachments)
+            addAll(attachmentsLiveData.valueOrEmpty())
         }
 
         subject = subjectLiveData.value?.take(SUBJECT_MAX_LENGTH)
@@ -693,7 +703,7 @@ class NewMessageViewModel @Inject constructor(
                 bcc != draft.bcc.toSet() ||
                 subject != draft.subject ||
                 body != draft.uiBody ||
-                attachmentsUuids != draft.attachments.map { it.uuid }.toSet()
+                attachmentsLocalUuids != draft.attachments.map { it.localUuid }.toSet()
     }
 
     private fun removeDraftFromRealm(localUuid: String) {
@@ -720,7 +730,7 @@ class NewMessageViewModel @Inject constructor(
 
     enum class ImportationResult {
         SUCCESS,
-        FILE_SIZE_TOO_BIG,
+        ATTACHMENTS_TOO_BIG,
     }
 
     enum class SignatureScore(private val weight: Int) {
@@ -750,7 +760,7 @@ class NewMessageViewModel @Inject constructor(
         val bcc: Set<Recipient>,
         var subject: String?,
         var body: String,
-        val attachmentsUuids: Set<String>,
+        val attachmentsLocalUuids: Set<String>,
     )
 
     companion object {
