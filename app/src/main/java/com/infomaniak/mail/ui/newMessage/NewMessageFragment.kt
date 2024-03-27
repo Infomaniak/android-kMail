@@ -152,9 +152,10 @@ class NewMessageFragment : Fragment() {
 
         handleOnBackPressed()
 
-        observeNewAttachments()
         observeInitResult()
         observeFromData()
+        observeAttachments()
+        observeImportAttachmentsResult()
         observeUiSignature()
         observeUiQuote()
         editorManager.observeEditorActions()
@@ -320,11 +321,6 @@ class NewMessageFragment : Fragment() {
     private fun configureUiWithDraftData(draft: Draft) = with(binding) {
         recipientFieldsManager.initRecipients(draft)
 
-        newMessageViewModel.updateIsSendingAllowed()
-
-        attachmentAdapter.addAll(draft.attachments)
-        attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-
         // Signature
         signatureWebView.apply {
             settings.setupNewMessageWebViewSettings()
@@ -432,16 +428,27 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeNewAttachments() = with(newMessageViewModel) {
-        importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
+    private fun observeAttachments() {
+        newMessageViewModel.attachmentsLiveData.observe(viewLifecycleOwner) {
 
-            attachmentAdapter.addAll(attachments)
-            draftInRAM.attachments.addAll(attachments)
+            val shouldTransition = attachmentAdapter.itemCount != 0 && it.isEmpty()
 
-            binding.attachmentsRecyclerView.isGone = draftInRAM.attachments.isEmpty()
+            attachmentAdapter.submitList(it)
 
-            if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
-            updateIsSendingAllowed()
+            binding.attachmentsRecyclerView.isVisible = if (it.isEmpty()) {
+                if (shouldTransition) TransitionManager.beginDelayedTransition(binding.root)
+                false
+            } else {
+                true
+            }
+
+            newMessageViewModel.updateIsSendingAllowed(attachments = it)
+        }
+    }
+
+    private fun observeImportAttachmentsResult() = with(newMessageViewModel) {
+        importAttachmentsResult.observe(viewLifecycleOwner) { result ->
+            if (result == ImportationResult.ATTACHMENTS_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
     }
 
@@ -483,26 +490,21 @@ class NewMessageFragment : Fragment() {
         draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
-    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
+    private fun onDeleteAttachment(position: Int) = with(newMessageViewModel) {
 
         trackAttachmentActionsEvent("delete")
 
-        if (itemCountLeft == 0) {
-            TransitionManager.beginDelayedTransition(binding.root)
-            binding.attachmentsRecyclerView.isGone = true
-        }
-
         runCatching {
-            val attachment = draftInRAM.attachments[position]
+            val attachments = attachmentsLiveData.value?.toMutableList() ?: mutableListOf()
+            val attachment = attachments[position]
             attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draftInRAM.localUuid, attachment.localUuid)
-            draftInRAM.attachments.removeAt(position)
+            LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draftLocalUuid()!!, attachment.localUuid)
+            attachments.removeAt(position)
+            attachmentsLiveData.value = attachments
         }.onFailure { exception ->
             // TODO: If we don't see this Sentry after May 2024, we can remove it.
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
         }
-
-        updateIsSendingAllowed()
     }
 
     private fun setupSendButton() = with(binding) {
