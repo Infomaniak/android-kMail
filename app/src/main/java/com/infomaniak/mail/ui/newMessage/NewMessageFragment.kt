@@ -74,7 +74,6 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import java.util.UUID
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -156,7 +155,6 @@ class NewMessageFragment : Fragment() {
         doAfterBodyChange()
 
         observeNewAttachments()
-        observeDraftWorkerResults()
         observeInitResult()
         aiManager.observeEverything()
         editorManager.observeEditorActions()
@@ -197,11 +195,6 @@ class NewMessageFragment : Fragment() {
     private fun setWebViewReference() {
         quoteWebView = binding.quoteWebView
         signatureWebView = binding.signatureWebView
-    }
-
-    override fun onStart() {
-        super.onStart()
-        newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -468,20 +461,6 @@ class NewMessageFragment : Fragment() {
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
             updateIsSendingAllowed()
-        }
-    }
-
-    private fun observeDraftWorkerResults() {
-        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner) {
-
-            val treatedWorkInfoUuids = mutableSetOf<UUID>()
-
-            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
-                it.forEach { workInfo ->
-                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
-                }
-            }
         }
     }
 
