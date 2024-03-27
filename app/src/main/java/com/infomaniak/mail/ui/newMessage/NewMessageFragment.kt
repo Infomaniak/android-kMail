@@ -151,12 +151,11 @@ class NewMessageFragment : Fragment() {
 
         handleOnBackPressed()
 
-        doAfterSubjectChange()
         doAfterBodyChange()
 
         observeNewAttachments()
         observeInitResult()
-
+        observeSubject()
         editorManager.observeEditorActions()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
 
@@ -320,8 +319,6 @@ class NewMessageFragment : Fragment() {
 
         newMessageViewModel.updateIsSendingAllowed()
 
-        subjectTextField.setText(draft.subject)
-
         attachmentAdapter.addAll(draft.attachments)
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
@@ -440,12 +437,6 @@ class NewMessageFragment : Fragment() {
         binding.fromMailAddress.text = formattedExpeditor
     }
 
-    private fun doAfterSubjectChange() {
-        binding.subjectTextField.doAfterTextChanged { editable ->
-            editable?.toString()?.let { newMessageViewModel.updateMailSubject(it.ifBlank { null }) }
-        }
-    }
-
     private fun doAfterBodyChange() {
         binding.bodyText.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
@@ -475,7 +466,16 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun observeSubject() = with(binding) {
+        newMessageViewModel.subjectLiveData.observe(viewLifecycleOwner) { newSubject ->
+            val oldSubject = subjectTextField.text?.toString()
+            if (newSubject != oldSubject) subjectTextField.setText(newSubject)
+        }
+    }
+
     override fun onStop() = with(newMessageViewModel) {
+
+        subjectLiveData.value = formatSubject()
 
         executeDraftActionWhenStopping(
             action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
@@ -535,7 +535,7 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (newMessageViewModel.draftInRAM.subject.isNullOrBlank()) {
+        if (formatSubject() == null) {
             trackNewMessageEvent("sendWithoutSubject")
             descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
@@ -550,6 +550,10 @@ class NewMessageFragment : Fragment() {
         } else {
             sendEmail()
         }
+    }
+
+    fun formatSubject(): String? {
+        return binding.subjectTextField.text?.toString()?.ifBlank { null }
     }
 
     private fun Activity.finishAppAndRemoveTaskIfNeeded() {

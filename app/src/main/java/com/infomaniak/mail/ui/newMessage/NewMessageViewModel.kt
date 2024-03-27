@@ -98,6 +98,11 @@ class NewMessageViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     var draftInRAM: Draft = Draft()
+
+    //region UI data
+    val subjectLiveData = MutableLiveData<String?>()
+    //endregion
+
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
@@ -328,6 +333,8 @@ class NewMessageViewModel @Inject constructor(
         // If the user put the app in background before we put the fetched Draft in Realm, and the system
         // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
         savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
+
+        subjectLiveData.postValue(subject)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherFieldsAreAllEmpty.postValue(false)
@@ -605,10 +612,6 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun updateMailSubject(newSubject: String?) = with(draftInRAM) {
-        if (newSubject != subject) subject = newSubject
-    }
-
     fun updateMailBody(newBody: String) = with(draftInRAM) {
         if (newBody != uiBody) uiBody = newBody
     }
@@ -662,7 +665,7 @@ class NewMessageViewModel @Inject constructor(
             addAll(draftInRAM.attachments)
         }
 
-        subject = draftInRAM.subject?.take(SUBJECT_MAX_LENGTH)
+        subject = subjectLiveData.value?.take(SUBJECT_MAX_LENGTH)
 
         uiBody = draftInRAM.uiBody
         uiSignature = draftInRAM.uiSignature
