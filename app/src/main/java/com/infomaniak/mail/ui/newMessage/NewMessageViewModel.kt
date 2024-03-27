@@ -329,6 +329,8 @@ class NewMessageViewModel @Inject constructor(
         // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
         savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
 
+        uiBodyLiveData.postValue(uiBody)
+
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherFieldsAreAllEmpty.postValue(false)
             initializeFieldsAsOpen.postValue(true)
@@ -605,10 +607,6 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun updateMailBody(newBody: String) = with(draftInRAM) {
-        if (newBody != uiBody) uiBody = newBody
-    }
-
     fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
         importAttachments(uris, draftInRAM)
     }
@@ -662,7 +660,7 @@ class NewMessageViewModel @Inject constructor(
 
         subject = subjectValue
 
-        uiBody = draftInRAM.uiBody
+        uiBody = uiBodyLiveData.value ?: ""
         uiSignature = draftInRAM.uiSignature
         uiQuote = draftInRAM.uiQuote
 

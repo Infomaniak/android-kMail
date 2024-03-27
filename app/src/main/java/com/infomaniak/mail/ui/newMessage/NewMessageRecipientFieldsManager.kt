@@ -126,11 +126,11 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     fun setOnFocusChangedListeners() = with(binding) {
         val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
         subjectTextField.onFocusChangeListener = listener
-        bodyText.onFocusChangeListener = listener
+        bodyTextField.onFocusChangeListener = listener
     }
 
     fun focusBodyField() {
-        binding.bodyText.showKeyboard()
+        binding.bodyTextField.showKeyboard()
     }
 
     fun focusToField() {
