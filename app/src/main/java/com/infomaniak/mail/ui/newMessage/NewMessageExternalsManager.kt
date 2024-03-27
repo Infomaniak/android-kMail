@@ -74,8 +74,12 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
 
     private fun updateBanner(shouldWarnForExternal: Boolean, externalData: ExternalData) = with(newMessageViewModel) {
         if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
-            val (externalEmail, externalQuantity) = draftInRAM.findExternalRecipientForNewMessage(externalData)
-            externalRecipientCount.value = externalEmail to externalQuantity
+            externalRecipientCount.value = findExternalRecipientForNewMessage(
+                externalData = externalData,
+                to = draftInRAM.to,
+                cc = draftInRAM.cc,
+                bcc = draftInRAM.bcc,
+            )
         }
     }
 
