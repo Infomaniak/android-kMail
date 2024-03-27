@@ -102,6 +102,7 @@ class NewMessageViewModel @Inject constructor(
     //region UI data
     val subjectLiveData = MutableLiveData<String?>()
     val uiBodyLiveData = MutableLiveData<String>()
+    val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
 
     var isAutoCompletionOpened = false
@@ -333,6 +334,8 @@ class NewMessageViewModel @Inject constructor(
 
         subjectLiveData.postValue(subject)
         uiBodyLiveData.postValue(uiBody)
+
+        uiQuoteLiveData.postValue(uiQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherFieldsAreAllEmpty.postValue(false)
@@ -663,7 +666,7 @@ class NewMessageViewModel @Inject constructor(
 
         uiBody = uiBodyLiveData.value ?: ""
         uiSignature = draftInRAM.uiSignature
-        uiQuote = draftInRAM.uiQuote
+        uiQuote = uiQuoteLiveData.value
 
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
     }

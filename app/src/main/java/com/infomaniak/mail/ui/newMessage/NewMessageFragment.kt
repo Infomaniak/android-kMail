@@ -154,6 +154,7 @@ class NewMessageFragment : Fragment() {
         observeInitResult()
         observeSubject()
         observeUiBody()
+        observeUiQuote()
         aiManager.observeEverything()
         editorManager.observeEditorActions()
         recipientFieldsManager.observeEverything()
@@ -199,7 +200,7 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.draftInRAM.uiSignature?.let { _ ->
             binding.signatureWebView.reload()
         }
-        newMessageViewModel.draftInRAM.uiQuote?.let { _ ->
+        newMessageViewModel.uiQuoteLiveData.value?.let { _ ->
             binding.quoteWebView.reload()
         }
         super.onConfigurationChanged(newConfig)
@@ -328,24 +329,18 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        draft.uiQuote?.let { html ->
-            quoteWebView.apply {
-                settings.setupNewMessageWebViewSettings()
-                loadContent(html, quoteGroup)
-                val alwaysShowExternalContent = localSettings.externalContent == ExternalContent.ALWAYS
-                initWebViewClientAndBridge(
-                    attachments = draft.attachments,
-                    messageUid = "QUOTE-${draft.messageUid}",
-                    shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
-                    navigateToNewMessageActivity = null,
-                )
-            }
-            removeQuote.setOnClickListener {
-                trackNewMessageEvent("deleteQuote")
-                draft.uiQuote = null
-                quoteGroup.isGone = true
-            }
+        // Quote
+        quoteWebView.apply {
+            settings.setupNewMessageWebViewSettings()
+            val alwaysShowExternalContent = localSettings.externalContent == ExternalContent.ALWAYS
+            initWebViewClientAndBridge(
+                attachments = draft.attachments,
+                messageUid = "QUOTE-${draft.messageUid}",
+                shouldLoadDistantResources = alwaysShowExternalContent || newMessageViewModel.shouldLoadDistantResources(),
+                navigateToNewMessageActivity = null,
+            )
         }
+        removeQuote.setOnClickListener { newMessageViewModel.uiQuoteLiveData.value = null }
     }
 
     private fun WebView.loadSignatureContent(html: String, webViewGroup: Group) {
@@ -457,6 +452,17 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.uiBodyLiveData.observe(viewLifecycleOwner) { newBody ->
             val oldBody = bodyTextField.text?.toString()
             if (newBody != oldBody) bodyTextField.setText(newBody)
+        }
+    }
+
+    private fun observeUiQuote() = with(binding) {
+        newMessageViewModel.uiQuoteLiveData.observe(viewLifecycleOwner) { quote ->
+            if (quote == null) {
+                trackNewMessageEvent("deleteQuote")
+                quoteGroup.isGone = true
+            } else {
+                quoteWebView.loadContent(quote, quoteGroup)
+            }
         }
     }
 
