@@ -99,6 +99,10 @@ class NewMessageViewModel @Inject constructor(
 
     var draftInRAM: Draft = Draft()
 
+    //region UI data
+    val uiQuoteLiveData = MutableLiveData<String?>()
+    //endregion
+
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
@@ -328,6 +332,8 @@ class NewMessageViewModel @Inject constructor(
         // If the user put the app in background before we put the fetched Draft in Realm, and the system
         // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
         savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
+
+        uiQuoteLiveData.postValue(uiQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherFieldsAreAllEmpty.postValue(false)
@@ -662,7 +668,7 @@ class NewMessageViewModel @Inject constructor(
 
         uiBody = uiBodyValue
         uiSignature = draftInRAM.uiSignature
-        uiQuote = draftInRAM.uiQuote
+        uiQuote = uiQuoteLiveData.value
 
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
     }
