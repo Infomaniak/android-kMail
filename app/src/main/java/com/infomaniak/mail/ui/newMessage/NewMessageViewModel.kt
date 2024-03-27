@@ -624,8 +624,8 @@ class NewMessageViewModel @Inject constructor(
 
         draft.updateDraft(action)
 
-        if (isFinishing && isSavingDraftWithoutChanges(draft, action)) {
-            if (!arrivedFromExistingDraft) removeDraftFromRealm(draft.localUuid)
+        if (!arrivedFromExistingDraft && isFinishing && isSavingDraftWithoutChanges(draft, action)) {
+            removeDraftFromRealm(draft.localUuid)
             return@launch
         }
 
