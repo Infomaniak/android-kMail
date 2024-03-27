@@ -47,6 +47,7 @@ import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.postfixWithTag
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -248,7 +249,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun generateNewAiProposition() {
-        val formattedRecipientsString = newMessageViewModel.draftInRAM.to
+        val formattedRecipientsString = newMessageViewModel.toLiveData.valueOrEmpty()
             .joinToString(", ") { it.name }
             .takeIf { it.isNotBlank() }
         val currentMailboxUuid = newMessageViewModel.currentMailbox.uuid
