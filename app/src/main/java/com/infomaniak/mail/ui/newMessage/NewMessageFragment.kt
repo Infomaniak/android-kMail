@@ -315,7 +315,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun populateUiWithViewModel(draft: Draft) = with(binding) {
+    private fun configureUiWithDraftData(draft: Draft) = with(binding) {
         recipientFieldsManager.initRecipients(draft)
 
         newMessageViewModel.updateIsSendingAllowed()
@@ -453,10 +453,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeInitResult() {
-        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
+        newMessageViewModel.initResult.observe(viewLifecycleOwner) {
             hideLoader()
-            populateUiWithViewModel(draft)
-            setupFromField(signatures)
+            configureUiWithDraftData(it.draft)
+            setupFromField(it.signatures)
             editorManager.setupEditorActions()
             editorManager.setupEditorFormatActionsToggle()
         }
@@ -488,7 +488,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftInRAM.localUuid)
+        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
