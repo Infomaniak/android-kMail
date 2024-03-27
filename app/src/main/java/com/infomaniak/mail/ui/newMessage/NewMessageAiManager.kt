@@ -91,7 +91,6 @@ class NewMessageAiManager @Inject constructor(
 
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
-            subject?.let(subjectTextField::setText)
             bodyText.setText(content)
         }
     }
@@ -220,7 +219,12 @@ class NewMessageAiManager @Inject constructor(
 
         closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
-        fragment.safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
+
+        fragment.safeNavigate(
+            NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
+                isSubjectBlank = fragment.formatSubject() == null,
+            ),
+        )
     }
 
     fun openAiPrompt() {
