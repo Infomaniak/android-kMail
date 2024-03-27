@@ -25,6 +25,7 @@ import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
@@ -65,18 +66,18 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
     }
 
     private fun updateFields(shouldWarnForExternal: Boolean, externalData: ExternalData) = with(binding) {
-            toField.updateExternals(shouldWarnForExternal, externalData)
-            ccField.updateExternals(shouldWarnForExternal, externalData)
-            bccField.updateExternals(shouldWarnForExternal, externalData)
-        }
+        toField.updateExternals(shouldWarnForExternal, externalData)
+        ccField.updateExternals(shouldWarnForExternal, externalData)
+        bccField.updateExternals(shouldWarnForExternal, externalData)
+    }
 
     private fun updateBanner(shouldWarnForExternal: Boolean, externalData: ExternalData) = with(newMessageViewModel) {
         if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
             externalRecipientCount.value = findExternalRecipientForNewMessage(
                 externalData = externalData,
-                to = draftInRAM.to,
-                cc = draftInRAM.cc,
-                bcc = draftInRAM.bcc,
+                to = toLiveData.valueOrEmpty(),
+                cc = ccLiveData.valueOrEmpty(),
+                bcc = bccLiveData.valueOrEmpty(),
             )
         }
     }

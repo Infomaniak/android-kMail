@@ -22,7 +22,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.*
@@ -143,13 +142,6 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
             ccField.updateContacts(sortedContactList)
             bccField.updateContacts(sortedContactList)
         }
-    }
-
-    fun initRecipients(draft: Draft) = with(binding) {
-        val ccAndBccFieldsAreEmpty = draft.cc.isEmpty() && draft.bcc.isEmpty()
-        toField.initRecipients(draft.to, ccAndBccFieldsAreEmpty)
-        ccField.initRecipients(draft.cc)
-        bccField.initRecipients(draft.bcc)
     }
 
     fun closeAutoCompletion() = with(binding) {
