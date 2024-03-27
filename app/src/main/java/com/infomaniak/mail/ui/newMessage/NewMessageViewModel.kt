@@ -101,6 +101,7 @@ class NewMessageViewModel @Inject constructor(
 
     //region UI data
     val subjectLiveData = MutableLiveData<String?>()
+    val uiBodyLiveData = MutableLiveData<String>()
     //endregion
 
     var isAutoCompletionOpened = false
@@ -331,6 +332,7 @@ class NewMessageViewModel @Inject constructor(
         savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
 
         subjectLiveData.postValue(subject)
+        uiBodyLiveData.postValue(uiBody)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherFieldsAreAllEmpty.postValue(false)
@@ -608,10 +610,6 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun updateMailBody(newBody: String) = with(draftInRAM) {
-        if (newBody != uiBody) uiBody = newBody
-    }
-
     fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
         importAttachments(uris, draftInRAM)
     }
@@ -663,7 +661,7 @@ class NewMessageViewModel @Inject constructor(
 
         subject = subjectLiveData.value?.take(SUBJECT_MAX_LENGTH)
 
-        uiBody = draftInRAM.uiBody
+        uiBody = uiBodyLiveData.value ?: ""
         uiSignature = draftInRAM.uiSignature
         uiQuote = draftInRAM.uiQuote
 

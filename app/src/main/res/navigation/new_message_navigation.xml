@@ -45,6 +45,9 @@
         <argument
             android:name="isSubjectBlank"
             app:argType="boolean" />
+        <argument
+            android:name="isBodyBlank"
+            app:argType="boolean" />
     </fragment>
 
     <dialog
