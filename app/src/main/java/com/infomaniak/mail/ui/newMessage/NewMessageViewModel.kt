@@ -100,6 +100,7 @@ class NewMessageViewModel @Inject constructor(
     var draftInRAM: Draft = Draft()
 
     //region UI data
+    val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
 
@@ -333,6 +334,7 @@ class NewMessageViewModel @Inject constructor(
         // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
         savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
 
+        uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
@@ -667,7 +669,7 @@ class NewMessageViewModel @Inject constructor(
         subject = subjectValue
 
         uiBody = uiBodyValue
-        uiSignature = draftInRAM.uiSignature
+        uiSignature = uiSignatureLiveData.value
         uiQuote = uiQuoteLiveData.value
 
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
