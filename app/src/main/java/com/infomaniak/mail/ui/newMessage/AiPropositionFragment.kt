@@ -120,7 +120,7 @@ class AiPropositionFragment : Fragment() {
         if (!aiViewModel.isHistoryEmpty()) propositionTextView.text = aiViewModel.getLastMessage()
 
         insertPropositionButton.setOnClickListener {
-            if (newMessageViewModel.draftInRAM.uiBody.isBlank()) {
+            if (navigationArgs.isBodyBlank) {
                 choosePropositionAndPopBack()
             } else {
                 trackAiWriterEvent("replacePropositionDialog")
@@ -200,11 +200,10 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun trackInsertionType() {
-        val willReplace = newMessageViewModel.draftInRAM.uiBody.isNotBlank()
-        if (willReplace) {
-            trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
-        } else {
+        if (navigationArgs.isBodyBlank) {
             trackAiWriterEvent("insertProposition", TrackerAction.DATA)
+        } else {
+            trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
         }
     }
 
