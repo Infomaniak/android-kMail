@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
@@ -43,12 +42,18 @@ object ExternalUtils {
         return externalRecipientEmail to externalRecipientQuantity
     }
 
-    fun Draft.findExternalRecipientForNewMessage(externalData: ExternalData): Pair<String?, Int> {
-        val to = to.onlyAutomaticallyAddedOnes()
-        val cc = cc.onlyAutomaticallyAddedOnes()
-        val bcc = bcc.onlyAutomaticallyAddedOnes()
-
-        return findExternalRecipientInIterables(externalData, to, cc, bcc)
+    fun findExternalRecipientForNewMessage(
+        externalData: ExternalData,
+        to: List<Recipient>,
+        cc: List<Recipient>,
+        bcc: List<Recipient>,
+    ): Pair<String?, Int> {
+        return findExternalRecipientInIterables(
+            externalData,
+            to.onlyAutomaticallyAddedOnes(),
+            cc.onlyAutomaticallyAddedOnes(),
+            bcc.onlyAutomaticallyAddedOnes(),
+        )
     }
 
     private fun List<Recipient>.onlyAutomaticallyAddedOnes(): List<Recipient> = filter { !it.isManuallyEntered }
