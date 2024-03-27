@@ -41,7 +41,11 @@
         android:id="@+id/aiPropositionFragment"
         android:name="com.infomaniak.mail.ui.newMessage.AiPropositionFragment"
         android:label="AiPropositionFragment"
-        tools:layout="@layout/fragment_ai_proposition" />
+        tools:layout="@layout/fragment_ai_proposition">
+        <argument
+            android:name="isSubjectBlank"
+            app:argType="boolean" />
+    </fragment>
 
     <dialog
         android:id="@+id/aiDiscoveryBottomSheetDialog"
