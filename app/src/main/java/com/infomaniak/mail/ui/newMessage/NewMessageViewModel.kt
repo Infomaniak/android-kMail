@@ -609,19 +609,6 @@ class NewMessageViewModel @Inject constructor(
         importAttachments(uris, draftInRAM)
     }
 
-    fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(ioCoroutineContext) {
-        if (draftInRAM.remoteUuid == null) {
-            draftController.getDraft(draftInRAM.localUuid)?.let { localDraft ->
-                draftInRAM.remoteUuid = localDraft.remoteUuid
-                draftInRAM.messageUid = localDraft.messageUid
-            }
-        }
-    }
-
-    fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioCoroutineContext) {
-        draftController.getDraft(draftInRAM.localUuid)?.let { draftInRAM = it.copyFromRealm() }
-    }
-
     fun executeDraftActionWhenStopping(
         action: DraftAction,
         isFinishing: Boolean,
