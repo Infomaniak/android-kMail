@@ -299,7 +299,7 @@
                         app:placeholderTextColor="@color/tertiaryTextColor">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/bodyText"
+                            android:id="@+id/bodyTextField"
                             style="@style/Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
