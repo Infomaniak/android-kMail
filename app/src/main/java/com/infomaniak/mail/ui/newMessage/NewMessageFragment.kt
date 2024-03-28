@@ -52,6 +52,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -61,15 +62,13 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -88,6 +87,10 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private var shouldInitToField = true
+    private var shouldInitCcField = true
+    private var shouldInitBccField = true
 
     private var addressListPopupWindow: ListPopupWindow? = null
 
@@ -154,6 +157,7 @@ class NewMessageFragment : Fragment() {
 
         observeInitResult()
         observeFromData()
+        observeRecipients()
         observeAttachments()
         observeImportAttachmentsResult()
         observeSubject()
@@ -265,9 +269,9 @@ class NewMessageFragment : Fragment() {
 
     private fun initializeDraft() = with(newMessageViewModel) {
         if (initResult.value == null) {
-            initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { isSuccess ->
+            initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { (isSuccess, isToFieldEmpty) ->
                 if (isSuccess) {
-                    showKeyboardInCorrectView()
+                    showKeyboardInCorrectView(isToFieldEmpty)
                 } else {
                     requireActivity().apply {
                         showToast(R.string.failToOpenDraft)
@@ -293,23 +297,16 @@ class NewMessageFragment : Fragment() {
         bccField.hideLoader()
     }
 
-    private fun showKeyboardInCorrectView() = with(recipientFieldsManager) {
+    private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean) = with(recipientFieldsManager) {
         when (newMessageViewModel.draftMode()) {
             DraftMode.REPLY,
             DraftMode.REPLY_ALL -> focusBodyField()
             DraftMode.FORWARD -> focusToField()
-            DraftMode.NEW_MAIL -> {
-                if (newMessageViewModel.recipient() == null && newMessageViewModel.draftInRAM.to.isEmpty()) {
-                    focusToField()
-                } else {
-                    focusBodyField()
-                }
-            }
+            DraftMode.NEW_MAIL -> if (isToFieldEmpty) focusToField() else focusBodyField()
         }
     }
 
     private fun configureUiWithDraftData(draft: Draft) = with(binding) {
-        recipientFieldsManager.initRecipients(draft)
 
         // Signature
         signatureWebView.apply {
@@ -415,6 +412,45 @@ class NewMessageFragment : Fragment() {
             }
 
             signatureAdapter.updateSelectedSignature(signature.id)
+        }
+    }
+
+    private fun observeRecipients() = with(newMessageViewModel) {
+
+        fun updateOtherFieldsAreAllEmpty(cc: List<Recipient>, bcc: List<Recipient>) {
+            if (cc.isEmpty() && bcc.isEmpty()) otherFieldsAreAllEmpty.value = true
+        }
+
+        toLiveData.observe(viewLifecycleOwner) {
+
+            if (shouldInitToField) {
+                shouldInitToField = false
+                binding.toField.initRecipients(it.recipients, it.otherFieldsAreEmpty)
+            }
+
+            updateIsSendingAllowed(type = FieldType.TO, recipients = it.recipients)
+        }
+
+        ccLiveData.observe(viewLifecycleOwner) {
+
+            if (shouldInitCcField) {
+                shouldInitCcField = false
+                binding.ccField.initRecipients(it.recipients)
+            }
+
+            updateIsSendingAllowed(type = FieldType.CC, recipients = it.recipients)
+            updateOtherFieldsAreAllEmpty(cc = it.recipients, bcc = bccLiveData.valueOrEmpty())
+        }
+
+        bccLiveData.observe(viewLifecycleOwner) {
+
+            if (shouldInitBccField) {
+                shouldInitBccField = false
+                binding.bccField.initRecipients(it.recipients)
+            }
+
+            updateIsSendingAllowed(type = FieldType.BCC, recipients = it.recipients)
+            updateOtherFieldsAreAllEmpty(cc = ccLiveData.valueOrEmpty(), bcc = it.recipients)
         }
     }
 
