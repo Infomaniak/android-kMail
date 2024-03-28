@@ -102,6 +102,7 @@ class NewMessageViewModel @Inject constructor(
     //region UI data
     val subjectLiveData = MutableLiveData<String?>()
     val uiBodyLiveData = MutableLiveData<String>()
+    val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
 
@@ -335,6 +336,7 @@ class NewMessageViewModel @Inject constructor(
         subjectLiveData.postValue(subject)
         uiBodyLiveData.postValue(uiBody)
 
+        uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
@@ -665,7 +667,7 @@ class NewMessageViewModel @Inject constructor(
         subject = subjectLiveData.value?.take(SUBJECT_MAX_LENGTH)
 
         uiBody = uiBodyLiveData.value ?: ""
-        uiSignature = draftInRAM.uiSignature
+        uiSignature = uiSignatureLiveData.value
         uiQuote = uiQuoteLiveData.value
 
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
