@@ -453,10 +453,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeInitResult() {
-        newMessageViewModel.initResult.observe(viewLifecycleOwner) {
+        newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
             hideLoader()
-            configureUiWithDraftData(it.draft)
-            setupFromField(it.signatures)
+            configureUiWithDraftData(draft)
+            setupFromField(signatures)
             editorManager.setupEditorActions()
             editorManager.setupEditorFormatActionsToggle()
         }
