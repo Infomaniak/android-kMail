@@ -188,13 +188,8 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox, realm)
 
             realm.writeBlocking { draftController.upsertDraft(draft, realm = this) }
-            draft.moveDataFromDraftToLiveData()
             draft.saveDraftSnapshot()
-
-            if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
-                otherFieldsAreAllEmpty.postValue(false)
-                initializeFieldsAsOpen.postValue(true)
-            }
+            draft.moveDataFromDraftToLiveData()
 
             draftInRAM = draft
 
@@ -314,11 +309,6 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.moveDataFromDraftToLiveData() {
-
-        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
-    }
-
     private fun Draft.saveDraftSnapshot() {
         snapshot = DraftSnapshot(
             identityId = identityId,
@@ -329,6 +319,16 @@ class NewMessageViewModel @Inject constructor(
             body = uiBody,
             attachmentsUuids = attachments.map { it.uuid }.toSet(),
         )
+    }
+
+    private fun Draft.moveDataFromDraftToLiveData() {
+
+        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
+
+        if (cc.isNotEmpty() || bcc.isNotEmpty()) {
+            otherFieldsAreAllEmpty.postValue(false)
+            initializeFieldsAsOpen.postValue(true)
+        }
     }
     //endregion
 
