@@ -99,7 +99,7 @@ class MainViewModel @Inject constructor(
     private var refreshEverythingJob: Job? = null
 
     // First boolean is the download status, second boolean is if the LoadMore button should be displayed
-    val isDownloadingChanges: MutableLiveData<Pair<Boolean, Boolean?>> = MutableLiveData(false to null)
+    val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isInternetAvailable = MutableLiveData<Boolean>()
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
@@ -396,7 +396,7 @@ class MainViewModel @Inject constructor(
 
     fun getOnePageOfOldMessages() = viewModelScope.launch(ioCoroutineContext) {
 
-        if (isDownloadingChanges.value?.first == true) return@launch
+        if (isDownloadingChanges.value == true) return@launch
 
         refreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
@@ -916,16 +916,11 @@ class MainViewModel @Inject constructor(
     }
 
     private fun onDownloadStart() {
-        isDownloadingChanges.postValue(true to null)
+        isDownloadingChanges.postValue(true)
     }
 
     private fun onDownloadStop() {
-
-        val shouldDisplayLoadMore = currentFolderId?.let(folderController::getFolder)
-            ?.let { it.cursor != null && !it.isHistoryComplete }
-            ?: false
-
-        isDownloadingChanges.postValue(false to shouldDisplayLoadMore)
+        isDownloadingChanges.postValue(false)
     }
 
     private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(threadController::getThread)
