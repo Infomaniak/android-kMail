@@ -34,7 +34,7 @@ import com.infomaniak.mail.utils.extensions.standardize
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
-    private val usedContacts: MutableSet<String>,
+    private val usedEmails: MutableSet<String>,
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
     private val snackbarManager: SnackbarManager,
@@ -68,7 +68,7 @@ class ContactAdapter(
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
         }
 
-        val isAlreadyUsed = usedContacts.contains(contact.email.standardize())
+        val isAlreadyUsed = usedEmails.contains(contact.email.standardize())
         if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) }
         greyedOutState.isVisible = isAlreadyUsed
         root.isEnabled = !isAlreadyUsed
@@ -78,7 +78,7 @@ class ContactAdapter(
         contactDetails.setAutocompleteUnknownContact(searchQuery)
         root.setOnClickListener {
             context.trackNewMessageEvent("addNewRecipient")
-            if (usedContacts.contains(searchQuery)) {
+            if (usedEmails.contains(searchQuery)) {
                 snackbarManager.setValue(context.getString(R.string.addUnknownRecipientAlreadyUsed))
             } else {
                 onAddUnrecognizedContact()
@@ -113,7 +113,7 @@ class ContactAdapter(
                 val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
                 val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
 
-                val displayNewContact = (matches && searchTerm == standardizedEmail && !usedContacts.contains(searchTerm))
+                val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
                 if (displayNewContact) displayAddUnknownContactButton = false
 
                 if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
@@ -134,7 +134,7 @@ class ContactAdapter(
     }
 
     fun removeUsedEmail(email: String): Boolean {
-        return usedContacts.remove(email.standardize()).also { isSuccess ->
+        return usedEmails.remove(email.standardize()).also { isSuccess ->
             if (isSuccess) {
                 matchedContacts.forEachIndexed { index, matchedContact ->
                     if (matchedContact.contact.email == email) notifyItemChanged(index)
@@ -143,7 +143,7 @@ class ContactAdapter(
         }
     }
 
-    fun addUsedContact(email: String) = usedContacts.add(email.standardize())
+    fun addUsedContact(email: String) = usedEmails.add(email.standardize())
 
     fun updateContacts(allContacts: List<MergedContact>) {
         this.allContacts = allContacts
