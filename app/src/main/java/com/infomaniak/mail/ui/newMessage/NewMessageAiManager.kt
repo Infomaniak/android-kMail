@@ -90,15 +90,8 @@ class NewMessageAiManager @Inject constructor(
     }
 
     fun observeEverything() {
-        observeAiOutput()
         observeAiPromptStatus()
         observeAiFeatureFlagUpdates()
-    }
-
-    private fun observeAiOutput() = with(binding) {
-        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
-            bodyText.setText(content)
-        }
     }
 
     private fun observeAiPromptStatus() {
@@ -229,6 +222,7 @@ class NewMessageAiManager @Inject constructor(
         fragment.safeNavigate(
             NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
                 isSubjectBlank = fragment.formatSubject() == null,
+                isBodyBlank = binding.bodyTextField.text?.isBlank() == true,
             ),
         )
     }
