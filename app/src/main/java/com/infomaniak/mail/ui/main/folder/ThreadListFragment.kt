@@ -73,6 +73,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
+import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
@@ -82,6 +83,7 @@ import io.sentry.SentryLevel
 import java.util.Date
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.lib.core.utils.Utils as UtilsCore
 
 @AndroidEntryPoint
 class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -97,7 +99,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
 
-    private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
+    private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private var isFirstTimeRefreshingThreads = true
 
@@ -159,6 +161,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeUpdatedAtTriggers()
         observeFlushFolderTrigger()
         observeUpdateInstall()
+        observeLoadMoreTriggers()
     }.getOrDefault(Unit)
 
     @ColorRes
@@ -269,7 +272,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     override fun onRefresh() {
-        if (mainViewModel.isDownloadingChanges.value?.first == true) return
+        if (mainViewModel.isDownloadingChanges.value == true) return
         mainViewModel.forceRefreshThreads()
     }
 
@@ -517,7 +520,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 trackThreadListEvent("unreadFilter")
                 isCloseIconVisible = isChecked
                 mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
-                threadListAdapter.updateLoadMore(shouldDisplayLoadMore = !isChecked)
             }
         }
     }
@@ -547,13 +549,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             deletedItemsIndices = ::removeMultiSelectItems
 
             afterUpdateAdapter = { threads ->
-                if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) {
-                    currentFilter.value = ThreadFilter.ALL
-                }
-                if (hasSwitchedToAnotherFolder()) {
-                    threadListAdapter.updateLoadMore(shouldDisplayLoadMore = false)
-                    scrollToTop()
-                }
+                if (currentFilter.value == ThreadFilter.UNSEEN && threads.isEmpty()) currentFilter.value = ThreadFilter.ALL
+                if (hasSwitchedToAnotherFolder()) scrollToTop()
             }
         }
     }
@@ -561,15 +558,12 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private fun observeDownloadState() {
         mainViewModel.isDownloadingChanges
             .distinctUntilChanged()
-            .observe(viewLifecycleOwner) { (isDownloading, shouldDisplayLoadMore) ->
+            .observe(viewLifecycleOwner) { isDownloading ->
                 if (isDownloading) {
                     showLoadingTimer.start()
                 } else {
                     showLoadingTimer.cancel()
                     binding.swipeRefreshLayout.isRefreshing = false
-                    if (mainViewModel.currentFilter.value == ThreadFilter.ALL) {
-                        shouldDisplayLoadMore?.let(threadListAdapter::updateLoadMore)
-                    }
                 }
             }
     }
@@ -618,6 +612,16 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { isUpdateDownloaded ->
             installUpdateGroup.isVisible = isUpdateDownloaded
             installUpdate.setOnClickListener { inAppUpdateManager.installDownloadedUpdate() }
+        }
+    }
+
+    private fun observeLoadMoreTriggers() = with(mainViewModel) {
+        Utils.waitInitMediator(currentFilter, currentFolderLive).observe(viewLifecycleOwner) { (filter, folder) ->
+            val shouldDisplayLoadMore = filter == ThreadFilter.ALL
+                    && folder.cursor != null
+                    && !folder.isHistoryComplete
+                    && folder.threads.isNotEmpty()
+            threadListAdapter.updateLoadMore(shouldDisplayLoadMore)
         }
     }
 
