@@ -113,7 +113,7 @@ class NewMessageViewModel @Inject constructor(
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
-    val initResult = MutableLiveData<Pair<Draft, List<Signature>>>()
+    val initResult = MutableLiveData<InitResult>()
 
     val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -149,6 +149,7 @@ class NewMessageViewModel @Inject constructor(
         inline get() = savedStateHandle.get<Boolean>(NewMessageActivityArgs::shouldLoadDistantResources.name) ?: false
 
     fun arrivedFromExistingDraft() = arrivedFromExistingDraft
+    fun draftLocalUuid() = draftLocalUuid
     fun draftMode() = draftMode
     fun recipient() = recipient
     fun shouldLoadDistantResources() = shouldLoadDistantResources
@@ -158,53 +159,50 @@ class NewMessageViewModel @Inject constructor(
         val realm = mailboxContentRealm()
         var signatures = emptyList<Signature>()
 
-        val isSuccess = runCatching {
+        val draft = runCatching {
 
             signatures = SignatureController.getAllSignatures(realm)
-            if (signatures.isEmpty()) return@runCatching false
+            if (signatures.isEmpty()) return@runCatching null
 
             val draftExists = arrivedFromExistingDraft || draftLocalUuid != null
 
-            draftInRAM = if (draftExists) {
-                getExistingDraft(realm) ?: return@runCatching false
+            val newDraft = if (draftExists) {
+                getExistingDraft(draftLocalUuid, realm) ?: return@runCatching null
             } else {
-                getNewDraft(signatures, realm) ?: return@runCatching false
+                getNewDraft(signatures, realm) ?: return@runCatching null
             }
 
-            if (draftInRAM.body.isNotEmpty()) splitSignatureAndQuoteFromBody(draftInRAM)
-            if (!draftExists) populateWithExternalMailDataIfNeeded(draftInRAM, intent)
-            draftInRAM.flagRecipientsAsAutomaticallyEntered()
+            if (newDraft.body.isNotEmpty()) splitSignatureAndQuoteFromBody(newDraft)
+            if (!draftExists) populateWithExternalMailDataIfNeeded(newDraft, intent)
+            newDraft.flagRecipientsAsAutomaticallyEntered()
 
-            true
+            return@runCatching newDraft
         }.getOrElse {
             Sentry.captureException(it)
-            false
+            return@getOrElse null
         }
 
-        if (isSuccess) {
+        if (draft != null) {
 
             dismissNotification()
             markAsRead(currentMailbox, realm)
 
-            realm.writeBlocking { draftController.upsertDraft(draftInRAM, realm = this) }
-            draftInRAM.saveDraftSnapshot()
-            saveDraftInitState(draftInRAM.localUuid)
+            realm.writeBlocking { draftController.upsertDraft(draft, realm = this) }
+            draft.saveDraftSnapshot()
+            draft.moveDataFromDraftToLiveData()
 
-            if (draftInRAM.cc.isNotEmpty() || draftInRAM.bcc.isNotEmpty()) {
-                otherFieldsAreAllEmpty.postValue(false)
-                initializeFieldsAsOpen.postValue(true)
-            }
+            draftInRAM = draft
 
-            initResult.postValue(draftInRAM to signatures)
+            initResult.postValue(InitResult(draft, signatures))
         }
 
+        val isSuccess = draft != null
         emit(isSuccess)
     }
 
     //region Initialization: 1st level of private fun
-    private fun getExistingDraft(realm: Realm): Draft? {
-        val uuid = draftLocalUuid ?: draftInRAM.localUuid
-        return getLocalOrRemoteDraft(uuid)?.also {
+    private fun getExistingDraft(localUuid: String?, realm: Realm): Draft? {
+        return getLocalOrRemoteDraft(localUuid)?.also {
             if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm)
         }
     }
@@ -323,13 +321,19 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun saveDraftInitState(localUuid: String) {
+    private fun Draft.moveDataFromDraftToLiveData() {
+
         savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
+
+        if (cc.isNotEmpty() || bcc.isNotEmpty()) {
+            otherFieldsAreAllEmpty.postValue(false)
+            initializeFieldsAsOpen.postValue(true)
+        }
     }
     //endregion
 
     //region Initialization: 2nd level of private fun
-    private fun getLocalOrRemoteDraft(localUuid: String): Draft? {
+    private fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
 
         fun trackOpenLocal(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
             context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
@@ -609,19 +613,6 @@ class NewMessageViewModel @Inject constructor(
         importAttachments(uris, draftInRAM)
     }
 
-    fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(ioCoroutineContext) {
-        if (draftInRAM.remoteUuid == null) {
-            draftController.getDraft(draftInRAM.localUuid)?.let { localDraft ->
-                draftInRAM.remoteUuid = localDraft.remoteUuid
-                draftInRAM.messageUid = localDraft.messageUid
-            }
-        }
-    }
-
-    fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioCoroutineContext) {
-        draftController.getDraft(draftInRAM.localUuid)?.let { draftInRAM = it.copyFromRealm() }
-    }
-
     fun executeDraftActionWhenStopping(
         action: DraftAction,
         isFinishing: Boolean,
@@ -629,14 +620,18 @@ class NewMessageViewModel @Inject constructor(
         startWorkerCallback: () -> Unit,
     ) = globalCoroutineScope.launch(ioDispatcher) {
 
-        if (isFinishing && isSavingDraftWithoutChanges(draftInRAM, action)) {
-            if (!arrivedFromExistingDraft) removeDraftFromRealm(draftInRAM.localUuid)
+        val draft = getLatestLocalDraft(draftLocalUuid) ?: return@launch
+
+        draft.updateDraft(action)
+
+        if (!arrivedFromExistingDraft && isFinishing && isSavingDraftWithoutChanges(draft, action)) {
+            removeDraftFromRealm(draft.localUuid)
             return@launch
         }
 
-        context.trackSendingDraftEvent(action, draftInRAM, currentMailbox.externalMailFlagEnabled)
+        context.trackSendingDraftEvent(action, draft, currentMailbox.externalMailFlagEnabled)
 
-        draftInRAM.saveDraftToLocal(action)
+        saveDraftToLocal(draft)
 
         if (isFinishing) {
             if (isTaskRoot) showDraftToastToUser(action)
@@ -645,8 +640,31 @@ class NewMessageViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        LocalStorageUtils.deleteDraftUploadDir(context, draftInRAM.localUuid)
+        draftLocalUuid?.let { LocalStorageUtils.deleteDraftUploadDir(context, draftLocalUuid = it) }
         super.onCleared()
+    }
+
+    private fun Draft.updateDraft(draftAction: DraftAction) {
+
+        action = draftAction
+        identityId = draftInRAM.identityId
+
+        to = draftInRAM.to
+        cc = draftInRAM.cc
+        bcc = draftInRAM.bcc
+
+        attachments.apply {
+            clear()
+            addAll(draftInRAM.attachments)
+        }
+
+        subject = draftInRAM.subject?.take(SUBJECT_MAX_LENGTH)
+
+        uiBody = draftInRAM.uiBody
+        uiSignature = draftInRAM.uiSignature
+        uiQuote = draftInRAM.uiQuote
+
+        body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
     }
 
     private fun isSavingDraftWithoutChanges(draft: Draft, action: DraftAction): Boolean {
@@ -669,16 +687,11 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun Draft.saveDraftToLocal(draftAction: DraftAction) {
+    private fun saveDraftToLocal(draft: Draft) {
         SentryLog.d("Draft", "Save Draft to local")
-
-        subject = subject?.take(SUBJECT_MAX_LENGTH)
-        body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
-        action = draftAction
-
         mailboxContentRealm().writeBlocking {
-            draftController.upsertDraft(draft = this@saveDraftToLocal, realm = this)
-            messageUid?.let { MessageController.getMessage(uid = it, realm = this)?.draftLocalUuid = localUuid }
+            draftController.upsertDraft(draft, realm = this)
+            messageUid?.let { MessageController.getMessage(uid = it, realm = this)?.draftLocalUuid = draft.localUuid }
         }
     }
 
@@ -704,6 +717,11 @@ class NewMessageViewModel @Inject constructor(
 
         fun strictlyGreaterThan(other: SignatureScore): Boolean = weight > other.weight
     }
+
+    data class InitResult(
+        val draft: Draft,
+        val signatures: List<Signature>,
+    )
 
     private data class DraftSnapshot(
         val identityId: String?,
