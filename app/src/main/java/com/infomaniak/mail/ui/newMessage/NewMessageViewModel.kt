@@ -97,7 +97,7 @@ class NewMessageViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    var draft: Draft = Draft()
+    var draftInRAM: Draft = Draft()
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
@@ -114,7 +114,7 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     // Needs to trigger every time the Fragment is recreated
-    val initResult = MutableLiveData<List<Signature>>()
+    val initResult = MutableLiveData<Pair<Draft, List<Signature>>>()
 
     val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -166,15 +166,15 @@ class NewMessageViewModel @Inject constructor(
             signatures = SignatureController.getAllSignatures(realm)
             if (signatures.isEmpty()) return@runCatching false
 
-            draft = if (draftExists) {
+            draftInRAM = if (draftExists) {
                 getExistingDraft(realm) ?: return@runCatching false
             } else {
                 getNewDraft(signatures, realm) ?: return@runCatching false
             }
 
-            if (draft.body.isNotEmpty()) splitSignatureAndQuoteFromBody()
+            if (draftInRAM.body.isNotEmpty()) draftInRAM.splitSignatureAndQuoteFromBody()
 
-            if (!draftExists) populateWithExternalMailDataIfNeeded(intent)
+            if (!draftExists) draftInRAM.populateWithExternalMailDataIfNeeded(intent)
 
             true
         }.getOrElse {
@@ -185,29 +185,29 @@ class NewMessageViewModel @Inject constructor(
         if (isSuccess) {
             dismissNotification()
             markAsRead(currentMailbox, realm)
-            flagRecipientsAsAutomaticallyEntered()
+            draftInRAM.flagRecipientsAsAutomaticallyEntered()
 
-            realm.writeBlocking { draftController.upsertDraft(draft, realm = this) }
+            realm.writeBlocking { draftController.upsertDraft(draftInRAM, realm = this) }
 
-            saveDraftSnapshot()
-            saveDraftInitState()
+            draftInRAM.saveDraftSnapshot()
+            saveDraftInitState(draftInRAM.localUuid)
 
-            if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
+            if (draftInRAM.cc.isNotEmpty() || draftInRAM.bcc.isNotEmpty()) {
                 otherFieldsAreAllEmpty.postValue(false)
                 initializeFieldsAsOpen.postValue(true)
             }
 
-            initResult.postValue(signatures)
+            initResult.postValue(draftInRAM to signatures)
         }
 
         emit(isSuccess)
     }
 
-    private fun saveDraftInitState() {
-        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = draft.localUuid
+    private fun saveDraftInitState(localUuid: String) {
+        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
     }
 
-    private fun flagRecipientsAsAutomaticallyEntered() = with(draft) {
+    private fun Draft.flagRecipientsAsAutomaticallyEntered() {
         to.flagRecipientsAsAutomaticallyEntered()
         cc.flagRecipientsAsAutomaticallyEntered()
         bcc.flagRecipientsAsAutomaticallyEntered()
@@ -220,7 +220,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun getExistingDraft(realm: Realm): Draft? {
-        val uuid = draftLocalUuid ?: draft.localUuid
+        val uuid = draftLocalUuid ?: draftInRAM.localUuid
         return getLocalOrRemoteDraft(uuid)?.also {
             if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm)
         }
@@ -242,10 +242,10 @@ class NewMessageViewModel @Inject constructor(
         return getLatestLocalDraft(uuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
     }
 
-    private fun populateWithExternalMailDataIfNeeded(intent: Intent) {
+    private fun Draft.populateWithExternalMailDataIfNeeded(intent: Intent) {
         when (intent.action) {
-            Intent.ACTION_SEND -> handleSingleSendIntent(intent)
-            Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent(intent)
+            Intent.ACTION_SEND -> handleSingleSendIntent(draft = this, intent)
+            Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent(draft = this, intent)
             Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo(intent.data, intent)
         }
 
@@ -256,7 +256,7 @@ class NewMessageViewModel @Inject constructor(
      * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
-    private fun handleMailTo(uri: Uri?, intent: Intent? = null) {
+    private fun Draft.handleMailTo(uri: Uri?, intent: Intent? = null) {
 
         /**
          * Mailto grammar accept 'name_of_recipient<email>' for recipients
@@ -284,17 +284,15 @@ class NewMessageViewModel @Inject constructor(
             ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
             ?: emptyList()
 
-        with(draft) {
-            to.addAll(splitTo)
-            cc.addAll(splitCc)
-            bcc.addAll(splitBcc)
+        to.addAll(splitTo)
+        cc.addAll(splitCc)
+        bcc.addAll(splitBcc)
 
-            subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
-        }
+        subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+        uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
     }
 
-    private fun handleSingleSendIntent(intent: Intent) = with(intent) {
+    private fun handleSingleSendIntent(draft: Draft, intent: Intent) = with(intent) {
 
         if (hasExtra(Intent.EXTRA_TEXT)) {
             getStringExtra(Intent.EXTRA_SUBJECT)?.let { draft.subject = it }
@@ -303,13 +301,16 @@ class NewMessageViewModel @Inject constructor(
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
             (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
-                importAttachments(listOf(uri))
+                importAttachments(draft, listOf(uri))
             }
         }
     }
 
-    private fun handleMultipleSendIntent(intent: Intent) {
-        intent.parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.filterIsInstance<Uri>()?.let(::importAttachments)
+    private fun handleMultipleSendIntent(draft: Draft, intent: Intent) {
+        intent
+            .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
+            ?.filterIsInstance<Uri>()
+            ?.let { importAttachments(draft, uris = it) }
     }
 
     /**
@@ -364,7 +365,7 @@ class NewMessageViewModel @Inject constructor(
 
                         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
                         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!, fullMessage.uid)
-                        if (shouldPreselectSignature) preSelectSignature(newDraft = this, previousMessage, signatures)
+                        if (shouldPreselectSignature) preSelectSignature(previousMessage, signatures)
                     }
             }
         }
@@ -385,7 +386,7 @@ class NewMessageViewModel @Inject constructor(
         else -> value
     }
 
-    private fun preSelectSignature(newDraft: Draft, message: Message, signatures: List<Signature>) = with(newDraft) {
+    private fun Draft.preSelectSignature(message: Message, signatures: List<Signature>) {
         val mostFittingSignature = guessMostFittingSignature(message, signatures)
         identityId = mostFittingSignature.id.toString()
         body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
@@ -469,7 +470,7 @@ class NewMessageViewModel @Inject constructor(
         return score
     }
 
-    private fun splitSignatureAndQuoteFromBody() {
+    private fun Draft.splitSignatureAndQuoteFromBody() {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
             return getElementsByClass(divClassName).firstOrNull()?.let {
@@ -485,26 +486,24 @@ class NewMessageViewModel @Inject constructor(
             return if (index == -1) Int.MAX_VALUE else index
         }
 
-        val doc = Jsoup.parse(draft.body).also { it.outputSettings().prettyPrint(false) }
+        val doc = Jsoup.parse(body).also { it.outputSettings().prettyPrint(false) }
 
-        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
+        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, body)
 
-        val replyPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val replyPosition = body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val forwardPosition = body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
         val (body, quote) = if (replyPosition < forwardPosition) {
             doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         } else {
             doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        draft.apply {
-            uiBody = body.htmlToText()
-            uiSignature = signature
-            uiQuote = quote
-        }
+        uiBody = body.htmlToText()
+        uiSignature = signature
+        uiQuote = quote
     }
 
-    private fun saveDraftSnapshot() = with(draft) {
+    private fun Draft.saveDraftSnapshot() {
         snapshot = DraftSnapshot(
             identityId,
             to.toSet(),
@@ -519,15 +518,15 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(ioCoroutineContext) {
-        if (draft.remoteUuid == null) {
-            draftController.getDraft(draft.localUuid)?.let { localDraft ->
-                draft.remoteUuid = localDraft.remoteUuid
-                draft.messageUid = localDraft.messageUid
+        if (draftInRAM.remoteUuid == null) {
+            draftController.getDraft(draftInRAM.localUuid)?.let { localDraft ->
+                draftInRAM.remoteUuid = localDraft.remoteUuid
+                draftInRAM.messageUid = localDraft.messageUid
             }
         }
     }
 
-    fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draft) {
+    fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draftInRAM) {
 
         if (type == FieldType.CC || type == FieldType.BCC) otherFieldsAreAllEmpty.value = false
 
@@ -541,7 +540,7 @@ class NewMessageViewModel @Inject constructor(
         updateIsSendingAllowed()
     }
 
-    fun removeRecipientFromField(recipient: Recipient, type: FieldType) = with(draft) {
+    fun removeRecipientFromField(recipient: Recipient, type: FieldType) = with(draftInRAM) {
 
         val field = when (type) {
             FieldType.TO -> to
@@ -558,11 +557,11 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.displayAsExternal) context.trackExternalEvent("deleteRecipient")
     }
 
-    fun updateMailSubject(newSubject: String?) = with(draft) {
+    fun updateMailSubject(newSubject: String?) = with(draftInRAM) {
         if (newSubject != subject) subject = newSubject
     }
 
-    fun updateMailBody(newBody: String) = with(draft) {
+    fun updateMailBody(newBody: String) = with(draftInRAM) {
         if (newBody != uiBody) uiBody = newBody
     }
 
@@ -573,14 +572,14 @@ class NewMessageViewModel @Inject constructor(
         startWorkerCallback: () -> Unit,
     ) = globalCoroutineScope.launch(ioDispatcher) {
 
-        if (isFinishing && isSavingDraftWithoutChanges(action)) {
-            if (!arrivedFromExistingDraft) removeDraftFromRealm()
+        if (isFinishing && isSavingDraftWithoutChanges(draftInRAM, action)) {
+            if (!arrivedFromExistingDraft) removeDraftFromRealm(draftInRAM.localUuid)
             return@launch
         }
 
-        context.trackSendingDraftEvent(action, draft, currentMailbox.externalMailFlagEnabled)
+        context.trackSendingDraftEvent(action, draftInRAM, currentMailbox.externalMailFlagEnabled)
 
-        saveDraftToLocal(action)
+        draftInRAM.saveDraftToLocal(action)
 
         if (isFinishing) {
             if (isTaskRoot) showDraftToastToUser(action)
@@ -596,17 +595,17 @@ class NewMessageViewModel @Inject constructor(
         context.showToast(resId)
     }
 
-    private fun removeDraftFromRealm() {
+    private fun removeDraftFromRealm(localUuid: String) {
         mailboxContentRealm().writeBlocking {
-            DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+            DraftController.getDraft(localUuid, realm = this)?.let(::delete)
         }
     }
 
     fun synchronizeViewModelDraftFromRealm() = viewModelScope.launch(ioCoroutineContext) {
-        draftController.getDraft(draft.localUuid)?.let { draft = it.copyFromRealm() }
+        draftController.getDraft(draftInRAM.localUuid)?.let { draftInRAM = it.copyFromRealm() }
     }
 
-    private fun saveDraftToLocal(draftAction: DraftAction) = with(draft) {
+    private fun Draft.saveDraftToLocal(draftAction: DraftAction) {
         SentryLog.d("Draft", "Save Draft to local")
 
         subject = subject?.take(SUBJECT_MAX_LENGTH)
@@ -614,18 +613,20 @@ class NewMessageViewModel @Inject constructor(
         action = draftAction
 
         mailboxContentRealm().writeBlocking {
-            draftController.upsertDraft(draft, realm = this)
+            draftController.upsertDraft(draft = this@saveDraftToLocal, realm = this)
             messageUid?.let { MessageController.getMessage(uid = it, realm = this)?.draftLocalUuid = localUuid }
         }
     }
 
-    private fun isSavingDraftWithoutChanges(action: DraftAction) = action == DraftAction.SAVE && snapshot?.hasChanges() != true
+    private fun isSavingDraftWithoutChanges(draft: Draft, action: DraftAction): Boolean {
+        return action == DraftAction.SAVE && snapshot?.hasChanges(draft) != true
+    }
 
     fun updateIsSendingAllowed() {
-        isSendingAllowed.value = if (draft.hasRecipient()) {
+        isSendingAllowed.value = if (draftInRAM.hasRecipient()) {
             var size = 0L
             var isSizeCorrect = true
-            for (attachment in draft.attachments) {
+            for (attachment in draftInRAM.attachments) {
                 size += attachment.size
                 if (size > ATTACHMENTS_MAX_SIZE) {
                     isSizeCorrect = false
@@ -639,10 +640,10 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
-        importAttachments(uris)
+        importAttachments(draftInRAM, uris)
     }
 
-    private fun importAttachments(uris: List<Uri>) = viewModelScope.launch(ioCoroutineContext) {
+    private fun importAttachments(draft: Draft, uris: List<Uri>) = viewModelScope.launch(ioCoroutineContext) {
 
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = draft.attachments.sumOf { it.size }
@@ -650,7 +651,7 @@ class NewMessageViewModel @Inject constructor(
 
         uris.forEach { uri ->
             val availableSpace = ATTACHMENTS_MAX_SIZE - attachmentsSize
-            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace) ?: return@forEach
+            val (attachment, hasSizeLimitBeenReached) = importAttachment(draft.localUuid, uri, availableSpace) ?: return@forEach
 
             if (hasSizeLimitBeenReached) result = ImportationResult.FILE_SIZE_TOO_BIG
 
@@ -663,12 +664,12 @@ class NewMessageViewModel @Inject constructor(
         importedAttachments.postValue(newAttachments to result)
     }
 
-    private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
+    private fun importAttachment(localUuid: String, uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
 
         val (fileName, fileSize) = context.getFileNameAndSize(uri) ?: return null
         val attachment = Attachment()
 
-        return LocalStorageUtils.saveAttachmentToUploadDir(context, uri, fileName, draft.localUuid, attachment.localUuid)
+        return LocalStorageUtils.saveAttachmentToUploadDir(context, uri, fileName, localUuid, attachment.localUuid)
             ?.let { file ->
                 Pair(
                     attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
@@ -678,7 +679,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        LocalStorageUtils.deleteDraftUploadDir(context, draft.localUuid)
+        LocalStorageUtils.deleteDraftUploadDir(context, draftInRAM.localUuid)
         super.onCleared()
     }
 
@@ -709,7 +710,7 @@ class NewMessageViewModel @Inject constructor(
         val attachmentsUuids: Set<String>,
     )
 
-    private fun DraftSnapshot.hasChanges(): Boolean {
+    private fun DraftSnapshot.hasChanges(draft: Draft): Boolean {
         return identityId != draft.identityId ||
                 to != draft.to.toSet() ||
                 cc != draft.cc.toSet() ||
@@ -722,7 +723,6 @@ class NewMessageViewModel @Inject constructor(
     }
 
     companion object {
-        private const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 1_000L
         private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998
     }
