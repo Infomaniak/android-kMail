@@ -188,7 +188,7 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox, realm)
 
             realm.writeBlocking { draftController.upsertDraft(draft, realm = this) }
-            moveDataFromDraftToLiveData(draft)
+            draft.moveDataFromDraftToLiveData()
             draft.saveDraftSnapshot()
 
             if (draft.cc.isNotEmpty() || draft.bcc.isNotEmpty()) {
@@ -314,9 +314,9 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun moveDataFromDraftToLiveData(draft: Draft) {
+    private fun Draft.moveDataFromDraftToLiveData() {
 
-        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = draft.localUuid
+        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
     }
 
     private fun Draft.saveDraftSnapshot() {
