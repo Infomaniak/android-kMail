@@ -511,8 +511,6 @@ class NewMessageViewModel @Inject constructor(
             bcc.toSet(),
             subject,
             uiBody,
-            uiSignature,
-            uiQuote,
             attachments.map { it.uuid }.toSet(),
         )
     }
@@ -705,8 +703,6 @@ class NewMessageViewModel @Inject constructor(
         val bcc: Set<Recipient>,
         var subject: String?,
         var body: String,
-        var signature: String?,
-        var quote: String?,
         val attachmentsUuids: Set<String>,
     )
 
@@ -717,8 +713,6 @@ class NewMessageViewModel @Inject constructor(
                 bcc != draft.bcc.toSet() ||
                 subject != draft.subject ||
                 body != draft.uiBody ||
-                signature != draft.uiSignature ||
-                quote != draft.uiQuote ||
                 attachmentsUuids != draft.attachments.map { it.uuid }.toSet()
     }
 
