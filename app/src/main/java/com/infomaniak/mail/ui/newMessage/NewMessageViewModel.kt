@@ -176,10 +176,10 @@ class NewMessageViewModel @Inject constructor(
             if (!draftExists) populateWithExternalMailDataIfNeeded(newDraft, intent)
             newDraft.flagRecipientsAsAutomaticallyEntered()
 
-            newDraft
+            return@runCatching newDraft
         }.getOrElse {
             Sentry.captureException(it)
-            null
+            return@getOrElse null
         }
 
         if (draft != null) {
