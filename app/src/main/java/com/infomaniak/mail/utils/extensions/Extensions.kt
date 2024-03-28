@@ -277,6 +277,8 @@ fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems:
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
 }
+
+fun <T> LiveData<List<T>>.valueOrEmpty(): List<T> = value ?: emptyList()
 //endregion
 
 //region Folders
