@@ -85,7 +85,7 @@ object MatomoMail : MatomoCore {
                 var externalRecipientCount = 0
                 listOf(draft.to, draft.cc, draft.bcc).forEach { field ->
                     field.forEach { recipient ->
-                        externalRecipientCount += if (recipient.displayAsExternal) 1 else 0
+                        externalRecipientCount += if (recipient.isDisplayedAsExternal) 1 else 0
                     }
                 }
 
