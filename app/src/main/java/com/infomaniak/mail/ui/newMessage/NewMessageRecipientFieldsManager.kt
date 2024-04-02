@@ -54,12 +54,6 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         _externalsManager = externalsManager
     }
 
-    fun observeEverything() {
-        setOnFocusChangedListeners()
-        observeContacts()
-        observeCcAndBccVisibility()
-    }
-
     fun setupAutoCompletionFields() = with(binding) {
         toField.initRecipientField(
             autoComplete = autoCompleteTo,
@@ -124,12 +118,12 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         bcc.isGone = isCollapsed
     }
 
-    private fun observeCcAndBccVisibility() = with(newMessageViewModel) {
+    fun observeCcAndBccVisibility() = with(newMessageViewModel) {
         otherFieldsAreAllEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherFieldsVisibility)
         initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(isCollapsed = !it) }
     }
 
-    private fun setOnFocusChangedListeners() = with(binding) {
+    fun setOnFocusChangedListeners() = with(binding) {
         val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
         subjectTextField.onFocusChangeListener = listener
         bodyText.onFocusChangeListener = listener
@@ -143,7 +137,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         binding.toField.showKeyboardInTextInput()
     }
 
-    private fun observeContacts() = with(binding) {
+    fun observeContacts() = with(binding) {
         newMessageViewModel.mergedContacts.observe(viewLifecycleOwner) { (sortedContactList, _) ->
             toField.updateContacts(sortedContactList)
             ccField.updateContacts(sortedContactList)
