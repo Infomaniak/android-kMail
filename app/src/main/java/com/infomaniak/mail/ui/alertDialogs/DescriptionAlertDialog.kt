@@ -69,12 +69,9 @@ open class DescriptionAlertDialog @Inject constructor(
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)? = null,
         onDismiss: (() -> Unit)? = null,
-    ) = with(alertDialog) {
-
+    ) {
         showDialogWithBasicInfo(title, description, displayCancelButton, positiveButtonText, negativeButtonText)
-
         if (displayLoader) initProgress()
-
         setupListeners(displayLoader, onPositiveButtonClicked, onNegativeButtonClicked, onDismiss)
     }
 
