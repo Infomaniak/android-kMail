@@ -552,7 +552,7 @@ class NewMessageViewModel @Inject constructor(
         updateIsSendingAllowed()
 
         appContext.trackNewMessageEvent("deleteRecipient")
-        if (recipient.displayAsExternal) appContext.trackExternalEvent("deleteRecipient")
+        if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent("deleteRecipient")
     }
 
     fun updateMailSubject(newSubject: String?) = with(draftInRAM) {

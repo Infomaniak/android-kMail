@@ -285,7 +285,7 @@ class RecipientFieldView @JvmOverloads constructor(
             isGone = isTextInputAccessible
             val recipient = contactChipAdapter.getRecipients().firstOrNull()
             text = recipient?.getNameOrEmail() ?: ""
-            setChipStyle(recipient?.displayAsExternal == true)
+            setChipStyle(recipient?.isDisplayedAsExternal == true)
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
@@ -324,7 +324,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
-            val recipient = Recipient().initLocalValues(email, name, displayAsExternal = false)
+            val recipient = Recipient().initLocalValues(email, name)
             contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
@@ -415,7 +415,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun findAlreadyExistingExternalRecipientsInFields(): Pair<String?, Int> {
-        val recipients = contactChipAdapter.getRecipients().filter { it.displayAsExternal }
+        val recipients = contactChipAdapter.getRecipients().filter { it.isDisplayedAsExternal }
         val recipientCount = recipients.count()
         return (if (recipientCount == 1) recipients.single().email else null) to recipientCount
     }
@@ -425,7 +425,7 @@ class RecipientFieldView @JvmOverloads constructor(
             if (recipient.isManuallyEntered) continue
 
             val shouldDisplayAsExternal = shouldWarnForExternal && recipient.isExternal(externalData)
-            recipient.updateDisplayAsExternal(shouldDisplayAsExternal)
+            recipient.updateIsDisplayedAsExternal(shouldDisplayAsExternal)
 
             updateCollapsedChipValues(isSelfCollapsed)
         }
