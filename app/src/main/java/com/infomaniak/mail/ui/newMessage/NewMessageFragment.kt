@@ -552,9 +552,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    fun formatSubject(): String? {
-        return binding.subjectTextField.text?.toString()?.ifBlank { null }
-    }
+    fun formatSubject(): String? = binding.subjectTextField.text?.toString()?.ifBlank { null }
 
     private fun Activity.finishAppAndRemoveTaskIfNeeded() {
         if (isTaskRoot) finishAndRemoveTask() else finish()
