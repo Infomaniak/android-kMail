@@ -158,10 +158,21 @@ class NewMessageFragment : Fragment() {
         observeNewAttachments()
         observeDraftWorkerResults()
         observeInitResult()
-        aiManager.observeEverything()
+
         editorManager.observeEditorActions()
-        recipientFieldsManager.observeEverything()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
+
+        with(aiManager) {
+            observeAiOutput()
+            observeAiPromptStatus()
+            observeAiFeatureFlagUpdates()
+        }
+
+        with(recipientFieldsManager) {
+            setOnFocusChangedListeners()
+            observeContacts()
+            observeCcAndBccVisibility()
+        }
     }
 
     private fun initManagers() {
