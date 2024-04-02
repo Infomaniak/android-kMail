@@ -121,6 +121,8 @@ class ThreadViewModel @Inject constructor(
         threadUid: String,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> = with(threadState) {
 
+        if (messages.isEmpty()) return emptyList<Any>() to emptyList()
+
         superCollapsedBlock = superCollapsedBlock ?: SuperCollapsedBlock()
 
         val thread = messages.first().threads.single { it.uid == threadUid }
