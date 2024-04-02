@@ -329,7 +329,7 @@ class NewMessageViewModel @Inject constructor(
             cc = cc.toSet(),
             bcc = bcc.toSet(),
             subject = subject,
-            body = uiBody,
+            uiBody = uiBody,
             attachmentsLocalUuids = attachments.map { it.localUuid }.toSet(),
         )
     }
@@ -677,24 +677,36 @@ class NewMessageViewModel @Inject constructor(
         startWorkerCallback: () -> Unit,
     ) = globalCoroutineScope.launch(ioDispatcher) {
 
-        val draft = getLatestLocalDraft(draftLocalUuid) ?: return@launch
+        val localUuid = draftLocalUuid ?: return@launch
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        draft.updateDraftFromLiveData(action, subject, uiBodyValue)
-
-        if (isFinishing && isSavingDraftWithoutChanges(draft, action, subject, uiBodyValue)) {
-            if (!arrivedFromExistingDraft) removeDraftFromRealm(draft.localUuid)
+        if (isFinishing && isSavingDraftWithoutChanges(action, subject, uiBodyValue)) {
+            if (!arrivedFromExistingDraft) removeDraftFromRealm(localUuid)
             return@launch
         }
 
-        appContext.trackSendingDraftEvent(action, draft, currentMailbox.externalMailFlagEnabled)
+        val hasFailed = mailboxContentRealm().writeBlocking {
+            DraftController.getDraft(localUuid, realm = this)
+                ?.apply { updateDraftFromLiveData(action, subject, uiBodyValue) }
+                ?: return@writeBlocking true
+            messageUid?.let { MessageController.getMessage(uid = it, realm = this)?.draftLocalUuid = localUuid }
+            return@writeBlocking false
+        }
 
-        saveDraftToLocal(draft)
+        if (hasFailed) return@launch
 
         if (isFinishing) {
-            if (isTaskRoot) showDraftToastToUser(action)
             startWorkerCallback()
+            if (isTaskRoot) showDraftToastToUser(action)
         }
+
+        appContext.trackSendingDraftEvent(
+            action = action,
+            to = toLiveData.valueOrEmpty(),
+            cc = ccLiveData.valueOrEmpty(),
+            bcc = bccLiveData.valueOrEmpty(),
+            externalMailFlagEnabled = currentMailbox.externalMailFlagEnabled,
+        )
     }
 
     override fun onCleared() {
@@ -725,36 +737,23 @@ class NewMessageViewModel @Inject constructor(
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
     }
 
-    private fun isSavingDraftWithoutChanges(
-        draft: Draft,
-        action: DraftAction,
-        subjectValue: String?,
-        uiBodyValue: String,
-    ): Boolean {
-        return action == DraftAction.SAVE && snapshot?.hasChanges(draft, subjectValue, uiBodyValue) != true
+    private fun isSavingDraftWithoutChanges(action: DraftAction, subjectValue: String?, uiBodyValue: String): Boolean {
+        return action == DraftAction.SAVE && snapshot?.hasChanges(subjectValue, uiBodyValue) != true
     }
 
-    private fun DraftSnapshot.hasChanges(draft: Draft, subjectValue: String?, uiBodyValue: String): Boolean {
-        return identityId != draft.identityId ||
-                to != draft.to.toSet() ||
-                cc != draft.cc.toSet() ||
-                bcc != draft.bcc.toSet() ||
+    private fun DraftSnapshot.hasChanges(subjectValue: String?, uiBodyValue: String): Boolean {
+        return identityId != fromLiveData.value?.signature?.id?.toString() ||
+                to != toLiveData.valueOrEmpty().toSet() ||
+                cc != ccLiveData.valueOrEmpty().toSet() ||
+                bcc != bccLiveData.valueOrEmpty().toSet() ||
                 subject != subjectValue ||
-                body != uiBodyValue ||
-                attachmentsLocalUuids != draft.attachments.map { it.localUuid }.toSet()
+                uiBody != uiBodyValue ||
+                attachmentsLocalUuids != attachmentsLiveData.valueOrEmpty().map { it.localUuid }.toSet()
     }
 
     private fun removeDraftFromRealm(localUuid: String) {
         mailboxContentRealm().writeBlocking {
             DraftController.getDraft(localUuid, realm = this)?.let(::delete)
-        }
-    }
-
-    private fun saveDraftToLocal(draft: Draft) {
-        SentryLog.d("Draft", "Save Draft to local")
-        mailboxContentRealm().writeBlocking {
-            draftController.upsertDraft(draft, realm = this)
-            messageUid?.let { MessageController.getMessage(uid = it, realm = this)?.draftLocalUuid = draft.localUuid }
         }
     }
 
@@ -817,7 +816,7 @@ class NewMessageViewModel @Inject constructor(
         val cc: Set<Recipient>,
         val bcc: Set<Recipient>,
         var subject: String?,
-        var body: String,
+        var uiBody: String,
         val attachmentsLocalUuids: Set<String>,
     )
 
