@@ -194,8 +194,12 @@ class RefreshController @Inject constructor(
     ): Pair<Set<Thread>?, Throwable?> {
 
         fun sendMessageNotFoundSentry(failedFolder: Folder) {
+            val fibonacci = if (strategy.iteration == Iteration.ABORT_MISSION) -1 else strategy.fibonacci
+
+            // Only log if we are at the last Fibonacci or at ABORT_MISSION.
+            if (fibonacci in 1..<FIBONACCI_SEQUENCE.last()) return
+
             Sentry.withScope { scope ->
-                val fibonacci = if (strategy.iteration == Iteration.ABORT_MISSION) -1 else strategy.fibonacci
                 scope.setTag("iteration", strategy.iteration.name)
                 scope.setTag("fibonacci", "$fibonacci")
                 scope.setTag("direction", exception.direction.name)
