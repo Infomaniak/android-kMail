@@ -454,7 +454,7 @@ class ThreadListAdapter @Inject constructor(
 
     private fun ItemThreadLoadMoreButtonBinding.displayLoadMoreButton() {
         loadMoreButton.setOnClickListener {
-            if (dataSet.last() is Unit) dataSet = dataSet.toMutableList().apply { removeIf { it is Unit } }
+            if (dataSet.last() is Unit) dataSet = dataSet.toMutableList().apply { removeLastOrNull() }
             onLoadMoreClicked?.invoke()
         }
     }
@@ -567,13 +567,13 @@ class ThreadListAdapter @Inject constructor(
         formatListJob = lifecycleScope.launch {
 
             val formattedList = runCatchingRealm {
-                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, scope = this).apply {
-                    // Add "Load more" button
-                    if (isLoadMoreDisplayed) add(Unit)
-                }
+                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, scope = this)
             }.getOrDefault(emptyList())
 
-            Dispatchers.Main { dataSet = formattedList }
+            Dispatchers.Main {
+                // Put back "Load more" button if it was already there
+                dataSet = if (isLoadMoreDisplayed) formattedList + Unit else formattedList
+            }
         }
     }
 
