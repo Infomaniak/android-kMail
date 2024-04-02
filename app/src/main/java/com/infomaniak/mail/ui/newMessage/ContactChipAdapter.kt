@@ -42,7 +42,7 @@ class ContactChipAdapter(
             text = recipient.getNameOrEmail()
             setOnClickListener { openContextMenu(recipient, root) }
             setOnBackspaceListener { onBackspace(recipient) }
-            setChipStyle(recipient.displayAsExternal)
+            setChipStyle(recipient.isDisplayedAsExternal)
         }
     }
 
