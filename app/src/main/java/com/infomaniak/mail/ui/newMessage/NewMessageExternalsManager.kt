@@ -66,9 +66,7 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
     }
 
     private fun updateFields(shouldWarnForExternal: Boolean, externalData: ExternalData) = with(binding) {
-        toField.updateExternals(shouldWarnForExternal, externalData)
-        ccField.updateExternals(shouldWarnForExternal, externalData)
-        bccField.updateExternals(shouldWarnForExternal, externalData)
+        listOf(toField, ccField, bccField).forEach { it.updateExternals(shouldWarnForExternal, externalData) }
     }
 
     private fun updateBanner(shouldWarnForExternal: Boolean, externalData: ExternalData) = with(newMessageViewModel) {

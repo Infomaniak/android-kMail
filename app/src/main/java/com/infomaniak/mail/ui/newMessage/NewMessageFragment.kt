@@ -51,7 +51,6 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -430,40 +429,30 @@ class NewMessageFragment : Fragment() {
 
     private fun observeRecipients() = with(newMessageViewModel) {
 
-        fun updateOtherFieldsAreAllEmpty(cc: List<Recipient>, bcc: List<Recipient>) {
-            if (cc.isEmpty() && bcc.isEmpty()) otherFieldsAreAllEmpty.value = true
-        }
-
         toLiveData.observe(viewLifecycleOwner) {
-
             if (shouldInitToField) {
                 shouldInitToField = false
                 binding.toField.initRecipients(it.recipients, it.otherFieldsAreEmpty)
             }
-
             updateIsSendingAllowed(type = FieldType.TO, recipients = it.recipients)
         }
 
         ccLiveData.observe(viewLifecycleOwner) {
-
             if (shouldInitCcField) {
                 shouldInitCcField = false
                 binding.ccField.initRecipients(it.recipients)
             }
-
             updateIsSendingAllowed(type = FieldType.CC, recipients = it.recipients)
-            updateOtherFieldsAreAllEmpty(cc = it.recipients, bcc = bccLiveData.valueOrEmpty())
+            updateOtherRecipientsFieldsAreEmpty(cc = it.recipients, bcc = bccLiveData.valueOrEmpty())
         }
 
         bccLiveData.observe(viewLifecycleOwner) {
-
             if (shouldInitBccField) {
                 shouldInitBccField = false
                 binding.bccField.initRecipients(it.recipients)
             }
-
             updateIsSendingAllowed(type = FieldType.BCC, recipients = it.recipients)
-            updateOtherFieldsAreAllEmpty(cc = ccLiveData.valueOrEmpty(), bcc = it.recipients)
+            updateOtherRecipientsFieldsAreEmpty(cc = ccLiveData.valueOrEmpty(), bcc = it.recipients)
         }
     }
 
