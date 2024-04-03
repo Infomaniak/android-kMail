@@ -626,6 +626,10 @@ class NewMessageViewModel @Inject constructor(
         importAttachments(uris, draftInRAM)
     }
 
+    fun updateSelectedSignatureInSignatureField(signature: Signature) {
+        uiSignatureLiveData.value = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+    }
+
     fun executeDraftActionWhenStopping(
         action: DraftAction,
         isFinishing: Boolean,
