@@ -81,7 +81,7 @@ class FetchMessagesManager @Inject constructor(
         }
 
         if (folder.cursor == null) {
-            // We only want to display Notifications about Mailboxes that the User opened at least one.
+            // We only want to display Notifications about Mailboxes that the User opened at least once.
             // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
             // We can leave safely.
             // But if a user never opened this Mailbox, we shouldn't have register it to receive Notifications. So this shouldn't happen.
