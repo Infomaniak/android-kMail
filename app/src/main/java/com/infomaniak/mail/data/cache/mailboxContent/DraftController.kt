@@ -88,7 +88,7 @@ class DraftController @Inject constructor(
                 draft.to = toList.toRealmList()
                 draft.cc = ccList.toRealmList()
 
-                draft.body += replyForwardFooterManager.createReplyFooter(previousMessage)
+                draft.uiQuote = replyForwardFooterManager.createReplyFooter(previousMessage)
             }
             DraftMode.FORWARD -> {
                 draft.forwardedUid = previousMessage.uid
@@ -100,7 +100,7 @@ class DraftController @Inject constructor(
                     }
                 }
 
-                draft.body += replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)
+                draft.uiQuote = replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)
             }
             DraftMode.NEW_MAIL -> Unit
         }
