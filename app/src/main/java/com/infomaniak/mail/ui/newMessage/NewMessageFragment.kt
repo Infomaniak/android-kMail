@@ -271,6 +271,7 @@ class NewMessageFragment : Fragment() {
                 if (draft != null) {
                     showKeyboardInCorrectView()
                     binding.subjectTextField.setText(draft.subject)
+                    binding.bodyTextField.setText(draft.uiBody)
                 } else {
                     requireActivity().apply {
                         showToast(R.string.failToOpenDraft)
@@ -457,13 +458,12 @@ class NewMessageFragment : Fragment() {
 
     override fun onStop() = with(newMessageViewModel) {
 
-        uiBodyLiveData.value = binding.bodyTextField.text.toString()
-
         executeDraftActionWhenStopping(
             action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = requireActivity().isFinishing,
             isTaskRoot = requireActivity().isTaskRoot,
             subjectValue = binding.subjectTextField.text.toString(),
+            rawUiBody = binding.bodyTextField.text.toString(),
             startWorkerCallback = ::startWorker,
         )
 
