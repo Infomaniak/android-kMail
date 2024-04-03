@@ -43,11 +43,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -63,7 +61,10 @@ import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.SignatureUtils
+import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
@@ -490,21 +491,8 @@ class NewMessageFragment : Fragment() {
         draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
-    private fun onDeleteAttachment(position: Int) = with(newMessageViewModel) {
-
-        trackAttachmentActionsEvent("delete")
-
-        runCatching {
-            val attachments = attachmentsLiveData.value?.toMutableList() ?: mutableListOf()
-            val attachment = attachments[position]
-            attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draftLocalUuid()!!, attachment.localUuid)
-            attachments.removeAt(position)
-            attachmentsLiveData.value = attachments
-        }.onFailure { exception ->
-            // TODO: If we don't see this Sentry after May 2024, we can remove it.
-            SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
-        }
+    private fun onDeleteAttachment(position: Int) {
+        newMessageViewModel.deleteAttachment(position)
     }
 
     private fun setupSendButton() = with(binding) {
@@ -555,8 +543,4 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
-
-    companion object {
-        private val TAG = NewMessageFragment::class.java.simpleName
-    }
 }
