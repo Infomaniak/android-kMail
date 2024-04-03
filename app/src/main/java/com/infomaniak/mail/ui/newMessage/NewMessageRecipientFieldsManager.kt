@@ -101,7 +101,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     private fun fieldGotFocus(field: FieldType?) = with(binding) {
         if (lastFieldToTakeFocus == field) return
 
-        if (field == null && newMessageViewModel.otherFieldsAreAllEmpty.value == true) {
+        if (field == null && newMessageViewModel.otherRecipientsFieldsAreEmpty.value == true) {
             toField.collapseEverything()
         } else {
             if (field != TO) toField.collapse()
@@ -118,7 +118,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     }
 
     fun observeCcAndBccVisibility() = with(newMessageViewModel) {
-        otherFieldsAreAllEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherFieldsVisibility)
+        otherRecipientsFieldsAreEmpty.observe(viewLifecycleOwner, binding.toField::updateOtherRecipientsFieldsVisibility)
         initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(isCollapsed = !it) }
     }
 
