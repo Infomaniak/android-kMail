@@ -188,8 +188,8 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox, realm)
 
             realm.writeBlocking { draftController.upsertDraft(draft, realm = this) }
-            draft.saveDraftSnapshot()
-            draft.moveDataFromDraftToLiveData()
+            draft.saveSnapshot()
+            draft.initLiveDataFromDraft()
 
             draftInRAM = draft
 
@@ -309,7 +309,7 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.saveDraftSnapshot() {
+    private fun Draft.saveSnapshot() {
         snapshot = DraftSnapshot(
             identityId = identityId,
             to = to.toSet(),
@@ -321,7 +321,7 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.moveDataFromDraftToLiveData() {
+    private fun Draft.initLiveDataFromDraft() {
 
         savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
 
@@ -622,7 +622,7 @@ class NewMessageViewModel @Inject constructor(
 
         val draft = getLatestLocalDraft(draftLocalUuid) ?: return@launch
 
-        draft.updateDraft(action)
+        draft.updateDraftFromLiveData(action)
 
         if (isFinishing && isSavingDraftWithoutChanges(draft, action)) {
             if (!arrivedFromExistingDraft) removeDraftFromRealm(draft.localUuid)
@@ -644,7 +644,7 @@ class NewMessageViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private fun Draft.updateDraft(draftAction: DraftAction) {
+    private fun Draft.updateDraftFromLiveData(draftAction: DraftAction) {
 
         action = draftAction
         identityId = draftInRAM.identityId
