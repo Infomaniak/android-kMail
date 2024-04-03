@@ -113,8 +113,6 @@ class Draft : RealmObject {
         }
     }
 
-    fun hasRecipient() = to.isNotEmpty() || cc.isNotEmpty() || bcc.isNotEmpty()
-
     enum class DraftAction(val apiCallValue: String, val matomoValue: String) {
         SAVE("save", "saveDraft"),
         SEND("send", "sendMail"),

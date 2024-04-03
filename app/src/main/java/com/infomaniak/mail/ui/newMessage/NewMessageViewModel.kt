@@ -181,25 +181,13 @@ class NewMessageViewModel @Inject constructor(
             draft = if (draftExists) {
                 getExistingDraft(draftLocalUuid, realm) ?: return@runCatching
             } else {
-                getNewDraft(signatures, realm) ?: return@runCatching
+                getNewDraft(signatures, intent, realm) ?: return@runCatching
             }
-
-            draft?.let {
-
-                savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = it.localUuid
-
-                // If the user put the app in background before we put the fetched Draft in Realm, and the system
-                // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
-                savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
-
-                if (it.body.isNotEmpty()) splitSignatureAndQuoteFromBody(it)
-                if (!draftExists) populateWithExternalMailDataIfNeeded(it, intent)
-                it.flagRecipientsAsAutomaticallyEntered()
-            }
-
         }.onFailure(Sentry::captureException)
 
         draft?.let {
+
+            it.flagRecipientsAsAutomaticallyEntered()
 
             dismissNotification()
             markAsRead(currentMailbox, realm)
@@ -214,38 +202,57 @@ class NewMessageViewModel @Inject constructor(
         emit(draft)
     }
 
-    //region Initialization: 1st level of private fun
     private fun getExistingDraft(localUuid: String?, realm: Realm): Draft? {
         return getLocalOrRemoteDraft(localUuid)?.also {
-            if (it.identityId.isNullOrBlank()) signatureUtils.addMissingSignatureData(it, realm)
+            saveNavArgsToSavedState(it.localUuid)
+            if (it.identityId.isNullOrBlank()) it.identityId = SignatureController.getSignature(realm).id.toString()
+            if (it.body.isNotEmpty()) splitSignatureAndQuoteFromBody(it)
         }
     }
 
-    private suspend fun getNewDraft(signatures: List<Signature>, realm: Realm): Draft? = Draft().apply {
+    private suspend fun getNewDraft(signatures: List<Signature>, intent: Intent, realm: Realm): Draft? = Draft().apply {
 
-        this.initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+        var previousMessage: Message? = null
 
-        val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-        signatureUtils.initSignature(draft = this, realm, addContent = !shouldPreselectSignature)
+        initLocalValues(mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+        saveNavArgsToSavedState(localUuid)
 
         when (draftMode) {
             DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
             DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
-                    ?.let { previousMessage ->
-                        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(previousMessage, realm)
-
+                    ?.let { message ->
+                        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(message, realm)
                         if (hasFailedFetching) return null
 
                         draftController.setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
 
                         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
                         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!, fullMessage.uid)
-                        if (shouldPreselectSignature) preSelectSignature(previousMessage, signatures)
+
+                        previousMessage = fullMessage
                     }
             }
         }
+
+        val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
+        val signature = if (shouldPreselectSignature) {
+            guessMostFittingSignature(previousMessage!!, signatures)
+        } else {
+            SignatureController.getSignature(realm)
+        }
+        signatureUtils.initSignature(draft = this, signature)
+
+        populateWithExternalMailDataIfNeeded(draft = this, intent)
+    }
+
+    private fun saveNavArgsToSavedState(localUuid: String) {
+        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
+
+        // If the user put the app in background before we put the fetched Draft in Realm, and the system
+        // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
+        savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
     }
 
     private fun splitSignatureAndQuoteFromBody(draft: Draft) {
@@ -358,9 +365,7 @@ class NewMessageViewModel @Inject constructor(
             initializeFieldsAsOpen.postValue(true)
         }
     }
-    //endregion
 
-    //region Initialization: 2nd level of private fun
     @Suppress("UNUSED_PARAMETER")
     private fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
 
@@ -402,12 +407,6 @@ class NewMessageViewModel @Inject constructor(
             fullBody.htmlToText()
         }
         else -> value
-    }
-
-    private fun Draft.preSelectSignature(message: Message, signatures: List<Signature>) {
-        val mostFittingSignature = guessMostFittingSignature(message, signatures)
-        identityId = mostFittingSignature.id.toString()
-        body += signatureUtils.encapsulateSignatureContentWithInfomaniakClass(mostFittingSignature.content)
     }
 
     private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature {
@@ -600,7 +599,6 @@ class NewMessageViewModel @Inject constructor(
             recipient.isManuallyEntered = false
         }
     }
-    //endregion
 
     fun addRecipientToField(recipient: Recipient, type: FieldType) {
 
