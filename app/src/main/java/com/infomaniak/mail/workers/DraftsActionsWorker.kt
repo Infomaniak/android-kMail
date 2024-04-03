@@ -188,7 +188,11 @@ class DraftsActionsWorker @AssistedInject constructor(
                     }
                 }
                 exception.printStackTrace()
-                Sentry.captureException(exception)
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    if (exception is ApiErrorException) scope.setTag("Api error code", exception.errorCode ?: "")
+                    Sentry.captureException(exception)
+                }
                 haveAllDraftsSucceeded = false
             }
         }
