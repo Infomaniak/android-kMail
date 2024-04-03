@@ -329,8 +329,6 @@ class NewMessageViewModel @Inject constructor(
         // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
         savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
 
-        uiBodyLiveData.postValue(uiBody)
-
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherFieldsAreAllEmpty.postValue(false)
             initializeFieldsAsOpen.postValue(true)
@@ -616,15 +614,16 @@ class NewMessageViewModel @Inject constructor(
         isFinishing: Boolean,
         isTaskRoot: Boolean,
         subjectValue: String,
+        rawUiBody: String,
         startWorkerCallback: () -> Unit,
     ) = globalCoroutineScope.launch(ioDispatcher) {
 
         val draft = getLatestLocalDraft(draftLocalUuid) ?: return@launch
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        draft.updateDraftFromLiveData(action, subject)
+        draft.updateDraftFromLiveData(action, subject, rawUiBody)
 
-        if (isFinishing && isSavingDraftWithoutChanges(draft, action, subject)) {
+        if (isFinishing && isSavingDraftWithoutChanges(draft, action, subject, rawUiBody)) {
             if (!arrivedFromExistingDraft) removeDraftFromRealm(draft.localUuid)
             return@launch
         }
@@ -644,7 +643,8 @@ class NewMessageViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private fun Draft.updateDraftFromLiveData(draftAction: DraftAction, subjectValue: String?) {
+    private fun Draft.updateDraftFromLiveData(draftAction: DraftAction, subjectValue: String?, uiBodyValue: String) {
+
 
         action = draftAction
         identityId = draftInRAM.identityId
@@ -660,24 +660,24 @@ class NewMessageViewModel @Inject constructor(
 
         subject = subjectValue
 
-        uiBody = uiBodyLiveData.value ?: ""
+        uiBody = uiBodyValue
         uiSignature = draftInRAM.uiSignature
         uiQuote = draftInRAM.uiQuote
 
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
     }
 
-    private fun isSavingDraftWithoutChanges(draft: Draft, action: DraftAction, subject: String?): Boolean {
-        return action == DraftAction.SAVE && snapshot?.hasChanges(draft, subject) != true
+    private fun isSavingDraftWithoutChanges(draft: Draft, action: DraftAction, subject: String?, uiBody: String): Boolean {
+        return action == DraftAction.SAVE && snapshot?.hasChanges(draft, subject, uiBody) != true
     }
 
-    private fun DraftSnapshot.hasChanges(draft: Draft, subjectValue: String?): Boolean {
+    private fun DraftSnapshot.hasChanges(draft: Draft, subjectValue: String?, uiBodyValue: String): Boolean {
         return identityId != draft.identityId ||
                 to != draft.to.toSet() ||
                 cc != draft.cc.toSet() ||
                 bcc != draft.bcc.toSet() ||
                 subject != subjectValue ||
-                body != draft.uiBody ||
+                body != uiBodyValue ||
                 attachmentsUuids != draft.attachments.map { it.uuid }.toSet()
     }
 
