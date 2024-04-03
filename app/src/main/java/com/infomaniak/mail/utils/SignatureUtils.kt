@@ -19,10 +19,9 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.extensions.readRawResource
-import io.realm.kotlin.TypedRealm
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,17 +40,8 @@ class SignatureUtils @Inject constructor(appContext: Context) {
         return Regex("""\{(.*)\}""").find(verticalMarginsCss)!!.groupValues[1]
     }
 
-    fun addMissingSignatureData(draft: Draft, realm: TypedRealm) {
-        initSignature(draft, realm, addContent = false)
-    }
-
-    fun initSignature(draft: Draft, realm: TypedRealm, addContent: Boolean) = with(draft) {
-        val signature = SignatureController.getSignature(realm)
-
+    fun initSignature(draft: Draft, signature: Signature) = with(draft) {
         identityId = signature.id.toString()
-
-        if (addContent && signature.content.isNotEmpty()) {
-            body += encapsulateSignatureContentWithInfomaniakClass(signature.content)
-        }
+        if (signature.content.isNotEmpty()) uiSignature = encapsulateSignatureContentWithInfomaniakClass(signature.content)
     }
 }
