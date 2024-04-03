@@ -271,9 +271,10 @@ class NewMessageFragment : Fragment() {
 
     private fun initializeDraft() = with(newMessageViewModel) {
         if (initResult.value == null) {
-            initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { isSuccess ->
-                if (isSuccess) {
+            initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
+                if (draft != null) {
                     showKeyboardInCorrectView()
+                    binding.subjectTextField.setText(draft.subject)
                 } else {
                     requireActivity().apply {
                         showToast(R.string.failToOpenDraft)
@@ -467,20 +468,16 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeSubject() = with(binding) {
-        newMessageViewModel.subjectLiveData.observe(viewLifecycleOwner) { newSubject ->
-            val oldSubject = subjectTextField.text?.toString()
-            if (newSubject != oldSubject) subjectTextField.setText(newSubject)
-        }
+        newMessageViewModel.subjectLiveData.observe(viewLifecycleOwner, subjectTextField::setText)
     }
 
     override fun onStop() = with(newMessageViewModel) {
-
-        subjectLiveData.value = formatSubject()
 
         executeDraftActionWhenStopping(
             action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = requireActivity().isFinishing,
             isTaskRoot = requireActivity().isTaskRoot,
+            rawSubject = binding.subjectTextField.text.toString(),
             startWorkerCallback = ::startWorker,
         )
 
@@ -535,7 +532,7 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (formatSubject() == null) {
+        if (binding.subjectTextField.text?.isBlank() == true) {
             trackNewMessageEvent("sendWithoutSubject")
             descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
@@ -551,8 +548,6 @@ class NewMessageFragment : Fragment() {
             sendEmail()
         }
     }
-
-    fun formatSubject(): String? = binding.subjectTextField.text?.toString()?.ifBlank { null }
 
     private fun Activity.finishAppAndRemoveTaskIfNeeded() {
         if (isTaskRoot) finishAndRemoveTask() else finish()

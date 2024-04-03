@@ -215,14 +215,14 @@ class NewMessageAiManager @Inject constructor(
         }
     }
 
-    fun navigateToPropositionFragment() {
+    fun navigateToPropositionFragment() = with(binding) {
 
         closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
 
         fragment.safeNavigate(
             NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
-                isSubjectBlank = fragment.formatSubject() == null,
+                isSubjectBlank = subjectTextField.text?.isBlank() == true,
             ),
         )
     }
