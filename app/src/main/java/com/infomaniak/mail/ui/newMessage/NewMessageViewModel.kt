@@ -29,6 +29,7 @@ import androidx.lifecycle.*
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.OPEN_LOCAL_DRAFT
+import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
@@ -617,6 +618,23 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent("deleteRecipient")
     }
 
+    fun deleteAttachment(position: Int) {
+
+        context.trackAttachmentActionsEvent("delete")
+
+        runCatching {
+            val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
+            val attachment = attachments[position]
+            attachment.getUploadLocalFile()?.delete()
+            LocalStorageUtils.deleteAttachmentUploadDir(context, draftLocalUuid()!!, attachment.localUuid)
+            attachments.removeAt(position)
+            attachmentsLiveData.value = attachments
+        }.onFailure { exception ->
+            // TODO: If we don't see this Sentry after June 2024, we can remove it.
+            SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
+        }
+    }
+
     fun updateIsSendingAllowed(
         attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty(),
     ) {
@@ -775,6 +793,7 @@ class NewMessageViewModel @Inject constructor(
     )
 
     companion object {
+        private val TAG = NewMessageViewModel::class.java.simpleName
         private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998
     }
