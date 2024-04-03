@@ -405,7 +405,7 @@ class NewMessageFragment : Fragment() {
         addressListPopupWindow?.dismiss()
     }
 
-    private fun updateSelectedSignatureFromField(signature: Signature) {
+    private fun updateSelectedSignatureInFromField(signature: Signature) {
         val formattedExpeditor = if (newMessageViewModel.signaturesCount > 1) {
             "${signature.senderName} <${signature.senderEmailIdn}> (${signature.name})"
         } else {
@@ -424,16 +424,10 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeFromData() {
-        newMessageViewModel.fromLiveData.observe(viewLifecycleOwner) { (signature, shouldUpdateUI) ->
-
-            updateSelectedSignatureFromField(signature)
-
-            if (shouldUpdateUI) {
-                val content = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
-                newMessageViewModel.uiSignatureLiveData.value = content
-            }
-
+    private fun observeFromData() = with(newMessageViewModel) {
+        fromLiveData.observe(viewLifecycleOwner) { (signature, shouldUpdateUI) ->
+            updateSelectedSignatureInFromField(signature)
+            if (shouldUpdateUI) updateSelectedSignatureInSignatureField(signature)
             signatureAdapter.updateSelectedSignature(signature.id)
         }
     }
