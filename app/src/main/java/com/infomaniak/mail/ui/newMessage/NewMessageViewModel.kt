@@ -113,7 +113,7 @@ class NewMessageViewModel @Inject constructor(
 
     private var snapshot: DraftSnapshot? = null
 
-    var otherFieldsAreAllEmpty = MutableLiveData(true)
+    var otherRecipientsFieldsAreEmpty = MutableLiveData(true)
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
     val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
@@ -353,7 +353,7 @@ class NewMessageViewModel @Inject constructor(
         uiQuoteLiveData.postValue(uiQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
-            otherFieldsAreAllEmpty.postValue(false)
+            otherRecipientsFieldsAreEmpty.postValue(false)
             initializeFieldsAsOpen.postValue(true)
         }
     }
@@ -592,7 +592,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun addRecipientToField(recipient: Recipient, type: FieldType) {
 
-        if (type == FieldType.CC || type == FieldType.BCC) otherFieldsAreAllEmpty.value = false
+        if (type == FieldType.CC || type == FieldType.BCC) otherRecipientsFieldsAreEmpty.value = false
 
         val recipientsLiveData = when (type) {
             FieldType.TO -> toLiveData
@@ -660,6 +660,10 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    fun updateOtherRecipientsFieldsAreEmpty(cc: List<Recipient>, bcc: List<Recipient>) {
+        if (cc.isEmpty() && bcc.isEmpty()) otherRecipientsFieldsAreEmpty.value = true
+    }
+
     fun updateBodySignature(signature: Signature) {
         uiSignatureLiveData.value = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
     }
@@ -699,7 +703,6 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun Draft.updateDraftFromLiveData(draftAction: DraftAction, subjectValue: String?, uiBodyValue: String) {
-
 
         action = draftAction
         identityId = fromLiveData.value?.signature?.id.toString()

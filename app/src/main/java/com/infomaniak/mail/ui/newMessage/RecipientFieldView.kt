@@ -95,7 +95,7 @@ class RecipientFieldView @JvmOverloads constructor(
     lateinit var snackbarManager: SnackbarManager
 
     private var canCollapseEverything = false
-    private var otherFieldsAreAllEmpty = true
+    private var otherFieldsAreEmpty = true
 
     private var isEverythingCollapsed = true
         set(value) {
@@ -403,13 +403,13 @@ class RecipientFieldView @JvmOverloads constructor(
         if (canCollapseEverything) isEverythingCollapsed = false else isSelfCollapsed = false
     }
 
-    fun updateOtherFieldsVisibility(otherFieldsAreAllEmpty: Boolean) {
-        this.otherFieldsAreAllEmpty = otherFieldsAreAllEmpty
+    fun updateOtherRecipientsFieldsVisibility(areEmpty: Boolean) {
+        otherFieldsAreEmpty = areEmpty
         computeEndIconVisibility()
     }
 
     private fun computeEndIconVisibility() = with(binding) {
-        val shouldDisplayChevron = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
+        val shouldDisplayChevron = canCollapseEverything && otherFieldsAreEmpty && !isAutoCompletionOpened
         chevron.isVisible = shouldDisplayChevron
         textInputLayout.isEndIconVisible = !shouldDisplayChevron && !textInput.text.isNullOrEmpty()
     }
