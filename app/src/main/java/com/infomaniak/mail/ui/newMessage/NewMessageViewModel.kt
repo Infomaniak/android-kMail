@@ -60,6 +60,7 @@ import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
@@ -375,7 +376,17 @@ class NewMessageViewModel @Inject constructor(
 
     private fun getLatestLocalDraft(localUuid: String?) = localUuid?.let(draftController::getDraft)?.copyFromRealm()
 
-    private fun fetchDraft(): Draft? = ApiRepository.getDraft(draftResource!!).data?.also { it.initLocalValues(messageUid!!) }
+    private fun fetchDraft(): Draft? {
+        return ApiRepository.getDraft(draftResource!!).data?.also {
+            /**
+             * If we are opening for the 1st time an existing Draft created somewhere else
+             * (ex: webmail), we need to create the link between the Draft and its Message.
+             * - The link in the Draft is added here, when creating the Draft.
+             * - The link in the Message is added later, when saving the Draft.
+             */
+            it.initLocalValues(messageUid!!)
+        }
+    }
 
     private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body, messageUid: String) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
@@ -687,9 +698,8 @@ class NewMessageViewModel @Inject constructor(
 
         val hasFailed = mailboxContentRealm().writeBlocking {
             DraftController.getDraft(localUuid, realm = this)
-                ?.apply { updateDraftFromLiveData(action, subject, uiBodyValue) }
+                ?.apply { updateDraftFromLiveData(action, subject, uiBodyValue, realm = this@writeBlocking) }
                 ?: return@writeBlocking true
-            messageUid?.let { MessageController.getMessage(uid = it, realm = this)?.draftLocalUuid = localUuid }
             return@writeBlocking false
         }
 
@@ -714,7 +724,12 @@ class NewMessageViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private fun Draft.updateDraftFromLiveData(draftAction: DraftAction, subjectValue: String?, uiBodyValue: String) {
+    private fun Draft.updateDraftFromLiveData(
+        draftAction: DraftAction,
+        subjectValue: String?,
+        uiBodyValue: String,
+        realm: MutableRealm,
+    ) {
 
         action = draftAction
         identityId = fromLiveData.value?.signature?.id.toString()
@@ -735,6 +750,14 @@ class NewMessageViewModel @Inject constructor(
         uiQuote = uiQuoteLiveData.value
 
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
+
+        /**
+         * If we are opening for the 1st time an existing Draft created somewhere else
+         * (ex: webmail), we need to create the link between the Draft and its Message.
+         * - The link in the Draft is already added, when creating the Draft.
+         * - The link in the Message is added here, when saving the Draft.
+         */
+        messageUid?.let { MessageController.getMessage(uid = it, realm)?.draftLocalUuid = localUuid }
     }
 
     private fun isSavingDraftWithoutChanges(action: DraftAction, subjectValue: String?, uiBodyValue: String): Boolean {
