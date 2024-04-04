@@ -90,6 +90,8 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
+    private var shouldRegisterToImportedAttachments = true
+
     private var addressListPopupWindow: ListPopupWindow? = null
 
     private var quoteWebView: WebView? = null
@@ -432,6 +434,8 @@ class NewMessageFragment : Fragment() {
     private fun observeAttachments() {
         newMessageViewModel.attachmentsLiveData.observe(viewLifecycleOwner) {
 
+            if (shouldRegisterToImportedAttachments) observeImportAttachments()
+
             val shouldTransition = attachmentAdapter.itemCount != 0 && it.isEmpty()
 
             attachmentAdapter.submitList(it)
@@ -444,6 +448,17 @@ class NewMessageFragment : Fragment() {
             }
 
             newMessageViewModel.updateIsSendingAllowed(attachments = it)
+        }
+    }
+
+    private fun observeImportAttachments() = with(newMessageViewModel) {
+
+        shouldRegisterToImportedAttachments = false
+
+        importAttachmentsLiveData.observe(viewLifecycleOwner) { uris ->
+            val currentAttachments = attachmentsLiveData.valueOrEmpty()
+            val newAttachments = importAttachments(currentAttachments, uris)
+            attachmentsLiveData.value = currentAttachments + newAttachments
         }
     }
 
