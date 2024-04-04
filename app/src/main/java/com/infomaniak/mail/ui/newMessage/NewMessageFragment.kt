@@ -436,12 +436,10 @@ class NewMessageFragment : Fragment() {
 
             if (shouldRegisterToImportedAttachments) observeImportAttachments()
 
-            val shouldTransition = attachmentAdapter.itemCount != 0 && it.isEmpty()
-
             attachmentAdapter.submitList(it)
 
             binding.attachmentsRecyclerView.isVisible = if (it.isEmpty()) {
-                if (shouldTransition) TransitionManager.beginDelayedTransition(binding.root)
+                if (attachmentAdapter.itemCount != 0) TransitionManager.beginDelayedTransition(binding.root)
                 false
             } else {
                 true
