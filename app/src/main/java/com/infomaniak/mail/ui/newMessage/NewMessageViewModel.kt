@@ -114,6 +114,7 @@ class NewMessageViewModel @Inject constructor(
 
     var otherFieldsAreAllEmpty = MutableLiveData(true)
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
+    val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
     val isSendingAllowed = SingleLiveEvent(false)
     val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
@@ -480,7 +481,8 @@ class NewMessageViewModel @Inject constructor(
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
             (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
-                importAttachments(uris = listOf(uri), draft)
+                val newAttachments = importAttachments(currentAttachments = draft.attachments, uris = listOf(uri))
+                draft.attachments.addAll(newAttachments)
             }
         }
     }
@@ -489,7 +491,8 @@ class NewMessageViewModel @Inject constructor(
         intent
             .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
             ?.filterIsInstance<Uri>()
-            ?.let { importAttachments(uris = it, draft) }
+            ?.let { importAttachments(currentAttachments = draft.attachments, uris = it) }
+            ?.let(draft.attachments::addAll)
     }
 
     /**
@@ -533,13 +536,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    /**
-     * If the `draft` parameter is provided, it means we are coming from the initialization. So we use the Draft object.
-     * If the `draft` is null, we are just adding new Attachments via the FilePicker, so we use the LiveData instead.
-     */
-    fun importAttachments(uris: List<Uri>, draft: Draft? = null) = viewModelScope.launch(ioCoroutineContext) {
-
-        val currentAttachments = draft?.attachments ?: attachmentsLiveData.valueOrEmpty()
+    fun importAttachments(currentAttachments: List<Attachment>, uris: List<Uri>): List<Attachment> {
 
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = currentAttachments.sumOf { it.size }
@@ -559,11 +556,7 @@ class NewMessageViewModel @Inject constructor(
 
         importAttachmentsResult.postValue(result)
 
-        if (draft == null) {
-            attachmentsLiveData.postValue(currentAttachments + newAttachments)
-        } else {
-            draft.attachments.addAll(newAttachments)
-        }
+        return newAttachments
     }
 
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
