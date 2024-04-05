@@ -332,7 +332,10 @@ class NewMessageFragment : Fragment() {
                 navigateToNewMessageActivity = null,
             )
         }
-        removeSignature.setOnClickListener { newMessageViewModel.uiSignatureLiveData.value = null }
+        removeSignature.setOnClickListener {
+            trackNewMessageEvent("deleteSignature")
+            newMessageViewModel.uiSignatureLiveData.value = null
+        }
 
         // Quote
         quoteWebView.apply {
@@ -452,7 +455,6 @@ class NewMessageFragment : Fragment() {
     private fun observeUiSignature() = with(binding) {
         newMessageViewModel.uiSignatureLiveData.observe(viewLifecycleOwner) { signature ->
             if (signature == null) {
-                trackNewMessageEvent("deleteSignature")
                 signatureGroup.isGone = true
             } else {
                 signatureWebView.loadSignatureContent(signature, signatureGroup)
