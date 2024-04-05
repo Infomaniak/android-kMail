@@ -339,7 +339,7 @@ class NewMessageViewModel @Inject constructor(
         fromLiveData.postValue(
             UiFrom(
                 signature = signatures.single { it.id == identityId?.toInt() },
-                shouldUpdateUiSignature = false,
+                shouldUpdateBodySignature = false,
             ),
         )
 
@@ -626,7 +626,7 @@ class NewMessageViewModel @Inject constructor(
         importAttachments(uris, draftInRAM)
     }
 
-    fun updateSelectedSignatureInSignatureField(signature: Signature) {
+    fun updateBodySignature(signature: Signature) {
         uiSignatureLiveData.value = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
     }
 
@@ -751,7 +751,7 @@ class NewMessageViewModel @Inject constructor(
 
     data class UiFrom(
         val signature: Signature,
-        val shouldUpdateUiSignature: Boolean = true,
+        val shouldUpdateBodySignature: Boolean = true,
     )
 
     private data class DraftSnapshot(
