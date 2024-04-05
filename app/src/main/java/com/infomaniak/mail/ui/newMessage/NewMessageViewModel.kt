@@ -614,16 +614,16 @@ class NewMessageViewModel @Inject constructor(
         isFinishing: Boolean,
         isTaskRoot: Boolean,
         subjectValue: String,
-        rawUiBody: String,
+        uiBodyValue: String,
         startWorkerCallback: () -> Unit,
     ) = globalCoroutineScope.launch(ioDispatcher) {
 
         val draft = getLatestLocalDraft(draftLocalUuid) ?: return@launch
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        draft.updateDraftFromLiveData(action, subject, rawUiBody)
+        draft.updateDraftFromLiveData(action, subject, uiBodyValue)
 
-        if (isFinishing && isSavingDraftWithoutChanges(draft, action, subject, rawUiBody)) {
+        if (isFinishing && isSavingDraftWithoutChanges(draft, action, subject, uiBodyValue)) {
             if (!arrivedFromExistingDraft) removeDraftFromRealm(draft.localUuid)
             return@launch
         }
@@ -667,8 +667,13 @@ class NewMessageViewModel @Inject constructor(
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
     }
 
-    private fun isSavingDraftWithoutChanges(draft: Draft, action: DraftAction, subject: String?, uiBody: String): Boolean {
-        return action == DraftAction.SAVE && snapshot?.hasChanges(draft, subject, uiBody) != true
+    private fun isSavingDraftWithoutChanges(
+        draft: Draft,
+        action: DraftAction,
+        subjectValue: String?,
+        uiBodyValue: String,
+    ): Boolean {
+        return action == DraftAction.SAVE && snapshot?.hasChanges(draft, subjectValue, uiBodyValue) != true
     }
 
     private fun DraftSnapshot.hasChanges(draft: Draft, subjectValue: String?, uiBodyValue: String): Boolean {

@@ -463,7 +463,7 @@ class NewMessageFragment : Fragment() {
             isFinishing = requireActivity().isFinishing,
             isTaskRoot = requireActivity().isTaskRoot,
             subjectValue = binding.subjectTextField.text.toString(),
-            rawUiBody = binding.bodyTextField.text.toString(),
+            uiBodyValue = binding.bodyTextField.text.toString(),
             startWorkerCallback = ::startWorker,
         )
 
