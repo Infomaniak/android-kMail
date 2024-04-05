@@ -159,41 +159,41 @@ class NewMessageViewModel @Inject constructor(
         val realm = mailboxContentRealm()
         var signatures = emptyList<Signature>()
 
-        val draft = runCatching {
+        var draft: Draft? = null
+
+        runCatching {
 
             signatures = SignatureController.getAllSignatures(realm)
-            if (signatures.isEmpty()) return@runCatching null
+            if (signatures.isEmpty()) return@runCatching
 
             val draftExists = arrivedFromExistingDraft || draftLocalUuid != null
 
-            val newDraft = if (draftExists) {
-                getExistingDraft(draftLocalUuid, realm) ?: return@runCatching null
+            draft = if (draftExists) {
+                getExistingDraft(draftLocalUuid, realm) ?: return@runCatching
             } else {
-                getNewDraft(signatures, realm) ?: return@runCatching null
+                getNewDraft(signatures, realm) ?: return@runCatching
             }
 
-            if (newDraft.body.isNotEmpty()) splitSignatureAndQuoteFromBody(newDraft)
-            if (!draftExists) populateWithExternalMailDataIfNeeded(newDraft, intent)
-            newDraft.flagRecipientsAsAutomaticallyEntered()
+            draft?.let {
+                if (it.body.isNotEmpty()) splitSignatureAndQuoteFromBody(it)
+                if (!draftExists) populateWithExternalMailDataIfNeeded(it, intent)
+                it.flagRecipientsAsAutomaticallyEntered()
+            }
 
-            return@runCatching newDraft
-        }.getOrElse {
-            Sentry.captureException(it)
-            return@getOrElse null
-        }
+        }.onFailure(Sentry::captureException)
 
-        if (draft != null) {
+        draft?.let {
 
             dismissNotification()
             markAsRead(currentMailbox, realm)
 
-            realm.writeBlocking { draftController.upsertDraft(draft, realm = this) }
-            draft.saveSnapshot()
-            draft.initLiveDataFromDraft()
+            realm.writeBlocking { draftController.upsertDraft(it, realm = this) }
+            it.saveSnapshot()
+            it.initLiveData()
 
-            draftInRAM = draft
+            draftInRAM = it
 
-            initResult.postValue(InitResult(draft, signatures))
+            initResult.postValue(InitResult(it, signatures))
         }
 
         val isSuccess = draft != null
@@ -321,7 +321,7 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.initLiveDataFromDraft() {
+    private fun Draft.initLiveData() {
 
         savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
 
