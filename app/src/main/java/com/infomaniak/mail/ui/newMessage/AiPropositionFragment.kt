@@ -168,12 +168,9 @@ class AiPropositionFragment : Fragment() {
 
     private fun choosePropositionAndPopBack() = with(aiViewModel) {
 
-        fun applyProposition(subject: String?, content: String) = with(newMessageViewModel) {
+        fun applyProposition(subject: String?, content: String) {
             trackInsertionType()
-            aiOutputToInsert.value = subject to content
-
-            subject?.let { subjectLiveData.value = it }
-
+            newMessageViewModel.aiOutputToInsert.value = subject to content
             findNavController().popBackStack()
         }
 
