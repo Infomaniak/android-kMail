@@ -619,12 +619,12 @@ class NewMessageViewModel @Inject constructor(
         action: DraftAction,
         isFinishing: Boolean,
         isTaskRoot: Boolean,
-        rawSubject: String,
+        subjectValue: String,
         startWorkerCallback: () -> Unit,
     ) = globalCoroutineScope.launch(ioDispatcher) {
 
         val draft = getLatestLocalDraft(draftLocalUuid) ?: return@launch
-        val subject = rawSubject.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
+        val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
         draft.updateDraftFromLiveData(action, subject)
 
