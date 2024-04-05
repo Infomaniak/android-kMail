@@ -479,7 +479,7 @@ class NewMessageFragment : Fragment() {
             action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = requireActivity().isFinishing,
             isTaskRoot = requireActivity().isTaskRoot,
-            rawSubject = binding.subjectTextField.text.toString(),
+            subjectValue = binding.subjectTextField.text.toString(),
             startWorkerCallback = ::startWorker,
         )
 
