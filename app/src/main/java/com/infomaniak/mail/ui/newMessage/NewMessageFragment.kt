@@ -425,9 +425,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeFromData() = with(newMessageViewModel) {
-        fromLiveData.observe(viewLifecycleOwner) { (signature, shouldUpdateUI) ->
+        fromLiveData.observe(viewLifecycleOwner) { (signature, shouldUpdateBodySignature) ->
             updateSelectedSignatureInFromField(signature)
-            if (shouldUpdateUI) updateSelectedSignatureInSignatureField(signature)
+            if (shouldUpdateBodySignature) updateBodySignature(signature)
             signatureAdapter.updateSelectedSignature(signature.id)
         }
     }
