@@ -534,7 +534,7 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (binding.subjectTextField.text?.isBlank() == true) {
+        if (isSubjectBlank()) {
             trackNewMessageEvent("sendWithoutSubject")
             descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
@@ -558,6 +558,8 @@ class NewMessageFragment : Fragment() {
     fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
 
     fun closeAiPrompt() = aiManager.closeAiPrompt()
+
+    fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
 
     companion object {
         private val TAG = NewMessageFragment::class.java.simpleName
