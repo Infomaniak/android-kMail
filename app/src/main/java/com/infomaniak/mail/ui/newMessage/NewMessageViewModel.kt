@@ -182,6 +182,13 @@ class NewMessageViewModel @Inject constructor(
             }
 
             draft?.let {
+
+                savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = it.localUuid
+
+                // If the user put the app in background before we put the fetched Draft in Realm, and the system
+                // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
+                savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
+
                 if (it.body.isNotEmpty()) splitSignatureAndQuoteFromBody(it)
                 if (!draftExists) populateWithExternalMailDataIfNeeded(it, intent)
                 it.flagRecipientsAsAutomaticallyEntered()
@@ -328,12 +335,6 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun Draft.initLiveData(signatures: List<Signature>) {
-
-        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
-
-        // If the user put the app in background before we put the fetched Draft in Realm, and the system
-        // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
-        savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
 
         fromLiveData.postValue(
             UiFrom(
