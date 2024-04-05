@@ -46,6 +46,7 @@ import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -505,6 +506,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onDeleteAttachment(position: Int) {
+        trackAttachmentActionsEvent("delete")
         newMessageViewModel.deleteAttachment(position)
     }
 
