@@ -479,16 +479,14 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
-            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
-                val newAttachments = importAttachments(currentAttachments = draft.attachments, uris = listOf(uri))
-                draft.attachments.addAll(newAttachments)
-            }
+            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+                ?.let { importAttachments(currentAttachments = draft.attachments, uris = listOf(it)) }
+                ?.let(draft.attachments::addAll)
         }
     }
 
     private fun handleMultipleSendIntent(draft: Draft, intent: Intent) {
-        intent
-            .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
+        intent.parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
             ?.filterIsInstance<Uri>()
             ?.let { importAttachments(currentAttachments = draft.attachments, uris = it) }
             ?.let(draft.attachments::addAll)
