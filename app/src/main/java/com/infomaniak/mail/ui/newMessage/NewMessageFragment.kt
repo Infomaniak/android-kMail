@@ -350,7 +350,10 @@ class NewMessageFragment : Fragment() {
                 navigateToNewMessageActivity = null,
             )
         }
-        removeQuote.setOnClickListener { newMessageViewModel.uiQuoteLiveData.value = null }
+        removeQuote.setOnClickListener {
+            trackNewMessageEvent("deleteQuote")
+            newMessageViewModel.uiQuoteLiveData.value = null
+        }
     }
 
     private fun WebView.loadSignatureContent(html: String, webViewGroup: Group) {
@@ -454,7 +457,6 @@ class NewMessageFragment : Fragment() {
     private fun observeUiQuote() = with(binding) {
         newMessageViewModel.uiQuoteLiveData.observe(viewLifecycleOwner) { quote ->
             if (quote == null) {
-                trackNewMessageEvent("deleteQuote")
                 quoteGroup.isGone = true
             } else {
                 quoteWebView.loadContent(quote, quoteGroup)
