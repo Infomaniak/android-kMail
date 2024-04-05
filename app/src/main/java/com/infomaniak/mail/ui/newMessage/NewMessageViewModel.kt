@@ -481,16 +481,26 @@ class NewMessageViewModel @Inject constructor(
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
             (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
-                ?.let { importAttachments(currentAttachments = draft.attachments, uris = listOf(it)) }
-                ?.let(draft.attachments::addAll)
+                ?.let {
+                    importAttachments(
+                        currentAttachments = draft.attachments,
+                        uris = listOf(it),
+                        completion = draft.attachments::addAll,
+                    )
+                }
         }
     }
 
     private fun handleMultipleSendIntent(draft: Draft, intent: Intent) {
         intent.parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
             ?.filterIsInstance<Uri>()
-            ?.let { importAttachments(currentAttachments = draft.attachments, uris = it) }
-            ?.let(draft.attachments::addAll)
+            ?.let {
+                importAttachments(
+                    currentAttachments = draft.attachments,
+                    uris = it,
+                    completion = draft.attachments::addAll,
+                )
+            }
     }
 
     /**
@@ -534,7 +544,11 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun importAttachments(currentAttachments: List<Attachment>, uris: List<Uri>): List<Attachment> {
+    fun importAttachments(
+        currentAttachments: List<Attachment>,
+        uris: List<Uri>,
+        completion: (List<Attachment>) -> Unit,
+    ) = viewModelScope.launch(ioCoroutineContext) {
 
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = currentAttachments.sumOf { it.size }
@@ -554,7 +568,7 @@ class NewMessageViewModel @Inject constructor(
 
         importAttachmentsResult.postValue(result)
 
-        return newAttachments
+        completion(newAttachments)
     }
 
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {

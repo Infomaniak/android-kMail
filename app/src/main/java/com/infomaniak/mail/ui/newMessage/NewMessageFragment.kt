@@ -453,8 +453,9 @@ class NewMessageFragment : Fragment() {
 
         importAttachmentsLiveData.observe(viewLifecycleOwner) { uris ->
             val currentAttachments = attachmentsLiveData.valueOrEmpty()
-            val newAttachments = importAttachments(currentAttachments, uris)
-            attachmentsLiveData.value = currentAttachments + newAttachments
+            importAttachments(currentAttachments, uris) { newAttachments ->
+                attachmentsLiveData.postValue(currentAttachments + newAttachments)
+            }
         }
     }
 
