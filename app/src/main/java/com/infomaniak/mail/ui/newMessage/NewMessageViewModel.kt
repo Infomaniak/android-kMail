@@ -99,9 +99,7 @@ class NewMessageViewModel @Inject constructor(
 
     var draftInRAM: Draft = Draft()
 
-    //region UI data
-    val subjectLiveData = SingleLiveEvent<String?>()
-    //endregion
+    val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false

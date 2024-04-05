@@ -155,12 +155,11 @@ class NewMessageFragment : Fragment() {
 
         observeNewAttachments()
         observeInitResult()
-        observeSubject()
+        observeAiOutput()
         editorManager.observeEditorActions()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
 
         with(aiManager) {
-            observeAiOutput()
             observeAiPromptStatus()
             observeAiFeatureFlagUpdates()
         }
@@ -467,8 +466,11 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeSubject() = with(binding) {
-        newMessageViewModel.subjectLiveData.observe(viewLifecycleOwner, subjectTextField::setText)
+    private fun observeAiOutput() = with(binding) {
+        newMessageViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
+            subject?.let(subjectTextField::setText)
+            bodyText.setText(content)
+        }
     }
 
     override fun onStop() = with(newMessageViewModel) {
