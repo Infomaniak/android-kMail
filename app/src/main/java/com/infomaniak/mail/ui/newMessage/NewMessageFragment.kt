@@ -68,10 +68,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -433,20 +430,20 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAttachments() {
-        newMessageViewModel.attachmentsLiveData.observe(viewLifecycleOwner) {
+        newMessageViewModel.attachmentsLiveData.observe(viewLifecycleOwner) { attachments ->
 
             if (shouldRegisterToImportedAttachments) observeImportAttachments()
 
-            attachmentAdapter.submitList(it)
+            attachmentAdapter.submitList(attachments)
 
-            binding.attachmentsRecyclerView.isVisible = if (it.isEmpty()) {
+            binding.attachmentsRecyclerView.isVisible = if (attachments.isEmpty()) {
                 if (attachmentAdapter.itemCount != 0) TransitionManager.beginDelayedTransition(binding.root)
                 false
             } else {
                 true
             }
 
-            newMessageViewModel.updateIsSendingAllowed(attachments = it)
+            newMessageViewModel.updateIsSendingAllowed(attachments)
         }
     }
 
