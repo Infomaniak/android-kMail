@@ -75,7 +75,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     val matomoTracker: Tracker by lazy { buildTracker() }
     var isAppInBackground = true
         private set
-    var lastAppClosingTime: Long? = firstLaunchTime
+    var lastAppClosingTime: Long? = FIRST_LAUNCH_TIME
         private set
 
     @Inject
@@ -260,6 +260,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     companion object {
-        const val firstLaunchTime = 0L
+        private const val FIRST_LAUNCH_TIME = 0L
     }
 }
