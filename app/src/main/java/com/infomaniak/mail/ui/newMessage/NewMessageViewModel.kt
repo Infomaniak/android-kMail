@@ -29,7 +29,6 @@ import androidx.lifecycle.*
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.OPEN_LOCAL_DRAFT
-import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
@@ -612,9 +611,6 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun deleteAttachment(position: Int) {
-
-        context.trackAttachmentActionsEvent("delete")
-
         runCatching {
             val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
             val attachment = attachments[position]
