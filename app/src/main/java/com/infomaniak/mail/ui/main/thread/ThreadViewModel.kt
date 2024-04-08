@@ -196,7 +196,6 @@ class ThreadViewModel @Inject constructor(
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
     }
 
-    // If we add a fourth case in the `when`, don't forget to add a fourth 'o' in the function name.
     private suspend fun formatLists(
         messages: List<Message>,
         computeBehavior: (Int, String) -> MessageBehavior,
