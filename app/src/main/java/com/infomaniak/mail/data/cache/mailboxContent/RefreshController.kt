@@ -708,9 +708,9 @@ class RefreshController @Inject constructor(
         val existingMessage = folderMessages[remoteMessage.uid]?.let {
             if (it.isManaged()) it else MessageController.getMessage(it.uid, realm = this)
         }
-        // Send Sentry and leave if needed
+        // Add Sentry log and leave if the message already exists
         if (existingMessage != null && !existingMessage.isOrphan()) {
-            SentryDebug.sendAlreadyExistingMessage(folder, remoteMessage, localSettings.threadMode)
+            SentryLog.i(TAG, "Already existing message in folder ${folder.name} | threadMode = ${localSettings.threadMode}")
             return true
         }
 
@@ -976,6 +976,7 @@ class RefreshController @Inject constructor(
     )
 
     companion object {
+        private val TAG = RefreshController::class.java.simpleName
         private val FIBONACCI_SEQUENCE = arrayOf(2, 8, 34, 144)
     }
 }
