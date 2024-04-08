@@ -40,13 +40,12 @@ data class NotificationPayload(
 
     val title get() = (if (behavior != null) behavior?.behaviorTitle else payloadTitle) ?: ""
     val content get() = if (behavior != null) behavior?.behaviorContent else payloadContent
-    val description get() = if (behavior != null) behavior?.behaviorDescription else payloadDescription
+    val description get() = if (behavior != null) null else payloadDescription
 
     data class NotificationBehavior(
         val type: NotificationType,
         val behaviorTitle: String? = null,
         val behaviorContent: String? = null,
-        val behaviorDescription: String? = null,
     ) : Serializable {
         enum class NotificationType : Serializable {
             SUMMARY,
