@@ -698,7 +698,7 @@ class NewMessageViewModel @Inject constructor(
 
         val hasFailed = mailboxContentRealm().writeBlocking {
             DraftController.getDraft(localUuid, realm = this)
-                ?.apply { updateDraftFromLiveData(action, subject, uiBodyValue, realm = this@writeBlocking) }
+                ?.updateDraftFromLiveData(action, subject, uiBodyValue, realm = this@writeBlocking)
                 ?: return@writeBlocking true
             return@writeBlocking false
         }
@@ -706,8 +706,8 @@ class NewMessageViewModel @Inject constructor(
         if (hasFailed) return@launch
 
         if (isFinishing) {
-            startWorkerCallback()
             if (isTaskRoot) showDraftToastToUser(action)
+            startWorkerCallback()
         }
 
         appContext.trackSendingDraftEvent(
