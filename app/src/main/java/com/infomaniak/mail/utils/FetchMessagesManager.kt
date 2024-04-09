@@ -251,8 +251,8 @@ class FetchMessagesManager @Inject constructor(
         private val TAG: String = FetchMessagesManager::class.java.simpleName
 
         // Based on what seems to be the limit taken into account by NotificationCompat.Builder, we truncate some fields to avoid
-        // pendingIntent that will trigger TransactionTooLargeException further down the line like sentry id 41593. We don't need
-        // the extra data, it was bound to be truncated anyway
-        private const val MAX_CHAR_LIMIT = 5 * 1024
+        // pendingIntent that will trigger TransactionTooLargeException further down the line like Sentry ID 41593. We don't need
+        // the extra data, it was bound to be truncated anyway.
+        private const val MAX_CHAR_LIMIT = 5 * 1_024
     }
 }
