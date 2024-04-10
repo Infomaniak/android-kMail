@@ -246,12 +246,12 @@ class MainViewModel @Inject constructor(
     private fun switchToValidMailbox() = viewModelScope.launch(ioCoroutineContext) {
         mailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.let {
             AccountUtils.switchToMailbox(it.mailboxId)
-        } ?: context.launchNoValidMailboxesActivity()
+        } ?: appContext.launchNoValidMailboxesActivity()
     }
 
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch(ioCoroutineContext) {
         currentMailbox.value?.let {
-            context.cancelNotification(it.notificationGroupId)
+            appContext.cancelNotification(it.notificationGroupId)
         }
     }
 
@@ -269,7 +269,7 @@ class MainViewModel @Inject constructor(
                 if (isSuccess()) {
                     mailboxController.updateMailboxes(data!!)
 
-                    val shouldStop = AccountUtils.manageMailboxesEdgeCases(context, data!!)
+                    val shouldStop = AccountUtils.manageMailboxesEdgeCases(appContext, data!!)
                     if (shouldStop) return@launch
                 }
             }
@@ -384,7 +384,7 @@ class MainViewModel @Inject constructor(
             if (isSuccess()) {
                 forceRefreshThreads()
             } else {
-                snackbarManager.postValue(context.getString(translatedError))
+                snackbarManager.postValue(appContext.getString(translatedError))
             }
         }
     }
@@ -413,7 +413,7 @@ class MainViewModel @Inject constructor(
 
     private fun updateContacts() {
         ApiRepository.getContacts().data?.let { apiContacts ->
-            val phoneMergedContacts = getPhoneContacts(context)
+            val phoneMergedContacts = getPhoneContacts(appContext)
             mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
             mergedContactController.update(phoneMergedContacts.values.toList())
         }
@@ -512,21 +512,21 @@ class MainViewModel @Inject constructor(
     ) {
 
         val snackbarTitle = if (apiResponse.isSuccess()) {
-            val destination = context.getString(FolderRole.TRASH.folderNameRes)
+            val destination = appContext.getString(FolderRole.TRASH.folderNameRes)
             when {
                 shouldPermanentlyDelete && message == null -> {
-                    context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
+                    appContext.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
                 }
                 shouldPermanentlyDelete && message != null -> {
-                    context.getString(R.string.snackbarMessageDeletedPermanently)
+                    appContext.getString(R.string.snackbarMessageDeletedPermanently)
                 }
                 !shouldPermanentlyDelete && message == null -> {
-                    context.resources.getQuantityString(R.plurals.snackbarThreadMoved, numberOfImpactedThreads, destination)
+                    appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, numberOfImpactedThreads, destination)
                 }
-                else -> context.getString(R.string.snackbarMessageMoved, destination)
+                else -> appContext.getString(R.string.snackbarMessageMoved, destination)
             }
         } else {
-            context.getString(apiResponse.translatedError)
+            appContext.getString(apiResponse.translatedError)
         }
 
         snackbarManager.postValue(snackbarTitle, undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
@@ -551,7 +551,7 @@ class MainViewModel @Inject constructor(
 
     private fun showDraftDeletedSnackbar(apiResponse: ApiResponse<Unit>) {
         val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
-        snackbarManager.postValue(context.getString(titleRes))
+        snackbarManager.postValue(appContext.getString(titleRes))
     }
     //endregion
 
@@ -592,12 +592,12 @@ class MainViewModel @Inject constructor(
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolder.id
 
-        val destination = destinationFolder.getLocalizedName(context)
+        val destination = destinationFolder.getLocalizedName(appContext)
 
         val snackbarTitle = when {
-            !apiResponse.isSuccess() -> context.getString(apiResponse.translatedError)
-            message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
-            else -> context.getString(R.string.snackbarMessageMoved, destination)
+            !apiResponse.isSuccess() -> appContext.getString(apiResponse.translatedError)
+            message == null -> appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
+            else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
         val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
@@ -835,7 +835,7 @@ class MainViewModel @Inject constructor(
             }
 
             reportPhishingTrigger.postValue(Unit)
-            snackbarManager.postValue(context.getString(snackbarTitle))
+            snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
     }
     //endregion
@@ -848,7 +848,7 @@ class MainViewModel @Inject constructor(
 
             val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translatedError
 
-            snackbarManager.postValue(context.getString(snackbarTitle))
+            snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
     }
     //endregion
@@ -872,7 +872,7 @@ class MainViewModel @Inject constructor(
                 if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
             }
 
-            snackbarManager.postValue(context.getString(snackbarTitle))
+            snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
     }
     //endregion
@@ -888,7 +888,7 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
             apiResponse.data?.id
         } else {
-            snackbarManager.postValue(title = context.getString(apiResponse.translateError()), undoData = null)
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()), undoData = null)
             null
         }
     }
@@ -965,7 +965,7 @@ class MainViewModel @Inject constructor(
                 translatedError
             }
 
-            snackbarManager.postValue(context.getString(snackbarTitle))
+            snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
     }
 
@@ -975,10 +975,10 @@ class MainViewModel @Inject constructor(
 
     fun selectOrUnselectAll() {
         if (isEverythingSelected) {
-            context.trackMultiSelectionEvent("none")
+            appContext.trackMultiSelectionEvent("none")
             selectedThreads.clear()
         } else {
-            context.trackMultiSelectionEvent("all")
+            appContext.trackMultiSelectionEvent("all")
             currentThreadsLive.value?.list?.forEach { thread -> selectedThreads.add(thread) }
         }
 
@@ -1009,7 +1009,7 @@ class MainViewModel @Inject constructor(
 
     fun handleDeletedMessages(uids: Set<String>) = viewModelScope.launch(ioCoroutineContext) {
 
-        snackbarManager.postValue(context.getString(R.string.snackbarDeletedConversation))
+        snackbarManager.postValue(appContext.getString(R.string.snackbarDeletedConversation))
 
         val mailbox = currentMailbox.value ?: return@launch
         val realm = mailboxContentRealm()
@@ -1030,13 +1030,13 @@ class MainViewModel @Inject constructor(
 
     fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
         val snackbarTitleRes = if (ApiRepository.ping().isSuccess()) {
-            DownloadManagerUtils.scheduleDownload(context, downloadUrl, filename)
+            DownloadManagerUtils.scheduleDownload(appContext, downloadUrl, filename)
             R.string.snackbarDownloadInProgress
         } else {
             RCore.string.errorDownload
         }
 
-        snackbarManager.postValue(context.getString(snackbarTitleRes))
+        snackbarManager.postValue(appContext.getString(snackbarTitleRes))
     }
 
     companion object {

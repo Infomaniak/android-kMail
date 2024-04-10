@@ -28,7 +28,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -53,8 +53,8 @@ class DownloadAttachmentViewModel @Inject constructor(
 
     fun downloadAttachment() = liveData(ioCoroutineContext) {
         val localAttachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
-        val attachmentFile = localAttachment.getCacheFile(context)
-        val isAttachmentCached = localAttachment.hasUsableCache(context, attachmentFile) ||
+        val attachmentFile = localAttachment.getCacheFile(appContext)
+        val isAttachmentCached = localAttachment.hasUsableCache(appContext, attachmentFile) ||
                 LocalStorageUtils.saveAttachmentToCache(attachmentResource, attachmentFile)
 
         if (isAttachmentCached) {
@@ -67,7 +67,7 @@ class DownloadAttachmentViewModel @Inject constructor(
 
     override fun onCleared() = runCatchingRealm {
         // If we end up with an incomplete cached Attachment, we delete it
-        attachment?.getCacheFile(context)?.apply { if (exists()) delete() }
+        attachment?.getCacheFile(appContext)?.apply { if (exists()) delete() }
         super.onCleared()
     }.getOrDefault(Unit)
 }

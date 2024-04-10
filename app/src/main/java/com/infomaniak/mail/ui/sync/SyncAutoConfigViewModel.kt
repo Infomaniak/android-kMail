@@ -31,7 +31,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -48,7 +48,7 @@ class SyncAutoConfigViewModel @Inject constructor(
     private var credentialsJob: Job? = null
 
     fun isSyncAppUpToDate(): Boolean = runCatching {
-        val packageInfo = context.packageManager.getPackageInfo(SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)
+        val packageInfo = appContext.packageManager.getPackageInfo(SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)
 
         val versionCode = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             packageInfo.versionCode.toLong()
@@ -76,7 +76,7 @@ class SyncAutoConfigViewModel @Inject constructor(
         scope.ensureActive()
 
         return apiResponse.data?.password.also { password ->
-            if (password == null) snackbarManager.postValue(context.getString(R.string.errorGetCredentials))
+            if (password == null) snackbarManager.postValue(appContext.getString(R.string.errorGetCredentials))
         }
     }
 
@@ -93,7 +93,7 @@ class SyncAutoConfigViewModel @Inject constructor(
                 putExtra(SYNC_PASSWORD_KEY, infomaniakPassword)
             }.also(launchAutoSyncIntent)
         } else {
-            snackbarManager.postValue(context.getString(RCore.string.anErrorHasOccurred))
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             SentryDebug.sendCredentialsIssue(infomaniakLogin, infomaniakPassword)
         }
     }

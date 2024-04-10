@@ -492,7 +492,7 @@ fun TextInputEditText.handleEditorSearchAction(searchCallback: (String) -> Unit)
 
 fun CharSequence.standardize(): String = toString().removeAccents().trim().lowercase()
 
-inline val AndroidViewModel.context: Context get() = getApplication()
+inline val AndroidViewModel.appContext: Context get() = getApplication()
 
 val TextInputEditText.trimmedText inline get() = text?.trim().toString()
 
