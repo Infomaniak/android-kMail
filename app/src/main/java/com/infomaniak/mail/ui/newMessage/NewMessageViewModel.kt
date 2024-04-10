@@ -58,7 +58,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.isEmail
 import com.infomaniak.mail.utils.extensions.textToHtml
@@ -226,11 +226,11 @@ class NewMessageViewModel @Inject constructor(
 
     private fun getLocalOrRemoteDraft(uuid: String): Draft? {
         fun trackOpenLocal(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
-            context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
+            appContext.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
         }
 
         fun trackOpenRemote(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
-            context.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
+            appContext.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
         }
 
         return getLatestLocalDraft(uuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
@@ -553,8 +553,8 @@ class NewMessageViewModel @Inject constructor(
         updateIsSendingAllowed()
         saveDraftDebouncing()
 
-        context.trackNewMessageEvent("deleteRecipient")
-        if (recipient.displayAsExternal) context.trackExternalEvent("deleteRecipient")
+        appContext.trackNewMessageEvent("deleteRecipient")
+        if (recipient.displayAsExternal) appContext.trackExternalEvent("deleteRecipient")
     }
 
     fun updateMailSubject(newSubject: String?) = with(draft) {
@@ -599,7 +599,7 @@ class NewMessageViewModel @Inject constructor(
             return@launch
         }
 
-        context.trackSendingDraftEvent(action, draft, currentMailbox.externalMailFlagEnabled)
+        appContext.trackSendingDraftEvent(action, draft, currentMailbox.externalMailFlagEnabled)
 
         saveDraftToLocal(action)
         showDraftToastToUser(action, isFinishing, isTaskRoot)
@@ -619,13 +619,13 @@ class NewMessageViewModel @Inject constructor(
         when (action) {
             DraftAction.SAVE -> {
                 if (isFinishing) {
-                    if (isTaskRoot) context.showToast(R.string.snackbarDraftSaving)
+                    if (isTaskRoot) appContext.showToast(R.string.snackbarDraftSaving)
                 } else {
-                    context.showToast(R.string.snackbarDraftSaving)
+                    appContext.showToast(R.string.snackbarDraftSaving)
                 }
             }
             DraftAction.SEND -> {
-                if (isTaskRoot) context.showToast(R.string.snackbarEmailSending)
+                if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
             }
         }
     }
@@ -691,10 +691,10 @@ class NewMessageViewModel @Inject constructor(
 
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
 
-        val (fileName, fileSize) = context.getFileNameAndSize(uri) ?: return null
+        val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null
         if (fileSize > availableSpace) return null to true
 
-        return LocalStorageUtils.saveUploadAttachment(context, uri, fileName, draft.localUuid)
+        return LocalStorageUtils.saveUploadAttachment(appContext, uri, fileName, draft.localUuid)
             ?.let { file ->
                 val mimeType = file.path.guessMimeType()
                 Attachment().initLocalValues(fileName, file.length(), mimeType, file.toUri().toString()) to false
@@ -702,7 +702,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(context, draft.localUuid)
+        LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(appContext, draft.localUuid)
         autoSaveJob?.cancel()
         super.onCleared()
     }

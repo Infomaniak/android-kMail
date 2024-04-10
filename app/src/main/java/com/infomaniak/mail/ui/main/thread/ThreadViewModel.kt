@@ -37,7 +37,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
-import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -271,12 +271,12 @@ class ThreadViewModel @Inject constructor(
 
         val nbMessages = thread.messages.count()
 
-        context.trackUserInfo("nbMessagesInThread", nbMessages)
+        appContext.trackUserInfo("nbMessagesInThread", nbMessages)
 
         when (nbMessages) {
             0 -> SentryDebug.sendEmptyThread(thread)
-            1 -> context.trackUserInfo("oneMessagesInThread")
-            else -> context.trackUserInfo("multipleMessagesInThread", nbMessages)
+            1 -> appContext.trackUserInfo("oneMessagesInThread")
+            else -> appContext.trackUserInfo("multipleMessagesInThread", nbMessages)
         }
     }
 

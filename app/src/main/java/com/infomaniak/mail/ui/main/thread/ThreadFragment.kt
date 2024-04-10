@@ -312,7 +312,7 @@ class ThreadFragment : Fragment() {
 
         binding.messagesList.addItemDecoration(
             DividerItemDecorator(
-                divider = InsetDrawable(dividerDrawable(context), 0),
+                divider = InsetDrawable(dividerDrawable(requireContext()), 0),
                 shouldIgnoreView = { view -> view.tag == ThreadAdapter.IGNORE_DIVIDER_TAG },
             ),
         )

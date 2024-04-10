@@ -37,7 +37,7 @@ import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.getMenuFolders
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
@@ -117,7 +117,7 @@ class SearchViewModel @Inject constructor(
     fun setFilter(filter: ThreadFilter, isEnabled: Boolean = true) = viewModelScope.launch(ioCoroutineContext) {
         if (isEnabled && currentFilters.contains(filter)) return@launch
         if (isEnabled) {
-            context.trackSearchEvent(filter.matomoValue)
+            appContext.trackSearchEvent(filter.matomoValue)
             filter.select()
         } else {
             filter.unselect()

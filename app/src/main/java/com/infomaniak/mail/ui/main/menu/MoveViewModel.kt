@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.extensions.context
+import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.getCustomMenuFolders
 import com.infomaniak.mail.utils.extensions.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -73,7 +73,7 @@ class MoveViewModel @Inject constructor(
                 ensureActive()
             }
             val filteredFolders = folders.filter { folder ->
-                val folderName = folder.role?.folderNameRes?.let(context::getString) ?: folder.name
+                val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
                 folderName.standardize().contains(query.standardize())
             }
 
