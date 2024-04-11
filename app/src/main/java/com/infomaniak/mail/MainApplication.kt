@@ -54,7 +54,9 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
+import io.sentry.Sentry
 import io.sentry.SentryEvent
+import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
@@ -236,6 +238,12 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             notificationManagerCompat.notify(UUID.randomUUID().hashCode(), builder.build())
         } else {
             globalCoroutineScope.launch(mainDispatcher) { showToast(notificationText) }
+        }
+
+        Sentry.withScope { scope ->
+            scope.level = SentryLevel.ERROR
+            scope.setExtra("userId", "${user.id}")
+            Sentry.captureMessage("Refresh Token Error")
         }
 
         globalCoroutineScope.launch(ioDispatcher) { logoutUser(user) }
