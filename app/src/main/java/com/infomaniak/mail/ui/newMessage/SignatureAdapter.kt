@@ -75,7 +75,7 @@ class SignatureAdapter(
 
     override fun isEnabled(position: Int): Boolean = true
 
-    fun updateList(newList: List<Signature>) = with(signatures) {
+    fun setList(newList: List<Signature>) = with(signatures) {
         clear()
         addAll(newList)
     }
