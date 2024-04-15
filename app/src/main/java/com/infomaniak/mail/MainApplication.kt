@@ -243,6 +243,17 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         Sentry.withScope { scope ->
             scope.level = SentryLevel.ERROR
             scope.setExtra("userId", "${user.id}")
+
+            val accessToken = user.apiToken.accessToken
+            scope.setExtra("accessToken", accessToken.take(2) + "**" + accessToken.takeLast(2))
+
+            val refreshTokenMessage = user.apiToken.refreshToken?.let { refreshToken ->
+                refreshToken.take(2) + "**" + refreshToken.takeLast(2)
+            } ?: "null"
+            scope.setExtra("accessToken", refreshTokenMessage)
+
+            // TODO : dates limites du token
+
             Sentry.captureMessage("Refresh Token Error")
         }
 
