@@ -100,10 +100,6 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackAttachmentActionsEvent(name: String) {
-        context?.trackAttachmentActionsEvent(name)
-    }
-
-    fun Context.trackAttachmentActionsEvent(name: String) {
         trackEvent("attachmentActions", name)
     }
 
