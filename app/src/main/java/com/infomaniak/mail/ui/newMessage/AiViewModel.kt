@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
@@ -59,6 +60,7 @@ class AiViewModel @Inject constructor(
     var previousMessageBodyPlainText by aiSharedData::previousMessageBodyPlainText
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
+    val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
 
     fun generateNewAiProposition(
         currentMailboxUuid: String,
