@@ -99,8 +99,6 @@ class NewMessageViewModel @Inject constructor(
 
     var draftInRAM: Draft = Draft()
 
-    val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
-
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
