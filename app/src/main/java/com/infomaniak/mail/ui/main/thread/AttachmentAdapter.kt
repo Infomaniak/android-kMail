@@ -83,8 +83,7 @@ class AttachmentAdapter(
     }
 
     fun submitList(newList: List<Attachment>) {
-        attachments.clear()
-        attachments.addAll(newList.filterNot { it.disposition == AttachmentDisposition.INLINE })
+        setAttachments(newList.filterNot { it.disposition == AttachmentDisposition.INLINE })
         notifyDataSetChanged()
     }
 
