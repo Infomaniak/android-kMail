@@ -325,6 +325,10 @@ class NewMessageViewModel @Inject constructor(
 
         savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
 
+        // If the user put the app in background before we put the fetched Draft in Realm, and the system
+        // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
+        savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
+
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherFieldsAreAllEmpty.postValue(false)
             initializeFieldsAsOpen.postValue(true)
