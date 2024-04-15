@@ -74,7 +74,6 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import java.util.UUID
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -156,7 +155,6 @@ class NewMessageFragment : Fragment() {
         doAfterBodyChange()
 
         observeNewAttachments()
-        observeDraftWorkerResults()
         observeInitResult()
 
         editorManager.observeEditorActions()
@@ -208,11 +206,6 @@ class NewMessageFragment : Fragment() {
     private fun setWebViewReference() {
         quoteWebView = binding.quoteWebView
         signatureWebView = binding.signatureWebView
-    }
-
-    override fun onStart() {
-        super.onStart()
-        newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -322,7 +315,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun populateUiWithViewModel(draft: Draft) = with(binding) {
+    private fun configureUiWithDraftData(draft: Draft) = with(binding) {
         recipientFieldsManager.initRecipients(draft)
 
         newMessageViewModel.updateIsSendingAllowed()
@@ -462,7 +455,7 @@ class NewMessageFragment : Fragment() {
     private fun observeInitResult() {
         newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
             hideLoader()
-            populateUiWithViewModel(draft)
+            configureUiWithDraftData(draft)
             setupFromField(signatures)
             editorManager.setupEditorActions()
             editorManager.setupEditorFormatActionsToggle()
@@ -482,20 +475,6 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeDraftWorkerResults() {
-        WorkerUtils.flushWorkersBefore(requireContext(), viewLifecycleOwner) {
-
-            val treatedWorkInfoUuids = mutableSetOf<UUID>()
-
-            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
-                it.forEach { workInfo ->
-                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
-                    newMessageViewModel.synchronizeViewModelDraftFromRealm()
-                }
-            }
-        }
-    }
-
     override fun onStop() = with(newMessageViewModel) {
 
         executeDraftActionWhenStopping(
@@ -509,7 +488,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftInRAM.localUuid)
+        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
