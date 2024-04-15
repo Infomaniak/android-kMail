@@ -89,6 +89,13 @@ class NewMessageAiManager @Inject constructor(
         _aiViewModel = aiViewModel
     }
 
+    fun observeAiOutput() = with(binding) {
+        aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
+            subject?.let(subjectTextField::setText)
+            bodyText.setText(content)
+        }
+    }
+
     fun observeAiPromptStatus() {
         aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent, becauseOfGeneration) ->
             if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed(becauseOfGeneration)

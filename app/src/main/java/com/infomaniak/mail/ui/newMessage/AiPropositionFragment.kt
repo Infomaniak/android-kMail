@@ -170,7 +170,7 @@ class AiPropositionFragment : Fragment() {
 
         fun applyProposition(subject: String?, content: String) {
             trackInsertionType()
-            newMessageViewModel.aiOutputToInsert.value = subject to content
+            aiOutputToInsert.value = subject to content
             findNavController().popBackStack()
         }
 
