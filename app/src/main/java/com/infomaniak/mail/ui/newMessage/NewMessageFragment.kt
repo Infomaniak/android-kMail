@@ -429,17 +429,17 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeAttachments() {
-        newMessageViewModel.attachmentsLiveData.observe(viewLifecycleOwner) { attachments ->
+    private fun observeAttachments() = with(newMessageViewModel) {
+        attachmentsLiveData.observe(viewLifecycleOwner) { attachments ->
 
             if (shouldRegisterToImportedAttachments) observeImportAttachments()
 
+            val shouldTransition = attachmentAdapter.itemCount != 0 && attachments.isEmpty()
             attachmentAdapter.submitList(attachments)
-
-            if (attachments.isEmpty() && attachmentAdapter.itemCount != 0) TransitionManager.beginDelayedTransition(binding.root)
+            if (shouldTransition) TransitionManager.beginDelayedTransition(binding.root)
             binding.attachmentsRecyclerView.isVisible = attachments.isNotEmpty()
 
-            newMessageViewModel.updateIsSendingAllowed(attachments)
+            updateIsSendingAllowed(attachments)
         }
     }
 
