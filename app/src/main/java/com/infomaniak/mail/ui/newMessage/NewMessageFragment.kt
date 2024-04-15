@@ -374,7 +374,7 @@ class NewMessageFragment : Fragment() {
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
-        signatureAdapter.updateList(signatures)
+        signatureAdapter.setList(signatures)
 
         fromMailAddress.post {
             runCatching {
