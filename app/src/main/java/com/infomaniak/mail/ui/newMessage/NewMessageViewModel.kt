@@ -542,10 +542,7 @@ class NewMessageViewModel @Inject constructor(
         completion(importAttachments(currentAttachments, uris))
     }
 
-    private fun importAttachments(
-        currentAttachments: List<Attachment>,
-        uris: List<Uri>,
-    ): List<Attachment> {
+    private fun importAttachments(currentAttachments: List<Attachment>, uris: List<Uri>): List<Attachment> {
 
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = currentAttachments.sumOf { it.size }
@@ -634,9 +631,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun updateIsSendingAllowed(
-        attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty(),
-    ) {
+    fun updateIsSendingAllowed(attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty()) {
         isSendingAllowed.value = if (draftInRAM.hasRecipient()) {
             var size = 0L
             var isSizeCorrect = true
