@@ -30,6 +30,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
@@ -60,6 +61,8 @@ class AiPropositionFragment : Fragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private val navigationArgs: AiPropositionFragmentArgs by navArgs()
 
     private var currentRequestJob: Job? = null
 
@@ -173,7 +176,7 @@ class AiPropositionFragment : Fragment() {
 
         val (subject, content) = splitBodyAndSubject(getLastMessage())
 
-        if (subject == null || newMessageViewModel.draftInRAM.subject.isNullOrBlank()) {
+        if (subject == null || navigationArgs.isSubjectBlank) {
             applyProposition(subject, content)
         } else {
             trackAiWriterEvent("replaceSubjectDialog")

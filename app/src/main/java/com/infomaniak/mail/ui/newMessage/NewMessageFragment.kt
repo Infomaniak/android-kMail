@@ -151,12 +151,10 @@ class NewMessageFragment : Fragment() {
 
         handleOnBackPressed()
 
-        doAfterSubjectChange()
         doAfterBodyChange()
 
         observeNewAttachments()
         observeInitResult()
-
         editorManager.observeEditorActions()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
 
@@ -272,9 +270,10 @@ class NewMessageFragment : Fragment() {
 
     private fun initializeDraft() = with(newMessageViewModel) {
         if (initResult.value == null) {
-            initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { isSuccess ->
-                if (isSuccess) {
+            initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
+                if (draft != null) {
                     showKeyboardInCorrectView()
+                    binding.subjectTextField.setText(draft.subject)
                 } else {
                     requireActivity().apply {
                         showToast(R.string.failToOpenDraft)
@@ -319,8 +318,6 @@ class NewMessageFragment : Fragment() {
         recipientFieldsManager.initRecipients(draft)
 
         newMessageViewModel.updateIsSendingAllowed()
-
-        subjectTextField.setText(draft.subject)
 
         attachmentAdapter.addAll(draft.attachments)
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
@@ -440,12 +437,6 @@ class NewMessageFragment : Fragment() {
         binding.fromMailAddress.text = formattedExpeditor
     }
 
-    private fun doAfterSubjectChange() {
-        binding.subjectTextField.doAfterTextChanged { editable ->
-            editable?.toString()?.let { newMessageViewModel.updateMailSubject(it.ifBlank { null }) }
-        }
-    }
-
     private fun doAfterBodyChange() {
         binding.bodyText.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
@@ -481,6 +472,7 @@ class NewMessageFragment : Fragment() {
             action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = requireActivity().isFinishing,
             isTaskRoot = requireActivity().isTaskRoot,
+            subjectValue = binding.subjectTextField.text.toString(),
             startWorkerCallback = ::startWorker,
         )
 
@@ -535,7 +527,7 @@ class NewMessageFragment : Fragment() {
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
 
-        if (newMessageViewModel.draftInRAM.subject.isNullOrBlank()) {
+        if (isSubjectBlank()) {
             trackNewMessageEvent("sendWithoutSubject")
             descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
@@ -559,6 +551,8 @@ class NewMessageFragment : Fragment() {
     fun navigateToPropositionFragment() = aiManager.navigateToPropositionFragment()
 
     fun closeAiPrompt() = aiManager.closeAiPrompt()
+
+    fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
 
     companion object {
         private val TAG = NewMessageFragment::class.java.simpleName

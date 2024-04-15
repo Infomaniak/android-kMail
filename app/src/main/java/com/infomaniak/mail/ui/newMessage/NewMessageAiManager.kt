@@ -220,7 +220,12 @@ class NewMessageAiManager @Inject constructor(
 
         closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
-        fragment.safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment())
+
+        fragment.safeNavigate(
+            NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
+                isSubjectBlank = fragment.isSubjectBlank(),
+            ),
+        )
     }
 
     fun openAiPrompt() {

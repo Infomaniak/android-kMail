@@ -98,6 +98,7 @@ class NewMessageViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     var draftInRAM: Draft = Draft()
+
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
@@ -154,7 +155,7 @@ class NewMessageViewModel @Inject constructor(
     fun recipient() = recipient
     fun shouldLoadDistantResources() = shouldLoadDistantResources
 
-    fun initDraftAndViewModel(intent: Intent): LiveData<Boolean> = liveData(ioCoroutineContext) {
+    fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
 
         val realm = mailboxContentRealm()
         var signatures = emptyList<Signature>()
@@ -196,8 +197,7 @@ class NewMessageViewModel @Inject constructor(
             initResult.postValue(InitResult(it, signatures))
         }
 
-        val isSuccess = draft != null
-        emit(isSuccess)
+        emit(draft)
     }
 
     //region Initialization: 1st level of private fun
@@ -605,10 +605,6 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun updateMailSubject(newSubject: String?) = with(draftInRAM) {
-        if (newSubject != subject) subject = newSubject
-    }
-
     fun updateMailBody(newBody: String) = with(draftInRAM) {
         if (newBody != uiBody) uiBody = newBody
     }
@@ -621,14 +617,16 @@ class NewMessageViewModel @Inject constructor(
         action: DraftAction,
         isFinishing: Boolean,
         isTaskRoot: Boolean,
+        subjectValue: String,
         startWorkerCallback: () -> Unit,
     ) = globalCoroutineScope.launch(ioDispatcher) {
 
         val draft = getLatestLocalDraft(draftLocalUuid) ?: return@launch
+        val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        draft.updateDraftFromLiveData(action)
+        draft.updateDraftFromLiveData(action, subject)
 
-        if (isFinishing && isSavingDraftWithoutChanges(draft, action)) {
+        if (isFinishing && isSavingDraftWithoutChanges(draft, action, subject)) {
             if (!arrivedFromExistingDraft) removeDraftFromRealm(draft.localUuid)
             return@launch
         }
@@ -648,7 +646,7 @@ class NewMessageViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private fun Draft.updateDraftFromLiveData(draftAction: DraftAction) {
+    private fun Draft.updateDraftFromLiveData(draftAction: DraftAction, subjectValue: String?) {
 
         action = draftAction
         identityId = draftInRAM.identityId
@@ -662,7 +660,7 @@ class NewMessageViewModel @Inject constructor(
             addAll(draftInRAM.attachments)
         }
 
-        subject = draftInRAM.subject?.take(SUBJECT_MAX_LENGTH)
+        subject = subjectValue
 
         uiBody = draftInRAM.uiBody
         uiSignature = draftInRAM.uiSignature
@@ -671,16 +669,16 @@ class NewMessageViewModel @Inject constructor(
         body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
     }
 
-    private fun isSavingDraftWithoutChanges(draft: Draft, action: DraftAction): Boolean {
-        return action == DraftAction.SAVE && snapshot?.hasChanges(draft) != true
+    private fun isSavingDraftWithoutChanges(draft: Draft, action: DraftAction, subject: String?): Boolean {
+        return action == DraftAction.SAVE && snapshot?.hasChanges(draft, subject) != true
     }
 
-    private fun DraftSnapshot.hasChanges(draft: Draft): Boolean {
+    private fun DraftSnapshot.hasChanges(draft: Draft, subjectValue: String?): Boolean {
         return identityId != draft.identityId ||
                 to != draft.to.toSet() ||
                 cc != draft.cc.toSet() ||
                 bcc != draft.bcc.toSet() ||
-                subject != draft.subject ||
+                subject != subjectValue ||
                 body != draft.uiBody ||
                 attachmentsUuids != draft.attachments.map { it.uuid }.toSet()
     }
