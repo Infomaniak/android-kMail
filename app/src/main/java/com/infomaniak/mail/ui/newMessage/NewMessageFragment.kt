@@ -436,12 +436,8 @@ class NewMessageFragment : Fragment() {
 
             attachmentAdapter.submitList(attachments)
 
-            binding.attachmentsRecyclerView.isVisible = if (attachments.isEmpty()) {
-                if (attachmentAdapter.itemCount != 0) TransitionManager.beginDelayedTransition(binding.root)
-                false
-            } else {
-                true
-            }
+            if (attachments.isEmpty() && attachmentAdapter.itemCount != 0) TransitionManager.beginDelayedTransition(binding.root)
+            binding.attachmentsRecyclerView.isVisible = attachments.isNotEmpty()
 
             newMessageViewModel.updateIsSendingAllowed(attachments)
         }
