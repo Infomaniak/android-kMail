@@ -155,11 +155,11 @@ class NewMessageFragment : Fragment() {
 
         observeNewAttachments()
         observeInitResult()
-        observeAiOutput()
         editorManager.observeEditorActions()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
 
         with(aiManager) {
+            observeAiOutput()
             observeAiPromptStatus()
             observeAiFeatureFlagUpdates()
         }
@@ -463,13 +463,6 @@ class NewMessageFragment : Fragment() {
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
             updateIsSendingAllowed()
-        }
-    }
-
-    private fun observeAiOutput() = with(binding) {
-        newMessageViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
-            subject?.let(subjectTextField::setText)
-            bodyText.setText(content)
         }
     }
 
