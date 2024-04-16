@@ -227,15 +227,13 @@ object SentryDebug {
             Sentry.withScope { scope ->
                 scope.setExtra(
                     "orphanDrafts",
-                    "${
-                        orphanDrafts.map {
-                            if (it.messageUid == null) {
-                                "${Draft::subject.name}: [${it.subject}]"
-                            } else {
-                                "${Draft::messageUid.name}: ${it.messageUid}"
-                            }
+                    orphanDrafts.joinToString {
+                        if (it.messageUid == null) {
+                            "${Draft::subject.name}: [${it.subject}]"
+                        } else {
+                            "${Draft::messageUid.name}: ${it.messageUid}"
                         }
-                    }",
+                    },
                 )
                 Sentry.captureMessage("We found some orphan Drafts.", SentryLevel.ERROR)
             }
