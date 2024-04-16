@@ -72,10 +72,9 @@ object MessageBodyUtils {
             },
             onTimeout = {
                 Sentry.withScope { scope ->
-                    scope.level = SentryLevel.WARNING
                     scope.setExtra("body size", "${bodyContent.toByteArray().size} bytes")
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    Sentry.captureMessage("Timeout reached while displaying a Message's body")
+                    Sentry.captureMessage("Timeout reached while displaying a Message's body", SentryLevel.WARNING)
                 }
             },
         )

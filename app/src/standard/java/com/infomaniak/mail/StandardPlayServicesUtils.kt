@@ -73,18 +73,14 @@ class StandardPlayServicesUtils @Inject constructor(
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
                     scope.setExtra("task.exception", task.exception.toString())
-                    Sentry.captureMessage("Fetching FCM registration token failed")
+                    Sentry.captureMessage("Fetching FCM registration token failed", SentryLevel.ERROR)
                 }
                 SentryLog.w("firebase", "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener
             }
             if (task.result == null) {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    Sentry.captureMessage("FirebaseMessaging token is null")
-                }
+                Sentry.captureMessage("FirebaseMessaging token is null", SentryLevel.ERROR)
                 return@addOnCompleteListener
             }
 

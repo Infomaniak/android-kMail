@@ -63,9 +63,8 @@ object ConfettiUtils {
     ) = with(container.context) {
 
         Sentry.withScope { scope ->
-            scope.level = SentryLevel.INFO
             scope.setTag("from", matomoValue)
-            Sentry.captureMessage("Easter egg Confetti has been triggered! Woohoo!")
+            Sentry.captureMessage("Easter egg Confetti has been triggered! Woohoo!", SentryLevel.INFO)
         }
 
         trackEasterEggEvent("confetti$matomoValue")

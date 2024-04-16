@@ -509,10 +509,7 @@ class MainActivity : BaseActivity() {
                 isVisible = true
                 playAnimation()
             }
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.INFO
-                Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
-            }
+            Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!", SentryLevel.INFO)
             trackEasterEggEvent("xmas${Date().year()}")
         }
     }

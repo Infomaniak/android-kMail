@@ -160,12 +160,11 @@ class Message : RealmObject {
                 _folders.single { _folders.count() == 1 || it.id != SEARCH_FOLDER_ID }
             }.getOrElse {
                 Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
                     scope.setExtra("folders", "${_folders.map { "name:[${it.name}] (id:[${it.id}])" }}")
                     scope.setExtra("foldersCount", "${_folders.count()}")
                     scope.setExtra("messageUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    Sentry.captureMessage("Message has several or 0 parent folders, it should not be possible")
+                    Sentry.captureMessage("Message has several or 0 parent folders, it should not be possible", SentryLevel.ERROR)
                 }
                 _folders.first()
             }

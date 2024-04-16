@@ -100,12 +100,11 @@ class Thread : RealmObject {
                 _folders.single()
             }.getOrElse {
                 Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
                     scope.setExtra("folders", "${_folders.map { "name:[${it.name}] (id:[${it.id}])" }}")
                     scope.setExtra("foldersCount", "${_folders.count()}")
                     scope.setExtra("threadUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    Sentry.captureMessage("Thread has several or 0 parent folders, it should not be possible")
+                    Sentry.captureMessage("Thread has several or 0 parent folders, it should not be possible", SentryLevel.ERROR)
                 }
                 _folders.first()
             }
