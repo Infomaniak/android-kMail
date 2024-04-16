@@ -432,7 +432,10 @@ class NewMessageFragment : Fragment() {
     private fun observeAttachments() = with(newMessageViewModel) {
         attachmentsLiveData.observe(viewLifecycleOwner) { attachments ->
 
-            if (shouldRegisterToImportedAttachments) observeImportAttachments()
+            if (shouldRegisterToImportedAttachments) {
+                shouldRegisterToImportedAttachments = false
+                observeImportAttachments()
+            }
 
             val shouldTransition = attachmentAdapter.itemCount != 0 && attachments.isEmpty()
             attachmentAdapter.submitList(attachments)
@@ -444,9 +447,6 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeImportAttachments() = with(newMessageViewModel) {
-
-        shouldRegisterToImportedAttachments = false
-
         importAttachmentsLiveData.observe(viewLifecycleOwner) { uris ->
             val currentAttachments = attachmentsLiveData.valueOrEmpty()
             importNewAttachments(currentAttachments, uris) { newAttachments ->
