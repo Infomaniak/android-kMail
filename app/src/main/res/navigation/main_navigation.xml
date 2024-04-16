@@ -568,7 +568,19 @@
     <fragment
         android:id="@+id/managementDataFragment"
         android:name="com.infomaniak.mail.ui.main.settings.ManagementDataFragment"
-        android:label="ManagementDataFragment" />
+        android:label="ManagementDataFragment"
+        tools:layout="@layout/fragment_management_data_settings">
+        <action
+            android:id="@+id/action_dataManagement_to_matomo"
+            app:destination="@id/matomoDataManagementDataFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/matomoDataManagementDataFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.MatomoDataManagementFragment"
+        android:label="MatomoManagementDataFragment"
+        tools:layout="@layout/fragment_management_data_settings">
+    </fragment>
 
     <dialog
         android:id="@+id/attachmentActionsBottomSheetDialog"

@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.*
+import com.infomaniak.mail.utils.extensions.animatedNavigation
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,4 +34,17 @@ class ManagementDataFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentManagementDataSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
+        setupListeners()
+    }
+    private fun setupListeners() = with(binding) {
+        dataManagementMatomo.setOnClickListener {
+            animatedNavigation(ManagementDataFragmentDirections.actionDataManagementToMatomo())
+        }
+    }
+
+
 }

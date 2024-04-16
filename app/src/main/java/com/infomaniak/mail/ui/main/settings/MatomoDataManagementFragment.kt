@@ -23,11 +23,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.databinding.FragmentMonomoManagementDataBinding
+import com.infomaniak.mail.databinding.FragmentMatomoManagementDataBinding
 
-class MonomoDataManagementFragment : Fragment() {
-    private var binding: FragmentMonomoManagementDataBinding by safeBinding()
+class MatomoDataManagementFragment : Fragment() {
+    private var binding: FragmentMatomoManagementDataBinding by safeBinding()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentMonomoManagementDataBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentMatomoManagementDataBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 }
