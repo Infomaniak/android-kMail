@@ -361,6 +361,7 @@ class NewMessageViewModel @Inject constructor(
     //endregion
 
     //region Initialization: 2nd level of private fun
+    @Suppress("UNUSED_PARAMETER")
     private fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
 
         fun trackOpenLocal(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
