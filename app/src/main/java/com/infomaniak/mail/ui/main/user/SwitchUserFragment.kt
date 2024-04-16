@@ -66,7 +66,8 @@ class SwitchUserFragment : Fragment() {
         }
     }
 
-    private fun observeAccounts() {
-        switchUserViewModel.allUsers.observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
+    private fun observeAccounts() = with(switchUserViewModel) {
+        accounts.observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
+        getAccountsInDB()
     }
 }
