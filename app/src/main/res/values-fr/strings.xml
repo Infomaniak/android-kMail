@@ -398,7 +398,7 @@
     <string name="settingsAppLock">Verrouillage de l’application</string>
     <string name="settingsCancellationPeriodDescription">Vous avez la possibilité d’annuler l’envoi de votre e-mail jusqu’à 30 secondes</string>
     <string name="settingsCancellationPeriodTitle">Délai d’annulation d’envoi</string>
-    <string name="settingsDataManagementDescription">Vous pouvez personnaliser les données d’utilisation et techniques qui sont récupérées par Infomaniak pour corriger des bugs et faire évoluer l’application. Les deux outils utilisés sont hébergés et gérés exclusivement chez nous.  \nInfomaniak respecte votre vie privée : le code source de cette application peut être vérifié, les informations récoltées sont anonymes et vos informations personnelles restent strictement confidentielles et ne sont jamais partagées avec des tiers.</string>
+    <string name="settingsDataManagementDescription">Vous pouvez personnaliser les données d’utilisation et techniques qui sont récupérées par Infomaniak pour corriger des bugs et faire évoluer l’application. Les deux outils utilisés sont hébergés et gérés exclusivement chez nous.\nInfomaniak respecte votre vie privée : le code source de cette application peut être vérifié, les informations récoltées sont anonymes et vos informations personnelles restent strictement confidentielles et ne sont jamais partagées avec des tiers.</string>
     <string name="settingsDataManagementSourceCode">Voir le code source</string>
     <string name="settingsDataManagementTitle">Gestion des données</string>
     <string name="settingsDefault">Par défaut</string>
@@ -418,7 +418,7 @@
     <string name="settingsMailboxGeneralFolders">Paramètres des dossiers</string>
     <string name="settingsMailboxGeneralNotifications">Notifications</string>
     <string name="settingsMailboxGeneralSignature">Paramètres de signature</string>
-    <string name="settingsMatomoDescription">Matomo est un outil d’analyse hébergé et géré exclusivement par Infomaniak pour comprendre comment l’application est utilisée.  \nL’étude de ces données permet à notre équipe d’améliorer en continue l’interface de l’application.</string>
+    <string name="settingsMatomoDescription">Matomo est un outil d’analyse hébergé et géré exclusivement par Infomaniak pour comprendre comment l’application est utilisée.\nL’étude de ces données permet à notre équipe d’améliorer en continue l’interface de l’application.</string>
     <string name="settingsMatomoTitle">Matomo</string>
     <string name="settingsOptionAlways">Toujours</string>
     <string name="settingsOptionAskMe">Me demander</string>
@@ -445,7 +445,7 @@
     <string name="settingsSendAcknowledgement">Demander un accusé de réception pour chaque message envoyé</string>
     <string name="settingsSendIncludeOriginalMessage">Inclure le message original dans la réponse</string>
     <string name="settingsSendTitle">Envoi</string>
-    <string name="settingsSentryDescription">Sentry est un outil hébergé et géré exclusivement par Infomaniak pour surveiller en temps réel la stabilité de l’application et signaler automatiquement d’éventuelles erreurs techniques à nos développeurs.\n  Ces données permettent à notre équipe de rapidement corriger et optimiser l’application, ce qui se traduit par une meilleure expérience d’utilisation pour vous.</string>
+    <string name="settingsSentryDescription">Sentry est un outil hébergé et géré exclusivement par Infomaniak pour surveiller en temps réel la stabilité de l’application et signaler automatiquement d’éventuelles erreurs techniques à nos développeurs.\nCes données permettent à notre équipe de rapidement corriger et optimiser l’application, ce qui se traduit par une meilleure expérience d’utilisation pour vous.</string>
     <string name="settingsSentryTitle">Sentry</string>
     <string name="settingsSignatureDescription">Sélectionner une signature par défaut</string>
     <string name="settingsSignatureTitle">Signatures</string>
