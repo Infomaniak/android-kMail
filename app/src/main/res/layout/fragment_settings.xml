@@ -151,15 +151,14 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsSectionAppearance" />
+                android:text="@string/settingsSectionDataPrivacy" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                android:id="@+id/settingsDataUse"
+                android:id="@+id/settingsDataManagement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
-                app:title="@string/settingsThreadModeTitle"
-                tools:subtitle="@string/settingsOptionThreadModeConversation" />
+                app:title="@string/settingsDataManagementTitle" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

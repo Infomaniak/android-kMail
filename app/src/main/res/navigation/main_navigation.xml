@@ -306,6 +306,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_aiEngineSettingFragment"
             app:destination="@id/aiEngineSettingFragment" />
+        <action
+            android:id="@+id/action_settings_to_managementDataSetting"
+            app:destination="@id/managementDataFragment" />
     </fragment>
 
     <fragment
@@ -561,6 +564,11 @@
         android:id="@+id/aiEngineSettingFragment"
         android:name="com.infomaniak.mail.ui.main.settings.swipe.AiEngineSettingFragment"
         android:label="AiEngineSettingFragment" />
+
+    <fragment
+        android:id="@+id/managementDataFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ManagementDataFragment"
+        android:label="ManagementDataFragment" />
 
     <dialog
         android:id="@+id/attachmentActionsBottomSheetDialog"
