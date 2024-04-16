@@ -64,6 +64,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
@@ -94,10 +95,11 @@ class NewMessageViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    var draftInRAM: Draft = Draft()
-
     //region UI data
     val fromLiveData = MutableLiveData<UiFrom>()
+    val toLiveData = MutableLiveData<UiRecipients>()
+    val ccLiveData = MutableLiveData<UiRecipients>()
+    val bccLiveData = MutableLiveData<UiRecipients>()
     val attachmentsLiveData = MutableLiveData<List<Attachment>>()
     val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
@@ -111,7 +113,7 @@ class NewMessageViewModel @Inject constructor(
 
     private var snapshot: DraftSnapshot? = null
 
-    var otherFieldsAreAllEmpty = MutableLiveData(true)
+    var otherRecipientsFieldsAreEmpty = MutableLiveData(true)
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
     val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
@@ -204,8 +206,6 @@ class NewMessageViewModel @Inject constructor(
             realm.writeBlocking { draftController.upsertDraft(it, realm = this) }
             it.saveSnapshot()
             it.initLiveData(signatures)
-
-            draftInRAM = it
 
             initResult.postValue(InitResult(it, signatures))
         }
@@ -343,13 +343,17 @@ class NewMessageViewModel @Inject constructor(
             ),
         )
 
+        toLiveData.postValue(UiRecipients(recipients = to, otherFieldsAreEmpty = cc.isEmpty() && bcc.isEmpty()))
+        ccLiveData.postValue(UiRecipients(recipients = cc))
+        bccLiveData.postValue(UiRecipients(recipients = bcc))
+
         attachmentsLiveData.postValue(attachments)
 
         uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
-            otherFieldsAreAllEmpty.postValue(false)
+            otherRecipientsFieldsAreEmpty.postValue(false)
             initializeFieldsAsOpen.postValue(true)
         }
     }
@@ -586,32 +590,28 @@ class NewMessageViewModel @Inject constructor(
     }
     //endregion
 
-    fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draftInRAM) {
+    fun addRecipientToField(recipient: Recipient, type: FieldType) {
 
-        if (type == FieldType.CC || type == FieldType.BCC) otherFieldsAreAllEmpty.value = false
+        if (type == FieldType.CC || type == FieldType.BCC) otherRecipientsFieldsAreEmpty.value = false
 
-        val field = when (type) {
-            FieldType.TO -> to
-            FieldType.CC -> cc
-            FieldType.BCC -> bcc
+        val recipientsLiveData = when (type) {
+            FieldType.TO -> toLiveData
+            FieldType.CC -> ccLiveData
+            FieldType.BCC -> bccLiveData
         }
-        field.add(recipient)
 
-        updateIsSendingAllowed()
+        recipientsLiveData.addRecipientThenSetValue(recipient)
     }
 
-    fun removeRecipientFromField(recipient: Recipient, type: FieldType) = with(draftInRAM) {
+    fun removeRecipientFromField(recipient: Recipient, type: FieldType) {
 
-        val field = when (type) {
-            FieldType.TO -> to
-            FieldType.CC -> cc
-            FieldType.BCC -> bcc
+        val recipientsLiveData = when (type) {
+            FieldType.TO -> toLiveData
+            FieldType.CC -> ccLiveData
+            FieldType.BCC -> bccLiveData
         }
-        field.remove(recipient)
 
-        if (cc.isEmpty() && bcc.isEmpty()) otherFieldsAreAllEmpty.value = true
-
-        updateIsSendingAllowed()
+        recipientsLiveData.removeRecipientThenSetValue(recipient)
 
         appContext.trackNewMessageEvent("deleteRecipient")
         if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent("deleteRecipient")
@@ -631,8 +631,20 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun updateIsSendingAllowed(attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty()) {
-        isSendingAllowed.value = if (draftInRAM.hasRecipient()) {
+    fun updateIsSendingAllowed(
+        attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty(),
+        type: FieldType? = null,
+        recipients: List<Recipient> = emptyList(),
+    ) {
+
+        val allRecipients = when (type) {
+            FieldType.TO -> recipients + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
+            FieldType.CC -> toLiveData.valueOrEmpty() + recipients + bccLiveData.valueOrEmpty()
+            FieldType.BCC -> toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + recipients
+            null -> toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
+        }
+
+        isSendingAllowed.value = if (allRecipients.isNotEmpty()) {
             var size = 0L
             var isSizeCorrect = true
             for (attachment in attachments) {
@@ -646,6 +658,10 @@ class NewMessageViewModel @Inject constructor(
         } else {
             false
         }
+    }
+
+    fun updateOtherRecipientsFieldsAreEmpty(cc: List<Recipient>, bcc: List<Recipient>) {
+        if (cc.isEmpty() && bcc.isEmpty()) otherRecipientsFieldsAreEmpty.value = true
     }
 
     fun updateBodySignature(signature: Signature) {
@@ -688,13 +704,12 @@ class NewMessageViewModel @Inject constructor(
 
     private fun Draft.updateDraftFromLiveData(draftAction: DraftAction, subjectValue: String?, uiBodyValue: String) {
 
-
         action = draftAction
         identityId = fromLiveData.value?.signature?.id.toString()
 
-        to = draftInRAM.to
-        cc = draftInRAM.cc
-        bcc = draftInRAM.bcc
+        to = toLiveData.valueOrEmpty().toRealmList()
+        cc = ccLiveData.valueOrEmpty().toRealmList()
+        bcc = bccLiveData.valueOrEmpty().toRealmList()
 
         attachments.apply {
             clear()
@@ -751,6 +766,21 @@ class NewMessageViewModel @Inject constructor(
         appContext.showToast(resId)
     }
 
+    private fun MutableLiveData<UiRecipients>.addRecipientThenSetValue(recipient: Recipient) {
+        updateRecipientsThenSetValue { it.add(recipient) }
+    }
+
+    private fun MutableLiveData<UiRecipients>.removeRecipientThenSetValue(recipient: Recipient) {
+        updateRecipientsThenSetValue { it.remove(recipient) }
+    }
+
+    private fun MutableLiveData<UiRecipients>.updateRecipientsThenSetValue(update: (MutableList<Recipient>) -> Unit) {
+        value = UiRecipients(
+            recipients = valueOrEmpty().toMutableList().apply { update(this) },
+            otherFieldsAreEmpty = value!!.otherFieldsAreEmpty,
+        )
+    }
+
     enum class ImportationResult {
         SUCCESS,
         ATTACHMENTS_TOO_BIG,
@@ -774,6 +804,11 @@ class NewMessageViewModel @Inject constructor(
     data class UiFrom(
         val signature: Signature,
         val shouldUpdateBodySignature: Boolean = true,
+    )
+
+    data class UiRecipients(
+        val recipients: List<Recipient>,
+        val otherFieldsAreEmpty: Boolean = true,
     )
 
     private data class DraftSnapshot(
