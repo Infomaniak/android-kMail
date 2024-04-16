@@ -69,7 +69,7 @@ class NewMessageEditorManager @Inject constructor(
         _filePicker = FilePicker(fragment).apply {
             initCallback { uris ->
                 activity.window.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                newMessageViewModel.importAttachmentsToCurrentDraft(uris)
+                newMessageViewModel.importAttachmentsLiveData.value = uris
             }
         }
     }

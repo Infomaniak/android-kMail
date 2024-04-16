@@ -58,10 +58,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.htmlToText
-import com.infomaniak.mail.utils.extensions.isEmail
-import com.infomaniak.mail.utils.extensions.textToHtml
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -101,6 +98,7 @@ class NewMessageViewModel @Inject constructor(
 
     //region UI data
     val fromLiveData = MutableLiveData<UiFrom>()
+    val attachmentsLiveData = MutableLiveData<List<Attachment>>()
     val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
@@ -115,7 +113,8 @@ class NewMessageViewModel @Inject constructor(
 
     var otherFieldsAreAllEmpty = MutableLiveData(true)
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
-    val importedAttachments = SingleLiveEvent<Pair<MutableList<Attachment>, ImportationResult>>()
+    val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
+    val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
     val isSendingAllowed = SingleLiveEvent(false)
     val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
@@ -183,6 +182,13 @@ class NewMessageViewModel @Inject constructor(
             }
 
             draft?.let {
+
+                savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = it.localUuid
+
+                // If the user put the app in background before we put the fetched Draft in Realm, and the system
+                // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
+                savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
+
                 if (it.body.isNotEmpty()) splitSignatureAndQuoteFromBody(it)
                 if (!draftExists) populateWithExternalMailDataIfNeeded(it, intent)
                 it.flagRecipientsAsAutomaticallyEntered()
@@ -324,17 +330,11 @@ class NewMessageViewModel @Inject constructor(
             bcc = bcc.toSet(),
             subject = subject,
             body = uiBody,
-            attachmentsUuids = attachments.map { it.uuid }.toSet(),
+            attachmentsLocalUuids = attachments.map { it.localUuid }.toSet(),
         )
     }
 
     private fun Draft.initLiveData(signatures: List<Signature>) {
-
-        savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
-
-        // If the user put the app in background before we put the fetched Draft in Realm, and the system
-        // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
-        savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
 
         fromLiveData.postValue(
             UiFrom(
@@ -342,6 +342,8 @@ class NewMessageViewModel @Inject constructor(
                 shouldUpdateBodySignature = false,
             ),
         )
+
+        attachmentsLiveData.postValue(attachments)
 
         uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
@@ -478,17 +480,17 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
-            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
-                importAttachments(uris = listOf(uri), draft)
-            }
+            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+                ?.let { importAttachments(currentAttachments = draft.attachments, uris = listOf(it)) }
+                ?.let(draft.attachments::addAll)
         }
     }
 
     private fun handleMultipleSendIntent(draft: Draft, intent: Intent) {
-        intent
-            .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
+        intent.parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
             ?.filterIsInstance<Uri>()
-            ?.let { importAttachments(uris = it, draft) }
+            ?.let { importAttachments(currentAttachments = draft.attachments, uris = it) }
+            ?.let(draft.attachments::addAll)
     }
 
     /**
@@ -532,17 +534,25 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun importAttachments(uris: List<Uri>, draft: Draft) = viewModelScope.launch(ioCoroutineContext) {
+    fun importNewAttachments(
+        currentAttachments: List<Attachment>,
+        uris: List<Uri>,
+        completion: (List<Attachment>) -> Unit,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        completion(importAttachments(currentAttachments, uris))
+    }
+
+    private fun importAttachments(currentAttachments: List<Attachment>, uris: List<Uri>): List<Attachment> {
 
         val newAttachments = mutableListOf<Attachment>()
-        var attachmentsSize = draft.attachments.sumOf { it.size }
+        var attachmentsSize = currentAttachments.sumOf { it.size }
         var result = ImportationResult.SUCCESS
 
         uris.forEach { uri ->
             val availableSpace = ATTACHMENTS_MAX_SIZE - attachmentsSize
-            val (attachment, hasSizeLimitBeenReached) = importAttachment(draft.localUuid, uri, availableSpace) ?: return@forEach
+            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace) ?: return@forEach
 
-            if (hasSizeLimitBeenReached) result = ImportationResult.FILE_SIZE_TOO_BIG
+            if (hasSizeLimitBeenReached) result = ImportationResult.ATTACHMENTS_TOO_BIG
 
             attachment?.let {
                 newAttachments.add(it)
@@ -550,15 +560,17 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        importedAttachments.postValue(newAttachments to result)
+        importAttachmentsResult.postValue(result)
+
+        return newAttachments
     }
 
-    private fun importAttachment(localUuid: String, uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
+    private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
 
         val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null
         val attachment = Attachment()
 
-        return LocalStorageUtils.saveAttachmentToUploadDir(appContext, uri, fileName, localUuid, attachment.localUuid)
+        return LocalStorageUtils.saveAttachmentToUploadDir(appContext, uri, fileName, draftLocalUuid!!, attachment.localUuid)
             ?.let { file ->
                 Pair(
                     attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
@@ -605,11 +617,25 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent("deleteRecipient")
     }
 
-    fun updateIsSendingAllowed() {
+    fun deleteAttachment(position: Int) {
+        runCatching {
+            val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
+            val attachment = attachments[position]
+            attachment.getUploadLocalFile()?.delete()
+            LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid()!!, attachment.localUuid)
+            attachments.removeAt(position)
+            attachmentsLiveData.value = attachments
+        }.onFailure { exception ->
+            // TODO: If we don't see this Sentry after June 2024, we can remove it.
+            SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
+        }
+    }
+
+    fun updateIsSendingAllowed(attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty()) {
         isSendingAllowed.value = if (draftInRAM.hasRecipient()) {
             var size = 0L
             var isSizeCorrect = true
-            for (attachment in draftInRAM.attachments) {
+            for (attachment in attachments) {
                 size += attachment.size
                 if (size > ATTACHMENTS_MAX_SIZE) {
                     isSizeCorrect = false
@@ -620,10 +646,6 @@ class NewMessageViewModel @Inject constructor(
         } else {
             false
         }
-    }
-
-    fun importAttachmentsToCurrentDraft(uris: List<Uri>) {
-        importAttachments(uris, draftInRAM)
     }
 
     fun updateBodySignature(signature: Signature) {
@@ -676,7 +698,7 @@ class NewMessageViewModel @Inject constructor(
 
         attachments.apply {
             clear()
-            addAll(draftInRAM.attachments)
+            addAll(attachmentsLiveData.valueOrEmpty())
         }
 
         subject = subjectValue
@@ -704,7 +726,7 @@ class NewMessageViewModel @Inject constructor(
                 bcc != draft.bcc.toSet() ||
                 subject != subjectValue ||
                 body != uiBodyValue ||
-                attachmentsUuids != draft.attachments.map { it.uuid }.toSet()
+                attachmentsLocalUuids != draft.attachments.map { it.localUuid }.toSet()
     }
 
     private fun removeDraftFromRealm(localUuid: String) {
@@ -731,7 +753,7 @@ class NewMessageViewModel @Inject constructor(
 
     enum class ImportationResult {
         SUCCESS,
-        FILE_SIZE_TOO_BIG,
+        ATTACHMENTS_TOO_BIG,
     }
 
     enum class SignatureScore(private val weight: Int) {
@@ -761,10 +783,11 @@ class NewMessageViewModel @Inject constructor(
         val bcc: Set<Recipient>,
         var subject: String?,
         var body: String,
-        val attachmentsUuids: Set<String>,
+        val attachmentsLocalUuids: Set<String>,
     )
 
     companion object {
+        private val TAG = NewMessageViewModel::class.java.simpleName
         private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998
     }

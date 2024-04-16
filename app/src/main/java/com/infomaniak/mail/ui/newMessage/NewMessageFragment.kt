@@ -43,7 +43,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
@@ -63,13 +62,13 @@ import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.SignatureUtils
+import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -88,6 +87,8 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private var shouldRegisterToImportedAttachments = true
 
     private var addressListPopupWindow: ListPopupWindow? = null
 
@@ -152,9 +153,10 @@ class NewMessageFragment : Fragment() {
 
         handleOnBackPressed()
 
-        observeNewAttachments()
         observeInitResult()
         observeFromData()
+        observeAttachments()
+        observeImportAttachmentsResult()
         observeUiSignature()
         observeUiQuote()
         editorManager.observeEditorActions()
@@ -320,11 +322,6 @@ class NewMessageFragment : Fragment() {
     private fun configureUiWithDraftData(draft: Draft) = with(binding) {
         recipientFieldsManager.initRecipients(draft)
 
-        newMessageViewModel.updateIsSendingAllowed()
-
-        attachmentAdapter.addAll(draft.attachments)
-        attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-
         // Signature
         signatureWebView.apply {
             settings.setupNewMessageWebViewSettings()
@@ -432,16 +429,35 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeNewAttachments() = with(newMessageViewModel) {
-        importedAttachments.observe(viewLifecycleOwner) { (attachments, importationResult) ->
+    private fun observeAttachments() = with(newMessageViewModel) {
+        attachmentsLiveData.observe(viewLifecycleOwner) { attachments ->
 
-            attachmentAdapter.addAll(attachments)
-            draftInRAM.attachments.addAll(attachments)
+            if (shouldRegisterToImportedAttachments) {
+                shouldRegisterToImportedAttachments = false
+                observeImportAttachments()
+            }
 
-            binding.attachmentsRecyclerView.isGone = draftInRAM.attachments.isEmpty()
+            val shouldTransition = attachmentAdapter.itemCount != 0 && attachments.isEmpty()
+            attachmentAdapter.submitList(attachments)
+            if (shouldTransition) TransitionManager.beginDelayedTransition(binding.root)
+            binding.attachmentsRecyclerView.isVisible = attachments.isNotEmpty()
 
-            if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
-            updateIsSendingAllowed()
+            updateIsSendingAllowed(attachments)
+        }
+    }
+
+    private fun observeImportAttachments() = with(newMessageViewModel) {
+        importAttachmentsLiveData.observe(viewLifecycleOwner) { uris ->
+            val currentAttachments = attachmentsLiveData.valueOrEmpty()
+            importNewAttachments(currentAttachments, uris) { newAttachments ->
+                attachmentsLiveData.postValue(currentAttachments + newAttachments)
+            }
+        }
+    }
+
+    private fun observeImportAttachmentsResult() = with(newMessageViewModel) {
+        importAttachmentsResult.observe(viewLifecycleOwner) { result ->
+            if (result == ImportationResult.ATTACHMENTS_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
     }
 
@@ -483,26 +499,9 @@ class NewMessageFragment : Fragment() {
         draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
-    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
-
+    private fun onDeleteAttachment(position: Int) {
         trackAttachmentActionsEvent("delete")
-
-        if (itemCountLeft == 0) {
-            TransitionManager.beginDelayedTransition(binding.root)
-            binding.attachmentsRecyclerView.isGone = true
-        }
-
-        runCatching {
-            val attachment = draftInRAM.attachments[position]
-            attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(requireContext(), draftInRAM.localUuid, attachment.localUuid)
-            draftInRAM.attachments.removeAt(position)
-        }.onFailure { exception ->
-            // TODO: If we don't see this Sentry after May 2024, we can remove it.
-            SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
-        }
-
-        updateIsSendingAllowed()
+        newMessageViewModel.deleteAttachment(position)
     }
 
     private fun setupSendButton() = with(binding) {
@@ -553,8 +552,4 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
-
-    companion object {
-        private val TAG = NewMessageFragment::class.java.simpleName
-    }
 }
