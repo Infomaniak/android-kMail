@@ -308,6 +308,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="l">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="launchActivity">
                     <value>
                       <LayoutPositions>
@@ -563,6 +575,11 @@
                         <option name="myPositions">
                           <map>
                             <entry key="action_settingsFragment_to_aiEngineSettingFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_settingsFragment_to_managementDataFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
