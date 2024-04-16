@@ -161,6 +161,7 @@
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSee">See</string>
     <string name="buttonSelectAll">All</string>
+    <string name="buttonSendWithDifferentAddress">Send with a different address</string>
     <string name="buttonShare">Share</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStartSync">Start synchronization</string>
@@ -178,6 +179,8 @@
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
+    <string name="composeMailboxCurrentTitle">Send a message with the address :</string>
+    <string name="composeMailboxSelectionTitle">Select sending address :</string>
     <string name="confirmLogoutDescription">Are you sure you want to log out from %s?</string>
     <string name="confirmLogoutTitle">Log out</string>
     <string name="contactActionAddToContacts">Add to contacts</string>
@@ -268,6 +271,7 @@
     <string name="errorLoginTitle">Login error</string>
     <string name="errorMailboxLocked">This mailbox is locked</string>
     <string name="errorMailboxPasswordLength">The password must be between 6 and 80 characters</string>
+    <string name="errorMailboxUnavailable">This email address is not available</string>
     <string name="errorMoveDestinationNotFound">The destination folder does not exist</string>
     <string name="errorNewFolderAlreadyExists">The folder already exists</string>
     <string name="errorNewFolderInvalidCharacter">The folder name contains invalid characters</string>
@@ -367,6 +371,7 @@
     <string name="pickerNoSelection">No selection</string>
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
     <string name="popupDetachMailboxTitle">Detach mailbox</string>
+    <string name="publicFolderSubtitle">This space belongs to %s and centralizes your organization’s common files.</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You have been disconnected</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>
@@ -396,6 +401,9 @@
     <string name="settingsAppLock">App lock</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>
+    <string name="settingsDataManagementDescription">You can customise the usage and technical data that Infomaniak retrieves to correct bugs and develop the application. The two tools used are hosted and managed exclusively by us.  \nInfomaniak respects your privacy: the source code of this application can be checked, the information collected is anonymous and your personal details remain strictly confidential and are never shared with third parties.\u0020</string>
+    <string name="settingsDataManagementSourceCode">See source code</string>
+    <string name="settingsDataManagementTitle">Data management</string>
     <string name="settingsDefault">Default</string>
     <string name="settingsDelaySeconds">%d seconds</string>
     <string name="settingsDensityOptionCompact">Compact</string>
@@ -413,6 +421,8 @@
     <string name="settingsMailboxGeneralFolders">Folders settings</string>
     <string name="settingsMailboxGeneralNotifications">Notifications</string>
     <string name="settingsMailboxGeneralSignature">Signature settings</string>
+    <string name="settingsMatomoDescription">Matomo is an analysis tool hosted and managed exclusively by Infomaniak to understand how the application is used.  \nBy studying this data, our team is able to continually improve the application’s interface.</string>
+    <string name="settingsMatomoTitle">Matomo</string>
     <string name="settingsOptionAlways">Always</string>
     <string name="settingsOptionAskMe">Ask me</string>
     <string name="settingsOptionDarkTheme">Dark</string>
@@ -423,6 +433,7 @@
     <string name="settingsPrivacyDeleteSearchHistory">Delete search history</string>
     <string name="settingsPrivacyViewLogs">View logs</string>
     <string name="settingsSectionAppearance">Appearance</string>
+    <string name="settingsSectionDataPrivacy">Data &amp; Privacy</string>
     <string name="settingsSectionEmailAddresses">Email addresses</string>
     <string name="settingsSectionGeneral">General</string>
     <string name="settingsSectionPrivacy">Privacy</string>
@@ -437,6 +448,8 @@
     <string name="settingsSendAcknowledgement">Request an acknowledgement of receipt for every email sent</string>
     <string name="settingsSendIncludeOriginalMessage">Include the original message in the reply</string>
     <string name="settingsSendTitle">Send</string>
+    <string name="settingsSentryDescription">Sentry is a tool hosted and managed exclusively by Infomaniak to monitor the stability of the application in real time and automatically report any technical errors to our developers.  \nThis data enables our team to quickly correct and optimise the application, resulting in a better user experience for you.</string>
+    <string name="settingsSentryTitle">Sentry</string>
     <string name="settingsSignatureDescription">Select a default signature</string>
     <string name="settingsSignatureTitle">Signatures</string>
     <string name="settingsSwipeActionNone">None</string>
