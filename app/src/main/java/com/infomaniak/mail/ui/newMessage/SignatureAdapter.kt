@@ -27,10 +27,11 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSignatureBinding
 
 class SignatureAdapter(
-    private var signatures: List<Signature>,
-    private var selectedSignatureId: Int,
     private val onClickListener: (signature: Signature) -> Unit,
 ) : ListAdapter {
+
+    private val signatures = mutableListOf<Signature>()
+    private var selectedSignatureId: Int? = null
 
     override fun registerDataSetObserver(observer: DataSetObserver?) = Unit
 
@@ -59,10 +60,7 @@ class SignatureAdapter(
 
             root.apply {
                 setCardBackgroundColor(context.getColor(backgroundColorRes))
-                setOnClickListener {
-                    onClickListener(signature)
-                    updateSelectedSignature(signature.id)
-                }
+                setOnClickListener { onClickListener(signature) }
             }
         }.root
     }
@@ -77,7 +75,12 @@ class SignatureAdapter(
 
     override fun isEnabled(position: Int): Boolean = true
 
-    private fun updateSelectedSignature(newSelectedSignatureId: Int) {
+    fun setList(newList: List<Signature>) = with(signatures) {
+        clear()
+        addAll(newList)
+    }
+
+    fun updateSelectedSignature(newSelectedSignatureId: Int) {
         selectedSignatureId = newSelectedSignatureId
     }
 }

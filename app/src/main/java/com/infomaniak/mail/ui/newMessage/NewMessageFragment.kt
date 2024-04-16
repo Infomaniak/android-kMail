@@ -62,6 +62,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -93,6 +94,7 @@ class NewMessageFragment : Fragment() {
     private var quoteWebView: WebView? = null
     private var signatureWebView: WebView? = null
 
+    private val signatureAdapter = SignatureAdapter(::onSignatureClicked)
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
@@ -152,6 +154,7 @@ class NewMessageFragment : Fragment() {
 
         observeNewAttachments()
         observeInitResult()
+        observeFromData()
         observeUiSignature()
         observeUiQuote()
         editorManager.observeEditorActions()
@@ -371,26 +374,7 @@ class NewMessageFragment : Fragment() {
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
-        val selectedSignatureId = newMessageViewModel.draftInRAM.identityId?.toInt() ?: -1
-        val selectedSignature = with(signatures) {
-            find { it.id == selectedSignatureId } ?: find { it.isDefault }!!
-        }
-        updateSelectedSignatureFromField(signatures.count(), selectedSignature)
-
-        val adapter = SignatureAdapter(
-            signatures = signatures,
-            selectedSignatureId = selectedSignatureId,
-            onClickListener = { newSelectedSignature ->
-                trackNewMessageEvent("switchIdentity")
-
-                updateSelectedSignatureFromField(signatures.count(), newSelectedSignature)
-                updateBodySignature(newSelectedSignature.content)
-
-                newMessageViewModel.draftInRAM.identityId = newSelectedSignature.id.toString()
-
-                addressListPopupWindow?.dismiss()
-            },
-        )
+        signatureAdapter.setList(signatures)
 
         fromMailAddress.post {
             runCatching {
@@ -401,13 +385,13 @@ class NewMessageFragment : Fragment() {
         }
 
         addressListPopupWindow?.apply {
-            setAdapter(adapter)
+            setAdapter(signatureAdapter)
             isModal = true
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
             anchorView = fromMailAddress
         }
 
-        if (signatures.count() > 1) {
+        if (newMessageViewModel.signaturesCount > 1) {
             fromMailAddress.apply {
                 icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
                 setOnClickListener { _ -> addressListPopupWindow?.show() }
@@ -415,13 +399,14 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun updateBodySignature(content: String) {
-        val signature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(content)
-        newMessageViewModel.uiSignatureLiveData.value = signature
+    private fun onSignatureClicked(signature: Signature) {
+        trackNewMessageEvent("switchIdentity")
+        newMessageViewModel.fromLiveData.value = UiFrom(signature)
+        addressListPopupWindow?.dismiss()
     }
 
-    private fun updateSelectedSignatureFromField(signaturesCount: Int, signature: Signature) {
-        val formattedExpeditor = if (signaturesCount > 1) {
+    private fun updateSelectedSignatureInFromField(signature: Signature) {
+        val formattedExpeditor = if (newMessageViewModel.signaturesCount > 1) {
             "${signature.senderName} <${signature.senderEmailIdn}> (${signature.name})"
         } else {
             signature.senderEmailIdn
@@ -436,6 +421,14 @@ class NewMessageFragment : Fragment() {
             setupFromField(signatures)
             editorManager.setupEditorActions()
             editorManager.setupEditorFormatActionsToggle()
+        }
+    }
+
+    private fun observeFromData() = with(newMessageViewModel) {
+        fromLiveData.observe(viewLifecycleOwner) { (signature, shouldUpdateBodySignature) ->
+            updateSelectedSignatureInFromField(signature)
+            if (shouldUpdateBodySignature) updateBodySignature(signature)
+            signatureAdapter.updateSelectedSignature(signature.id)
         }
     }
 

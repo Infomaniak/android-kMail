@@ -100,6 +100,7 @@ class NewMessageViewModel @Inject constructor(
     var draftInRAM: Draft = Draft()
 
     //region UI data
+    val fromLiveData = MutableLiveData<UiFrom>()
     val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
@@ -108,6 +109,7 @@ class NewMessageViewModel @Inject constructor(
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
     var shouldSendInsteadOfSave = false
+    var signaturesCount = 0
 
     private var snapshot: DraftSnapshot? = null
 
@@ -169,7 +171,7 @@ class NewMessageViewModel @Inject constructor(
 
         runCatching {
 
-            signatures = SignatureController.getAllSignatures(realm)
+            signatures = SignatureController.getAllSignatures(realm).also { signaturesCount = it.count() }
             if (signatures.isEmpty()) return@runCatching
 
             val draftExists = arrivedFromExistingDraft || draftLocalUuid != null
@@ -195,7 +197,7 @@ class NewMessageViewModel @Inject constructor(
 
             realm.writeBlocking { draftController.upsertDraft(it, realm = this) }
             it.saveSnapshot()
-            it.initLiveData()
+            it.initLiveData(signatures)
 
             draftInRAM = it
 
@@ -326,13 +328,20 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.initLiveData() {
+    private fun Draft.initLiveData(signatures: List<Signature>) {
 
         savedStateHandle[NewMessageActivityArgs::draftLocalUuid.name] = localUuid
 
         // If the user put the app in background before we put the fetched Draft in Realm, and the system
         // kill the app, then we won't be able to fetch the Draft anymore as the `draftResource` will be null.
         savedStateHandle[NewMessageActivityArgs::draftResource.name] = draftResource
+
+        fromLiveData.postValue(
+            UiFrom(
+                signature = signatures.single { it.id == identityId?.toInt() },
+                shouldUpdateBodySignature = false,
+            ),
+        )
 
         uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
@@ -617,6 +626,10 @@ class NewMessageViewModel @Inject constructor(
         importAttachments(uris, draftInRAM)
     }
 
+    fun updateBodySignature(signature: Signature) {
+        uiSignatureLiveData.value = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+    }
+
     fun executeDraftActionWhenStopping(
         action: DraftAction,
         isFinishing: Boolean,
@@ -655,7 +668,7 @@ class NewMessageViewModel @Inject constructor(
 
 
         action = draftAction
-        identityId = draftInRAM.identityId
+        identityId = fromLiveData.value?.signature?.id.toString()
 
         to = draftInRAM.to
         cc = draftInRAM.cc
@@ -734,6 +747,11 @@ class NewMessageViewModel @Inject constructor(
     data class InitResult(
         val draft: Draft,
         val signatures: List<Signature>,
+    )
+
+    data class UiFrom(
+        val signature: Signature,
+        val shouldUpdateBodySignature: Boolean = true,
     )
 
     private data class DraftSnapshot(
