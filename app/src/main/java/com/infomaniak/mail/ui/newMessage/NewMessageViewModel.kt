@@ -636,7 +636,7 @@ class NewMessageViewModel @Inject constructor(
             attachments.removeAt(position)
             attachmentsLiveData.value = attachments
         }.onFailure { exception ->
-            // TODO: If we don't see this Sentry after June 2024, we can remove it.
+            // TODO: If we don't see this Sentry after mid-2024, we can remove it.
             SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
         }
     }
