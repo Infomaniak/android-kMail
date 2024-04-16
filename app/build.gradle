@@ -61,7 +61,10 @@ android {
 
     kotlinOptions { jvmTarget = javaVersion }
 
-    buildFeatures { viewBinding true }
+    buildFeatures {
+        buildConfig true
+        viewBinding true
+    }
 
     flavorDimensions += 'distribution'
 
