@@ -119,13 +119,12 @@ object SentryDebug {
     //  If this doesn't trigger after a certain amount of time, you can remove it.
     fun sendEmptyThread(thread: Thread) {
         Sentry.withScope { scope ->
-            scope.level = SentryLevel.ERROR
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
             scope.setExtra("folder.name", thread.folder.name)
             scope.setExtra("folder.id", thread.folder.id)
             scope.setExtra("thread.uid", "[${thread.uid}]")
-            Sentry.captureMessage("No Message in the Thread when opening it")
+            Sentry.captureMessage("No Message in the Thread when opening it", SentryLevel.ERROR)
         }
     }
 
@@ -177,13 +176,15 @@ object SentryDebug {
             val missingUids = sentUids.filterNot(receivedUids::contains)
             if (missingUids.isNotEmpty()) {
                 Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
                     scope.setExtra("1. newCursor", newCursor)
                     scope.setExtra("2. previousCursor", "${folder.cursor}")
                     scope.setExtra("3. input", "${sentUids.map { it }}")
                     scope.setExtra("4. output", "${receivedMessages.map { it.shortUid }}")
                     scope.setExtra("5. missing", "${missingUids.map { it.toString().toLongUid(folder.id) }}")
-                    Sentry.captureMessage("We tried to download some Messages, but they were nowhere to be found.")
+                    Sentry.captureMessage(
+                        "We tried to download some Messages, but they were nowhere to be found.",
+                        SentryLevel.ERROR,
+                    )
                 }
             }
         }
@@ -193,13 +194,12 @@ object SentryDebug {
         val orphanMessages = folder.messages.filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
             Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
                 scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
                 scope.setExtra("number of Messages", "${orphanMessages.count()}")
                 scope.setExtra("previousCursor", "$previousCursor")
                 scope.setExtra("newCursor", "${folder.cursor}")
                 scope.setExtra("folderName", folder.name)
-                Sentry.captureMessage("We found some orphan Messages.")
+                Sentry.captureMessage("We found some orphan Messages.", SentryLevel.ERROR)
             }
         }
         return orphanMessages
@@ -209,14 +209,13 @@ object SentryDebug {
         val orphanThreads = ThreadController.getOrphanThreads(realm)
         if (orphanThreads.isNotEmpty()) {
             Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
                 scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
                 scope.setExtra("number of Threads", "${orphanThreads.count()}")
                 scope.setExtra("number of Messages", "${orphanThreads.map { it.messages.count() }}")
                 scope.setExtra("previousCursor", "$previousCursor")
                 scope.setExtra("newCursor", "${folder.cursor}")
                 scope.setExtra("folderName", folder.name)
-                Sentry.captureMessage("We found some orphan Threads.")
+                Sentry.captureMessage("We found some orphan Threads.", SentryLevel.ERROR)
             }
         }
         return orphanThreads
@@ -226,9 +225,9 @@ object SentryDebug {
         val orphanDrafts = DraftController.getOrphanDrafts(realm)
         if (orphanDrafts.isNotEmpty()) {
             Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
                 scope.setExtra(
-                    "orphanDrafts", "${
+                    "orphanDrafts",
+                    "${
                         orphanDrafts.map {
                             if (it.messageUid == null) {
                                 "${Draft::subject.name}: [${it.subject}]"
@@ -236,46 +235,42 @@ object SentryDebug {
                                 "${Draft::messageUid.name}: ${it.messageUid}"
                             }
                         }
-                    }"
+                    }",
                 )
-                Sentry.captureMessage("We found some orphan Drafts.")
+                Sentry.captureMessage("We found some orphan Drafts.", SentryLevel.ERROR)
             }
         }
     }
 
     fun sendOverScrolledMessage(clientWidth: Int, scrollWidth: Int, messageUid: String) {
         Sentry.withScope { scope ->
-            scope.level = SentryLevel.ERROR
             scope.setTag("messageUid", messageUid)
             scope.setExtra("clientWidth", "$clientWidth")
             scope.setExtra("scrollWidth", "$scrollWidth")
-            Sentry.captureMessage("When resizing the mail with js, after zooming, it can still scroll.")
+            Sentry.captureMessage("When resizing the mail with js, after zooming, it can still scroll.", SentryLevel.ERROR)
         }
     }
 
     fun sendJavaScriptError(errorName: String, errorMessage: String, errorStack: String, messageUid: String) {
         Sentry.withScope { scope ->
-            scope.level = SentryLevel.ERROR
             scope.setTag("messageUid", messageUid)
             scope.setExtra("errorName", errorName)
             scope.setExtra("errorMessage", errorMessage)
             scope.setExtra("errorStack", errorStack)
-            Sentry.captureMessage("JavaScript returned an error when displaying an email.")
+            Sentry.captureMessage("JavaScript returned an error when displaying an email.", SentryLevel.ERROR)
         }
     }
 
     fun sendSubBodiesTrigger(messageUid: String) {
         Sentry.withScope { scope ->
-            scope.level = SentryLevel.INFO
             scope.setExtra("email", "${AccountUtils.currentMailboxEmail}")
             scope.setExtra("messageUid", messageUid)
-            Sentry.captureMessage("Received an email with SubBodies!!")
+            Sentry.captureMessage("Received an email with SubBodies!!", SentryLevel.INFO)
         }
     }
 
     fun sendCredentialsIssue(infomaniakLogin: String?, infomaniakPassword: String) {
         Sentry.withScope { scope ->
-            scope.level = SentryLevel.ERROR
             scope.setExtra("email", "${AccountUtils.currentUser?.email}")
             val loginStatus = when {
                 infomaniakLogin == null -> "is null"
@@ -290,7 +285,7 @@ object SentryDebug {
                 else -> "is ok"
             }
             scope.setExtra("infomaniakPassword status", passwordStatus)
-            Sentry.captureMessage("Credentials issue when trying to auto-sync user")
+            Sentry.captureMessage("Credentials issue when trying to auto-sync user", SentryLevel.ERROR)
         }
     }
     //endregion

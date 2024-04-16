@@ -296,9 +296,11 @@ class ThreadFragment : Fragment() {
                     // When adding a phone number to contacts, Google decodes this value in case it's url-encoded. But I could not
                     // reproduce this issue when manually creating a url-encoded href. If this is triggered, fix it by also
                     // decoding it at that step.
-                    if (type == ContextMenuType.PHONE && data.contains('%')) Sentry.withScope { scope ->
-                        scope.level = SentryLevel.ERROR
-                        Sentry.captureMessage("Google was right, phone numbers can be url-encoded. Needs to be fixed")
+                    if (type == ContextMenuType.PHONE && data.contains('%')) {
+                        Sentry.captureMessage(
+                            "Google was right, phone numbers can be url-encoded. Needs to be fixed",
+                            SentryLevel.ERROR,
+                        )
                     }
 
                     when (type) {
@@ -580,12 +582,14 @@ class ThreadFragment : Fragment() {
                 val targetChild = binding.messagesList.getChildAt(indexToScroll)
                 if (targetChild == null) {
                     Sentry.withScope { scope ->
-                        scope.level = SentryLevel.ERROR
                         scope.setExtra("indexToScroll", indexToScroll.toString())
                         scope.setExtra("messageCount", threadAdapter.items.count().toString())
                         scope.setExtra("isExpandedMap", threadState.isExpandedMap.toString())
                         scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
-                        Sentry.captureMessage("Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom")
+                        Sentry.captureMessage(
+                            "Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom",
+                            SentryLevel.ERROR,
+                        )
                     }
                     getBottomY()
                 } else {

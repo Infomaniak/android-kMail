@@ -255,10 +255,7 @@ class AiPropositionFragment : Fragment() {
 
         fun sendMissingContentSentry(status: PropositionStatus) {
             if (status == PropositionStatus.MISSING_CONTENT) {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    Sentry.captureMessage("AI call succeeded but no content returned")
-                }
+                Sentry.captureMessage("AI call succeeded but no content returned", SentryLevel.ERROR)
             }
         }
 

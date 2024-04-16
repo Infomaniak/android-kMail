@@ -691,12 +691,14 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 if (!areThereThreads && !isFilterEnabled && !isBooting) {
                     val currentFolder = mainViewModel.currentFolder.value
                     Sentry.withScope { scope ->
-                        scope.level = SentryLevel.WARNING
                         scope.setExtra("cursor", "$currentFolderCursor")
                         scope.setExtra("isBooting", "$isBooting")
                         scope.setExtra("folderRole", "${currentFolder?.role?.name}")
                         scope.setExtra("folderThreadsCount", "${currentFolder?.threads?.count()}")
-                        Sentry.captureMessage("Should display threads is true but there are no threads to display")
+                        Sentry.captureMessage(
+                            "Should display threads is true but there are no threads to display",
+                            SentryLevel.WARNING,
+                        )
                     }
                 }
             }

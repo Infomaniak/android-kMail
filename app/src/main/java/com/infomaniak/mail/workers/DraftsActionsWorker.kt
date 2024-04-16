@@ -384,7 +384,6 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (attachment.uuid.isBlank()) {
 
                 Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
                     scope.setExtra("attachmentUuid", attachment.uuid)
                     scope.setExtra("attachmentsCount", "${updatedDraft.attachments.count()}")
                     scope.setExtra(
@@ -394,7 +393,10 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scope.setExtra("draftUuid", "${updatedDraft.remoteUuid}")
                     scope.setExtra("draftLocalUuid", updatedDraft.localUuid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    Sentry.captureMessage("We tried to [${updatedDraft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.")
+                    Sentry.captureMessage(
+                        "We tried to [${updatedDraft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.",
+                        SentryLevel.ERROR,
+                    )
                 }
 
                 return DraftActionResult(
@@ -432,11 +434,10 @@ class DraftsActionsWorker @AssistedInject constructor(
                     error?.exception is SerializationException -> {
                         realmActionOnDraft = deleteDraftCallback(updatedDraft)
                         Sentry.withScope { scope ->
-                            scope.level = SentryLevel.ERROR
-                            Sentry.captureMessage("Return JSON for SendDraft API call was modified")
-                            Sentry.setExtra("Is data null ?", "${data == null}")
-                            Sentry.setExtra("Error code", error?.code.toString())
-                            Sentry.setExtra("Error description", error?.description.toString())
+                            scope.setExtra("Is data null ?", "${data == null}")
+                            scope.setExtra("Error code", error?.code.toString())
+                            scope.setExtra("Error description", error?.description.toString())
+                            Sentry.captureMessage("Return JSON for SendDraft API call was modified", SentryLevel.ERROR)
                         }
                     }
                     else -> {

@@ -138,10 +138,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
 
         if ((month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)) {
             binding.easterEggHalloween.isVisible = true
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.INFO
-                Sentry.captureMessage("Easter egg Halloween has been triggered! Woohoo!")
-            }
+            Sentry.captureMessage("Easter egg Halloween has been triggered! Woohoo!", SentryLevel.INFO)
             trackEasterEggEvent("halloween${Date().year()}")
         }
     }
