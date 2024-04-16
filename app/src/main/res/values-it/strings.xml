@@ -390,6 +390,9 @@
     <string name="settingsAppLock">Blocco dell’app</string>
     <string name="settingsCancellationPeriodDescription">Avete la possibilità di annullare l’invio della vostra email fino a 30 secondi.</string>
     <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell’invio</string>
+    <string name="settingsDataManagementDescription">È possibile personalizzare i dati tecnici e di utilizzo che Infomaniak recupera per correggere i bug e sviluppare l’applicazione. I due strumenti utilizzati sono ospitati e gestiti esclusivamente da noi.\nInfomaniak rispetta la vostra privacy: il codice sorgente di questa applicazione può essere controllato, le informazioni raccolte sono anonime e i vostri dati personali rimangono strettamente confidenziali e non vengono mai condivisi con terzi.</string>
+    <string name="settingsDataManagementSourceCode">Vedere il codice sorgente</string>
+    <string name="settingsDataManagementTitle">Gestione dei dati</string>
     <string name="settingsDefault">Predefinito</string>
     <string name="settingsDelaySeconds">%d secondi</string>
     <string name="settingsDensityOptionCompact">Compatto</string>
@@ -407,6 +410,8 @@
     <string name="settingsMailboxGeneralFolders">Impostazioni delle cartelle</string>
     <string name="settingsMailboxGeneralNotifications">Notifiche</string>
     <string name="settingsMailboxGeneralSignature">Impostazioni della firma</string>
+    <string name="settingsMatomoDescription">Matomo è uno strumento di analisi ospitato e gestito esclusivamente da Infomaniak per capire come viene utilizzata l’applicazione.\nStudiando questi dati, il nostro team è in grado di migliorare continuamente l’interfaccia dell’applicazione.</string>
+    <string name="settingsMatomoTitle">Matomo</string>
     <string name="settingsOptionAlways">Sempre</string>
     <string name="settingsOptionAskMe">Chiedetemi</string>
     <string name="settingsOptionDarkTheme">Scuro</string>
@@ -417,6 +422,7 @@
     <string name="settingsPrivacyDeleteSearchHistory">Cancella la cronologia delle ricerche</string>
     <string name="settingsPrivacyViewLogs">Visualizza i log</string>
     <string name="settingsSectionAppearance">Aspetto</string>
+    <string name="settingsSectionDataPrivacy">Dati e privacy</string>
     <string name="settingsSectionEmailAddresses">Indirizzi e-mail</string>
     <string name="settingsSectionGeneral">Generale</string>
     <string name="settingsSectionPrivacy">La privacy</string>
@@ -431,6 +437,8 @@
     <string name="settingsSendAcknowledgement">Richiedete una conferma di ricezione per ogni e-mail inviata.</string>
     <string name="settingsSendIncludeOriginalMessage">Includere il messaggio originale nella risposta</string>
     <string name="settingsSendTitle">Inviare</string>
+    <string name="settingsSentryDescription">Sentry è uno strumento ospitato e gestito esclusivamente da Infomaniak per monitorare la stabilità dell’applicazione in tempo reale e segnalare automaticamente eventuali errori tecnici ai nostri sviluppatori.\nQuesti dati consentono al nostro team di correggere e ottimizzare rapidamente l’applicazione, migliorando l’esperienza dell’utente.</string>
+    <string name="settingsSentryTitle">Sentry</string>
     <string name="settingsSignatureDescription">Selezionare una firma predefinita</string>
     <string name="settingsSignatureTitle">Firme</string>
     <string name="settingsSwipeActionNone">Nessuno</string>

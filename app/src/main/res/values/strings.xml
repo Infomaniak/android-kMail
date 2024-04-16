@@ -401,7 +401,7 @@
     <string name="settingsAppLock">App lock</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>
-    <string name="settingsDataManagementDescription">You can customise the usage and technical data that Infomaniak retrieves to correct bugs and develop the application. The two tools used are hosted and managed exclusively by us.  \nInfomaniak respects your privacy: the source code of this application can be checked, the information collected is anonymous and your personal details remain strictly confidential and are never shared with third parties.\u0020</string>
+    <string name="settingsDataManagementDescription">You can customise the usage and technical data that Infomaniak retrieves to correct bugs and develop the application. The two tools used are hosted and managed exclusively by us.  \nInfomaniak respects your privacy: the source code of this application can be checked, the information collected is anonymous and your personal details remain strictly confidential and are never shared with third parties.</string>
     <string name="settingsDataManagementSourceCode">See source code</string>
     <string name="settingsDataManagementTitle">Data management</string>
     <string name="settingsDefault">Default</string>
