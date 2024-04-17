@@ -366,13 +366,14 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
     private fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
 
+        @Suppress("UNUSED_PARAMETER")
         fun trackOpenLocal(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
             appContext.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
         }
 
+        @Suppress("UNUSED_PARAMETER")
         fun trackOpenRemote(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
             appContext.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
         }
