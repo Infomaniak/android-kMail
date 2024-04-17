@@ -573,14 +573,22 @@
         <action
             android:id="@+id/action_dataManagement_to_matomo"
             app:destination="@id/matomoDataManagementDataFragment" />
+        <action
+            android:id="@+id/action_dataManagement_to_sentry"
+            app:destination="@id/sentryDataManagementDataFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/matomoDataManagementDataFragment"
         android:name="com.infomaniak.mail.ui.main.settings.MatomoDataManagementFragment"
         android:label="MatomoManagementDataFragment"
-        tools:layout="@layout/fragment_management_data_settings">
-    </fragment>
+        tools:layout="@layout/fragment_management_data_settings" />
+
+    <fragment
+        android:id="@+id/sentryDataManagementDataFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.SentryDataManagementFragment"
+        android:label="SentryManagementDataFragment"
+        tools:layout="@layout/fragment_management_data_settings" />
 
     <dialog
         android:id="@+id/attachmentActionsBottomSheetDialog"
