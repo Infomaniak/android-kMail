@@ -165,10 +165,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureSentry() {
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
-            // Register the callback as an option
-            options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent?, _: Any? ->
-                // If the application is in debug mode, discard the events
-                if (BuildConfig.DEBUG) null else event
+            options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
+                if (localSettings.isSentryTrackingEnabled) event else null
             }
             options.addIntegration(
                 FragmentLifecycleIntegration(
