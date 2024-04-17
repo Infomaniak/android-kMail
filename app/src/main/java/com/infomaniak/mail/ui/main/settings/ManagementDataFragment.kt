@@ -22,7 +22,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -40,11 +44,17 @@ class ManagementDataFragment : Fragment() {
         setSystemBarsColors()
         setupListeners()
     }
+
     private fun setupListeners() = with(binding) {
         dataManagementMatomo.setOnClickListener {
             animatedNavigation(ManagementDataFragmentDirections.actionDataManagementToMatomo())
         }
+        dataManagementSentry.setOnClickListener {
+            animatedNavigation(ManagementDataFragmentDirections.actionDataManagementToSentry())
+        }
+        dataManagementSourceCodeButton.setOnClickListener {
+            trackMenuDrawerEvent("source code")
+            context.openUrl(BuildConfig.GITHUB_REPO_URL)
+        }
     }
-
-
 }
