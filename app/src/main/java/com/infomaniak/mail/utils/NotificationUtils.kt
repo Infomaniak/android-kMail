@@ -184,8 +184,12 @@ class NotificationUtils @Inject constructor(
         title: String,
         description: String?,
     ): NotificationCompat.Builder {
-        return appContext.buildNotification(channelId, defaultSmallIcon, title, description)
-            .setCategory(Notification.CATEGORY_EMAIL)
+        return appContext.buildNotification(
+            channelId,
+            defaultSmallIcon,
+            title,
+            description
+        ).setCategory(Notification.CATEGORY_EMAIL)
     }
 
     private fun initMessageNotificationContent(
