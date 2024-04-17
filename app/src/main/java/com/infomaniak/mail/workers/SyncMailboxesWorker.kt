@@ -71,7 +71,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
 
         suspend fun scheduleWorkIfNeeded() = withContext(ioDispatcher) {
 
-            if (!playServicesUtils.areGooglePlayServicesAvailable() && AccountUtils.getAllUsersCount() > 0) {
+            if (AccountUtils.getAllUsersCount() > 0) {
                 SentryLog.d(TAG, "Work scheduled")
 
                 val workRequest =
