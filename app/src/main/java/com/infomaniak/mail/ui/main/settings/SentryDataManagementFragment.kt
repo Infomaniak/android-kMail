@@ -41,12 +41,10 @@ class SentryDataManagementFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchSentry) {
         super.onViewCreated(view, savedInstanceState)
 
-        apply {
-            isChecked = localSettings.isSentryTrackingEnabled
+        isChecked = localSettings.isSentryTrackingEnabled
 
-            setOnClickListener {
-                localSettings.isSentryTrackingEnabled = !localSettings.isSentryTrackingEnabled
-            }
+        setOnClickListener {
+            localSettings.isSentryTrackingEnabled = !localSettings.isSentryTrackingEnabled
         }
     }
 }

@@ -23,6 +23,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorkerFactory
@@ -46,6 +47,7 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.stores.AppUpdateScheduler
 import com.infomaniak.mail.MatomoMail.buildTracker
+import com.infomaniak.mail.MatomoMail.tracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.di.IoDispatcher
@@ -72,7 +74,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
 
-    val matomoTracker: Tracker by lazy { buildTracker() }
+    val matomoTracker: Tracker by lazy { buildTracker(!localSettings.isMatomoTrackingEnabled) }
     var isAppInBackground = true
         private set
     var lastAppClosingTime: Long? = FIRST_LAUNCH_TIME
@@ -118,7 +120,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     override fun onCreate() {
         super<Application>.onCreate()
-
+        
         HttpClientConfig.cacheDir = applicationContext.cacheDir
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
