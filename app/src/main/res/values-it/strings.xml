@@ -388,6 +388,7 @@
     <string name="settingsAccentColorDescription">Scegliere il colore d’accento per l’applicazione</string>
     <string name="settingsAiEngineDescription">Selezionare l’assistente di scrittura</string>
     <string name="settingsAppLock">Blocco dell’app</string>
+    <string name="settingsAuthorizeTracking">Autorizza il tracciamento</string>
     <string name="settingsCancellationPeriodDescription">Avete la possibilità di annullare l’invio della vostra email fino a 30 secondi.</string>
     <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell’invio</string>
     <string name="settingsDataManagementDescription">È possibile personalizzare i dati tecnici e di utilizzo che Infomaniak recupera per correggere i bug e sviluppare l’applicazione. I due strumenti utilizzati sono ospitati e gestiti esclusivamente da noi.\n\nInfomaniak rispetta la vostra privacy: il codice sorgente di questa applicazione può essere controllato, le informazioni raccolte sono anonime e i vostri dati personali rimangono strettamente confidenziali e non vengono mai condivisi con terzi.</string>
