@@ -35,6 +35,7 @@ import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
+import com.infomaniak.mail.utils.NotificationUtils.Companion.EXTRA_MESSAGE_UID
 import io.realm.kotlin.Realm
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -133,6 +134,15 @@ class FetchMessagesManager @Inject constructor(
                 mailbox = mailbox,
             )
             return
+        }
+
+        // Dismiss notifications for messages that have been read on another device
+        notificationManagerCompat.activeNotifications.forEach { statusBarNotification ->
+            statusBarNotification.notification.extras.getString(EXTRA_MESSAGE_UID)?.let { messageUid ->
+                if (MessageController.getMessage(messageUid, mailboxContentRealm!!)?.isSeen == true) {
+                    notificationManagerCompat.cancel(statusBarNotification.id)
+                }
+            }
         }
 
         // Notify Threads with new Messages
