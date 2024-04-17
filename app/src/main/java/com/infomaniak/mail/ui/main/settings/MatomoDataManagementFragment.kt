@@ -18,16 +18,39 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.tracker
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentMatomoManagementDataBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MatomoDataManagementFragment : Fragment() {
     private var binding: FragmentMatomoManagementDataBinding by safeBinding()
+
+    @Inject
+    lateinit var localSettings: LocalSettings
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMatomoManagementDataBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchMatomo) {
+        super.onViewCreated(view, savedInstanceState)
+
+        isChecked = localSettings.isMatomoTrackingEnabled
+
+        setOnClickListener {
+            val hasUserOptIn = isChecked
+            localSettings.isMatomoTrackingEnabled = hasUserOptIn
+            MatomoMail.shouldOptOut(requireContext().applicationContext, !hasUserOptIn)
+        }
     }
 }
