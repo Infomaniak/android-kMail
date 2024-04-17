@@ -19,9 +19,9 @@ package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -41,7 +41,11 @@ class SwitchUserViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
-    val allUsers = AccountUtils.getAllUsers().map { users -> users.sortedBy { it.displayName } }
+    val accounts = SingleLiveEvent<List<User>>()
+
+    fun getAccountsInDB() = viewModelScope.launch(ioDispatcher) {
+        accounts.postValue(AccountUtils.getAllUsersSync().sortedBy { it.displayName })
+    }
 
     fun switchAccount(user: User) = viewModelScope.launch(ioDispatcher) {
         if (user.id != AccountUtils.currentUserId) {

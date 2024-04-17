@@ -24,12 +24,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter.SwitchUserAccountViewHolder
-import com.infomaniak.mail.utils.AccountUtils
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 
 @SuppressLint("NotifyDataSetChanged")
 class SwitchUserAdapter(
@@ -72,17 +68,6 @@ class SwitchUserAdapter(
     override fun getItemCount(): Int = accounts.count()
 
     fun initializeAccounts(newList: List<User>) {
-
-        if (accounts.isNotEmpty()) {
-            SentryLog.d("Users", "We received users more than one time, which should not happen.")
-            Sentry.withScope { scope ->
-                scope.setExtra("currentEmail", "${AccountUtils.currentMailboxEmail}")
-                scope.setExtra("previousCount", "${accounts.count()}")
-                scope.setExtra("newCount", "${newList.count()}")
-                Sentry.captureMessage("We received users more than one time, which should not happen.", SentryLevel.ERROR)
-            }
-        }
-
         accounts = newList
         notifyDataSetChanged()
     }

@@ -46,7 +46,7 @@ class SwitchUserFragment : Fragment() {
         return FragmentSwitchUserBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
@@ -66,7 +66,8 @@ class SwitchUserFragment : Fragment() {
         }
     }
 
-    private fun observeAccounts() {
-        switchUserViewModel.allUsers.observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
+    private fun observeAccounts() = with(switchUserViewModel) {
+        accounts.observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
+        getAccountsInDB()
     }
 }

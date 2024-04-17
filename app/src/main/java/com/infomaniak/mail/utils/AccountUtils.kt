@@ -138,5 +138,4 @@ object AccountUtils : CredentialManager() {
     }
 
     fun getAllUsersSync(): List<User> = userDatabase.userDao().getAllSync()
-
 }
