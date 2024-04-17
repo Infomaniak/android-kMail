@@ -48,13 +48,12 @@
             android:text="@string/settingsMatomoDescription" />
 
 
-
-            <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                android:id="@+id/settingsAppLock"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:itemAction="toggle"
-                app:title="@string/settingsAppLock" />
+        <com.infomaniak.mail.ui.main.settings.ItemSettingView
+            android:id="@+id/settingsTrackingSwitchMatomo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:itemAction="toggle"
+            app:title="@string/settingsAuthorizeTracking" />
 
 
     </LinearLayout>
