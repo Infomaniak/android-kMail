@@ -62,6 +62,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showAiDiscoveryBottomSheet by sharedValue("showAiDiscoveryBottomSheetKey", true)
     var showSyncDiscoveryBottomSheet by sharedValue("showSyncDiscoveryBottomSheetKey", true)
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
+    var isSentryTrackingEnabled by sharedValue("isSentryTrackingEnabledKey", true)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 

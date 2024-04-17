@@ -403,6 +403,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_dataManagement_to_sentry">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                           </map>
                         </option>
                       </LayoutPositions>
@@ -531,6 +536,18 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="1756" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="sDataManagementDataFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
                             <option name="y" value="12" />
                           </Point>
                         </option>
