@@ -691,8 +691,8 @@ class NewMessageViewModel @Inject constructor(
         val localUuid = draftLocalUuid ?: return@launch
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        if (isFinishing && isSavingDraftWithoutChanges(action, subject, uiBodyValue)) {
-            if (!arrivedFromExistingDraft) removeDraftFromRealm(localUuid)
+        if (action == DraftAction.SAVE && isSnapshotTheSame(subjectValue, uiBodyValue)) {
+            if (isFinishing && !arrivedFromExistingDraft) removeDraftFromRealm(localUuid)
             return@launch
         }
 
@@ -760,8 +760,8 @@ class NewMessageViewModel @Inject constructor(
         messageUid?.let { MessageController.getMessage(uid = it, realm)?.draftLocalUuid = localUuid }
     }
 
-    private fun isSavingDraftWithoutChanges(action: DraftAction, subjectValue: String?, uiBodyValue: String): Boolean {
-        return action == DraftAction.SAVE && snapshot?.hasChanges(subjectValue, uiBodyValue) != true
+    private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
+        return snapshot?.hasChanges(subjectValue, uiBodyValue) != true
     }
 
     private fun DraftSnapshot.hasChanges(subjectValue: String?, uiBodyValue: String): Boolean {
