@@ -17,67 +17,50 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import android.app.Activity
-import android.content.Context
 import android.content.res.ColorStateList
-import android.view.WindowManager.LayoutParams
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.notYetImplemented
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
 @FragmentScoped
-class NewMessageEditorManager @Inject constructor(
-    @ActivityContext private val activityContext: Context,
-) : NewMessageManager() {
-
-    private inline val activity get() = activityContext as Activity
+class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
 
     private var _aiManager: NewMessageAiManager? = null
     private inline val aiManager: NewMessageAiManager get() = _aiManager!!
-    private var _filePicker: FilePicker? = null
-    private inline val filePicker: FilePicker get() = _filePicker!!
+
+    private var _openFilePicker: (() -> Unit)? = null
 
     fun initValues(
         newMessageViewModel: NewMessageViewModel,
         binding: FragmentNewMessageBinding,
         fragment: NewMessageFragment,
         aiManager: NewMessageAiManager,
+        openFilePicker: () -> Unit,
     ) {
         super.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
             fragment = fragment,
-            freeReferences = {
-                _aiManager = null
-                _filePicker = null
-            },
+            freeReferences = { _aiManager = null },
         )
 
         _aiManager = aiManager
-
-        _filePicker = FilePicker(fragment).apply {
-            initCallback { uris ->
-                activity.window.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                newMessageViewModel.importAttachmentsLiveData.value = uris
-            }
-        }
+        _openFilePicker = openFilePicker
     }
 
     fun observeEditorActions() {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
-                EditorAction.ATTACHMENT -> filePicker.open()
+                EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
                 EditorAction.CAMERA -> fragment.notYetImplemented()
                 EditorAction.LINK -> fragment.notYetImplemented()
                 EditorAction.CLOCK -> fragment.notYetImplemented()
@@ -109,6 +92,7 @@ class NewMessageEditorManager @Inject constructor(
     }
 
     private fun updateEditorVisibility(isEditorExpanded: Boolean) = with(binding) {
+
         val color = if (isEditorExpanded) {
             context.getAttributeColor(RMaterial.attr.colorPrimary)
         } else {
