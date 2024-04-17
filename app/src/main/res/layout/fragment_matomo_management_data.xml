@@ -29,9 +29,11 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/settingsMatomoTitle"
                 android:src="@drawable/ic_matomo_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -39,17 +41,21 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             style="@style/Body"
-            android:padding="@dimen/dividerHorizontalPadding"
-            android:text="@string/settingsMatomoDescription"/>
-
-        <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            android:padding="@dimen/dividerHorizontalPadding"
+            android:text="@string/settingsMatomoDescription" />
+
+
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsAppLock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsAppLock" />
+
+
     </LinearLayout>
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>
