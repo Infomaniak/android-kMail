@@ -178,4 +178,19 @@
         <attr name="centerHorizontally" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="PrimaryPalette">
+        <attr name="primary0" format="color"/>
+        <attr name="primary10" format="color"/>
+        <attr name="primary20" format="color"/>
+        <attr name="primary30" format="color"/>
+        <attr name="primary40" format="color"/>
+        <attr name="primary50" format="color"/>
+        <attr name="primary60" format="color"/>
+        <attr name="primary70" format="color"/>
+        <attr name="primary80" format="color"/>
+        <attr name="primary90" format="color"/>
+        <attr name="primary95" format="color"/>
+        <attr name="primary99" format="color"/>
+        <attr name="primary100" format="color"/>
+    </declare-styleable>
 </resources>

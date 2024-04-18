@@ -36,7 +36,7 @@
                 android:id="@+id/dataManagementIllustration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/illustration_management_data_paper_pink"
+                android:src="@drawable/illustration_management_data_paper"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
