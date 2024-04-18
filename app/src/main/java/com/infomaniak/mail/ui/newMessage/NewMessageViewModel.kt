@@ -740,9 +740,21 @@ class NewMessageViewModel @Inject constructor(
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
 
+        val updatedAttachments = mutableListOf<Attachment>()
+        attachmentsLiveData.valueOrEmpty().forEach { uiAttachment ->
+            // If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
+            val localAttachment = attachments.firstOrNull { it.uploadLocalUri == uiAttachment.uploadLocalUri }
+            /**
+             * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly
+             * already be an `uuid` for Attachments in Realm. If we don't take back the Realm version of the
+             * Attachment, its `uuid` will be lost forever and we won't be able to save/send the Draft.
+             */
+            val updatedAttachment = if (localAttachment?.uuid != null) localAttachment.copyFromRealm() else uiAttachment
+            updatedAttachments.add(updatedAttachment)
+        }
         attachments.apply {
             clear()
-            addAll(attachmentsLiveData.valueOrEmpty())
+            addAll(updatedAttachments)
         }
 
         subject = subjectValue
