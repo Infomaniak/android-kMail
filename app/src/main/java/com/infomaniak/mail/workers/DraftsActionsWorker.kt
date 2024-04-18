@@ -296,7 +296,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private fun getNotUploadedAttachments(draft: Draft): List<Attachment> = draft.attachments.filter { it.uploadLocalUri != null }
+    private fun getNotUploadedAttachments(draft: Draft): List<Attachment> = draft.attachments.filter { it.uuid.isEmpty() }
 
     private fun Attachment.startUpload(draftLocalUuid: String) {
         val attachmentFile = getUploadLocalFile().also {
@@ -347,6 +347,9 @@ class DraftsActionsWorker @AssistedInject constructor(
                 val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
                 SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (Uuids to localUris): $uuidToLocalUri")
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
+
+                // The API version of an Attachment doesn't have the `uploadLocalUri`, so we need to back it up.
+                remoteAttachment.uploadLocalUri = uploadLocalUri
 
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
                 draft.attachments.add(remoteAttachment)
