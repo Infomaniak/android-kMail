@@ -39,7 +39,8 @@
                 android:src="@drawable/illustration_management_data_paper"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:importantForAccessibility="no"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
