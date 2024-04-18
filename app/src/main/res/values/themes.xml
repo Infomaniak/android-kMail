@@ -66,7 +66,7 @@
         <!--Created for the stroke color of participation chips so it can be overridden later on-->
         <item name="calendarChipSelectedStrokeColor">#00ff00</item>
 
-
+        <!-- Primary color palette -->
         <item name="primary0">@color/material_dynamic_primary0</item>
         <item name="primary10">@color/material_dynamic_primary10</item>
         <item name="primary20">@color/material_dynamic_primary20</item>
@@ -96,7 +96,7 @@
 
         <item name="colorControlNormal">@color/pinkMail</item>
 
-
+        <!-- Primary color palette -->
         <item name="primary0">@color/pink0</item>
         <item name="primary10">@color/pink10</item>
         <item name="primary20">@color/pink20</item>
@@ -124,7 +124,7 @@
 
         <item name="colorControlNormal">@color/blueMail</item>
 
-
+        <!-- Primary color palette -->
         <item name="primary0">@color/blue0</item>
         <item name="primary10">@color/blue10</item>
         <item name="primary20">@color/blue20</item>
