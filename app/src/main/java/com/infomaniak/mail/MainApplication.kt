@@ -72,7 +72,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
 
-    val matomoTracker: Tracker by lazy { buildTracker(!localSettings.isMatomoTrackingEnabled) }
+    val matomoTracker: Tracker by lazy { buildTracker(shouldOptOut = !localSettings.isMatomoTrackingEnabled) }
     var isAppInBackground = true
         private set
     var lastAppClosingTime: Long? = FIRST_LAUNCH_TIME

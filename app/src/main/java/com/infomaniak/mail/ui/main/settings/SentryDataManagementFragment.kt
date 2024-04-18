@@ -25,21 +25,25 @@ import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSentryManagementDataBinding
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SentryDataManagementFragment : Fragment() {
+
     private var binding: FragmentSentryManagementDataBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSentryManagementDataBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchSentry) {
         super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
         isChecked = localSettings.isSentryTrackingEnabled
 
