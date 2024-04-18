@@ -80,6 +80,21 @@
         <item name="colorAccent">@color/pinkMail</item>
 
         <item name="colorControlNormal">@color/pinkMail</item>
+
+
+        <item name="primary0">@color/pink0</item>
+        <item name="primary10">@color/pink10</item>
+        <item name="primary20">@color/pink20</item>
+        <item name="primary30">@color/pink30</item>
+        <item name="primary40">@color/pink40</item>
+        <item name="primary50">@color/pink50</item>
+        <item name="primary60">@color/pink60</item>
+        <item name="primary70">@color/pink70</item>
+        <item name="primary80">@color/pink80</item>
+        <item name="primary90">@color/pink90</item>
+        <item name="primary95">@color/pink95</item>
+        <item name="primary99">@color/pink99</item>
+        <item name="primary100">@color/pink100</item>
     </style>
 
     <style name="AppTheme.Blue">
@@ -93,6 +108,21 @@
         <item name="colorAccent">@color/blueMail</item>
 
         <item name="colorControlNormal">@color/blueMail</item>
+
+
+        <item name="primary0">@color/blue0</item>
+        <item name="primary10">@color/blue10</item>
+        <item name="primary20">@color/blue20</item>
+        <item name="primary30">@color/blue30</item>
+        <item name="primary40">@color/blue40</item>
+        <item name="primary50">@color/blue50</item>
+        <item name="primary60">@color/blue60</item>
+        <item name="primary70">@color/blue70</item>
+        <item name="primary80">@color/blue80</item>
+        <item name="primary90">@color/blue90</item>
+        <item name="primary95">@color/blue95</item>
+        <item name="primary99">@color/blue99</item>
+        <item name="primary100">@color/blue100</item>
     </style>
 
     <!-- AppLock -->

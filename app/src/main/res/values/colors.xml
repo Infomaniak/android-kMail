@@ -96,6 +96,36 @@
     <color name="ai_light">#8D4AFF</color>
     <color name="ai_dark">#BF99FF</color>
 
+    <!-- Primary color palette -->
+    <color name="pink0">@color/black</color>
+    <color name="pink10">#3F0019</color>
+    <color name="pink20">#66002C</color>
+    <color name="pink30">#8F0040</color>
+    <color name="pink40">#BB0055</color>
+    <color name="pink50">#C82468</color>
+    <color name="pink60">#D6497B</color>
+    <color name="pink70">#E5708F</color>
+    <color name="pink80">#EF8BA4</color>
+    <color name="pink90">#FFB9C8</color>
+    <color name="pink95">#FFECEE</color>
+    <color name="pink99">#FFF8F7</color>
+    <color name="pink100">@color/white</color>
+
+    <color name="blue0">@color/black</color>
+    <color name="blue10">#002748</color>
+    <color name="blue20">#004D86</color>
+    <color name="blue30">#0072C2</color>
+    <color name="blue40">#0098FF</color>
+    <color name="blue50">#19A1FF</color>
+    <color name="blue60">#32ABFF</color>
+    <color name="blue70">#4CB7FF</color>
+    <color name="blue80">#91CDFF</color>
+    <color name="blue90">#CBE6FF</color>
+    <color name="blue95">#E6F2FF</color>
+    <color name="blue99">#FCFCFF</color>
+    <color name="blue100">@color/white</color>
+
+
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/background_color_light</color>
