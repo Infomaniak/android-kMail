@@ -27,7 +27,7 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
-import com.infomaniak.mail.databinding.*
+import com.infomaniak.mail.databinding.FragmentManagementDataSettingsBinding
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint

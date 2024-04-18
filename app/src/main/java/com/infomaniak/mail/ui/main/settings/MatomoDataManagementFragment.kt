@@ -18,14 +18,12 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail
-import com.infomaniak.mail.MatomoMail.tracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentMatomoManagementDataBinding
 import dagger.hilt.android.AndroidEntryPoint

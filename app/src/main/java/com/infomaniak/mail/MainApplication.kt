@@ -23,7 +23,6 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorkerFactory
@@ -47,7 +46,6 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.stores.AppUpdateScheduler
 import com.infomaniak.mail.MatomoMail.buildTracker
-import com.infomaniak.mail.MatomoMail.tracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.di.IoDispatcher
@@ -120,7 +118,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     override fun onCreate() {
         super<Application>.onCreate()
-        
+
         HttpClientConfig.cacheDir = applicationContext.cacheDir
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
