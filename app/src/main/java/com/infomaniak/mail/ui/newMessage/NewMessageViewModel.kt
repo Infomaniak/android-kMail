@@ -760,18 +760,16 @@ class NewMessageViewModel @Inject constructor(
         messageUid?.let { MessageController.getMessage(uid = it, realm)?.draftLocalUuid = localUuid }
     }
 
-    private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean = with(snapshot) {
-        return@with if (this == null) {
-            false
-        } else {
-            identityId == fromLiveData.value?.signature?.id?.toString() &&
-                    to == toLiveData.valueOrEmpty().toSet() &&
-                    cc == ccLiveData.valueOrEmpty().toSet() &&
-                    bcc == bccLiveData.valueOrEmpty().toSet() &&
-                    subject == subjectValue &&
-                    uiBody == uiBodyValue &&
-                    attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty().map { it.localUuid }.toSet()
-        }
+    private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
+        return snapshot?.let {
+            it.identityId == fromLiveData.value?.signature?.id?.toString() &&
+                    it.to == toLiveData.valueOrEmpty().toSet() &&
+                    it.cc == ccLiveData.valueOrEmpty().toSet() &&
+                    it.bcc == bccLiveData.valueOrEmpty().toSet() &&
+                    it.subject == subjectValue &&
+                    it.uiBody == uiBodyValue &&
+                    it.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty().map { att -> att.localUuid }.toSet()
+        } ?: false
     }
 
     private fun removeDraftFromRealm(localUuid: String) {
