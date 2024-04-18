@@ -743,7 +743,12 @@ class NewMessageViewModel @Inject constructor(
         val updatedAttachments = mutableListOf<Attachment>()
         attachmentsLiveData.valueOrEmpty().forEach { uiAttachment ->
             // If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
-            val localAttachment = attachments.firstOrNull { it.uploadLocalUri == uiAttachment.uploadLocalUri }
+            val localAttachment = attachments.filter { it.uploadLocalUri == uiAttachment.uploadLocalUri }
+                .also {
+                    // If this Sentry never triggers, remove it and replace the
+                    // `attachments.filter { … }.also { … }.firstOrNull()` with `attachments.singleOrNull { … }`
+                    if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same uploadLocalUri")
+                }.firstOrNull()
             /**
              * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly
              * already be an `uuid` for Attachments in Realm. If we don't take back the Realm version of the
