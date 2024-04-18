@@ -203,10 +203,10 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun getExistingDraft(localUuid: String?, realm: Realm): Draft? {
-        return getLocalOrRemoteDraft(localUuid)?.also {
-            saveNavArgsToSavedState(it.localUuid)
-            if (it.identityId.isNullOrBlank()) it.identityId = SignatureController.getSignature(realm).id.toString()
-            if (it.body.isNotEmpty()) splitSignatureAndQuoteFromBody(it)
+        return getLocalOrRemoteDraft(localUuid)?.also { draft ->
+            saveNavArgsToSavedState(draft.localUuid)
+            if (draft.identityId.isNullOrBlank()) draft.identityId = SignatureController.getSignature(realm).id.toString()
+            if (draft.body.isNotEmpty()) splitSignatureAndQuoteFromBody(draft)
         }
     }
 
