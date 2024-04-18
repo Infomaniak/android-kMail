@@ -65,6 +65,21 @@
 
         <!--Created for the stroke color of participation chips so it can be overridden later on-->
         <item name="calendarChipSelectedStrokeColor">#00ff00</item>
+
+
+        <item name="primary0">@color/material_dynamic_primary0</item>
+        <item name="primary10">@color/material_dynamic_primary10</item>
+        <item name="primary20">@color/material_dynamic_primary20</item>
+        <item name="primary30">@color/material_dynamic_primary30</item>
+        <item name="primary40">@color/material_dynamic_primary40</item>
+        <item name="primary50">@color/material_dynamic_primary50</item>
+        <item name="primary60">@color/material_dynamic_primary60</item>
+        <item name="primary70">@color/material_dynamic_primary70</item>
+        <item name="primary80">@color/material_dynamic_primary80</item>
+        <item name="primary90">@color/material_dynamic_primary90</item>
+        <item name="primary95">@color/material_dynamic_primary95</item>
+        <item name="primary99">@color/material_dynamic_primary99</item>
+        <item name="primary100">@color/material_dynamic_primary100</item>
     </style>
 
     <style name="AppTheme" parent="AppThemeBase" />
