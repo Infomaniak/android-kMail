@@ -188,7 +188,7 @@ class NotificationUtils @Inject constructor(
             channelId,
             defaultSmallIcon,
             title,
-            description
+            description,
         ).setCategory(Notification.CATEGORY_EMAIL)
     }
 
@@ -213,9 +213,7 @@ class NotificationUtils @Inject constructor(
         setContentIntent(contentIntent)
         setGroup(mailbox.notificationGroupKey)
         setGroupSummary(payload.isSummary)
-        setExtras(Bundle().apply {
-            putString(EXTRA_MESSAGE_UID, payload.messageUid)
-        })
+        setExtras(Bundle().apply { putString(EXTRA_MESSAGE_UID, payload.messageUid) })
         color = localSettings.accentColor.getPrimary(appContext)
 
         SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")

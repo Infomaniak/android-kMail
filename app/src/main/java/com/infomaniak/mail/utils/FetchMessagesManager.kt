@@ -136,7 +136,7 @@ class FetchMessagesManager @Inject constructor(
             return
         }
 
-        // Dismiss notifications for messages that have been read on another device
+        // Dismiss Notifications for Messages that have been read on another device
         notificationManagerCompat.activeNotifications.forEach { statusBarNotification ->
             statusBarNotification.notification.extras.getString(EXTRA_MESSAGE_UID)?.let { messageUid ->
                 if (MessageController.getMessage(messageUid, mailboxContentRealm!!)?.isSeen == true) {

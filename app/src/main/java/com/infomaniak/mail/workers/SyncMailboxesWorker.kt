@@ -99,6 +99,6 @@ class SyncMailboxesWorker @AssistedInject constructor(
     companion object {
         private const val TAG = "SyncMessagesWorker" // To support the old services, don't change this name
         private const val INITIAL_DELAY = 2L
-        private const val PERIODIC_INTERVAL_MILLIS = 240 * 60 * 1000L // 4 hours
+        private const val PERIODIC_INTERVAL_MILLIS = 4 * 60 * 60 * 1_000L // 4 hours
     }
 }
