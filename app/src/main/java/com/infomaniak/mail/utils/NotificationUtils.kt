@@ -297,6 +297,7 @@ class NotificationUtils @Inject constructor(
         addAction(replyAction)
     }
 
+    @Suppress("MayBeConstant")
     companion object : NotificationUtilsCore() {
 
         private val TAG: String = NotificationUtils::class.java.simpleName
@@ -306,7 +307,6 @@ class NotificationUtils @Inject constructor(
         private val defaultSmallIcon = R.drawable.ic_logo_notification
 
         const val DRAFT_ACTIONS_ID = 1
-
         const val EXTRA_MESSAGE_UID = "messageUid"
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
