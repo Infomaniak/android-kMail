@@ -26,7 +26,7 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.trackLinkEvent
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.databinding.FragmentManagementDataSettingsBinding
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -55,7 +55,7 @@ class ManagementDataFragment : Fragment() {
             animatedNavigation(ManagementDataFragmentDirections.actionDataManagementToSentry())
         }
         dataManagementSourceCodeButton.setOnClickListener {
-            trackLinkEvent("sourceCode")
+            trackEvent("settingsManagementData", "sourceCode")
             context.openUrl(BuildConfig.GITHUB_REPO_URL)
         }
     }
