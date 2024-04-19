@@ -78,6 +78,8 @@ class FetchMessagesManager @Inject constructor(
                 messageUid = sentryMessageUid,
                 mailbox = mailbox,
             )
+
+            realm.close()
             return
         }
 
@@ -94,6 +96,8 @@ class FetchMessagesManager @Inject constructor(
                 messageUid = sentryMessageUid,
                 mailbox = mailbox,
             )
+
+            realm.close()
             return
         }
 
@@ -117,6 +121,8 @@ class FetchMessagesManager @Inject constructor(
                     mailbox = mailbox,
                     throwable = throwable,
                 )
+
+                realm.close()
                 return
             }
             return@let threads.toList()
@@ -142,6 +148,8 @@ class FetchMessagesManager @Inject constructor(
                 messageUid = sentryMessageUid,
                 mailbox = mailbox,
             )
+
+            realm.close()
             return
         }
 
