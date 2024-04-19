@@ -391,7 +391,7 @@
     <string name="settingsAuthorizeTracking">Verfolgung genehmigen</string>
     <string name="settingsCancellationPeriodDescription">Sie haben die Möglichkeit, den Versand Ihrer E-Mail bis zu 30 Sekunden abzubrechen</string>
     <string name="settingsCancellationPeriodTitle">Kündigungsfrist senden</string>
-    <string name="settingsDataManagementDescription">Sie können die Nutzungs- und technischen Daten, die Infomaniak abruft, individuell anpassen, um Fehler zu beheben und die Anwendung weiterzuentwickeln. Die beiden verwendeten Tools werden ausschliesslich von uns gehostet und verwaltet.\n\nInfomaniak respektiert Ihre Privatsphäre: Der Quellcode dieser Anwendung kann überprüft werden, die gesammelten Informationen sind anonym und Ihre persönlichen Daten bleiben streng vertraulich und werden niemals an Dritte weitergegeben.</string>
+    <string name="settingsDataManagementDescription">Sie können die Nutzungs- und Betriebsdaten, die Infomaniak abruft, individuell anpassen, um Fehler zu beheben und die Anwendung zu verbessern. Beide Tools werden ausschliesslich von uns gehostet und verwaltet.\n\nInfomaniak respektiert Ihre Privatsphäre: Der Quellcode dieser Anwendung kann überprüft werden, die gesammelten Informationen sind anonym und Ihre persönlichen Daten werden streng vertraulich behandelt und niemals an Dritte weitergegeben.</string>
     <string name="settingsDataManagementSourceCode">Siehe Quellcode</string>
     <string name="settingsDataManagementTitle">Verwaltung der Daten</string>
     <string name="settingsDefault">Standard</string>

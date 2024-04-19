@@ -391,7 +391,7 @@
     <string name="settingsAuthorizeTracking">Autorizar el seguimiento</string>
     <string name="settingsCancellationPeriodDescription">Tiene la posibilidad de cancelar el envío de su correo electrónico hasta 30 segundos</string>
     <string name="settingsCancellationPeriodTitle">Enviar plazo de anulación</string>
-    <string name="settingsDataManagementDescription">Puede personalizar los datos de uso y técnicos que Infomaniak recupera para corregir errores y desarrollar la aplicación. Las dos herramientas utilizadas están alojadas y gestionadas exclusivamente por nosotros.\n\nInfomaniak respeta su privacidad: el código fuente de esta aplicación puede consultarse, la información recopilada es anónima y sus datos personales permanecen estrictamente confidenciales y nunca se comparten con terceros.</string>
+    <string name="settingsDataManagementDescription">Puede personalizar los datos de uso y funcionamiento que Infomaniak recupera para corregir errores y mejorar la aplicación. Ambas herramientas están alojadas y gestionadas exclusivamente por nosotros.\n\nInfomaniak respeta su privacidad: el código fuente de esta aplicación puede verificarse, la información recopilada es anónima y sus datos personales permanecen estrictamente confidenciales y nunca se comparten con terceros.</string>
     <string name="settingsDataManagementSourceCode">Ver código fuente</string>
     <string name="settingsDataManagementTitle">Gestión de datos</string>
     <string name="settingsDefault">Por defecto</string>
