@@ -21,58 +21,57 @@
     android:layout_height="match_parent"
     app:title="@string/settingsDataManagementTitle">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/dataManagementIllustration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"
-            android:src="@drawable/illustration_management_data_paper"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/dataManagementTextDescription"
-            style="@style/Body"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/dividerHorizontalPadding"
-            android:text="@string/settingsDataManagementDescription"
-            app:layout_constraintTop_toBottomOf="@+id/settings_data_management_illustration" />
+            android:orientation="vertical">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/dataManagementSourceCodeButton"
-            style="@style/TextButtonSecondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="@string/settingsDataManagementSourceCode"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/settings_data_management_text_description" />
+            <ImageView
+                android:id="@+id/dataManagementIllustration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:src="@drawable/illustration_management_data_paper" />
 
-        <com.infomaniak.mail.ui.main.settings.ItemSettingView
-            android:id="@+id/dataManagementMatomo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_matomo"
-            app:itemAction="chevron"
-            app:title="@string/settingsMatomoTitle" />
+            <TextView
+                android:id="@+id/dataManagementTextDescription"
+                style="@style/Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/dividerHorizontalPadding"
+                android:text="@string/settingsDataManagementDescription" />
 
-        <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dataManagementSourceCodeButton"
+                style="@style/TextButtonSecondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="@string/settingsDataManagementSourceCode" />
 
-        <com.infomaniak.mail.ui.main.settings.ItemSettingView
-            android:id="@+id/dataManagementSentry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_sentry"
-            app:itemAction="chevron"
-            app:title="@string/settingsSentryTitle" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/dataManagementMatomo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_matomo"
+                app:itemAction="chevron"
+                app:title="@string/settingsMatomoTitle" />
 
-    </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/dataManagementSentry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_sentry"
+                app:itemAction="chevron"
+                app:title="@string/settingsSentryTitle" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>
