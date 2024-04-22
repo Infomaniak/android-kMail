@@ -89,11 +89,6 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
 
-    private var shouldInitToField = true
-    private var shouldInitCcField = true
-    private var shouldInitBccField = true
-    private var shouldRegisterToImportedAttachments = true
-
     private var addressListPopupWindow: ListPopupWindow? = null
 
     private var quoteWebView: WebView? = null
@@ -429,6 +424,10 @@ class NewMessageFragment : Fragment() {
 
     private fun observeRecipients() = with(newMessageViewModel) {
 
+        var shouldInitToField = true
+        var shouldInitCcField = true
+        var shouldInitBccField = true
+
         toLiveData.observe(viewLifecycleOwner) {
             if (shouldInitToField) {
                 shouldInitToField = false
@@ -457,6 +456,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeAttachments() = with(newMessageViewModel) {
+
+        var shouldRegisterToImportedAttachments = true
+
         attachmentsLiveData.observe(viewLifecycleOwner) { attachments ->
 
             if (shouldRegisterToImportedAttachments) {
