@@ -52,7 +52,7 @@ class DataManagementSettingsFragment : Fragment() {
             animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToMatomoSetting())
         }
         dataManagementSentry.setOnClickListener {
-            animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToSentry())
+            animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToSentrySetting())
         }
         dataManagementSourceCodeButton.setOnClickListener {
             trackEvent("settingsManagementData", "sourceCode")

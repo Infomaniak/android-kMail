@@ -24,21 +24,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.databinding.FragmentSentryManagementDataBinding
+import com.infomaniak.mail.databinding.FragmentDataManagementSentrySettingBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SentryDataManagementFragment : Fragment() {
+class DataManagementSentrySettingFragment : Fragment() {
 
-    private var binding: FragmentSentryManagementDataBinding by safeBinding()
+    private var binding: FragmentDataManagementSentrySettingBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentSentryManagementDataBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentDataManagementSentrySettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchSentry) {

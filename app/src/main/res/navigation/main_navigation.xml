@@ -439,8 +439,8 @@
             android:id="@+id/action_dataManagement_to_matomoSetting"
             app:destination="@id/dataManagementMatomoSettingFragment" />
         <action
-            android:id="@+id/action_dataManagement_to_sentry"
-            app:destination="@id/sentryDataManagementDataFragment" />
+            android:id="@+id/action_dataManagement_to_sentrySetting"
+            app:destination="@id/dataManagementSentrySettingFragment" />
     </fragment>
 
     <fragment
@@ -450,9 +450,9 @@
         tools:layout="@layout/fragment_data_management_matomo_setting" />
 
     <fragment
-        android:id="@+id/sentryDataManagementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.privacy.SentryDataManagementFragment"
-        android:label="SentryManagementDataFragment"
+        android:id="@+id/dataManagementSentrySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementSentrySettingFragment"
+        android:label="DataManagementSentrySettingFragment"
         tools:layout="@layout/fragment_data_management_settings" />
 
     <fragment
