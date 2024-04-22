@@ -147,6 +147,19 @@
                 app:title="@string/settingsThreadModeTitle"
                 tools:subtitle="@string/settingsOptionThreadModeConversation" />
 
+            <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
+
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/settingsSectionDataPrivacy" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsDataManagement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsDataManagementTitle" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>

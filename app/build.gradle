@@ -41,6 +41,7 @@ android {
         buildConfigField 'String', 'BUGTRACKER_MAIL_BUCKET_ID', '"app_mail"'
         buildConfigField 'String', 'BUGTRACKER_MAIL_PROJECT_NAME', '"mail"'
         buildConfigField 'String', 'GITHUB_REPO', '"android-mail"'
+        buildConfigField 'String', 'GITHUB_REPO_URL', '"https://github.com/Infomaniak/android-kMail"'
 
         resValue 'string', 'ATTACHMENTS_AUTHORITY', 'com.infomaniak.mail.attachments'
 

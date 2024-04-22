@@ -306,6 +306,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_aiEngineSettingFragment"
             app:destination="@id/aiEngineSettingFragment" />
+        <action
+            android:id="@+id/action_settings_to_dataManagementSettingsFragment"
+            app:destination="@id/dataManagementSettingsFragment" />
     </fragment>
 
     <fragment
@@ -426,6 +429,31 @@
             android:name="titleResId"
             app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/dataManagementSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementSettingsFragment"
+        android:label="DataManagementSettingsFragment"
+        tools:layout="@layout/fragment_data_management_settings">
+        <action
+            android:id="@+id/action_dataManagement_to_matomoSetting"
+            app:destination="@id/dataManagementMatomoSettingFragment" />
+        <action
+            android:id="@+id/action_dataManagement_to_sentrySetting"
+            app:destination="@id/dataManagementSentrySettingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dataManagementMatomoSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementMatomoSettingFragment"
+        android:label="DataManagementMatomoSettingFragment"
+        tools:layout="@layout/fragment_data_management_matomo_setting" />
+
+    <fragment
+        android:id="@+id/dataManagementSentrySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementSentrySettingFragment"
+        android:label="DataManagementSentrySettingFragment"
+        tools:layout="@layout/fragment_data_management_sentry_setting" />
 
     <fragment
         android:id="@+id/invalidPasswordFragment"

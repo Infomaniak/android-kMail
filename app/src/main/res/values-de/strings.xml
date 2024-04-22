@@ -388,8 +388,12 @@
     <string name="settingsAccentColorDescription">Wählen Sie die Akzentfarbe für die Anwendung</string>
     <string name="settingsAiEngineDescription">Wählen Sie Ihren Schreibassistent</string>
     <string name="settingsAppLock">App-Sperre</string>
+    <string name="settingsAuthorizeTracking">Verfolgung genehmigen</string>
     <string name="settingsCancellationPeriodDescription">Sie haben die Möglichkeit, den Versand Ihrer E-Mail bis zu 30 Sekunden abzubrechen</string>
     <string name="settingsCancellationPeriodTitle">Kündigungsfrist senden</string>
+    <string name="settingsDataManagementDescription">Sie können die Nutzungs- und Betriebsdaten, die Infomaniak abruft, individuell anpassen, um Fehler zu beheben und die Anwendung zu verbessern. Beide Tools werden ausschliesslich von uns gehostet und verwaltet.\n\nInfomaniak respektiert Ihre Privatsphäre: Der Quellcode dieser Anwendung kann überprüft werden, die gesammelten Informationen sind anonym und Ihre persönlichen Daten werden streng vertraulich behandelt und niemals an Dritte weitergegeben.</string>
+    <string name="settingsDataManagementSourceCode">Siehe Quellcode</string>
+    <string name="settingsDataManagementTitle">Verwaltung der Daten</string>
     <string name="settingsDefault">Standard</string>
     <string name="settingsDelaySeconds">%d Sekunden</string>
     <string name="settingsDensityOptionCompact">Kompakt</string>
@@ -407,6 +411,8 @@
     <string name="settingsMailboxGeneralFolders">Einstellungen für Ordner</string>
     <string name="settingsMailboxGeneralNotifications">Benachrichtigungen</string>
     <string name="settingsMailboxGeneralSignature">Signatur-Einstellungen</string>
+    <string name="settingsMatomoDescription">Matomo ist ein Analysetool, das ausschliesslich von Infomaniak gehostet und verwaltet wird, um zu verstehen, wie die Anwendung genutzt wird.\n\nDurch die Untersuchung dieser Daten kann unser Team die Schnittstelle der Anwendung kontinuierlich verbessern.</string>
+    <string name="settingsMatomoTitle">Matomo</string>
     <string name="settingsOptionAlways">Immer</string>
     <string name="settingsOptionAskMe">Fragen Sie mich</string>
     <string name="settingsOptionDarkTheme">Dunkel</string>
@@ -417,6 +423,7 @@
     <string name="settingsPrivacyDeleteSearchHistory">Suchverlauf löschen</string>
     <string name="settingsPrivacyViewLogs">Protokolle ansehen</string>
     <string name="settingsSectionAppearance">Erscheinungsbild</string>
+    <string name="settingsSectionDataPrivacy">Daten und Datenschutz</string>
     <string name="settingsSectionEmailAddresses">E-Mail-Adressen</string>
     <string name="settingsSectionGeneral">Allgemein</string>
     <string name="settingsSectionPrivacy">Datenschutz</string>
@@ -431,6 +438,8 @@
     <string name="settingsSendAcknowledgement">Verlangen Sie eine Empfangsbestätigung für jede gesendete E-Mail</string>
     <string name="settingsSendIncludeOriginalMessage">Fügen Sie die ursprüngliche Nachricht in die Antwort ein</string>
     <string name="settingsSendTitle">Senden Sie</string>
+    <string name="settingsSentryDescription">Sentry ist ein Tool, das ausschliesslich von Infomaniak gehostet und verwaltet wird, um die Stabilität der Anwendung in Echtzeit zu überwachen und unseren Entwicklern automatisch alle technischen Fehler zu melden.\n\nAnhand dieser Daten kann unser Team die Anwendung schnell korrigieren und optimieren, was zu einem besseren Nutzererlebnis für Sie führt.</string>
+    <string name="settingsSentryTitle">Sentry</string>
     <string name="settingsSignatureDescription">Wählen Sie eine Standardsignatur</string>
     <string name="settingsSignatureTitle">Unterschriften</string>
     <string name="settingsSwipeActionNone">Keine</string>

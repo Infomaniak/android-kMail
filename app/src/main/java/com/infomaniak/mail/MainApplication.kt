@@ -72,7 +72,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
 
-    val matomoTracker: Tracker by lazy { buildTracker() }
+    val matomoTracker: Tracker by lazy { buildTracker(shouldOptOut = !localSettings.isMatomoTrackingEnabled) }
     var isAppInBackground = true
         private set
     var lastAppClosingTime: Long? = FIRST_LAUNCH_TIME
@@ -166,9 +166,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     private fun configureSentry() {
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             // Register the callback as an option
-            options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent?, _: Any? ->
+            options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
                 // If the application is in debug mode, discard the events
-                if (BuildConfig.DEBUG) null else event
+                if (!BuildConfig.DEBUG && localSettings.isSentryTrackingEnabled) event else null
             }
             options.addIntegration(
                 FragmentLifecycleIntegration(

@@ -155,6 +155,10 @@ class SettingsFragment : Fragment() {
         settingsExternalContent.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
         }
+
+        settingsDataManagement.setOnClickListener {
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettingsFragment())
+        }
     }
 
     private fun observeFeatureFlag() {

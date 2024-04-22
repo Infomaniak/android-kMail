@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M12,12m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0" />
+    <path
+        android:fillColor="#95C748"
+        android:pathData="M21.35,13.478L21.302,13.402C21.293,13.393 21.285,13.382 21.279,13.37L17.939,8.288L13.623,11.493L16.794,16.36L16.833,16.422L16.851,16.447C17.253,17.028 17.866,17.428 18.56,17.563C19.253,17.697 19.972,17.554 20.561,17.164C21.15,16.775 21.564,16.171 21.713,15.481C21.862,14.79 21.735,14.069 21.359,13.471" />
+    <path
+        android:fillColor="#35BFC0"
+        android:pathData="M8.403,14.893C8.403,14.358 8.245,13.836 7.948,13.392C7.651,12.948 7.229,12.601 6.735,12.397C6.242,12.193 5.699,12.139 5.174,12.243C4.65,12.347 4.169,12.605 3.791,12.983C3.413,13.36 3.156,13.842 3.052,14.366C2.948,14.89 3.001,15.433 3.206,15.927C3.41,16.42 3.756,16.842 4.201,17.139C4.645,17.436 5.167,17.594 5.701,17.594C6.418,17.594 7.105,17.31 7.612,16.803C8.118,16.296 8.403,15.609 8.403,14.893Z" />
+    <path
+        android:fillColor="#F38334"
+        android:pathData="M18.344,9.703C18.344,9.168 18.186,8.646 17.889,8.201C17.591,7.757 17.169,7.411 16.675,7.206C16.181,7.002 15.638,6.949 15.113,7.054C14.589,7.158 14.108,7.416 13.73,7.795C13.353,8.173 13.096,8.655 12.993,9.18C12.889,9.704 12.943,10.248 13.149,10.741C13.354,11.235 13.702,11.656 14.147,11.952C14.592,12.248 15.115,12.406 15.65,12.404C16.366,12.404 17.053,12.12 17.56,11.613C18.067,11.106 18.351,10.419 18.351,9.703" />
+    <path
+        android:fillColor="#3152A0"
+        android:pathData="M15.65,12.404C15.202,12.405 14.761,12.293 14.367,12.081C13.973,11.868 13.638,11.561 13.392,11.186L11.332,8.288C11.091,7.895 10.753,7.57 10.351,7.345C9.949,7.12 9.495,7.001 9.034,7.001C8.573,7.001 8.12,7.12 7.718,7.345C7.316,7.57 6.978,7.895 6.737,8.288L3.463,13.38C3.717,13.004 4.061,12.698 4.464,12.49C4.867,12.282 5.316,12.18 5.77,12.191C6.223,12.203 6.666,12.329 7.058,12.557C7.45,12.785 7.778,13.108 8.012,13.496L10.155,16.493C10.405,16.835 10.733,17.113 11.111,17.305C11.488,17.497 11.906,17.597 12.33,17.597C12.754,17.597 13.172,17.497 13.55,17.305C13.927,17.113 14.255,16.835 14.505,16.493L14.526,16.459L14.681,16.23L17.886,11.23C17.638,11.593 17.304,11.89 16.914,12.095C16.524,12.3 16.09,12.406 15.65,12.404Z" />
+</vector>
