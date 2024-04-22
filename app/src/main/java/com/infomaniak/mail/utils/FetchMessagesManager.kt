@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
+import com.infomaniak.mail.utils.NotificationUtils.Companion.EXTRA_MESSAGE_UID
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
 import io.realm.kotlin.Realm
@@ -77,6 +78,8 @@ class FetchMessagesManager @Inject constructor(
                 messageUid = sentryMessageUid,
                 mailbox = mailbox,
             )
+
+            realm.close()
             return
         }
 
@@ -93,6 +96,8 @@ class FetchMessagesManager @Inject constructor(
                 messageUid = sentryMessageUid,
                 mailbox = mailbox,
             )
+
+            realm.close()
             return
         }
 
@@ -116,12 +121,23 @@ class FetchMessagesManager @Inject constructor(
                     mailbox = mailbox,
                     throwable = throwable,
                 )
+
+                realm.close()
                 return
             }
             return@let threads.toList()
         }
 
         SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${threadsWithNewMessages.count()} Threads with new Messages")
+
+        // Dismiss Notifications for Messages that have been read on another device
+        notificationManagerCompat.activeNotifications.forEach { statusBarNotification ->
+            statusBarNotification.notification.extras.getString(EXTRA_MESSAGE_UID)?.let { messageUid ->
+                if (MessageController.getMessage(messageUid, realm)?.isSeen == true) {
+                    notificationManagerCompat.cancel(statusBarNotification.id)
+                }
+            }
+        }
 
         if (threadsWithNewMessages.isEmpty()) {
             SentryDebug.sendFailedNotification(
@@ -132,6 +148,8 @@ class FetchMessagesManager @Inject constructor(
                 messageUid = sentryMessageUid,
                 mailbox = mailbox,
             )
+
+            realm.close()
             return
         }
 

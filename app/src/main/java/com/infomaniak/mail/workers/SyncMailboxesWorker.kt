@@ -71,11 +71,11 @@ class SyncMailboxesWorker @AssistedInject constructor(
 
         suspend fun scheduleWorkIfNeeded() = withContext(ioDispatcher) {
 
-            if (!playServicesUtils.areGooglePlayServicesAvailable() && AccountUtils.getAllUsersCount() > 0) {
+            if (AccountUtils.getAllUsersCount() > 0) {
                 SentryLog.d(TAG, "Work scheduled")
 
                 val workRequest =
-                    PeriodicWorkRequestBuilder<SyncMailboxesWorker>(MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
+                    PeriodicWorkRequestBuilder<SyncMailboxesWorker>(getPeriodicInterval(), TimeUnit.MILLISECONDS)
                         .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                         // We start with a delayed duration, so that when the app is rebooted the service is not launched
                         .setInitialDelay(INITIAL_DELAY, TimeUnit.MINUTES)
@@ -89,10 +89,16 @@ class SyncMailboxesWorker @AssistedInject constructor(
             SentryLog.d(TAG, "Work cancelled")
             workManager.cancelUniqueWork(TAG)
         }
+
+        private fun getPeriodicInterval(): Long {
+            val hasGooglePlayServices = playServicesUtils.areGooglePlayServicesAvailable()
+            return if (hasGooglePlayServices) PERIODIC_INTERVAL_MILLIS else MIN_PERIODIC_INTERVAL_MILLIS
+        }
     }
 
     companion object {
         private const val TAG = "SyncMessagesWorker" // To support the old services, don't change this name
         private const val INITIAL_DELAY = 2L
+        private const val PERIODIC_INTERVAL_MILLIS = 4 * 60 * 60 * 1_000L // 4 hours
     }
 }

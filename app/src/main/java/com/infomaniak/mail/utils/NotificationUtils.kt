@@ -115,7 +115,7 @@ class NotificationUtils @Inject constructor(
     fun buildGeneralNotification(title: String, description: String? = null): NotificationCompat.Builder {
         return appContext.buildNotification(
             channelId = appContext.getString(R.string.notification_channel_id_general),
-            icon = DEFAULT_SMALL_ICON,
+            icon = defaultSmallIcon,
             title = title,
             description = description,
         )
@@ -125,7 +125,7 @@ class NotificationUtils @Inject constructor(
         val channelId = getString(R.string.notification_channel_id_draft_service)
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle(getString(R.string.notificationSyncDraftChannelName))
-            .setSmallIcon(DEFAULT_SMALL_ICON)
+            .setSmallIcon(defaultSmallIcon)
             .setProgress(100, 0, true)
     }
 
@@ -144,7 +144,6 @@ class NotificationUtils @Inject constructor(
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
     ) = with(payload) {
-
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification(
                 reason = "Created Notif: no Mailbox in Realm",
@@ -185,8 +184,12 @@ class NotificationUtils @Inject constructor(
         title: String,
         description: String?,
     ): NotificationCompat.Builder {
-        return appContext.buildNotification(channelId, DEFAULT_SMALL_ICON, title, description)
-            .setCategory(Notification.CATEGORY_EMAIL)
+        return appContext.buildNotification(
+            channelId,
+            defaultSmallIcon,
+            title,
+            description,
+        ).setCategory(Notification.CATEGORY_EMAIL)
     }
 
     private fun initMessageNotificationContent(
@@ -210,6 +213,7 @@ class NotificationUtils @Inject constructor(
         setContentIntent(contentIntent)
         setGroup(mailbox.notificationGroupKey)
         setGroupSummary(payload.isSummary)
+        setExtras(Bundle().apply { putString(EXTRA_MESSAGE_UID, payload.messageUid) })
         color = localSettings.accentColor.getPrimary(appContext)
 
         SentryLog.i(TAG, "Display notification | Email: ${mailbox.email} | MessageUid: ${payload.messageUid}")
@@ -293,14 +297,17 @@ class NotificationUtils @Inject constructor(
         addAction(replyAction)
     }
 
+    @Suppress("MayBeConstant")
     companion object : NotificationUtilsCore() {
 
         private val TAG: String = NotificationUtils::class.java.simpleName
 
-        private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
         private const val DELAY_DEBOUNCE_NOTIF_MS = 500L
 
+        private val defaultSmallIcon = R.drawable.ic_logo_notification
+
         const val DRAFT_ACTIONS_ID = 1
+        const val EXTRA_MESSAGE_UID = "messageUid"
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
