@@ -42,7 +42,7 @@ class DataManagementMatomoSettingFragment : Fragment() {
         return FragmentDataManagementMatomoSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchMatomo) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.settingsTrackingSwitchMatomo) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
