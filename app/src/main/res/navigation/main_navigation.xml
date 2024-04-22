@@ -431,6 +431,31 @@
     </fragment>
 
     <fragment
+        android:id="@+id/managementDataFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ManagementDataFragment"
+        android:label="ManagementDataFragment"
+        tools:layout="@layout/fragment_management_data_settings">
+        <action
+            android:id="@+id/action_dataManagement_to_matomo"
+            app:destination="@id/matomoDataManagementDataFragment" />
+        <action
+            android:id="@+id/action_dataManagement_to_sentry"
+            app:destination="@id/sentryDataManagementDataFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/matomoDataManagementDataFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.MatomoDataManagementFragment"
+        android:label="MatomoManagementDataFragment"
+        tools:layout="@layout/fragment_management_data_settings" />
+
+    <fragment
+        android:id="@+id/sentryDataManagementDataFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.SentryDataManagementFragment"
+        android:label="SentryManagementDataFragment"
+        tools:layout="@layout/fragment_management_data_settings" />
+
+    <fragment
         android:id="@+id/invalidPasswordFragment"
         android:name="com.infomaniak.mail.ui.main.InvalidPasswordFragment"
         android:label="InvalidPasswordFragment"
@@ -564,31 +589,6 @@
         android:id="@+id/aiEngineSettingFragment"
         android:name="com.infomaniak.mail.ui.main.settings.swipe.AiEngineSettingFragment"
         android:label="AiEngineSettingFragment" />
-
-    <fragment
-        android:id="@+id/managementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ManagementDataFragment"
-        android:label="ManagementDataFragment"
-        tools:layout="@layout/fragment_management_data_settings">
-        <action
-            android:id="@+id/action_dataManagement_to_matomo"
-            app:destination="@id/matomoDataManagementDataFragment" />
-        <action
-            android:id="@+id/action_dataManagement_to_sentry"
-            app:destination="@id/sentryDataManagementDataFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/matomoDataManagementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.MatomoDataManagementFragment"
-        android:label="MatomoManagementDataFragment"
-        tools:layout="@layout/fragment_management_data_settings" />
-
-    <fragment
-        android:id="@+id/sentryDataManagementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.SentryDataManagementFragment"
-        android:label="SentryManagementDataFragment"
-        tools:layout="@layout/fragment_management_data_settings" />
 
     <dialog
         android:id="@+id/attachmentActionsBottomSheetDialog"
