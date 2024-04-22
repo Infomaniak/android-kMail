@@ -286,7 +286,7 @@
             android:id="@+id/action_settings_to_sendSettings"
             app:destination="@id/sendSettingsFragment" />
         <action
-            android:id="@+id/action_settingsFragment_to_aiEngineSettingFragment"
+            android:id="@+id/action_settings_to_aiEngineSetting"
             app:destination="@id/aiEngineSettingFragment" />
         <action
             android:id="@+id/action_settings_to_externalContentSetting"
@@ -307,7 +307,7 @@
             android:id="@+id/action_settings_to_threadModeSetting"
             app:destination="@id/threadModeSettingFragment" />
         <action
-            android:id="@+id/action_settings_to_dataManagementSettingsFragment"
+            android:id="@+id/action_settings_to_dataManagementSettings"
             app:destination="@id/dataManagementSettingsFragment" />
     </fragment>
 
