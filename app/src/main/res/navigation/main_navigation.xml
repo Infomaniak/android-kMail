@@ -453,7 +453,7 @@
         android:id="@+id/dataManagementSentrySettingFragment"
         android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementSentrySettingFragment"
         android:label="DataManagementSentrySettingFragment"
-        tools:layout="@layout/fragment_data_management_settings" />
+        tools:layout="@layout/fragment_data_management_sentry_setting" />
 
     <fragment
         android:id="@+id/invalidPasswordFragment"
