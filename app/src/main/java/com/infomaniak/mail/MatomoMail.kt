@@ -259,6 +259,10 @@ object MatomoMail : MatomoCore {
         context.trackEvent("calendarEvent", name, value = value?.toFloat())
     }
 
+    fun Context.trackShortcutEvent(name: String) {
+        trackEvent("shortcutEvent", name)
+    }
+
     // We need to invert this logical value to keep a coherent value for analytics because actions
     // conditions are inverted (ex: if the condition is `message.isSpam`, then we want to unspam)
     private fun Boolean.toMailActionValue() = (!this).toFloat()

@@ -23,9 +23,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.lib.core.extensions.setDefaultLocaleIfNeeded
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
+import com.infomaniak.mail.MatomoMail.trackShortcutEvent
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -76,10 +78,12 @@ class LaunchActivity : AppCompatActivity() {
             val user = AccountUtils.requestCurrentUser()
 
             withContext(mainDispatcher) {
+                val isShortcutHandled = handleShortcuts(user == null)
+                if (isShortcutHandled) return@withContext
+
                 if (user == null) {
                     launchLoginActivity(args = LoginActivityArgs(isFirstAccount = true))
                 } else {
-                    trackUserId(AccountUtils.currentUserId)
                     startApp()
                 }
                 // After starting the destination activity, we run finish to make sure we close the LaunchScreen,
@@ -90,40 +94,41 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun startApp() {
-
         val openThreadUid = navigationArgs?.openThreadUid
         val replyToMessageUid = navigationArgs?.replyToMessageUid
-
         when {
             openThreadUid != null -> {
                 applicationContext.trackNotificationActionEvent("open")
-                NavDeepLinkBuilder(this)
-                    .setGraph(R.navigation.main_navigation)
-                    .setDestination(R.id.threadListFragment, ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle())
-                    .setComponentName(MainActivity::class.java)
-                    .createTaskStackBuilder()
-                    .startActivities()
+                startActivityByDestination(
+                    destId = R.id.threadListFragment,
+                    args = ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle()
+                )
             }
             replyToMessageUid != null -> {
                 applicationContext.trackNotificationActionEvent("reply")
-                NavDeepLinkBuilder(this)
-                    .setGraph(R.navigation.main_navigation)
-                    .setDestination(
-                        destId = R.id.threadListFragment,
-                        args = ThreadListFragmentArgs(
-                            replyToMessageUid = replyToMessageUid,
-                            draftMode = navigationArgs?.draftMode!!,
-                            notificationId = navigationArgs?.notificationId!!,
-                        ).toBundle(),
-                    )
-                    .setComponentName(MainActivity::class.java)
-                    .createTaskStackBuilder()
-                    .startActivities()
+                startActivityByDestination(
+                    destId = R.id.threadListFragment,
+                    args = ThreadListFragmentArgs(
+                        replyToMessageUid = replyToMessageUid,
+                        draftMode = navigationArgs?.draftMode!!,
+                        notificationId = navigationArgs?.notificationId!!,
+                    ).toBundle()
+                )
             }
             else -> {
                 startActivity(Intent(this, MainActivity::class.java))
             }
         }
+    }
+
+    private fun startActivityByDestination(destId: Int, args: Bundle? = null) {
+        trackUserId(AccountUtils.currentUserId)
+        NavDeepLinkBuilder(this)
+            .setGraph(R.navigation.main_navigation)
+            .setDestination(destId = destId, args = args)
+            .setComponentName(MainActivity::class.java)
+            .createTaskStackBuilder()
+            .startActivities()
     }
 
     private fun handleNotificationDestinationIntent() {
@@ -134,5 +139,44 @@ class LaunchActivity : AppCompatActivity() {
                 SentryDebug.addNotificationBreadcrumb("SyncMessages notification has been clicked")
             }
         }
+    }
+
+
+    private fun handleShortcuts(isUserDisconnected: Boolean): Boolean {
+        intent.extras?.getString(SHORTCUTS_TAG)?.let {
+            return runByShortcut(it, isUserDisconnected)
+        }
+        return false
+    }
+
+    private fun runByShortcut(shortcutId: String, isUserDisconnected: Boolean): Boolean {
+        if (shortcutId == SHORTCUTS_HELP) {
+            trackShortcutEvent(shortcutId)
+            openUrl(BuildConfig.CHATBOT_URL)
+            return true
+        }
+
+        if (isUserDisconnected) return false
+
+        return when (shortcutId) {
+            SHORTCUTS_SEARCH -> {
+                trackShortcutEvent(shortcutId)
+                startActivityByDestination(destId = R.id.searchFragment)
+                true
+            }
+            SHORTCUTS_WRITE -> {
+                trackShortcutEvent(shortcutId)
+                startActivityByDestination(destId = R.id.newMessageActivity)
+                true
+            }
+            else -> false
+        }
+    }
+
+    companion object {
+        private const val SHORTCUTS_TAG = "shortcuts_tag"
+        private const val SHORTCUTS_WRITE = "write"
+        private const val SHORTCUTS_HELP = "help"
+        private const val SHORTCUTS_SEARCH = "search"
     }
 }
