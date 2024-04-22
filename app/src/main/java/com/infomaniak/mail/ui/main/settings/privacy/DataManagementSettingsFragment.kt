@@ -27,18 +27,18 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.databinding.FragmentManagementDataSettingsBinding
+import com.infomaniak.mail.databinding.FragmentDataManagementSettingsBinding
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ManagementDataFragment : Fragment() {
+class DataManagementSettingsFragment : Fragment() {
 
-    private var binding: FragmentManagementDataSettingsBinding by safeBinding()
+    private var binding: FragmentDataManagementSettingsBinding by safeBinding()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentManagementDataSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentDataManagementSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,10 +49,10 @@ class ManagementDataFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         dataManagementMatomo.setOnClickListener {
-            animatedNavigation(ManagementDataFragmentDirections.actionDataManagementToMatomo())
+            animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToMatomo())
         }
         dataManagementSentry.setOnClickListener {
-            animatedNavigation(ManagementDataFragmentDirections.actionDataManagementToSentry())
+            animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToSentry())
         }
         dataManagementSourceCodeButton.setOnClickListener {
             trackEvent("settingsManagementData", "sourceCode")

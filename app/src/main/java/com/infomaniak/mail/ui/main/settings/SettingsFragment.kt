@@ -157,7 +157,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsDataManagement.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToManagementDataSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettingsFragment())
         }
     }
 

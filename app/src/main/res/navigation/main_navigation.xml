@@ -307,8 +307,8 @@
             android:id="@+id/action_settingsFragment_to_aiEngineSettingFragment"
             app:destination="@id/aiEngineSettingFragment" />
         <action
-            android:id="@+id/action_settings_to_managementDataSetting"
-            app:destination="@id/managementDataFragment" />
+            android:id="@+id/action_settings_to_dataManagementSettingsFragment"
+            app:destination="@id/dataManagementSettingsFragment" />
     </fragment>
 
     <fragment
@@ -431,10 +431,10 @@
     </fragment>
 
     <fragment
-        android:id="@+id/managementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.privacy.ManagementDataFragment"
-        android:label="ManagementDataFragment"
-        tools:layout="@layout/fragment_management_data_settings">
+        android:id="@+id/dataManagementSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementSettingsFragment"
+        android:label="DataManagementSettingsFragment"
+        tools:layout="@layout/fragment_data_management_settings">
         <action
             android:id="@+id/action_dataManagement_to_matomo"
             app:destination="@id/matomoDataManagementDataFragment" />
@@ -447,13 +447,13 @@
         android:id="@+id/matomoDataManagementDataFragment"
         android:name="com.infomaniak.mail.ui.main.settings.privacy.MatomoDataManagementFragment"
         android:label="MatomoManagementDataFragment"
-        tools:layout="@layout/fragment_management_data_settings" />
+        tools:layout="@layout/fragment_data_management_settings" />
 
     <fragment
         android:id="@+id/sentryDataManagementDataFragment"
         android:name="com.infomaniak.mail.ui.main.settings.privacy.SentryDataManagementFragment"
         android:label="SentryManagementDataFragment"
-        tools:layout="@layout/fragment_management_data_settings" />
+        tools:layout="@layout/fragment_data_management_settings" />
 
     <fragment
         android:id="@+id/invalidPasswordFragment"
