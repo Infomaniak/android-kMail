@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings
+package com.infomaniak.mail.ui.main.settings.privacy
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,35 +23,32 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.databinding.FragmentMatomoManagementDataBinding
+import com.infomaniak.mail.databinding.FragmentSentryManagementDataBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MatomoDataManagementFragment : Fragment() {
+class SentryDataManagementFragment : Fragment() {
 
-    private var binding: FragmentMatomoManagementDataBinding by safeBinding()
+    private var binding: FragmentSentryManagementDataBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentMatomoManagementDataBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentSentryManagementDataBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchMatomo) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchSentry) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
-        isChecked = localSettings.isMatomoTrackingEnabled
+        isChecked = localSettings.isSentryTrackingEnabled
 
         setOnClickListener {
-            val hasUserOptIn = isChecked
-            localSettings.isMatomoTrackingEnabled = hasUserOptIn
-            MatomoMail.shouldOptOut(requireContext().applicationContext, !hasUserOptIn)
+            localSettings.isSentryTrackingEnabled = !localSettings.isSentryTrackingEnabled
         }
     }
 }

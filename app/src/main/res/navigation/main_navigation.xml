@@ -432,7 +432,7 @@
 
     <fragment
         android:id="@+id/managementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ManagementDataFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.ManagementDataFragment"
         android:label="ManagementDataFragment"
         tools:layout="@layout/fragment_management_data_settings">
         <action
@@ -445,13 +445,13 @@
 
     <fragment
         android:id="@+id/matomoDataManagementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.MatomoDataManagementFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.MatomoDataManagementFragment"
         android:label="MatomoManagementDataFragment"
         tools:layout="@layout/fragment_management_data_settings" />
 
     <fragment
         android:id="@+id/sentryDataManagementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.SentryDataManagementFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.SentryDataManagementFragment"
         android:label="SentryManagementDataFragment"
         tools:layout="@layout/fragment_management_data_settings" />
 
