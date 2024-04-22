@@ -129,7 +129,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsAiEngine.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsFragmentToAiEngineSettingFragment())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToAiEngineSetting())
         }
 
         settingsThreadListDensity.setOnClickListener {
@@ -157,7 +157,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsDataManagement.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettingsFragment())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettings())
         }
     }
 
