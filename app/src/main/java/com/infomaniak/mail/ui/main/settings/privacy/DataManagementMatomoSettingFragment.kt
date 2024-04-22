@@ -25,21 +25,21 @@ import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.databinding.FragmentMatomoManagementDataBinding
+import com.infomaniak.mail.databinding.FragmentDataManagementMatomoSettingBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MatomoDataManagementFragment : Fragment() {
+class DataManagementMatomoSettingFragment : Fragment() {
 
-    private var binding: FragmentMatomoManagementDataBinding by safeBinding()
+    private var binding: FragmentDataManagementMatomoSettingBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentMatomoManagementDataBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentDataManagementMatomoSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchMatomo) {

@@ -49,7 +49,7 @@ class DataManagementSettingsFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         dataManagementMatomo.setOnClickListener {
-            animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToMatomo())
+            animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToMatomoSetting())
         }
         dataManagementSentry.setOnClickListener {
             animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToSentry())

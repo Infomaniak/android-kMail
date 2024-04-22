@@ -436,17 +436,17 @@
         android:label="DataManagementSettingsFragment"
         tools:layout="@layout/fragment_data_management_settings">
         <action
-            android:id="@+id/action_dataManagement_to_matomo"
-            app:destination="@id/matomoDataManagementDataFragment" />
+            android:id="@+id/action_dataManagement_to_matomoSetting"
+            app:destination="@id/dataManagementMatomoSettingFragment" />
         <action
             android:id="@+id/action_dataManagement_to_sentry"
             app:destination="@id/sentryDataManagementDataFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/matomoDataManagementDataFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.privacy.MatomoDataManagementFragment"
-        android:label="MatomoManagementDataFragment"
+        android:id="@+id/dataManagementMatomoSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.DataManagementMatomoSettingFragment"
+        android:label="DataManagementMatomoSettingFragment"
         tools:layout="@layout/fragment_data_management_settings" />
 
     <fragment
