@@ -761,14 +761,14 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
-        return snapshot?.let {
-            it.identityId == fromLiveData.value?.signature?.id?.toString() &&
-                    it.to == toLiveData.valueOrEmpty().toSet() &&
-                    it.cc == ccLiveData.valueOrEmpty().toSet() &&
-                    it.bcc == bccLiveData.valueOrEmpty().toSet() &&
-                    it.subject == subjectValue &&
-                    it.uiBody == uiBodyValue &&
-                    it.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty().map { att -> att.localUuid }.toSet()
+        return snapshot?.let { draftSnapshot ->
+            draftSnapshot.identityId == fromLiveData.value?.signature?.id?.toString() &&
+                    draftSnapshot.to == toLiveData.valueOrEmpty().toSet() &&
+                    draftSnapshot.cc == ccLiveData.valueOrEmpty().toSet() &&
+                    draftSnapshot.bcc == bccLiveData.valueOrEmpty().toSet() &&
+                    draftSnapshot.subject == subjectValue &&
+                    draftSnapshot.uiBody == uiBodyValue &&
+                    draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty().map { it.localUuid }.toSet()
         } ?: false
     }
 
