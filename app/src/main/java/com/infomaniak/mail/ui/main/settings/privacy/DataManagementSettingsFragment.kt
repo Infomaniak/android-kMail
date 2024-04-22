@@ -55,7 +55,7 @@ class DataManagementSettingsFragment : Fragment() {
             animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToSentrySetting())
         }
         dataManagementSourceCodeButton.setOnClickListener {
-            trackEvent("settingsManagementData", "sourceCode")
+            trackEvent("settingsDataManagement", "showSourceCode")
             context.openUrl(BuildConfig.GITHUB_REPO_URL)
         }
     }
