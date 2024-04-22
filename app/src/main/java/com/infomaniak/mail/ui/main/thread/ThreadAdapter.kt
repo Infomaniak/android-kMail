@@ -33,7 +33,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.*
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -46,9 +46,9 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.*
-import com.infomaniak.mail.databinding.*
-import com.infomaniak.mail.ui.main.thread.ThreadAdapter.*
+import com.infomaniak.mail.databinding.ItemMessageBinding
+import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate

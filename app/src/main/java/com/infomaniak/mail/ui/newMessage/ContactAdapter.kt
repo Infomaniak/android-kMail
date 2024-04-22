@@ -21,14 +21,16 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView.*
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.*
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.KNOWN_CONTACT
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.UNKNOWN_CONTACT
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.extensions.standardize
 

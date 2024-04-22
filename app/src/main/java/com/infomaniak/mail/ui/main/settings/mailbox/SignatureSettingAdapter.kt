@@ -20,7 +20,8 @@ package com.infomaniak.mail.ui.main.settings.mailbox
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView.*
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSettingsSignatureBinding
 import com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingAdapter.SettingsSignatureViewHolder

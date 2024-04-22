@@ -286,6 +286,12 @@
             android:id="@+id/action_settings_to_sendSettings"
             app:destination="@id/sendSettingsFragment" />
         <action
+            android:id="@+id/action_settings_to_aiEngineSetting"
+            app:destination="@id/aiEngineSettingFragment" />
+        <action
+            android:id="@+id/action_settings_to_externalContentSetting"
+            app:destination="@id/externalContentSettingFragment" />
+        <action
             android:id="@+id/action_settings_to_threadListDensitySetting"
             app:destination="@id/threadListDensitySettingFragment" />
         <action
@@ -301,45 +307,9 @@
             android:id="@+id/action_settings_to_threadModeSetting"
             app:destination="@id/threadModeSettingFragment" />
         <action
-            android:id="@+id/action_settings_to_externalContentSetting"
-            app:destination="@id/externalContentSettingFragment" />
-        <action
-            android:id="@+id/action_settingsFragment_to_aiEngineSettingFragment"
-            app:destination="@id/aiEngineSettingFragment" />
-        <action
-            android:id="@+id/action_settings_to_dataManagementSettingsFragment"
+            android:id="@+id/action_settings_to_dataManagementSettings"
             app:destination="@id/dataManagementSettingsFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/threadListDensitySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ThreadListDensitySettingFragment"
-        android:label="ListDensitySettingFragment"
-        tools:layout="@layout/fragment_thread_list_density_setting" />
-
-    <fragment
-        android:id="@+id/themeSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ThemeSettingFragment"
-        android:label="ThemeSettingFragment"
-        tools:layout="@layout/fragment_theme_setting" />
-
-    <fragment
-        android:id="@+id/accentColorSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.AccentColorSettingFragment"
-        android:label="AccentColorSettingFragment"
-        tools:layout="@layout/fragment_accent_color_setting" />
-
-    <fragment
-        android:id="@+id/threadModeSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ThreadModeSettingFragment"
-        android:label="ThreadModeSettingFragment"
-        tools:layout="@layout/fragment_thread_mode_setting" />
-
-    <fragment
-        android:id="@+id/externalContentSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ExternalContentSettingFragment"
-        android:label="ExternalContentSettingFragment"
-        tools:layout="@layout/fragment_external_content_setting" />
 
     <fragment
         android:id="@+id/mailboxSettingsFragment"
@@ -411,6 +381,35 @@
         tools:layout="@layout/fragment_forward_mails_setting" />
 
     <fragment
+        android:id="@+id/aiEngineSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.swipe.AiEngineSettingFragment"
+        android:label="AiEngineSettingFragment" />
+
+    <fragment
+        android:id="@+id/externalContentSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ExternalContentSettingFragment"
+        android:label="ExternalContentSettingFragment"
+        tools:layout="@layout/fragment_external_content_setting" />
+
+    <fragment
+        android:id="@+id/threadListDensitySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ThreadListDensitySettingFragment"
+        android:label="ListDensitySettingFragment"
+        tools:layout="@layout/fragment_thread_list_density_setting" />
+
+    <fragment
+        android:id="@+id/themeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ThemeSettingFragment"
+        android:label="ThemeSettingFragment"
+        tools:layout="@layout/fragment_theme_setting" />
+
+    <fragment
+        android:id="@+id/accentColorSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.AccentColorSettingFragment"
+        android:label="AccentColorSettingFragment"
+        tools:layout="@layout/fragment_accent_color_setting" />
+
+    <fragment
         android:id="@+id/swipeActionsSettingsFragment"
         android:name="com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment"
         android:label="SwipeActionsSettingsFragment"
@@ -429,6 +428,12 @@
             android:name="titleResId"
             app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/threadModeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ThreadModeSettingFragment"
+        android:label="ThreadModeSettingFragment"
+        tools:layout="@layout/fragment_thread_mode_setting" />
 
     <fragment
         android:id="@+id/dataManagementSettingsFragment"
@@ -584,11 +589,6 @@
         android:id="@+id/syncDiscoveryBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.SyncDiscoveryBottomSheetDialog"
         android:label="SyncDiscoveryBottomSheetDialog" />
-
-    <fragment
-        android:id="@+id/aiEngineSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.swipe.AiEngineSettingFragment"
-        android:label="AiEngineSettingFragment" />
 
     <dialog
         android:id="@+id/attachmentActionsBottomSheetDialog"
