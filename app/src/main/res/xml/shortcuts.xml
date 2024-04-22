@@ -18,7 +18,7 @@
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
 
     <shortcut
-        android:icon="@drawable/ic_search_small"
+        android:icon="@mipmap/ic_shortcut_new_message"
         android:shortcutId="write"
         android:shortcutLongLabel="@string/buttonNewMessage"
         android:shortcutShortLabel="@string/buttonNewMessage">
@@ -33,7 +33,7 @@
     </shortcut>
 
     <shortcut
-        android:icon="@drawable/ic_search_small"
+        android:icon="@mipmap/ic_shortcut_search"
         android:shortcutId="search"
         android:shortcutLongLabel="@string/searchFolderName"
         android:shortcutShortLabel="@string/searchFolderName">
@@ -48,7 +48,7 @@
     </shortcut>
 
     <shortcut
-        android:icon="@drawable/ic_help"
+        android:icon="@mipmap/ic_shortcut_help"
         android:shortcutId="help"
         android:shortcutLongLabel="@string/buttonHelp"
         android:shortcutShortLabel="@string/buttonHelp">

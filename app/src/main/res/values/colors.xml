@@ -269,6 +269,9 @@
     <color name="commonColor10">#F8F8F8</color>
     <color name="commonColor11">#D9D9D9</color>
 
+    <!-- Shortcut -->
+    <color name="backgroundShortcut">#F5F5F5</color>
+
     <!-- Other -->
     <color name="textInputStrokeColor">@color/mouse</color>
     <color name="toggleableTextFormatterBackgroundColor">@color/elephant</color>
