@@ -15,52 +15,65 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings
+package com.infomaniak.mail.ui.main.settings.appearance
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ExternalContent
-import com.infomaniak.mail.data.LocalSettings.ExternalContent.ALWAYS
-import com.infomaniak.mail.data.LocalSettings.ExternalContent.ASK_ME
-import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
+import com.infomaniak.mail.data.LocalSettings.Theme
+import com.infomaniak.mail.data.LocalSettings.Theme.*
+import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExternalContentSettingFragment : Fragment() {
+class ThemeSettingFragment : Fragment() {
 
-    private var binding: FragmentExternalContentSettingBinding by safeBinding()
+    private var binding: FragmentThemeSettingBinding by safeBinding()
 
     @Inject
     lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentExternalContentSettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentThemeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
+        setSystemThemeVisibility()
+
         initBijectionTable(
-            R.id.always to ALWAYS,
-            R.id.askMe to ASK_ME,
+            R.id.systemTheme to SYSTEM,
+            R.id.lightTheme to LIGHT,
+            R.id.darkTheme to DARK,
         )
 
-        check(localSettings.externalContent)
+        check(localSettings.theme)
 
-        onItemCheckedListener { _, _, enum ->
-            val externalContent = enum as ExternalContent
-            trackEvent("settingsExternalContent", externalContent.matomoValue)
-            localSettings.externalContent = externalContent
+        onItemCheckedListener { _, _, theme ->
+            chooseTheme(theme as Theme)
+            trackEvent("settingsTheme", theme.toString())
         }
+    }
+
+    private fun setSystemThemeVisibility() {
+        binding.systemTheme.isGone = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+    }
+
+    private fun chooseTheme(theme: Theme) {
+        setDefaultNightMode(theme.mode)
+        localSettings.theme = theme
     }
 }

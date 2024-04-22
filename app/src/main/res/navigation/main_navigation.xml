@@ -382,36 +382,36 @@
 
     <fragment
         android:id="@+id/aiEngineSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.swipe.AiEngineSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.general.AiEngineSettingFragment"
         android:label="AiEngineSettingFragment" />
 
     <fragment
         android:id="@+id/externalContentSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ExternalContentSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.general.ExternalContentSettingFragment"
         android:label="ExternalContentSettingFragment"
         tools:layout="@layout/fragment_external_content_setting" />
 
     <fragment
         android:id="@+id/threadListDensitySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ThreadListDensitySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.appearance.ThreadListDensitySettingFragment"
         android:label="ListDensitySettingFragment"
         tools:layout="@layout/fragment_thread_list_density_setting" />
 
     <fragment
         android:id="@+id/themeSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ThemeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.appearance.ThemeSettingFragment"
         android:label="ThemeSettingFragment"
         tools:layout="@layout/fragment_theme_setting" />
 
     <fragment
         android:id="@+id/accentColorSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.AccentColorSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.appearance.AccentColorSettingFragment"
         android:label="AccentColorSettingFragment"
         tools:layout="@layout/fragment_accent_color_setting" />
 
     <fragment
         android:id="@+id/swipeActionsSettingsFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment"
         android:label="SwipeActionsSettingsFragment"
         tools:layout="@layout/fragment_swipe_actions_settings">
         <action
@@ -421,7 +421,7 @@
 
     <fragment
         android:id="@+id/swipeActionSelectionSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSelectionSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSelectionSettingFragment"
         android:label="SwipeActionSelectionSettingFragment"
         tools:layout="@layout/fragment_swipe_actions_selection_setting">
         <argument
@@ -431,7 +431,7 @@
 
     <fragment
         android:id="@+id/threadModeSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ThreadModeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.appearance.threadMode.ThreadModeSettingFragment"
         android:label="ThreadModeSettingFragment"
         tools:layout="@layout/fragment_thread_mode_setting" />
 

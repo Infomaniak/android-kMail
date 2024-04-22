@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:title="@string/settingsThreadModeTitle"
-    tools:context=".ui.main.settings.ThreadModeSettingFragment">
+    tools:context=".ui.main.settings.appearance.threadMode.ThreadModeSettingFragment">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

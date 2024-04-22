@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:title="@string/aiPromptTitle"
-    tools:context=".ui.main.settings.ThemeSettingFragment">
+    tools:context=".ui.main.settings.appearance.ThemeSettingFragment">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings
+package com.infomaniak.mail.ui.main.settings.appearance.threadMode
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
