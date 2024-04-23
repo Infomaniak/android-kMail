@@ -75,17 +75,13 @@ class SyncMailboxesWorker @AssistedInject constructor(
                 .build()
         }
 
-        private var lastSyncDate: Date? = null
+        private var lastUnlockSyncDate: Date? = null
 
         suspend fun scheduleWorkIfNeeded(shouldBeExecuteNow: Boolean = false) = withContext(ioDispatcher) {
             if (AccountUtils.getAllUsersCount() > 0) {
                 SentryLog.d(TAG, "Work scheduled")
 
-                if (shouldBeExecuteNow) {
-                    enqueueOneTimeWorkRequest()
-                } else {
-                    enqueuePeriodicWorkRequest()
-                }
+                if (shouldBeExecuteNow) enqueueOneTimeWorkRequest() else enqueuePeriodicWorkRequest()
             }
         }
 
@@ -95,8 +91,8 @@ class SyncMailboxesWorker @AssistedInject constructor(
         }
 
         private fun enqueueOneTimeWorkRequest() {
-            if (canSync()) {
-                lastSyncDate = Date()
+            if (canSyncWhenUnlocking()) {
+                lastUnlockSyncDate = Date()
 
                 val workRequest =
                     OneTimeWorkRequestBuilder<SyncMailboxesWorker>()
@@ -116,9 +112,9 @@ class SyncMailboxesWorker @AssistedInject constructor(
             workManager.enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
         }
 
-        private fun canSync(): Boolean {
-            return lastSyncDate != null && lastSyncDate!!.time + MIN_PERIODIC_INTERVAL_MILLIS < Date().time
-                    || lastSyncDate == null
+        private fun canSyncWhenUnlocking(): Boolean {
+            // We only want to synchronize when unlocking if the last refresh has been done at least 15 minutes ago
+            return lastUnlockSyncDate?.let { it.time + MIN_PERIODIC_INTERVAL_MILLIS < Date().time } ?: true
         }
 
         private fun getPeriodicInterval(): Long {
