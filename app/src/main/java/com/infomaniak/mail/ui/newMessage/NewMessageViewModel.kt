@@ -111,6 +111,7 @@ class NewMessageViewModel @Inject constructor(
     var isExternalBannerManuallyClosed = false
     var shouldSendInsteadOfSave = false
     var signaturesCount = 0
+    private var isNewMessage = false
 
     private var snapshot: DraftSnapshot? = null
 
@@ -176,12 +177,12 @@ class NewMessageViewModel @Inject constructor(
             signatures = SignatureController.getAllSignatures(realm).also { signaturesCount = it.count() }
             if (signatures.isEmpty()) return@runCatching
 
-            val draftExists = arrivedFromExistingDraft || draftLocalUuid != null
+            isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
 
-            draft = if (draftExists) {
-                getExistingDraft(draftLocalUuid, realm) ?: return@runCatching
-            } else {
+            draft = if (isNewMessage) {
                 getNewDraft(signatures, intent, realm) ?: return@runCatching
+            } else {
+                getExistingDraft(draftLocalUuid, realm) ?: return@runCatching
             }
         }.onFailure(Sentry::captureException)
 
@@ -245,6 +246,8 @@ class NewMessageViewModel @Inject constructor(
         signatureUtils.initSignature(draft = this, signature)
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
+
+        body = getWholeBody()
     }
 
     private fun saveNavArgsToSavedState(localUuid: String) {
@@ -691,24 +694,22 @@ class NewMessageViewModel @Inject constructor(
         val localUuid = draftLocalUuid ?: return@launch
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
-        if (action == DraftAction.SAVE && isSnapshotTheSame(subjectValue, uiBodyValue)) {
-            if (isFinishing && !arrivedFromExistingDraft) removeDraftFromRealm(localUuid)
+        if (action == DraftAction.SAVE && isSnapshotTheSame(subject, uiBodyValue)) {
+            if (isFinishing && isNewMessage) removeDraftFromRealm(localUuid)
             return@launch
         }
 
         val hasFailed = mailboxContentRealm().writeBlocking {
             DraftController.getDraft(localUuid, realm = this)
-                ?.updateDraftFromLiveData(action, subject, uiBodyValue, realm = this@writeBlocking)
+                ?.updateDraftFromLiveData(action, isFinishing, subject, uiBodyValue, realm = this@writeBlocking)
                 ?: return@writeBlocking true
             return@writeBlocking false
         }
 
         if (hasFailed) return@launch
 
-        if (isFinishing) {
-            if (isTaskRoot) showDraftToastToUser(action)
-            startWorkerCallback()
-        }
+        showDraftToastToUser(action, isFinishing, isTaskRoot)
+        startWorkerCallback()
 
         appContext.trackSendingDraftEvent(
             action = action,
@@ -726,6 +727,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun Draft.updateDraftFromLiveData(
         draftAction: DraftAction,
+        isFinishing: Boolean,
         subjectValue: String?,
         uiBodyValue: String,
         realm: MutableRealm,
@@ -738,9 +740,24 @@ class NewMessageViewModel @Inject constructor(
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
 
+        val updatedAttachments = attachmentsLiveData.valueOrEmpty().map { uiAttachment ->
+            // If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
+            val localAttachment = attachments.filter { it.uploadLocalUri == uiAttachment.uploadLocalUri }
+                .also {
+                    // If this Sentry never triggers, remove it and replace the
+                    // `attachments.filter { … }.also { … }.firstOrNull()` with `attachments.singleOrNull { … }`
+                    if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same uploadLocalUri")
+                }.firstOrNull()
+            /**
+             * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly already be
+             * some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of
+             * the Attachment, this data will be lost forever and we won't be able to save/send the Draft.
+             */
+            return@map if (localAttachment?.uuid != null) localAttachment.copyFromRealm() else uiAttachment
+        }
         attachments.apply {
             clear()
-            addAll(attachmentsLiveData.valueOrEmpty())
+            addAll(updatedAttachments)
         }
 
         subject = subjectValue
@@ -749,7 +766,7 @@ class NewMessageViewModel @Inject constructor(
         uiSignature = uiSignatureLiveData.value
         uiQuote = uiQuoteLiveData.value
 
-        body = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
+        body = getWholeBody()
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -758,7 +775,21 @@ class NewMessageViewModel @Inject constructor(
          * - The link in the Message is added here, when saving the Draft.
          */
         messageUid?.let { MessageController.getMessage(uid = it, realm)?.draftLocalUuid = localUuid }
+
+        // Only if `!isFinishing`, because if we are finishing, well… We're out of here so we don't care about all of that.
+        if (!isFinishing) {
+            copyFromRealm()
+                .apply {
+                    uiBody = this@updateDraftFromLiveData.uiBody
+                    uiSignature = this@updateDraftFromLiveData.uiSignature
+                    uiQuote = this@updateDraftFromLiveData.uiQuote
+                }
+                .saveSnapshot()
+            isNewMessage = false
+        }
     }
+
+    private fun Draft.getWholeBody(): String = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
@@ -778,12 +809,23 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun showDraftToastToUser(action: DraftAction) = withContext(mainDispatcher) {
-        val resId = when (action) {
-            DraftAction.SAVE -> R.string.snackbarDraftSaving
-            DraftAction.SEND -> R.string.snackbarEmailSending
+    private suspend fun showDraftToastToUser(
+        action: DraftAction,
+        isFinishing: Boolean,
+        isTaskRoot: Boolean,
+    ) = withContext(mainDispatcher) {
+        when (action) {
+            DraftAction.SAVE -> {
+                if (isFinishing) {
+                    if (isTaskRoot) appContext.showToast(R.string.snackbarDraftSaving)
+                } else {
+                    appContext.showToast(R.string.snackbarDraftSaving)
+                }
+            }
+            DraftAction.SEND -> {
+                if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
+            }
         }
-        appContext.showToast(resId)
     }
 
     private fun MutableLiveData<UiRecipients>.addRecipientThenSetValue(recipient: Recipient) {

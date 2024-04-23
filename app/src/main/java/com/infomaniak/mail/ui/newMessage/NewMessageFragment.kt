@@ -29,6 +29,7 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager.LayoutParams
 import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
@@ -43,6 +44,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
@@ -88,6 +90,13 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private val filePicker = FilePicker(fragment = this).apply {
+        initCallback { uris ->
+            activity?.window?.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            newMessageViewModel.importAttachmentsLiveData.value = uris
+        }
+    }
 
     private var addressListPopupWindow: ListPopupWindow? = null
 
@@ -176,6 +185,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initManagers() {
+
         aiManager.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
@@ -195,6 +205,7 @@ class NewMessageFragment : Fragment() {
             binding = binding,
             fragment = this@NewMessageFragment,
             aiManager = aiManager,
+            openFilePicker = filePicker::open,
         )
 
         recipientFieldsManager.initValues(
