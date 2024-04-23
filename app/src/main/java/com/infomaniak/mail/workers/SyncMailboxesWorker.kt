@@ -31,6 +31,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -68,26 +69,56 @@ class SyncMailboxesWorker @AssistedInject constructor(
         private val workManager: WorkManager,
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) {
+        private val constraints by lazy {
+            Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+        }
 
-        suspend fun scheduleWorkIfNeeded() = withContext(ioDispatcher) {
+        private var lastSyncDate: Date? = null
 
+        suspend fun scheduleWorkIfNeeded(shouldBeExecuteNow: Boolean = false) = withContext(ioDispatcher) {
             if (AccountUtils.getAllUsersCount() > 0) {
                 SentryLog.d(TAG, "Work scheduled")
 
-                val workRequest =
-                    PeriodicWorkRequestBuilder<SyncMailboxesWorker>(getPeriodicInterval(), TimeUnit.MILLISECONDS)
-                        .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                        // We start with a delayed duration, so that when the app is rebooted the service is not launched
-                        .setInitialDelay(INITIAL_DELAY, TimeUnit.MINUTES)
-                        .build()
-
-                workManager.enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
+                if (shouldBeExecuteNow) {
+                    enqueueOneTimeWorkRequest()
+                } else {
+                    enqueuePeriodicWorkRequest()
+                }
             }
         }
 
         fun cancelWork() {
             SentryLog.d(TAG, "Work cancelled")
             workManager.cancelUniqueWork(TAG)
+        }
+
+        private fun enqueueOneTimeWorkRequest() {
+            if (canSync()) {
+                lastSyncDate = Date()
+
+                val workRequest =
+                    OneTimeWorkRequestBuilder<SyncMailboxesWorker>()
+                        .setConstraints(constraints)
+                        .build()
+                workManager.enqueueUniqueWork(TAG_SYNC_WHEN_UNLOCK, ExistingWorkPolicy.REPLACE, workRequest)
+            }
+        }
+
+        private fun enqueuePeriodicWorkRequest() {
+            val workRequest =
+                PeriodicWorkRequestBuilder<SyncMailboxesWorker>(getPeriodicInterval(), TimeUnit.MILLISECONDS)
+                    .setConstraints(constraints)
+                    .setInitialDelay(INITIAL_DELAY, TimeUnit.MINUTES)
+                    .build()
+            // We start with a delayed duration, so that when the app is rebooted the service is not launched
+            workManager.enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
+        }
+
+        private fun canSync(): Boolean {
+            return lastSyncDate != null && lastSyncDate!!.time + MIN_PERIODIC_INTERVAL_MILLIS < Date().time
+                    || lastSyncDate == null
         }
 
         private fun getPeriodicInterval(): Long {
@@ -98,6 +129,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "SyncMessagesWorker" // To support the old services, don't change this name
+        private const val TAG_SYNC_WHEN_UNLOCK = "SyncMessagesWorkerForUnlock"
         private const val INITIAL_DELAY = 2L
         private const val PERIODIC_INTERVAL_MILLIS = 4 * 60 * 60 * 1_000L // 4 hours
     }

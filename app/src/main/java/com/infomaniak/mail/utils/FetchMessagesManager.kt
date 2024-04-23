@@ -150,6 +150,10 @@ class FetchMessagesManager @Inject constructor(
             )
 
             realm.close()
+
+            // We don't need to display a group notification saying "0 new messages" so if we don't have any new unread messages,
+            // We dismiss the group notification.
+            notificationManagerCompat.cancel(mailbox.notificationGroupId)
             return
         }
 
