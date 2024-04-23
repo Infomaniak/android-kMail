@@ -101,7 +101,7 @@ class LaunchActivity : AppCompatActivity() {
                 applicationContext.trackNotificationActionEvent("open")
                 startActivityByDestination(
                     destId = R.id.threadListFragment,
-                    args = ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle()
+                    args = ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle(),
                 )
             }
             replyToMessageUid != null -> {
@@ -112,7 +112,7 @@ class LaunchActivity : AppCompatActivity() {
                         replyToMessageUid = replyToMessageUid,
                         draftMode = navigationArgs?.draftMode!!,
                         notificationId = navigationArgs?.notificationId!!,
-                    ).toBundle()
+                    ).toBundle(),
                 )
             }
             else -> {
@@ -143,14 +143,11 @@ class LaunchActivity : AppCompatActivity() {
 
 
     private fun handleShortcuts(isUserDisconnected: Boolean): Boolean {
-        intent.extras?.getString(SHORTCUTS_TAG)?.let {
-            return runByShortcut(it, isUserDisconnected)
-        }
-        return false
+        return intent.extras?.getString(SHORTCUTS_TAG)?.let { startWithShortcut(it, isUserDisconnected) } ?: false
     }
 
-    private fun runByShortcut(shortcutId: String, isUserDisconnected: Boolean): Boolean {
-        if (shortcutId == SHORTCUTS_HELP) {
+    private fun startWithShortcut(shortcutId: String, isUserDisconnected: Boolean): Boolean {
+        if (shortcutId == SHORTCUTS_SUPPORT) {
             trackShortcutEvent(shortcutId)
             openUrl(BuildConfig.CHATBOT_URL)
             return true
@@ -164,7 +161,7 @@ class LaunchActivity : AppCompatActivity() {
                 startActivityByDestination(destId = R.id.searchFragment)
                 true
             }
-            SHORTCUTS_WRITE -> {
+            SHORTCUTS_NEW_MESSAGE -> {
                 trackShortcutEvent(shortcutId)
                 startActivityByDestination(destId = R.id.newMessageActivity)
                 true
@@ -175,8 +172,8 @@ class LaunchActivity : AppCompatActivity() {
 
     companion object {
         private const val SHORTCUTS_TAG = "shortcuts_tag"
-        private const val SHORTCUTS_WRITE = "write"
-        private const val SHORTCUTS_HELP = "help"
+        private const val SHORTCUTS_NEW_MESSAGE = "newMessage"
+        private const val SHORTCUTS_SUPPORT = "support"
         private const val SHORTCUTS_SEARCH = "search"
     }
 }
