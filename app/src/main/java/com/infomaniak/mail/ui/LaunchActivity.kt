@@ -140,8 +140,6 @@ class LaunchActivity : AppCompatActivity() {
             }
         }
     }
-
-
     private fun handleShortcuts(isUserDisconnected: Boolean): Boolean {
         return intent.extras?.getString(SHORTCUTS_TAG)?.let { startWithShortcut(it, isUserDisconnected) } ?: false
     }
