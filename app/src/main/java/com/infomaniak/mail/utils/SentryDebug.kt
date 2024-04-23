@@ -226,7 +226,7 @@ object SentryDebug {
                     "orphanDrafts",
                     orphanDrafts.joinToString {
                         if (it.messageUid == null) {
-                            "${Draft::subject.name} hashCode: [${it.subject.hashCode()}]"
+                            "${Draft::localUuid.name}: [${it.localUuid}]"
                         } else {
                             "${Draft::messageUid.name}: ${it.messageUid}"
                         }
