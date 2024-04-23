@@ -50,6 +50,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
+import com.infomaniak.mail.service.SyncMailsService
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.SyncMailboxesWorker
@@ -116,6 +117,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
+    private val syncServiceIntent by lazy { Intent(this, SyncMailsService::class.java) }
+
     override fun onCreate() {
         super<Application>.onCreate()
 
@@ -135,6 +138,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     override fun onStart(owner: LifecycleOwner) {
         isAppInBackground = false
+        stopService(syncServiceIntent)
         syncMailboxesWorkerScheduler.cancelWork()
         owner.lifecycleScope.launch { appUpdateWorkerScheduler.cancelWorkIfNeeded() }
     }
@@ -142,6 +146,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     override fun onStop(owner: LifecycleOwner) {
         lastAppClosingTime = Date().time
         isAppInBackground = true
+        startService(syncServiceIntent)
         owner.lifecycleScope.launch {
             syncMailboxesWorkerScheduler.scheduleWorkIfNeeded()
             appUpdateWorkerScheduler.scheduleWorkIfNeeded()
