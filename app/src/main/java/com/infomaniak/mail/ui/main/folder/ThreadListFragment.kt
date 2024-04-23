@@ -692,7 +692,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                     val currentFolder = mainViewModel.currentFolder.value
                     Sentry.withScope { scope ->
                         scope.setExtra("cursor", "$currentFolderCursor")
-                        scope.setExtra("isBooting", "$isBooting")
                         scope.setExtra("folderRole", "${currentFolder?.role?.name}")
                         scope.setExtra("folderThreadsCount", "${currentFolder?.threads?.count()}")
                         Sentry.captureMessage(

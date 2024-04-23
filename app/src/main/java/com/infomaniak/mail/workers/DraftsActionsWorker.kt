@@ -381,7 +381,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scope.setExtra("attachmentsCount", "${updatedDraft.attachments.count()}")
                     scope.setExtra(
                         "attachmentsUuids to attachmentsLocalUris",
-                        "${updatedDraft.attachments.map { it.uuid to it.name }}",
+                        "${updatedDraft.attachments.map { it.uuid to it.uploadLocalUri }}",
                     )
                     scope.setExtra("draftUuid", "${updatedDraft.remoteUuid}")
                     scope.setExtra("draftLocalUuid", updatedDraft.localUuid)

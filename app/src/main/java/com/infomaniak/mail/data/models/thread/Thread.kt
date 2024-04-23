@@ -100,7 +100,7 @@ class Thread : RealmObject {
                 _folders.single()
             }.getOrElse {
                 Sentry.withScope { scope ->
-                    scope.setExtra("folders", "${_folders.map { "name:[${it.name}] (id:[${it.id}])" }}")
+                    scope.setExtra("folders", "${_folders.map { "name:[${it.role?.name}] (id:[${it.id}])" }}")
                     scope.setExtra("foldersCount", "${_folders.count()}")
                     scope.setExtra("threadUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
@@ -225,7 +225,7 @@ class Thread : RealmObject {
 
     }.getOrElse { throwable ->
         Sentry.withScope { scope ->
-            scope.setExtra("thread.folder.name", folder.name)
+            scope.setExtra("thread.folder.role", folder.role?.name ?: folder.id)
             scope.setExtra("thread.folder.id", folder.id)
             scope.setExtra("thread.uid", uid)
             scope.setExtra("thread.messages.count", "${messages.count()}")

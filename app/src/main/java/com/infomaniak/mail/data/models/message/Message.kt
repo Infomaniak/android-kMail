@@ -160,7 +160,7 @@ class Message : RealmObject {
                 _folders.single { _folders.count() == 1 || it.id != SEARCH_FOLDER_ID }
             }.getOrElse {
                 Sentry.withScope { scope ->
-                    scope.setExtra("folders", "${_folders.map { "name:[${it.name}] (id:[${it.id}])" }}")
+                    scope.setExtra("folders", "${_folders.map { "role:[${it.role}] (id:[${it.id}])" }}")
                     scope.setExtra("foldersCount", "${_folders.count()}")
                     scope.setExtra("messageUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())

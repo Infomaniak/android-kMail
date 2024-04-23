@@ -206,7 +206,7 @@ class RefreshController @Inject constructor(
                 scope.setExtra("iteration", strategy.iteration.name)
                 scope.setExtra("fibonacci", "$fibonacci")
                 scope.setExtra("folderCursor", "${failedFolder.cursor}")
-                scope.setExtra("folderName", failedFolder.name)
+                scope.setExtra("folderRole", "${failedFolder.role ?: failedFolder.id}")
                 Sentry.captureException(exception)
             }
         }
