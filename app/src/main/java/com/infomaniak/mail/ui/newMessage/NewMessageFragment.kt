@@ -468,13 +468,15 @@ class NewMessageFragment : Fragment() {
 
     private fun observeAttachments() = with(newMessageViewModel) {
 
-        var shouldRegisterToImportedAttachments = true
+        var isFirstTime = true
 
         attachmentsLiveData.observe(viewLifecycleOwner) { attachments ->
 
-            if (shouldRegisterToImportedAttachments) {
-                shouldRegisterToImportedAttachments = false
+            if (isFirstTime) {
+                isFirstTime = false
                 observeImportAttachments()
+            } else {
+                saveDraft()
             }
 
             val shouldTransition = attachmentAdapter.itemCount != 0 && attachments.isEmpty()
@@ -521,8 +523,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    override fun onStop() = with(newMessageViewModel) {
+    override fun onStop() {
+        saveDraft()
+        super.onStop()
+    }
 
+    private fun saveDraft() = with(newMessageViewModel) {
         executeDraftActionWhenStopping(
             action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = requireActivity().isFinishing,
@@ -531,8 +537,6 @@ class NewMessageFragment : Fragment() {
             uiBodyValue = binding.bodyTextField.text.toString(),
             startWorkerCallback = ::startWorker,
         )
-
-        super.onStop()
     }
 
     private fun startWorker() {
