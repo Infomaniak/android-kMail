@@ -749,9 +749,9 @@ class NewMessageViewModel @Inject constructor(
                     if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same uploadLocalUri")
                 }.firstOrNull()
             /**
-             * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly
-             * already be an `uuid` for Attachments in Realm. If we don't take back the Realm version of the
-             * Attachment, its `uuid` will be lost forever and we won't be able to save/send the Draft.
+             * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly already be
+             * some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of
+             * the Attachment, this data will be lost forever and we won't be able to save/send the Draft.
              */
             return@map if (localAttachment?.uuid != null) localAttachment.copyFromRealm() else uiAttachment
         }
