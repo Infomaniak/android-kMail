@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.utils.extensions.toLongUid
@@ -91,7 +92,7 @@ class RefreshController @Inject constructor(
         callbacks: RefreshCallbacks? = null,
     ): Pair<Set<Thread>?, Throwable?> {
 
-        SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.role?.name ?: folder.id})")
+        SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.displayForSentry()})")
 
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
@@ -101,7 +102,7 @@ class RefreshController @Inject constructor(
         return refreshWithRunCatching(refreshThreadsJob!!).also { (threads, _) ->
             if (threads != null) {
                 onStop?.invoke()
-                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.role?.name ?: folder.id})")
+                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.displayForSentry()})")
             }
         }
     }
@@ -206,7 +207,7 @@ class RefreshController @Inject constructor(
                 scope.setExtra("iteration", strategy.iteration.name)
                 scope.setExtra("fibonacci", "$fibonacci")
                 scope.setExtra("folderCursor", "${failedFolder.cursor}")
-                scope.setExtra("folderRole", "${failedFolder.role ?: failedFolder.id}")
+                scope.setExtra("folder", failedFolder.displayForSentry())
                 Sentry.captureException(exception)
             }
         }
@@ -261,7 +262,7 @@ class RefreshController @Inject constructor(
 
         SentryLog.d(
             "API",
-            "Start of refreshing threads with mode: $refreshMode | (${initialFolder.role?.name ?: initialFolder.id})"
+            "Start of refreshing threads with mode: $refreshMode | (${initialFolder.displayForSentry()})"
         )
 
         return when (refreshMode) {
@@ -474,7 +475,7 @@ class RefreshController @Inject constructor(
         scope.ensureActive()
 
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
-        SentryLog.d("API", "$logMessage | ${folder.role?.name ?: folder.id}")
+        SentryLog.d("API", "$logMessage | ${folder.displayForSentry()}")
 
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
@@ -525,7 +526,7 @@ class RefreshController @Inject constructor(
     ): Set<Thread> {
 
         val logMessage = "Added: ${uids.count()}"
-        SentryLog.d("API", "$logMessage | ${folder.role?.name ?: folder.id}")
+        SentryLog.d("API", "$logMessage | ${folder.displayForSentry()}")
 
         addSentryBreadcrumbForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
 
@@ -555,7 +556,7 @@ class RefreshController @Inject constructor(
                     }
                     SentryLog.d(
                         "Realm",
-                        "Saved Messages: ${latestFolder.role?.name ?: latestFolder.id} | ${latestFolder.messages.count()}"
+                        "Saved Messages: ${latestFolder.displayForSentry()} | ${latestFolder.messages.count()}"
                     )
 
                     impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
@@ -718,7 +719,7 @@ class RefreshController @Inject constructor(
         if (existingMessage != null && !existingMessage.isOrphan()) {
             SentryLog.i(
                 TAG,
-                "Already existing message in folder ${folder.role?.name ?: folder.id} | threadMode = ${localSettings.threadMode}"
+                "Already existing message in folder ${folder.displayForSentry()} | threadMode = ${localSettings.threadMode}"
             )
             return true
         }

@@ -195,7 +195,7 @@ object SentryDebug {
                 scope.setExtra("number of Messages", "${orphanMessages.count()}")
                 scope.setExtra("previousCursor", "$previousCursor")
                 scope.setExtra("newCursor", "${folder.cursor}")
-                scope.setExtra("folder role or id", folder.role?.name ?: folder.id)
+                scope.setExtra("folder", folder.displayForSentry())
                 Sentry.captureMessage("We found some orphan Messages.", SentryLevel.ERROR)
             }
         }
@@ -211,7 +211,7 @@ object SentryDebug {
                 scope.setExtra("number of Messages", "${orphanThreads.map { it.messages.count() }}")
                 scope.setExtra("previousCursor", "$previousCursor")
                 scope.setExtra("newCursor", "${folder.cursor}")
-                scope.setExtra("folderRole", folder.role?.name ?: folder.id)
+                scope.setExtra("folder", folder.displayForSentry())
                 Sentry.captureMessage("We found some orphan Threads.", SentryLevel.ERROR)
             }
         }
@@ -283,5 +283,9 @@ object SentryDebug {
             Sentry.captureMessage("Credentials issue when trying to auto-sync user", SentryLevel.ERROR)
         }
     }
+    //endregion
+
+    //region Utils
+    fun Folder.displayForSentry() = role?.name ?: id
     //endregion
 }
