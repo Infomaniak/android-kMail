@@ -778,7 +778,13 @@ class NewMessageViewModel @Inject constructor(
 
         // Only if `!isFinishing`, because if we are finishing, well… We're out of here so we don't care about all of that.
         if (!isFinishing) {
-            copyFromRealm().saveSnapshot()
+            copyFromRealm()
+                .apply {
+                    uiBody = this@updateDraftFromLiveData.uiBody
+                    uiSignature = this@updateDraftFromLiveData.uiSignature
+                    uiQuote = this@updateDraftFromLiveData.uiQuote
+                }
+                .saveSnapshot()
             isNewMessage = false
         }
     }
