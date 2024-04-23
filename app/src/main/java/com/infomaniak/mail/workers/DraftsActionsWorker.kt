@@ -332,7 +332,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         } else {
             SentryLog.e(
                 tag = ATTACHMENT_TAG,
-                msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
+                msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - remoteUuid : ${apiResponse.data?.uuid}",
                 throwable = apiResponse.getApiException(),
             )
 

@@ -91,7 +91,7 @@ class RefreshController @Inject constructor(
         callbacks: RefreshCallbacks? = null,
     ): Pair<Set<Thread>?, Throwable?> {
 
-        SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
+        SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.role?.name ?: folder.id})")
 
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
@@ -101,7 +101,7 @@ class RefreshController @Inject constructor(
         return refreshWithRunCatching(refreshThreadsJob!!).also { (threads, _) ->
             if (threads != null) {
                 onStop?.invoke()
-                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
+                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.role?.name ?: folder.id})")
             }
         }
     }
@@ -259,7 +259,10 @@ class RefreshController @Inject constructor(
 
     private suspend fun Realm.handleRefreshMode(scope: CoroutineScope): Set<Thread> {
 
-        SentryLog.d("API", "Start of refreshing threads with mode: $refreshMode | (${initialFolder.name})")
+        SentryLog.d(
+            "API",
+            "Start of refreshing threads with mode: $refreshMode | (${initialFolder.role?.name ?: initialFolder.id})"
+        )
 
         return when (refreshMode) {
             REFRESH_FOLDER_WITH_ROLE -> refreshWithRoleConsideration(scope)
@@ -471,7 +474,7 @@ class RefreshController @Inject constructor(
         scope.ensureActive()
 
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
-        SentryLog.d("API", "$logMessage | ${folder.name}")
+        SentryLog.d("API", "$logMessage | ${folder.role?.name ?: folder.id}")
 
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
@@ -522,7 +525,7 @@ class RefreshController @Inject constructor(
     ): Set<Thread> {
 
         val logMessage = "Added: ${uids.count()}"
-        SentryLog.d("API", "$logMessage | ${folder.name}")
+        SentryLog.d("API", "$logMessage | ${folder.role?.name ?: folder.id}")
 
         addSentryBreadcrumbForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
 
@@ -550,7 +553,10 @@ class RefreshController @Inject constructor(
                         val foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id
                         foldersIds.forEach { refreshUnreadCount(id = it, realm = this) }
                     }
-                    SentryLog.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
+                    SentryLog.d(
+                        "Realm",
+                        "Saved Messages: ${latestFolder.role?.name ?: latestFolder.id} | ${latestFolder.messages.count()}"
+                    )
 
                     impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
                 }
@@ -710,7 +716,10 @@ class RefreshController @Inject constructor(
         }
         // Add Sentry log and leave if the message already exists
         if (existingMessage != null && !existingMessage.isOrphan()) {
-            SentryLog.i(TAG, "Already existing message in folder ${folder.name} | threadMode = ${localSettings.threadMode}")
+            SentryLog.i(
+                TAG,
+                "Already existing message in folder ${folder.role?.name ?: folder.id} | threadMode = ${localSettings.threadMode}"
+            )
             return true
         }
 

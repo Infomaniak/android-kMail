@@ -540,7 +540,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
             beforeUpdateAdapter = { threads ->
                 threadListViewModel.currentThreadsCount = threads.count()
-                SentryLog.i("UI", "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.name})")
+                SentryLog.i(
+                    "UI",
+                    "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.role?.name ?: currentFolder.value.id}})"
+                )
                 updateThreadsVisibility()
             }
 
@@ -591,7 +594,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
-            SentryLog.i("UI", "Received cursor: $currentFolderCursor | (${folder.name})")
+            SentryLog.i("UI", "Received cursor: $currentFolderCursor | (${folder.role?.name ?: folder.id})")
             updateThreadsVisibility()
             updateUnreadCount(folder.unreadCountLocal)
             checkLastUpdateDay()
@@ -655,7 +658,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun displayFolderName(folder: Folder) {
         val folderName = folder.getLocalizedName(binding.context)
-        SentryLog.i("UI", "Received folder name: $folderName")
+        SentryLog.i("UI", "Received folder name: ${folder.role?.name ?: folder.id}")
         binding.toolbar.title = folderName
     }
 
