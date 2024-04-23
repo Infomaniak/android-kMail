@@ -155,6 +155,7 @@
     <string name="buttonSchedule">Planen Sie den Versand von E-Mails für einen späteren Zeitpunkt</string>
     <string name="buttonSee">Siehe</string>
     <string name="buttonSelectAll">Alle</string>
+    <string name="buttonSendWithDifferentAddress">Senden mit abweichender Adresse</string>
     <string name="buttonShare">Teilen Sie</string>
     <string name="buttonStart">Anfangen</string>
     <string name="buttonStartSync">Start der Synchronisierung</string>
@@ -172,6 +173,8 @@
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Demnächst…</string>
     <string name="commercialFolder">Werbeaktionen</string>
+    <string name="composeMailboxCurrentTitle">Senden Sie eine Nachricht mit der Adresse :</string>
+    <string name="composeMailboxSelectionTitle">Wählen Sie die Absenderadresse aus:</string>
     <string name="confirmLogoutDescription">Sind Sie sicher, dass Sie sich von %s abmelden möchten?</string>
     <string name="confirmLogoutTitle">Abmelden</string>
     <string name="contactActionAddToContacts">Zu Kontakten hinzufügen</string>
@@ -262,6 +265,7 @@
     <string name="errorLoginTitle">Login-Fehler</string>
     <string name="errorMailboxLocked">Diese Mailbox ist gesperrt</string>
     <string name="errorMailboxPasswordLength">Das Passwort muss zwischen 6 und 80 Zeichen lang sein</string>
+    <string name="errorMailboxUnavailable">Diese E-Mail Adresse ist nicht verfügbar</string>
     <string name="errorMoveDestinationNotFound">Der Zielordner besteht nicht</string>
     <string name="errorNewFolderAlreadyExists">Der Ordner besteht bereits</string>
     <string name="errorNewFolderInvalidCharacter">Der Ordnername enthält ungültige Zeichen</string>
@@ -361,6 +365,7 @@
     <string name="pickerNoSelection">Keine Auswahl</string>
     <string name="popupDetachMailboxDescription">Sind Sie sicher, dass Sie die Adresse %s lösen möchten?</string>
     <string name="popupDetachMailboxTitle">Adresse abtrennen</string>
+    <string name="publicFolderSubtitle">Dieser Bereich gehört zu %s und fungiert als zentrales Verzeichnis der gemeinsamen Dateien Ihrer Organisation.</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
     <string name="refreshTokenError">Sie wurden abgemeldet</string>
     <string name="reportDisplayProblemDescription">Sind Sie damit einverstanden, Ihre Daten mit unseren Entwicklern zu teilen, damit diese Ihnen bei Ihrem Problem helfen können?</string>
@@ -389,6 +394,17 @@
     <string name="settingsAiEngineDescription">Wählen Sie Ihren Schreibassistent</string>
     <string name="settingsAppLock">App-Sperre</string>
     <string name="settingsAuthorizeTracking">Verfolgung genehmigen</string>
+    <string name="settingsAutoAdvanceDescription">Auswählen, was angezeigt werden soll, wenn eine Nachricht archiviert oder gelöscht wird</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Beim Archivieren oder Löschen folgenden Thread anzeigen\n</string>
+    <string name="settingsAutoAdvanceFollowingThreadTitle">Folgender Thread</string>
+    <string name="settingsAutoAdvanceListOfThreadsDescription">Liste der Threads beim Archivieren oder Löschen anzeigen</string>
+    <string name="settingsAutoAdvanceListOfThreadsTitle">Liste der Themen</string>
+    <string name="settingsAutoAdvanceNaturalThreadDescription">Wiederholt die letzte Aktion, die Sie durchgeführt haben</string>
+    <string name="settingsAutoAdvanceNaturalThreadHint">Wählt automatisch die nächste oder vorherige Konversation aus, je nachdem, wie Sie zuletzt interagiert haben.</string>
+    <string name="settingsAutoAdvanceNaturalThreadTitle">Wiederholung der letzten Aktion</string>
+    <string name="settingsAutoAdvancePreviousThreadDescription">Vorheriges Thema beim Archivieren oder Löschen anzeigen</string>
+    <string name="settingsAutoAdvancePreviousThreadTitle">Voriges Thema</string>
+    <string name="settingsAutoAdvanceTitle">Autovorschuss</string>
     <string name="settingsCancellationPeriodDescription">Sie haben die Möglichkeit, den Versand Ihrer E-Mail bis zu 30 Sekunden abzubrechen</string>
     <string name="settingsCancellationPeriodTitle">Kündigungsfrist senden</string>
     <string name="settingsDataManagementDescription">Sie können die Nutzungs- und Betriebsdaten, die Infomaniak abruft, individuell anpassen, um Fehler zu beheben und die Anwendung zu verbessern. Beide Tools werden ausschliesslich von uns gehostet und verwaltet.\n\nInfomaniak respektiert Ihre Privatsphäre: Der Quellcode dieser Anwendung kann überprüft werden, die gesammelten Informationen sind anonym und Ihre persönlichen Daten werden streng vertraulich behandelt und niemals an Dritte weitergegeben.</string>
@@ -505,6 +521,8 @@
     <string name="syncFragmentTitle">Synchronisieren Sie Ihre Kalender und Kontakte</string>
     <string name="syncInstallDescription">Um die kSync-App aus dem Play Store herunterladen zu können, klicken Sie auf \"Installieren\" und kehren Sie dann zu Ihrer Mail-App zurück.</string>
     <string name="syncInstalled">Installierte</string>
+    <string name="syncServiceNotifDescription">kMail wird im Hintergrund ausgeführt, um E-Mails regelmäßig zu synchronisieren. Sie können die Benachrichtigungseinstellungen ändern, um sie auszublenden.</string>
+    <string name="syncServiceNotifTitle">Aktiv im Hintergrund</string>
     <string name="syncStartDescription">Aktivieren Sie die Kalender und Adressbücher in kSync, die Sie mit Ihrem Telefon synchronisieren möchten.</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Sind Sie sicher, dass Sie diese Nachricht endgültig löschen wollen?</item>
