@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.swipe
+package com.infomaniak.mail.ui.main.settings.general
 
 import android.os.Bundle
 import android.view.LayoutInflater

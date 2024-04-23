@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:title="@string/settingsSwipeActionsTitle"
-    tools:context=".ui.main.settings.swipe.SwipeActionsSettingsFragment">
+    tools:context=".ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"

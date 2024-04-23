@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:title="@string/settingsAccentColor"
-    tools:context=".ui.main.settings.AccentColorSettingFragment">
+    tools:context=".ui.main.settings.appearance.AccentColorSettingFragment">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
