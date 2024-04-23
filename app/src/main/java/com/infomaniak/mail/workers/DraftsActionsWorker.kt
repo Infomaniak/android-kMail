@@ -279,7 +279,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
             SentryLog.d(
                 tag = ATTACHMENT_TAG,
-                msg = "Attachments Uuids to localUris : ${attachmentsToUpload.map { it.uuid to it.uploadLocalUri }}}",
+                msg = "Attachments Uuids to localUris : ${attachmentsToUpload.map { it.uuid to it.localUuid }}}",
             )
         }
 
@@ -301,7 +301,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun Attachment.startUpload(draftLocalUuid: String) {
         val attachmentFile = getUploadLocalFile().also {
             if (it?.exists() != true) {
-                SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
+                SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $localUuid")
                 throw UploadMissingLocalFileException()
             }
         }
@@ -332,7 +332,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         } else {
             SentryLog.e(
                 tag = ATTACHMENT_TAG,
-                msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - remoteUuid : ${apiResponse.data?.uuid}",
+                msg = "Upload failed for attachment $localUuid - error : ${apiResponse.translatedError} - remoteUuid : ${apiResponse.data?.uuid}",
                 throwable = apiResponse.getApiException(),
             )
 
@@ -344,9 +344,9 @@ class DraftsActionsWorker @AssistedInject constructor(
         mailboxContentRealm.writeBlocking {
             draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
 
-                val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
-                SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (Uuids to localUris): $uuidToLocalUri")
-                SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
+                val uuidToLocalUri = draft.attachments.map { it.uuid to it.localUuid }
+                SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (Uuids to localUuid): $uuidToLocalUri")
+                SentryLog.d(ATTACHMENT_TAG, "Target localUuid is: $localUuid")
 
                 // The API version of an Attachment doesn't have the `uploadLocalUri`, so we need to back it up.
                 remoteAttachment.uploadLocalUri = uploadLocalUri
@@ -380,8 +380,8 @@ class DraftsActionsWorker @AssistedInject constructor(
                     scope.setExtra("attachmentUuid", attachment.uuid)
                     scope.setExtra("attachmentsCount", "${updatedDraft.attachments.count()}")
                     scope.setExtra(
-                        "attachmentsUuids to attachmentsLocalUris",
-                        "${updatedDraft.attachments.map { it.uuid to it.uploadLocalUri }}",
+                        "attachmentsUuids to attachmentsLocalUuid",
+                        "${updatedDraft.attachments.map { it.uuid to it.localUuid }}",
                     )
                     scope.setExtra("draftUuid", "${updatedDraft.remoteUuid}")
                     scope.setExtra("draftLocalUuid", updatedDraft.localUuid)
