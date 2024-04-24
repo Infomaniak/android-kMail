@@ -251,6 +251,7 @@
     <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
     <string name="errorDraftNotFound">Bozza non trovata</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
+    <string name="errorFileNameTooLong">Nome del file troppo lungo</string>
     <string name="errorFolderDoesNotExist">La cartella è inesistente</string>
     <string name="errorGetCredentials">Non è stato possibile ottenere le credenziali</string>
     <string name="errorInvalidAttachment">Allegato non valido</string>

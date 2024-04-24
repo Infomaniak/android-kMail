@@ -253,6 +253,7 @@
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
+    <string name="errorFileNameTooLong">Nom de fichier trop long</string>
     <string name="errorFolderDoesNotExist">Le dossier n’existe pas</string>
     <string name="errorGetCredentials">Impossible d’obtenir les informations d’identification</string>
     <string name="errorInvalidAttachment">Pièce jointe non valide</string>

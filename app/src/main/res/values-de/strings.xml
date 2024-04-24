@@ -251,6 +251,7 @@
     <string name="errorCorruptAttachment">Der Entwurf konnte nicht bearbeitet werden, ein Anhang ist beschädigt</string>
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>
+    <string name="errorFileNameTooLong">Dateiname zu lang</string>
     <string name="errorFolderDoesNotExist">Der Ordner besteht nicht</string>
     <string name="errorGetCredentials">Konnte keine Anmeldeinformationen erhalten</string>
     <string name="errorInvalidAttachment">Dateianhang ungültig</string>
