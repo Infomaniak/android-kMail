@@ -161,7 +161,6 @@
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSee">See</string>
     <string name="buttonSelectAll">All</string>
-    <string name="buttonSendWithDifferentAddress">Send with a different address</string>
     <string name="buttonShare">Share</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStartSync">Start synchronization</string>
@@ -179,8 +178,6 @@
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Coming soon…</string>
     <string name="commercialFolder">Promotions</string>
-    <string name="composeMailboxCurrentTitle">Send a message with the address :</string>
-    <string name="composeMailboxSelectionTitle">Select sending address :</string>
     <string name="confirmLogoutDescription">Are you sure you want to log out from %s?</string>
     <string name="confirmLogoutTitle">Log out</string>
     <string name="contactActionAddToContacts">Add to contacts</string>
@@ -271,7 +268,6 @@
     <string name="errorLoginTitle">Login error</string>
     <string name="errorMailboxLocked">This mailbox is locked</string>
     <string name="errorMailboxPasswordLength">The password must be between 6 and 80 characters</string>
-    <string name="errorMailboxUnavailable">This email address is not available</string>
     <string name="errorMoveDestinationNotFound">The destination folder does not exist</string>
     <string name="errorNewFolderAlreadyExists">The folder already exists</string>
     <string name="errorNewFolderInvalidCharacter">The folder name contains invalid characters</string>
@@ -371,7 +367,6 @@
     <string name="pickerNoSelection">No selection</string>
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
     <string name="popupDetachMailboxTitle">Detach mailbox</string>
-    <string name="publicFolderSubtitle">This space belongs to %s and centralizes your organization’s common files.</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You have been disconnected</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>
@@ -400,17 +395,6 @@
     <string name="settingsAiEngineDescription">Select your AI writing assistant</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsAuthorizeTracking">Authorize tracking</string>
-    <string name="settingsAutoAdvanceDescription">Select what to display when a message is archived or deleted\u0020</string>
-    <string name="settingsAutoAdvanceFollowingThreadDescription">Display following thread when archiving or deleting\n</string>
-    <string name="settingsAutoAdvanceFollowingThreadTitle">Following thread</string>
-    <string name="settingsAutoAdvanceListOfThreadsDescription">Display list of threads when archiving or deleting</string>
-    <string name="settingsAutoAdvanceListOfThreadsTitle">List of threads</string>
-    <string name="settingsAutoAdvanceNaturalThreadDescription">Repeats the last action you performed</string>
-    <string name="settingsAutoAdvanceNaturalThreadHint">Automatically selects the next or previous thread, depending on your last interaction.</string>
-    <string name="settingsAutoAdvanceNaturalThreadTitle">Repeat last action</string>
-    <string name="settingsAutoAdvancePreviousThreadDescription">Display previous thread when archiving or deleting</string>
-    <string name="settingsAutoAdvancePreviousThreadTitle">Previous thread</string>
-    <string name="settingsAutoAdvanceTitle">Auto advance</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>
     <string name="settingsDataManagementDescription">You can customize the usage and operational data that Infomaniak retrieves to correct bugs and enhance the application. Both tools are hosted and managed exclusively by us.\n\nInfomaniak respects your privacy: the source code of this application can be verified, the information collected is anonymous and your personal information remains strictly confidential and is never shared with third parties.</string>
