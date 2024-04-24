@@ -41,7 +41,7 @@
                 style="@style/Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/dividerHorizontalPadding"
+                android:padding="@dimen/marginStandardMedium"
                 android:text="@string/settingsSentryDescription" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView

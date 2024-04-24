@@ -41,7 +41,7 @@ class DataManagementSentrySettingFragment : Fragment() {
         return FragmentDataManagementSentrySettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding.settingsTrackingSwitchSentry) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.settingsTrackingSwitchSentry) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
