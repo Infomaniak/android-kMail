@@ -28,6 +28,7 @@ import android.transition.TransitionSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -55,6 +56,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ConfettiUtils
 import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
@@ -151,6 +153,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
         }
 
         help.setOnClickListener {
+            ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SUPPORT.id)
             trackMenuDrawerEvent("help")
             context.openUrl(BuildConfig.CHATBOT_URL)
             closeDrawer()

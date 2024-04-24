@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.viewModels
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.BuildConfig
@@ -36,6 +37,7 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -61,6 +63,7 @@ class NewMessageActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
+        ShortcutManagerCompat.reportShortcutUsed(this@NewMessageActivity, Shortcuts.NEW_MESSAGE.id)
         setContentView(binding.root)
 
         if (!isAuth()) {

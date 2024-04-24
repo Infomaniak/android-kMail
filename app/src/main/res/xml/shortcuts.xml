@@ -19,7 +19,7 @@
 
     <shortcut
         android:icon="@mipmap/ic_shortcut_new_message"
-        android:shortcutId="write"
+        android:shortcutId="newMessage"
         android:shortcutLongLabel="@string/buttonNewMessage"
         android:shortcutShortLabel="@string/buttonNewMessage">
         <intent
@@ -28,7 +28,7 @@
             android:targetPackage="com.infomaniak.mail">
             <extra
                 android:name="shortcuts_tag"
-                android:value="write" />
+                android:value="newMessage" />
         </intent>
     </shortcut>
 
@@ -49,7 +49,7 @@
 
     <shortcut
         android:icon="@mipmap/ic_shortcut_help"
-        android:shortcutId="help"
+        android:shortcutId="support"
         android:shortcutLongLabel="@string/buttonHelp"
         android:shortcutShortLabel="@string/buttonHelp">
         <intent
@@ -58,7 +58,7 @@
             android:targetPackage="com.infomaniak.mail">
             <extra
                 android:name="shortcuts_tag"
-                android:value="help" />
+                android:value="support" />
         </intent>
     </shortcut>
 </shortcuts>

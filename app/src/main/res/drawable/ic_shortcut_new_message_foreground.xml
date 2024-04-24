@@ -1,15 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-  <group android:scaleX="0.94"
-      android:scaleY="0.94"
-      android:translateX="3.24"
-      android:translateY="3.24">
     <path
-        android:pathData="M62.11,36.55C62.98,36.19 63.91,36 64.86,36C65.81,36 66.74,36.19 67.62,36.55C68.49,36.91 69.27,37.44 69.93,38.1C70.59,38.76 71.11,39.55 71.47,40.4C71.82,41.26 72,42.18 72,43.1C72,44.02 71.82,44.94 71.47,45.79C71.11,46.65 70.59,47.43 69.93,48.1L49.83,68.27C49.69,68.42 49.51,68.52 49.31,68.58L37.55,71.95C37.13,72.07 36.68,71.97 36.36,71.68C36.05,71.39 35.93,70.97 36.04,70.57L39.4,58.76C39.45,58.58 39.55,58.41 39.69,58.28L59.79,38.1C60.45,37.44 61.23,36.91 62.11,36.55ZM64.86,38.28C64.25,38.28 63.64,38.4 63.07,38.63C62.5,38.87 61.98,39.22 61.53,39.66L60.44,40.76L67.45,47.28L68.19,46.53C68.63,46.09 68.99,45.56 69.23,44.97C69.47,44.38 69.6,43.74 69.6,43.1C69.6,42.46 69.47,41.82 69.23,41.23C68.99,40.64 68.63,40.11 68.19,39.66C67.74,39.22 67.22,38.87 66.65,38.63C66.08,38.4 65.47,38.28 64.86,38.28ZM42.2,59.07L58.8,42.41L65.8,48.93L49.2,65.59L42.2,59.07ZM41.17,61.29L38.92,69.18L47.11,66.83L41.17,61.29Z"
         android:fillColor="#BC0055"
-        android:fillType="evenOdd"/>
-  </group>
+        android:pathData="M67.7,37.1L70.9,40.31C72.37,41.78 72.37,44.16 70.9,45.63L68.76,47.77C68.47,48.07 67.99,48.07 67.7,47.77L60.23,40.31C59.93,40.01 59.93,39.53 60.23,39.24L62.37,37.1C63.84,35.63 66.22,35.63 67.7,37.1Z" />
+    <path
+        android:fillColor="#BC0055"
+        android:pathData="M58.63,41.91C58.49,41.77 58.29,41.69 58.09,41.69C57.89,41.69 57.7,41.77 57.56,41.91L41.08,58.39C40.79,58.69 40.79,59.16 41.08,59.46L48.55,66.92C48.84,67.22 49.32,67.22 49.61,66.92L66.08,50.45C66.38,50.16 66.38,49.68 66.08,49.39L58.63,41.91Z" />
+    <path
+        android:fillColor="#BC0055"
+        android:pathData="M39.56,61.24C39.37,61.05 39.09,60.98 38.82,61.05C38.56,61.13 38.36,61.34 38.29,61.6L36.02,71.07C35.96,71.33 36.04,71.6 36.22,71.78C36.41,71.96 36.68,72.04 36.93,71.98L46.39,69.72C46.66,69.65 46.87,69.45 46.94,69.19C47.02,68.93 46.94,68.64 46.75,68.45L39.56,61.24Z" />
 </vector>

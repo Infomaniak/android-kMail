@@ -537,6 +537,10 @@
             android:name="isFirstAccount"
             android:defaultValue="false"
             app:argType="boolean" />
+        <argument
+            android:name="isHelpShortcutPressed"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </activity>
 
     <dialog

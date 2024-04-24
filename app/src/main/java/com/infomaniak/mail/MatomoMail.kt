@@ -260,7 +260,7 @@ object MatomoMail : MatomoCore {
     }
 
     fun Context.trackShortcutEvent(name: String) {
-        trackEvent("shortcutEvent", name)
+        trackEvent("homeScreenShortcuts", name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions

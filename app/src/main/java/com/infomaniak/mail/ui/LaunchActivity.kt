@@ -23,11 +23,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.lib.core.extensions.setDefaultLocaleIfNeeded
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
-import com.infomaniak.mail.MatomoMail.trackShortcutEvent
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -38,6 +36,7 @@ import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -49,6 +48,9 @@ import javax.inject.Inject
 class LaunchActivity : AppCompatActivity() {
 
     private val navigationArgs: LaunchActivityArgs? by lazy { intent?.extras?.let(LaunchActivityArgs::fromBundle) }
+    private var isHelpShortcutPressed = false
+
+    private var extrasMainActivity: Bundle? = null
 
     @Inject
     @IoDispatcher
@@ -78,11 +80,16 @@ class LaunchActivity : AppCompatActivity() {
             val user = AccountUtils.requestCurrentUser()
 
             withContext(mainDispatcher) {
-                val isShortcutHandled = handleShortcuts(user == null)
-                if (isShortcutHandled) return@withContext
+
+                handleShortcuts()
 
                 if (user == null) {
-                    launchLoginActivity(args = LoginActivityArgs(isFirstAccount = true))
+                    launchLoginActivity(
+                        args = LoginActivityArgs(
+                            isFirstAccount = true,
+                            isHelpShortcutPressed = isHelpShortcutPressed
+                        )
+                    )
                 } else {
                     startApp()
                 }
@@ -100,14 +107,12 @@ class LaunchActivity : AppCompatActivity() {
             openThreadUid != null -> {
                 applicationContext.trackNotificationActionEvent("open")
                 startActivityByDestination(
-                    destId = R.id.threadListFragment,
                     args = ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle(),
                 )
             }
             replyToMessageUid != null -> {
                 applicationContext.trackNotificationActionEvent("reply")
                 startActivityByDestination(
-                    destId = R.id.threadListFragment,
                     args = ThreadListFragmentArgs(
                         replyToMessageUid = replyToMessageUid,
                         draftMode = navigationArgs?.draftMode!!,
@@ -116,16 +121,19 @@ class LaunchActivity : AppCompatActivity() {
                 )
             }
             else -> {
-                startActivity(Intent(this, MainActivity::class.java))
+                val intent = Intent(this, MainActivity::class.java).apply {
+                    extrasMainActivity?.let(::putExtras)
+                }
+                startActivity(intent)
             }
         }
     }
 
-    private fun startActivityByDestination(destId: Int, args: Bundle? = null) {
+    private fun startActivityByDestination(args: Bundle? = null) {
         trackUserId(AccountUtils.currentUserId)
         NavDeepLinkBuilder(this)
             .setGraph(R.navigation.main_navigation)
-            .setDestination(destId = destId, args = args)
+            .setDestination(destId = R.id.threadListFragment, args = args)
             .setComponentName(MainActivity::class.java)
             .createTaskStackBuilder()
             .startActivities()
@@ -140,38 +148,17 @@ class LaunchActivity : AppCompatActivity() {
             }
         }
     }
-    private fun handleShortcuts(isUserDisconnected: Boolean): Boolean {
-        return intent.extras?.getString(SHORTCUTS_TAG)?.let { startWithShortcut(it, isUserDisconnected) } ?: false
-    }
 
-    private fun startWithShortcut(shortcutId: String, isUserDisconnected: Boolean): Boolean {
-        if (shortcutId == SHORTCUTS_SUPPORT) {
-            trackShortcutEvent(shortcutId)
-            openUrl(BuildConfig.CHATBOT_URL)
-            return true
-        }
+    private fun handleShortcuts() {
+        intent.getStringExtra(SHORTCUTS_TAG)?.let {
+            extrasMainActivity = MainActivityArgs(shortcutId = it).toBundle()
 
-        if (isUserDisconnected) return false
-
-        return when (shortcutId) {
-            SHORTCUTS_SEARCH -> {
-                trackShortcutEvent(shortcutId)
-                startActivityByDestination(destId = R.id.searchFragment)
-                true
-            }
-            SHORTCUTS_NEW_MESSAGE -> {
-                trackShortcutEvent(shortcutId)
-                startActivityByDestination(destId = R.id.newMessageActivity)
-                true
-            }
-            else -> false
+            if (it == Shortcuts.SUPPORT.id)
+                isHelpShortcutPressed = true
         }
     }
 
     companion object {
         private const val SHORTCUTS_TAG = "shortcuts_tag"
-        private const val SHORTCUTS_NEW_MESSAGE = "newMessage"
-        private const val SHORTCUTS_SUPPORT = "support"
-        private const val SHORTCUTS_SEARCH = "search"
     }
 }

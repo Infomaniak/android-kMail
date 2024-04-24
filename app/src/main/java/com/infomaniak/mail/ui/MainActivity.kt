@@ -42,6 +42,7 @@ import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils
@@ -56,6 +57,7 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.MatomoMail.trackShortcutEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityMainBinding
@@ -70,6 +72,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
+import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -149,6 +152,8 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var inAppReviewManager: InAppReviewManager
 
+    private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let { MainActivityArgs.fromBundle(it) } }
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
         var hasDragged = false
@@ -208,6 +213,8 @@ class MainActivity : BaseActivity() {
         loadCurrentMailbox()
 
         managePermissionsRequesting()
+
+        handleShortcuts()
 
         initAppUpdateManager()
         initAppReviewManager()
@@ -528,6 +535,24 @@ class MainActivity : BaseActivity() {
     }
 
     fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
+
+    private fun handleShortcuts() {
+        navigationArgs?.shortcutId?.let { shortcutId ->
+            trackEvent("shortcuts", shortcutId)
+            when (shortcutId) {
+                Shortcuts.SEARCH.id -> {
+                    navController.navigate(R.id.searchFragment)
+                }
+                Shortcuts.NEW_MESSAGE.id -> {
+                    navController.navigate(R.id.newMessageActivity)
+                }
+                Shortcuts.SUPPORT.id -> {
+                    trackShortcutEvent(shortcutId)
+                    openUrl(BuildConfig.CHATBOT_URL)
+                }
+            }
+        }
+    }
 
     companion object {
         const val DRAFT_ACTION_KEY = "draftAction"

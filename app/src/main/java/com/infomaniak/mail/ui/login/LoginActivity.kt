@@ -29,10 +29,13 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackScreen
+import com.infomaniak.mail.MatomoMail.trackShortcutEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
@@ -41,6 +44,7 @@ import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
+import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
@@ -56,6 +60,8 @@ class LoginActivity : AppCompatActivity() {
 
     lateinit var infomaniakLogin: InfomaniakLogin
 
+    private val navigationArgs: LoginActivityArgs? by lazy { intent?.extras?.let { LoginActivityArgs.fromBundle(it) } }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         lockOrientationForSmallScreens()
 
@@ -65,6 +71,8 @@ class LoginActivity : AppCompatActivity() {
         infomaniakLogin = getInfomaniakLogin()
 
         setupNavController()
+
+        handleHelpShortcut()
 
         trackScreen()
     }
@@ -80,6 +88,15 @@ class LoginActivity : AppCompatActivity() {
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
+    }
+
+    private fun handleHelpShortcut() {
+        navigationArgs?.isHelpShortcutPressed?.let { isHelpShortcutPressed ->
+            if (isHelpShortcutPressed) {
+                trackShortcutEvent(Shortcuts.SUPPORT.id)
+                openUrl(BuildConfig.CHATBOT_URL)
+            }
+        }
     }
 
     companion object {

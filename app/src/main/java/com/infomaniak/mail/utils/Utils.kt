@@ -99,4 +99,10 @@ object Utils {
         NO_MAILBOX,
         NO_VALID_MAILBOX,
     }
+
+    enum class Shortcuts(val id: String) {
+        NEW_MESSAGE("newMessage"),
+        SUPPORT("support"),
+        SEARCH("search"),
+    }
 }
