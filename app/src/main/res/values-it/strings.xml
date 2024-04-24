@@ -392,6 +392,17 @@
     <string name="settingsAiEngineDescription">Selezionare l’assistente di scrittura</string>
     <string name="settingsAppLock">Blocco dell’app</string>
     <string name="settingsAuthorizeTracking">Autorizza il tracciamento</string>
+    <string name="settingsAutoAdvanceDescription">Selezionare cosa visualizzare quando un messaggio viene archiviato o eliminato</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Visualizza la seguente discussione quando si archivia o si elimina\n</string>
+    <string name="settingsAutoAdvanceFollowingThreadTitle">Seguendo il filo conduttore</string>
+    <string name="settingsAutoAdvanceListOfThreadsDescription">Visualizzazione dell’elenco delle discussioni durante l’archiviazione o la cancellazione</string>
+    <string name="settingsAutoAdvanceListOfThreadsTitle">Elenco delle discussioni</string>
+    <string name="settingsAutoAdvanceNaturalThreadDescription">Ripete l’ultima azione eseguita</string>
+    <string name="settingsAutoAdvanceNaturalThreadHint">Seleziona automaticamente la conversazione successiva o precedente, a seconda dell’ultima interazione.</string>
+    <string name="settingsAutoAdvanceNaturalThreadTitle">Ripetere l’ultima azione</string>
+    <string name="settingsAutoAdvancePreviousThreadDescription">Visualizzazione della discussione precedente quando si archivia o si elimina</string>
+    <string name="settingsAutoAdvancePreviousThreadTitle">Filo conduttore precedente</string>
+    <string name="settingsAutoAdvanceTitle">Anticipo auto</string>
     <string name="settingsCancellationPeriodDescription">Avete la possibilità di annullare l’invio della vostra email fino a 30 secondi.</string>
     <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell’invio</string>
     <string name="settingsDataManagementDescription">È possibile personalizzare i dati di utilizzo e operativi che Infomaniak recupera per correggere i bug e migliorare l’applicazione. Entrambi gli strumenti sono ospitati e gestiti esclusivamente da noi.\n\nInfomaniak rispetta la vostra privacy: il codice sorgente di questa applicazione può essere verificato, le informazioni raccolte sono anonime e i vostri dati personali rimangono strettamente confidenziali e non vengono mai condivisi con terze parti.</string>

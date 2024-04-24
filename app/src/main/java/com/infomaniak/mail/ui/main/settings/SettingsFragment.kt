@@ -159,6 +159,10 @@ class SettingsFragment : Fragment() {
         settingsDataManagement.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettings())
         }
+
+        settingsAutomaticAdvance.setOnClickListener {
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToAutoAdvanceSettings())
+        }
     }
 
     private fun observeFeatureFlag() {

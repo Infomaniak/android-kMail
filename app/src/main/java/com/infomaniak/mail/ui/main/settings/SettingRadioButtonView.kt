@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.settings
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
@@ -55,8 +56,16 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 associatedValue = getString(R.styleable.SettingRadioButtonView_value)
 
                 setIcon(iconDrawable)
+
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
+
+                getString(R.styleable.SettingRadioButtonView_subText).let {
+                    subText.apply {
+                        subText.text = it
+                        isGone = it == null
+                    }
+                }
 
                 root.setOnClickListener {
                     (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) ?: onClickListener?.onClick(root)

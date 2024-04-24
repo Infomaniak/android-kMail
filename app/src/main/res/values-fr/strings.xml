@@ -400,6 +400,17 @@
     <string name="settingsAiEngineDescription">Sélectionnez votre assistant à la rédaction</string>
     <string name="settingsAppLock">Verrouillage de l’application</string>
     <string name="settingsAuthorizeTracking">Autoriser le suivi</string>
+    <string name="settingsAutoAdvanceDescription">Sélectionnez ce que vous souhaitez afficher lorsqu’un message est archivé ou supprimé</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Afficher la conversation suivante après archivage ou suppression</string>
+    <string name="settingsAutoAdvanceFollowingThreadTitle">Conversation suivante</string>
+    <string name="settingsAutoAdvanceListOfThreadsDescription">Afficher la liste des conversations après archivage ou suppression</string>
+    <string name="settingsAutoAdvanceListOfThreadsTitle">Liste des conversations</string>
+    <string name="settingsAutoAdvanceNaturalThreadDescription">Répète la dernière action que vous avez effectuée</string>
+    <string name="settingsAutoAdvanceNaturalThreadHint">Sélectionne automatiquement la conversation suivante ou précédente, selon votre dernière interaction.</string>
+    <string name="settingsAutoAdvanceNaturalThreadTitle">Répéter la dernière action</string>
+    <string name="settingsAutoAdvancePreviousThreadDescription">Afficher la conversation précédente après archivage ou suppression</string>
+    <string name="settingsAutoAdvancePreviousThreadTitle">Conversation précédente</string>
+    <string name="settingsAutoAdvanceTitle">Avance automatique</string>
     <string name="settingsCancellationPeriodDescription">Vous avez la possibilité d’annuler l’envoi de votre e-mail jusqu’à 30 secondes</string>
     <string name="settingsCancellationPeriodTitle">Délai d’annulation d’envoi</string>
     <string name="settingsDataManagementDescription">Vous pouvez personnaliser les données d’utilisation et opérationnelles qui sont récupérées par Infomaniak pour corriger des bugs et faire évoluer l’application. Les deux outils utilisés sont hébergés et gérés exclusivement chez nous.\n\nInfomaniak respecte votre vie privée : le code source de cette application peut être vérifié, les informations récoltées sont anonymes et vos informations personnelles restent strictement confidentielles et ne sont jamais partagées avec des tiers.</string>
