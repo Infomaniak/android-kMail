@@ -176,7 +176,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                         throw exception
                     }
                     is ApiErrorException, is UploadMissingLocalFileException -> {
-                        if (draft.messageUid.isNullOrEmpty()) realmActionsOnDraft.add(deleteDraftCallback(draft))
+                        realmActionsOnDraft.add(deleteDraftCallback(draft))
                         if (isTargetDraft) {
                             isTrackedDraftSuccess = false
                             trackedDraftErrorMessageResId = if (exception is ApiErrorException) {
