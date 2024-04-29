@@ -636,7 +636,7 @@ class NewMessageViewModel @Inject constructor(
             val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
             val attachment = attachments[position]
             attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid()!!, attachment.localUuid)
+            LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
             attachments.removeAt(position)
             attachmentsLiveData.value = attachments
         }.onFailure { exception ->
