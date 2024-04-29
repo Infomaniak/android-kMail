@@ -48,6 +48,7 @@ import javax.inject.Inject
 class LaunchActivity : AppCompatActivity() {
 
     private val navigationArgs: LaunchActivityArgs? by lazy { intent?.extras?.let(LaunchActivityArgs::fromBundle) }
+
     private var isHelpShortcutPressed = false
 
     private var extrasMainActivity: Bundle? = null
@@ -84,12 +85,7 @@ class LaunchActivity : AppCompatActivity() {
                 handleShortcuts()
 
                 if (user == null) {
-                    launchLoginActivity(
-                        args = LoginActivityArgs(
-                            isFirstAccount = true,
-                            isHelpShortcutPressed = isHelpShortcutPressed
-                        )
-                    )
+                    launchLoginActivity(LoginActivityArgs(isFirstAccount = true, isHelpShortcutPressed))
                 } else {
                     startApp()
                 }
@@ -106,14 +102,12 @@ class LaunchActivity : AppCompatActivity() {
         when {
             openThreadUid != null -> {
                 applicationContext.trackNotificationActionEvent("open")
-                startActivityByDestination(
-                    args = ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle(),
-                )
+                startActivityByDestination(ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle())
             }
             replyToMessageUid != null -> {
                 applicationContext.trackNotificationActionEvent("reply")
                 startActivityByDestination(
-                    args = ThreadListFragmentArgs(
+                    ThreadListFragmentArgs(
                         replyToMessageUid = replyToMessageUid,
                         draftMode = navigationArgs?.draftMode!!,
                         notificationId = navigationArgs?.notificationId!!,
@@ -121,17 +115,16 @@ class LaunchActivity : AppCompatActivity() {
                 )
             }
             else -> {
-                val intent = Intent(this, MainActivity::class.java).apply {
+                Intent(this, MainActivity::class.java).apply {
                     extrasMainActivity?.let(::putExtras)
-                }
-                startActivity(intent)
+                }.also(::startActivity)
             }
         }
     }
 
     private fun startActivityByDestination(args: Bundle? = null) {
         trackUserId(AccountUtils.currentUserId)
-        NavDeepLinkBuilder(this)
+        NavDeepLinkBuilder(context = this)
             .setGraph(R.navigation.main_navigation)
             .setDestination(destId = R.id.threadListFragment, args = args)
             .setComponentName(MainActivity::class.java)
@@ -153,8 +146,7 @@ class LaunchActivity : AppCompatActivity() {
         intent.getStringExtra(SHORTCUTS_TAG)?.let {
             extrasMainActivity = MainActivityArgs(shortcutId = it).toBundle()
 
-            if (it == Shortcuts.SUPPORT.id)
-                isHelpShortcutPressed = true
+            if (it == Shortcuts.SUPPORT.id) isHelpShortcutPressed = true
         }
     }
 
