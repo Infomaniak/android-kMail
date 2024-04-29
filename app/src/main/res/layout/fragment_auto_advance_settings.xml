@@ -45,26 +45,30 @@
                     android:id="@+id/lastThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/settingsAutoAdvancePreviousThreadTitle" />
+                    app:text="@string/settingsAutoAdvancePreviousThreadTitle"
+                    app:value="lastThread"/>
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/nextThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/settingsAutoAdvanceFollowingThreadTitle" />
+                    app:text="@string/settingsAutoAdvanceFollowingThreadTitle"
+                    app:value="nextThread"/>
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/listThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:text="@string/settingsAutoAdvanceListOfThreadsTitle" />
+                    app:text="@string/settingsAutoAdvanceListOfThreadsTitle"
+                    app:value="listThread"/>
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/lastAction"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:subText="@string/settingsAutoAdvanceNaturalThreadHint"
-                    app:text="@string/settingsAutoAdvanceNaturalThreadTitle" />
+                    app:text="@string/settingsAutoAdvanceNaturalThreadTitle"
+                    app:value="lastAction"/>
 
 
             </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>

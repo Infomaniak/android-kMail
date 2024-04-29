@@ -64,6 +64,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
     var isSentryTrackingEnabled by sharedValue("isSentryTrackingEnabledKey", true)
     var isMatomoTrackingEnabled by sharedValue("isMatomoTrackingEnabledKey", true)
+    var autoAdvanceMode by sharedValue("autoAdvanceModeKey", AutoAdvanceCode.NEXT_THREAD)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 
@@ -189,6 +190,13 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: String) {
         ALWAYS("true", R.string.settingsOptionAlways, "always"),
         ASK_ME("false", R.string.settingsOptionAskMe, "askMe"),
+    }
+
+    enum class AutoAdvanceCode(val id: String) {
+        LAST_THREAD("lastThread"),
+        NEXT_THREAD("nextThread"),
+        LIST_THREAD("listThread"),
+        LAST_ACTION("lastAction"),
     }
 
     companion object {

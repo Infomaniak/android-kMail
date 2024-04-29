@@ -23,11 +23,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAutoAdvanceSettingsBinding
-import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class AutoAdvanceSettingsFragment : Fragment() {
 
     private var binding: FragmentAutoAdvanceSettingsBinding by safeBinding()
@@ -39,7 +42,26 @@ class AutoAdvanceSettingsFragment : Fragment() {
         return FragmentAutoAdvanceSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
+        super.onViewCreated(view, savedInstanceState)
+        setSystemBarsColors()
 
+        initBijectionTable(
+            R.id.lastAction to LocalSettings.AutoAdvanceCode.LAST_ACTION,
+            R.id.nextThread to LocalSettings.AutoAdvanceCode.NEXT_THREAD,
+            R.id.listThread to LocalSettings.AutoAdvanceCode.LIST_THREAD,
+            R.id.lastThread to LocalSettings.AutoAdvanceCode.LAST_THREAD,
+        )
+
+        check(localSettings.autoAdvanceMode)
+
+        onItemCheckedListener { _, _, autoAdvanceMode ->
+            chooseAutoAdvanceMode(autoAdvanceMode as LocalSettings.AutoAdvanceCode)
+            // TODO track event
+        }
+    }
+
+    private fun chooseAutoAdvanceMode(autoAdvanceMode: LocalSettings.AutoAdvanceCode) {
+        localSettings.autoAdvanceMode = autoAdvanceMode
     }
 }
