@@ -540,15 +540,9 @@ class MainActivity : BaseActivity() {
         navigationArgs?.shortcutId?.let { shortcutId ->
             trackShortcutEvent(shortcutId)
             when (shortcutId) {
-                Shortcuts.SEARCH.id -> {
-                    navController.navigate(R.id.searchFragment)
-                }
-                Shortcuts.NEW_MESSAGE.id -> {
-                    navController.navigate(R.id.newMessageActivity)
-                }
-                Shortcuts.SUPPORT.id -> {
-                    openUrl(BuildConfig.CHATBOT_URL)
-                }
+                Shortcuts.SEARCH.id -> navController.navigate(R.id.searchFragment)
+                Shortcuts.NEW_MESSAGE.id -> navController.navigate(R.id.newMessageActivity)
+                Shortcuts.SUPPORT.id -> openUrl(BuildConfig.CHATBOT_URL)
             }
         }
     }
