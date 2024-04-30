@@ -68,6 +68,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
+import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
@@ -540,7 +541,13 @@ class MainActivity : BaseActivity() {
         navigationArgs?.shortcutId?.let { shortcutId ->
             trackShortcutEvent(shortcutId)
             when (shortcutId) {
-                Shortcuts.SEARCH.id -> navController.navigate(R.id.searchFragment)
+                Shortcuts.SEARCH.id -> {
+                    navController.navigate(
+                        R.id.searchFragment, SearchFragmentArgs(
+                            dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--"
+                        ).toBundle()
+                    )
+                }
                 Shortcuts.NEW_MESSAGE.id -> navController.navigate(R.id.newMessageActivity)
                 Shortcuts.SUPPORT.id -> openUrl(BuildConfig.CHATBOT_URL)
             }
