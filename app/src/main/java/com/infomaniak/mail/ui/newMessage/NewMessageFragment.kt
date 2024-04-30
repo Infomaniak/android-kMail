@@ -479,9 +479,9 @@ class NewMessageFragment : Fragment() {
                 saveDraft()
             }
 
-            val shouldTransition = attachmentAdapter.itemCount != 0 && attachments.isEmpty()
-            attachmentAdapter.submitList(attachments)
-            if (shouldTransition) TransitionManager.beginDelayedTransition(binding.root)
+            if (attachments.count() != attachmentAdapter.itemCount) attachmentAdapter.submitList(attachments)
+
+            if (attachments.isEmpty()) TransitionManager.beginDelayedTransition(binding.root)
             binding.attachmentsRecyclerView.isVisible = attachments.isNotEmpty()
 
             updateIsSendingAllowed(attachments)
