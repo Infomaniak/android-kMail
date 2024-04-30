@@ -59,6 +59,7 @@ import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackShortcutEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
@@ -544,7 +545,7 @@ class MainActivity : BaseActivity() {
                 Shortcuts.SEARCH.id -> {
                     navController.navigate(
                         R.id.searchFragment, SearchFragmentArgs(
-                            dummyFolderId = mainViewModel.currentFolderId ?: "eJzz9HPyjwAABGYBgQ--"
+                            dummyFolderId = mainViewModel.currentFolderId ?: Folder.INBOX_FOLDER_ID
                         ).toBundle()
                     )
                 }

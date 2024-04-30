@@ -23,7 +23,7 @@
         android:shortcutLongLabel="@string/buttonNewMessage"
         android:shortcutShortLabel="@string/buttonNewMessage">
         <intent
-            android:action="android.intent.action.ATTACH_DATA"
+            android:action="android.intent.action.VIEW"
             android:targetClass="com.infomaniak.mail.ui.LaunchActivity"
             android:targetPackage="com.infomaniak.mail">
             <extra

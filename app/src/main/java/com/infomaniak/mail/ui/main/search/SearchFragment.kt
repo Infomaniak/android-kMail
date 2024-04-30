@@ -66,7 +66,6 @@ class SearchFragment : TwoPaneFragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val searchViewModel: SearchViewModel by viewModels()
-
     @Inject
     lateinit var localSettings: LocalSettings
 
