@@ -477,6 +477,7 @@ class NewMessageFragment : Fragment() {
                 observeImportAttachments()
             } else if (attachments.count() > attachmentAdapter.itemCount) {
                 // If we are adding Attachments, directly save the Draft, so the Attachments' upload starts now.
+                // TODO: Only save Attachments, and not the whole Draft.
                 saveDraft()
             }
 
