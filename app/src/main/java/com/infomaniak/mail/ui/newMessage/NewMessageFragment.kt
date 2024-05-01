@@ -103,7 +103,7 @@ class NewMessageFragment : Fragment() {
     private var quoteWebView: WebView? = null
     private var signatureWebView: WebView? = null
 
-    private var signatureAdapter: SignatureAdapter? = SignatureAdapter(::onSignatureClicked)
+    private var signatureAdapter: SignatureAdapter? = null
     private val attachmentAdapter inline get() = binding.attachmentsRecyclerView.adapter as AttachmentAdapter
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
@@ -376,7 +376,7 @@ class NewMessageFragment : Fragment() {
 
     private fun setupFromField(signatures: List<Signature>) = with(binding) {
 
-        signatureAdapter?.setList(signatures)
+        signatureAdapter = SignatureAdapter(::onSignatureClicked).also { it.setList(signatures) }
 
         fromMailAddress.post {
             runCatching {
