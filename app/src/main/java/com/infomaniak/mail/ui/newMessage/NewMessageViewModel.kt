@@ -106,6 +106,9 @@ class NewMessageViewModel @Inject constructor(
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
 
+    var subjectTextField = ""
+    var bodyTextField = ""
+
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false

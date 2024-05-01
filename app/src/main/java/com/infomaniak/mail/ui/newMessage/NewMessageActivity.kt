@@ -29,12 +29,14 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -51,6 +53,9 @@ class NewMessageActivity : BaseActivity() {
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,5 +113,35 @@ class NewMessageActivity : BaseActivity() {
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
+    }
+
+
+    override fun onStop() {
+        saveDraft()
+        super.onStop()
+    }
+
+    fun saveDraft() {
+
+        val fragment = getCurrentFragment(R.id.newMessageHostFragment)
+
+        val (subjectValue, uiBodyValue) = if (fragment is NewMessageFragment) {
+            with(fragment.binding) { subjectTextField.text.toString() to bodyTextField.text.toString() }
+        } else {
+            with(newMessageViewModel) { subjectTextField to bodyTextField }
+        }
+
+        newMessageViewModel.executeDraftActionWhenStopping(
+            action = if (newMessageViewModel.shouldSendInsteadOfSave) Draft.DraftAction.SEND else Draft.DraftAction.SAVE,
+            isFinishing = isFinishing,
+            isTaskRoot = isTaskRoot,
+            subjectValue = subjectValue,
+            uiBodyValue = uiBodyValue,
+            startWorkerCallback = ::startWorker,
+        )
+    }
+
+    private fun startWorker() {
+        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 }

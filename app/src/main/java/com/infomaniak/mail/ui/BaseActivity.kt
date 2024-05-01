@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.os.Bundle
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.isKeyguardSecure
@@ -67,4 +68,9 @@ open class BaseActivity : AppCompatActivity() {
             resetLastAppClosing()
         }
     }
+
+    fun getCurrentFragment(@IdRes fragmentContainerViewId: Int) = supportFragmentManager
+        .findFragmentById(fragmentContainerViewId)
+        ?.childFragmentManager
+        ?.primaryNavigationFragment
 }
