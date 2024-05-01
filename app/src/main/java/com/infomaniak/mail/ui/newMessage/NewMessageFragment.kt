@@ -479,6 +479,8 @@ class NewMessageFragment : Fragment() {
                 saveDraft()
             }
 
+            // When removing an Attachment, both counts will be the same, because the Adapter is already notified.
+            // We don't want to notify it again, because it will cancel the nice animation.
             if (attachments.count() != attachmentAdapter.itemCount) attachmentAdapter.submitList(attachments)
 
             if (attachments.isEmpty()) TransitionManager.beginDelayedTransition(binding.root)
