@@ -475,8 +475,7 @@ class NewMessageFragment : Fragment() {
             } else if (attachments.count() > attachmentAdapter.itemCount) {
                 // If we are adding Attachments, directly save the Draft, so the Attachments' upload starts now.
                 // TODO: Only save Attachments, and not the whole Draft.
-                // TODO: When not using `saveDraft()` anymore, make it private again.
-                newMessageActivity.saveDraft()
+                newMessageViewModel.uploadAttachmentToServer()
             }
 
             // When removing an Attachment, both counts will be the same, because the Adapter is already notified.

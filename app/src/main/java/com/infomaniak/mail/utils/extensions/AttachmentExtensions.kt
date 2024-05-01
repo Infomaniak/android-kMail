@@ -23,22 +23,39 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.content.FileProvider
+import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
+import io.realm.kotlin.Realm
 import io.sentry.Sentry
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
 
 object AttachmentExtensions {
+
+    // TODO: Delete logs with this tag when Attachments' `uuid` problem will be resolved
+    const val ATTACHMENT_TAG = "attachmentUpload"
+    const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
     private const val DRIVE_PACKAGE = "com.infomaniak.drive"
     private const val SAVE_EXTERNAL_ACTIVITY_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
 
-    const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
     //region Intent
     private fun canSaveOnKDrive(context: Context) = runCatching {
@@ -110,6 +127,82 @@ object AttachmentExtensions {
             intentType = intentType,
         ).toBundle()
     }
+
+    suspend fun Attachment.startUpload(
+        appContext: Context,
+        draftLocalUuid: String,
+        userId: Int,
+        mailbox: Mailbox,
+        draftController: DraftController,
+        realm: Realm,
+    ): Boolean {
+        val attachmentFile = getUploadLocalFile().also {
+            if (it?.exists() != true) {
+                SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
+                throw WorkerUtils.UploadMissingLocalFileException()
+            }
+        }
+
+        val userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return false
+        val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
+            .set("Authorization", "Bearer $userApiToken")
+            .addUnsafeNonAscii("x-ws-attachment-filename", name)
+            .add("x-ws-attachment-mime-type", mimeType)
+            .add("x-ws-attachment-disposition", "attachment")
+            .build()
+        val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
+            .headers(headers)
+            .post(attachmentFile!!.asRequestBody(mimeType.toMediaType()))
+            .build()
+
+        val response = AccountUtils.getHttpClient(userId).newCall(request).execute()
+
+        val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
+        if (apiResponse.isSuccess() && apiResponse.data != null) {
+            updateLocalAttachment(draftLocalUuid, apiResponse.data!!, draftController, realm)
+            attachmentFile.delete()
+            LocalStorageUtils.deleteAttachmentUploadDir(
+                context = appContext,
+                draftLocalUuid = draftLocalUuid,
+                attachmentLocalUuid = localUuid,
+                userId = userId,
+                mailboxId = mailbox.mailboxId,
+            )
+        } else {
+            SentryLog.e(
+                tag = ATTACHMENT_TAG,
+                msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
+                throwable = apiResponse.getApiException(),
+            )
+
+            apiResponse.throwErrorAsException()
+        }
+
+        return true
+    }
+
+    private fun Attachment.updateLocalAttachment(
+        draftLocalUuid: String,
+        remoteAttachment: Attachment,
+        draftController: DraftController,
+        realm: Realm,
+    ) {
+        realm.writeBlocking {
+            draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
+
+                val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
+                SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (Uuids to localUris): $uuidToLocalUri")
+                SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
+
+                // The API version of an Attachment doesn't have the `uploadLocalUri`, so we need to back it up.
+                remoteAttachment.uploadLocalUri = uploadLocalUri
+
+                delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
+                draft.attachments.add(remoteAttachment)
+            }
+        }
+    }
+
     //endregion
 
     enum class AttachmentIntentType {
