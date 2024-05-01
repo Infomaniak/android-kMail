@@ -313,6 +313,35 @@ class ThreadListAdapter @Inject constructor(
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
     }
 
+    fun openThreadByPosition(autoAdvanceMode: LocalSettings.AutoAdvanceMode) {
+        val thread: Thread? = openedThreadPosition?.let {
+            getThreadByPosition(it, autoAdvanceMode)
+        }
+
+        thread?.let {
+            onThreadClicked?.invoke(it)
+            if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(openedThreadPosition, thread.uid)
+        }
+    }
+
+    private fun getThreadByPosition(positionThread: Int, autoAdvanceMode: LocalSettings.AutoAdvanceMode): Thread? {
+        var indexThread = positionThread
+        if (autoAdvanceMode == LocalSettings.AutoAdvanceMode.LAST_THREAD)
+            while (indexThread > 0)
+                if (dataSet[indexThread - 1] is Thread) {
+                    openedThreadPosition = indexThread
+                    return dataSet[indexThread - 1] as Thread
+                } else indexThread--
+        else if (autoAdvanceMode == LocalSettings.AutoAdvanceMode.NEXT_THREAD)
+            while (indexThread + 1 < dataSet.size)
+                if (dataSet[indexThread + 1] is Thread) {
+                    openedThreadPosition = indexThread + 1
+                    return dataSet[indexThread + 1] as Thread
+                } else indexThread++
+
+        return null
+    }
+
     /**
      * Sometimes, we want to select a Thread before even having any Thread in the Adapter (example: coming from a Notification).
      * The selected Thread's UI will update when the Adapter triggers the next batch of `onBindViewHolder()`.

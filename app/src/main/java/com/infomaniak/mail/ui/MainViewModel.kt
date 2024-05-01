@@ -110,6 +110,10 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
 
+
+    // Thread auto advance
+    val isThreadDeletedOrArchived = MutableLiveData(false)
+
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection

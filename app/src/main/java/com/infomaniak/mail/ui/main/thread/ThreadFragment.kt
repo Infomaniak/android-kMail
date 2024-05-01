@@ -499,11 +499,13 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionArchive -> {
                     trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
                     mainViewModel.archiveThread(threadUid)
+                    mainViewModel.isThreadDeletedOrArchived.value = true
                 }
                 R.id.quickActionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(ACTION_DELETE_NAME)
                         mainViewModel.deleteThread(threadUid)
+                        mainViewModel.isThreadDeletedOrArchived.value = true
                     }
                 }
                 R.id.quickActionMenu -> {

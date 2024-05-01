@@ -95,6 +95,7 @@ class SettingsFragment : Fragment() {
             settingsAccentColor.setSubtitle(accentColor.localisedNameRes)
             settingsThreadMode.setSubtitle(threadMode.localisedNameRes)
             settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
+            settingsAutomaticAdvance.setSubtitle(autoAdvanceMode.localisedNameRes)
         }
     }
 

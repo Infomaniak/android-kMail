@@ -409,6 +409,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 return shouldKeepItem
             }
         }
+
+        mainViewModel.isThreadDeletedOrArchived.observe(viewLifecycleOwner) {
+            threadListAdapter.openThreadByPosition(localSettings.autoAdvanceMode)
+        }
     }
 
     /**

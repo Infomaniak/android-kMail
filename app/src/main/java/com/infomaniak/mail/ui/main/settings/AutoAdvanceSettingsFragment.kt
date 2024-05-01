@@ -47,21 +47,21 @@ class AutoAdvanceSettingsFragment : Fragment() {
         setSystemBarsColors()
 
         initBijectionTable(
-            R.id.lastAction to LocalSettings.AutoAdvanceCode.LAST_ACTION,
-            R.id.nextThread to LocalSettings.AutoAdvanceCode.NEXT_THREAD,
-            R.id.listThread to LocalSettings.AutoAdvanceCode.LIST_THREAD,
-            R.id.lastThread to LocalSettings.AutoAdvanceCode.LAST_THREAD,
+            R.id.lastAction to LocalSettings.AutoAdvanceMode.LAST_ACTION,
+            R.id.nextThread to LocalSettings.AutoAdvanceMode.NEXT_THREAD,
+            R.id.listThread to LocalSettings.AutoAdvanceMode.LIST_THREAD,
+            R.id.lastThread to LocalSettings.AutoAdvanceMode.LAST_THREAD,
         )
 
         check(localSettings.autoAdvanceMode)
 
         onItemCheckedListener { _, _, autoAdvanceMode ->
-            chooseAutoAdvanceMode(autoAdvanceMode as LocalSettings.AutoAdvanceCode)
+            chooseAutoAdvanceMode(autoAdvanceMode as LocalSettings.AutoAdvanceMode)
             // TODO track event
         }
     }
 
-    private fun chooseAutoAdvanceMode(autoAdvanceMode: LocalSettings.AutoAdvanceCode) {
+    private fun chooseAutoAdvanceMode(autoAdvanceMode: LocalSettings.AutoAdvanceMode) {
         localSettings.autoAdvanceMode = autoAdvanceMode
     }
 }
