@@ -39,6 +39,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -72,7 +73,6 @@ import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -125,9 +125,6 @@ class NewMessageFragment : Fragment() {
     lateinit var localSettings: LocalSettings
 
     @Inject
-    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
-
-    @Inject
     lateinit var informationDialog: InformationAlertDialog
 
     @Inject
@@ -160,6 +157,9 @@ class NewMessageFragment : Fragment() {
         initializeDraft()
 
         handleOnBackPressed()
+
+        doAfterSubjectChange()
+        doAfterBodyChange()
 
         observeInitResult()
         observeFromData()
@@ -415,6 +415,18 @@ class NewMessageFragment : Fragment() {
         binding.fromMailAddress.text = formattedExpeditor
     }
 
+    private fun doAfterSubjectChange() {
+        binding.subjectTextField.doAfterTextChanged { editable ->
+            editable?.toString()?.let { newMessageViewModel.subjectTextField = it }
+        }
+    }
+
+    private fun doAfterBodyChange() {
+        binding.bodyTextField.doAfterTextChanged { editable ->
+            editable?.toString()?.let { newMessageViewModel.bodyTextField = it }
+        }
+    }
+
     private fun observeInitResult() {
         newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
             hideLoader()
@@ -478,7 +490,8 @@ class NewMessageFragment : Fragment() {
             } else if (attachments.count() > attachmentAdapter.itemCount) {
                 // If we are adding Attachments, directly save the Draft, so the Attachments' upload starts now.
                 // TODO: Only save Attachments, and not the whole Draft.
-                saveDraft()
+                // TODO: When not using `saveDraft()` anymore, make it private again.
+                newMessageActivity.saveDraft()
             }
 
             // When removing an Attachment, both counts will be the same, because the Adapter is already notified.
@@ -525,26 +538,6 @@ class NewMessageFragment : Fragment() {
                 quoteWebView.loadContent(quote, quoteGroup)
             }
         }
-    }
-
-    override fun onStop() {
-        saveDraft()
-        super.onStop()
-    }
-
-    private fun saveDraft() = with(newMessageViewModel) {
-        executeDraftActionWhenStopping(
-            action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
-            isFinishing = requireActivity().isFinishing,
-            isTaskRoot = requireActivity().isTaskRoot,
-            subjectValue = binding.subjectTextField.text.toString(),
-            uiBodyValue = binding.bodyTextField.text.toString(),
-            startWorkerCallback = ::startWorker,
-        )
-    }
-
-    private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
     private fun onDeleteAttachment(position: Int) {
