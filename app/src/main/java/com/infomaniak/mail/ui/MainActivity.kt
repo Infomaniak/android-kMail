@@ -123,11 +123,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private val currentFragment
-        get() = supportFragmentManager
-            .findFragmentById(R.id.mainHostFragment)
-            ?.childFragmentManager
-            ?.primaryNavigationFragment
+    private val currentFragment get() = getCurrentFragment(R.id.mainHostFragment)
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler

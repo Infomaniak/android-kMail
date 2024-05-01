@@ -72,7 +72,6 @@ import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -82,7 +81,7 @@ import javax.inject.Inject
 class NewMessageFragment : Fragment() {
 
     private var _binding: FragmentNewMessageBinding? = null
-    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+    val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val newMessageActivityArgs by lazy {
         // When opening this fragment via deeplink, it can happen that the navigation
         // extras aren't yet initialized, so we don't use the `navArgs` here.
@@ -123,9 +122,6 @@ class NewMessageFragment : Fragment() {
 
     @Inject
     lateinit var localSettings: LocalSettings
-
-    @Inject
-    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     @Inject
     lateinit var informationDialog: InformationAlertDialog
@@ -478,7 +474,8 @@ class NewMessageFragment : Fragment() {
             } else if (attachments.count() > attachmentAdapter.itemCount) {
                 // If we are adding Attachments, directly save the Draft, so the Attachments' upload starts now.
                 // TODO: Only save Attachments, and not the whole Draft.
-                saveDraft()
+                // TODO: When not using `saveDraft()` anymore, make it private again.
+                newMessageActivity.saveDraft()
             }
 
             // When removing an Attachment, both counts will be the same, because the Adapter is already notified.
@@ -527,24 +524,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    override fun onStop() {
-        saveDraft()
+    override fun onStop() = with(binding) {
+
+        newMessageViewModel.subjectTextField = subjectTextField.text.toString()
+        newMessageViewModel.bodyTextField = bodyTextField.text.toString()
+
         super.onStop()
-    }
-
-    private fun saveDraft() = with(newMessageViewModel) {
-        executeDraftActionWhenStopping(
-            action = if (shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
-            isFinishing = requireActivity().isFinishing,
-            isTaskRoot = requireActivity().isTaskRoot,
-            subjectValue = binding.subjectTextField.text.toString(),
-            uiBodyValue = binding.bodyTextField.text.toString(),
-            startWorkerCallback = ::startWorker,
-        )
-    }
-
-    private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
     private fun onDeleteAttachment(position: Int) {
