@@ -41,6 +41,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
@@ -243,7 +244,7 @@ class ThreadFragment : Fragment() {
                     mainViewModel.currentMailbox.value?.let { mailbox -> deleteDraft(message, mailbox) }
                 },
                 onAttachmentClicked = {
-                    trackAttachmentActionsEvent("open")
+                    trackAttachmentActionsEvent(ACTION_OPEN_NAME)
                     it.openAttachment(
                         context = requireContext(),
                         navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->

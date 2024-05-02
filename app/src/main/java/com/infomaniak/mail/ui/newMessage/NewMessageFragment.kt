@@ -49,6 +49,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
@@ -271,7 +272,7 @@ class NewMessageFragment : Fragment() {
             shouldDisplayCloseButton = true,
             onDelete = ::onDeleteAttachment,
             onAttachmentClicked = {
-                trackAttachmentActionsEvent("open")
+                trackAttachmentActionsEvent(ACTION_OPEN_NAME)
                 it.openAttachment(
                     context = requireContext(),
                     navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
