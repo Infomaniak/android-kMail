@@ -81,7 +81,7 @@ import javax.inject.Inject
 class NewMessageFragment : Fragment() {
 
     private var _binding: FragmentNewMessageBinding? = null
-    val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val newMessageActivityArgs by lazy {
         // When opening this fragment via deeplink, it can happen that the navigation
         // extras aren't yet initialized, so we don't use the `navArgs` here.
@@ -585,4 +585,8 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
+
+    fun getSubjectAndBodyValues(): Pair<String, String> = with(binding) {
+        return subjectTextField.text.toString() to bodyTextField.text.toString()
+    }
 }
