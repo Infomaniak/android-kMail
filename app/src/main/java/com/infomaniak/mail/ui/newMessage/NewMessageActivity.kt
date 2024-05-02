@@ -126,7 +126,7 @@ class NewMessageActivity : BaseActivity() {
         val fragment = getCurrentFragment(R.id.newMessageHostFragment)
 
         val (subjectValue, uiBodyValue) = if (fragment is NewMessageFragment) {
-            with(fragment.binding) { subjectTextField.text.toString() to bodyTextField.text.toString() }
+            fragment.getSubjectAndBodyValues()
         } else {
             with(newMessageViewModel) { subjectTextField to bodyTextField }
         }
