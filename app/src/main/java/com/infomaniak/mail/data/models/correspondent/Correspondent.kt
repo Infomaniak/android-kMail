@@ -46,7 +46,9 @@ interface Correspondent : Parcelable {
         }.getOrElse { exception ->
             Sentry.withScope { scope ->
                 scope.setExtra("email", email)
-                scope.setExtra("name", name)
+                scope.setExtra("name size", name.count().toString())
+                scope.setExtra("name is blank", name.isBlank().toString())
+                scope.setExtra("characters not letters", name.filterNot(Char::isLetter))
                 Sentry.captureException(exception)
             }
 

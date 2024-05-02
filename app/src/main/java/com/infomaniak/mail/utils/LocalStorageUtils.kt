@@ -113,7 +113,9 @@ object LocalStorageUtils {
             }
         } ?: run {
             Sentry.withScope { scope ->
-                scope.setExtra("uri", uri.toString())
+                scope.setExtra("uri is absolute", uri.isAbsolute.toString())
+                scope.setExtra("uri is relative", uri.isRelative.toString())
+                scope.setExtra("uri is opaque", uri.isOpaque.toString())
                 Sentry.captureMessage("failed to access uri")
             }
             null

@@ -72,6 +72,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
@@ -540,7 +541,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
             beforeUpdateAdapter = { threads ->
                 threadListViewModel.currentThreadsCount = threads.count()
-                SentryLog.i("UI", "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.name})")
+                SentryLog.i(
+                    "UI",
+                    "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.displayForSentry()}})",
+                )
                 updateThreadsVisibility()
             }
 
@@ -591,7 +595,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
-            SentryLog.i("UI", "Received cursor: $currentFolderCursor | (${folder.name})")
+            SentryLog.i("UI", "Received cursor: $currentFolderCursor | (${folder.displayForSentry()})")
             updateThreadsVisibility()
             updateUnreadCount(folder.unreadCountLocal)
             checkLastUpdateDay()
@@ -655,7 +659,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun displayFolderName(folder: Folder) {
         val folderName = folder.getLocalizedName(binding.context)
-        SentryLog.i("UI", "Received folder name: $folderName")
+        SentryLog.i("UI", "Received folder: ${folder.displayForSentry()}")
         binding.toolbar.title = folderName
     }
 
@@ -692,7 +696,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                     val currentFolder = mainViewModel.currentFolder.value
                     Sentry.withScope { scope ->
                         scope.setExtra("cursor", "$currentFolderCursor")
-                        scope.setExtra("isBooting", "$isBooting")
                         scope.setExtra("folderRole", "${currentFolder?.role?.name}")
                         scope.setExtra("folderThreadsCount", "${currentFolder?.threads?.count()}")
                         Sentry.captureMessage(

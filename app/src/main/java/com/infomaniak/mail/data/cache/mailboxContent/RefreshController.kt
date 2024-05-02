@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.utils.extensions.toLongUid
@@ -91,7 +92,7 @@ class RefreshController @Inject constructor(
         callbacks: RefreshCallbacks? = null,
     ): Pair<Set<Thread>?, Throwable?> {
 
-        SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.name})")
+        SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.displayForSentry()})")
 
         refreshThreadsJob?.cancel()
         refreshThreadsJob = Job()
@@ -101,7 +102,7 @@ class RefreshController @Inject constructor(
         return refreshWithRunCatching(refreshThreadsJob!!).also { (threads, _) ->
             if (threads != null) {
                 onStop?.invoke()
-                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.name})")
+                SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.displayForSentry()})")
             }
         }
     }
@@ -206,7 +207,7 @@ class RefreshController @Inject constructor(
                 scope.setExtra("iteration", strategy.iteration.name)
                 scope.setExtra("fibonacci", "$fibonacci")
                 scope.setExtra("folderCursor", "${failedFolder.cursor}")
-                scope.setExtra("folderName", failedFolder.name)
+                scope.setExtra("folder", failedFolder.displayForSentry())
                 Sentry.captureException(exception)
             }
         }
@@ -259,7 +260,10 @@ class RefreshController @Inject constructor(
 
     private suspend fun Realm.handleRefreshMode(scope: CoroutineScope): Set<Thread> {
 
-        SentryLog.d("API", "Start of refreshing threads with mode: $refreshMode | (${initialFolder.name})")
+        SentryLog.d(
+            "API",
+            "Start of refreshing threads with mode: $refreshMode | (${initialFolder.displayForSentry()})",
+        )
 
         return when (refreshMode) {
             REFRESH_FOLDER_WITH_ROLE -> refreshWithRoleConsideration(scope)
@@ -471,7 +475,7 @@ class RefreshController @Inject constructor(
         scope.ensureActive()
 
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
-        SentryLog.d("API", "$logMessage | ${folder.name}")
+        SentryLog.d("API", "$logMessage | ${folder.displayForSentry()}")
 
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
@@ -522,7 +526,7 @@ class RefreshController @Inject constructor(
     ): Set<Thread> {
 
         val logMessage = "Added: ${uids.count()}"
-        SentryLog.d("API", "$logMessage | ${folder.name}")
+        SentryLog.d("API", "$logMessage | ${folder.displayForSentry()}")
 
         addSentryBreadcrumbForAddedUids(logMessage = logMessage, email = mailbox.email, folder = folder, uids = uids)
 
@@ -550,7 +554,10 @@ class RefreshController @Inject constructor(
                         val foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id
                         foldersIds.forEach { refreshUnreadCount(id = it, realm = this) }
                     }
-                    SentryLog.d("Realm", "Saved Messages: ${latestFolder.name} | ${latestFolder.messages.count()}")
+                    SentryLog.d(
+                        "Realm",
+                        "Saved Messages: ${latestFolder.displayForSentry()} | ${latestFolder.messages.count()}",
+                    )
 
                     impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
                 }
@@ -710,7 +717,10 @@ class RefreshController @Inject constructor(
         }
         // Add Sentry log and leave if the message already exists
         if (existingMessage != null && !existingMessage.isOrphan()) {
-            SentryLog.i(TAG, "Already existing message in folder ${folder.name} | threadMode = ${localSettings.threadMode}")
+            SentryLog.i(
+                TAG,
+                "Already existing message in folder ${folder.displayForSentry()} | threadMode = ${localSettings.threadMode}",
+            )
             return true
         }
 

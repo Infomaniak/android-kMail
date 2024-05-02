@@ -121,7 +121,7 @@ object SentryDebug {
         Sentry.withScope { scope ->
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
-            scope.setExtra("folder.name", thread.folder.name)
+            scope.setExtra("folder.role", thread.folder.role?.name.toString())
             scope.setExtra("folder.id", thread.folder.id)
             scope.setExtra("thread.uid", "[${thread.uid}]")
             Sentry.captureMessage("No Message in the Thread when opening it", SentryLevel.ERROR)
@@ -148,9 +148,6 @@ object SentryDebug {
             scope.setExtra("mailbox.email", "[${mailbox?.email}]")
             scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
             scope.setExtra("messageUid", "$messageUid")
-            scope.setExtra("user displayName", "${AccountUtils.currentUser?.displayName}")
-            scope.setExtra("user firstName", "${AccountUtils.currentUser?.firstname}")
-            scope.setExtra("user lastName", "${AccountUtils.currentUser?.lastname}")
 
             val message = "We received a Notification, but we failed to show it"
 
@@ -198,7 +195,7 @@ object SentryDebug {
                 scope.setExtra("number of Messages", "${orphanMessages.count()}")
                 scope.setExtra("previousCursor", "$previousCursor")
                 scope.setExtra("newCursor", "${folder.cursor}")
-                scope.setExtra("folderName", folder.name)
+                scope.setExtra("folder", folder.displayForSentry())
                 Sentry.captureMessage("We found some orphan Messages.", SentryLevel.ERROR)
             }
         }
@@ -214,7 +211,7 @@ object SentryDebug {
                 scope.setExtra("number of Messages", "${orphanThreads.map { it.messages.count() }}")
                 scope.setExtra("previousCursor", "$previousCursor")
                 scope.setExtra("newCursor", "${folder.cursor}")
-                scope.setExtra("folderName", folder.name)
+                scope.setExtra("folder", folder.displayForSentry())
                 Sentry.captureMessage("We found some orphan Threads.", SentryLevel.ERROR)
             }
         }
@@ -229,7 +226,7 @@ object SentryDebug {
                     "orphanDrafts",
                     orphanDrafts.joinToString {
                         if (it.messageUid == null) {
-                            "${Draft::subject.name}: [${it.subject}]"
+                            "${Draft::localUuid.name}: [${it.localUuid}]"
                         } else {
                             "${Draft::messageUid.name}: ${it.messageUid}"
                         }
@@ -286,5 +283,9 @@ object SentryDebug {
             Sentry.captureMessage("Credentials issue when trying to auto-sync user", SentryLevel.ERROR)
         }
     }
+    //endregion
+
+    //region Utils
+    fun Folder.displayForSentry() = role?.name ?: id
     //endregion
 }
