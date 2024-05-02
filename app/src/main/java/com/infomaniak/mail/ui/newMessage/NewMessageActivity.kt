@@ -29,7 +29,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
@@ -115,7 +115,6 @@ class NewMessageActivity : BaseActivity() {
         trackDestination(destination)
     }
 
-
     override fun onStop() {
         saveDraft()
         super.onStop()
@@ -132,7 +131,7 @@ class NewMessageActivity : BaseActivity() {
         }
 
         newMessageViewModel.executeDraftActionWhenStopping(
-            action = if (newMessageViewModel.shouldSendInsteadOfSave) Draft.DraftAction.SEND else Draft.DraftAction.SAVE,
+            action = if (newMessageViewModel.shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = isFinishing,
             isTaskRoot = isTaskRoot,
             subjectValue = subjectValue,
