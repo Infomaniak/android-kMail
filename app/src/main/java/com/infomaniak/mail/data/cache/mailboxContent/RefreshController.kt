@@ -262,7 +262,7 @@ class RefreshController @Inject constructor(
 
         SentryLog.d(
             "API",
-            "Start of refreshing threads with mode: $refreshMode | (${initialFolder.displayForSentry()})"
+            "Start of refreshing threads with mode: $refreshMode | (${initialFolder.displayForSentry()})",
         )
 
         return when (refreshMode) {
@@ -556,7 +556,7 @@ class RefreshController @Inject constructor(
                     }
                     SentryLog.d(
                         "Realm",
-                        "Saved Messages: ${latestFolder.displayForSentry()} | ${latestFolder.messages.count()}"
+                        "Saved Messages: ${latestFolder.displayForSentry()} | ${latestFolder.messages.count()}",
                     )
 
                     impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
@@ -719,7 +719,7 @@ class RefreshController @Inject constructor(
         if (existingMessage != null && !existingMessage.isOrphan()) {
             SentryLog.i(
                 TAG,
-                "Already existing message in folder ${folder.displayForSentry()} | threadMode = ${localSettings.threadMode}"
+                "Already existing message in folder ${folder.displayForSentry()} | threadMode = ${localSettings.threadMode}",
             )
             return true
         }
