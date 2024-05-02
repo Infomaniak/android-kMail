@@ -61,4 +61,23 @@
         android:label="AiEngineChoiceFragment"
         tools:layout="@layout/fragment_ai_engine_choice" />
 
+    <dialog
+        android:id="@+id/downloadAttachmentProgressDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog"
+        android:label="DownloadAttachmentProgressDialog"
+        tools:layout="@layout/dialog_download_progress">
+        <argument
+            android:name="attachmentResource"
+            app:argType="string" />
+        <argument
+            android:name="attachmentName"
+            app:argType="string" />
+        <argument
+            android:name="attachmentType"
+            app:argType="com.infomaniak.mail.data.models.Attachment$AttachmentType" />
+        <argument
+            android:name="intentType"
+            app:argType="com.infomaniak.mail.utils.extensions.AttachmentExtensions$AttachmentIntentType" />
+    </dialog>
+
 </navigation>
