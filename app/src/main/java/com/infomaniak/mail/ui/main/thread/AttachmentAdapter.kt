@@ -31,12 +31,12 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 
 class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
-    private val onDelete: ((position: Int, itemCountLeft: Int) -> Unit)? = null,
+    private val onDelete: ((position: Int) -> Unit)? = null,
     private val onAttachmentClicked: ((Attachment) -> Unit)? = null,
     private val onAttachmentOptionsClicked: ((Attachment) -> Unit)? = null,
 ) : Adapter<AttachmentViewHolder>() {
 
-    private var attachments: MutableList<Attachment> = mutableListOf()
+    private val attachments: MutableList<Attachment> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -60,15 +60,15 @@ class AttachmentAdapter(
                 setOnClickListener {
                     val index = attachments.indexOf(attachment)
 
-                    // When clicking on the the attachment in order to delete it, we remove the attachment from the list
-                    // successfully which means that during the fade out animation, if we click again on the little cross the
-                    // attachment is not in the list anymore yet the cross has been clicked. This results in a negative index
-                    // which is why this check is for.
+                    // When clicking on the Attachment in order to delete it, we remove it from the list
+                    // successfully, which means that if we click again on the little cross during the
+                    // fade out animation, the Attachment is not in the list anymore yet the cross has
+                    // been clicked. This results in a negative index, which is why this check is for.
                     if (index != -1) {
                         attachments.removeAt(index)
                         notifyItemRemoved(index)
 
-                        onDelete?.invoke(index, itemCount)
+                        onDelete?.invoke(index)
                     }
                 }
             }
@@ -77,11 +77,14 @@ class AttachmentAdapter(
 
     override fun getItemCount(): Int = runCatchingRealm { attachments.count() }.getOrDefault(0)
 
-    fun setAttachments(newList: List<Attachment>) = runCatchingRealm { attachments = newList.toMutableList() }
+    fun setAttachments(newList: List<Attachment>) = runCatchingRealm {
+        attachments.clear()
+        attachments.addAll(newList)
+    }
 
-    fun addAll(newAttachments: List<Attachment>) {
-        attachments.addAll(newAttachments.filterNot { it.disposition == AttachmentDisposition.INLINE })
-        notifyItemRangeInserted(attachments.lastIndex, newAttachments.count())
+    fun submitList(newList: List<Attachment>) {
+        setAttachments(newList.filterNot { it.disposition == AttachmentDisposition.INLINE })
+        notifyDataSetChanged()
     }
 
     private fun ItemAttachmentBinding.toggleEndIconVisibility(shouldDisplayCloseButton: Boolean) {

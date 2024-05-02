@@ -56,7 +56,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         return BottomSheetAttachmentActionsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(attachmentActionsViewModel) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(attachmentActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
         if (attachment == null) {

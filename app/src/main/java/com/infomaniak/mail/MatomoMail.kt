@@ -26,7 +26,7 @@ import androidx.navigation.NavDestination
 import com.infomaniak.lib.core.MatomoCore
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
-import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import org.matomo.sdk.Tracker
 
@@ -71,9 +71,11 @@ object MatomoMail : MatomoCore {
 
     fun Context.trackSendingDraftEvent(
         action: DraftAction,
-        draft: Draft,
+        to: List<Recipient>,
+        cc: List<Recipient>,
+        bcc: List<Recipient>,
         externalMailFlagEnabled: Boolean,
-    ) = with(draft) {
+    ) {
         trackNewMessageEvent(action.matomoValue)
         if (action == DraftAction.SEND) {
             val trackerData = listOf("numberOfTo" to to, "numberOfCc" to cc, "numberOfBcc" to bcc)
@@ -83,9 +85,9 @@ object MatomoMail : MatomoCore {
 
             if (externalMailFlagEnabled) {
                 var externalRecipientCount = 0
-                listOf(draft.to, draft.cc, draft.bcc).forEach { field ->
+                listOf(to, cc, bcc).forEach { field ->
                     field.forEach { recipient ->
-                        externalRecipientCount += if (recipient.displayAsExternal) 1 else 0
+                        externalRecipientCount += if (recipient.isDisplayedAsExternal) 1 else 0
                     }
                 }
 

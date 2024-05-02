@@ -125,7 +125,6 @@
     <color name="blue99">#FCFCFF</color>
     <color name="blue100">@color/white</color>
 
-
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/background_color_light</color>

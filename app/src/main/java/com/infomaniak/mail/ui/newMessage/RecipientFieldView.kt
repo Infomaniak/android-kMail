@@ -95,7 +95,7 @@ class RecipientFieldView @JvmOverloads constructor(
     lateinit var snackbarManager: SnackbarManager
 
     private var canCollapseEverything = false
-    private var otherFieldsAreAllEmpty = true
+    private var otherFieldsAreEmpty = true
 
     private var isEverythingCollapsed = true
         set(value) {
@@ -128,7 +128,7 @@ class RecipientFieldView @JvmOverloads constructor(
             }
 
             contactAdapter = ContactAdapter(
-                usedContacts = mutableSetOf(),
+                usedEmails = mutableSetOf(),
                 onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
@@ -166,7 +166,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun hideLoader() = with(binding) {
         textInput.isVisible = true
-        computeEndIconVisibility()
+        chevronContainer.isVisible = true
 
         loader.isGone = true
     }
@@ -252,7 +252,7 @@ class RecipientFieldView @JvmOverloads constructor(
             removeRecipient(popupRecipient)
             if (popupDeletesTheCollapsedChip) {
                 popupDeletesTheCollapsedChip = false
-                updateCollapsedChipValues(true)
+                updateCollapsedChipValues(isCollapsed = true)
             }
             contactPopupWindow.dismiss()
         }
@@ -285,7 +285,7 @@ class RecipientFieldView @JvmOverloads constructor(
             isGone = isTextInputAccessible
             val recipient = contactChipAdapter.getRecipients().firstOrNull()
             text = recipient?.getNameOrEmail() ?: ""
-            setChipStyle(recipient?.displayAsExternal == true)
+            setChipStyle(recipient?.isDisplayedAsExternal == true)
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
@@ -311,6 +311,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addRecipient(email: String, name: String) {
+
         if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
             snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
             return
@@ -320,9 +321,10 @@ class RecipientFieldView @JvmOverloads constructor(
             expand()
             binding.chipsRecyclerView.isVisible = true
         }
+
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
-            val recipient = Recipient().initLocalValues(email, name, displayAsExternal = false)
+            val recipient = Recipient().initLocalValues(email, name)
             contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
@@ -376,6 +378,7 @@ class RecipientFieldView @JvmOverloads constructor(
     fun clearField() = binding.textInput.setText("")
 
     fun initRecipients(initialRecipients: List<Recipient>, otherFieldsAreAllEmpty: Boolean = true) {
+
         initialRecipients.forEach { recipient ->
             if (contactChipAdapter.addChip(recipient)) contactAdapter.addUsedContact(recipient.email)
         }
@@ -400,19 +403,19 @@ class RecipientFieldView @JvmOverloads constructor(
         if (canCollapseEverything) isEverythingCollapsed = false else isSelfCollapsed = false
     }
 
-    fun updateOtherFieldsVisibility(otherFieldsAreAllEmpty: Boolean) {
-        this.otherFieldsAreAllEmpty = otherFieldsAreAllEmpty
+    fun updateOtherRecipientsFieldsVisibility(areEmpty: Boolean) {
+        otherFieldsAreEmpty = areEmpty
         computeEndIconVisibility()
     }
 
     private fun computeEndIconVisibility() = with(binding) {
-        val shouldDisplayChevron = canCollapseEverything && otherFieldsAreAllEmpty && !isAutoCompletionOpened
+        val shouldDisplayChevron = canCollapseEverything && otherFieldsAreEmpty && !isAutoCompletionOpened
         chevron.isVisible = shouldDisplayChevron
         textInputLayout.isEndIconVisible = !shouldDisplayChevron && !textInput.text.isNullOrEmpty()
     }
 
     fun findAlreadyExistingExternalRecipientsInFields(): Pair<String?, Int> {
-        val recipients = contactChipAdapter.getRecipients().filter { it.displayAsExternal }
+        val recipients = contactChipAdapter.getRecipients().filter { it.isDisplayedAsExternal }
         val recipientCount = recipients.count()
         return (if (recipientCount == 1) recipients.single().email else null) to recipientCount
     }
@@ -422,7 +425,7 @@ class RecipientFieldView @JvmOverloads constructor(
             if (recipient.isManuallyEntered) continue
 
             val shouldDisplayAsExternal = shouldWarnForExternal && recipient.isExternal(externalData)
-            recipient.initDisplayAsExternal(shouldDisplayAsExternal)
+            recipient.updateIsDisplayedAsExternal(shouldDisplayAsExternal)
 
             updateCollapsedChipValues(isSelfCollapsed)
         }

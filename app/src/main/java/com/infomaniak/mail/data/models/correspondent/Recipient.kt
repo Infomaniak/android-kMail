@@ -39,7 +39,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     // `isExternal()` could return true even if this value is false.
     @Transient
     @Ignore
-    var displayAsExternal: Boolean = false
+    var isDisplayedAsExternal: Boolean = false
         private set
     @Transient
     @Ignore
@@ -49,17 +49,16 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    fun initLocalValues(email: String? = null, name: String? = null, displayAsExternal: Boolean = false): Recipient {
+    fun initLocalValues(email: String? = null, name: String? = null): Recipient {
 
         email?.let { this.email = it }
         name?.let { this.name = it }
-        initDisplayAsExternal(displayAsExternal)
 
         return this
     }
 
-    fun initDisplayAsExternal(shouldDisplayAsExternal: Boolean) {
-        displayAsExternal = shouldDisplayAsExternal
+    fun updateIsDisplayedAsExternal(shouldDisplayAsExternal: Boolean) {
+        isDisplayedAsExternal = shouldDisplayAsExternal
     }
 
     // Computes if the Recipient is external, according to the required conditions.

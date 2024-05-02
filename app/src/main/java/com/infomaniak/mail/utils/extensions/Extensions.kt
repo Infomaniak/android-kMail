@@ -89,6 +89,7 @@ import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPain
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguration
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
@@ -277,6 +278,11 @@ fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems:
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
 }
+
+fun <T> LiveData<List<T>>.valueOrEmpty(): List<T> = value ?: emptyList()
+
+@JvmName("valueOrEmptyForUiRecipients")
+fun LiveData<UiRecipients>.valueOrEmpty(): List<Recipient> = value?.recipients ?: emptyList()
 //endregion
 
 //region Folders

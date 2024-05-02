@@ -25,6 +25,7 @@ import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessage
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
@@ -64,20 +65,18 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
         }
     }
 
-    private fun updateFields(shouldWarnForExternal: Boolean, externalData: ExternalData) {
-        with(binding) {
-            toField.updateExternals(shouldWarnForExternal, externalData)
-            ccField.updateExternals(shouldWarnForExternal, externalData)
-            bccField.updateExternals(shouldWarnForExternal, externalData)
-        }
+    private fun updateFields(shouldWarnForExternal: Boolean, externalData: ExternalData) = with(binding) {
+        listOf(toField, ccField, bccField).forEach { it.updateExternals(shouldWarnForExternal, externalData) }
     }
 
-    private fun updateBanner(shouldWarnForExternal: Boolean, externalData: ExternalData) {
-        with(newMessageViewModel) {
-            if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
-                val (externalEmail, externalQuantity) = draft.findExternalRecipientForNewMessage(externalData)
-                externalRecipientCount.value = externalEmail to externalQuantity
-            }
+    private fun updateBanner(shouldWarnForExternal: Boolean, externalData: ExternalData) = with(newMessageViewModel) {
+        if (shouldWarnForExternal && !isExternalBannerManuallyClosed) {
+            externalRecipientCount.value = findExternalRecipientForNewMessage(
+                externalData = externalData,
+                to = toLiveData.valueOrEmpty(),
+                cc = ccLiveData.valueOrEmpty(),
+                bcc = bccLiveData.valueOrEmpty(),
+            )
         }
     }
 
@@ -107,29 +106,29 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
             )
         }
 
-        newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (email, externalQuantity) ->
+        newMessageViewModel.externalRecipientCount.observe(viewLifecycleOwner) { (externalEmail, externalQuantity) ->
             externalBanner.isGone = newMessageViewModel.isExternalBannerManuallyClosed || externalQuantity == 0
-            externalRecipientEmail = email
+            externalRecipientEmail = externalEmail
             externalRecipientQuantity = externalQuantity
         }
     }
 
     fun updateBannerVisibility() = with(binding) {
-        var externalRecipientEmail: String? = null
-        var externalRecipientQuantity = 0
+        var externalEmail: String? = null
+        var externalQuantity = 0
 
         listOf(toField, ccField, bccField).forEach { field ->
             val (singleEmail, quantityForThisField) = field.findAlreadyExistingExternalRecipientsInFields()
-            externalRecipientQuantity += quantityForThisField
+            externalQuantity += quantityForThisField
 
-            if (externalRecipientQuantity > 1) {
+            if (externalQuantity > 1) {
                 newMessageViewModel.externalRecipientCount.value = null to 2
                 return
             }
 
-            if (quantityForThisField == 1) externalRecipientEmail = singleEmail
+            if (quantityForThisField == 1) externalEmail = singleEmail
         }
 
-        newMessageViewModel.externalRecipientCount.value = externalRecipientEmail to externalRecipientQuantity
+        newMessageViewModel.externalRecipientCount.value = externalEmail to externalQuantity
     }
 }

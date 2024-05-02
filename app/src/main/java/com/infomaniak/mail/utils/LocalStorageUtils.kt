@@ -46,11 +46,11 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
     }
 
-    fun saveAttachmentToCache(resource: String, cacheFile: File): Boolean {
+    fun downloadThenSaveAttachmentToCacheDir(resource: String, cacheFile: File): Boolean {
         fun Response.saveAttachmentTo(outputFile: File): Boolean {
             if (!isSuccessful) return false
             return body?.byteStream()?.use { inputStream ->
-                saveCacheAttachment(inputStream, outputFile)
+                saveAttachmentToCacheDir(inputStream, outputFile)
                 true
             } ?: false
         }
@@ -62,7 +62,7 @@ object LocalStorageUtils {
      * Save the Attachment in disk memory.
      * The file remains unreadable as long as it's being processed.
      */
-    fun saveCacheAttachment(inputStream: InputStream, outputFile: File) = with(outputFile) {
+    fun saveAttachmentToCacheDir(inputStream: InputStream, outputFile: File) = with(outputFile) {
         if (exists()) delete()
         inputStream.buffered().use {
             parentFile?.mkdirs()
@@ -74,11 +74,21 @@ object LocalStorageUtils {
         }
     }
 
-    private fun deleteAttachmentsCaches(context: Context) = context.attachmentsCacheRootDir.deleteRecursively()
+    private fun deleteAttachmentsCacheDir(context: Context) = context.attachmentsCacheRootDir.deleteRecursively()
     //endregion
 
     //region Upload
-    private fun getAttachmentsUploadDir(
+    private fun getAttachmentUploadDir(
+        context: Context,
+        draftLocalUuid: String,
+        attachmentLocalUuid: String,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId,
+    ): File {
+        return getDraftUploadDir(context, "${draftLocalUuid}/${attachmentLocalUuid}", userId, mailboxId)
+    }
+
+    private fun getDraftUploadDir(
         context: Context,
         draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
@@ -87,10 +97,16 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), draftLocalUuid)
     }
 
-    fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, draftLocalUuid: String): File? {
+    fun saveAttachmentToUploadDir(
+        context: Context,
+        uri: Uri,
+        fileName: String,
+        draftLocalUuid: String,
+        attachmentLocalUuid: String,
+    ): File? {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            val attachmentsUploadDir = getAttachmentsUploadDir(context, draftLocalUuid)
-            if (!attachmentsUploadDir.exists()) attachmentsUploadDir.mkdirs()
+            val attachmentsUploadDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid)
+            attachmentsUploadDir.mkdirs()
             val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_$fileName"
             File(attachmentsUploadDir, hashedFileName).also { file ->
                 FileOutputStream(file).use(inputStream::copyTo)
@@ -104,29 +120,48 @@ object LocalStorageUtils {
         }
     }
 
-    fun deleteAttachmentsUploadsDirIfEmpty(
+    fun deleteAttachmentUploadDir(
+        context: Context,
+        draftLocalUuid: String,
+        attachmentLocalUuid: String,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId,
+    ) {
+
+        val attachmentDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid, userId, mailboxId).also {
+            if (!it.exists()) return
+        }
+
+        // Only delete a directory if it's empty
+        if (attachmentDir.hasNoChildren) attachmentDir.delete()
+
+        deleteDraftUploadDir(context, draftLocalUuid, userId, mailboxId)
+    }
+
+    fun deleteDraftUploadDir(
         context: Context,
         draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ) {
-        val attachmentsDir = getAttachmentsUploadDir(context, draftLocalUuid, userId, mailboxId).also {
+        val draftDir = getDraftUploadDir(context, draftLocalUuid, userId, mailboxId).also {
             if (!it.exists()) return
         }
-        val mailboxDir = attachmentsDir.parentFile ?: return
+        val mailboxDir = draftDir.parentFile ?: return
         val userDir = mailboxDir.parentFile ?: return
         val attachmentsRootDir = userDir.parentFile ?: return
 
-        if (attachmentsDir.hasNoChildren) attachmentsDir.delete()
-        if (mailboxDir.hasNoChildren) mailboxDir.delete()
-        if (userDir.hasNoChildren) userDir.delete()
+        // Only delete a directory if it's empty
+        if (draftDir.hasNoChildren) draftDir.delete() else return
+        if (mailboxDir.hasNoChildren) mailboxDir.delete() else return
+        if (userDir.hasNoChildren) userDir.delete() else return
         if (attachmentsRootDir.hasNoChildren) attachmentsRootDir.delete()
     }
     //endregion
 
     //region Global
     fun deleteUserData(context: Context, userId: Int) {
-        deleteAttachmentsCaches(context)
+        deleteAttachmentsCacheDir(context)
         with(context.attachmentsUploadRootDir) {
             File(this, "$userId").deleteRecursively()
             if (this.listFiles()?.isEmpty() == true) deleteRecursively()

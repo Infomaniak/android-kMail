@@ -123,11 +123,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private val currentFragment
-        get() = supportFragmentManager
-            .findFragmentById(R.id.mainHostFragment)
-            ?.childFragmentManager
-            ?.primaryNavigationFragment
+    private val currentFragment get() = getCurrentFragment(R.id.mainHostFragment)
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
@@ -227,12 +223,15 @@ class MainActivity : BaseActivity() {
 
     private fun observeNetworkStatus() {
         LiveDataNetworkStatus(context = this).distinctUntilChanged().observe(this) { isAvailable ->
+
             SentryLog.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
-            Sentry.addBreadcrumb(Breadcrumb().apply {
+
+            Breadcrumb().apply {
                 category = "Network"
                 message = "Internet access is available : $isAvailable"
                 level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
-            })
+            }.also(Sentry::addBreadcrumb)
+
             mainViewModel.isInternetAvailable.value = isAvailable
         }
     }
