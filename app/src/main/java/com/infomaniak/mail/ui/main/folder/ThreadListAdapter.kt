@@ -100,7 +100,7 @@ class ThreadListAdapter @Inject constructor(
     private var previousThreadClickedPosition: Int? = null
 
     //region Tablet mode
-    private var openedThreadPosition: Int? = null
+    var openedThreadPosition: Int? = null
     private var openedThreadUid: String? = null
     //endregion
 
@@ -356,8 +356,6 @@ class ThreadListAdapter @Inject constructor(
         var currentIndexThread = startingThreadIndex
         currentIndexThread += direction
         while (currentIndexThread >= 0 && currentIndexThread <= dataSet.lastIndex) {
-            println("iteration $currentIndexThread")
-            println("start $startingThreadIndex")
             if (dataSet[currentIndexThread] is Thread) {
                 openedThreadPosition = currentIndexThread
                 return dataSet[currentIndexThread] as Thread

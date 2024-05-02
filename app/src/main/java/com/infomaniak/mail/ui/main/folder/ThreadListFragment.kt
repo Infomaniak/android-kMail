@@ -173,12 +173,15 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     override fun getRightPane(): FragmentContainerView? = _binding?.threadHostFragment
 
     override fun getAnchor(): View? {
-        return if (isOnlyRightShown()) {
-            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
-        } else {
+        return if (isSelectedThreadAtLastPositionOrStart() || !isOnlyRightShown()) {
             _binding?.newMessageFab
+        } else {
+            _binding?.threadHostFragment?.getFragment<ThreadFragment?>()?.getAnchor()
         }
     }
+
+    private fun isSelectedThreadAtLastPositionOrStart() =
+        threadListAdapter.openedThreadPosition == 1 || threadListAdapter.openedThreadPosition == threadListAdapter.dataSet.size
 
     override fun doAfterFolderChanged() {
         navigateFromNotificationToThread()
