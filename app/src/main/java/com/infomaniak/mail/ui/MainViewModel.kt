@@ -603,6 +603,7 @@ class MainViewModel @Inject constructor(
             message == null -> appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
+        println(destinationFolder.name)
 
         val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
         snackbarManager.postValue(snackbarTitle, undoData)

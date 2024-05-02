@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.settings
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.opengl.Visibility
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -63,9 +64,11 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 getString(R.styleable.SettingRadioButtonView_subText).let {
                     subText.apply {
                         subText.text = it
-                        isGone = it == null
+                        subText.visibility = GONE
                     }
                 }
+
+
 
                 root.setOnClickListener {
                     (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) ?: onClickListener?.onClick(root)
@@ -97,6 +100,10 @@ class SettingRadioButtonView @JvmOverloads constructor(
             isVisible = iconDrawable != null
             setImageDrawable(iconDrawable)
         }
+    }
+
+    fun setSubTextVisibility(visibility: Int) = with(binding.subText){
+        this.visibility = visibility
     }
 
     override fun setOnClickListener(listener: OnClickListener?) {

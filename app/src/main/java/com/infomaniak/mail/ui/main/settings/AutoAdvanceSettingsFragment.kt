@@ -42,21 +42,22 @@ class AutoAdvanceSettingsFragment : Fragment() {
         return FragmentAutoAdvanceSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
-        initBijectionTable(
+        radioGroup.initBijectionTable(
             R.id.lastAction to LocalSettings.AutoAdvanceMode.LAST_ACTION,
             R.id.nextThread to LocalSettings.AutoAdvanceMode.NEXT_THREAD,
             R.id.listThread to LocalSettings.AutoAdvanceMode.LIST_THREAD,
-            R.id.lastThread to LocalSettings.AutoAdvanceMode.LAST_THREAD,
+            R.id.lastThread to LocalSettings.AutoAdvanceMode.PREVIOUS_THREAD,
         )
 
-        check(localSettings.autoAdvanceMode)
+        radioGroup.check(localSettings.autoAdvanceMode)
 
-        onItemCheckedListener { _, _, autoAdvanceMode ->
+        radioGroup.onItemCheckedListener { _, _, autoAdvanceMode ->
             chooseAutoAdvanceMode(autoAdvanceMode as LocalSettings.AutoAdvanceMode)
+            lastAction.setSubTextVisibility(if (autoAdvanceMode == LocalSettings.AutoAdvanceMode.LAST_ACTION) View.VISIBLE else View.GONE)
             // TODO track event
         }
     }

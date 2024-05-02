@@ -47,8 +47,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.SwipeAction
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -97,6 +96,8 @@ class ThreadListAdapter @Inject constructor(
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
     private var isFolderNameVisible: Boolean = false
+
+    private var previousThreadClickedPosition: Int? = null
 
     //region Tablet mode
     private var openedThreadPosition: Int? = null
@@ -216,7 +217,19 @@ class ThreadListAdapter @Inject constructor(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        selectionCardView.setOnClickListener { onThreadClicked(thread, position) }
+        selectionCardView.setOnClickListener {
+            previousThreadClickedPosition?.let { previousThreadClickedPosition ->
+                if (position > previousThreadClickedPosition) {
+                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.NEXT_THREAD
+                } else if (position < previousThreadClickedPosition) {
+                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.PREVIOUS_THREAD
+                }
+            }
+
+            previousThreadClickedPosition = position
+
+            onThreadClicked(thread, position)
+        }
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
@@ -313,32 +326,45 @@ class ThreadListAdapter @Inject constructor(
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
     }
 
-    fun openThreadByPosition(autoAdvanceMode: LocalSettings.AutoAdvanceMode) {
+    fun openThreadByPosition(autoAdvanceMode: AutoAdvanceMode) {
         val thread: Thread? = openedThreadPosition?.let {
-            getThreadByPosition(it, autoAdvanceMode)
+            getNextThreadToOpenByPosition(it, autoAdvanceMode)
         }
 
         thread?.let {
-            onThreadClicked?.invoke(it)
             if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(openedThreadPosition, thread.uid)
+            onThreadClicked?.invoke(it)
         }
     }
 
-    private fun getThreadByPosition(positionThread: Int, autoAdvanceMode: LocalSettings.AutoAdvanceMode): Thread? {
-        var indexThread = positionThread
-        if (autoAdvanceMode == LocalSettings.AutoAdvanceMode.LAST_THREAD)
-            while (indexThread > 0)
-                if (dataSet[indexThread - 1] is Thread) {
-                    openedThreadPosition = indexThread
-                    return dataSet[indexThread - 1] as Thread
-                } else indexThread--
-        else if (autoAdvanceMode == LocalSettings.AutoAdvanceMode.NEXT_THREAD)
-            while (indexThread + 1 < dataSet.size)
-                if (dataSet[indexThread + 1] is Thread) {
-                    openedThreadPosition = indexThread + 1
-                    return dataSet[indexThread + 1] as Thread
-                } else indexThread++
+    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Thread? {
+        return when (autoAdvanceMode) {
+            AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
+            AutoAdvanceMode.NEXT_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
+            AutoAdvanceMode.LIST_THREAD -> null
+            AutoAdvanceMode.LAST_ACTION -> {
+                if (localSettings.autoAdvanceIntelligentMode == AutoAdvanceMode.PREVIOUS_THREAD) {
+                    getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
+                } else {
+                    getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
+                }
+            }
+        }
+    }
 
+    private fun getNextThread(startingThreadIndex: Int, direction: Int): Thread? {
+        var currentIndexThread = startingThreadIndex
+        currentIndexThread += direction
+        while (currentIndexThread >= 0 && currentIndexThread <= dataSet.lastIndex) {
+            println("iteration $currentIndexThread")
+            println("start $startingThreadIndex")
+            if (dataSet[currentIndexThread] is Thread) {
+                openedThreadPosition = currentIndexThread
+                return dataSet[currentIndexThread] as Thread
+            }
+            
+            currentIndexThread += direction
+        }
         return null
     }
 
@@ -705,6 +731,9 @@ class ThreadListAdapter @Inject constructor(
 
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
+
+        private const val PREVIOUS_CHRONOLOGICAL_THREAD = 1
+        private const val NEXT_CHRONOLOGICAL_THREAD = -1
     }
 
     class ThreadListViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {
