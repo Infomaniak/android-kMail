@@ -526,8 +526,8 @@ class NewMessageFragment : Fragment() {
 
     override fun onStop() = with(binding) {
 
-        newMessageViewModel.subjectTextField = subjectTextField.text.toString()
-        newMessageViewModel.bodyTextField = bodyTextField.text.toString()
+        newMessageViewModel.lastOnStopSubjectValue = subjectTextField.text.toString()
+        newMessageViewModel.lastOnStopBodyValue = bodyTextField.text.toString()
 
         super.onStop()
     }

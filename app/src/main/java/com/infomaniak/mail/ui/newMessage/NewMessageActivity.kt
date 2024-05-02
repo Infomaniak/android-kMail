@@ -127,8 +127,8 @@ class NewMessageActivity : BaseActivity() {
 
         val (subjectValue, uiBodyValue) = if (fragment is NewMessageFragment) {
             fragment.getSubjectAndBodyValues()
-        } else {
-            with(newMessageViewModel) { subjectTextField to bodyTextField }
+        } else with(newMessageViewModel) {
+            lastOnStopSubjectValue to lastOnStopBodyValue
         }
 
         newMessageViewModel.executeDraftActionWhenStopping(
