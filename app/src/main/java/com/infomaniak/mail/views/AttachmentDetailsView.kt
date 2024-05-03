@@ -25,11 +25,11 @@ import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
 import coil.load
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.humanReadableBinaryBytesCount
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ViewAttachmentDetailsBinding
-import com.infomaniak.mail.utils.extensions.humanReadableBinaryBytesCount
 import com.infomaniak.lib.core.R as RCore
 
 class AttachmentDetailsView @JvmOverloads constructor(

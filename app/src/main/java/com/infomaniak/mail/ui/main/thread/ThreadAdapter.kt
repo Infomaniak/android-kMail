@@ -38,6 +38,7 @@ import androidx.viewbinding.ViewBinding
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.humanReadableBinaryBytesCount
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R

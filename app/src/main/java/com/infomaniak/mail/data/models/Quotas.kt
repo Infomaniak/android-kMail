@@ -18,8 +18,8 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
+import com.infomaniak.lib.core.utils.humanReadableBinaryBytesCount
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.extensions.humanReadableBinaryBytesCount
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
