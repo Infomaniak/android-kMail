@@ -33,6 +33,8 @@ object LocalStorageUtils {
 
     private const val ATTACHMENTS_CACHE_DIR = "attachments_cache"
     private const val ATTACHMENTS_UPLOAD_DIR = "attachments_upload"
+    private const val HIDDEN_FILE_NAME = "HIDDEN_FILE_NAME"
+    private const val NAME_TOO_LONG_EXCEPTION = "ENAMETOOLONG"
 
     private inline val Context.attachmentsCacheRootDir get() = File(cacheDir, ATTACHMENTS_CACHE_DIR)
     private inline val Context.attachmentsUploadRootDir get() = File(filesDir, ATTACHMENTS_UPLOAD_DIR)
@@ -112,6 +114,7 @@ object LocalStorageUtils {
             val attachmentsUploadDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid)
             attachmentsUploadDir.mkdirs()
             val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_$fileName"
+            
             return@use getFileToUpload(context, uri, snackbarManager, attachmentsUploadDir, hashedFileName, inputStream)
         } ?: run {
             Sentry.withScope { scope ->
@@ -138,19 +141,18 @@ object LocalStorageUtils {
             true
         }.getOrElse {
             Sentry.withScope { scope ->
-                scope.setExtra("uri", uri.toString().replace(file.path, "HIDDEN FILE NAME"))
+                scope.setExtra("uri", uri.toString().replace(file.path, HIDDEN_FILE_NAME))
                 val exception = it.message
-                    ?.let { message -> AttachmentMissingFileException(message.replace(file.path, "HIDDEN FILE NAME")) }
+                    ?.let { message -> AttachmentMissingFileException(message.replace(file.path, HIDDEN_FILE_NAME)) }
                     ?: it
 
                 exception.stackTrace = it.stackTrace
                 Sentry.captureException(exception)
 
-                if (exception.message?.contains("ENAMETOOLONG") == true) {
-                    snackbarManager.postValue(context.getString(R.string.errorFileNameTooLong))
-                } else {
-                    snackbarManager.postValue(context.getString(RCore.string.errorFileNotFound))
-                }
+                val isNameLong = exception.message?.contains(NAME_TOO_LONG_EXCEPTION) == true
+                val snackbarMessageId = if (isNameLong) R.string.errorFileNameTooLong else RCore.string.errorFileNotFound
+
+                snackbarManager.postValue(context.getString(snackbarMessageId))
             }
             false
         }
