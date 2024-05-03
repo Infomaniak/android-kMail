@@ -249,8 +249,10 @@ fun WebView.initWebViewClientAndBridge(
 }
 
 fun Context.humanReadableBinaryBytesCount(bytes: Long): String {
+    val byteChar = "B"
+
     val absBytes = if (bytes == Long.MIN_VALUE) Long.MAX_VALUE else abs(bytes)
-    if (absBytes < 1_024L) return "$bytes B"
+    if (absBytes < 1_024L) return "$bytes $byteChar"
 
     var value = absBytes
     val characters = StringCharacterIterator("KMGTPE")
@@ -265,7 +267,7 @@ fun Context.humanReadableBinaryBytesCount(bytes: Long): String {
     value *= bytes.sign.toLong()
 
     val locale = resources.configuration.getLocales().get(0)
-    return String.format(locale, "%.1f %cB", value / 1_024.0f, characters.current())
+    return String.format(locale, "%.1f %c$byteChar", value / 1_024.0f, characters.current())
 }
 //endregion
 
