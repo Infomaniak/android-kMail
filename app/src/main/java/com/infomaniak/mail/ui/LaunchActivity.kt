@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.extensions.setDefaultLocaleIfNeeded
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
+import com.infomaniak.mail.MatomoMail.trackShortcutEvent
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -102,11 +103,11 @@ class LaunchActivity : AppCompatActivity() {
         when {
             openThreadUid != null -> {
                 applicationContext.trackNotificationActionEvent("open")
-                startActivityByDestination(ThreadListFragmentArgs(openThreadUid = openThreadUid).toBundle())
+                launchMainActivityToThreadList(ThreadListFragmentArgs(openThreadUid).toBundle())
             }
             replyToMessageUid != null -> {
                 applicationContext.trackNotificationActionEvent("reply")
-                startActivityByDestination(
+                launchMainActivityToThreadList(
                     ThreadListFragmentArgs(
                         replyToMessageUid = replyToMessageUid,
                         draftMode = navigationArgs?.draftMode!!,
@@ -117,12 +118,12 @@ class LaunchActivity : AppCompatActivity() {
             else -> {
                 Intent(this, MainActivity::class.java).apply {
                     extrasMainActivity?.let(::putExtras)
-                }.also(::startActivity)
+                }.also(this::startActivity)
             }
         }
     }
 
-    private fun startActivityByDestination(args: Bundle? = null) {
+    private fun launchMainActivityToThreadList(args: Bundle? = null) {
         trackUserId(AccountUtils.currentUserId)
         NavDeepLinkBuilder(context = this)
             .setGraph(R.navigation.main_navigation)
@@ -144,6 +145,7 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun handleShortcuts() {
         intent.getStringExtra(SHORTCUTS_TAG)?.let {
+            trackShortcutEvent(it)
             extrasMainActivity = MainActivityArgs(shortcutId = it).toBundle()
 
             if (it == Shortcuts.SUPPORT.id) isHelpShortcutPressed = true

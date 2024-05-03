@@ -42,7 +42,6 @@ import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils
@@ -57,7 +56,6 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
-import com.infomaniak.mail.MatomoMail.trackShortcutEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -75,6 +73,7 @@ import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
+import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -100,6 +99,7 @@ class MainActivity : BaseActivity() {
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
+    private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let { MainActivityArgs.fromBundle(it) } }
 
     private var previousDestinationId: Int? = null
 
@@ -153,8 +153,6 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var inAppReviewManager: InAppReviewManager
-
-    private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let { MainActivityArgs.fromBundle(it) } }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -540,17 +538,17 @@ class MainActivity : BaseActivity() {
 
     private fun handleShortcuts() {
         navigationArgs?.shortcutId?.let { shortcutId ->
-            trackShortcutEvent(shortcutId)
             when (shortcutId) {
                 Shortcuts.SEARCH.id -> {
                     navController.navigate(
-                        R.id.searchFragment, SearchFragmentArgs(
-                            dummyFolderId = mainViewModel.currentFolderId ?: Folder.INBOX_FOLDER_ID
-                        ).toBundle()
+                        R.id.searchFragment,
+                        SearchFragmentArgs(dummyFolderId = mainViewModel.currentFolderId ?: Folder.INBOX_FOLDER_ID).toBundle(),
                     )
                 }
                 Shortcuts.NEW_MESSAGE.id -> navController.navigate(R.id.newMessageActivity)
-                Shortcuts.SUPPORT.id -> openUrl(BuildConfig.CHATBOT_URL)
+                Shortcuts.SUPPORT.id -> {
+                    openShortcutHelp(context = this)
+                }
             }
         }
     }
