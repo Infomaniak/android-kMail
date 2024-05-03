@@ -717,6 +717,12 @@ class RefreshController @Inject constructor(
         }
         // Add Sentry log and leave if the message already exists
         if (existingMessage != null && !existingMessage.isOrphan()) {
+            SentryDebug.addThreadsAlgoBreadcrumb(
+                message = "LastUids",
+                data = mapOf(
+                    "lastUids" to MessageController.getNewestMessages(folder.id, limit = 50, realm = this).map { it.shortUid },
+                ),
+            )
             SentryLog.i(
                 TAG,
                 "Already existing message in folder ${folder.displayForSentry()} | threadMode = ${localSettings.threadMode}",
