@@ -41,6 +41,7 @@ import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
+import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.extensions.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.lib.core.R as RCore
@@ -56,6 +57,8 @@ class LoginActivity : AppCompatActivity() {
 
     lateinit var infomaniakLogin: InfomaniakLogin
 
+    private val navigationArgs: LoginActivityArgs? by lazy { intent?.extras?.let { LoginActivityArgs.fromBundle(it) } }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         lockOrientationForSmallScreens()
 
@@ -65,6 +68,8 @@ class LoginActivity : AppCompatActivity() {
         infomaniakLogin = getInfomaniakLogin()
 
         setupNavController()
+
+        handleHelpShortcut()
 
         trackScreen()
     }
@@ -80,6 +85,14 @@ class LoginActivity : AppCompatActivity() {
     private fun onDestinationChanged(destination: NavDestination, arguments: Bundle?) {
         SentryDebug.addNavigationBreadcrumb(destination.displayName, arguments)
         trackDestination(destination)
+    }
+
+    private fun handleHelpShortcut() {
+        navigationArgs?.isHelpShortcutPressed?.let { isHelpShortcutPressed ->
+            if (isHelpShortcutPressed) {
+                openShortcutHelp(context = this)
+            }
+        }
     }
 
     companion object {

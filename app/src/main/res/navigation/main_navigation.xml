@@ -521,7 +521,12 @@
         android:id="@+id/mainActivity"
         android:name="com.infomaniak.mail.ui.MainActivity"
         android:label="MainActivity"
-        tools:layout="@layout/activity_main" />
+        tools:layout="@layout/activity_main" >
+        <argument
+            android:name="shortcutId"
+            android:defaultValue=""
+            app:argType="string" />
+    </activity>
 
     <activity
         android:id="@+id/loginActivity"
@@ -530,6 +535,10 @@
         tools:layout="@layout/activity_login">
         <argument
             android:name="isFirstAccount"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="isHelpShortcutPressed"
             android:defaultValue="false"
             app:argType="boolean" />
     </activity>

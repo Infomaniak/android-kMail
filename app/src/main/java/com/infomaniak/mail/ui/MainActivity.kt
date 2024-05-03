@@ -57,6 +57,7 @@ import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
@@ -66,10 +67,13 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
+import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
+import com.infomaniak.mail.utils.Utils.Shortcuts
+import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -95,6 +99,7 @@ class MainActivity : BaseActivity() {
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
+    private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let { MainActivityArgs.fromBundle(it) } }
 
     private var previousDestinationId: Int? = null
 
@@ -208,6 +213,8 @@ class MainActivity : BaseActivity() {
         loadCurrentMailbox()
 
         managePermissionsRequesting()
+
+        handleShortcuts()
 
         initAppUpdateManager()
         initAppReviewManager()
@@ -528,6 +535,23 @@ class MainActivity : BaseActivity() {
     }
 
     fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
+
+    private fun handleShortcuts() {
+        navigationArgs?.shortcutId?.let { shortcutId ->
+            when (shortcutId) {
+                Shortcuts.SEARCH.id -> {
+                    navController.navigate(
+                        R.id.searchFragment,
+                        SearchFragmentArgs(dummyFolderId = mainViewModel.currentFolderId ?: Folder.INBOX_FOLDER_ID).toBundle(),
+                    )
+                }
+                Shortcuts.NEW_MESSAGE.id -> navController.navigate(R.id.newMessageActivity)
+                Shortcuts.SUPPORT.id -> {
+                    openShortcutHelp(context = this)
+                }
+            }
+        }
+    }
 
     companion object {
         const val DRAFT_ACTION_KEY = "draftAction"

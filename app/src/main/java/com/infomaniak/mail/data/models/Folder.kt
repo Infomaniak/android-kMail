@@ -159,5 +159,7 @@ class Folder : RealmObject {
 
         val DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH = max(Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH - Utils.PAGE_SIZE, 0)
         const val DEFAULT_IS_HISTORY_COMPLETE = false
+
+        const val INBOX_FOLDER_ID = "eJzz9HPyjwAABGYBgQ--"
     }
 }

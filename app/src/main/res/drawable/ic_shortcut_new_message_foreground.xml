@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#BC0055"
+        android:pathData="M67.7,37.1L70.9,40.31C72.37,41.78 72.37,44.16 70.9,45.63L68.76,47.77C68.47,48.07 67.99,48.07 67.7,47.77L60.23,40.31C59.93,40.01 59.93,39.53 60.23,39.24L62.37,37.1C63.84,35.63 66.22,35.63 67.7,37.1Z" />
+    <path
+        android:fillColor="#BC0055"
+        android:pathData="M58.63,41.91C58.49,41.77 58.29,41.69 58.09,41.69C57.89,41.69 57.7,41.77 57.56,41.91L41.08,58.39C40.79,58.69 40.79,59.16 41.08,59.46L48.55,66.92C48.84,67.22 49.32,67.22 49.61,66.92L66.08,50.45C66.38,50.16 66.38,49.68 66.08,49.39L58.63,41.91Z" />
+    <path
+        android:fillColor="#BC0055"
+        android:pathData="M39.56,61.24C39.37,61.05 39.09,60.98 38.82,61.05C38.56,61.13 38.36,61.34 38.29,61.6L36.02,71.07C35.96,71.33 36.04,71.6 36.22,71.78C36.41,71.96 36.68,72.04 36.93,71.98L46.39,69.72C46.66,69.65 46.87,69.45 46.94,69.19C47.02,68.93 46.94,68.64 46.75,68.45L39.56,61.24Z" />
+</vector>

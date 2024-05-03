@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.annotation.ColorRes
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -53,6 +54,7 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -64,7 +66,6 @@ class SearchFragment : TwoPaneFragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val searchViewModel: SearchViewModel by viewModels()
-
     @Inject
     lateinit var localSettings: LocalSettings
 
@@ -100,10 +101,13 @@ class SearchFragment : TwoPaneFragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
+        ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SEARCH.id)
+
         searchViewModel.executePendingSearch()
 
         setupAdapter()
         setupListeners()
+
         setFoldersDropdownUi()
         setAttachmentsUi()
         setMutuallyExclusiveChipGroupUi()
