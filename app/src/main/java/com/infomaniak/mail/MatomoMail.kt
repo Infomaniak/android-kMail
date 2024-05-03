@@ -263,6 +263,10 @@ object MatomoMail : MatomoCore {
         trackEvent("homeScreenShortcuts", name)
     }
 
+    fun Fragment.trackAutoAdvanceEvent(name: String) {
+        trackEvent("settingsAutoAdvance", name)
+    }
+
     // We need to invert this logical value to keep a coherent value for analytics because actions
     // conditions are inverted (ex: if the condition is `message.isSpam`, then we want to unspam)
     private fun Boolean.toMailActionValue() = (!this).toFloat()

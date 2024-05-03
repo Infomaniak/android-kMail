@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.trackAutoAdvanceEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAutoAdvanceSettingsBinding
@@ -47,8 +48,8 @@ class AutoAdvanceSettingsFragment : Fragment() {
         setSystemBarsColors()
 
         radioGroup.initBijectionTable(
-            R.id.lastAction to LocalSettings.AutoAdvanceMode.LAST_ACTION,
-            R.id.nextThread to LocalSettings.AutoAdvanceMode.NEXT_THREAD,
+            R.id.lastAction to LocalSettings.AutoAdvanceMode.NATURAL_THREAD,
+            R.id.nextThread to LocalSettings.AutoAdvanceMode.FOLLOWING_THREAD,
             R.id.listThread to LocalSettings.AutoAdvanceMode.LIST_THREAD,
             R.id.lastThread to LocalSettings.AutoAdvanceMode.PREVIOUS_THREAD,
         )
@@ -57,8 +58,8 @@ class AutoAdvanceSettingsFragment : Fragment() {
 
         radioGroup.onItemCheckedListener { _, _, autoAdvanceMode ->
             chooseAutoAdvanceMode(autoAdvanceMode as LocalSettings.AutoAdvanceMode)
-            lastAction.setSubTextVisibility(if (autoAdvanceMode == LocalSettings.AutoAdvanceMode.LAST_ACTION) View.VISIBLE else View.GONE)
-            // TODO track event
+            lastAction.setSubTextVisibility(if (autoAdvanceMode == LocalSettings.AutoAdvanceMode.NATURAL_THREAD) View.VISIBLE else View.GONE)
+            trackAutoAdvanceEvent(autoAdvanceMode.id)
         }
     }
 
