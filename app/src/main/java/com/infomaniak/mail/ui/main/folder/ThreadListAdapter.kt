@@ -40,7 +40,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
@@ -167,8 +166,8 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-
         val payload = payloads.firstOrNull()
+
         if (payload !is NotificationType) {
             super.onBindViewHolder(holder, position, payloads)
             return@runCatchingRealm
@@ -219,9 +218,9 @@ class ThreadListAdapter @Inject constructor(
 
         selectionCardView.setOnClickListener {
             previousThreadClickedPosition?.let { previousThreadClickedPosition ->
-                if (position > previousThreadClickedPosition) {
-                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.NEXT_THREAD
-                } else if (position < previousThreadClickedPosition) {
+                if (position < previousThreadClickedPosition) {
+                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.FOLLOWING_THREAD
+                } else if (position > previousThreadClickedPosition) {
                     localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.PREVIOUS_THREAD
                 }
             }
@@ -326,23 +325,28 @@ class ThreadListAdapter @Inject constructor(
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
     }
 
-    fun openThreadByPosition(autoAdvanceMode: AutoAdvanceMode) {
-        val thread: Thread? = openedThreadPosition?.let {
-            getNextThreadToOpenByPosition(it, autoAdvanceMode)
-        }
+    fun openThreadByPosition(autoAdvanceMode: AutoAdvanceMode, threadDeleteUid: List<String>) {
+        if (threadDeleteUid.contains(openedThreadUid)) {
+            val thread: Thread? = openedThreadPosition?.let {
+                println("here start openedThread")
+                getNextThreadToOpenByPosition(it, autoAdvanceMode)
+            }
 
-        thread?.let {
-            if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(openedThreadPosition, thread.uid)
-            onThreadClicked?.invoke(it)
+            thread?.let {
+                if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(openedThreadPosition, thread.uid)
+                onThreadClicked?.invoke(it)
+            }
+        } else {
+            println("don't contains")
         }
     }
 
     private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Thread? {
         return when (autoAdvanceMode) {
             AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
-            AutoAdvanceMode.NEXT_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
+            AutoAdvanceMode.FOLLOWING_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
             AutoAdvanceMode.LIST_THREAD -> null
-            AutoAdvanceMode.LAST_ACTION -> {
+            AutoAdvanceMode.NATURAL_THREAD -> {
                 if (localSettings.autoAdvanceIntelligentMode == AutoAdvanceMode.PREVIOUS_THREAD) {
                     getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
                 } else {
@@ -353,14 +357,19 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun getNextThread(startingThreadIndex: Int, direction: Int): Thread? {
+        println("start")
         var currentIndexThread = startingThreadIndex
         currentIndexThread += direction
+        println("second start $currentIndexThread")
         while (currentIndexThread >= 0 && currentIndexThread <= dataSet.lastIndex) {
+            println("here $currentIndexThread")
             if (dataSet[currentIndexThread] is Thread) {
-                openedThreadPosition = currentIndexThread
+                println("found")
+                println("folder ${dataSet[currentIndexThread]}")
+                val thread = dataSet[currentIndexThread] as Thread
                 return dataSet[currentIndexThread] as Thread
             }
-            
+
             currentIndexThread += direction
         }
         return null
@@ -618,7 +627,7 @@ class ThreadListAdapter @Inject constructor(
         return getItemViewType(position) == DisplayType.THREAD.layout && swipingIsAuthorized
     }
 
-    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
+    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>) = null
 
     override fun updateList(itemList: List<Thread>, lifecycleScope: LifecycleCoroutineScope) {
 

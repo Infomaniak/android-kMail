@@ -413,8 +413,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             }
         }
 
-        mainViewModel.isThreadDeletedOrArchived.observe(viewLifecycleOwner) {
-            threadListAdapter.openThreadByPosition(localSettings.autoAdvanceMode)
+        mainViewModel.threadUidToDeleteOrArchive.observe(viewLifecycleOwner) {
+            threadListAdapter.openThreadByPosition(localSettings.autoAdvanceMode, it)
         }
     }
 

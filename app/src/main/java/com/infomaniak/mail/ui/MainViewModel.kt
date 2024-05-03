@@ -110,9 +110,7 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
 
-
-    // Thread auto advance
-    val isThreadDeletedOrArchived = MutableLiveData(false)
+    val threadUidToDeleteOrArchive = MutableLiveData<List<String>>()
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
@@ -444,15 +442,21 @@ class MainViewModel @Inject constructor(
 
     //region Delete
     fun deleteMessage(threadUid: String, message: Message) {
+        if (shouldWeDeleteOrAchieveThread(threadUid))
+            threadUidToDeleteOrArchive.postValue(listOf(threadUid))
+
         deleteThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
     }
 
     fun deleteThread(threadUid: String, isSwipe: Boolean = false) {
-        deleteThreadsOrMessage(threadsUids = listOf(threadUid), isSwipe = isSwipe)
+        val threadUidList = listOf(threadUid)
+        deleteThreadsOrMessage(threadsUids = threadUidList, isSwipe = isSwipe)
+        threadUidToDeleteOrArchive.postValue(threadUidList)
     }
 
     fun deleteThreads(threadsUids: List<String>) {
         deleteThreadsOrMessage(threadsUids = threadsUids)
+        threadUidToDeleteOrArchive.postValue(threadsUids)
     }
 
     private fun deleteThreadsOrMessage(
@@ -503,6 +507,7 @@ class MainViewModel @Inject constructor(
             undoDestinationId,
             threads.count(),
         )
+
     }
 
     private fun showDeleteSnackbar(
@@ -611,14 +616,21 @@ class MainViewModel @Inject constructor(
 
     //region Archive
     fun archiveMessage(threadUid: String, message: Message) {
+        if (shouldWeDeleteOrAchieveThread(threadUid))
+            threadUidToDeleteOrArchive.postValue(listOf(threadUid))
+
         archiveThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
     }
 
     fun archiveThread(threadUid: String) {
-        archiveThreadsOrMessage(threadsUids = listOf(threadUid))
+        val threadUidsList = listOf(threadUid)
+        if (shouldWeDeleteOrAchieveThread(threadUid)) threadUidToDeleteOrArchive.postValue(threadUidsList)
+
+        archiveThreadsOrMessage(threadsUids = threadUidsList)
     }
 
     fun archiveThreads(threadsUids: List<String>) {
+        threadUidToDeleteOrArchive.postValue(threadsUids)
         archiveThreadsOrMessage(threadsUids = threadsUids)
     }
 
@@ -626,6 +638,7 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         message: Message? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
+
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
@@ -647,6 +660,7 @@ class MainViewModel @Inject constructor(
                 destinationFolderId = destinationFolder.id,
                 callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
+
         }
 
         showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
@@ -1042,7 +1056,18 @@ class MainViewModel @Inject constructor(
 
         snackbarManager.postValue(appContext.getString(snackbarTitleRes))
     }
+    private fun shouldWeDeleteOrAchieveThread(threadUid: String): Boolean {
+        var howMuchMessageInFolder = 0
+        threadController.getThread(threadUid)?.messages?.forEach {
+            if (it.folderId == currentFolderId)
+                howMuchMessageInFolder++
 
+            if (howMuchMessageInFolder > 1)
+                return false
+        }
+
+        return true
+    }
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX

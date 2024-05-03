@@ -44,6 +44,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
+import com.infomaniak.mail.MatomoMail.shouldOptOut
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -499,13 +500,11 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionArchive -> {
                     trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
                     mainViewModel.archiveThread(threadUid)
-                    mainViewModel.isThreadDeletedOrArchived.value = true
                 }
                 R.id.quickActionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                         trackThreadActionsEvent(ACTION_DELETE_NAME)
                         mainViewModel.deleteThread(threadUid)
-                        mainViewModel.isThreadDeletedOrArchived.value = true
                     }
                 }
                 R.id.quickActionMenu -> {
