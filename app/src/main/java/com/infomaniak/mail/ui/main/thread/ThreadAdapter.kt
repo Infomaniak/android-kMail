@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View.OnClickListener
@@ -462,7 +461,7 @@ class ThreadAdapter(
             attachment.size
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
 
-        return Formatter.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
+        return context.humanReadableBinaryBytesCount(totalAttachmentsFileSizeInBytes)
     }
 
     private fun MessageViewHolder.bindContent(message: Message) {
