@@ -194,6 +194,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                 .also { if (it.count() < fibonacci) endOfMessagesReached() }
                 .lastOrNull()
         }
+
+        fun getNewestMessages(folderId: String, limit: Int, realm: MutableRealm): List<Message> {
+            return getOldestOrNewestMessagesQuery(folderId, Sort.DESCENDING, realm, limit).find()
+        }
         //endregion
 
         //region Edit data
