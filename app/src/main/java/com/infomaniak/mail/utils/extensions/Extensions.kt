@@ -107,11 +107,14 @@ import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.text.StringCharacterIterator
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import kotlin.collections.set
+import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 //region Type alias
 // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
@@ -243,6 +246,26 @@ fun WebView.initWebViewClientAndBridge(
     ).also {
         webViewClient = it
     }
+}
+
+fun Context.humanReadableBinaryBytesCount(bytes: Long): String {
+    val absBytes = if (bytes == Long.MIN_VALUE) Long.MAX_VALUE else abs(bytes)
+    if (absBytes < 1_024L) return "$bytes B"
+
+    var value = absBytes
+    val characters = StringCharacterIterator("KMGTPE")
+
+    var i = 40
+    while (i >= 0 && absBytes > 0xfffccccccccccccL shr i) {
+        value = value shr 10
+        characters.next()
+        i -= 10
+    }
+
+    value *= bytes.sign.toLong()
+
+    val locale = resources.configuration.getLocales().get(0)
+    return String.format(locale, "%.1f %cB", value / 1_024.0f, characters.current())
 }
 //endregion
 
