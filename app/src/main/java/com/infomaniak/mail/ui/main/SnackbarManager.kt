@@ -52,7 +52,6 @@ class SnackbarManager @Inject constructor() {
             val buttonTitle = buttonTitleRes ?: RCore.string.buttonCancel
 
             previousSnackbar?.dismiss()
-
             previousSnackbar = showSnackbar(
                 view = view,
                 title = title,

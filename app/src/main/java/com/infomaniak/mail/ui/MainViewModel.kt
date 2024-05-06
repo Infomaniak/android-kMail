@@ -442,21 +442,20 @@ class MainViewModel @Inject constructor(
 
     //region Delete
     fun deleteMessage(threadUid: String, message: Message) {
-        if (shouldWeDeleteOrAchieveThread(threadUid))
-            threadUidToDeleteOrArchive.postValue(listOf(threadUid))
-
-        deleteThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
+        val threadUidsList = listOf(threadUid)
+        if (isMessageTheLastInFolder(threadUid)) threadUidToDeleteOrArchive.postValue(threadUidsList)
+        deleteThreadsOrMessage(threadsUids = threadUidsList, message = message)
     }
 
     fun deleteThread(threadUid: String, isSwipe: Boolean = false) {
         val threadUidList = listOf(threadUid)
-        deleteThreadsOrMessage(threadsUids = threadUidList, isSwipe = isSwipe)
         threadUidToDeleteOrArchive.postValue(threadUidList)
+        deleteThreadsOrMessage(threadsUids = threadUidList, isSwipe = isSwipe)
     }
 
     fun deleteThreads(threadsUids: List<String>) {
-        deleteThreadsOrMessage(threadsUids = threadsUids)
         threadUidToDeleteOrArchive.postValue(threadsUids)
+        deleteThreadsOrMessage(threadsUids = threadsUids)
     }
 
     private fun deleteThreadsOrMessage(
@@ -618,16 +617,14 @@ class MainViewModel @Inject constructor(
 
     //region Archive
     fun archiveMessage(threadUid: String, message: Message) {
-        if (shouldWeDeleteOrAchieveThread(threadUid))
-            threadUidToDeleteOrArchive.postValue(listOf(threadUid))
-
-        archiveThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
+        val threadUidsList = listOf(threadUid)
+        if (isMessageTheLastInFolder(threadUid)) threadUidToDeleteOrArchive.postValue(threadUidsList)
+        archiveThreadsOrMessage(threadsUids = threadUidsList, message = message)
     }
 
     fun archiveThread(threadUid: String) {
         val threadUidsList = listOf(threadUid)
-        if (shouldWeDeleteOrAchieveThread(threadUid)) threadUidToDeleteOrArchive.postValue(threadUidsList)
-
+        threadUidToDeleteOrArchive.postValue(threadUidsList)
         archiveThreadsOrMessage(threadsUids = threadUidsList)
     }
 
@@ -1058,18 +1055,16 @@ class MainViewModel @Inject constructor(
 
         snackbarManager.postValue(appContext.getString(snackbarTitleRes))
     }
-    private fun shouldWeDeleteOrAchieveThread(threadUid: String): Boolean {
-        var howMuchMessageInFolder = 0
-        threadController.getThread(threadUid)?.messages?.forEach {
-            if (it.folderId == currentFolderId)
-                howMuchMessageInFolder++
 
-            if (howMuchMessageInFolder > 1)
-                return false
+    private fun isMessageTheLastInFolder(threadUid: String): Boolean {
+        currentFolderId?.let { folderId ->
+            if (threadController.getMessageCountInThreadForFolder(threadUid, folderId) == 1) {
+                return true
+            }
         }
-
-        return true
+        return false
     }
+
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX

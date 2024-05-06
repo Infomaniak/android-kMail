@@ -166,8 +166,8 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: ThreadListViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-        val payload = payloads.firstOrNull()
 
+        val payload = payloads.firstOrNull()
         if (payload !is NotificationType) {
             super.onBindViewHolder(holder, position, payloads)
             return@runCatchingRealm
@@ -327,21 +327,21 @@ class ThreadListAdapter @Inject constructor(
 
     fun openThreadByPosition(autoAdvanceMode: AutoAdvanceMode, threadDeleteUid: List<String>) {
         if (threadDeleteUid.contains(openedThreadUid)) {
-            val thread: Thread? = openedThreadPosition?.let {
-                println("here start openedThread")
+            val nextThreadData: Pair<Thread, Int>? = openedThreadPosition?.let {
                 getNextThreadToOpenByPosition(it, autoAdvanceMode)
             }
 
-            thread?.let {
-                if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(openedThreadPosition, thread.uid)
-                onThreadClicked?.invoke(it)
+            nextThreadData?.let { (nextThread, indexNextThread) ->
+                if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
+                    selectNewThread(newPosition = indexNextThread, nextThread.uid)
+                }
+
+                onThreadClicked?.invoke(nextThread)
             }
-        } else {
-            println("don't contains")
         }
     }
 
-    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Thread? {
+    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Pair<Thread, Int>? {
         return when (autoAdvanceMode) {
             AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
             AutoAdvanceMode.FOLLOWING_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
@@ -356,18 +356,13 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    private fun getNextThread(startingThreadIndex: Int, direction: Int): Thread? {
-        println("start")
+    private fun getNextThread(startingThreadIndex: Int, direction: Int): Pair<Thread, Int>? {
         var currentIndexThread = startingThreadIndex
         currentIndexThread += direction
-        println("second start $currentIndexThread")
         while (currentIndexThread >= 0 && currentIndexThread <= dataSet.lastIndex) {
-            println("here $currentIndexThread")
             if (dataSet[currentIndexThread] is Thread) {
-                println("found")
-                println("folder ${dataSet[currentIndexThread]}")
                 val thread = dataSet[currentIndexThread] as Thread
-                return dataSet[currentIndexThread] as Thread
+                return thread to currentIndexThread
             }
 
             currentIndexThread += direction

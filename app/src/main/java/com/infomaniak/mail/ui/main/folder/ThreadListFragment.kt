@@ -163,6 +163,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeFlushFolderTrigger()
         observeUpdateInstall()
         observeLoadMoreTriggers()
+        observeArchiveOrDelete()
     }.getOrDefault(Unit)
 
     @ColorRes
@@ -412,10 +413,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 return shouldKeepItem
             }
         }
-
-        mainViewModel.threadUidToDeleteOrArchive.observe(viewLifecycleOwner) {
-            threadListAdapter.openThreadByPosition(localSettings.autoAdvanceMode, it)
-        }
     }
 
     /**
@@ -626,6 +623,12 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                     && !folder.isHistoryComplete
                     && folder.threads.isNotEmpty()
             threadListAdapter.updateLoadMore(shouldDisplayLoadMore)
+        }
+    }
+
+    private fun observeArchiveOrDelete() {
+        mainViewModel.threadUidToDeleteOrArchive.observe(viewLifecycleOwner) {
+            threadListAdapter.openThreadByPosition(localSettings.autoAdvanceMode, it)
         }
     }
 
