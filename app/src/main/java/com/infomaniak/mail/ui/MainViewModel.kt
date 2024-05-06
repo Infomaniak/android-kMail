@@ -579,6 +579,8 @@ class MainViewModel @Inject constructor(
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
+        threadUidToDeleteOrArchive.postValue(threadsUids.toList())
+
         if (apiResponse.isSuccess()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
