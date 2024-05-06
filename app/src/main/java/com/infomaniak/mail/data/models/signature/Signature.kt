@@ -21,9 +21,12 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 class Signature : RealmObject {
+
+    //region Remote data
     @PrimaryKey
     var id: Int = 0
     var name: String = ""
@@ -36,9 +39,14 @@ class Signature : RealmObject {
     var senderEmail: String = ""
     @SerialName("sender_idn")
     var senderEmailIdn: String = ""
-
     @SerialName("reply_to_id")
     var replyToId: Int = 0 /* Required for the update call, do not delete */
     @SerialName("sender_id")
     var senderId: Int = 0 /* Required for the update call, do not delete */
+    //endregion
+
+    //region Local data (Transient)
+    @Transient
+    var isDefaultReply: Boolean = false
+    //endregion
 }

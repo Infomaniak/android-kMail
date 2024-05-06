@@ -60,9 +60,20 @@ object SignatureController {
     //endregion
 
     //region Edit data
-    fun update(apiSignatures: List<Signature>, realm: MutableRealm) {
+    fun update(
+        signatures: List<Signature>,
+        defaultSignatureId: Int?,
+        defaultReplySignatureId: Int?,
+        realm: MutableRealm,
+    ) {
         SentryLog.d(RealmDatabase.TAG, "Signatures: Save new data")
-        realm.update<Signature>(apiSignatures)
+
+        val modifiedSignatures = signatures.toMutableList().apply {
+            firstOrNull { it.id == defaultSignatureId }?.isDefault = true
+            firstOrNull { it.id == defaultReplySignatureId }?.isDefaultReply = true
+        }
+
+        realm.update<Signature>(modifiedSignatures)
     }
     //endregion
 }

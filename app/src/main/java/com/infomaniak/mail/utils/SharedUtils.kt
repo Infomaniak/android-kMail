@@ -157,7 +157,14 @@ class SharedUtils @Inject constructor(
         fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
             with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
                 return if (isSuccess() && data?.signatures?.isNotEmpty() == true) {
-                    customRealm.writeBlocking { SignatureController.update(data!!.signatures, realm = this) }
+                    customRealm.writeBlocking {
+                        SignatureController.update(
+                            signatures = data!!.signatures,
+                            defaultSignatureId = data!!.defaultSignatureId,
+                            defaultReplySignatureId = data!!.defaultReplySignatureId,
+                            realm = this,
+                        )
+                    }
                     null
                 } else {
                     Sentry.withScope { scope ->
