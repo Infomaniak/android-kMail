@@ -67,7 +67,7 @@
         android:label="DownloadAttachmentProgressDialog"
         tools:layout="@layout/dialog_download_progress">
         <argument
-            android:name="attachmentResource"
+            android:name="attachmentLocalUuid"
             app:argType="string" />
         <argument
             android:name="attachmentName"

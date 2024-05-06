@@ -123,7 +123,7 @@ class NewMessageActivity : BaseActivity() {
         super.onStop()
     }
 
-    fun saveDraft() {
+    private fun saveDraft() {
 
         val fragment = getCurrentFragment(R.id.newMessageHostFragment)
 

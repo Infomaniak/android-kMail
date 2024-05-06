@@ -43,8 +43,8 @@ class DownloadAttachmentViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val attachmentResource
-        inline get() = savedStateHandle.get<String>(DownloadAttachmentProgressDialogArgs::attachmentResource.name)!!
+    private val attachmentLocalUuid
+        inline get() = savedStateHandle.get<String>(DownloadAttachmentProgressDialogArgs::attachmentLocalUuid.name)!!
 
     /**
      * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading
@@ -52,10 +52,16 @@ class DownloadAttachmentViewModel @Inject constructor(
     private var attachment: Attachment? = null
 
     fun downloadAttachment() = liveData(ioCoroutineContext) {
-        val localAttachment = attachmentController.getAttachment(attachmentResource).also { attachment = it }
+        val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
         val attachmentFile = localAttachment.getCacheFile(appContext)
-        val isAttachmentCached = localAttachment.hasUsableCache(appContext, attachmentFile) ||
-                LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(attachmentResource, attachmentFile)
+
+
+        var isAttachmentCached = localAttachment.hasUsableCache(appContext, attachmentFile)
+        if (!isAttachmentCached) {
+            isAttachmentCached = localAttachment.resource?.let { resource ->
+                LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(resource, attachmentFile)
+            } ?: false
+        }
 
         if (isAttachmentCached) {
             emit(localAttachment)

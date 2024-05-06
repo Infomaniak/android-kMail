@@ -29,8 +29,8 @@ class AttachmentActionsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val attachmentResource
-        inline get() = savedStateHandle.get<String>(AttachmentActionsBottomSheetDialogArgs::attachmentResource.name)!!
+    private val attachmentLocalUuid
+        inline get() = savedStateHandle.get<String>(AttachmentActionsBottomSheetDialogArgs::attachmentLocalUuid.name)!!
 
-    val attachment = runCatching { attachmentController.getAttachment(attachmentResource) }.getOrNull()
+    val attachment = runCatching { attachmentController.getAttachment(attachmentLocalUuid) }.getOrNull()
 }

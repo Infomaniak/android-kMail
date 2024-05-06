@@ -27,14 +27,14 @@ import javax.inject.Inject
 class AttachmentController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     //region Get data
-    fun getAttachment(resource: String) = getAttachmentQuery(resource, mailboxContentRealm()).find()!!
+    fun getAttachment(localUuid: String) = getAttachmentQuery(localUuid, mailboxContentRealm()).find()!!
     //endregion
 
     companion object {
 
         //region Queries
-        private fun getAttachmentQuery(resource: String, realm: TypedRealm): RealmSingleQuery<Attachment> {
-            return realm.query<Attachment>("${Attachment::resource.name} == $0", resource).first()
+        private fun getAttachmentQuery(localUuid: String, realm: TypedRealm): RealmSingleQuery<Attachment> {
+            return realm.query<Attachment>("${Attachment::localUuid.name} == $0", localUuid).first()
         }
         //endregion
     }

@@ -121,7 +121,7 @@ object AttachmentExtensions {
 
     fun Attachment.createDownloadDialogNavArgs(intentType: AttachmentIntentType): Bundle {
         return DownloadAttachmentProgressDialogArgs(
-            attachmentResource = resource!!,
+            attachmentLocalUuid = localUuid,
             attachmentName = name,
             attachmentType = getFileTypeFromMimeType(),
             intentType = intentType,
