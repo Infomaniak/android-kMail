@@ -211,7 +211,9 @@ class NewMessageViewModel @Inject constructor(
     private fun getExistingDraft(localUuid: String?, realm: Realm): Draft? {
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
-            if (draft.identityId.isNullOrBlank()) draft.identityId = SignatureController.getSignature(realm).id.toString()
+            if (draft.identityId.isNullOrBlank()) {
+                draft.identityId = SignatureController.getSuitableSignatureWithFallback(realm, draftMode)?.id?.toString()
+            }
             if (draft.body.isNotEmpty()) splitSignatureAndQuoteFromBody(draft)
         }
     }
@@ -242,13 +244,16 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
+        val defaultSignature = SignatureController.getSuitableSignature(realm, draftMode)
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
         val signature = if (shouldPreselectSignature) {
-            guessMostFittingSignature(previousMessage!!, signatures)
+            defaultSignature ?: guessMostFittingSignature(previousMessage!!, signatures)
         } else {
-            SignatureController.getSignature(realm)
+            defaultSignature
         }
-        signatureUtils.initSignature(draft = this, signature)
+        (signature ?: SignatureController.getSuitableSignatureWithFallback(realm, draftMode))?.let {
+            signatureUtils.initSignature(draft = this, signature = it)
+        }
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
 
@@ -418,19 +423,15 @@ class NewMessageViewModel @Inject constructor(
         else -> value
     }
 
-    private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature {
-        var defaultSignature: Signature? = null
+    private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature? {
 
-        val signatureEmailsMap = signatures.groupBy { signature ->
-            if (signature.isDefault) defaultSignature = signature
-            signature.senderEmail
-        }
+        val signatureEmailsMap = signatures.groupBy { it.senderEmail }
 
         findSignatureInRecipients(message.to, signatureEmailsMap)?.let { return it }
         findSignatureInRecipients(message.from, signatureEmailsMap)?.let { return it }
         findSignatureInRecipients(message.cc, signatureEmailsMap)?.let { return it }
 
-        return defaultSignature!!
+        return null
     }
 
     private fun findSignatureInRecipients(

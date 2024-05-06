@@ -19,6 +19,8 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.*
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.extensions.update
 import io.realm.kotlin.MutableRealm
@@ -32,8 +34,13 @@ import kotlinx.coroutines.flow.map
 object SignatureController {
 
     //region Queries
-    private fun getDefaultSignatureQuery(realm: TypedRealm): RealmQuery<Signature> {
-        return realm.query("${Signature::isDefault.name} == true")
+    private fun getDefaultSignatureQuery(realm: TypedRealm, draftMode: DraftMode?): RealmQuery<Signature> {
+        val defaultPropertyName = if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
+            Signature::isDefaultReply.name
+        } else {
+            Signature::isDefault.name
+        }
+        return realm.query("$defaultPropertyName == true")
     }
 
     private fun getAllSignaturesQuery(realm: TypedRealm): RealmQuery<Signature> {
@@ -42,12 +49,16 @@ object SignatureController {
     //endregion
 
     //region Get data
-    private fun getDefaultSignature(realm: TypedRealm): Signature? {
-        return getDefaultSignatureQuery(realm).first().find()
+    private fun getDefaultSignature(realm: TypedRealm, draftMode: DraftMode?): Signature? {
+        return getDefaultSignatureQuery(realm, draftMode).first().find()
     }
 
-    fun getSignature(realm: TypedRealm): Signature {
-        return getDefaultSignature(realm) ?: getAllSignaturesQuery(realm).first().find()!!
+    fun getSuitableSignatureWithFallback(realm: TypedRealm, draftMode: DraftMode? = null): Signature? {
+        return getSuitableSignature(realm, draftMode) ?: getAllSignaturesQuery(realm).first().find()
+    }
+
+    fun getSuitableSignature(realm: TypedRealm, draftMode: DraftMode? = null): Signature? {
+        return getDefaultSignature(realm, draftMode)
     }
 
     fun getSignaturesAsync(realm: TypedRealm): Flow<RealmResults<Signature>> {
