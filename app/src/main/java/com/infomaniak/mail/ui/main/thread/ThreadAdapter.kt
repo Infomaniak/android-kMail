@@ -37,8 +37,8 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.humanReadableBinaryBytesCount
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
@@ -462,7 +462,7 @@ class ThreadAdapter(
             attachment.size
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
 
-        return context.humanReadableBinaryBytesCount(totalAttachmentsFileSizeInBytes)
+        return context.formatShortFileSize(totalAttachmentsFileSizeInBytes)
     }
 
     private fun MessageViewHolder.bindContent(message: Message) {

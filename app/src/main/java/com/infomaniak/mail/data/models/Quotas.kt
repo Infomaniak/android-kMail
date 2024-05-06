@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.humanReadableBinaryBytesCount
+import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
@@ -35,8 +35,8 @@ class Quotas : EmbeddedRealmObject {
 
     fun getText(context: Context): String {
 
-        val usedSize = context.humanReadableBinaryBytesCount(size)
-        val maxSize = context.humanReadableBinaryBytesCount(QUOTAS_MAX_SIZE)
+        val usedSize = context.formatShortFileSize(size)
+        val maxSize = context.formatShortFileSize(QUOTAS_MAX_SIZE)
 
         return context.getString(R.string.menuDrawerMailboxStorage, usedSize, maxSize)
     }

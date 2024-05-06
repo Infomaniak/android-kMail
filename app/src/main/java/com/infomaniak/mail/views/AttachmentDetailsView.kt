@@ -24,8 +24,8 @@ import android.widget.LinearLayout
 import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
 import coil.load
+import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.humanReadableBinaryBytesCount
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -65,7 +65,7 @@ class AttachmentDetailsView @JvmOverloads constructor(
 
     fun setDetails(attachment: Attachment) = with(binding) {
         fileName.text = attachment.name
-        fileSize.text = context.humanReadableBinaryBytesCount(attachment.size)
+        fileSize.text = context.formatShortFileSize(attachment.size)
         icon.load(attachment.getFileTypeFromMimeType().icon)
     }
 
