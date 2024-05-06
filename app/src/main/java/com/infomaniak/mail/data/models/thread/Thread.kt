@@ -247,6 +247,8 @@ class Thread : RealmObject {
     }
 
     fun computePreview(): String {
+        if (messages.isEmpty()) return ""
+
         val message = if (folder.role == FolderRole.SENT) {
             messages.lastOrNull { it.folderId == folderId } ?: messages.last()
         } else {
