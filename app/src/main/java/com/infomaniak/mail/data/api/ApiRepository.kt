@@ -98,7 +98,8 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName, signature.id), PUT, Json.encodeToString(signature))
+        val body = mapOf("default_signature_id" to signature.id, "default_reply_signature_id" to null)
+        return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName), PUT, body)
     }
 
     fun getBackups(mailboxHostingId: Int, mailboxName: String): ApiResponse<BackupResult> {
