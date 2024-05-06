@@ -57,6 +57,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
+import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MultipartBody
@@ -164,7 +165,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun saveDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SaveDraftResult> {
 
-        val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
+        val body = getBody(draft)
 
         fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
@@ -176,7 +177,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun sendDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SendDraftResult> {
 
-        val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
+        val body = getBody(draft)
 
         fun postDraft(): ApiResponse<SendDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
@@ -184,6 +185,17 @@ object ApiRepository : ApiRepositoryCore() {
             callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
+    }
+
+    private fun getBody(draft: Draft): String {
+        val updatedDraft = if (draft.identityId == Draft.NO_IDENTITY.toString()) {
+            // When we select no signature, we create a dummy signature
+            // That's why identity ID should be null here to avoid the default value of Signature, which is 0
+            draft.copyFromRealm().apply { identityId = null }
+        } else {
+            draft
+        }
+        return Json.encodeToString(updatedDraft.getJsonRequestBody()).removeEmptyRealmLists()
     }
 
     fun attachmentsToForward(mailboxUuid: String, message: Message): ApiResponse<AttachmentsToForwardResult> {

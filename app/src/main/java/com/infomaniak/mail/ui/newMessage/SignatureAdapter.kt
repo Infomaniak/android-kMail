@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSignatureBinding
@@ -51,18 +52,25 @@ class SignatureAdapter(
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         return (if (convertView == null) inflateAndGetNewBinding(parent) else convertView.tag as ItemSignatureBinding).apply {
-            val signature = getItem(position)
-            fullNameAndName.text = "${signature.senderName} (${signature.name})"
-            emailAddress.text = signature.senderEmailIdn
-
-            val isSelected = selectedSignatureId == signature.id
-            val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
-
-            root.apply {
-                setCardBackgroundColor(context.getColor(backgroundColorRes))
-                setOnClickListener { onClickListener(signature) }
-            }
+            bindSignature(signature = getItem(position))
         }.root
+    }
+
+    private fun ItemSignatureBinding.bindSignature(signature: Signature) {
+        fullNameAndName.text = if (signature.isDummy) {
+            context.getString(R.string.selectSignatureNone)
+        } else {
+            "${signature.senderName} (${signature.name})"
+        }
+        emailAddress.text = signature.senderEmailIdn
+
+        val isSelected = selectedSignatureId == signature.id
+        val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
+
+        root.apply {
+            setCardBackgroundColor(context.getColor(backgroundColorRes))
+            setOnClickListener { onClickListener(signature) }
+        }
     }
 
     override fun getItemViewType(position: Int): Int = 0

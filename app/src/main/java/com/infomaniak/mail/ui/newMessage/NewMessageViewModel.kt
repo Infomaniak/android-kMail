@@ -179,8 +179,16 @@ class NewMessageViewModel @Inject constructor(
 
         runCatching {
 
-            signatures = SignatureController.getAllSignatures(realm).also { signaturesCount = it.count() }
-            if (signatures.isEmpty()) return@runCatching
+            signatures = SignatureController.getAllSignatures(realm).also { signaturesCount = it.count() }.toMutableList().apply {
+                add(
+                    index = 0,
+                    element = Signature().apply {
+                        id = Draft.NO_IDENTITY
+                        isDummy = true
+                        senderEmailIdn = AccountUtils.currentMailboxEmail!!
+                    },
+                )
+            }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
 
@@ -702,7 +710,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun updateBodySignature(signature: Signature) {
-        uiSignatureLiveData.value = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+        uiSignatureLiveData.value = if (signature.isDummy) {
+            null
+        } else {
+            signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+        }
     }
 
     fun executeDraftActionWhenStopping(

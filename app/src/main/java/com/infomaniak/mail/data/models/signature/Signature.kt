@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.signature
 
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -48,5 +49,11 @@ class Signature : RealmObject {
     //region Local data (Transient)
     @Transient
     var isDefaultReply: Boolean = false
+    //endregion
+
+    //region UI data (Transient & Ignore)
+    @Transient
+    @Ignore
+    var isDummy: Boolean = false
     //endregion
 }
