@@ -257,6 +257,7 @@
     <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
     <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
+    <string name="errorFileNameTooLong">File name too long</string>
     <string name="errorFolderDoesNotExist">The folder does not exist</string>
     <string name="errorGetCredentials">Couldn’t get credentials</string>
     <string name="errorInvalidAttachment">Invalid attachment</string>

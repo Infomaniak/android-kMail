@@ -19,17 +19,22 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.net.Uri
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.ui.main.SnackbarManager
 import io.sentry.Sentry
 import okhttp3.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import com.infomaniak.lib.core.R as RCore
 
 object LocalStorageUtils {
 
     private const val ATTACHMENTS_CACHE_DIR = "attachments_cache"
     private const val ATTACHMENTS_UPLOAD_DIR = "attachments_upload"
+    private const val HIDDEN_FILE_NAME = "HIDDEN_FILE_NAME"
+    private const val NAME_TOO_LONG_EXCEPTION = "ENAMETOOLONG"
 
     private inline val Context.attachmentsCacheRootDir get() = File(cacheDir, ATTACHMENTS_CACHE_DIR)
     private inline val Context.attachmentsUploadRootDir get() = File(filesDir, ATTACHMENTS_UPLOAD_DIR)
@@ -103,14 +108,14 @@ object LocalStorageUtils {
         fileName: String,
         draftLocalUuid: String,
         attachmentLocalUuid: String,
+        snackbarManager: SnackbarManager,
     ): File? {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
             val attachmentsUploadDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid)
             attachmentsUploadDir.mkdirs()
             val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_$fileName"
-            File(attachmentsUploadDir, hashedFileName).also { file ->
-                FileOutputStream(file).use(inputStream::copyTo)
-            }
+            
+            return@use getFileToUpload(context, uri, snackbarManager, attachmentsUploadDir, hashedFileName, inputStream)
         } ?: run {
             Sentry.withScope { scope ->
                 scope.setExtra("uri is absolute", uri.isAbsolute.toString())
@@ -120,6 +125,39 @@ object LocalStorageUtils {
             }
             null
         }
+    }
+
+    private fun getFileToUpload(
+        context: Context,
+        uri: Uri,
+        snackbarManager: SnackbarManager,
+        attachmentsUploadDir: File,
+        hashedFileName: String,
+        inputStream: InputStream,
+    ): File? {
+        val file = File(attachmentsUploadDir, hashedFileName)
+        val isSuccess = runCatching {
+            FileOutputStream(file).use(inputStream::copyTo)
+            true
+        }.getOrElse {
+            Sentry.withScope { scope ->
+                scope.setExtra("uri", uri.toString().replace(file.path, HIDDEN_FILE_NAME))
+                val exception = it.message
+                    ?.let { message -> AttachmentMissingFileException(message.replace(file.path, HIDDEN_FILE_NAME)) }
+                    ?: it
+
+                exception.stackTrace = it.stackTrace
+                Sentry.captureException(exception)
+
+                val isNameLong = exception.message?.contains(NAME_TOO_LONG_EXCEPTION) == true
+                val snackbarMessageId = if (isNameLong) R.string.errorFileNameTooLong else RCore.string.errorFileNotFound
+
+                snackbarManager.postValue(context.getString(snackbarMessageId))
+            }
+            false
+        }
+
+        return if (isSuccess) file else null
     }
 
     fun deleteAttachmentUploadDir(
@@ -174,4 +212,6 @@ object LocalStorageUtils {
         return File(directory, "$userId/$mailboxId")
     }
     //endregion
+
+    private class AttachmentMissingFileException(message: String) : Exception(message)
 }

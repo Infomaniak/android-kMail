@@ -52,6 +52,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
@@ -90,6 +91,7 @@ class NewMessageViewModel @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val sharedUtils: SharedUtils,
     private val signatureUtils: SignatureUtils,
+    private val snackbarManager: SnackbarManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
@@ -592,7 +594,14 @@ class NewMessageViewModel @Inject constructor(
         val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null
         val attachment = Attachment()
 
-        return LocalStorageUtils.saveAttachmentToUploadDir(appContext, uri, fileName, draftLocalUuid!!, attachment.localUuid)
+        return LocalStorageUtils.saveAttachmentToUploadDir(
+            appContext,
+            uri,
+            fileName,
+            draftLocalUuid!!,
+            attachment.localUuid,
+            snackbarManager,
+        )
             ?.let { file ->
                 Pair(
                     attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),

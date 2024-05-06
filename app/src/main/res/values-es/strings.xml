@@ -251,6 +251,7 @@
     <string name="errorCorruptAttachment">No se ha podido gestionar el borrador, un archivo adjunto está dañado</string>
     <string name="errorDraftNotFound">No se puede encontrar el borrador</string>
     <string name="errorEditScheduledMessage">Imposible modificar un mensaje programado o enviado</string>
+    <string name="errorFileNameTooLong">Nombre de archivo demasiado largo</string>
     <string name="errorFolderDoesNotExist">La carpeta no existe</string>
     <string name="errorGetCredentials">No se han podido obtener las credenciales</string>
     <string name="errorInvalidAttachment">El adjunto no es válido</string>
