@@ -98,12 +98,15 @@ class Thread : RealmObject {
         get() = run {
             runCatching {
                 _folders.single()
-            }.getOrElse {
+            }.getOrElse { exception ->
                 Sentry.withScope { scope ->
-                    scope.setExtra("folders", "${_folders.map { "name:[${it.role?.name}] (id:[${it.id}])" }}")
+                    scope.setTag("foldersId", _folders.map(Folder::id).joinToString())
+                    scope.setTag("foldersCount", "${_folders.count()}")
                     scope.setExtra("foldersCount", "${_folders.count()}")
+                    scope.setExtra("folders", "${_folders.map { "name:[${it.role?.name}] (id:[${it.id}])" }}")
                     scope.setExtra("threadUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                    scope.setExtra("exception message", exception.message.toString())
                     Sentry.captureMessage("Thread has several or 0 parent folders, it should not be possible", SentryLevel.ERROR)
                 }
                 _folders.first()
