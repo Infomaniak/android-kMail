@@ -390,6 +390,7 @@
     <string name="searchFilterRead">Read</string>
     <string name="searchFilterUnread">Unread</string>
     <string name="searchFolderName">Search</string>
+    <string name="selectSignatureNone">No signature</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>

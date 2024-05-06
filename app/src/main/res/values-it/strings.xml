@@ -155,6 +155,7 @@
     <string name="buttonSchedule">Programmare l’invio di un’e-mail in un secondo momento</string>
     <string name="buttonSee">Vedi</string>
     <string name="buttonSelectAll">Tutti</string>
+    <string name="buttonSendWithDifferentAddress">Invia con un indirizzo diverso</string>
     <string name="buttonShare">Condividi</string>
     <string name="buttonStart">Inizia</string>
     <string name="buttonStartSync">Avvio della sincronizzazione</string>
@@ -172,6 +173,8 @@
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Prossimamente…</string>
     <string name="commercialFolder">Promozioni</string>
+    <string name="composeMailboxCurrentTitle">Invia un messaggio con l’indirizzo :</string>
+    <string name="composeMailboxSelectionTitle">Seleziona l’indirizzo di invio :</string>
     <string name="confirmLogoutDescription">Sei sicuro di volerti disconnettere da %s?</string>
     <string name="confirmLogoutTitle">Disconnettersi</string>
     <string name="contactActionAddToContacts">Aggiungi ai contatti</string>
@@ -263,6 +266,7 @@
     <string name="errorLoginTitle">Errore di accesso</string>
     <string name="errorMailboxLocked">Questo indirizzo e-mail è bloccato</string>
     <string name="errorMailboxPasswordLength">La password deve essere compresa tra 6 e 80 caratteri</string>
+    <string name="errorMailboxUnavailable">Questo indirizzo e-mail non è disponibile</string>
     <string name="errorMoveDestinationNotFound">La cartella di destinazione è inesistente</string>
     <string name="errorNewFolderAlreadyExists">La cartella è già esistente</string>
     <string name="errorNewFolderInvalidCharacter">Il nome della cartella contiene caratteri non validi</string>
@@ -274,6 +278,7 @@
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
     <string name="errorUserAlreadySynchronized">L’utente è già sincronizzato</string>
+    <string name="expeditorAuthenticationDescription">L’origine del mittente è stata autenticata.</string>
     <string name="externalDialogConfirmButton">Capisco</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Il mittente %s non fa parte della vostra organizzazione o dei vostri contatti. Fate attenzione se state condividendo informazioni sensibili.</item>
@@ -363,6 +368,7 @@
     <string name="pickerNoSelection">Nessuna selezione</string>
     <string name="popupDetachMailboxDescription">Sei sicuro di voler staccare l’indirizzo %s?</string>
     <string name="popupDetachMailboxTitle">Staccare l’indirizzo</string>
+    <string name="publicFolderSubtitle">Questo spazio appartiene a %s e centralizza i file condivisi della tua organizzazione.</string>
     <string name="recentSearchesTitle">Ricerche recenti</string>
     <string name="refreshTokenError">Sei stato disconnesso</string>
     <string name="reportDisplayProblemDescription">Accettate di condividere i vostri dati con i nostri sviluppatori in modo che possano aiutarvi a risolvere il vostro problema?</string>
@@ -384,6 +390,7 @@
     <string name="searchFilterRead">Leggi</string>
     <string name="searchFilterUnread">Non letti</string>
     <string name="searchFolderName">Ricerca</string>
+    <string name="selectSignatureNone">Nessuna firma</string>
     <string name="send">Inviare</string>
     <string name="sentFolder">Messaggi inviati</string>
     <string name="settingsAccentColor">Colore d’accento</string>
@@ -391,10 +398,21 @@
     <string name="settingsAiEngineDescription">Selezionare l’assistente di scrittura</string>
     <string name="settingsAppLock">Blocco dell’app</string>
     <string name="settingsAuthorizeTracking">Autorizza il tracciamento</string>
+    <string name="settingsAutoAdvanceDescription">Selezionare cosa visualizzare quando un messaggio viene archiviato o eliminato</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Visualizza la seguente discussione quando si archivia o si elimina\n</string>
+    <string name="settingsAutoAdvanceFollowingThreadTitle">Seguendo il filo conduttore</string>
+    <string name="settingsAutoAdvanceListOfThreadsDescription">Visualizzazione dell’elenco delle discussioni durante l’archiviazione o la cancellazione</string>
+    <string name="settingsAutoAdvanceListOfThreadsTitle">Elenco delle discussioni</string>
+    <string name="settingsAutoAdvanceNaturalThreadDescription">Ripete l’ultima azione eseguita</string>
+    <string name="settingsAutoAdvanceNaturalThreadHint">Seleziona automaticamente la conversazione successiva o precedente, a seconda dell’ultima interazione.</string>
+    <string name="settingsAutoAdvanceNaturalThreadTitle">Ripetere l’ultima azione</string>
+    <string name="settingsAutoAdvancePreviousThreadDescription">Visualizzazione della discussione precedente quando si archivia o si elimina</string>
+    <string name="settingsAutoAdvancePreviousThreadTitle">Filo conduttore precedente</string>
+    <string name="settingsAutoAdvanceTitle">Anticipo auto</string>
     <string name="settingsCancellationPeriodDescription">Avete la possibilità di annullare l’invio della vostra email fino a 30 secondi.</string>
     <string name="settingsCancellationPeriodTitle">Periodo di cancellazione dell’invio</string>
     <string name="settingsDataManagementDescription">È possibile personalizzare i dati di utilizzo e operativi che Infomaniak recupera per correggere i bug e migliorare l’applicazione. Entrambi gli strumenti sono ospitati e gestiti esclusivamente da noi.\n\nInfomaniak rispetta la vostra privacy: il codice sorgente di questa applicazione può essere verificato, le informazioni raccolte sono anonime e i vostri dati personali rimangono strettamente confidenziali e non vengono mai condivisi con terze parti.</string>
-    <string name="settingsDataManagementSourceCode">Vedere il codice sorgente</string>
+    <string name="settingsDataManagementSourceCode">Vedi il codice sorgente</string>
     <string name="settingsDataManagementTitle">Gestione dei dati</string>
     <string name="settingsDefault">Predefinito</string>
     <string name="settingsDelaySeconds">%d secondi</string>
@@ -404,7 +422,7 @@
     <string name="settingsDisabled">Disabili</string>
     <string name="settingsEnabled">Abilitato</string>
     <string name="settingsExternalContentDescription">Visualizzare il contenuto esterno</string>
-    <string name="settingsExternalContentTitle">contenuto esterno</string>
+    <string name="settingsExternalContentTitle">Contenuto esterno</string>
     <string name="settingsInboxAlias">Alias</string>
     <string name="settingsInboxRedirect">Reindirizzamenti</string>
     <string name="settingsInboxRules">Regole</string>
@@ -416,7 +434,7 @@
     <string name="settingsMatomoDescription">Matomo è uno strumento di analisi ospitato e gestito esclusivamente da Infomaniak per capire come viene utilizzata l’applicazione.\n\nStudiando questi dati, il nostro team è in grado di migliorare continuamente l’interfaccia dell’applicazione.</string>
     <string name="settingsMatomoTitle">Matomo</string>
     <string name="settingsOptionAlways">Sempre</string>
-    <string name="settingsOptionAskMe">Chiedetemi</string>
+    <string name="settingsOptionAskMe">Chiedi</string>
     <string name="settingsOptionDarkTheme">Scuro</string>
     <string name="settingsOptionLightTheme">Chiaro</string>
     <string name="settingsOptionSystemTheme">Sistema</string>
