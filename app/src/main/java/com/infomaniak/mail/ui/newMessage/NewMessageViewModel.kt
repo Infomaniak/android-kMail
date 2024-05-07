@@ -179,16 +179,10 @@ class NewMessageViewModel @Inject constructor(
 
         runCatching {
 
-            signatures = SignatureController.getAllSignatures(realm).also { signaturesCount = it.count() }.toMutableList().apply {
-                add(
-                    index = 0,
-                    element = Signature().apply {
-                        id = Draft.NO_IDENTITY
-                        isDummy = true
-                        senderEmailIdn = AccountUtils.currentMailboxEmail!!
-                    },
-                )
-            }
+            signatures = SignatureController.getAllSignatures(realm)
+                .also { signaturesCount = it.count() }
+                .toMutableList()
+                .apply { add(index = 0, element = Signature.getDummySignature()) }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
 

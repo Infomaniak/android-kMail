@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.data.models.signature
 
+import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -56,4 +58,12 @@ class Signature : RealmObject {
     @Ignore
     var isDummy: Boolean = false
     //endregion
+
+    companion object {
+        fun getDummySignature() = Signature().apply {
+            id = Draft.NO_IDENTITY
+            isDummy = true
+            senderEmailIdn = AccountUtils.currentMailboxEmail!!
+        }
+    }
 }
