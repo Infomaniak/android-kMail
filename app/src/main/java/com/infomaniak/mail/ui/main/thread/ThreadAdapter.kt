@@ -22,6 +22,7 @@ import android.net.Uri
 import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
+import android.view.View.OnClickListener
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -349,12 +350,14 @@ class ThreadAdapter(
             shortMessageDate.text = mailFormattedDate(context, messageDate)
         }
 
-        message.sender?.let { recipient ->
-            userAvatar.setOnClickListener {
+        val listener: OnClickListener? = message.sender?.let { recipient ->
+            OnClickListener {
                 context.trackMessageEvent("selectAvatar")
                 threadAdapterCallbacks?.onContactClicked?.invoke(recipient)
             }
         }
+
+        userAvatar.setOnClickListener(listener)
 
         setDetailedFieldsVisibility(message)
 
