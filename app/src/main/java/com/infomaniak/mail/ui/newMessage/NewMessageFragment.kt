@@ -403,10 +403,11 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateSelectedSignatureInFromField(signature: Signature) {
-        val formattedExpeditor = if (newMessageViewModel.signaturesCount <= 1 || signature.isDummy) {
-            signature.senderEmailIdn
-        } else {
-            "${signature.senderName} <${signature.senderEmailIdn}> (${signature.name})"
+        val defaultFormat = "${signature.senderName} <${signature.senderEmailIdn}>"
+        val formattedExpeditor = when {
+            signature.isDummy -> signature.senderEmailIdn
+            newMessageViewModel.signaturesCount > 1 -> "$defaultFormat (${signature.name})"
+            else -> defaultFormat
         }
         binding.fromMailAddress.text = formattedExpeditor
     }
