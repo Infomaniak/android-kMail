@@ -19,7 +19,6 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
@@ -170,10 +169,7 @@ class Message : RealmObject {
             }
         }
 
-    inline val sender
-        get() = from.firstOrNull().also {
-            if (it == null) SentryLog.e("ThreadAdapter", "Message $uid has empty from")
-        }
+    inline val sender get() = from.firstOrNull()
 
     val calendarAttachment: Attachment? get() = if (isDraft) null else attachments.firstOrNull(Attachment::isCalendarEvent)
 
