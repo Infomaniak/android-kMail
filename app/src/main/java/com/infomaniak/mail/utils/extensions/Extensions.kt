@@ -353,7 +353,7 @@ fun DescriptionAlertDialog.deleteWithConfirmationPopup(
     displayLoader: Boolean = true,
     onDismiss: (() -> Unit)? = null,
     callback: () -> Unit,
-) = if (isPermanentDeleteFolder(folderRole)) {
+) = if (isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT) { // We don't want to display the popup for Drafts
     showDeletePermanentlyDialog(count, displayLoader, callback, onDismiss)
 } else {
     callback()
