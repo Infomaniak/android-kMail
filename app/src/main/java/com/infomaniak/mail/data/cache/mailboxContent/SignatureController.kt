@@ -74,12 +74,12 @@ object SignatureController {
     ) {
         SentryLog.d(RealmDatabase.TAG, "Signatures: Save new data")
 
-        val modifiedSignatures = signatures.toMutableList().apply {
+        val updatedSignatures = signatures.toMutableList().apply {
             firstOrNull { it.id == defaultSignatureId }?.isDefault = true
             firstOrNull { it.id == defaultReplySignatureId }?.isDefaultReply = true
         }
 
-        realm.update<Signature>(modifiedSignatures)
+        realm.update<Signature>(updatedSignatures)
     }
     //endregion
 }

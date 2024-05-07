@@ -57,15 +57,17 @@ class SignatureAdapter(
     }
 
     private fun ItemSignatureBinding.bindSignature(signature: Signature) {
+
+        val isSelected = selectedSignatureId == signature.id
+        val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
+
         fullNameAndName.text = if (signature.isDummy) {
             context.getString(R.string.selectSignatureNone)
         } else {
             "${signature.senderName} (${signature.name})"
         }
-        emailAddress.text = signature.senderEmailIdn
 
-        val isSelected = selectedSignatureId == signature.id
-        val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
+        emailAddress.text = signature.senderEmailIdn
 
         root.apply {
             setCardBackgroundColor(context.getColor(backgroundColorRes))
