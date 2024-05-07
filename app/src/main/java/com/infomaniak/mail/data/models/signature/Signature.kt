@@ -56,7 +56,7 @@ class Signature : RealmObject {
     //region UI data (Transient & Ignore)
     @Transient
     @Ignore
-    var isDummy: Boolean = false
+    var isDummy: Boolean = false // The empty Signature to allow the User to not choose any Signature.
     //endregion
 
     companion object {
