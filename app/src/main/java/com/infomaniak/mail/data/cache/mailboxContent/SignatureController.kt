@@ -48,16 +48,12 @@ object SignatureController {
     //endregion
 
     //region Get data
-    private fun getDefaultSignature(realm: TypedRealm, draftMode: DraftMode?): Signature? {
+    fun getDefaultSignatureWithFallback(realm: TypedRealm, draftMode: DraftMode? = null): Signature? {
+        return getDefaultSignature(realm, draftMode) ?: getAllSignaturesQuery(realm).first().find()
+    }
+
+    fun getDefaultSignature(realm: TypedRealm, draftMode: DraftMode? = null): Signature? {
         return getDefaultSignatureQuery(realm, draftMode).first().find()
-    }
-
-    fun getSuitableSignatureWithFallback(realm: TypedRealm, draftMode: DraftMode? = null): Signature? {
-        return getSuitableSignature(realm, draftMode) ?: getAllSignaturesQuery(realm).first().find()
-    }
-
-    fun getSuitableSignature(realm: TypedRealm, draftMode: DraftMode? = null): Signature? {
-        return getDefaultSignature(realm, draftMode)
     }
 
     fun getSignaturesAsync(realm: TypedRealm): Flow<RealmResults<Signature>> {

@@ -220,7 +220,7 @@ class NewMessageViewModel @Inject constructor(
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
             if (draft.identityId.isNullOrBlank()) {
-                draft.identityId = SignatureController.getSuitableSignatureWithFallback(realm, draftMode)?.id?.toString()
+                draft.identityId = SignatureController.getDefaultSignatureWithFallback(realm, draftMode)?.id?.toString()
             }
             if (draft.body.isNotEmpty()) splitSignatureAndQuoteFromBody(draft)
         }
@@ -252,14 +252,14 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        val defaultSignature = SignatureController.getSuitableSignature(realm, draftMode)
+        val defaultSignature = SignatureController.getDefaultSignature(realm, draftMode)
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
         val signature = if (shouldPreselectSignature) {
             defaultSignature ?: guessMostFittingSignature(previousMessage!!, signatures)
         } else {
             defaultSignature
         }
-        (signature ?: SignatureController.getSuitableSignatureWithFallback(realm, draftMode))?.let {
+        (signature ?: SignatureController.getDefaultSignatureWithFallback(realm, draftMode))?.let {
             signatureUtils.initSignature(draft = this, signature = it)
         }
 
