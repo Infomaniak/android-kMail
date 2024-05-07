@@ -429,11 +429,9 @@ class NewMessageViewModel @Inject constructor(
 
         val signatureEmailsMap = signatures.groupBy { it.senderEmail }
 
-        findSignatureInRecipients(message.to, signatureEmailsMap)?.let { return it }
-        findSignatureInRecipients(message.from, signatureEmailsMap)?.let { return it }
-        findSignatureInRecipients(message.cc, signatureEmailsMap)?.let { return it }
-
-        return null
+        return findSignatureInRecipients(message.to, signatureEmailsMap)
+            ?: findSignatureInRecipients(message.from, signatureEmailsMap)
+            ?: findSignatureInRecipients(message.cc, signatureEmailsMap)
     }
 
     private fun findSignatureInRecipients(
