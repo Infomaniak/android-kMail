@@ -110,7 +110,7 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
 
-    val threadUidsToDeleteOrArchive = MutableLiveData<List<String>>()
+    val autoAdvanceTrigger = MutableLiveData<List<String>>()
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
@@ -442,19 +442,14 @@ class MainViewModel @Inject constructor(
 
     //region Delete
     fun deleteMessage(threadUid: String, message: Message) {
-        val threadUidsList = listOf(threadUid)
-        if (threadHasOnlyOneMessageLeftInCurrentFolder(threadUid)) threadUidsToDeleteOrArchive.postValue(threadUidsList)
-        deleteThreadsOrMessage(threadsUids = threadUidsList, message = message)
+        deleteThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
     }
 
     fun deleteThread(threadUid: String, isSwipe: Boolean = false) {
-        val threadUidList = listOf(threadUid)
-        threadUidsToDeleteOrArchive.postValue(threadUidList)
-        deleteThreadsOrMessage(threadsUids = threadUidList, isSwipe = isSwipe)
+        deleteThreadsOrMessage(threadsUids = listOf(threadUid), isSwipe = isSwipe)
     }
 
     fun deleteThreads(threadsUids: List<String>) {
-        threadUidsToDeleteOrArchive.postValue(threadsUids)
         deleteThreadsOrMessage(threadsUids = threadsUids)
     }
 
@@ -484,6 +479,12 @@ class MainViewModel @Inject constructor(
 
         deleteThreadOrMessageTrigger.postValue(Unit)
         if (apiResponse.isSuccess()) {
+            if (message == null) {
+                autoAdvanceTrigger.postValue(threadsUids)
+            } else if (threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())) {
+                autoAdvanceTrigger.postValue(threadsUids)
+            }
+
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = trashId),
@@ -577,9 +578,9 @@ class MainViewModel @Inject constructor(
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
-        threadUidsToDeleteOrArchive.postValue(threadsUids.toList())
-
         if (apiResponse.isSuccess()) {
+            autoAdvanceTrigger.postValue(threadsUids.toList())
+
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
@@ -616,19 +617,14 @@ class MainViewModel @Inject constructor(
 
     //region Archive
     fun archiveMessage(threadUid: String, message: Message) {
-        val threadUidsList = listOf(threadUid)
-        if (threadHasOnlyOneMessageLeftInCurrentFolder(threadUid)) threadUidsToDeleteOrArchive.postValue(threadUidsList)
-        archiveThreadsOrMessage(threadsUids = threadUidsList, message = message)
+        archiveThreadsOrMessage(listOf(threadUid), message = message)
     }
 
     fun archiveThread(threadUid: String) {
-        val threadUidsList = listOf(threadUid)
-        threadUidsToDeleteOrArchive.postValue(threadUidsList)
-        archiveThreadsOrMessage(threadsUids = threadUidsList)
+        archiveThreadsOrMessage(listOf(threadUid))
     }
 
     fun archiveThreads(threadsUids: List<String>) {
-        threadUidsToDeleteOrArchive.postValue(threadsUids)
         archiveThreadsOrMessage(threadsUids = threadsUids)
     }
 
@@ -650,6 +646,12 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
+            if (message == null) {
+                autoAdvanceTrigger.postValue(threadsUids)
+            } else if (threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())) {
+                autoAdvanceTrigger.postValue(threadsUids)
+            }
+
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
             refreshFoldersAsync(
                 mailbox = mailbox,

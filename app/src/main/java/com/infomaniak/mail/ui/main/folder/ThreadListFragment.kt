@@ -627,10 +627,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     private fun observeClosedThread() {
-        mainViewModel.threadUidsToDeleteOrArchive.observe(viewLifecycleOwner) { listThreadsUids ->
-            if(!listThreadsUids.contains(threadListAdapter.openedThreadUid))
-                return@observe
-            threadListAdapter.openThreadByPosition(localSettings.autoAdvanceMode)
+        mainViewModel.autoAdvanceTrigger.observe(viewLifecycleOwner) { listThreadsUids ->
+            threadListAdapter.tryToAutoAdvance(localSettings.autoAdvanceMode, listThreadsUids)
         }
     }
 

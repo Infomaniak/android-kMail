@@ -102,8 +102,7 @@ class ThreadListAdapter @Inject constructor(
     //region Tablet mode
     var openedThreadPosition: Int? = null
         private set
-    var openedThreadUid: String? = null
-        private set
+    private var openedThreadUid: String? = null
     //endregion
 
     init {
@@ -219,19 +218,7 @@ class ThreadListAdapter @Inject constructor(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        selectionCardView.setOnClickListener {
-            previousThreadClickedPosition?.let { previousThreadClickedPosition ->
-                if (position > previousThreadClickedPosition) {
-                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.FOLLOWING_THREAD
-                } else {
-                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.PREVIOUS_THREAD
-                }
-            }
-
-            previousThreadClickedPosition = position
-
-            onThreadClicked(thread, position)
-        }
+        selectionCardView.setOnClickListener { onThreadClicked(thread, position) }
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
@@ -338,7 +325,9 @@ class ThreadListAdapter @Inject constructor(
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
     }
 
-    fun openThreadByPosition(autoAdvanceMode: AutoAdvanceMode) {
+    fun tryToAutoAdvance(autoAdvanceMode: AutoAdvanceMode, listThreadUids : List<String>) {
+        if (!listThreadUids.contains(openedThreadUid)) return
+
         openedThreadPosition?.let {
             val (nextThread, indexNextThread) = getNextThreadToOpenByPosition(it, autoAdvanceMode) ?: return@let
             if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
