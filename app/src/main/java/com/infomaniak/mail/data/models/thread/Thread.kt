@@ -100,7 +100,7 @@ class Thread : RealmObject {
                 _folders.single()
             }.getOrElse { exception ->
                 Sentry.withScope { scope ->
-                    scope.setTag("foldersId", _folders.map(Folder::id).joinToString())
+                    scope.setTag("foldersId", _folders.joinToString { it.id })
                     scope.setTag("foldersCount", "${_folders.count()}")
                     scope.setExtra("foldersCount", "${_folders.count()}")
                     scope.setExtra("folders", "${_folders.map { "name:[${it.role?.name}] (id:[${it.id}])" }}")
