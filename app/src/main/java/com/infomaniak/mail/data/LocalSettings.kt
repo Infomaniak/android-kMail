@@ -193,7 +193,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         ASK_ME("false", R.string.settingsOptionAskMe, "askMe"),
     }
 
-    enum class AutoAdvanceMode(val id: String, @StringRes val localisedNameRes: Int) {
+    enum class AutoAdvanceMode(val matomoValue: String, @StringRes val localisedNameRes: Int) {
         PREVIOUS_THREAD("previousThread", R.string.settingsAutoAdvancePreviousThreadDescription),
         FOLLOWING_THREAD("followingThread", R.string.settingsAutoAdvanceFollowingThreadDescription),
         LIST_THREAD("listOfThread", R.string.settingsAutoAdvanceListOfThreadsDescription),
