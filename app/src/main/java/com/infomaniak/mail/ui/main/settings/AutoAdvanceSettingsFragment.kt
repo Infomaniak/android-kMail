@@ -21,11 +21,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackAutoAdvanceEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.AutoAdvanceMode
 import com.infomaniak.mail.databinding.FragmentAutoAdvanceSettingsBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,22 +50,22 @@ class AutoAdvanceSettingsFragment : Fragment() {
         setSystemBarsColors()
 
         radioGroup.initBijectionTable(
-            R.id.lastAction to LocalSettings.AutoAdvanceMode.NATURAL_THREAD,
-            R.id.nextThread to LocalSettings.AutoAdvanceMode.FOLLOWING_THREAD,
-            R.id.listThread to LocalSettings.AutoAdvanceMode.LIST_THREAD,
-            R.id.lastThread to LocalSettings.AutoAdvanceMode.PREVIOUS_THREAD,
+            R.id.lastAction to AutoAdvanceMode.NATURAL_THREAD,
+            R.id.nextThread to AutoAdvanceMode.FOLLOWING_THREAD,
+            R.id.listThread to AutoAdvanceMode.LIST_THREAD,
+            R.id.lastThread to AutoAdvanceMode.PREVIOUS_THREAD,
         )
 
         radioGroup.check(localSettings.autoAdvanceMode)
 
         radioGroup.onItemCheckedListener { _, _, autoAdvanceMode ->
-            chooseAutoAdvanceMode(autoAdvanceMode as LocalSettings.AutoAdvanceMode)
-            lastAction.setSubTextVisibility(if (autoAdvanceMode == LocalSettings.AutoAdvanceMode.NATURAL_THREAD) View.VISIBLE else View.GONE)
+            chooseAutoAdvanceMode(autoAdvanceMode as AutoAdvanceMode)
+            descriptionLastAction.isVisible = autoAdvanceMode == AutoAdvanceMode.NATURAL_THREAD
             trackAutoAdvanceEvent(autoAdvanceMode.id)
         }
     }
 
-    private fun chooseAutoAdvanceMode(autoAdvanceMode: LocalSettings.AutoAdvanceMode) {
+    private fun chooseAutoAdvanceMode(autoAdvanceMode: AutoAdvanceMode) {
         localSettings.autoAdvanceMode = autoAdvanceMode
     }
 }

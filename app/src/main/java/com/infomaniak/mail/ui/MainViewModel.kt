@@ -110,7 +110,7 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
 
-    val threadUidToDeleteOrArchive = MutableLiveData<List<String>>()
+    val threadUidsToDeleteOrArchive = MutableLiveData<List<String>>()
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
@@ -443,18 +443,18 @@ class MainViewModel @Inject constructor(
     //region Delete
     fun deleteMessage(threadUid: String, message: Message) {
         val threadUidsList = listOf(threadUid)
-        if (isMessageTheLastInFolder(threadUid)) threadUidToDeleteOrArchive.postValue(threadUidsList)
+        if (threadHasOnlyOneMessageLeftInCurrentFolder(threadUid)) threadUidsToDeleteOrArchive.postValue(threadUidsList)
         deleteThreadsOrMessage(threadsUids = threadUidsList, message = message)
     }
 
     fun deleteThread(threadUid: String, isSwipe: Boolean = false) {
         val threadUidList = listOf(threadUid)
-        threadUidToDeleteOrArchive.postValue(threadUidList)
+        threadUidsToDeleteOrArchive.postValue(threadUidList)
         deleteThreadsOrMessage(threadsUids = threadUidList, isSwipe = isSwipe)
     }
 
     fun deleteThreads(threadsUids: List<String>) {
-        threadUidToDeleteOrArchive.postValue(threadsUids)
+        threadUidsToDeleteOrArchive.postValue(threadsUids)
         deleteThreadsOrMessage(threadsUids = threadsUids)
     }
 
@@ -506,7 +506,6 @@ class MainViewModel @Inject constructor(
             undoDestinationId,
             threads.count(),
         )
-
     }
 
     private fun showDeleteSnackbar(
@@ -578,7 +577,7 @@ class MainViewModel @Inject constructor(
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
-        threadUidToDeleteOrArchive.postValue(threadsUids.toList())
+        threadUidsToDeleteOrArchive.postValue(threadsUids.toList())
 
         if (apiResponse.isSuccess()) {
             refreshFoldersAsync(
@@ -618,18 +617,18 @@ class MainViewModel @Inject constructor(
     //region Archive
     fun archiveMessage(threadUid: String, message: Message) {
         val threadUidsList = listOf(threadUid)
-        if (isMessageTheLastInFolder(threadUid)) threadUidToDeleteOrArchive.postValue(threadUidsList)
+        if (threadHasOnlyOneMessageLeftInCurrentFolder(threadUid)) threadUidsToDeleteOrArchive.postValue(threadUidsList)
         archiveThreadsOrMessage(threadsUids = threadUidsList, message = message)
     }
 
     fun archiveThread(threadUid: String) {
         val threadUidsList = listOf(threadUid)
-        threadUidToDeleteOrArchive.postValue(threadUidsList)
+        threadUidsToDeleteOrArchive.postValue(threadUidsList)
         archiveThreadsOrMessage(threadsUids = threadUidsList)
     }
 
     fun archiveThreads(threadsUids: List<String>) {
-        threadUidToDeleteOrArchive.postValue(threadsUids)
+        threadUidsToDeleteOrArchive.postValue(threadsUids)
         archiveThreadsOrMessage(threadsUids = threadsUids)
     }
 
@@ -637,7 +636,6 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         message: Message? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-
         val mailbox = currentMailbox.value!!
         val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
 
@@ -659,7 +657,6 @@ class MainViewModel @Inject constructor(
                 destinationFolderId = destinationFolder.id,
                 callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
-
         }
 
         showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
@@ -1056,19 +1053,15 @@ class MainViewModel @Inject constructor(
         snackbarManager.postValue(appContext.getString(snackbarTitleRes))
     }
 
-    private fun isMessageTheLastInFolder(threadUid: String): Boolean {
-        currentFolderId?.let { folderId ->
-            if (threadController.getMessageCountInThreadForFolder(threadUid, folderId) == 1) {
-                return true
-            }
-        }
-        return false
+    private fun threadHasOnlyOneMessageLeftInCurrentFolder(threadUid: String): Boolean {
+        val folderId = currentFolderId ?: return false
+        return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
     }
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
-        private const val REFRESH_DELAY = 2_000L // We add this delay because it doesn't always work if we just use the `etop`.
+        private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
     }
 }

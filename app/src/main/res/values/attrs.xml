@@ -101,7 +101,6 @@
     <declare-styleable name="SettingRadioButtonView">
         <attr name="icon" />
         <attr name="text" />
-        <attr name="subText" format="string"/>
         <attr name="checkMarkColor" format="color" />
         <attr name="value" format="string" />
     </declare-styleable>

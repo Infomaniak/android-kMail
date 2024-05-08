@@ -398,8 +398,8 @@
     <string name="settingsAiEngineDescription">Select your AI writing assistant</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsAuthorizeTracking">Authorize tracking</string>
-    <string name="settingsAutoAdvanceDescription">Select what to display when a message is archived or deleted\u0020</string>
-    <string name="settingsAutoAdvanceFollowingThreadDescription">Display following thread when archiving or deleting\n</string>
+    <string name="settingsAutoAdvanceDescription">Select what to display when a message is archived or deleted</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Display following thread when archiving or deleting</string>
     <string name="settingsAutoAdvanceFollowingThreadTitle">Following thread</string>
     <string name="settingsAutoAdvanceListOfThreadsDescription">Display list of threads when archiving or deleting</string>
     <string name="settingsAutoAdvanceListOfThreadsTitle">List of threads</string>

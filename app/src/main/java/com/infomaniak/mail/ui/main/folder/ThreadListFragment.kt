@@ -163,7 +163,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeFlushFolderTrigger()
         observeUpdateInstall()
         observeLoadMoreTriggers()
-        observeArchiveOrDelete()
+        observeClosedThread()
     }.getOrDefault(Unit)
 
     @ColorRes
@@ -626,9 +626,11 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         }
     }
 
-    private fun observeArchiveOrDelete() {
-        mainViewModel.threadUidToDeleteOrArchive.observe(viewLifecycleOwner) {
-            threadListAdapter.openThreadByPosition(localSettings.autoAdvanceMode, it)
+    private fun observeClosedThread() {
+        mainViewModel.threadUidsToDeleteOrArchive.observe(viewLifecycleOwner) { listThreadsUids ->
+            if(!listThreadsUids.contains(threadListAdapter.openedThreadUid))
+                return@observe
+            threadListAdapter.openThreadByPosition(localSettings.autoAdvanceMode)
         }
     }
 

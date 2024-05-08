@@ -40,6 +40,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
@@ -100,7 +101,9 @@ class ThreadListAdapter @Inject constructor(
 
     //region Tablet mode
     var openedThreadPosition: Int? = null
-    private var openedThreadUid: String? = null
+        private set
+    var openedThreadUid: String? = null
+        private set
     //endregion
 
     init {
@@ -218,9 +221,9 @@ class ThreadListAdapter @Inject constructor(
 
         selectionCardView.setOnClickListener {
             previousThreadClickedPosition?.let { previousThreadClickedPosition ->
-                if (position < previousThreadClickedPosition) {
+                if (position > previousThreadClickedPosition) {
                     localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.FOLLOWING_THREAD
-                } else if (position > previousThreadClickedPosition) {
+                } else {
                     localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.PREVIOUS_THREAD
                 }
             }
@@ -325,19 +328,14 @@ class ThreadListAdapter @Inject constructor(
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
     }
 
-    fun openThreadByPosition(autoAdvanceMode: AutoAdvanceMode, threadDeleteUid: List<String>) {
-        if (threadDeleteUid.contains(openedThreadUid)) {
-            val nextThreadData: Pair<Thread, Int>? = openedThreadPosition?.let {
-                getNextThreadToOpenByPosition(it, autoAdvanceMode)
+    fun openThreadByPosition(autoAdvanceMode: AutoAdvanceMode) {
+        openedThreadPosition?.let {
+            val (nextThread, indexNextThread) = getNextThreadToOpenByPosition(it, autoAdvanceMode) ?: return@let
+            if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
+                selectNewThread(newPosition = indexNextThread, nextThread.uid)
             }
 
-            nextThreadData?.let { (nextThread, indexNextThread) ->
-                if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
-                    selectNewThread(newPosition = indexNextThread, nextThread.uid)
-                }
-
-                onThreadClicked?.invoke(nextThread)
-            }
+            onThreadClicked?.invoke(nextThread)
         }
     }
 
@@ -622,7 +620,7 @@ class ThreadListAdapter @Inject constructor(
         return getItemViewType(position) == DisplayType.THREAD.layout && swipingIsAuthorized
     }
 
-    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>) = null
+    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>, lifecycleScope: LifecycleCoroutineScope) {
 
@@ -734,8 +732,8 @@ class ThreadListAdapter @Inject constructor(
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
 
-        private const val PREVIOUS_CHRONOLOGICAL_THREAD = 1
-        private const val NEXT_CHRONOLOGICAL_THREAD = -1
+        private const val PREVIOUS_CHRONOLOGICAL_THREAD = -1
+        private const val NEXT_CHRONOLOGICAL_THREAD = 1
     }
 
     class ThreadListViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {

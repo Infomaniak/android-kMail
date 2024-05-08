@@ -71,11 +71,6 @@ class ThreadController @Inject constructor(
         return getThreadQuery(uid, mailboxContentRealm()).asFlow()
     }
 
-    fun getMessageCountInThreadForFolder(threadUid: String, folderId : String) : Int{
-        return getThreadQuery(threadUid, mailboxContentRealm()).find()?.messages?.query("${Message::folderId.name} == $0", folderId)?.count()
-            ?.find()?.toInt() ?: -1
-    }
-
     /**
      * Initialize and retrieve the search Threads obtained from the API.
      * - Format the remote threads to make them compatible with the existing logic.

@@ -44,16 +44,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="Simple messages" />
-
-        <TextView
-            android:id="@+id/subText"
-            style="@style/BodySmall.Tertiary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:text="@string/settingsDefault"
-            tools:visibility="visible"
-            android:paddingTop="@dimen/marginStandardVerySmall"/>
     </LinearLayout>
 
     <ImageView

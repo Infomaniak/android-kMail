@@ -39,40 +39,53 @@
             <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
                 android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:ignoreDividers="true">
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/lastThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:text="@string/settingsAutoAdvancePreviousThreadTitle"
-                    app:value="lastThread"/>
+                    app:value="lastThread" />
+
+                <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/nextThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:text="@string/settingsAutoAdvanceFollowingThreadTitle"
-                    app:value="nextThread"/>
+                    app:value="nextThread" />
+
+                <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/listThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:text="@string/settingsAutoAdvanceListOfThreadsTitle"
-                    app:value="listThread"/>
+                    app:value="listThread" />
+
+                <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/lastAction"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:subText="@string/settingsAutoAdvanceNaturalThreadHint"
                     app:text="@string/settingsAutoAdvanceNaturalThreadTitle"
-                    app:value="lastAction"/>
+                    app:value="lastAction" />
 
+                <TextView
+                    android:id="@+id/descriptionLastAction"
+                    style="@style/BodySmall.Tertiary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/marginStandardMedium"
+                    android:paddingEnd="@dimen/marginStandardMedium"
+                    android:text="@string/settingsAutoAdvanceNaturalThreadHint" />
 
             </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>

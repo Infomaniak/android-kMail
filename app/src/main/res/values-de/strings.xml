@@ -393,7 +393,7 @@
     <string name="settingsAppLock">App-Sperre</string>
     <string name="settingsAuthorizeTracking">Verfolgung genehmigen</string>
     <string name="settingsAutoAdvanceDescription">Auswählen, was angezeigt werden soll, wenn eine Nachricht archiviert oder gelöscht wird</string>
-    <string name="settingsAutoAdvanceFollowingThreadDescription">Beim Archivieren oder Löschen folgenden Thread anzeigen\n</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Beim Archivieren oder Löschen folgenden Thread anzeigen</string>
     <string name="settingsAutoAdvanceFollowingThreadTitle">Folgender Thread</string>
     <string name="settingsAutoAdvanceListOfThreadsDescription">Liste der Threads beim Archivieren oder Löschen anzeigen</string>
     <string name="settingsAutoAdvanceListOfThreadsTitle">Liste der Themen</string>
