@@ -37,6 +37,7 @@ android {
         // buildConfigField 'String', 'MAIL_API_PREPROD', '"https://mail.preprod.dev.infomaniak.ch"'
         buildConfigField 'String', 'SHOP_URL', '"https://ik.me"'
         buildConfigField 'String', 'CHATBOT_URL', '"https://www.infomaniak.com/chatbot"'
+        buildConfigField 'String', 'MANAGE_SIGNATURES_URL', '"https://mail.infomaniak.com/0/settings/signatures"'
 
         buildConfigField 'String', 'BUGTRACKER_MAIL_BUCKET_ID', '"app_mail"'
         buildConfigField 'String', 'BUGTRACKER_MAIL_PROJECT_NAME', '"mail"'

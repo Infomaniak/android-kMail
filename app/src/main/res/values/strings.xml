@@ -306,6 +306,7 @@
         <item quantity="one">Blocked mailbox</item>
         <item quantity="other">Blocked mailboxes</item>
     </plurals>
+    <string name="manageSignatures">Manage my signatures</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
     <string name="messageDetailsDateAt">%1$s at %2$s</string>

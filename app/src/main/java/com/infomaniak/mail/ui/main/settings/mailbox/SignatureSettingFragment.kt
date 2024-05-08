@@ -24,7 +24,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
@@ -49,6 +51,10 @@ class SignatureSettingFragment : Fragment() {
         setSystemBarsColors()
 
         setupAdapter(mailbox)
+
+        binding.manageSignatures.setOnClickListener {
+            requireContext().openUrl(BuildConfig.MANAGE_SIGNATURES_URL)
+        }
 
         updateSignatures()
 

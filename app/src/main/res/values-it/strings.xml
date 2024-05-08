@@ -300,6 +300,7 @@
         <item quantity="one">Indirizzo e-mail bloccato</item>
         <item quantity="other">Indirizzi e-mail bloccati</item>
     </plurals>
+    <string name="manageSignatures">Gestire le mie firme</string>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>
     <string name="messageDetailsDateAt">%1$s alle %2$s</string>

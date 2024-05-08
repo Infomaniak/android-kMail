@@ -306,6 +306,7 @@
         <item quantity="other">Adresses mail bloquées</item>
         <item quantity="many">Adresses mail bloquées</item>
     </plurals>
+    <string name="manageSignatures">Gérer mes signatures</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
     <string name="messageDetailsDateAt">%1$s à %2$s</string>
