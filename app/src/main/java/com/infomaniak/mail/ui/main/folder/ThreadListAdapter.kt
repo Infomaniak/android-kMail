@@ -310,6 +310,16 @@ class ThreadListAdapter @Inject constructor(
         if (multiSelection?.isEnabled == true) {
             toggleMultiSelectedThread(thread)
         } else {
+            previousThreadClickedPosition?.let { previousThreadClickedPosition ->
+                if (position > previousThreadClickedPosition) {
+                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.FOLLOWING_THREAD
+                } else {
+                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.PREVIOUS_THREAD
+                }
+            }
+
+            previousThreadClickedPosition = position
+
             onThreadClicked?.invoke(thread)
             // If the Thread is `onlyOneDraft`, we'll directly navigate to the NewMessageActivity.
             // It means that we won't go to the ThreadFragment, so there's no need to select anything.
