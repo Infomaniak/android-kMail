@@ -299,11 +299,11 @@ class ThreadListAdapter @Inject constructor(
         if (multiSelection?.isEnabled == true) {
             toggleMultiSelectedThread(thread)
         } else {
-            previousThreadClickedPosition?.let { previousThreadClickedPosition ->
-                if (position > previousThreadClickedPosition) {
-                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.FOLLOWING_THREAD
+            previousThreadClickedPosition?.let {
+                localSettings.autoAdvanceIntelligentMode = if (position > it) {
+                    AutoAdvanceMode.FOLLOWING_THREAD
                 } else {
-                    localSettings.autoAdvanceIntelligentMode = AutoAdvanceMode.PREVIOUS_THREAD
+                    AutoAdvanceMode.PREVIOUS_THREAD
                 }
             }
 
@@ -317,6 +317,7 @@ class ThreadListAdapter @Inject constructor(
     }
 
     fun selectNewThread(newPosition: Int?, threadUid: String?) {
+
         val oldPosition = openedThreadPosition
 
         openedThreadPosition = newPosition

@@ -55,7 +55,6 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 associatedValue = getString(R.styleable.SettingRadioButtonView_value)
 
                 setIcon(iconDrawable)
-
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
 

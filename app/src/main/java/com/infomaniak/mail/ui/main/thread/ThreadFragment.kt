@@ -467,7 +467,6 @@ class ThreadFragment : Fragment() {
 
     private fun observeClosedThread() {
         mainViewModel.autoAdvanceTrigger.observe(viewLifecycleOwner) { listThreadsUids ->
-            println("called")
             tryToAutoAdvance(localSettings.autoAdvanceMode, listThreadsUids)
         }
     }
@@ -631,22 +630,6 @@ class ThreadFragment : Fragment() {
         twoPaneViewModel.navArgs.value = NavData(resId, args)
     }
 
-    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Pair<Thread, Int>? =
-        with(twoPaneFragment.threadListAdapter) {
-            return when (autoAdvanceMode) {
-                AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
-                AutoAdvanceMode.FOLLOWING_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
-                AutoAdvanceMode.LIST_THREAD -> null
-                AutoAdvanceMode.NATURAL_THREAD -> {
-                    if (localSettings.autoAdvanceIntelligentMode == AutoAdvanceMode.PREVIOUS_THREAD) {
-                        getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
-                    } else {
-                        getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
-                    }
-                }
-            }
-        }
-
     private fun tryToAutoAdvance(autoAdvanceMode: AutoAdvanceMode, listThreadUids: List<String>) =
         with(twoPaneFragment.threadListAdapter) {
             if (!listThreadUids.contains(openedThreadUid)) return@with
@@ -661,6 +644,22 @@ class ThreadFragment : Fragment() {
                     onThreadClicked?.invoke(nextThread)
                 } ?: run {
                     twoPaneViewModel.closeThread()
+                }
+            }
+        }
+
+    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Pair<Thread, Int>? =
+        with(twoPaneFragment.threadListAdapter) {
+            return when (autoAdvanceMode) {
+                AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
+                AutoAdvanceMode.FOLLOWING_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
+                AutoAdvanceMode.LIST_THREAD -> null
+                AutoAdvanceMode.NATURAL_THREAD -> {
+                    if (localSettings.autoAdvanceIntelligentMode == AutoAdvanceMode.PREVIOUS_THREAD) {
+                        getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
+                    } else {
+                        getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
+                    }
                 }
             }
         }

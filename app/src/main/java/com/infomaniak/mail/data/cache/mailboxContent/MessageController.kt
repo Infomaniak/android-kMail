@@ -205,7 +205,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         fun getNewestMessages(folderId: String, limit: Int, realm: MutableRealm): List<Message> {
             return getOldestOrNewestMessagesQuery(folderId, Sort.DESCENDING, realm, limit).find()
         }
-
         //endregion
 
         //region Edit data

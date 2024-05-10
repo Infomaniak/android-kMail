@@ -617,11 +617,11 @@ class MainViewModel @Inject constructor(
 
     //region Archive
     fun archiveMessage(threadUid: String, message: Message) {
-        archiveThreadsOrMessage(listOf(threadUid), message = message)
+        archiveThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
     }
 
     fun archiveThread(threadUid: String) {
-        archiveThreadsOrMessage(listOf(threadUid))
+        archiveThreadsOrMessage(threadsUids = listOf(threadUid))
     }
 
     fun archiveThreads(threadsUids: List<String>) {
