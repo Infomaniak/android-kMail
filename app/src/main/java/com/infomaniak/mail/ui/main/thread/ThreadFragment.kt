@@ -50,11 +50,13 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.AutoAdvanceMode
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
@@ -145,6 +147,7 @@ class ThreadFragment : Fragment() {
         observeCurrentFolderName()
 
         observeThreadOpening()
+        observeClosedThread()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -462,6 +465,13 @@ class ThreadFragment : Fragment() {
         }
     }
 
+    private fun observeClosedThread() {
+        mainViewModel.autoAdvanceTrigger.observe(viewLifecycleOwner) { listThreadsUids ->
+            println("called")
+            tryToAutoAdvance(localSettings.autoAdvanceMode, listThreadsUids)
+        }
+    }
+
     private fun displayThreadView() = with(binding) {
         emptyView.isGone = true
         threadView.isVisible = true
@@ -621,6 +631,40 @@ class ThreadFragment : Fragment() {
         twoPaneViewModel.navArgs.value = NavData(resId, args)
     }
 
+    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Pair<Thread, Int>? =
+        with(twoPaneFragment.threadListAdapter) {
+            return when (autoAdvanceMode) {
+                AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
+                AutoAdvanceMode.FOLLOWING_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
+                AutoAdvanceMode.LIST_THREAD -> null
+                AutoAdvanceMode.NATURAL_THREAD -> {
+                    if (localSettings.autoAdvanceIntelligentMode == AutoAdvanceMode.PREVIOUS_THREAD) {
+                        getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
+                    } else {
+                        getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
+                    }
+                }
+            }
+        }
+
+    private fun tryToAutoAdvance(autoAdvanceMode: AutoAdvanceMode, listThreadUids: List<String>) =
+        with(twoPaneFragment.threadListAdapter) {
+            if (!listThreadUids.contains(openedThreadUid)) return@with
+
+            openedThreadPosition?.let {
+                val data = getNextThreadToOpenByPosition(it, autoAdvanceMode)
+
+                data?.let { (nextThread, index) ->
+                    if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
+                        selectNewThread(newPosition = index, nextThread.uid)
+                    }
+                    onThreadClicked?.invoke(nextThread)
+                } ?: run {
+                    twoPaneViewModel.closeThread()
+                }
+            }
+        }
+
     enum class HeaderState {
         ELEVATED,
         LOWERED,
@@ -629,6 +673,9 @@ class ThreadFragment : Fragment() {
     companion object {
         private const val COLLAPSE_TITLE_THRESHOLD = 0.5
         private const val ARCHIVE_INDEX = 2
+
+        private const val PREVIOUS_CHRONOLOGICAL_THREAD = -1
+        private const val NEXT_CHRONOLOGICAL_THREAD = 1
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
     }

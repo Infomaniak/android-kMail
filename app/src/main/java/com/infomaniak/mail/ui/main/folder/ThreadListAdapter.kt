@@ -102,7 +102,9 @@ class ThreadListAdapter @Inject constructor(
     //region Tablet mode
     var openedThreadPosition: Int? = null
         private set
-    private var openedThreadUid: String? = null
+    var openedThreadUid: String? = null
+        private set
+
     //endregion
 
     init {
@@ -315,7 +317,6 @@ class ThreadListAdapter @Inject constructor(
     }
 
     fun selectNewThread(newPosition: Int?, threadUid: String?) {
-
         val oldPosition = openedThreadPosition
 
         openedThreadPosition = newPosition
@@ -325,35 +326,7 @@ class ThreadListAdapter @Inject constructor(
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
     }
 
-    fun tryToAutoAdvance(autoAdvanceMode: AutoAdvanceMode, listThreadUids : List<String>) {
-        if (!listThreadUids.contains(openedThreadUid)) return
-
-        openedThreadPosition?.let {
-            val (nextThread, indexNextThread) = getNextThreadToOpenByPosition(it, autoAdvanceMode) ?: return@let
-            if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
-                selectNewThread(newPosition = indexNextThread, nextThread.uid)
-            }
-
-            onThreadClicked?.invoke(nextThread)
-        }
-    }
-
-    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Pair<Thread, Int>? {
-        return when (autoAdvanceMode) {
-            AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
-            AutoAdvanceMode.FOLLOWING_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
-            AutoAdvanceMode.LIST_THREAD -> null
-            AutoAdvanceMode.NATURAL_THREAD -> {
-                if (localSettings.autoAdvanceIntelligentMode == AutoAdvanceMode.PREVIOUS_THREAD) {
-                    getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
-                } else {
-                    getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
-                }
-            }
-        }
-    }
-
-    private fun getNextThread(startingThreadIndex: Int, direction: Int): Pair<Thread, Int>? {
+    fun getNextThread(startingThreadIndex: Int, direction: Int): Pair<Thread, Int>? {
         var currentIndexThread = startingThreadIndex
         currentIndexThread += direction
         while (currentIndexThread >= 0 && currentIndexThread <= dataSet.lastIndex) {
@@ -730,9 +703,6 @@ class ThreadListAdapter @Inject constructor(
 
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
-
-        private const val PREVIOUS_CHRONOLOGICAL_THREAD = -1
-        private const val NEXT_CHRONOLOGICAL_THREAD = 1
     }
 
     class ThreadListViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {

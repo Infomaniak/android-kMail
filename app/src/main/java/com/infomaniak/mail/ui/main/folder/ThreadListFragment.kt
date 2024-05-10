@@ -163,7 +163,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeFlushFolderTrigger()
         observeUpdateInstall()
         observeLoadMoreTriggers()
-        observeClosedThread()
     }.getOrDefault(Unit)
 
     @ColorRes
@@ -626,11 +625,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         }
     }
 
-    private fun observeClosedThread() {
-        mainViewModel.autoAdvanceTrigger.observe(viewLifecycleOwner) { listThreadsUids ->
-            threadListAdapter.tryToAutoAdvance(localSettings.autoAdvanceMode, listThreadsUids)
-        }
-    }
 
     private fun checkLastUpdateDay() {
         if (lastUpdatedDate?.isToday() == false) mainViewModel.forceTriggerCurrentFolder()
