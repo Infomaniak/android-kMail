@@ -393,14 +393,14 @@
     <string name="settingsAppLock">Bloqueo de aplicaciones</string>
     <string name="settingsAuthorizeTracking">Autorizar el seguimiento</string>
     <string name="settingsAutoAdvanceDescription">Seleccione qué mostrar cuando se archiva o elimina un mensaje</string>
-    <string name="settingsAutoAdvanceFollowingThreadDescription">Mostrar el siguiente conversación al archivar o borrar</string>
-    <string name="settingsAutoAdvanceFollowingThreadTitle">Siguiendo el conversación</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Mostrar la siguiente conversación al archivar o borrar</string>
+    <string name="settingsAutoAdvanceFollowingThreadTitle">Siguiendo la conversación</string>
     <string name="settingsAutoAdvanceListOfThreadsDescription">Mostrar lista de conversaciones al archivar o borrar</string>
     <string name="settingsAutoAdvanceListOfThreadsTitle">Lista de conversaciones</string>
     <string name="settingsAutoAdvanceNaturalThreadDescription">Repite la última acción realizada</string>
     <string name="settingsAutoAdvanceNaturalThreadHint">Selecciona automáticamente la conversación siguiente o anterior, en función de tu última interacción.</string>
     <string name="settingsAutoAdvanceNaturalThreadTitle">Repetir la última acción</string>
-    <string name="settingsAutoAdvancePreviousThreadDescription">Mostrar el conversación anterior al archivar o borrar</string>
+    <string name="settingsAutoAdvancePreviousThreadDescription">Mostrar la conversación anterior al archivar o borrar</string>
     <string name="settingsAutoAdvancePreviousThreadTitle">Conversación anterior</string>
     <string name="settingsAutoAdvanceTitle">Avance automático</string>
     <string name="settingsCancellationPeriodDescription">Tiene la posibilidad de cancelar el envío de su correo electrónico hasta 30 segundos</string>
