@@ -641,7 +641,8 @@ class ThreadFragment : Fragment() {
                     if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
                         selectNewThread(newPosition = index, nextThread.uid)
                     }
-                    onThreadClicked?.invoke(nextThread)
+
+                    twoPaneFragment.navigateToThread(nextThread)
                 } ?: run {
                     twoPaneViewModel.closeThread()
                 }
