@@ -254,12 +254,10 @@ class ThreadFragment : Fragment() {
                     )
                 },
                 onAttachmentOptionsClicked = {
-                    it.resource?.let { resource ->
-                        safeNavigate(
-                            resId = R.id.attachmentActionsBottomSheetDialog,
-                            args = AttachmentActionsBottomSheetDialogArgs(resource).toBundle(),
-                        )
-                    }
+                    safeNavigate(
+                        resId = R.id.attachmentActionsBottomSheetDialog,
+                        args = AttachmentActionsBottomSheetDialogArgs(it.localUuid).toBundle(),
+                    )
                 },
                 onDownloadAllClicked = { message ->
                     trackAttachmentActionsEvent("downloadAll")

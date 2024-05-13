@@ -55,7 +55,6 @@ class DownloadAttachmentViewModel @Inject constructor(
         val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
         val attachmentFile = localAttachment.getCacheFile(appContext)
 
-
         var isAttachmentCached = localAttachment.hasUsableCache(appContext, attachmentFile)
         if (!isAttachmentCached) {
             isAttachmentCached = localAttachment.resource?.let { resource ->
