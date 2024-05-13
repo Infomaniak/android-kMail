@@ -147,7 +147,24 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun setupAdapter() {
-        threadListAdapter(folderRole = null, isFolderNameVisible = true)
+        threadListAdapter(
+            folderRole = null,
+            isFolderNameVisible = true,
+            onThreadClicked = { thread ->
+                with(searchViewModel) {
+                    if (!isLengthTooShort(currentSearchQuery)) history.value = currentSearchQuery
+                    binding.searchBar.searchTextInput.apply {
+                        hideKeyboard()
+                        clearFocus()
+                    }
+                    navigateToThread(thread)
+                }
+            },
+        )
+
+        binding.mailRecyclerView.adapter = threadListAdapter.apply {
+            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
     }
 
     private fun setupListeners() = with(binding) {
@@ -192,10 +209,10 @@ class SearchFragment : TwoPaneFragment() {
         return popupMenu
     }
 
-    private fun onFolderSelected(folder: Folder?, title: String) = with(binding) {
+    private fun onFolderSelected(folder: Folder?, title: String) {
         updateFolderDropDownUi(folder, title)
         searchViewModel.selectFolder(folder)
-        trackSearchEvent(ThreadFilter.FOLDER.matomoValue, folder != null)
+        return trackSearchEvent(ThreadFilter.FOLDER.matomoValue, folder != null)
     }
 
     private fun updateFolderDropDownUi(folder: Folder?, title: String) = with(binding) {
@@ -246,23 +263,8 @@ class SearchFragment : TwoPaneFragment() {
         }
     }
 
-    private fun setMessagesUi() = with(binding) {
-
-        mailRecyclerView.adapter = threadListAdapter.apply {
-            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            onThreadClicked = { thread ->
-                with(searchViewModel) {
-                    if (!isLengthTooShort(currentSearchQuery)) history.value = currentSearchQuery
-                    binding.searchBar.searchTextInput.apply {
-                        hideKeyboard()
-                        clearFocus()
-                    }
-                    navigateToThread(thread)
-                }
-            }
-        }
-
-        mailRecyclerView.apply {
+    private fun setMessagesUi() {
+        binding.mailRecyclerView.apply {
             disableDragDirection(DirectionFlag.UP)
             disableDragDirection(DirectionFlag.DOWN)
             disableDragDirection(DirectionFlag.LEFT)

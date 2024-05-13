@@ -89,9 +89,9 @@ class ThreadListAdapter @Inject constructor(
     private var swipingIsAuthorized: Boolean = true
     private var isLoadMoreDisplayed = false
 
-    var onThreadClicked: ((thread: Thread) -> Unit)? = null
-    var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
-    var onLoadMoreClicked: (() -> Unit)? = null
+    private var onThreadClicked: ((thread: Thread) -> Unit)? = null
+    private var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
+    private var onLoadMoreClicked: (() -> Unit)? = null
 
     private var folderRole: FolderRole? = null
     private var onSwipeFinished: (() -> Unit)? = null
@@ -112,11 +112,17 @@ class ThreadListAdapter @Inject constructor(
         onSwipeFinished: (() -> Unit)? = null,
         multiSelection: MultiSelectionListener<Thread>? = null,
         isFolderNameVisible: Boolean = false,
+        onThreadClicked: ((thread: Thread) -> Unit),
+        onFlushClicked: ((dialogTitle: String) -> Unit)? = null,
+        onLoadMoreClicked: (() -> Unit)? = null,
     ) {
         this.folderRole = folderRole
         this.onSwipeFinished = onSwipeFinished
         this.multiSelection = multiSelection
         this.isFolderNameVisible = isFolderNameVisible
+        this.onThreadClicked = onThreadClicked
+        this.onFlushClicked = onFlushClicked
+        this.onLoadMoreClicked = onLoadMoreClicked
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
