@@ -99,7 +99,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature): ApiResponse<Boolean> {
-        val body = mapOf("default_signature_id" to signature.id, "default_reply_signature_id" to null)
+        val body = mapOf("default_signature_id" to signature.id)
         return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName), PUT, body)
     }
 
