@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
@@ -52,6 +53,9 @@ abstract class TwoPaneFragment : Fragment() {
     //  between the ThreadList's RecyclerView and its Adapter as it throws an NPE.
     @Inject
     lateinit var threadListAdapter: ThreadListAdapter
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     @ColorRes
     abstract fun getStatusBarColor(): Int
@@ -184,8 +188,7 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> = with(twoPaneViewModel) {
-
+    private fun computeTwoPaneWidths(widthPixels: Int, isThreadOpen: Boolean): Pair<Int, Int> {
         val leftPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.leftPaneWidthRatio)
         val rightPaneWidthRatio = ResourcesCompat.getFloat(resources, R.dimen.rightPaneWidthRatio)
 
@@ -216,5 +219,13 @@ abstract class TwoPaneFragment : Fragment() {
         }
 
         setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
+    }
+
+    protected fun changeNaturalAdvanceModeByPosition(currentPosition: Int, previousPosition: Int) {
+        localSettings.autoAdvanceIntelligentMode = if (currentPosition > previousPosition) {
+            LocalSettings.AutoAdvanceMode.FOLLOWING_THREAD
+        } else {
+            LocalSettings.AutoAdvanceMode.PREVIOUS_THREAD
+        }
     }
 }

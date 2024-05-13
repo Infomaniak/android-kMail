@@ -55,7 +55,6 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
@@ -103,9 +102,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private var isFirstTimeRefreshingThreads = true
-
-    @Inject
-    lateinit var localSettings: LocalSettings
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
@@ -320,6 +316,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 trackThreadListEvent("loadMore")
                 mainViewModel.getOnePageOfOldMessages()
             },
+            onPositionClickedChanged = ::changeNaturalAdvanceModeByPosition
         )
 
         threadListAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY

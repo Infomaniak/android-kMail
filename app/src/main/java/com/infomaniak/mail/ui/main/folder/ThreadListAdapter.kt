@@ -92,6 +92,8 @@ class ThreadListAdapter @Inject constructor(
     private var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
     private var onLoadMoreClicked: (() -> Unit)? = null
 
+    private var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? = null
+
     private var folderRole: FolderRole? = null
     private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
@@ -119,6 +121,7 @@ class ThreadListAdapter @Inject constructor(
         onThreadClicked: ((thread: Thread) -> Unit),
         onFlushClicked: ((dialogTitle: String) -> Unit)? = null,
         onLoadMoreClicked: (() -> Unit)? = null,
+        onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? = null,
     ) {
         this.folderRole = folderRole
         this.onSwipeFinished = onSwipeFinished
@@ -127,6 +130,7 @@ class ThreadListAdapter @Inject constructor(
         this.onThreadClicked = onThreadClicked
         this.onFlushClicked = onFlushClicked
         this.onLoadMoreClicked = onLoadMoreClicked
+        this.onPositionClickedChanged = onPositionClickedChanged
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -300,11 +304,10 @@ class ThreadListAdapter @Inject constructor(
             toggleMultiSelectedThread(thread)
         } else {
             previousThreadClickedPosition?.let { previousPosition ->
-                localSettings.autoAdvanceIntelligentMode = if (position > previousPosition) {
-                    AutoAdvanceMode.FOLLOWING_THREAD
-                } else {
-                    AutoAdvanceMode.PREVIOUS_THREAD
-                }
+                onPositionClickedChanged?.invoke(
+                    position,
+                    previousPosition
+                )
             }
 
             previousThreadClickedPosition = position
