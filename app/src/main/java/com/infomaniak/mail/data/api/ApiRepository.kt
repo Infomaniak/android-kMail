@@ -98,9 +98,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
-    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature): ApiResponse<Boolean> {
-        val body = mapOf("default_signature_id" to signature.id)
-        return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName), PUT, body)
+    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature?): ApiResponse<Boolean> {
+        // If signature is null, it means we want to have no default signature.
+        // If we want to delete the default signature, we have to pass null to the WS call.
+        val body = """{"default_signature_id":${signature?.id}}"""
+        return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName), POST, body)
     }
 
     fun getBackups(mailboxHostingId: Int, mailboxName: String): ApiResponse<BackupResult> {

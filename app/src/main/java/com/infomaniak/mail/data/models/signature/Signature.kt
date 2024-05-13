@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.data.models.signature
 
+import android.content.Context
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.types.RealmObject
@@ -60,10 +63,12 @@ class Signature : RealmObject {
     //endregion
 
     companion object {
-        fun getDummySignature() = Signature().apply {
+        fun getDummySignature(context: Context, isDefault: Boolean = false) = Signature().apply {
             id = Draft.NO_IDENTITY
             isDummy = true
+            name = context.getString(R.string.selectSignatureNone)
             senderEmailIdn = AccountUtils.currentMailboxEmail!!
+            this.isDefault = isDefault
         }
     }
 }

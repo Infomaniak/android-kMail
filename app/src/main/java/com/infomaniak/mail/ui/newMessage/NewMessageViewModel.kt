@@ -182,7 +182,7 @@ class NewMessageViewModel @Inject constructor(
             signatures = SignatureController.getAllSignatures(realm)
                 .also { signaturesCount = it.count() }
                 .toMutableList()
-                .apply { add(index = 0, element = Signature.getDummySignature()) }
+                .apply { add(index = 0, element = Signature.getDummySignature(appContext)) }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
 

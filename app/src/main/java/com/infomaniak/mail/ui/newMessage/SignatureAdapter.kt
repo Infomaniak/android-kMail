@@ -61,11 +61,7 @@ class SignatureAdapter(
         val isSelected = selectedSignatureId == signature.id
         val backgroundColorRes = if (isSelected) R.color.backgroundSelectedSignature else R.color.backgroundColorTertiary
 
-        fullNameAndName.text = if (signature.isDummy) {
-            context.getString(R.string.selectSignatureNone)
-        } else {
-            "${signature.senderName} (${signature.name})"
-        }
+        fullNameAndName.text = if (signature.isDummy) signature.name else "${signature.senderName} (${signature.name})"
 
         emailAddress.text = signature.senderEmailIdn
 

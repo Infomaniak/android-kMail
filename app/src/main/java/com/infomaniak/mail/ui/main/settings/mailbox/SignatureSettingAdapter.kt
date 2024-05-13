@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.settings.mailbox
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -50,8 +51,10 @@ class SignatureSettingAdapter(
     override fun getItemCount(): Int = signatures.count()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setSignatures(newSignatures: List<Signature>) {
-        signatures = newSignatures
+    fun setSignatures(context: Context, newSignatures: List<Signature>) {
+        val hasDefaultSignature = newSignatures.none { it.isDefault }
+        val dummySignature = Signature.getDummySignature(context, isDefault = hasDefaultSignature)
+        signatures = newSignatures.toMutableList().apply { add(0, dummySignature) }
         notifyDataSetChanged()
     }
 
