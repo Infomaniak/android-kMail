@@ -479,11 +479,7 @@ class MainViewModel @Inject constructor(
 
         deleteThreadOrMessageTrigger.postValue(Unit)
         if (apiResponse.isSuccess()) {
-            if (message == null) {
-                autoAdvanceTrigger.postValue(threadsUids)
-            } else if (threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())) {
-                autoAdvanceTrigger.postValue(threadsUids)
-            }
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceTrigger.postValue(threadsUids)
 
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -566,12 +562,12 @@ class MainViewModel @Inject constructor(
     //region Move
     fun moveThreadsOrMessageTo(
         destinationFolderId: String,
-        threadsUids: Array<String>,
+        threadsUids: List<String>,
         messageUid: String? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
         val destinationFolder = folderController.getFolder(destinationFolderId)!!
-        val threads = getActionThreads(threadsUids.toList()).ifEmpty { return@launch }
+        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
@@ -579,7 +575,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            autoAdvanceTrigger.postValue(threadsUids.toList())
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceTrigger.postValue(threadsUids)
 
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -646,11 +642,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            if (message == null) {
-                autoAdvanceTrigger.postValue(threadsUids)
-            } else if (threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())) {
-                autoAdvanceTrigger.postValue(threadsUids)
-            }
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceTrigger.postValue(threadsUids)
 
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
             refreshFoldersAsync(
@@ -854,7 +846,6 @@ class MainViewModel @Inject constructor(
             snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
     }
-    //endregion
 
     //region BlockUser
     fun blockUser(message: Message) = viewModelScope.launch(ioCoroutineContext) {
@@ -913,7 +904,7 @@ class MainViewModel @Inject constructor(
 
     fun moveToNewFolder(
         name: String,
-        threadsUids: Array<String>,
+        threadsUids: List<String>,
         messageUid: String?,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
@@ -1058,6 +1049,11 @@ class MainViewModel @Inject constructor(
     private fun threadHasOnlyOneMessageLeftInCurrentFolder(threadUid: String): Boolean {
         val folderId = currentFolderId ?: return false
         return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
+    }
+
+    private fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
+        val isWorkingWithThread = message == null
+        return isWorkingWithThread || threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())
     }
 
     companion object {
