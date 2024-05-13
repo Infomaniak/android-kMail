@@ -58,6 +58,8 @@ class AutoAdvanceSettingsFragment : Fragment() {
 
         radioGroup.check(localSettings.autoAdvanceMode)
 
+        descriptionLastAction.isVisible = localSettings.autoAdvanceMode == AutoAdvanceMode.NATURAL_THREAD
+
         radioGroup.onItemCheckedListener { _, _, autoAdvanceMode ->
             chooseAutoAdvanceMode(autoAdvanceMode as AutoAdvanceMode)
             descriptionLastAction.isVisible = autoAdvanceMode == AutoAdvanceMode.NATURAL_THREAD

@@ -299,8 +299,8 @@ class ThreadListAdapter @Inject constructor(
         if (multiSelection?.isEnabled == true) {
             toggleMultiSelectedThread(thread)
         } else {
-            previousThreadClickedPosition?.let {
-                localSettings.autoAdvanceIntelligentMode = if (position > it) {
+            previousThreadClickedPosition?.let { previousPosition ->
+                localSettings.autoAdvanceIntelligentMode = if (position > previousPosition) {
                     AutoAdvanceMode.FOLLOWING_THREAD
                 } else {
                     AutoAdvanceMode.PREVIOUS_THREAD
