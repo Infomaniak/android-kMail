@@ -253,9 +253,11 @@ class NewMessageViewModel @Inject constructor(
         } else {
             defaultSignature
         }
-        (signature ?: SignatureController.getDefaultSignatureWithFallback(realm, draftMode))?.let {
-            signatureUtils.initSignature(draft = this, signature = it)
-        }
+
+        signatureUtils.initSignature(
+            draft = this,
+            signature = signature ?: Signature.getDummySignature(appContext, isDefault = true),
+        )
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
 

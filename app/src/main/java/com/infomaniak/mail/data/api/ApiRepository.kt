@@ -60,6 +60,8 @@ import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -101,7 +103,7 @@ object ApiRepository : ApiRepositoryCore() {
     fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature?): ApiResponse<Boolean> {
         // If signature is null, it means we want to have no default signature.
         // If we want to delete the default signature, we have to pass null to the WS call.
-        val body = """{"default_signature_id":${signature?.id}}"""
+        val body = JsonObject(mapOf("default_signature_id" to JsonPrimitive(signature?.id)))
         return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName), POST, body)
     }
 

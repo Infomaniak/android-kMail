@@ -63,6 +63,7 @@ class Signature : RealmObject {
     //endregion
 
     companion object {
+
         fun getDummySignature(context: Context, isDefault: Boolean = false) = Signature().apply {
             id = Draft.NO_IDENTITY
             isDummy = true
