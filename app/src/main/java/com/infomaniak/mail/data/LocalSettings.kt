@@ -64,8 +64,8 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
     var isSentryTrackingEnabled by sharedValue("isSentryTrackingEnabledKey", true)
     var isMatomoTrackingEnabled by sharedValue("isMatomoTrackingEnabledKey", true)
-    var autoAdvanceMode by sharedValue("autoAdvanceModeKey", AutoAdvanceMode.LIST_THREAD)
-    var autoAdvanceIntelligentMode by sharedValue("autoAdvanceIntelligentModeKey", AutoAdvanceMode.FOLLOWING_THREAD)
+    var autoAdvanceMode by sharedValue("autoAdvanceModeKey", AutoAdvanceMode.THREADS_LIST)
+    var autoAdvanceNaturalThread by sharedValue("autoAdvanceNaturalThreadKey", AutoAdvanceMode.FOLLOWING_THREAD)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 
@@ -196,7 +196,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     enum class AutoAdvanceMode(val matomoValue: String, @StringRes val localisedNameRes: Int) {
         PREVIOUS_THREAD("previousThread", R.string.settingsAutoAdvancePreviousThreadDescription),
         FOLLOWING_THREAD("followingThread", R.string.settingsAutoAdvanceFollowingThreadDescription),
-        LIST_THREAD("listOfThread", R.string.settingsAutoAdvanceListOfThreadsDescription),
+        THREADS_LIST("listOfThread", R.string.settingsAutoAdvanceListOfThreadsDescription),
         NATURAL_THREAD("naturalThread", R.string.settingsAutoAdvanceNaturalThreadDescription),
     }
 

@@ -52,7 +52,7 @@ class AutoAdvanceSettingsFragment : Fragment() {
         radioGroup.initBijectionTable(
             R.id.lastAction to AutoAdvanceMode.NATURAL_THREAD,
             R.id.nextThread to AutoAdvanceMode.FOLLOWING_THREAD,
-            R.id.listThread to AutoAdvanceMode.LIST_THREAD,
+            R.id.listThread to AutoAdvanceMode.THREADS_LIST,
             R.id.lastThread to AutoAdvanceMode.PREVIOUS_THREAD,
         )
 

@@ -110,7 +110,7 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
 
-    val autoAdvanceTrigger = MutableLiveData<List<String>>()
+    val autoAdvanceThreadsUids = MutableLiveData<List<String>>()
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
@@ -479,7 +479,7 @@ class MainViewModel @Inject constructor(
 
         deleteThreadOrMessageTrigger.postValue(Unit)
         if (apiResponse.isSuccess()) {
-            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceTrigger.postValue(threadsUids)
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -575,7 +575,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceTrigger.postValue(threadsUids)
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -642,7 +642,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceTrigger.postValue(threadsUids)
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
             refreshFoldersAsync(

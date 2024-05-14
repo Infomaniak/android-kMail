@@ -466,8 +466,8 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeAutoAdavance() {
-        mainViewModel.autoAdvanceTrigger.observe(viewLifecycleOwner) { listThreadsUids ->
-            tryToAutoAdvance(localSettings.autoAdvanceMode, listThreadsUids)
+        mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner) { listThreadsUids ->
+            tryToAutoAdvance(listThreadsUids)
         }
     }
 
@@ -630,12 +630,12 @@ class ThreadFragment : Fragment() {
         twoPaneViewModel.navArgs.value = NavData(resId, args)
     }
 
-    private fun tryToAutoAdvance(autoAdvanceMode: AutoAdvanceMode, listThreadUids: List<String>) =
+    private fun tryToAutoAdvance(listThreadUids: List<String>) =
         with(twoPaneFragment.threadListAdapter) {
             if (!listThreadUids.contains(openedThreadUid)) return@with
 
             openedThreadPosition?.let {
-                val data = getNextThreadToOpenByPosition(it, autoAdvanceMode)
+                val data = getNextThreadToOpenByPosition(it)
 
                 data?.let { (nextThread, index) ->
                     if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
@@ -649,14 +649,14 @@ class ThreadFragment : Fragment() {
             }
         }
 
-    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int, autoAdvanceMode: AutoAdvanceMode): Pair<Thread, Int>? =
+    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int): Pair<Thread, Int>? =
         with(twoPaneFragment.threadListAdapter) {
-            return when (autoAdvanceMode) {
+            return when (localSettings.autoAdvanceMode) {
                 AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
                 AutoAdvanceMode.FOLLOWING_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
-                AutoAdvanceMode.LIST_THREAD -> null
+                AutoAdvanceMode.THREADS_LIST -> null
                 AutoAdvanceMode.NATURAL_THREAD -> {
-                    if (localSettings.autoAdvanceIntelligentMode == AutoAdvanceMode.PREVIOUS_THREAD) {
+                    if (localSettings.autoAdvanceNaturalThread == AutoAdvanceMode.PREVIOUS_THREAD) {
                         getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
                     } else {
                         getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
