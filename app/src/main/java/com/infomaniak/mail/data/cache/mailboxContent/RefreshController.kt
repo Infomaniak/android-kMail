@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
@@ -852,7 +853,7 @@ class RefreshController @Inject constructor(
 
     private fun getMessagesUidsDelta(folderId: String, previousCursor: String): ActivitiesResult? {
         return with(ApiRepository.getMessagesUidsDelta(mailbox.uuid, folderId, previousCursor, okHttpClient)) {
-            if (!isSuccess()) throwErrorAsException()
+            if (!isSuccess() && error?.exception?.isNetworkException() != true) throwErrorAsException()
             return@with data
         }
     }
