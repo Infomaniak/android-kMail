@@ -212,7 +212,7 @@ class SearchFragment : TwoPaneFragment() {
     private fun onFolderSelected(folder: Folder?, title: String) {
         updateFolderDropDownUi(folder, title)
         searchViewModel.selectFolder(folder)
-        return trackSearchEvent(ThreadFilter.FOLDER.matomoValue, folder != null)
+        trackSearchEvent(ThreadFilter.FOLDER.matomoValue, folder != null)
     }
 
     private fun updateFolderDropDownUi(folder: Folder?, title: String) = with(binding) {
