@@ -31,6 +31,7 @@ import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -71,9 +72,13 @@ class AvatarNameEmailView @JvmOverloads constructor(
         }
     }
 
-    fun setCorrespondent(correspondent: Correspondent) = with(binding) {
-        userAvatar.loadAvatar(correspondent)
-        setNameAndEmail(correspondent)
+    fun setCorrespondent(correspondent: Correspondent, bimi: Bimi? = null) = with(binding) {
+        if (bimi == null || !bimi.isCertified) {
+            userAvatar.loadAvatar(correspondent)
+        } else {
+            userAvatar.loadBimiAvatar(bimi.svgContentUrl.orEmpty(), correspondent)
+        }
+        setNameAndEmail(correspondent, isCorrespondentCertified = bimi?.isCertified ?: false)
     }
 
     fun setMergedContact(mergedContact: MergedContact) = with(binding) {
@@ -86,12 +91,17 @@ class AvatarNameEmailView @JvmOverloads constructor(
         setNameAndEmail(attendee)
     }
 
-    private fun ViewAvatarNameEmailBinding.setNameAndEmail(correspondent: Correspondent) {
+    private fun ViewAvatarNameEmailBinding.setNameAndEmail(
+        correspondent: Correspondent,
+        isCorrespondentCertified: Boolean = false
+    ) {
         val filledSingleField = fillInUserNameAndEmail(correspondent, userName, userEmail, ignoreIsMe = !processNameAndEmail)
         if (displayAsAttendee) {
             val userNameTextColor = if (filledSingleField) R.style.AvatarNameEmailSecondary else R.style.AvatarNameEmailPrimary
             userName.setTextAppearance(userNameTextColor)
         }
+
+        iconCertified.isVisible = isCorrespondentCertified
     }
 
     fun setAutocompleteUnknownContact(searchQuery: String) = with(binding) {

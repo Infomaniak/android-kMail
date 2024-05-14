@@ -53,7 +53,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        contactDetails.setCorrespondent(navigationArgs.recipient)
+        contactDetails.setCorrespondent(navigationArgs.recipient, navigationArgs.bimi)
         setupListeners()
     }
 

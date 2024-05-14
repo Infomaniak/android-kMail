@@ -224,10 +224,13 @@ class ThreadFragment : Fragment() {
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
             threadAdapterCallbacks = ThreadAdapterCallbacks(
-                onContactClicked = {
+                onContactClicked =  { recipient, bimi ->
                     safeNavigate(
                         resId = R.id.detailedContactBottomSheetDialog,
-                        args = DetailedContactBottomSheetDialogArgs(it).toBundle(),
+                        args = DetailedContactBottomSheetDialogArgs(
+                            recipient = recipient,
+                            bimi
+                        ).toBundle(),
                     )
                 },
                 onDraftClicked = { message ->

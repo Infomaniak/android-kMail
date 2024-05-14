@@ -121,7 +121,7 @@ class ThreadAdapter(
                 shouldLoadDistantResources,
                 threadAdapterCallbacks?.onContactClicked,
                 threadAdapterCallbacks?.onAttachmentClicked,
-                threadAdapterCallbacks?.onAttachmentOptionsClicked,
+                threadAdapterCallbacks?.onAttachmentOptionsClicked
             )
         } else {
             SuperCollapsedBlockViewHolder(ItemSuperCollapsedBlockBinding.inflate(layoutInflater, parent, false))
@@ -355,7 +355,7 @@ class ThreadAdapter(
         val listener: OnClickListener? = message.sender?.let { recipient ->
             OnClickListener {
                 context.trackMessageEvent("selectAvatar")
-                threadAdapterCallbacks?.onContactClicked?.invoke(recipient)
+                threadAdapterCallbacks?.onContactClicked?.invoke(recipient, message.bimi)
             }
         }
 
@@ -372,7 +372,7 @@ class ThreadAdapter(
         bimi: Bimi?,
         firstSender: Recipient?
     ) {
-        if (bimi == null || bimi.isCertified.not()) {
+        if (bimi == null || !bimi.isCertified) {
             userAvatar.loadAvatar(firstSender)
         } else {
             userAvatar.loadBimiAvatar(ApiRoutes.bimi(bimi.svgContentUrl.orEmpty()), firstSender)
@@ -414,7 +414,7 @@ class ThreadAdapter(
 
     private fun MessageViewHolder.bindRecipientDetails(message: Message, messageDate: Date) = with(binding) {
 
-        fromAdapter.updateList(message.from.toList())
+        fromAdapter.updateList(message.from.toList(), message.bimi)
         toAdapter.updateList(message.to.toList())
 
         val ccIsNotEmpty = message.cc.isNotEmpty()
@@ -687,7 +687,7 @@ class ThreadAdapter(
 
     data class ThreadAdapterCallbacks(
         var onBodyWebViewFinishedLoading: (() -> Unit)? = null,
-        var onContactClicked: ((contact: Recipient) -> Unit)? = null,
+        var onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)? = null,
         var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
         var onDraftClicked: ((message: Message) -> Unit)? = null,
         var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
@@ -725,9 +725,9 @@ class ThreadAdapter(
     private class MessageViewHolder(
         override val binding: ItemMessageBinding,
         private val shouldLoadDistantResources: Boolean,
-        onContactClicked: ((contact: Recipient) -> Unit)?,
+        onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
-        onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?,
+        onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?
     ) : ThreadAdapterViewHolder(binding) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
