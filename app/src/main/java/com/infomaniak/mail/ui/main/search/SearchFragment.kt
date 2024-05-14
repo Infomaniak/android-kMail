@@ -45,10 +45,13 @@ import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
+import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallback
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -146,17 +149,26 @@ class SearchFragment : TwoPaneFragment() {
         threadListAdapter(
             folderRole = null,
             isFolderNameVisible = true,
-            onThreadClicked = { thread ->
-                with(searchViewModel) {
-                    if (!isLengthTooShort(currentSearchQuery)) history.value = currentSearchQuery
-                    binding.searchBar.searchTextInput.apply {
-                        hideKeyboard()
-                        clearFocus()
+            threadListAdapterCallback = object : ThreadListAdapterCallback {
+                override var onSwipeFinished: (() -> Unit)? = null
+                override var onThreadClicked: (Thread) -> Unit = { thread ->
+                    with(searchViewModel) {
+                        if (!isLengthTooShort(currentSearchQuery)) history.value = currentSearchQuery
+                        binding.searchBar.searchTextInput.apply {
+                            hideKeyboard()
+                            clearFocus()
+                        }
+                        navigateToThread(thread)
                     }
-                    navigateToThread(thread)
                 }
-            },
-            onPositionClickedChanged = ::changeNaturalAdvanceModeByPosition
+                override var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
+                override var onLoadMoreClicked: (() -> Unit)? = {
+                    trackThreadListEvent("loadMore")
+                    mainViewModel.getOnePageOfOldMessages()
+                }
+                override var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? =
+                    ::updateAutoAdvanceNaturalThread
+            }
         )
 
         threadListAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY

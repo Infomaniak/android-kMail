@@ -221,8 +221,8 @@ abstract class TwoPaneFragment : Fragment() {
         setSystemBarsColors(statusBarColor = statusBarColor, navigationBarColor = null)
     }
 
-    protected fun changeNaturalAdvanceModeByPosition(currentPosition: Int, previousPosition: Int) {
-        localSettings.autoAdvanceIntelligentMode = if (currentPosition > previousPosition) {
+    protected fun updateAutoAdvanceNaturalThread(currentPosition: Int, previousPosition: Int) {
+        localSettings.autoAdvanceNaturalThread = if (currentPosition > previousPosition) {
             LocalSettings.AutoAdvanceMode.FOLLOWING_THREAD
         } else {
             LocalSettings.AutoAdvanceMode.PREVIOUS_THREAD

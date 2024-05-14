@@ -283,40 +283,43 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     private fun setupAdapter() {
-
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
-            onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
-            multiSelection = object : MultiSelectionListener<Thread> {
+            threadListAdapterCallback = object : ThreadListAdapterCallback {
+                override var onSwipeFinished: (() -> Unit)? = { threadListViewModel.isRecoveringFinished.value = true }
+                override var onThreadClicked: (Thread) -> Unit = ::navigateToThread
+                override var onFlushClicked: ((dialogTitle: String) -> Unit)? = { dialogTitle ->
+                    val trackerName = when {
+                        isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
+                        isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
+                        isCurrentFolderRole(FolderRole.SPAM) -> "emptySpam"
+                        else -> null
+                    }
+
+                    trackerName?.let { trackThreadListEvent(it) }
+
+                    descriptionDialog.show(
+                        title = dialogTitle,
+                        description = getString(R.string.threadListEmptyFolderAlertDescription),
+                        onPositiveButtonClicked = {
+                            trackThreadListEvent("${trackerName}Confirm")
+                            mainViewModel.flushFolder()
+                        },
+                    )
+                }
+                override var onLoadMoreClicked: (() -> Unit)? = {
+                    trackThreadListEvent("loadMore")
+                    mainViewModel.getOnePageOfOldMessages()
+                }
+                override var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? =
+                    ::updateAutoAdvanceNaturalThread
+            },
+            multiSelection =
+            object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
                 override val selectedItems by mainViewModel::selectedThreads
                 override val publishSelectedItems = mainViewModel::publishSelectedItems
             },
-            onThreadClicked = ::navigateToThread,
-            onFlushClicked = { dialogTitle ->
-                val trackerName = when {
-                    isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
-                    isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
-                    isCurrentFolderRole(FolderRole.SPAM) -> "emptySpam"
-                    else -> null
-                }
-
-                trackerName?.let { trackThreadListEvent(it) }
-
-                descriptionDialog.show(
-                    title = dialogTitle,
-                    description = getString(R.string.threadListEmptyFolderAlertDescription),
-                    onPositiveButtonClicked = {
-                        trackThreadListEvent("${trackerName}Confirm")
-                        mainViewModel.flushFolder()
-                    },
-                )
-            },
-            onLoadMoreClicked = {
-                trackThreadListEvent("loadMore")
-                mainViewModel.getOnePageOfOldMessages()
-            },
-            onPositionClickedChanged = ::changeNaturalAdvanceModeByPosition
         )
 
         threadListAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY

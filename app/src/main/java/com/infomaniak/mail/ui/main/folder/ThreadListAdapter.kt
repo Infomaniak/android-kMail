@@ -47,7 +47,8 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.*
+import com.infomaniak.mail.data.LocalSettings.SwipeAction
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -88,16 +89,10 @@ class ThreadListAdapter @Inject constructor(
     private var swipingIsAuthorized: Boolean = true
     private var isLoadMoreDisplayed = false
 
-    private var onThreadClicked: ((thread: Thread) -> Unit)? = null
-    private var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
-    private var onLoadMoreClicked: (() -> Unit)? = null
-
-    private var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? = null
-
     private var folderRole: FolderRole? = null
-    private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
     private var isFolderNameVisible: Boolean = false
+    private var threadListAdapterCallback: ThreadListAdapterCallback? = null
 
     private var previousThreadClickedPosition: Int? = null
 
@@ -115,22 +110,14 @@ class ThreadListAdapter @Inject constructor(
 
     operator fun invoke(
         folderRole: FolderRole?,
-        onSwipeFinished: (() -> Unit)? = null,
+        threadListAdapterCallback: ThreadListAdapterCallback,
         multiSelection: MultiSelectionListener<Thread>? = null,
         isFolderNameVisible: Boolean = false,
-        onThreadClicked: ((thread: Thread) -> Unit),
-        onFlushClicked: ((dialogTitle: String) -> Unit)? = null,
-        onLoadMoreClicked: (() -> Unit)? = null,
-        onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? = null,
     ) {
         this.folderRole = folderRole
-        this.onSwipeFinished = onSwipeFinished
         this.multiSelection = multiSelection
         this.isFolderNameVisible = isFolderNameVisible
-        this.onThreadClicked = onThreadClicked
-        this.onFlushClicked = onFlushClicked
-        this.onLoadMoreClicked = onLoadMoreClicked
-        this.onPositionClickedChanged = onPositionClickedChanged
+        this.threadListAdapterCallback = threadListAdapterCallback
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -304,7 +291,7 @@ class ThreadListAdapter @Inject constructor(
             toggleMultiSelectedThread(thread)
         } else {
             previousThreadClickedPosition?.let { previousPosition ->
-                onPositionClickedChanged?.invoke(
+                threadListAdapterCallback?.onPositionClickedChanged?.invoke(
                     position,
                     previousPosition
                 )
@@ -312,7 +299,7 @@ class ThreadListAdapter @Inject constructor(
 
             previousThreadClickedPosition = position
 
-            onThreadClicked?.invoke(thread)
+            threadListAdapterCallback?.onThreadClicked?.invoke(thread)
             // If the Thread is `onlyOneDraft`, we'll directly navigate to the NewMessageActivity.
             // It means that we won't go to the ThreadFragment, so there's no need to select anything.
             if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(position, thread.uid)
@@ -331,15 +318,11 @@ class ThreadListAdapter @Inject constructor(
     }
 
     fun getNextThread(startingThreadIndex: Int, direction: Int): Pair<Thread, Int>? {
-        var currentIndexThread = startingThreadIndex
-        currentIndexThread += direction
-        while (currentIndexThread >= 0 && currentIndexThread <= dataSet.lastIndex) {
-            if (dataSet[currentIndexThread] is Thread) {
-                val thread = dataSet[currentIndexThread] as Thread
-                return thread to currentIndexThread
-            }
+        var currentThreadIndex = startingThreadIndex + direction
 
-            currentIndexThread += direction
+        while (currentThreadIndex >= 0 && currentThreadIndex <= dataSet.lastIndex) {
+            if (dataSet[currentThreadIndex] is Thread) return dataSet[currentThreadIndex] as Thread to currentThreadIndex
+            currentThreadIndex += direction
         }
         return null
     }
@@ -485,14 +468,14 @@ class ThreadListAdapter @Inject constructor(
         flushButton.apply {
             val buttonText = context.getString(buttonTextId)
             text = buttonText
-            setOnClickListener { onFlushClicked?.invoke(buttonText) }
+            setOnClickListener { threadListAdapterCallback?.onFlushClicked?.invoke(buttonText) }
         }
     }
 
     private fun ItemThreadLoadMoreButtonBinding.displayLoadMoreButton() {
         loadMoreButton.setOnClickListener {
             if (dataSet.last() is Unit) dataSet = dataSet.toMutableList().apply { removeLastOrNull() }
-            onLoadMoreClicked?.invoke()
+            threadListAdapterCallback?.onLoadMoreClicked?.invoke()
         }
     }
 
@@ -569,7 +552,7 @@ class ThreadListAdapter @Inject constructor(
 
     override fun onSwipeAnimationFinished(viewHolder: ThreadListViewHolder) {
         viewHolder.isSwipedOverHalf = false
-        onSwipeFinished?.invoke()
+        threadListAdapterCallback?.onSwipeFinished?.invoke()
         unblockOtherSwipes()
     }
 
