@@ -543,7 +543,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 threadListViewModel.currentThreadsCount = threads.count()
                 SentryLog.i(
                     "UI",
-                    "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.displayForSentry()}})",
+                    "Received threads: ${threadListViewModel.currentThreadsCount} | (${currentFolder.value?.displayForSentry()})",
                 )
                 updateThreadsVisibility()
             }

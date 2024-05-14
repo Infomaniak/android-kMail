@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import android.text.format.Formatter
+import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
@@ -31,16 +31,12 @@ class Quotas : EmbeddedRealmObject {
     @SerialName("size")
     private var _size: Long = 0L
 
-    private val size: Long
-        get() {
-            val converted = _size * 1_000L / 1_024L // Convert from binary units to decimal units
-            return converted * 1_000L // Convert from KiloOctets to Octets
-        }
+    private val size: Long get() = _size * 1_000L // Convert from KiloOctets to Octets
 
     fun getText(context: Context): String {
 
-        val usedSize = Formatter.formatShortFileSize(context, size)
-        val maxSize = Formatter.formatShortFileSize(context, QUOTAS_MAX_SIZE)
+        val usedSize = context.formatShortFileSize(size)
+        val maxSize = context.formatShortFileSize(QUOTAS_MAX_SIZE)
 
         return context.getString(R.string.menuDrawerMailboxStorage, usedSize, maxSize)
     }
@@ -48,6 +44,7 @@ class Quotas : EmbeddedRealmObject {
     fun getProgress(): Int = ceil(100.0f * size.toFloat() / QUOTAS_MAX_SIZE.toFloat()).toInt()
 
     companion object {
-        private const val QUOTAS_MAX_SIZE = 20_000_000_000L // TODO: Get this value from API?
+        // TODO: Get this value from API ? If the free IK.ME storage size change, we won't know it.
+        private const val QUOTAS_MAX_SIZE = 20L * 1_024L * 1_024L * 1_024L // 20 GB
     }
 }

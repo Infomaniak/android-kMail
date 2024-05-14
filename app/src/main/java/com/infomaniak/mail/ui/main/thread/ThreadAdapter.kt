@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View.OnClickListener
@@ -38,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
@@ -462,7 +462,7 @@ class ThreadAdapter(
             attachment.size
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
 
-        return Formatter.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
+        return context.formatShortFileSize(totalAttachmentsFileSizeInBytes)
     }
 
     private fun MessageViewHolder.bindContent(message: Message) {
