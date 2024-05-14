@@ -162,9 +162,7 @@ class SearchFragment : TwoPaneFragment() {
             },
         )
 
-        binding.mailRecyclerView.adapter = threadListAdapter.apply {
-            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        }
+        threadListAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
     private fun setupListeners() = with(binding) {
@@ -265,6 +263,8 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun setMessagesUi() {
         binding.mailRecyclerView.apply {
+            adapter = threadListAdapter
+
             disableDragDirection(DirectionFlag.UP)
             disableDragDirection(DirectionFlag.DOWN)
             disableDragDirection(DirectionFlag.LEFT)
