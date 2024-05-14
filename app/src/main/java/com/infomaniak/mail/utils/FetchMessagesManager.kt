@@ -139,14 +139,17 @@ class FetchMessagesManager @Inject constructor(
             }
         }
 
-        val mailboxActiveNotifications = notificationManagerCompat.activeNotifications.filter {
-            it.notification.group == mailbox.notificationGroupKey
-        }
-        // We don't need to display a group notification saying "0 new messages".
-        // If we only have 1 active notification for a specific mailbox, it means the group notification is empty except for
-        // the group notification itself.
-        if (mailboxActiveNotifications.size == 1) {
-            notificationManagerCompat.cancel(mailbox.notificationGroupId)
+        /**
+         * We don't want to display an empty group notification saying "0 new messages".
+         *
+         * If we only have 1 active notification for a specific Mailbox, it means that there is either :
+         * - 1 normal notification,
+         * - or 1 empty group notification.
+         * In case of the later, we need to cancel it.
+         */
+        with(notificationManagerCompat) {
+            val mailboxGroupNotifications = activeNotifications.filter { it.notification.group == mailbox.notificationGroupKey }
+            if (mailboxGroupNotifications.size == 1) cancel(mailbox.notificationGroupId)
         }
 
         if (threadsWithNewMessages.isEmpty()) {
