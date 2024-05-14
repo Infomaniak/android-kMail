@@ -55,9 +55,12 @@ class AvatarView @JvmOverloads constructor(
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var currentCorrespondent: Correspondent? = null
+    private var isBimiShow: Boolean? = null
 
     private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
-        currentCorrespondent?.let { correspondent -> loadAvatarUsingDictionary(correspondent, contacts) }
+        currentCorrespondent?.let { correspondent ->
+            if (isBimiShow == false) loadAvatarUsingDictionary(correspondent, contacts)
+        }
     }
 
     @Inject
@@ -142,8 +145,8 @@ class AvatarView @JvmOverloads constructor(
 
     fun loadBimiAvatar(urlBimi: String, correspondent: Correspondent?) = with(binding.avatarImage) {
         val fakeUrlBimi = "https://upload.wikimedia.org/wikipedia/commons/4/4f/SVG_Logo.svg"
-
         contentDescription = correspondent?.email.orEmpty()
+        isBimiShow = fakeUrlBimi.isNotEmpty()
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(
                 correspondent?.email.orEmpty().hashCode(),

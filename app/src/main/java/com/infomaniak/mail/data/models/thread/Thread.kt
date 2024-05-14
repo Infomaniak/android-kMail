@@ -26,6 +26,7 @@ import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -213,7 +214,7 @@ class Thread : RealmObject {
         }
     }
 
-    fun computeAvatarRecipient(): Recipient? = runCatching {
+    fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
 
         val message = messages
             .lastOrNull { it.folder.role != FolderRole.SENT && it.folder.role != FolderRole.DRAFT }
@@ -224,7 +225,7 @@ class Thread : RealmObject {
             else -> message.from
         }
 
-        recipients.firstOrNull()
+        recipients.firstOrNull() to message.bimi
 
     }.getOrElse { throwable ->
         Sentry.withScope { scope ->
@@ -239,7 +240,7 @@ class Thread : RealmObject {
             Sentry.captureException(throwable)
         }
 
-        null
+        null to null
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {
