@@ -40,7 +40,9 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -337,12 +339,16 @@ class ThreadAdapter(
             shortMessageDate.text = ""
         } else {
             val firstSender = message.sender
-            userAvatar.loadAvatar(firstSender)
+
             expeditorName.apply {
                 text = firstSender?.let { context.getPrettyNameAndEmail(it).first }
                     ?: run { context.getString(R.string.unknownRecipientTitle) }
                 setTextAppearance(R.style.BodyMedium)
             }
+
+            loadAvatar(message.bimi, firstSender)
+            iconCertified.isVisible = message.bimi?.isCertified ?: false
+
             shortMessageDate.text = mailFormattedDate(context, messageDate)
         }
 
@@ -360,6 +366,17 @@ class ThreadAdapter(
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
+    }
+
+    private fun ItemMessageBinding.loadAvatar(
+        bimi: Bimi?,
+        firstSender: Recipient?
+    ) {
+        if (bimi == null || bimi.isCertified.not()) {
+            userAvatar.loadAvatar(firstSender)
+        } else {
+            userAvatar.loadBimiAvatar(ApiRoutes.bimi(bimi.svgContentUrl.orEmpty()), firstSender)
+        }
     }
 
     private fun ItemMessageBinding.setDetailedFieldsVisibility(message: Message) {

@@ -140,6 +140,22 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
+    fun loadBimiAvatar(urlBimi: String, correspondent: Correspondent?) = with(binding.avatarImage) {
+        val fakeUrlBimi = "https://upload.wikimedia.org/wikipedia/commons/4/4f/SVG_Logo.svg"
+
+        contentDescription = correspondent?.email.orEmpty()
+        loadAvatar(
+            backgroundColor = context.getBackgroundColorBasedOnId(
+                correspondent?.email.orEmpty().hashCode(),
+                R.array.AvatarColors
+            ),
+            avatarUrl = fakeUrlBimi,
+            initials = correspondent?.initials.orEmpty(),
+            imageLoader = context.simpleImageLoader,
+            initialsColor = context.getColor(R.color.onColorfulBackground),
+        )
+    }
+
     fun setImageDrawable(drawable: Drawable?) = binding.avatarImage.setImageDrawable(drawable)
 
     private fun searchInMergedContact(correspondent: Correspondent, contacts: MergedContactDictionary): MergedContact? {
