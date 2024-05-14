@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import androidx.fragment.app.Fragment
+import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -160,10 +161,15 @@ class SharedUtils @Inject constructor(
                     customRealm.writeBlocking { SignatureController.update(data!!.signatures, realm = this) }
                     null
                 } else {
-                    Sentry.withScope { scope ->
-                        scope.level = SentryLevel.ERROR
-                        val apiException = getApiException()
-                        Sentry.captureException(SignatureException(apiException.message, apiException))
+                    when {
+                        error?.exception?.isNetworkException() == true -> Unit
+                        error?.exception != null -> {
+                            val apiException = getApiException()
+                            Sentry.captureException(SignatureException(apiException.message, apiException))
+                        }
+                        data?.signatures?.isEmpty() == true -> {
+                            Sentry.captureMessage("Signatures list is empty", SentryLevel.ERROR)
+                        }
                     }
                     translatedError
                 }
