@@ -296,27 +296,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 override val selectedItems by mainViewModel::selectedThreads
                 override val publishSelectedItems = mainViewModel::publishSelectedItems
             },
-        )
-
-        binding.threadsList.apply {
-            adapter = threadListAdapter
-            layoutManager = LinearLayoutManager(context)
-            orientation = VERTICAL_LIST_WITH_VERTICAL_DRAGGING
-            disableDragDirection(DirectionFlag.UP)
-            disableDragDirection(DirectionFlag.DOWN)
-            disableDragDirection(DirectionFlag.RIGHT)
-            disableDragDirection(DirectionFlag.LEFT)
-            addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
-        }
-
-        threadListAdapter.apply {
-
-            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-            onThreadClicked = ::navigateToThread
-
+            onThreadClicked = ::navigateToThread,
             onFlushClicked = { dialogTitle ->
-
                 val trackerName = when {
                     isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
                     isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
@@ -334,12 +315,24 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                         mainViewModel.flushFolder()
                     },
                 )
-            }
-
+            },
             onLoadMoreClicked = {
                 trackThreadListEvent("loadMore")
                 mainViewModel.getOnePageOfOldMessages()
-            }
+            },
+        )
+
+        threadListAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+        binding.threadsList.apply {
+            adapter = threadListAdapter
+            layoutManager = LinearLayoutManager(context)
+            orientation = VERTICAL_LIST_WITH_VERTICAL_DRAGGING
+            disableDragDirection(DirectionFlag.UP)
+            disableDragDirection(DirectionFlag.DOWN)
+            disableDragDirection(DirectionFlag.RIGHT)
+            disableDragDirection(DirectionFlag.LEFT)
+            addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
         }
     }
 
