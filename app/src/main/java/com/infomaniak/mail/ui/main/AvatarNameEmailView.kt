@@ -73,11 +73,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     }
 
     fun setCorrespondent(correspondent: Correspondent, bimi: Bimi? = null) = with(binding) {
-        if (bimi == null || !bimi.isCertified) {
-            userAvatar.loadAvatar(correspondent)
-        } else {
-            userAvatar.loadBimiAvatar(bimi.svgContentUrl.orEmpty(), correspondent)
-        }
+        userAvatar.loadAvatar(correspondent, bimi)
         setNameAndEmail(correspondent, isCorrespondentCertified = bimi?.isCertified ?: false)
     }
 

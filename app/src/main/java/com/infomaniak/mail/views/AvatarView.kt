@@ -33,8 +33,11 @@ import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
@@ -184,6 +187,14 @@ class AvatarView @JvmOverloads constructor(
                 imageLoader = context.imageLoader,
                 initialsColor = color,
             )
+        }
+    }
+
+    fun loadAvatar(correspondent: Correspondent?, bimi: Bimi?) {
+        if (bimi == null || !bimi.isCertified) {
+            loadAvatar(correspondent)
+        } else {
+            loadBimiAvatar(ApiRoutes.bimi(bimi.svgContentUrl.orEmpty()), correspondent)
         }
     }
 }
