@@ -49,7 +49,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
-import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -403,10 +402,10 @@ class ThreadListAdapter @Inject constructor(
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
         val avatarValue = thread.computeAvatarRecipient()
 
-        if (avatarValue.second != null && avatarValue.second?.isCertified == true) {
+        if (avatarValue?.second != null && avatarValue.second?.isCertified == true) {
             expeditorAvatar.loadBimiAvatar(avatarValue.second?.svgContentUrl.toString(), avatarValue.first)
         } else {
-            expeditorAvatar.loadAvatar(avatarValue.first)
+            expeditorAvatar.loadAvatar(avatarValue?.first)
         }
     }
 
