@@ -147,7 +147,7 @@ class ThreadFragment : Fragment() {
         observeCurrentFolderName()
 
         observeThreadOpening()
-        observeAutoAdavance()
+        observeAutoAdvance()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -465,7 +465,7 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeAutoAdavance() {
+    private fun observeAutoAdvance() {
         mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner) { listThreadsUids ->
             tryToAutoAdvance(listThreadsUids)
         }

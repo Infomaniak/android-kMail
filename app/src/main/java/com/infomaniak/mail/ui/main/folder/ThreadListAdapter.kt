@@ -291,10 +291,7 @@ class ThreadListAdapter @Inject constructor(
             toggleMultiSelectedThread(thread)
         } else {
             previousThreadClickedPosition?.let { previousPosition ->
-                threadListAdapterCallback?.onPositionClickedChanged?.invoke(
-                    position,
-                    previousPosition
-                )
+                threadListAdapterCallback?.onPositionClickedChanged?.invoke(position, previousPosition)
             }
 
             previousThreadClickedPosition = position

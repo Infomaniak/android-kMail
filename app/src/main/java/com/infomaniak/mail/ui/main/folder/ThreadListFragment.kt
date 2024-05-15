@@ -314,8 +314,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 override var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? =
                     ::updateAutoAdvanceNaturalThread
             },
-            multiSelection =
-            object : MultiSelectionListener<Thread> {
+            multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
                 override val selectedItems by mainViewModel::selectedThreads
                 override val publishSelectedItems = mainViewModel::publishSelectedItems
