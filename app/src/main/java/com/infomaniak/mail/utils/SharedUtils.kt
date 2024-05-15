@@ -40,7 +40,6 @@ import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
-import io.sentry.SentryLevel
 import org.jsoup.Jsoup
 import javax.inject.Inject
 
@@ -167,11 +166,8 @@ class SharedUtils @Inject constructor(
                     }
                     null
                 } else {
-                    Sentry.withScope { scope ->
-                        scope.level = SentryLevel.ERROR
-                        val apiException = getApiException()
-                        Sentry.captureException(SignatureException(apiException.message, apiException))
-                    }
+                    val apiException = getApiException()
+                    Sentry.captureException(SignatureException(apiException.message, apiException))
                     translatedError
                 }
             }
