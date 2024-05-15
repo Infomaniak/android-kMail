@@ -57,6 +57,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
 
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
+    override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog

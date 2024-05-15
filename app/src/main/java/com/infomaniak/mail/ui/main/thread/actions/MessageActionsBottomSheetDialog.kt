@@ -56,6 +56,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private var folderRole: FolderRole? = null
 
+    override val shouldCloseMultiSelection: Boolean = false
+    
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 

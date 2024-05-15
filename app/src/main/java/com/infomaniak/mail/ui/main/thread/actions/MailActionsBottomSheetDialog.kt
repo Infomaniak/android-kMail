@@ -31,8 +31,10 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     protected var binding: BottomSheetActionsMenuBinding by safeBinding()
-    protected val mainViewModel: MainViewModel by activityViewModels()
+    override val mainViewModel: MainViewModel by activityViewModels()
     protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
+
+    abstract val shouldCloseMultiSelection: Boolean
 
     private var onClickListener: OnActionClick = object : OnActionClick {
 
@@ -62,16 +64,16 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        archive.setClosingOnClickListener { onClickListener.onArchive() }
-        markAsReadUnread.setClosingOnClickListener { onClickListener.onReadUnread() }
-        move.setClosingOnClickListener { onClickListener.onMove() }
-        postpone.setClosingOnClickListener { onClickListener.onPostpone() }
-        favorite.setClosingOnClickListener { onClickListener.onFavorite() }
-        reportJunk.setClosingOnClickListener { onClickListener.onReportJunk() }
-        print.setClosingOnClickListener { onClickListener.onPrint() }
-        reportDisplayProblem.setClosingOnClickListener { onClickListener.onReportDisplayProblem() }
+        archive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onArchive() }
+        markAsReadUnread.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReadUnread() }
+        move.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onMove() }
+        postpone.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPostpone() }
+        favorite.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onFavorite() }
+        reportJunk.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportJunk() }
+        print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
+        reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
 
-        mainActions.setClosingOnClickListener { id: Int ->
+        mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
             when (id) {
                 R.id.actionReply -> onClickListener.onReply()
                 R.id.actionReplyAll -> onClickListener.onReplyAll()

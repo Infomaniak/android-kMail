@@ -29,11 +29,13 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 
 open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetReplyBinding by safeBinding()
+    override val mainViewModel: MainViewModel? = null
     private val navigationArgs: ReplyBottomSheetDialogArgs by navArgs()
 
     private val currentClassName: String by lazy { ReplyBottomSheetDialog::class.java.name }

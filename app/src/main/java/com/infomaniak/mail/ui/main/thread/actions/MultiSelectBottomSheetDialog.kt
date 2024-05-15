@@ -47,7 +47,7 @@ import javax.inject.Inject
 class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetMultiSelectBinding by safeBinding()
-    private val mainViewModel: MainViewModel by activityViewModels()
+    override val mainViewModel: MainViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { MultiSelectBottomSheetDialog::class.java.name }
 
@@ -67,7 +67,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setStateDependentUi(shouldRead, shouldFavorite)
 
-        binding.mainActions.setClosingOnClickListener { id: Int ->
+        binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             when (id) {
                 R.id.actionMove -> {
                     trackMultiSelectActionEvent(ACTION_MOVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
@@ -96,7 +96,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     }
                 }
             }
-            isMultiSelectOn = false
         }
 
         // binding.postpone.setClosingOnClickListener {
@@ -105,13 +104,13 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         //     isMultiSelectOn = false
         // }
 
-        binding.spam.setClosingOnClickListener {
+        binding.spam.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_SPAM_NAME, selectedThreadsCount, isFromBottomSheet = true)
             toggleThreadsSpamStatus(selectedThreadsUids)
             isMultiSelectOn = false
         }
 
-        binding.favorite.setClosingOnClickListener {
+        binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, selectedThreadsCount, isFromBottomSheet = true)
             toggleThreadsFavoriteStatus(selectedThreadsUids, shouldFavorite)
             isMultiSelectOn = false

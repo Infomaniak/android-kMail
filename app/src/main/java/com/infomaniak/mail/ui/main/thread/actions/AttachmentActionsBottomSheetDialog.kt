@@ -43,7 +43,7 @@ import javax.inject.Inject
 class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetAttachmentActionsBinding by safeBinding()
-    private val mainViewModel: MainViewModel by activityViewModels()
+    override val mainViewModel: MainViewModel by activityViewModels()
     private val attachmentActionsViewModel: AttachmentActionsViewModel by viewModels()
 
     @Inject
