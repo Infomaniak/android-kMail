@@ -498,7 +498,9 @@ class NewMessageViewModel @Inject constructor(
 
     private fun handleSingleSendIntent(draft: Draft, intent: Intent) = with(intent) {
 
-        if (hasExtra(Intent.EXTRA_TEXT)) {
+        if (hasExtra(Intent.EXTRA_EMAIL)) {
+            handleMailTo(draft, intent.data, intent)
+        } else if (hasExtra(Intent.EXTRA_TEXT)) {
             getStringExtra(Intent.EXTRA_SUBJECT)?.let { draft.subject = it }
             getStringExtra(Intent.EXTRA_TEXT)?.let { draft.uiBody = it }
         }
@@ -518,8 +520,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     /**
-     * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
-     * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
+     * Handle `MailTo` from [Intent.ACTION_VIEW], [Intent.ACTION_SENDTO] or [Intent.ACTION_SEND]
+     * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] or [Intent.ACTION_SEND] with [Intent]
+     *
+     * [Intent.ACTION_SEND] shouldn't be used for mailTo as it's not meant to pass the recipient of the mail,
+     * but some apps don't follow the guideline, so we support it anyway
      */
     private fun handleMailTo(draft: Draft, uri: Uri?, intent: Intent? = null) {
 
@@ -536,16 +541,21 @@ class NewMessageViewModel @Inject constructor(
             if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
         }
 
-        if (uri == null || !MailTo.isMailTo(uri)) return
+        fun Intent.getRecipientsFromIntent(recipientsFlag: String): List<Recipient>? {
+            return getStringArrayExtra(recipientsFlag)?.map { Recipient().initLocalValues(it, it) }
+        }
 
-        val mailToIntent = MailTo.parse(uri)
-        val splitTo = mailToIntent.to?.splitToRecipientList()
+        val mailToIntent = runCatching { MailTo.parse(uri!!) }.getOrNull()
+        if (mailToIntent == null && intent?.hasExtra(Intent.EXTRA_EMAIL) != true) return
+
+        val splitTo = mailToIntent?.to?.splitToRecipientList()
+            ?: intent?.getRecipientsFromIntent(Intent.EXTRA_EMAIL)
             ?: emptyList()
-        val splitCc = mailToIntent.cc?.splitToRecipientList()
-            ?: intent?.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
+        val splitCc = mailToIntent?.cc?.splitToRecipientList()
+            ?: intent?.getRecipientsFromIntent(Intent.EXTRA_CC)
             ?: emptyList()
-        val splitBcc = mailToIntent.bcc?.splitToRecipientList()
-            ?: intent?.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
+        val splitBcc = mailToIntent?.bcc?.splitToRecipientList()
+            ?: intent?.getRecipientsFromIntent(Intent.EXTRA_BCC)
             ?: emptyList()
 
         draft.apply {
@@ -553,8 +563,8 @@ class NewMessageViewModel @Inject constructor(
             cc.addAll(splitCc)
             bcc.addAll(splitBcc)
 
-            subject = mailToIntent.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            uiBody = mailToIntent.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            subject = mailToIntent?.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+            uiBody = mailToIntent?.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
         }
     }
 
