@@ -104,7 +104,7 @@ class ThreadListMultiSelection {
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                             threadUid = selectedThreadsUids.single(),
                             shouldLoadDistantResources = false,
-                            shouldCloseMultiSelection = true
+                            shouldCloseMultiSelection = true,
                         )
                     } else {
                         ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()
