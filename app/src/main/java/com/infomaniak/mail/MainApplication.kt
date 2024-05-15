@@ -167,14 +167,14 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
-                val networkExceptionCount = event.exceptions?.count { it.type == "ApiController\$NetworkException" } ?: 0
+                val isNetworkException = event.exceptions?.any { it.type == "ApiController\$NetworkException" } ?: false
                 /**
                  * Reasons to discard Sentry events :
                  * - Application is in Debug mode
                  * - User deactivated Sentry tracking in DataManagement settings
                  * - The exception was a NetworkException, and we don't want to send them to Sentry
                  */
-                if (!BuildConfig.DEBUG && localSettings.isSentryTrackingEnabled && networkExceptionCount == 0) event else null
+                if (!BuildConfig.DEBUG && localSettings.isSentryTrackingEnabled && !isNetworkException) event else null
             }
             options.addIntegration(
                 FragmentLifecycleIntegration(
