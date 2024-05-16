@@ -520,11 +520,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     /**
-     * Handle `MailTo` from [Intent.ACTION_VIEW], [Intent.ACTION_SENDTO] or [Intent.ACTION_SEND]
-     * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] or [Intent.ACTION_SEND] with [Intent]
+     * Handle `mailTo` from [Intent.ACTION_VIEW], [Intent.ACTION_SENDTO] or [Intent.ACTION_SEND].
+     * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] or [Intent.ACTION_SEND] with [Intent].
      *
-     * [Intent.ACTION_SEND] shouldn't be used for mailTo as it's not meant to pass the recipient of the mail,
-     * but some apps don't follow the guideline, so we support it anyway
+     * [Intent.ACTION_SEND] shouldn't be used for `mailTo` as it isn't meant to pass the Recipient of the mail,
+     * but some apps don't follow the guidelines, so we support it anyway.
      */
     private fun handleMailTo(draft: Draft, uri: Uri?, intent: Intent? = null) {
 
