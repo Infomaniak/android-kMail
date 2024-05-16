@@ -101,8 +101,8 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature?): ApiResponse<Boolean> {
-        // If signature is null, it means we want to have no default signature.
-        // If we want to delete the default signature, we have to pass null to the WS call.
+        // If the signature is `null`, it means we want to have no default signature.
+        // If we want to remove the default signature, we have to send `null` to the API call.
         val body = """{"default_signature_id":${signature?.id}}"""
         return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName), POST, body)
     }
@@ -193,8 +193,8 @@ object ApiRepository : ApiRepositoryCore() {
 
     private fun getDraftBody(draft: Draft): String {
         val updatedDraft = if (draft.identityId == Draft.NO_IDENTITY.toString()) {
-            // When we select no signature, we create a dummy signature.
-            // That's why identity ID should be null here to avoid the default value of Signature, which is 0.
+            // When we select no signature, we create a dummy signature with -1 (NO_IDENTITY) as identity ID.
+            // But we can't send that to the API, instead we need to put the `null` value.
             draft.copyFromRealm().apply { identityId = null }
         } else {
             draft
