@@ -189,11 +189,14 @@ class DraftsActionsWorker @AssistedInject constructor(
                     }
                 }
                 exception.printStackTrace()
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    if (exception is ApiErrorException) scope.setTag("Api error code", exception.errorCode ?: "")
-                    Sentry.captureException(exception)
+
+                if (exception !is ApiErrorException || exception.errorCode != ErrorCode.DRAFT_HAS_TOO_MANY_RECIPIENTS) {
+                    Sentry.withScope { scope ->
+                        if (exception is ApiErrorException) scope.setTag("Api error code", exception.errorCode ?: "")
+                        Sentry.captureException(exception)
+                    }
                 }
+
                 haveAllDraftsSucceeded = false
             }
         }
