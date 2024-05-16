@@ -190,7 +190,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                 }
                 exception.printStackTrace()
 
-                if (exception !is ApiErrorException || exception.errorCode != ErrorCode.DRAFT_HAS_TOO_MANY_RECIPIENTS) {
+                if ((exception as? ApiErrorException)?.errorCode != ErrorCode.DRAFT_HAS_TOO_MANY_RECIPIENTS) {
                     Sentry.withScope { scope ->
                         if (exception is ApiErrorException) scope.setTag("Api error code", exception.errorCode ?: "")
                         Sentry.captureException(exception)
