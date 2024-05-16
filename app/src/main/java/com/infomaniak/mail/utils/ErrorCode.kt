@@ -112,7 +112,7 @@ object ErrorCode {
         ApiErrorCode(DRAFT_ATTACHMENT_NOT_FOUND, R.string.errorAttachmentNotFound), // Should we show this technical info ?
         ApiErrorCode(DRAFT_DOES_NOT_EXIST, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
         ApiErrorCode(DRAFT_MESSAGE_NOT_FOUND, R.string.errorDraftNotFound), // Should we show this technical info to the user ?
-        ApiErrorCode(DRAFT_HAS_TOO_MANY_RECIPIENTS, R.string.errorTooManyRecipients), // Useless until we handle local drafts
+        ApiErrorCode(DRAFT_HAS_TOO_MANY_RECIPIENTS, R.string.errorTooManyRecipients),
         ApiErrorCode(DRAFT_MAX_ATTACHMENTS_SIZE_REACHED, R.string.attachmentFileLimitReached),
         ApiErrorCode(DRAFT_NEED_AT_LEAST_ONE_RECIPIENT, R.string.errorAtLeastOneRecipient), // Useless until local drafts
         ApiErrorCode(DRAFT_ALREADY_SCHEDULED_OR_SENT, R.string.errorEditScheduledMessage),
