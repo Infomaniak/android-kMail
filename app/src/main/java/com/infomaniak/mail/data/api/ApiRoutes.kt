@@ -45,8 +45,8 @@ object ApiRoutes {
         return "${mailboxV1(mailboxHostingId, mailboxName)}/signatures"
     }
 
-    fun signature(mailboxHostingId: Int, mailboxName: String, signatureId: Int): String {
-        return "${signatures(mailboxHostingId, mailboxName)}/$signatureId"
+    fun signature(mailboxHostingId: Int, mailboxName: String): String {
+        return "${signatures(mailboxHostingId, mailboxName)}/set_defaults"
     }
     //endregion
 

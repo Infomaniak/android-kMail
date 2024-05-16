@@ -384,6 +384,7 @@
     <string name="searchFilterRead">Lesen</string>
     <string name="searchFilterUnread">Ungelesen</string>
     <string name="searchFolderName">Suche</string>
+    <string name="selectSignatureNone">Keine Unterschrift</string>
     <string name="send">Senden Sie</string>
     <string name="sentFolder">Gesendete Nachrichten</string>
     <string name="settingsAccentColor">Akzentfarbe</string>

@@ -17,7 +17,14 @@
  */
 package com.infomaniak.mail.data.models.signature
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SignaturesResult(val signatures: List<Signature>)
+data class SignaturesResult(
+    val signatures: List<Signature>,
+    @SerialName("default_signature_id")
+    val defaultSignatureId: Int?,
+    @SerialName("default_reply_signature_id")
+    val defaultReplySignatureId: Int?,
+)

@@ -126,6 +126,8 @@ class Draft : RealmObject {
     }
 
     companion object {
+        const val NO_IDENTITY = -1
+
         val actionPropertyName get() = Draft::_action.name
         private val draftJson = Json(ApiController.json) { encodeDefaults = true }
     }

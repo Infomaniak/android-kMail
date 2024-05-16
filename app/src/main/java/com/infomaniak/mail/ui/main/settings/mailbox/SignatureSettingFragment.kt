@@ -76,11 +76,17 @@ class SignatureSettingFragment : Fragment() {
     }
 
     private fun observeSignatures() {
-        signatureSettingViewModel.signaturesLive.observe(viewLifecycleOwner, signatureAdapter::setSignatures)
+        signatureSettingViewModel.signaturesLive.observe(viewLifecycleOwner) { signatures ->
+            signatureAdapter.setSignatures(requireContext(), signatures)
+        }
     }
 
     private fun onSignatureClicked(signature: Signature) = with(signatureSettingViewModel) {
-        val newDefaultSignature = signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
+        val newDefaultSignature = if (signature.isDummy) {
+            null
+        } else {
+            signature.copyFromRealm().apply { isDefault = true }
+        }
 
         setDefaultSignature(newDefaultSignature)
     }

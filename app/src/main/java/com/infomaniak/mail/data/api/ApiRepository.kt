@@ -57,8 +57,11 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
+import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -97,8 +100,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
-    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName, signature.id), PUT, Json.encodeToString(signature))
+    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature?): ApiResponse<Boolean> {
+        // If the signature is `null`, it means we want to have no default signature.
+        // If we want to remove the default signature, we have to send `null` to the API call.
+        val body = """{"default_signature_id":${signature?.id}}"""
+        return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName), POST, body)
     }
 
     fun getBackups(mailboxHostingId: Int, mailboxName: String): ApiResponse<BackupResult> {
@@ -163,7 +169,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun saveDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SaveDraftResult> {
 
-        val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
+        val body = getDraftBody(draft)
 
         fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
@@ -175,7 +181,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun sendDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SendDraftResult> {
 
-        val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
+        val body = getDraftBody(draft)
 
         fun postDraft(): ApiResponse<SendDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
@@ -183,6 +189,17 @@ object ApiRepository : ApiRepositoryCore() {
             callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
+    }
+
+    private fun getDraftBody(draft: Draft): String {
+        val updatedDraft = if (draft.identityId == Draft.NO_IDENTITY.toString()) {
+            // When we select no signature, we create a dummy signature with -1 (NO_IDENTITY) as identity ID.
+            // But we can't send that to the API, instead we need to put the `null` value.
+            draft.copyFromRealm().apply { identityId = null }
+        } else {
+            draft
+        }
+        return Json.encodeToString(updatedDraft.getJsonRequestBody()).removeEmptyRealmLists()
     }
 
     fun attachmentsToForward(mailboxUuid: String, message: Message): ApiResponse<AttachmentsToForwardResult> {

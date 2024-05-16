@@ -384,6 +384,7 @@
     <string name="searchFilterRead">Leggi</string>
     <string name="searchFilterUnread">Non letti</string>
     <string name="searchFolderName">Ricerca</string>
+    <string name="selectSignatureNone">Nessuna firma</string>
     <string name="send">Inviare</string>
     <string name="sentFolder">Messaggi inviati</string>
     <string name="settingsAccentColor">Colore d’accento</string>

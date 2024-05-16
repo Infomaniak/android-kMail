@@ -17,13 +17,22 @@
  */
 package com.infomaniak.mail.data.models.signature
 
+import android.content.Context
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 class Signature : RealmObject {
+
+    //region Remote data
     @PrimaryKey
     var id: Int = 0
     var name: String = ""
@@ -36,9 +45,31 @@ class Signature : RealmObject {
     var senderEmail: String = ""
     @SerialName("sender_idn")
     var senderEmailIdn: String = ""
-
     @SerialName("reply_to_id")
     var replyToId: Int = 0 /* Required for the update call, do not delete */
     @SerialName("sender_id")
     var senderId: Int = 0 /* Required for the update call, do not delete */
+    //endregion
+
+    //region Local data (Transient)
+    @Transient
+    var isDefaultReply: Boolean = false
+    //endregion
+
+    //region UI data (Transient & Ignore)
+    @Transient
+    @Ignore
+    var isDummy: Boolean = false // The empty Signature to allow the User to not choose any Signature.
+    //endregion
+
+    companion object {
+
+        fun getDummySignature(context: Context, isDefault: Boolean = false) = Signature().apply {
+            id = Draft.NO_IDENTITY
+            isDummy = true
+            name = context.getString(R.string.selectSignatureNone)
+            senderEmailIdn = AccountUtils.currentMailboxEmail!!
+            this.isDefault = isDefault
+        }
+    }
 }

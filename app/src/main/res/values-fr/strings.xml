@@ -392,6 +392,7 @@
     <string name="searchFilterRead">Lus</string>
     <string name="searchFilterUnread">Non lus</string>
     <string name="searchFolderName">Recherche</string>
+    <string name="selectSignatureNone">Aucune signature</string>
     <string name="send">Envoyer</string>
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>

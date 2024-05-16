@@ -52,7 +52,7 @@ class SignatureSettingViewModel @Inject constructor(
     val signaturesLive = SignatureController.getSignaturesAsync(customRealm).asLiveData(coroutineContext)
     val showError = SingleLiveEvent<Int>() // StringRes
 
-    fun setDefaultSignature(signature: Signature) = viewModelScope.launch(ioDispatcher) {
+    fun setDefaultSignature(signature: Signature?) = viewModelScope.launch(ioDispatcher) {
         with(ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)) {
             if (isSuccess()) {
                 updateSignatures()
