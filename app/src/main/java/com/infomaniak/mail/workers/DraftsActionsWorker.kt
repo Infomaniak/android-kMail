@@ -455,8 +455,8 @@ class DraftsActionsWorker @AssistedInject constructor(
         mailboxUuid: String,
         isFirstTime: Boolean,
     ): DraftActionResult {
-        return if (isFirstTime && error?.code == ErrorCode.IDENTITY_NOT_FOUND) {
-            updateSignaturesThenRetry(draft, mailboxUuid)
+        if (isFirstTime && error?.code == ErrorCode.IDENTITY_NOT_FOUND) {
+            return updateSignaturesThenRetry(draft, mailboxUuid)
         } else {
             throwErrorAsException()
         }
