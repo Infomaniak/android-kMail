@@ -85,7 +85,7 @@ class SignatureSettingFragment : Fragment() {
         val newDefaultSignature = if (signature.isDummy) {
             null
         } else {
-            signature.copyFromRealm(UInt.MIN_VALUE).apply { isDefault = true }
+            signature.copyFromRealm().apply { isDefault = true }
         }
 
         setDefaultSignature(newDefaultSignature)
