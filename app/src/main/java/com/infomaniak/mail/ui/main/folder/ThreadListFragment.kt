@@ -682,9 +682,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 binding.emptyStateView.isGone = true
                 binding.threadsList.isVisible = true
 
-                // TODO: I added the `!isBooting` check, because when the app is booting, we display
-                //  an empty ThreadList before getting 1st Realm results. If the Sentry doesn't
-                //  trigger anymore, it means everything is fine and we can remove it.
                 if (!areThereThreads && !isFilterEnabled && !isBooting) {
                     val currentFolder = mainViewModel.currentFolder.value
                     Sentry.withScope { scope ->
