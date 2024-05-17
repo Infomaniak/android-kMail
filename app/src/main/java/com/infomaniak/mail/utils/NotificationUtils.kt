@@ -48,6 +48,7 @@ import io.realm.kotlin.Realm
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.infomaniak.lib.core.R as RCore
@@ -60,7 +61,7 @@ class NotificationUtils @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
 ) {
 
-    private val notificationsByMailboxId = mutableMapOf<Int, MutableList<NotificationWithIdAndTag>>()
+    private val notificationsByMailboxId = ConcurrentHashMap<Int, MutableList<NotificationWithIdAndTag>>()
     private val notificationsJobByMailboxId = mutableMapOf<Int, Job?>()
 
     fun initNotificationChannel() = with(appContext) {
