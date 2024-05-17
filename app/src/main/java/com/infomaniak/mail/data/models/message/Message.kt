@@ -159,11 +159,23 @@ class Message : RealmObject {
                 _folders.single { _folders.count() == 1 || it.id != SEARCH_FOLDER_ID }
             }.getOrElse {
                 Sentry.withScope { scope ->
-                    scope.setExtra("folders", "${_folders.map { "role:[${it.role?.name}] (id:[${it.id}])" }}")
-                    scope.setExtra("foldersCount", "${_folders.count()}")
+                    scope.level = SentryLevel.ERROR
                     scope.setExtra("messageUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    Sentry.captureMessage("Message has several or 0 parent folders, it should not be possible", SentryLevel.ERROR)
+                    val sentryMessage = if (_folders.isEmpty()) {
+                        "Message has 0 parent folders, it should not be possible"
+                    } else {
+                        scope.setExtra("folders", "${_folders.map { "role:[${it.role?.name}] (id:[${it.id}])" }}")
+                        scope.setExtra("foldersCount", "${_folders.count()}")
+                        val allFoldersAreSearch = _folders.all { it.id == SEARCH_FOLDER_ID }
+                        val allFoldersAreTheSame = _folders.all { it.id == _folders.firstOrNull()?.id }
+                        when {
+                            allFoldersAreSearch -> "Message has multiple times the Search folder as parent, it should not be possible"
+                            allFoldersAreTheSame -> "Message has multiple times the same parent folder, it should not be possible"
+                            else -> "Message has multiple parent folders, it should not be possible"
+                        }
+                    }
+                    Sentry.captureMessage(sentryMessage)
                 }
                 _folders.first()
             }
