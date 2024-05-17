@@ -219,6 +219,10 @@
         <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
+        <argument
+            android:name="shouldCloseMultiSelection"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 
     <dialog
@@ -521,7 +525,7 @@
         android:id="@+id/mainActivity"
         android:name="com.infomaniak.mail.ui.MainActivity"
         android:label="MainActivity"
-        tools:layout="@layout/activity_main" >
+        tools:layout="@layout/activity_main">
         <argument
             android:name="shortcutId"
             android:defaultValue=""

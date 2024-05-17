@@ -101,10 +101,10 @@ class ThreadListMultiSelection {
                 R.id.quickActionMenu -> {
                     threadListFragment.trackMultiSelectActionEvent(OPEN_ACTION_BOTTOM_SHEET, selectedThreadsCount)
                     val direction = if (selectedThreadsCount == 1) {
-                        isMultiSelectOn = false
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                             threadUid = selectedThreadsUids.single(),
                             shouldLoadDistantResources = false,
+                            shouldCloseMultiSelection = true,
                         )
                     } else {
                         ThreadListFragmentDirections.actionThreadListFragmentToMultiSelectBottomSheetDialog()

@@ -41,7 +41,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetJunkBinding by safeBinding()
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
+    override val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog

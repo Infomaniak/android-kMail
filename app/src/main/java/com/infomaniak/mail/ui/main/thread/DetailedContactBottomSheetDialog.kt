@@ -40,7 +40,7 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetDetailedContactBinding by safeBinding()
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
+    override val mainViewModel: MainViewModel by activityViewModels()
 
     private val currentClassName: String by lazy { DetailedContactBottomSheetDialog::class.java.name }
 

@@ -19,18 +19,23 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.mail.ui.MainViewModel
 
 abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
-    protected fun ActionItemView.setClosingOnClickListener(callback: () -> Unit) {
+    abstract val mainViewModel: MainViewModel?
+
+    protected fun ActionItemView.setClosingOnClickListener(shouldCloseMultiSelection: Boolean = false, callback: () -> Unit) {
         setOnClickListener {
+            if (shouldCloseMultiSelection) mainViewModel?.isMultiSelectOn = false
             findNavController().popBackStack()
             callback()
         }
     }
 
-    protected fun MainActionsView.setClosingOnClickListener(callback: (Int) -> Unit) {
+    protected fun MainActionsView.setClosingOnClickListener(shouldCloseMultiSelection: Boolean = false, callback: (Int) -> Unit) {
         setOnItemClickListener { id ->
+            if (shouldCloseMultiSelection) mainViewModel?.isMultiSelectOn = false
             findNavController().popBackStack()
             callback(id)
         }
