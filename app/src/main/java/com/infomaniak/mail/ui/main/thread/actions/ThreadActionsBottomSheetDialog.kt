@@ -59,12 +59,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection by lazy { navigationArgs.shouldCloseMultiSelection }
 
-    @Inject
-    lateinit var descriptionDialog: DescriptionAlertDialog
-
     private var folderRole: FolderRole? = null
     private var isFromArchive: Boolean = false
     private var isFromSpam: Boolean = false
+
+    @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)

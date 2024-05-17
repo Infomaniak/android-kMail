@@ -22,6 +22,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.ui.MainViewModel
 
 abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
+
     abstract val mainViewModel: MainViewModel?
 
     protected fun ActionItemView.setClosingOnClickListener(shouldCloseMultiSelection: Boolean = false, callback: () -> Unit) {

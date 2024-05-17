@@ -53,11 +53,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
 
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
+    override val shouldCloseMultiSelection: Boolean = false
 
     private var folderRole: FolderRole? = null
 
-    override val shouldCloseMultiSelection: Boolean = false
-    
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
