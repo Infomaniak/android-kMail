@@ -23,6 +23,7 @@ import android.graphics.Canvas
 import android.os.Build
 import android.text.Spannable
 import android.text.TextUtils.TruncateAt
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -49,6 +50,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -401,9 +403,8 @@ class ThreadListAdapter @Inject constructor(
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
         val avatarValue = thread.computeAvatarRecipient()
-
         if (avatarValue?.second != null && avatarValue.second?.isCertified == true) {
-            expeditorAvatar.loadBimiAvatar(avatarValue.second?.svgContentUrl.toString(), avatarValue.first)
+            expeditorAvatar.loadBimiAvatar(ApiRoutes.bimi(avatarValue.second?.svgContentUrl.toString()), avatarValue.first)
         } else {
             expeditorAvatar.loadAvatar(avatarValue?.first)
         }

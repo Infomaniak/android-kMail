@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -37,7 +38,6 @@ import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
@@ -149,13 +149,14 @@ class AvatarView @JvmOverloads constructor(
     fun loadBimiAvatar(urlBimi: String, correspondent: Correspondent?) = with(binding.avatarImage) {
         val fakeUrlBimi = "https://upload.wikimedia.org/wikipedia/commons/4/4f/SVG_Logo.svg"
         contentDescription = correspondent?.email.orEmpty()
-        isBimiShow = fakeUrlBimi.isNotEmpty()
+        isBimiShow = urlBimi.isNotEmpty()
+        Log.e("Bimi", urlBimi)
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(
                 correspondent?.email.orEmpty().hashCode(),
                 R.array.AvatarColors
             ),
-            avatarUrl = fakeUrlBimi,
+            avatarUrl = urlBimi,
             initials = correspondent?.initials.orEmpty(),
             imageLoader = context.simpleImageLoader,
             initialsColor = context.getColor(R.color.onColorfulBackground),
