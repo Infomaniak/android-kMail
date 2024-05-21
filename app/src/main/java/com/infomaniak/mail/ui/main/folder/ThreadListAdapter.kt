@@ -101,7 +101,6 @@ class ThreadListAdapter @Inject constructor(
         private set
     var openedThreadUid: String? = null
         private set
-
     //endregion
 
     init {
@@ -321,6 +320,7 @@ class ThreadListAdapter @Inject constructor(
             if (dataSet[currentThreadIndex] is Thread) return dataSet[currentThreadIndex] as Thread to currentThreadIndex
             currentThreadIndex += direction
         }
+
         return null
     }
 

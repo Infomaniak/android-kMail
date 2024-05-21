@@ -630,8 +630,7 @@ class ThreadFragment : Fragment() {
         twoPaneViewModel.navArgs.value = NavData(resId, args)
     }
 
-    private fun tryToAutoAdvance(listThreadUids: List<String>) =
-        with(twoPaneFragment.threadListAdapter) {
+    private fun tryToAutoAdvance(listThreadUids: List<String>) = with(twoPaneFragment.threadListAdapter) {
             if (!listThreadUids.contains(openedThreadUid)) return@with
 
             openedThreadPosition?.let {

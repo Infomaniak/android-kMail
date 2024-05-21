@@ -34,6 +34,7 @@ import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.AutoAdvanceMode
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
@@ -223,9 +224,9 @@ abstract class TwoPaneFragment : Fragment() {
 
     protected fun updateAutoAdvanceNaturalThread(currentPosition: Int, previousPosition: Int) {
         localSettings.autoAdvanceNaturalThread = if (currentPosition > previousPosition) {
-            LocalSettings.AutoAdvanceMode.FOLLOWING_THREAD
+            AutoAdvanceMode.FOLLOWING_THREAD
         } else {
-            LocalSettings.AutoAdvanceMode.PREVIOUS_THREAD
+            AutoAdvanceMode.PREVIOUS_THREAD
         }
     }
 }
