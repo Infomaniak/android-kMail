@@ -94,8 +94,6 @@ class ThreadListAdapter @Inject constructor(
     private var isFolderNameVisible: Boolean = false
     private var threadListAdapterCallback: ThreadListAdapterCallback? = null
 
-    private var previousThreadClickedPosition: Int? = null
-
     //region Tablet mode
     var openedThreadPosition: Int? = null
         private set
@@ -289,12 +287,6 @@ class ThreadListAdapter @Inject constructor(
         if (multiSelection?.isEnabled == true) {
             toggleMultiSelectedThread(thread)
         } else {
-            previousThreadClickedPosition?.let { previousPosition ->
-                threadListAdapterCallback?.onPositionClickedChanged?.invoke(position, previousPosition)
-            }
-
-            previousThreadClickedPosition = position
-
             threadListAdapterCallback?.onThreadClicked?.invoke(thread)
             // If the Thread is `onlyOneDraft`, we'll directly navigate to the NewMessageActivity.
             // It means that we won't go to the ThreadFragment, so there's no need to select anything.
@@ -311,6 +303,9 @@ class ThreadListAdapter @Inject constructor(
 
         if (oldPosition != null && oldPosition < itemCount) notifyItemChanged(oldPosition, NotificationType.SELECTED_STATE)
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
+        if (oldPosition != null && newPosition != null) {
+            threadListAdapterCallback?.onPositionClickedChanged?.invoke(newPosition, oldPosition)
+        }
     }
 
     fun getNextThread(startingThreadIndex: Int, direction: Int): Pair<Thread, Int>? {
