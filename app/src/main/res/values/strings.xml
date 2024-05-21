@@ -401,7 +401,7 @@
     <string name="settingsAutoAdvanceDescription">Select what to display when a message is archived or deleted</string>
     <string name="settingsAutoAdvanceFollowingThreadDescription">Display following thread when archiving or deleting</string>
     <string name="settingsAutoAdvanceFollowingThreadTitle">Following thread</string>
-    <string name="settingsAutoAdvanceListOfThreadsDescription">Display list of threads when archiving or deleting</string>
+    <string name="settingsAutoAdvanceListOfThreadsDescription">Display the list of threads when archiving or deleting</string>
     <string name="settingsAutoAdvanceListOfThreadsTitle">List of threads</string>
     <string name="settingsAutoAdvanceNaturalThreadDescription">Repeats the last action you performed</string>
     <string name="settingsAutoAdvanceNaturalThreadHint">Automatically selects the next or previous thread, depending on your last interaction.</string>
