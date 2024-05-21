@@ -631,38 +631,42 @@ class ThreadFragment : Fragment() {
     }
 
     private fun tryToAutoAdvance(listThreadUids: List<String>) = with(twoPaneFragment.threadListAdapter) {
-            if (!listThreadUids.contains(openedThreadUid)) return@with
+        if (!listThreadUids.contains(openedThreadUid)) return@with
 
-            openedThreadPosition?.let {
-                val data = getNextThreadToOpenByPosition(it)
+        openedThreadPosition?.let {
+            val data = getNextThreadToOpenByPosition(it)
 
-                data?.let { (nextThread, index) ->
-                    if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
-                        selectNewThread(newPosition = index, nextThread.uid)
-                    }
+            data?.let { (nextThread, index) ->
+                if (nextThread.uid != openedThreadUid && !nextThread.isOnlyOneDraft) {
+                    selectNewThread(newPosition = index, nextThread.uid)
+                }
 
-                    twoPaneFragment.navigateToThread(nextThread)
-                } ?: run {
-                    twoPaneViewModel.closeThread()
+                twoPaneFragment.navigateToThread(nextThread)
+            } ?: run {
+                twoPaneViewModel.closeThread()
+            }
+        }
+    }
+
+    private fun getNextThreadToOpenByPosition(
+        startingThreadIndex: Int,
+    ): Pair<Thread, Int>? = with(twoPaneFragment.threadListAdapter) {
+
+        val direction = when (localSettings.autoAdvanceMode) {
+            AutoAdvanceMode.PREVIOUS_THREAD -> PREVIOUS_CHRONOLOGICAL_THREAD
+            AutoAdvanceMode.FOLLOWING_THREAD -> NEXT_CHRONOLOGICAL_THREAD
+            AutoAdvanceMode.THREADS_LIST -> null
+            AutoAdvanceMode.NATURAL_THREAD -> {
+                if (localSettings.autoAdvanceNaturalThread == AutoAdvanceMode.PREVIOUS_THREAD) {
+                    PREVIOUS_CHRONOLOGICAL_THREAD
+                } else {
+                    NEXT_CHRONOLOGICAL_THREAD
                 }
             }
         }
 
-    private fun getNextThreadToOpenByPosition(startingThreadIndex: Int): Pair<Thread, Int>? =
-        with(twoPaneFragment.threadListAdapter) {
-            return when (localSettings.autoAdvanceMode) {
-                AutoAdvanceMode.PREVIOUS_THREAD -> getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
-                AutoAdvanceMode.FOLLOWING_THREAD -> getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
-                AutoAdvanceMode.THREADS_LIST -> null
-                AutoAdvanceMode.NATURAL_THREAD -> {
-                    if (localSettings.autoAdvanceNaturalThread == AutoAdvanceMode.PREVIOUS_THREAD) {
-                        getNextThread(startingThreadIndex, direction = PREVIOUS_CHRONOLOGICAL_THREAD)
-                    } else {
-                        getNextThread(startingThreadIndex, direction = NEXT_CHRONOLOGICAL_THREAD)
-                    }
-                }
-            }
-        }
+        return direction?.let { getNextThread(startingThreadIndex, direction) }
+    }
 
     enum class HeaderState {
         ELEVATED,
