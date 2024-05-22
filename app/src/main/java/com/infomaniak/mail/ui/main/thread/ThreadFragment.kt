@@ -466,9 +466,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeAutoAdvance() {
-        mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner) { listThreadsUids ->
-            tryToAutoAdvance(listThreadsUids)
-        }
+        mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner, ::tryToAutoAdvance)
     }
 
     private fun displayThreadView() = with(binding) {

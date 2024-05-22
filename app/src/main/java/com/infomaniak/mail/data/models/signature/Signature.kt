@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.models.signature
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.utils.AccountUtils

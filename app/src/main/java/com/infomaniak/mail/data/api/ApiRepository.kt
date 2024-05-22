@@ -60,8 +60,6 @@ import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request

@@ -114,7 +114,7 @@ object LocalStorageUtils {
             val attachmentsUploadDir = getAttachmentUploadDir(context, draftLocalUuid, attachmentLocalUuid)
             attachmentsUploadDir.mkdirs()
             val hashedFileName = "${uri.toString().substringAfter("document/").hashCode()}_$fileName"
-            
+
             return@use getFileToUpload(context, uri, snackbarManager, attachmentsUploadDir, hashedFileName, inputStream)
         } ?: run {
             Sentry.withScope { scope ->

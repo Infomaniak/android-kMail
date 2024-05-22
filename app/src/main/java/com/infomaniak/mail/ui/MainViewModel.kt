@@ -846,6 +846,7 @@ class MainViewModel @Inject constructor(
             snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
     }
+    //endregion
 
     //region BlockUser
     fun blockUser(message: Message) = viewModelScope.launch(ioCoroutineContext) {
