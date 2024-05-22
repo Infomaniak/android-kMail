@@ -52,13 +52,16 @@ object LocalStorageUtils {
     fun downloadThenSaveAttachmentToCacheDir(resource: String, cacheFile: File): Boolean {
         fun Response.saveAttachmentTo(outputFile: File): Boolean {
             if (!isSuccessful) return false
-            return body?.byteStream()?.use { inputStream ->
+            body?.byteStream()?.use { inputStream ->
                 saveAttachmentToCacheDir(inputStream, outputFile)
-                true
-            } ?: false
+                return true
+            }
+
+            return false
         }
 
-        return runCatching { ApiRepository.downloadAttachment(resource) }.getOrNull()?.saveAttachmentTo(cacheFile) ?: false
+        val attachment = runCatching { ApiRepository.downloadAttachment(resource) }.getOrNull()
+        return attachment?.saveAttachmentTo(cacheFile) == true
     }
 
     /**
