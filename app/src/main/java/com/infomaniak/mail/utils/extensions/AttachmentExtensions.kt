@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
@@ -37,7 +38,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
@@ -55,7 +55,6 @@ object AttachmentExtensions {
 
     private const val DRIVE_PACKAGE = "com.infomaniak.drive"
     private const val SAVE_EXTERNAL_ACTIVITY_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
-
 
     //region Intent
     private fun canSaveOnKDrive(context: Context) = runCatching {
@@ -129,7 +128,6 @@ object AttachmentExtensions {
     }
 
     suspend fun Attachment.startUpload(
-        appContext: Context,
         draftLocalUuid: String,
         userId: Int,
         mailbox: Mailbox,
@@ -160,14 +158,6 @@ object AttachmentExtensions {
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
             updateLocalAttachment(draftLocalUuid, apiResponse.data!!, draftController, realm)
-            attachmentFile.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(
-                context = appContext,
-                draftLocalUuid = draftLocalUuid,
-                attachmentLocalUuid = localUuid,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-            )
         } else {
             SentryLog.e(
                 tag = ATTACHMENT_TAG,
@@ -195,7 +185,9 @@ object AttachmentExtensions {
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
                 // The API version of an Attachment doesn't have the `uploadLocalUri`, so we need to back it up.
+                // Same for the localUuid
                 remoteAttachment.uploadLocalUri = uploadLocalUri
+                remoteAttachment.localUuid = draftLocalUuid
 
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
                 draft.attachments.add(remoteAttachment)

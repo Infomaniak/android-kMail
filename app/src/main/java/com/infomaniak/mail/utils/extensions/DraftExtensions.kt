@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils.extensions
 
-import android.content.Context
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.isNetworkException
@@ -29,13 +28,7 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions.ATTACHMENT_TAG
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.startUpload
 import io.realm.kotlin.Realm
 
-suspend fun Draft.uploadAttachments(
-    appContext: Context,
-    userId: Int,
-    mailbox: Mailbox,
-    draftController: DraftController,
-    realm: Realm,
-): Boolean {
+suspend fun Draft.uploadAttachments(userId: Int, mailbox: Mailbox, draftController: DraftController, realm: Realm): Boolean {
 
     val attachmentsToUpload = getNotUploadedAttachments(draft = this)
     val attachmentsToUploadCount = attachmentsToUpload.count()
@@ -49,7 +42,7 @@ suspend fun Draft.uploadAttachments(
 
     attachmentsToUpload.forEach { attachment ->
         runCatching {
-            attachment.startUpload(appContext, localUuid, userId, mailbox, draftController, realm)
+            attachment.startUpload(localUuid, userId, mailbox, draftController, realm)
         }.onFailure { exception ->
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
             if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()

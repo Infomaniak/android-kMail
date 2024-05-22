@@ -147,7 +147,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (isTargetDraft) trackedDraftAction = draft.action
 
             runCatching {
-                draft.uploadAttachments(applicationContext, userId, mailbox, draftController, mailboxContentRealm)
+                draft.uploadAttachments(userId, mailbox, draftController, mailboxContentRealm)
                 with(executeDraftAction(draft, mailbox.uuid)) {
                     if (isSuccess) {
                         if (isTargetDraft) {

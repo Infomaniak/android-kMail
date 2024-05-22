@@ -717,13 +717,7 @@ class NewMessageViewModel @Inject constructor(
             DraftController.getDraft(localUuid, realm = this)?.also { it.updateDraftAttachmentsFromLiveData() }
         } ?: return@launch
 
-        localDraft.uploadAttachments(
-            appContext,
-            AccountUtils.currentUserId,
-            currentMailbox,
-            draftController,
-            mailboxContentRealm(),
-        )
+        localDraft.uploadAttachments(AccountUtils.currentUserId, currentMailbox, draftController, mailboxContentRealm())
     }
 
     fun executeDraftActionWhenStopping(
