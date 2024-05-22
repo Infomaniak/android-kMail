@@ -76,7 +76,9 @@ object AttachmentExtensions {
     }
 
     private fun Attachment.openWithIntent(context: Context): Intent {
-        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
+        val file = getUploadLocalFile() ?: getCacheFile(context)
+        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), file)
+
         return Intent().apply {
             action = Intent.ACTION_VIEW
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -99,7 +101,7 @@ object AttachmentExtensions {
         intentType: AttachmentIntentType,
         navigateToDownloadProgressDialog: (Attachment, AttachmentIntentType) -> Unit,
     ) {
-        if (hasUsableCache(context) || isInlineCachedFile(context)) {
+        if (hasUsableCache(context, getUploadLocalFile()) || isInlineCachedFile(context)) {
             getIntentOrGoToPlayStore(context, intentType)?.let(context::startActivity)
         } else {
             navigateToDownloadProgressDialog(this, intentType)

@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
@@ -469,8 +470,11 @@ class DraftsActionsWorker @AssistedInject constructor(
         return executeDraftAction(draft, mailboxUuid, isFirstTime = false)
     }
 
-    private fun deleteDraftCallback(draft: Draft): (MutableRealm) -> Unit {
-        return { realm -> realm.findLatest(draft)?.let(realm::delete) }
+    private fun deleteDraftCallback(draft: Draft): (MutableRealm) -> Unit = { realm ->
+        realm.findLatest(draft)?.let { localDraft ->
+            deleteDraftUploadDir(applicationContext, localDraft.localUuid, mailbox.userId, mailboxId, mustForceDelete = true)
+            realm.delete(localDraft)
+        }
     }
 
     class Scheduler @Inject constructor(

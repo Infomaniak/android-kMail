@@ -56,25 +56,18 @@ class DownloadAttachmentViewModel @Inject constructor(
         val attachment = runCatching {
 
             val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
-            Log.e("TOTO", "local attachment = localuuid : ${localAttachment.localUuid} | resource = ${localAttachment.resource}")
-            val attachmentFile = localAttachment.getCacheFile(appContext)
-            Log.e("TOTO", "attachmentFile = $attachmentFile")
 
-            var isAttachmentCached = localAttachment.hasUsableCache(appContext, attachmentFile)
-            Log.e("TOTO", "isAttachmentCached = $isAttachmentCached")
+            var isAttachmentCached = localAttachment.hasUsableCache(appContext, localAttachment.getUploadLocalFile())
             if (!isAttachmentCached) {
                 isAttachmentCached = localAttachment.resource?.let { resource ->
-                    Log.e("TOTO", "resource not null")
-                    LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(resource, attachmentFile)
+                    LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(resource, localAttachment.getCacheFile(appContext))
                 } ?: false
             }
 
             if (isAttachmentCached) {
-                Log.e("TOTO", "emit attachment")
                 attachment = null
                 localAttachment
             } else {
-                Log.e("TOTO", "emit null")
                 null
             }
         }.getOrNull()

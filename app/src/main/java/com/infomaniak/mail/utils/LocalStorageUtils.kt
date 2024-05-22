@@ -183,16 +183,18 @@ object LocalStorageUtils {
         draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
+        mustForceDelete: Boolean = false,
     ) {
         val draftDir = getDraftUploadDir(context, draftLocalUuid, userId, mailboxId).also {
             if (!it.exists()) return
         }
+
         val mailboxDir = draftDir.parentFile ?: return
         val userDir = mailboxDir.parentFile ?: return
         val attachmentsRootDir = userDir.parentFile ?: return
 
         // Only delete a directory if it's empty
-        if (draftDir.hasNoChildren) draftDir.delete() else return
+        if (draftDir.hasNoChildren || mustForceDelete) draftDir.deleteRecursively() else return
         if (mailboxDir.hasNoChildren) mailboxDir.delete() else return
         if (userDir.hasNoChildren) userDir.delete() else return
         if (attachmentsRootDir.hasNoChildren) attachmentsRootDir.delete()
