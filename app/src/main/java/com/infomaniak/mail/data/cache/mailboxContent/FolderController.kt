@@ -17,10 +17,12 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.extensions.copyListToRealm
 import com.infomaniak.mail.utils.extensions.flattenFolderChildren
 import io.realm.kotlin.MutableRealm
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 class FolderController @Inject constructor(
+    private val appContext: Context,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
 ) {
 
@@ -75,13 +78,13 @@ class FolderController @Inject constructor(
     }
     //endregion
 
-    fun update(remoteFolders: List<Folder>, realm: Realm) {
+    fun update(mailbox: Mailbox, remoteFolders: List<Folder>, realm: Realm) {
         val remoteFoldersWithChildren = remoteFolders.flattenFolderChildren()
 
         realm.writeBlocking {
 
             SentryLog.d(RealmDatabase.TAG, "Folders: Delete outdated data")
-            deleteOutdatedFolders(remoteFoldersWithChildren)
+            deleteOutdatedFolders(mailbox, remoteFoldersWithChildren)
 
             SentryLog.d(RealmDatabase.TAG, "Folders: Save new data")
             upsertFolders(remoteFoldersWithChildren)
@@ -93,14 +96,14 @@ class FolderController @Inject constructor(
         threads = realmListOf()
     }
 
-    private fun MutableRealm.deleteOutdatedFolders(remoteFolders: List<Folder>) {
+    private fun MutableRealm.deleteOutdatedFolders(mailbox: Mailbox, remoteFolders: List<Folder>) {
         getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
-            deleteLocalFolder(folder)
+            deleteLocalFolder(mailbox, folder)
         }
     }
 
-    private fun MutableRealm.deleteLocalFolder(folder: Folder) {
-        MessageController.deleteMessages(folder.messages, realm = this)
+    private fun MutableRealm.deleteLocalFolder(mailbox: Mailbox, folder: Folder) {
+        MessageController.deleteMessages(appContext, mailbox, folder.messages, realm = this)
         if (folder.threads.isNotEmpty()) delete(folder.threads)
         delete(folder)
     }

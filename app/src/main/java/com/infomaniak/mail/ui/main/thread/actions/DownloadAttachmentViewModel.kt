@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData
@@ -52,22 +53,33 @@ class DownloadAttachmentViewModel @Inject constructor(
     private var attachment: Attachment? = null
 
     fun downloadAttachment() = liveData(ioCoroutineContext) {
-        val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
-        val attachmentFile = localAttachment.getCacheFile(appContext)
+        val attachment = runCatching {
 
-        var isAttachmentCached = localAttachment.hasUsableCache(appContext, attachmentFile)
-        if (!isAttachmentCached) {
-            isAttachmentCached = localAttachment.resource?.let { resource ->
-                LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(resource, attachmentFile)
-            } ?: false
-        }
+            val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
+            Log.e("TOTO", "local attachment = localuuid : ${localAttachment.localUuid} | resource = ${localAttachment.resource}")
+            val attachmentFile = localAttachment.getCacheFile(appContext)
+            Log.e("TOTO", "attachmentFile = $attachmentFile")
 
-        if (isAttachmentCached) {
-            emit(localAttachment)
-            attachment = null
-        } else {
-            emit(null)
-        }
+            var isAttachmentCached = localAttachment.hasUsableCache(appContext, attachmentFile)
+            Log.e("TOTO", "isAttachmentCached = $isAttachmentCached")
+            if (!isAttachmentCached) {
+                isAttachmentCached = localAttachment.resource?.let { resource ->
+                    Log.e("TOTO", "resource not null")
+                    LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(resource, attachmentFile)
+                } ?: false
+            }
+
+            if (isAttachmentCached) {
+                Log.e("TOTO", "emit attachment")
+                attachment = null
+                localAttachment
+            } else {
+                Log.e("TOTO", "emit null")
+                null
+            }
+        }.getOrNull()
+
+        emit(attachment)
     }
 
     override fun onCleared() = runCatchingRealm {

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -57,6 +58,7 @@ import kotlin.math.max
 
 @Singleton
 class RefreshController @Inject constructor(
+    private val appContext: Context,
     private val localSettings: LocalSettings,
     private val mailboxController: MailboxController,
     private val delayApiCallManager: DelayApiCallManager,
@@ -600,7 +602,7 @@ class RefreshController @Inject constructor(
                 impactedFolders.add(threadFolderId)
             }
 
-            MessageController.deleteMessage(message, realm = this)
+            MessageController.deleteMessage(appContext, mailbox, message, realm = this)
         }
 
         threads.forEach {
@@ -880,10 +882,12 @@ class RefreshController @Inject constructor(
         writeBlocking {
             findLatest(folder)?.let {
                 SentryDebug.sendOrphanMessages(previousCursor, folder = it).also { orphans ->
-                    MessageController.deleteMessages(orphans, realm = this)
+                    MessageController.deleteMessages(appContext, mailbox, orphans, realm = this)
                 }
                 SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this).also { orphans ->
-                    orphans.forEach { thread -> MessageController.deleteMessages(thread.messages, realm = this) }
+                    orphans.forEach { thread ->
+                        MessageController.deleteMessages(appContext, mailbox, thread.messages, realm = this)
+                    }
                     delete(orphans)
                 }
             }
