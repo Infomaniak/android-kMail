@@ -89,18 +89,16 @@ class ThreadListAdapter @Inject constructor(
     private var swipingIsAuthorized: Boolean = true
     private var isLoadMoreDisplayed = false
 
-    private var onThreadClicked: ((thread: Thread) -> Unit)? = null
-    private var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
-    private var onLoadMoreClicked: (() -> Unit)? = null
-
     private var folderRole: FolderRole? = null
-    private var onSwipeFinished: (() -> Unit)? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
     private var isFolderNameVisible: Boolean = false
+    private var threadListAdapterCallback: ThreadListAdapterCallback? = null
 
     //region Tablet mode
-    private var openedThreadPosition: Int? = null
-    private var openedThreadUid: String? = null
+    var openedThreadPosition: Int? = null
+        private set
+    var openedThreadUid: String? = null
+        private set
     //endregion
 
     init {
@@ -109,20 +107,14 @@ class ThreadListAdapter @Inject constructor(
 
     operator fun invoke(
         folderRole: FolderRole?,
-        onSwipeFinished: (() -> Unit)? = null,
+        threadListAdapterCallback: ThreadListAdapterCallback,
         multiSelection: MultiSelectionListener<Thread>? = null,
         isFolderNameVisible: Boolean = false,
-        onThreadClicked: ((thread: Thread) -> Unit),
-        onFlushClicked: ((dialogTitle: String) -> Unit)? = null,
-        onLoadMoreClicked: (() -> Unit)? = null,
     ) {
         this.folderRole = folderRole
-        this.onSwipeFinished = onSwipeFinished
         this.multiSelection = multiSelection
         this.isFolderNameVisible = isFolderNameVisible
-        this.onThreadClicked = onThreadClicked
-        this.onFlushClicked = onFlushClicked
-        this.onLoadMoreClicked = onLoadMoreClicked
+        this.threadListAdapterCallback = threadListAdapterCallback
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -295,7 +287,7 @@ class ThreadListAdapter @Inject constructor(
         if (multiSelection?.isEnabled == true) {
             toggleMultiSelectedThread(thread)
         } else {
-            onThreadClicked?.invoke(thread)
+            threadListAdapterCallback?.onThreadClicked?.invoke(thread)
             // If the Thread is `onlyOneDraft`, we'll directly navigate to the NewMessageActivity.
             // It means that we won't go to the ThreadFragment, so there's no need to select anything.
             if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(position, thread.uid)
@@ -311,6 +303,20 @@ class ThreadListAdapter @Inject constructor(
 
         if (oldPosition != null && oldPosition < itemCount) notifyItemChanged(oldPosition, NotificationType.SELECTED_STATE)
         if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
+        if (oldPosition != null && newPosition != null) {
+            threadListAdapterCallback?.onPositionClickedChanged?.invoke(newPosition, oldPosition)
+        }
+    }
+
+    fun getNextThread(startingThreadIndex: Int, direction: Int): Pair<Thread, Int>? {
+        var currentThreadIndex = startingThreadIndex + direction
+
+        while (currentThreadIndex >= 0 && currentThreadIndex <= dataSet.lastIndex) {
+            if (dataSet[currentThreadIndex] is Thread) return dataSet[currentThreadIndex] as Thread to currentThreadIndex
+            currentThreadIndex += direction
+        }
+
+        return null
     }
 
     /**
@@ -454,14 +460,14 @@ class ThreadListAdapter @Inject constructor(
         flushButton.apply {
             val buttonText = context.getString(buttonTextId)
             text = buttonText
-            setOnClickListener { onFlushClicked?.invoke(buttonText) }
+            setOnClickListener { threadListAdapterCallback?.onFlushClicked?.invoke(buttonText) }
         }
     }
 
     private fun ItemThreadLoadMoreButtonBinding.displayLoadMoreButton() {
         loadMoreButton.setOnClickListener {
             if (dataSet.last() is Unit) dataSet = dataSet.toMutableList().apply { removeLastOrNull() }
-            onLoadMoreClicked?.invoke()
+            threadListAdapterCallback?.onLoadMoreClicked?.invoke()
         }
     }
 
@@ -538,7 +544,7 @@ class ThreadListAdapter @Inject constructor(
 
     override fun onSwipeAnimationFinished(viewHolder: ThreadListViewHolder) {
         viewHolder.isSwipedOverHalf = false
-        onSwipeFinished?.invoke()
+        threadListAdapterCallback?.onSwipeFinished?.invoke()
         unblockOtherSwipes()
     }
 

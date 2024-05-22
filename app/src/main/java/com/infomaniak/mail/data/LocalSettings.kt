@@ -64,6 +64,8 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
     var isSentryTrackingEnabled by sharedValue("isSentryTrackingEnabledKey", true)
     var isMatomoTrackingEnabled by sharedValue("isMatomoTrackingEnabledKey", true)
+    var autoAdvanceMode by sharedValue("autoAdvanceModeKey", AutoAdvanceMode.THREADS_LIST)
+    var autoAdvanceNaturalThread by sharedValue("autoAdvanceNaturalThreadKey", AutoAdvanceMode.FOLLOWING_THREAD)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 
@@ -189,6 +191,13 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: String) {
         ALWAYS("true", R.string.settingsOptionAlways, "always"),
         ASK_ME("false", R.string.settingsOptionAskMe, "askMe"),
+    }
+
+    enum class AutoAdvanceMode(val matomoValue: String, @StringRes val localisedNameRes: Int) {
+        PREVIOUS_THREAD("previousThread", R.string.settingsAutoAdvancePreviousThreadDescription),
+        FOLLOWING_THREAD("followingThread", R.string.settingsAutoAdvanceFollowingThreadDescription),
+        THREADS_LIST("listOfThread", R.string.settingsAutoAdvanceListOfThreadsDescription),
+        NATURAL_THREAD("naturalThread", R.string.settingsAutoAdvanceNaturalThreadDescription),
     }
 
     companion object {

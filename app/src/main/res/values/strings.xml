@@ -398,6 +398,17 @@
     <string name="settingsAiEngineDescription">Select your AI writing assistant</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsAuthorizeTracking">Authorize tracking</string>
+    <string name="settingsAutoAdvanceDescription">Select what to display when a message is archived or deleted</string>
+    <string name="settingsAutoAdvanceFollowingThreadDescription">Display following thread when archiving or deleting</string>
+    <string name="settingsAutoAdvanceFollowingThreadTitle">Following thread</string>
+    <string name="settingsAutoAdvanceListOfThreadsDescription">Display the list of threads when archiving or deleting</string>
+    <string name="settingsAutoAdvanceListOfThreadsTitle">List of threads</string>
+    <string name="settingsAutoAdvanceNaturalThreadDescription">Repeats the last action you performed</string>
+    <string name="settingsAutoAdvanceNaturalThreadHint">Automatically selects the next or previous thread, depending on your last interaction.</string>
+    <string name="settingsAutoAdvanceNaturalThreadTitle">Repeat last action</string>
+    <string name="settingsAutoAdvancePreviousThreadDescription">Display previous thread when archiving or deleting</string>
+    <string name="settingsAutoAdvancePreviousThreadTitle">Previous thread</string>
+    <string name="settingsAutoAdvanceTitle">Auto advance</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>
     <string name="settingsDataManagementDescription">You can customize the usage and operational data that Infomaniak retrieves to correct bugs and enhance the application. Both tools are hosted and managed exclusively by us.\n\nInfomaniak respects your privacy: the source code of this application can be verified, the information collected is anonymous and your personal information remains strictly confidential and is never shared with third parties.</string>

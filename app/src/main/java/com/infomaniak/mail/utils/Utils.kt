@@ -98,7 +98,7 @@ object Utils {
             addSource(liveData2) { postIfInit() }
         }
     }
-    
+
     fun openShortcutHelp(context: Context) {
         ShortcutManagerCompat.reportShortcutUsed(context, Shortcuts.SUPPORT.id)
         context.openUrl(BuildConfig.CHATBOT_URL)

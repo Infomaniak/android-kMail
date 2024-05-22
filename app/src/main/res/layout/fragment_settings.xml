@@ -102,6 +102,14 @@
                 app:title="@string/settingsExternalContentTitle"
                 tools:subtitle="@string/settingsOptionAskMe" />
 
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsAutomaticAdvance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsAutoAdvanceTitle"
+                tools:subtitle="@string/settingsAutoAdvanceListOfThreadsDescription" />
+
             <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
             <TextView

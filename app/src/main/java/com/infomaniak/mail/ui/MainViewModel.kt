@@ -110,6 +110,8 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
 
+    val autoAdvanceThreadsUids = MutableLiveData<List<String>>()
+
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     //region Multi selection
@@ -477,6 +479,8 @@ class MainViewModel @Inject constructor(
 
         deleteThreadOrMessageTrigger.postValue(Unit)
         if (apiResponse.isSuccess()) {
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
+
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = trashId),
@@ -558,12 +562,12 @@ class MainViewModel @Inject constructor(
     //region Move
     fun moveThreadsOrMessageTo(
         destinationFolderId: String,
-        threadsUids: Array<String>,
+        threadsUids: List<String>,
         messageUid: String? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
         val destinationFolder = folderController.getFolder(destinationFolderId)!!
-        val threads = getActionThreads(threadsUids.toList()).ifEmpty { return@launch }
+        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
@@ -571,6 +575,8 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
+
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
@@ -636,6 +642,8 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
+
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
             refreshFoldersAsync(
                 mailbox = mailbox,
@@ -897,7 +905,7 @@ class MainViewModel @Inject constructor(
 
     fun moveToNewFolder(
         name: String,
-        threadsUids: Array<String>,
+        threadsUids: List<String>,
         messageUid: String?,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
@@ -1039,10 +1047,20 @@ class MainViewModel @Inject constructor(
         snackbarManager.postValue(appContext.getString(snackbarTitleRes))
     }
 
+    private fun threadHasOnlyOneMessageLeftInCurrentFolder(threadUid: String): Boolean {
+        val folderId = currentFolderId ?: return false
+        return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
+    }
+
+    private fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
+        val isWorkingWithThread = message == null
+        return isWorkingWithThread || threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())
+    }
+
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
-        private const val REFRESH_DELAY = 2_000L // We add this delay because it doesn't always work if we just use the `etop`.
+        private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
     }
 }

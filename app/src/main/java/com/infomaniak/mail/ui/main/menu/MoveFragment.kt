@@ -104,7 +104,7 @@ class MoveFragment : MenuFoldersFragment() {
         inputDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
-                mainViewModel.moveToNewFolder(folderName, navigationArgs.threadsUids, navigationArgs.messageUid)
+                mainViewModel.moveToNewFolder(folderName, navigationArgs.threadsUids.toList(), navigationArgs.messageUid)
             },
             onErrorCheck = ::checkForFolderCreationErrors,
         )
@@ -133,7 +133,7 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
-        mainViewModel.moveThreadsOrMessageTo(folderId, threadsUids, messageUid)
+        mainViewModel.moveThreadsOrMessageTo(folderId, threadsUids.toList(), messageUid)
         findNavController().popBackStack()
     }
 

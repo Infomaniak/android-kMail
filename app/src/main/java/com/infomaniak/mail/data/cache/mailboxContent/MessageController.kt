@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
@@ -136,6 +137,13 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
     fun getMessagesAsync(messageUid: String): Flow<ResultsChange<Message>> {
         return getMessagesQuery(messageUid, mailboxContentRealm()).asFlow()
+    }
+
+    fun getMessageCountInThreadForFolder(threadUid: String, folderId: String, realm: Realm): Long? {
+        return ThreadController.getThread(threadUid, realm)
+            ?.messages?.query("${Message::folderId.name} == $0", folderId)
+            ?.count()
+            ?.find()
     }
     //endregion
 

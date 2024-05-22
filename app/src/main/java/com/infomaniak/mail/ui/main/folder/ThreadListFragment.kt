@@ -55,7 +55,6 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
@@ -103,9 +102,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private var isFirstTimeRefreshingThreads = true
-
-    @Inject
-    lateinit var localSettings: LocalSettings
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
@@ -287,38 +283,41 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     private fun setupAdapter() {
-
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
-            onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
+            threadListAdapterCallback = object : ThreadListAdapterCallback {
+                override var onSwipeFinished: (() -> Unit)? = { threadListViewModel.isRecoveringFinished.value = true }
+                override var onThreadClicked: (Thread) -> Unit = ::navigateToThread
+                override var onFlushClicked: ((dialogTitle: String) -> Unit)? = { dialogTitle ->
+                    val trackerName = when {
+                        isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
+                        isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
+                        isCurrentFolderRole(FolderRole.SPAM) -> "emptySpam"
+                        else -> null
+                    }
+
+                    trackerName?.let { trackThreadListEvent(it) }
+
+                    descriptionDialog.show(
+                        title = dialogTitle,
+                        description = getString(R.string.threadListEmptyFolderAlertDescription),
+                        onPositiveButtonClicked = {
+                            trackThreadListEvent("${trackerName}Confirm")
+                            mainViewModel.flushFolder()
+                        },
+                    )
+                }
+                override var onLoadMoreClicked: (() -> Unit)? = {
+                    trackThreadListEvent("loadMore")
+                    mainViewModel.getOnePageOfOldMessages()
+                }
+                override var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? =
+                    ::updateAutoAdvanceNaturalThread
+            },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
                 override val selectedItems by mainViewModel::selectedThreads
                 override val publishSelectedItems = mainViewModel::publishSelectedItems
-            },
-            onThreadClicked = ::navigateToThread,
-            onFlushClicked = { dialogTitle ->
-                val trackerName = when {
-                    isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
-                    isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
-                    isCurrentFolderRole(FolderRole.SPAM) -> "emptySpam"
-                    else -> null
-                }
-
-                trackerName?.let { trackThreadListEvent(it) }
-
-                descriptionDialog.show(
-                    title = dialogTitle,
-                    description = getString(R.string.threadListEmptyFolderAlertDescription),
-                    onPositiveButtonClicked = {
-                        trackThreadListEvent("${trackerName}Confirm")
-                        mainViewModel.flushFolder()
-                    },
-                )
-            },
-            onLoadMoreClicked = {
-                trackThreadListEvent("loadMore")
-                mainViewModel.getOnePageOfOldMessages()
             },
         )
 

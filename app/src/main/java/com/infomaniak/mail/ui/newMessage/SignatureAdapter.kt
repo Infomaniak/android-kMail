@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSignatureBinding
