@@ -77,6 +77,7 @@ class Attachment : EmbeddedRealmObject {
         this.size = size
         this.mimeType = mimeType
         this.uploadLocalUri = uri
+
         return this
     }
 

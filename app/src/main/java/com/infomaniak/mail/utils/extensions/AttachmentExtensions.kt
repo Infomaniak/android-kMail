@@ -187,7 +187,7 @@ object AttachmentExtensions {
                 // The API version of an Attachment doesn't have the `uploadLocalUri`, so we need to back it up.
                 // Same for the localUuid
                 remoteAttachment.uploadLocalUri = uploadLocalUri
-                remoteAttachment.localUuid = draftLocalUuid
+                remoteAttachment.localUuid = localUuid
 
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
                 draft.attachments.add(remoteAttachment)
