@@ -214,7 +214,7 @@ class Thread : RealmObject {
         }
     }
 
-    fun computeAvatarRecipient(): Pair<Recipient?, Bimi?>? = runCatching {
+    fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
 
         val message = messages
             .lastOrNull { it.folder.role != FolderRole.SENT && it.folder.role != FolderRole.DRAFT }
@@ -240,7 +240,7 @@ class Thread : RealmObject {
             Sentry.captureException(throwable)
         }
 
-        null
+        null to null
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {

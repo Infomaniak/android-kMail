@@ -23,7 +23,6 @@ import android.graphics.Canvas
 import android.os.Build
 import android.text.Spannable
 import android.text.TextUtils.TruncateAt
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -402,11 +401,11 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
-        val avatarValue = thread.computeAvatarRecipient()
-        if (avatarValue?.second != null && avatarValue.second?.isCertified == true) {
-            expeditorAvatar.loadBimiAvatar(ApiRoutes.bimi(avatarValue.second?.svgContentUrl.toString()), avatarValue.first)
+        val (recipient, bimi) = thread.computeAvatarRecipient()
+        if (bimi != null && bimi.isCertified) {
+            expeditorAvatar.loadBimiAvatar(ApiRoutes.bimi(bimi.svgContentUrl.toString()), recipient)
         } else {
-            expeditorAvatar.loadAvatar(avatarValue?.first)
+            expeditorAvatar.loadAvatar(recipient)
         }
     }
 
