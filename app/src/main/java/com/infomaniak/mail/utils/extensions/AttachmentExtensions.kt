@@ -37,7 +37,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.WorkerUtils
+import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
 import io.realm.kotlin.Realm
@@ -137,7 +137,7 @@ object AttachmentExtensions {
         val attachmentFile = getUploadLocalFile().also {
             if (it?.exists() != true) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
-                throw WorkerUtils.UploadMissingLocalFileException()
+                throw UploadMissingLocalFileException()
             }
         }
 
@@ -161,7 +161,7 @@ object AttachmentExtensions {
         } else {
             SentryLog.e(
                 tag = ATTACHMENT_TAG,
-                msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
+                msg = "Upload failed for attachment $localUuid - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
                 throwable = apiResponse.getApiException(),
             )
 
@@ -184,8 +184,7 @@ object AttachmentExtensions {
                 SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (uuids to localUris): $uuidToLocalUri")
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
-                // The API version of an Attachment doesn't have the `uploadLocalUri`, so we need to back it up.
-                // Same for the localUuid
+                // The API version of an Attachment doesn't have the `uploadLocalUri` & `localUuid`, so we need to back them up.
                 remoteAttachment.uploadLocalUri = uploadLocalUri
                 remoteAttachment.localUuid = localUuid
 

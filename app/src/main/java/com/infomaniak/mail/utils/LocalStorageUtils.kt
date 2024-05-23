@@ -21,6 +21,7 @@ import android.content.Context
 import android.net.Uri
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.ui.main.SnackbarManager
 import io.sentry.Sentry
 import okhttp3.Response
@@ -49,9 +50,11 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
     }
 
-    fun downloadThenSaveAttachmentToCacheDir(resource: String, cacheFile: File): Boolean {
+    fun downloadThenSaveAttachmentToCacheDir(context: Context, localAttachment: Attachment): Boolean {
+
         fun Response.saveAttachmentTo(outputFile: File): Boolean {
             if (!isSuccessful) return false
+
             body?.byteStream()?.use { inputStream ->
                 saveAttachmentToCacheDir(inputStream, outputFile)
                 return true
@@ -60,8 +63,8 @@ object LocalStorageUtils {
             return false
         }
 
-        val attachment = runCatching { ApiRepository.downloadAttachment(resource) }.getOrNull()
-        return attachment?.saveAttachmentTo(cacheFile) == true
+        val attachment = runCatching { localAttachment.resource?.let(ApiRepository::downloadAttachment) }.getOrNull()
+        return attachment?.saveAttachmentTo(localAttachment.getCacheFile(context)) == true
     }
 
     /**
@@ -173,7 +176,7 @@ object LocalStorageUtils {
             if (!it.exists()) return
         }
 
-        // Only delete a directory if it's empty
+        // The File.delete() function only delete the file if it has no children, that's precisely what we want here
         attachmentDir.delete()
 
         deleteDraftUploadDir(context, draftLocalUuid, userId, mailboxId)
@@ -194,7 +197,7 @@ object LocalStorageUtils {
         val userDir = mailboxDir.parentFile ?: return
         val attachmentsRootDir = userDir.parentFile ?: return
 
-        // Only delete a directory if it's empty
+        // The File.delete() function only delete the file if it has no children, that's precisely what we want here
         if (mustForceDelete) draftDir.deleteRecursively() else draftDir.delete()
         if (!mailboxDir.delete()) return
         if (!userDir.delete()) return

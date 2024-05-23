@@ -52,15 +52,12 @@ class DownloadAttachmentViewModel @Inject constructor(
     private var attachment: Attachment? = null
 
     fun downloadAttachment() = liveData(ioCoroutineContext) {
-        val attachment = runCatching {
-
+        val downloadedAttachment = runCatching {
             val localAttachment = attachmentController.getAttachment(attachmentLocalUuid).also { attachment = it }
 
             var isAttachmentCached = localAttachment.hasUsableCache(appContext, localAttachment.getUploadLocalFile())
             if (!isAttachmentCached) {
-                isAttachmentCached = localAttachment.resource?.let { resource ->
-                    LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(resource, localAttachment.getCacheFile(appContext))
-                } ?: false
+                isAttachmentCached = LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(appContext, localAttachment)
             }
 
             if (isAttachmentCached) {
@@ -71,7 +68,7 @@ class DownloadAttachmentViewModel @Inject constructor(
             }
         }.getOrNull()
 
-        emit(attachment)
+        emit(downloadedAttachment)
     }
 
     override fun onCleared() = runCatchingRealm {

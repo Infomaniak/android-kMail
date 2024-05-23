@@ -432,8 +432,6 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     companion object {
-        // TODO: Delete logs with this tag when Attachments' `uuid` problem will be resolved
-        private const val ATTACHMENT_TAG = "attachmentUpload"
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"

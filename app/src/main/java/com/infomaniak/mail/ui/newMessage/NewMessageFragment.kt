@@ -49,7 +49,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
+import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
@@ -272,7 +272,7 @@ class NewMessageFragment : Fragment() {
             shouldDisplayCloseButton = true,
             onDelete = ::onDeleteAttachment,
             onAttachmentClicked = {
-                trackAttachmentActionsEvent(ACTION_OPEN_NAME)
+                trackAttachmentActionsEvent(OPEN_FROM_DRAFT_NAME)
                 it.openAttachment(
                     context = requireContext(),
                     navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
@@ -495,7 +495,7 @@ class NewMessageFragment : Fragment() {
                 isFirstTime = false
                 observeImportAttachments()
             } else if (attachments.count() > attachmentAdapter.itemCount) {
-                // If we are adding Attachments, directly upload them to save time when sending/saving the draft
+                // If we are adding Attachments, directly upload them to save time when sending/saving the Draft.
                 newMessageViewModel.uploadAttachmentsToServer()
             }
 
