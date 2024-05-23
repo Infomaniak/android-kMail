@@ -58,11 +58,11 @@ class AvatarView @JvmOverloads constructor(
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var currentCorrespondent: Correspondent? = null
-    private var isBimiShow: Boolean? = null
+    private var isBimiShow: Boolean = false
 
     private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
         currentCorrespondent?.let { correspondent ->
-            if (isBimiShow == false) loadAvatarUsingDictionary(correspondent, contacts)
+            if (!isBimiShow) loadAvatarUsingDictionary(correspondent, contacts)
         }
     }
 
