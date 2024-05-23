@@ -84,9 +84,9 @@
 
             <ImageView
                 android:id="@+id/iconCertified"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginStart="@dimen/marginStandardVerySmall"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="@dimen/marginStandardSmall"
                 android:src="@drawable/ic_certified"
                 tools:ignore="ContentDescription" />
         </LinearLayout>

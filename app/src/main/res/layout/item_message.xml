@@ -71,8 +71,8 @@
 
                 <ImageView
                     android:id="@+id/iconCertified"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardVerySmall"
                     android:src="@drawable/ic_certified"
                     app:layout_constraintBottom_toBottomOf="@+id/expeditorName"
