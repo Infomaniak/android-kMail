@@ -274,6 +274,10 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         lastAppClosingTime = null
     }
 
+    fun createSvgImageLoader(): ImageLoader {
+        return CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener(), isSvg = true)
+    }
+
     companion object {
         private const val FIRST_LAUNCH_TIME = 0L
     }
