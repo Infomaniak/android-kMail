@@ -28,9 +28,9 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions.ATTACHMENT_TAG
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.startUpload
 import io.realm.kotlin.Realm
 
-suspend fun Draft.uploadAttachments(userId: Int, mailbox: Mailbox, draftController: DraftController, realm: Realm): Boolean {
+suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: DraftController, realm: Realm): Boolean {
 
-    val attachmentsToUpload = getNotUploadedAttachments(draft = this)
+    val attachmentsToUpload = getNotUploadedAttachments()
     val attachmentsToUploadCount = attachmentsToUpload.count()
     if (attachmentsToUploadCount > 0) {
         SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
@@ -42,7 +42,7 @@ suspend fun Draft.uploadAttachments(userId: Int, mailbox: Mailbox, draftControll
 
     attachmentsToUpload.forEach { attachment ->
         runCatching {
-            attachment.startUpload(localUuid, userId, mailbox, draftController, realm)
+            attachment.startUpload(localUuid, mailbox, draftController, realm)
         }.onFailure { exception ->
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
             if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
@@ -53,4 +53,4 @@ suspend fun Draft.uploadAttachments(userId: Int, mailbox: Mailbox, draftControll
     return true
 }
 
-private fun getNotUploadedAttachments(draft: Draft): List<Attachment> = draft.attachments.filter { it.uuid.isEmpty() }
+private fun Draft.getNotUploadedAttachments(): List<Attachment> = attachments.filter { it.uuid.isEmpty() }

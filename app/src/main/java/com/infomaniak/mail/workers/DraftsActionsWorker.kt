@@ -148,7 +148,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (isTargetDraft) trackedDraftAction = draft.action
 
             runCatching {
-                draft.uploadAttachments(userId, mailbox, draftController, mailboxContentRealm)
+                draft.uploadAttachments(mailbox, draftController, mailboxContentRealm)
                 with(executeDraftAction(draft, mailbox.uuid)) {
                     if (isSuccess) {
                         if (isTargetDraft) {
@@ -267,92 +267,6 @@ class DraftsActionsWorker @AssistedInject constructor(
             Result.failure(outputData)
         }
     }
-    //
-    // private fun Draft.uploadAttachments(): Result {
-    //
-    //     val attachmentsToUpload = getNotUploadedAttachments(draft = this)
-    //     val attachmentsToUploadCount = attachmentsToUpload.count()
-    //     if (attachmentsToUploadCount > 0) {
-    //         SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
-    //         SentryLog.d(
-    //             tag = ATTACHMENT_TAG,
-    //             msg = "Attachments Uuids to localUris : ${attachmentsToUpload.map { it.uuid to it.uploadLocalUri }}}",
-    //         )
-    //     }
-    //
-    //     attachmentsToUpload.forEach { attachment ->
-    //         runCatching {
-    //             attachment.startUpload(localUuid)
-    //         }.onFailure { exception ->
-    //             SentryLog.d(TAG, "${exception.message}", exception)
-    //             if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
-    //             throw exception
-    //         }
-    //     }
-    //
-    //     return Result.success()
-    // }
-
-    // private fun getNotUploadedAttachments(draft: Draft): List<Attachment> = draft.attachments.filter { it.uuid.isEmpty() }
-    //
-    // private fun Attachment.startUpload(draftLocalUuid: String) {
-    //     val attachmentFile = getUploadLocalFile().also {
-    //         if (it?.exists() != true) {
-    //             SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
-    //             throw WorkerUtils.UploadMissingLocalFileException()
-    //         }
-    //     }
-    //     val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
-    //         .set("Authorization", "Bearer $userApiToken")
-    //         .addUnsafeNonAscii("x-ws-attachment-filename", name)
-    //         .add("x-ws-attachment-mime-type", mimeType)
-    //         .add("x-ws-attachment-disposition", "attachment")
-    //         .build()
-    //     val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
-    //         .headers(headers)
-    //         .post(attachmentFile!!.asRequestBody(mimeType.toMediaType()))
-    //         .build()
-    //
-    //     val response = okHttpClient.newCall(request).execute()
-    //
-    //     val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
-    //     if (apiResponse.isSuccess() && apiResponse.data != null) {
-    //         updateLocalAttachment(draftLocalUuid, apiResponse.data!!)
-    //         attachmentFile.delete()
-    //         LocalStorageUtils.deleteAttachmentUploadDir(
-    //             context = applicationContext,
-    //             draftLocalUuid = draftLocalUuid,
-    //             attachmentLocalUuid = localUuid,
-    //             userId = userId,
-    //             mailboxId = mailbox.mailboxId,
-    //         )
-    //     } else {
-    //         SentryLog.e(
-    //             tag = ATTACHMENT_TAG,
-    //             msg = "Upload failed for attachment $name - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
-    //             throwable = apiResponse.getApiException(),
-    //         )
-    //
-    //         apiResponse.throwErrorAsException()
-    //     }
-    // }
-    //
-    // private fun Attachment.updateLocalAttachment(draftLocalUuid: String, remoteAttachment: Attachment) {
-    //     mailboxContentRealm.writeBlocking {
-    //         draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
-    //
-    //             val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
-    //             SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (Uuids to localUris): $uuidToLocalUri")
-    //             SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
-    //
-    //             // The API version of an Attachment doesn't have the `uploadLocalUri`, so we need to back it up.
-    //             remoteAttachment.uploadLocalUri = uploadLocalUri
-    //
-    //             delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
-    //             draft.attachments.add(remoteAttachment)
-    //         }
-    //     }
-    // }
 
     data class DraftActionResult(
         val realmActionOnDraft: ((MutableRealm) -> Unit)?,
@@ -472,7 +386,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private fun deleteDraftCallback(draft: Draft): (MutableRealm) -> Unit = { realm ->
         realm.findLatest(draft)?.let { localDraft ->
-            deleteDraftUploadDir(applicationContext, localDraft.localUuid, mailbox.userId, mailboxId, mustForceDelete = true)
+            deleteDraftUploadDir(applicationContext, localDraft.localUuid, userId, mailboxId, mustForceDelete = true)
             realm.delete(localDraft)
         }
     }

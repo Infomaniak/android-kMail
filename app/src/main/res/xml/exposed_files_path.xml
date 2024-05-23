@@ -20,6 +20,6 @@
         name="attachments"
         path="attachments_cache" />
     <files-path
-        name="attachments uploaded"
+        name="uploaded attachments"
         path="attachments_upload" />
 </paths>

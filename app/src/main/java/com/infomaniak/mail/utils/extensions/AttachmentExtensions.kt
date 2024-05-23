@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
@@ -131,7 +130,6 @@ object AttachmentExtensions {
 
     suspend fun Attachment.startUpload(
         draftLocalUuid: String,
-        userId: Int,
         mailbox: Mailbox,
         draftController: DraftController,
         realm: Realm,
@@ -143,7 +141,7 @@ object AttachmentExtensions {
             }
         }
 
-        val userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return false
+        val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return false
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
             .addUnsafeNonAscii("x-ws-attachment-filename", name)
@@ -155,7 +153,7 @@ object AttachmentExtensions {
             .post(attachmentFile!!.asRequestBody(mimeType.toMediaType()))
             .build()
 
-        val response = AccountUtils.getHttpClient(userId).newCall(request).execute()
+        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
@@ -183,7 +181,7 @@ object AttachmentExtensions {
             draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
 
                 val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
-                SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (Uuids to localUris): $uuidToLocalUri")
+                SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (uuids to localUris): $uuidToLocalUri")
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
                 // The API version of an Attachment doesn't have the `uploadLocalUri`, so we need to back it up.

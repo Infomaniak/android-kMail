@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData

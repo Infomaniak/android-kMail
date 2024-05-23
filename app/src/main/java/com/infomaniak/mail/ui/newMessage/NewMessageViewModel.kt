@@ -608,19 +608,18 @@ class NewMessageViewModel @Inject constructor(
         val attachment = Attachment()
 
         return LocalStorageUtils.saveAttachmentToUploadDir(
-            appContext,
-            uri,
-            fileName,
-            draftLocalUuid!!,
-            attachment.localUuid,
-            snackbarManager,
-        )
-            ?.let { file ->
-                Pair(
-                    attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
-                    fileSize > availableSpace,
-                )
-            }
+            context = appContext,
+            uri = uri,
+            fileName = fileName,
+            draftLocalUuid = draftLocalUuid!!,
+            attachmentLocalUuid = attachment.localUuid,
+            snackbarManager = snackbarManager,
+        )?.let { file ->
+            Pair(
+                attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
+                fileSize > availableSpace,
+            )
+        }
     }
 
     private fun RealmList<Recipient>.flagRecipientsAsAutomaticallyEntered() {
@@ -711,13 +710,15 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun uploadAttachmentToServer() = viewModelScope.launch(ioDispatcher) {
+    fun uploadAttachmentsToServer() = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
         val localDraft = mailboxContentRealm().writeBlocking {
             DraftController.getDraft(localUuid, realm = this)?.also { it.updateDraftAttachmentsFromLiveData() }
         } ?: return@launch
 
-        localDraft.uploadAttachments(AccountUtils.currentUserId, currentMailbox, draftController, mailboxContentRealm())
+        runCatching {
+            localDraft.uploadAttachments(currentMailbox, draftController, mailboxContentRealm())
+        }.onFailure(Sentry::captureException)
     }
 
     fun executeDraftActionWhenStopping(
@@ -818,6 +819,7 @@ class NewMessageViewModel @Inject constructor(
                     // `attachments.filter { … }.also { … }.firstOrNull()` with `attachments.singleOrNull { … }`
                     if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same uploadLocalUri")
                 }.firstOrNull()
+
             /**
              * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly already be
              * some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of
@@ -825,6 +827,7 @@ class NewMessageViewModel @Inject constructor(
              */
             return@map if (localAttachment?.uuid != null) localAttachment.copyFromRealm() else uiAttachment
         }
+
         attachments.apply {
             clear()
             addAll(updatedAttachments)
