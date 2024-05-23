@@ -39,8 +39,6 @@ object LocalStorageUtils {
     private inline val Context.attachmentsCacheRootDir get() = File(cacheDir, ATTACHMENTS_CACHE_DIR)
     private inline val Context.attachmentsUploadRootDir get() = File(filesDir, ATTACHMENTS_UPLOAD_DIR)
 
-    private inline val File.hasNoChildren get() = listFiles().isNullOrEmpty()
-
     //region Cache
     fun getAttachmentsCacheDir(
         context: Context,
@@ -173,7 +171,7 @@ object LocalStorageUtils {
         }
 
         // Only delete a directory if it's empty
-        if (attachmentDir.hasNoChildren) attachmentDir.delete()
+        attachmentDir.delete()
 
         deleteDraftUploadDir(context, draftLocalUuid, userId, mailboxId)
     }
@@ -194,10 +192,10 @@ object LocalStorageUtils {
         val attachmentsRootDir = userDir.parentFile ?: return
 
         // Only delete a directory if it's empty
-        if (draftDir.hasNoChildren || mustForceDelete) draftDir.deleteRecursively() else return
-        if (mailboxDir.hasNoChildren) mailboxDir.delete() else return
-        if (userDir.hasNoChildren) userDir.delete() else return
-        if (attachmentsRootDir.hasNoChildren) attachmentsRootDir.delete()
+        if (mustForceDelete) draftDir.deleteRecursively() else draftDir.delete()
+        if (!mailboxDir.delete()) return
+        if (!userDir.delete()) return
+        attachmentsRootDir.delete()
     }
     //endregion
 
