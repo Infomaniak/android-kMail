@@ -23,6 +23,7 @@ import android.view.ContextThemeWrapper
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
+import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor.ApiCallRecord
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SharedValues
 import com.infomaniak.lib.core.utils.sharedValue
@@ -66,6 +67,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var isMatomoTrackingEnabled by sharedValue("isMatomoTrackingEnabledKey", true)
     var autoAdvanceMode by sharedValue("autoAdvanceModeKey", AutoAdvanceMode.THREADS_LIST)
     var autoAdvanceNaturalThread by sharedValue("autoAdvanceNaturalThreadKey", AutoAdvanceMode.FOLLOWING_THREAD)
+    var accessTokenApiCallRecord by sharedValue<ApiCallRecord>("accessTokenApiCallRecord", null)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 

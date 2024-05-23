@@ -37,6 +37,7 @@ import com.facebook.stetho.Stetho
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpClientConfig
 import com.infomaniak.lib.core.utils.CoilUtils
@@ -224,8 +225,16 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureHttpClient() {
         AccountUtils.onRefreshTokenError = refreshTokenError
-        HttpClientConfig.customInterceptors = listOf(UrlTraceInterceptor())
-        HttpClient.init(tokenInterceptorListener())
+        val tokenInterceptorListener = tokenInterceptorListener()
+        HttpClientConfig.customInterceptors = listOf(
+            UrlTraceInterceptor(),
+            AccessTokenUsageInterceptor(
+                tokenInterceptorListener = tokenInterceptorListener,
+                previousApiCall = localSettings.accessTokenApiCallRecord,
+                updateLastApiCall = { localSettings.accessTokenApiCallRecord = it },
+            )
+        )
+        HttpClient.init(tokenInterceptorListener)
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
