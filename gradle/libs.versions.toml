@@ -22,6 +22,7 @@ sentryAndroidFragment = "7.10.0"
 webkit = "1.11.0"
 workConcurrentFutures = "1.2.0"
 workRuntimeKtx = "2.9.0"
+coilSvg = "2.6.0"
 
 [libraries]
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
@@ -43,6 +44,7 @@ sentry-android-fragment = { module = "io.sentry:sentry-android-fragment", versio
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 work-concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "workConcurrentFutures" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilSvg" }
 # Unit tests
 ext-junit = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
 junit = { module = "junit:junit", version.ref = "junit" }
