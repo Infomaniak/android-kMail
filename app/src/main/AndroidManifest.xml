@@ -99,6 +99,10 @@
             <meta-data
                 android:name="WindowManagerPreference:FreeformWindowOrientation"
                 android:value="landscape" />
+            <!-- Chromebook specific : the app will boot in fullscreen -->
+            <meta-data
+                android:name="WindowManagerPreference:FreeformWindowSize"
+                android:value="maximize" />
         </activity>
 
         <activity
