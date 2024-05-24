@@ -38,20 +38,26 @@
                 android:layout_marginTop="@dimen/marginStandard"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_logo_infomaniak_mail"
-                app:layout_constraintBottom_toTopOf="@id/noValidMailboxesEmptyState"
+                app:layout_constraintBottom_toTopOf="@id/noValidMailboxesBlock"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.infomaniak.mail.ui.main.EmptyStateView
-                android:id="@+id/noValidMailboxesEmptyState"
+            <com.infomaniak.mail.views.InformationBlockView
+                android:id="@+id/noValidMailboxesBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandard"
                 android:layout_marginTop="@dimen/marginLarge"
-                app:icon="@drawable/ic_invalid_mailbox"
                 app:layout_constraintTop_toBottomOf="@id/logo"
-                tools:description="L’accès à vos adresses mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur."
-                tools:title="Adresses bloquées" />
+                app:icon="@drawable/ic_warning"
+                app:showCloseIcon="false"
+                app:title="@string/lockedMailboxTitleIB"
+                app:showTitle="true"
+                tools:description="@string/lockedMailboxTitleIB"
+                app:showDescription="true"
+                app:button="@string/readFAQ"
+                app:showButton="true" />
 
             <TextView
                 android:id="@+id/invalidPasswordTitle"
@@ -62,13 +68,14 @@
                 android:layout_marginTop="@dimen/marginLarge"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/noValidMailboxesEmptyState"
+                app:layout_constraintTop_toBottomOf="@id/noValidMailboxesBlock"
                 tools:text="Mots de passe bloqués" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/invalidPasswordMailboxesRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
                 android:layout_marginTop="@dimen/marginStandardMedium"
                 android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -92,7 +99,7 @@
                 style="@style/BodyMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginHorizontal="@dimen/marginStandard"
                 android:layout_marginTop="@dimen/marginStandard"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -103,6 +110,7 @@
                 android:id="@+id/lockedMailboxesRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
                 android:layout_marginTop="@dimen/marginStandardMedium"
                 android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

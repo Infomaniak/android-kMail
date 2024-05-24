@@ -299,8 +299,8 @@
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
     <plurals name="lockedMailboxDescription">
-        <item quantity="one">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
-        <item quantity="other">L’accès à vos adresses mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
+        <item quantity="one">L’accès à votre adresse mail est actuellement bloqué.\nPour plus d’informations, consultez les FAQ.</item>
+        <item quantity="other">Pour plus d’informations :</item>
         <item quantity="many">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
     </plurals>
     <plurals name="lockedMailboxTitle">
@@ -308,6 +308,7 @@
         <item quantity="other">Adresses mail bloquées</item>
         <item quantity="many">Adresses mail bloquées</item>
     </plurals>
+    <string name="lockedMailboxTitleIB">Certaines de vos adresses mail sont bloquées</string>
     <string name="manageSignatures">Gérer mes signatures</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
@@ -373,6 +374,7 @@
     <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
     <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
+    <string name="readFAQ">Consulter les FAQ</string>
     <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté</string>

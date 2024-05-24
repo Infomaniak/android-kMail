@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.noValidMailboxes
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,8 +25,10 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.ui.WebViewActivity
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
@@ -57,6 +60,8 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        noValidMailboxesBlock.description = resources.getQuantityString(R.plurals.lockedMailboxDescription, 2)
+
         setupAdapters()
         setupListeners()
 
@@ -76,6 +81,11 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     }
 
     private fun setupListeners() = with(binding) {
+        noValidMailboxesBlock.setOnInformationClicked {
+            trackNoValidMailboxesEvent("readFAQ")
+            context?.let { WebViewActivity.startActivity(it, Uri.parse(BuildConfig.FAQ_URL).toString()) }
+        }
+
         changeAccountButton.setOnClickListener {
             trackNoValidMailboxesEvent("switchAccount")
             safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToSwitchUserFragment())
@@ -109,9 +119,5 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
         invalidPasswordTitle.text = resources.getQuantityString(R.plurals.blockedPasswordTitle, count)
         lockedMailboxTitle.text = lockedMailboxTitleString
-        noValidMailboxesEmptyState.apply {
-            title = lockedMailboxTitleString
-            description = resources.getQuantityText(R.plurals.lockedMailboxDescription, count)
-        }
     }
 }

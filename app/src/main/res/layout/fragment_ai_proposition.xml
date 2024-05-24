@@ -59,7 +59,7 @@
                 android:visibility="gone"
                 app:icon="@drawable/ic_warning"
                 app:showCloseIcon="true"
-                tools:text="@string/aiErrorTooManyRequests"
+                tools:title="@string/aiErrorTooManyRequests"
                 tools:visibility="visible" />
 
             <FrameLayout

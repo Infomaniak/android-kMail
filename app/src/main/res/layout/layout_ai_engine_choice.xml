@@ -46,5 +46,5 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/marginStandardMedium"
         app:icon="@drawable/ic_external_information"
-        app:text="@string/aiEngineWarning" />
+        app:title="@string/aiEngineWarning" />
 </merge>
