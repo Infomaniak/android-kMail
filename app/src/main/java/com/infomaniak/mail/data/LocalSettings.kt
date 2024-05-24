@@ -67,6 +67,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var isMatomoTrackingEnabled by sharedValue("isMatomoTrackingEnabledKey", true)
     var autoAdvanceMode by sharedValue("autoAdvanceModeKey", AutoAdvanceMode.THREADS_LIST)
     var autoAdvanceNaturalThread by sharedValue("autoAdvanceNaturalThreadKey", AutoAdvanceMode.FOLLOWING_THREAD)
+    var canShowWebViewOutdated by sharedValue("canShowWebViewOutdated", true)
     var accessTokenApiCallRecord by sharedValue<ApiCallRecord>("accessTokenApiCallRecordKey", null)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }

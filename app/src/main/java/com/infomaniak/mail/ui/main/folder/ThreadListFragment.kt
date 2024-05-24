@@ -33,7 +33,10 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -64,6 +67,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -80,6 +84,7 @@ import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
@@ -118,48 +123,59 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
 
+    @Inject
+    lateinit var titleDialog: TitleAlertDialog
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        runCatchingRealm {
+            navigateFromNotificationToNewMessage()
 
-        navigateFromNotificationToNewMessage()
+            super.onViewCreated(view, savedInstanceState)
+            setSystemBarsColors(
+                statusBarColor = R.color.backgroundHeaderColor,
+                navigationBarColor = if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor,
+            )
 
-        super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(
-            statusBarColor = R.color.backgroundHeaderColor,
-            navigationBarColor = if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor,
-        )
+            threadListViewModel.deleteSearchData()
+            bindAlertToViewLifecycle(descriptionDialog)
 
-        threadListViewModel.deleteSearchData()
-        bindAlertToViewLifecycle(descriptionDialog)
+            setupDensityDependentUi()
+            setupOnRefresh()
+            setupAdapter()
+            setupListeners()
+            setupUserAvatar()
+            setupUnreadCountChip()
 
-        setupDensityDependentUi()
-        setupOnRefresh()
-        setupAdapter()
-        setupListeners()
-        setupUserAvatar()
-        setupUnreadCountChip()
+            threadListMultiSelection.initMultiSelection(
+                mainViewModel = mainViewModel,
+                threadListFragment = this,
+                unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
+                localSettings = localSettings,
+            )
 
-        threadListMultiSelection.initMultiSelection(
-            mainViewModel = mainViewModel,
-            threadListFragment = this,
-            unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
-            localSettings = localSettings,
-        )
+            observeNetworkStatus()
+            observeCurrentThreads()
+            observeDownloadState()
+            observeFilter()
+            observeCurrentFolder()
+            observeCurrentFolderLive()
+            observeUpdatedAtTriggers()
+            observeFlushFolderTrigger()
+            observeUpdateInstall()
+            observeWebViewOutdated()
+            observeLoadMoreTriggers()
 
-        observeNetworkStatus()
-        observeCurrentThreads()
-        observeDownloadState()
-        observeFilter()
-        observeCurrentFolder()
-        observeCurrentFolderLive()
-        observeUpdatedAtTriggers()
-        observeFlushFolderTrigger()
-        observeUpdateInstall()
-        observeLoadMoreTriggers()
-    }.getOrDefault(Unit)
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    mainViewModel.checkWebViewVersion(localSettings.canShowWebViewOutdated)
+                }
+            }
+        }
+    }
 
     @ColorRes
     override fun getStatusBarColor(): Int = R.color.backgroundHeaderColor
@@ -612,6 +628,28 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { isUpdateDownloaded ->
             installUpdateGroup.isVisible = isUpdateDownloaded
             installUpdate.setOnClickListener { inAppUpdateManager.installDownloadedUpdate() }
+        }
+    }
+
+    private fun observeWebViewOutdated() = with(binding) {
+        mainViewModel.webViewOutdated.observe(viewLifecycleOwner) { isWebViewOutdated ->
+            webviewVersionGroup.isVisible = isWebViewOutdated
+            webviewVersionReadMore.setOnClickListener {
+                titleDialog.show(
+                    title = getString(R.string.displayMailIssueTitle),
+                    description = getString(R.string.displayMailIssueDescription),
+                    displayLoader = false,
+                    positiveButtonText = RCore.string.buttonUpdate,
+                    negativeButtonText = RCore.string.buttonLater,
+                    onPositiveButtonClicked = {
+                        requireContext().goToPlayStore("com.google.android.webview")
+                    },
+                    onNegativeButtonClicked = {
+                        webviewVersionGroup.isVisible = false
+                        localSettings.canShowWebViewOutdated = false
+                    }
+                )
+            }
         }
     }
 

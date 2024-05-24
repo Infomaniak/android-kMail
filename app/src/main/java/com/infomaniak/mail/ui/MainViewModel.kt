@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui
 
 import android.app.Application
 import androidx.lifecycle.*
+import androidx.webkit.WebViewCompat
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -109,6 +110,7 @@ class MainViewModel @Inject constructor(
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
+    val webViewOutdated = MutableLiveData(false)
 
     val autoAdvanceThreadsUids = MutableLiveData<List<String>>()
 
@@ -173,6 +175,18 @@ class MainViewModel @Inject constructor(
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
     private var currentThreadsLiveJob: Job? = null
+
+    fun checkWebViewVersion(showWebViewOutdated: Boolean) {
+        webViewOutdated.value = if (showWebViewOutdated) {
+            WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName?.let { versionName ->
+                val majorVersion = versionName.substring(0, versionName.indexOfFirst { it == '.' }).toInt()
+                // Current major version of Android WebView System
+                majorVersion < MIN_VERSION_WEBVIEW
+            } ?: false
+        } else {
+            false
+        }
+    }
 
     fun reassignCurrentThreadsLive() {
         currentThreadsLiveJob?.cancel()
@@ -1062,5 +1076,6 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
+        private const val MIN_VERSION_WEBVIEW = 124
     }
 }
