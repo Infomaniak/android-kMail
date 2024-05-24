@@ -109,8 +109,9 @@ class LoginFragment : Fragment() {
         nextButton.setOnClickListener { introViewpager.currentItem += 1 }
 
         connectButton.apply {
-            initProgress(viewLifecycleOwner)
+            initProgress(viewLifecycleOwner, getCurrentOnPrimary())
             setOnClickListener {
+                updateTextColor(getCurrentOnPrimary())
                 signInButton.isEnabled = false
                 connectButtonProgressTimer.start()
                 requireContext().trackAccountEvent("openLoginWebview")
