@@ -29,6 +29,11 @@
         android:name="android.permission.POST_NOTIFICATIONS"
         android:minSdkVersion="33" />
 
+    <!-- Chromebook specific : the app will boot even if there's no touchscreen -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -90,6 +95,14 @@
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
+            <!-- Chromebook specific : the app will boot in landscape -->
+            <meta-data
+                android:name="WindowManagerPreference:FreeformWindowOrientation"
+                android:value="landscape" />
+            <!-- Chromebook specific : the app will boot in fullscreen -->
+            <meta-data
+                android:name="WindowManagerPreference:FreeformWindowSize"
+                android:value="maximize" />
         </activity>
 
         <activity
