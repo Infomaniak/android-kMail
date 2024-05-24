@@ -72,7 +72,7 @@ class IntroFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         when (navigationArgs.position) {
-            0 -> introViewModel.updatedAccentColor.value?.let { (newAccentColor) ->
+            0 -> introViewModel.updatedAccentColor.value?.let { (newAccentColor, _) ->
                 pinkBlueSwitch.isVisible = true
 
                 if (!DynamicColors.isDynamicColorAvailable()) {
@@ -143,12 +143,13 @@ class IntroFragment : Fragment() {
         })
     }
 
-    private fun triggerUiUpdateWhenAnimationEnd(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-        lifecycleScope.launch(ioDispatcher) {
-            val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
-            delay(duration)
-            introViewModel.updatedAccentColor.postValue(newAccentColor to oldAccentColor)
-        }
+    private fun triggerUiUpdateWhenAnimationEnd(
+        newAccentColor: AccentColor,
+        oldAccentColor: AccentColor,
+    ) = lifecycleScope.launch(ioDispatcher) {
+        val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
+        delay(duration)
+        introViewModel.updatedAccentColor.postValue(newAccentColor to oldAccentColor)
     }
 
     private fun updateUiWhenThemeChanges(position: Int) {

@@ -30,7 +30,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -44,6 +43,7 @@ import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -186,7 +186,7 @@ class LoginFragment : Fragment() {
 
     private fun resetLoginButtons() = with(binding) {
         connectButtonProgressTimer.cancel()
-        connectButton.hideProgress(R.string.connect)
+        connectButton.hideProgress(RCore.string.connect)
         signInButton.isEnabled = true
     }
 
@@ -197,6 +197,8 @@ class LoginFragment : Fragment() {
     }
 
     private fun startProgress() {
-        binding.connectButton.showProgress()
+        binding.connectButton.showProgress(getCurrentOnPrimary())
     }
+
+    private fun getCurrentOnPrimary(): Int? = introViewModel.updatedAccentColor.value?.first?.getOnPrimary(requireContext())
 }
