@@ -295,13 +295,14 @@
     <string name="inboxFolder">Posteingang</string>
     <string name="loadingText">Laden…</string>
     <plurals name="lockedMailboxDescription">
-        <item quantity="one">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</item>
-        <item quantity="other">Der Zugriff auf Ihre Mailboxen ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</item>
+        <item quantity="one">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt.\nFür weitere Informationen, FAQ lesen.</item>
+        <item quantity="other">Für weitere Informationen:</item>
     </plurals>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Blockierte E-Mail-Adresse</item>
         <item quantity="other">Gesperrte Mailadressen</item>
     </plurals>
+    <string name="lockedMailboxTitleIB">Einige Ihrer Mailboxen sind blockiert</string>
     <string name="manageSignatures">Meine Signaturen verwalten</string>
     <string name="menuDrawerAdvancedActions">Erweiterte Aktionen</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s verwendet</string>
@@ -365,6 +366,7 @@
     <string name="pickerNoSelection">Keine Auswahl</string>
     <string name="popupDetachMailboxDescription">Sind Sie sicher, dass Sie die Adresse %s lösen möchten?</string>
     <string name="popupDetachMailboxTitle">Adresse abtrennen</string>
+    <string name="readFAQ">FAQ lesen</string>
     <string name="readMore">Mehr erfahren</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
     <string name="refreshTokenError">Sie wurden abgemeldet</string>

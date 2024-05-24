@@ -295,13 +295,14 @@
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="loadingText">Caricamento…</string>
     <plurals name="lockedMailboxDescription">
-        <item quantity="one">L’accesso al tuo indirizzo e-mail è attualmente bloccato. Si prega di contattare l’amministratore.</item>
-        <item quantity="other">L’accesso alle caselle di posta elettronica è attualmente bloccato. Contattare l’amministratore.</item>
+        <item quantity="one">L’accesso al tuo indirizzo e-mail è attualmente bloccato.\nPer ulteriori informazioni, leggi le FAQ.</item>
+        <item quantity="other">Per ulteriori informazioni:</item>
     </plurals>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Indirizzo e-mail bloccato</item>
         <item quantity="other">Indirizzi e-mail bloccati</item>
     </plurals>
+    <string name="lockedMailboxTitleIB">Alcuni indirizzi e-mail bloccati</string>
     <string name="manageSignatures">Gestisci le mie firme</string>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>
@@ -365,6 +366,7 @@
     <string name="pickerNoSelection">Nessuna selezione</string>
     <string name="popupDetachMailboxDescription">Sei sicuro di voler staccare l’indirizzo %s?</string>
     <string name="popupDetachMailboxTitle">Staccare l’indirizzo</string>
+    <string name="readFAQ">Leggi le FAQ</string>
     <string name="readMore">Per saperne di più</string>
     <string name="recentSearchesTitle">Ricerche recenti</string>
     <string name="refreshTokenError">Sei stato disconnesso</string>
