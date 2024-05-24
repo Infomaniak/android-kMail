@@ -181,7 +181,7 @@ class MainViewModel @Inject constructor(
             WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName?.let { versionName ->
                 val majorVersion = versionName.substring(0, versionName.indexOfFirst { it == '.' }).toInt()
                 // Current major version of Android WebView System
-                majorVersion < MIN_VERSION_WEBVIEW
+                majorVersion < WEBVIEW_MIN_VERSION
             } ?: false
         } else {
             false
@@ -1076,6 +1076,7 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
-        private const val MIN_VERSION_WEBVIEW = 124
+        private const val WEBVIEW_MIN_VERSION = 124
+        const val WEBVIEW_PACKAGE_NAME = "com.google.android.webview"
     }
 }

@@ -33,7 +33,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
@@ -249,7 +249,7 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
             // Make sure you always cancel all mailbox current notifications, whenever it is visible by the user.
             // Also cancel notifications from the current mailbox if it no longer exists.
             lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                repeatOnLifecycle(State.STARTED) {
                     mainViewModel.dismissCurrentMailboxNotifications()
                 }
             }

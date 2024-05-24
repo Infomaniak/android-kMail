@@ -33,7 +33,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -66,6 +66,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -170,7 +171,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             observeLoadMoreTriggers()
 
             viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                repeatOnLifecycle(State.STARTED) {
                     mainViewModel.checkWebViewVersion(localSettings.canShowWebViewOutdated)
                 }
             }
@@ -632,24 +633,24 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     private fun observeWebViewOutdated() = with(binding) {
+
+        webviewVersionReadMore.setOnClickListener {
+            titleDialog.show(
+                title = getString(R.string.displayMailIssueTitle),
+                description = getString(R.string.displayMailIssueDescription),
+                displayLoader = false,
+                positiveButtonText = RCore.string.buttonUpdate,
+                negativeButtonText = RCore.string.buttonLater,
+                onPositiveButtonClicked = { requireContext().goToPlayStore(MainViewModel.WEBVIEW_PACKAGE_NAME) },
+                onNegativeButtonClicked = {
+                    webviewVersionGroup.isVisible = false
+                    localSettings.canShowWebViewOutdated = false
+                }
+            )
+        }
+
         mainViewModel.webViewOutdated.observe(viewLifecycleOwner) { isWebViewOutdated ->
             webviewVersionGroup.isVisible = isWebViewOutdated
-            webviewVersionReadMore.setOnClickListener {
-                titleDialog.show(
-                    title = getString(R.string.displayMailIssueTitle),
-                    description = getString(R.string.displayMailIssueDescription),
-                    displayLoader = false,
-                    positiveButtonText = RCore.string.buttonUpdate,
-                    negativeButtonText = RCore.string.buttonLater,
-                    onPositiveButtonClicked = {
-                        requireContext().goToPlayStore("com.google.android.webview")
-                    },
-                    onNegativeButtonClicked = {
-                        webviewVersionGroup.isVisible = false
-                        localSettings.canShowWebViewOutdated = false
-                    }
-                )
-            }
         }
     }
 
