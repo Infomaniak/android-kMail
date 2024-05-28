@@ -60,7 +60,7 @@ class DownloadAttachmentViewModel @Inject constructor(
                 isAttachmentCached = LocalStorageUtils.downloadThenSaveAttachmentToCacheDir(appContext, localAttachment)
             }
 
-            if (isAttachmentCached) {
+            return@runCatching if (isAttachmentCached) {
                 attachment = null
                 localAttachment
             } else {
