@@ -608,19 +608,18 @@ class NewMessageViewModel @Inject constructor(
         val attachment = Attachment()
 
         return LocalStorageUtils.saveAttachmentToUploadDir(
-            appContext,
-            uri,
-            fileName,
-            draftLocalUuid!!,
-            attachment.localUuid,
-            snackbarManager,
-        )
-            ?.let { file ->
-                Pair(
-                    attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
-                    fileSize > availableSpace,
-                )
-            }
+            context = appContext,
+            uri = uri,
+            fileName = fileName,
+            draftLocalUuid = draftLocalUuid!!,
+            attachmentLocalUuid = attachment.localUuid,
+            snackbarManager = snackbarManager,
+        )?.let { file ->
+            Pair(
+                attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
+                fileSize > availableSpace,
+            )
+        }
     }
 
     private fun RealmList<Recipient>.flagRecipientsAsAutomaticallyEntered() {
@@ -711,6 +710,17 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    fun uploadAttachmentsToServer() = viewModelScope.launch(ioDispatcher) {
+        val localUuid = draftLocalUuid ?: return@launch
+        val localDraft = mailboxContentRealm().writeBlocking {
+            DraftController.getDraft(localUuid, realm = this)?.also { it.updateDraftAttachmentsFromLiveData() }
+        } ?: return@launch
+
+        runCatching {
+            localDraft.uploadAttachments(currentMailbox, draftController, mailboxContentRealm())
+        }.onFailure(Sentry::captureException)
+    }
+
     fun executeDraftActionWhenStopping(
         action: DraftAction,
         isFinishing: Boolean,
@@ -769,25 +779,7 @@ class NewMessageViewModel @Inject constructor(
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
 
-        val updatedAttachments = attachmentsLiveData.valueOrEmpty().map { uiAttachment ->
-            // If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
-            val localAttachment = attachments.filter { it.uploadLocalUri == uiAttachment.uploadLocalUri }
-                .also {
-                    // If this Sentry never triggers, remove it and replace the
-                    // `attachments.filter { … }.also { … }.firstOrNull()` with `attachments.singleOrNull { … }`
-                    if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same uploadLocalUri")
-                }.firstOrNull()
-            /**
-             * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly already be
-             * some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of
-             * the Attachment, this data will be lost forever and we won't be able to save/send the Draft.
-             */
-            return@map if (localAttachment?.uuid != null) localAttachment.copyFromRealm() else uiAttachment
-        }
-        attachments.apply {
-            clear()
-            addAll(updatedAttachments)
-        }
+        updateDraftAttachmentsFromLiveData()
 
         subject = subjectValue
 
@@ -815,6 +807,30 @@ class NewMessageViewModel @Inject constructor(
                 }
                 .saveSnapshot()
             isNewMessage = false
+        }
+    }
+
+    private fun Draft.updateDraftAttachmentsFromLiveData() {
+        val updatedAttachments = attachmentsLiveData.valueOrEmpty().map { uiAttachment ->
+            // If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
+            val localAttachment = attachments.filter { it.uploadLocalUri == uiAttachment.uploadLocalUri }
+                .also {
+                    // If this Sentry never triggers, remove it and replace the
+                    // `attachments.filter { … }.also { … }.firstOrNull()` with `attachments.singleOrNull { … }`
+                    if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same uploadLocalUri")
+                }.firstOrNull()
+
+            /**
+             * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly already be
+             * some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of
+             * the Attachment, this data will be lost forever and we won't be able to save/send the Draft.
+             */
+            return@map if (localAttachment?.uuid != null) localAttachment.copyFromRealm() else uiAttachment
+        }
+
+        attachments.apply {
+            clear()
+            addAll(updatedAttachments)
         }
     }
 

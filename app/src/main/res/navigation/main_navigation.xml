@@ -562,7 +562,7 @@
         android:label="DownloadAttachmentProgressDialog"
         tools:layout="@layout/dialog_download_progress">
         <argument
-            android:name="attachmentResource"
+            android:name="attachmentLocalUuid"
             app:argType="string" />
         <argument
             android:name="attachmentName"
@@ -617,7 +617,7 @@
         android:name="com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog"
         android:label="AttachmentActionsBottomSheetDialog">
         <argument
-            android:name="attachmentResource"
+            android:name="attachmentLocalUuid"
             app:argType="string" />
         <action
             android:id="@+id/action_attachmentActionsBottomSheetDialog_to_downloadAttachmentProgressDialog"

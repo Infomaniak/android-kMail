@@ -44,6 +44,7 @@ object MatomoMail : MatomoCore {
     const val OPEN_ACTION_BOTTOM_SHEET = "openBottomSheet"
     const val OPEN_FROM_DRAFT_NAME = "openFromDraft"
     const val OPEN_LOCAL_DRAFT = "openLocalDraft"
+    const val ACTION_OPEN_NAME = "open"
     const val ACTION_REPLY_NAME = "reply"
     const val ACTION_REPLY_ALL_NAME = "replyAll"
     const val ACTION_FORWARD_NAME = "forward"

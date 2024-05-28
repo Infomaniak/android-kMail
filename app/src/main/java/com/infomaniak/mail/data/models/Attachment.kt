@@ -77,18 +77,20 @@ class Attachment : EmbeddedRealmObject {
         this.size = size
         this.mimeType = mimeType
         this.uploadLocalUri = uri
+
         return this
     }
 
     fun getFileTypeFromMimeType(): AttachmentType = AttachmentMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
     fun hasUsableCache(
-        context: Context, cacheFile: File? = null,
+        context: Context,
+        file: File? = null,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): Boolean {
-        val file = cacheFile ?: getCacheFile(context, userId, mailboxId)
-        return file.length() > 0 && file.canRead()
+        val cachedFile = file ?: getCacheFile(context, userId, mailboxId)
+        return cachedFile.length() > 0 && cachedFile.canRead()
     }
 
     fun isInlineCachedFile(context: Context): Boolean {

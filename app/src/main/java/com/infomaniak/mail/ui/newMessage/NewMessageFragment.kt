@@ -46,8 +46,10 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
@@ -61,6 +63,7 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
+import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
@@ -72,6 +75,7 @@ import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -132,6 +136,9 @@ class NewMessageFragment : Fragment() {
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
@@ -162,8 +169,10 @@ class NewMessageFragment : Fragment() {
         observeRecipients()
         observeAttachments()
         observeImportAttachmentsResult()
+        observeOpenAttachment()
         observeUiSignature()
         observeUiQuote()
+
         editorManager.observeEditorActions()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
 
@@ -259,7 +268,20 @@ class NewMessageFragment : Fragment() {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(quoteWebView.settings, true)
         }
 
-        attachmentsRecyclerView.adapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
+        attachmentsRecyclerView.adapter = AttachmentAdapter(
+            shouldDisplayCloseButton = true,
+            onDelete = ::onDeleteAttachment,
+            onAttachmentClicked = {
+                trackAttachmentActionsEvent(OPEN_FROM_DRAFT_NAME)
+                it.openAttachment(
+                    context = requireContext(),
+                    navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                        navigateToDownloadProgressDialog(attachment, attachmentIntentType, NewMessageFragment::class.java.name)
+                    },
+                    snackbarManager = snackbarManager,
+                )
+            },
+        )
 
         recipientFieldsManager.setupAutoCompletionFields()
 
@@ -473,10 +495,8 @@ class NewMessageFragment : Fragment() {
                 isFirstTime = false
                 observeImportAttachments()
             } else if (attachments.count() > attachmentAdapter.itemCount) {
-                // If we are adding Attachments, directly save the Draft, so the Attachments' upload starts now.
-                // TODO: Only save Attachments, and not the whole Draft.
-                // TODO: When not using `saveDraft()` anymore, make it private again.
-                newMessageActivity.saveDraft()
+                // If we are adding Attachments, directly upload them to save time when sending/saving the Draft.
+                newMessageViewModel.uploadAttachmentsToServer()
             }
 
             // When removing an Attachment, both counts will be the same, because the Adapter is already notified.
@@ -497,6 +517,10 @@ class NewMessageFragment : Fragment() {
                 attachmentsLiveData.postValue(currentAttachments + newAttachments)
             }
         }
+    }
+
+    private fun observeOpenAttachment() {
+        getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
 
     private fun observeImportAttachmentsResult() = with(newMessageViewModel) {

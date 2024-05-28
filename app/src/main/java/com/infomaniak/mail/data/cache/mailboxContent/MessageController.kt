@@ -17,13 +17,16 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -217,10 +220,17 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             onUpdate(getMessage(messageUid, realm))
         }
 
-        fun deleteMessage(message: Message, realm: MutableRealm) {
+        fun deleteMessage(context: Context, mailbox: Mailbox, message: Message, realm: MutableRealm) {
 
             DraftController.getDraftByMessageUid(message.uid, realm)?.let { draft ->
                 if (draft.action == null) {
+                    deleteDraftUploadDir(
+                        context = context,
+                        draftLocalUuid = draft.localUuid,
+                        userId = mailbox.userId,
+                        mailboxId = mailbox.mailboxId,
+                        mustForceDelete = true,
+                    )
                     realm.delete(draft)
                 } else {
                     draft.remoteUuid = null
@@ -230,9 +240,9 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             realm.delete(message)
         }
 
-        fun deleteMessages(messages: List<Message>, realm: MutableRealm) {
+        fun deleteMessages(context: Context, mailbox: Mailbox, messages: List<Message>, realm: MutableRealm) {
             messages.reversed().forEach { message ->
-                deleteMessage(message, realm)
+                deleteMessage(context, mailbox, message, realm)
             }
         }
         //endregion

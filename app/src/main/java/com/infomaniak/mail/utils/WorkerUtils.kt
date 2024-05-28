@@ -18,12 +18,14 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
+import com.infomaniak.mail.R
 
 object WorkerUtils {
 
@@ -40,5 +42,10 @@ object WorkerUtils {
     ): LiveData<MutableList<WorkInfo>> {
         val workQuery = WorkQuery.Builder.fromTags(listOf(tag)).addStates(states).build()
         return workManager.getWorkInfosLiveData(workQuery)
+    }
+
+    class UploadMissingLocalFileException : Exception() {
+        @StringRes
+        val errorRes: Int = R.string.errorCorruptAttachment
     }
 }

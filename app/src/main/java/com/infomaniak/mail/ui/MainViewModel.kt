@@ -364,7 +364,7 @@ class MainViewModel @Inject constructor(
     private fun updateFolders(mailbox: Mailbox) {
         SentryLog.d(TAG, "Force refresh Folders")
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
-            if (!mailboxContentRealm().isClosed()) folderController.update(folders, mailboxContentRealm())
+            if (!mailboxContentRealm().isClosed()) folderController.update(mailbox, folders, mailboxContentRealm())
         }
     }
 

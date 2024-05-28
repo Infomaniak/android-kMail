@@ -21,6 +21,7 @@ import android.content.Context
 import android.net.Uri
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.ui.main.SnackbarManager
 import io.sentry.Sentry
 import okhttp3.Response
@@ -39,8 +40,6 @@ object LocalStorageUtils {
     private inline val Context.attachmentsCacheRootDir get() = File(cacheDir, ATTACHMENTS_CACHE_DIR)
     private inline val Context.attachmentsUploadRootDir get() = File(filesDir, ATTACHMENTS_UPLOAD_DIR)
 
-    private inline val File.hasNoChildren get() = listFiles().isNullOrEmpty()
-
     //region Cache
     fun getAttachmentsCacheDir(
         context: Context,
@@ -51,16 +50,21 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
     }
 
-    fun downloadThenSaveAttachmentToCacheDir(resource: String, cacheFile: File): Boolean {
+    fun downloadThenSaveAttachmentToCacheDir(context: Context, localAttachment: Attachment): Boolean {
+
         fun Response.saveAttachmentTo(outputFile: File): Boolean {
             if (!isSuccessful) return false
-            return body?.byteStream()?.use { inputStream ->
+
+            body?.byteStream()?.use { inputStream ->
                 saveAttachmentToCacheDir(inputStream, outputFile)
-                true
-            } ?: false
+                return true
+            }
+
+            return false
         }
 
-        return runCatching { ApiRepository.downloadAttachment(resource) }.getOrNull()?.saveAttachmentTo(cacheFile) ?: false
+        val attachment = runCatching { localAttachment.resource?.let(ApiRepository::downloadAttachment) }.getOrNull()
+        return attachment?.saveAttachmentTo(localAttachment.getCacheFile(context)) == true
     }
 
     /**
@@ -172,8 +176,8 @@ object LocalStorageUtils {
             if (!it.exists()) return
         }
 
-        // Only delete a directory if it's empty
-        if (attachmentDir.hasNoChildren) attachmentDir.delete()
+        // The File.delete() function only delete the file if it has no children, that's precisely what we want here
+        attachmentDir.delete()
 
         deleteDraftUploadDir(context, draftLocalUuid, userId, mailboxId)
     }
@@ -183,19 +187,21 @@ object LocalStorageUtils {
         draftLocalUuid: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
+        mustForceDelete: Boolean = false,
     ) {
         val draftDir = getDraftUploadDir(context, draftLocalUuid, userId, mailboxId).also {
             if (!it.exists()) return
         }
+
         val mailboxDir = draftDir.parentFile ?: return
         val userDir = mailboxDir.parentFile ?: return
         val attachmentsRootDir = userDir.parentFile ?: return
 
-        // Only delete a directory if it's empty
-        if (draftDir.hasNoChildren) draftDir.delete() else return
-        if (mailboxDir.hasNoChildren) mailboxDir.delete() else return
-        if (userDir.hasNoChildren) userDir.delete() else return
-        if (attachmentsRootDir.hasNoChildren) attachmentsRootDir.delete()
+        // The File.delete() function only delete the file if it has no children, that's precisely what we want here
+        if (mustForceDelete) draftDir.deleteRecursively() else draftDir.delete()
+        if (!mailboxDir.delete()) return
+        if (!userDir.delete()) return
+        attachmentsRootDir.delete()
     }
     //endregion
 
