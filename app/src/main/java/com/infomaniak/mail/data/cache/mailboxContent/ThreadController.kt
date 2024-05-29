@@ -159,6 +159,12 @@ class ThreadController @Inject constructor(
             }
         }
     }
+
+    fun deleteThread(threadUid: String) {
+        mailboxContentRealm().writeBlocking {
+            delete(getThreadQuery(threadUid, realm = this))
+        }
+    }
     //endregion
 
     companion object {

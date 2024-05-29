@@ -191,6 +191,14 @@ class ThreadListAdapter @Inject constructor(
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
 
+        // If we are trying to display an empty Thread, don't. Just delete it.
+        if (thread.messages.isEmpty()) {
+            // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
+            //  It's possibly because we are out of sync, and the situation will resolve itself shortly? ¯\_(ツ)_/¯
+            threadListAdapterCallback?.deleteThreadInRealm?.invoke(thread.uid)
+            return
+        }
+
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
         setupThreadDensityDependentUi()
         displayAvatar(thread)

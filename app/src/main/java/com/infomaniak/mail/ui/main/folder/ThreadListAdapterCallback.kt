@@ -25,4 +25,5 @@ interface ThreadListAdapterCallback {
     var onFlushClicked: ((dialogTitle: String) -> Unit)?
     var onLoadMoreClicked: () -> Unit
     var onPositionClickedChanged: (position: Int, previousPosition: Int) -> Unit
+    var deleteThreadInRealm: (threadUid: String) -> Unit
 }

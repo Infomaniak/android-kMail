@@ -172,6 +172,8 @@ class SearchFragment : TwoPaneFragment() {
                 }
 
                 override var onPositionClickedChanged: (Int, Int) -> Unit = ::updateAutoAdvanceNaturalThread
+
+                override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
             },
         )
 
