@@ -206,9 +206,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         AccountUtils.reloadApp = { withContext(mainDispatcher) { startActivity(getLaunchIntent()) } }
     }
 
-    private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).apply {
-        clearStack()
-    }
+    private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).clearStack()
 
     private fun configureInfomaniakCore() {
         InfomaniakCore.apply {
@@ -266,6 +264,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         }
 
         override suspend fun getApiToken(): ApiToken? = AccountUtils.currentUser?.apiToken
+
+        override fun getCurrentUserId(): Int = AccountUtils.currentUserId
     }
 
     override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
