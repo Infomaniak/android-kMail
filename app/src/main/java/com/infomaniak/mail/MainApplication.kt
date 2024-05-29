@@ -232,7 +232,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                 tokenInterceptorListener = tokenInterceptorListener,
                 previousApiCall = localSettings.accessTokenApiCallRecord,
                 updateLastApiCall = { localSettings.accessTokenApiCallRecord = it },
-            )
+            ),
         )
         HttpClient.init(tokenInterceptorListener)
     }
