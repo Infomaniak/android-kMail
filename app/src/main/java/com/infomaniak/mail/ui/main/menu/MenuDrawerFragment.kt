@@ -280,21 +280,23 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
     }
 
     private fun observeFoldersLive() = with(mainViewModel) {
-        runCatchingRealm {
-            Utils.waitInitMediator(
-                currentFolder,
-                currentDefaultFoldersLive,
-            ).observe(viewLifecycleOwner) { (currentFolder, defaultFolders) ->
+        Utils.waitInitMediator(
+            currentFolder,
+            currentDefaultFoldersLive,
+        ).observe(viewLifecycleOwner) { (currentFolder, defaultFolders) ->
+            runCatchingRealm {
                 val newCurrentFolderId = currentFolder?.id ?: return@observe
                 binding.defaultFoldersList.post {
                     defaultFoldersAdapter.setFolders(defaultFolders, newCurrentFolderId)
                 }
             }
+        }
 
-            Utils.waitInitMediator(
-                currentFolder,
-                currentCustomFoldersLive,
-            ).observe(viewLifecycleOwner) { (currentFolder, customFolders) ->
+        Utils.waitInitMediator(
+            currentFolder,
+            currentCustomFoldersLive,
+        ).observe(viewLifecycleOwner) { (currentFolder, customFolders) ->
+            runCatchingRealm {
                 binding.noFolderText.isVisible = customFolders.isEmpty()
                 val newCurrentFolderId = currentFolder?.id ?: return@observe
                 binding.customFoldersList.post {
