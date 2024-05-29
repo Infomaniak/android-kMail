@@ -56,6 +56,8 @@ class LogoutUser @Inject constructor(
         localSettings.removeRegisteredFirebaseUser(userId = user.id)
 
         if (user.id == AccountUtils.currentUserId) {
+            AccountUtils.currentUser = null // Prevent that the user current no longer exists
+
             if (AccountUtils.getAllUsersCount() == 0) {
                 resetSettings()
                 playServicesUtils.deleteFirebaseToken()
