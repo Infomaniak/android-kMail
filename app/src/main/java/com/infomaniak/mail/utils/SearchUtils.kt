@@ -34,9 +34,6 @@ import javax.inject.Singleton
 @Singleton
 class SearchUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    private val folderController: FolderController,
-    private val messageController: MessageController,
-    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -77,9 +74,9 @@ class SearchUtils @Inject constructor(
     suspend fun deleteRealmSearchData() = withContext(ioDispatcher) {
         mailboxContentRealm().writeBlocking {
             SentryLog.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
-            messageController.deleteSearchMessages(realm = this)
-            threadController.deleteSearchThreads(realm = this)
-            folderController.deleteSearchFolderData(realm = this)
+            MessageController.deleteSearchMessages(realm = this)
+            ThreadController.deleteSearchThreads(realm = this)
+            FolderController.deleteSearchFolderData(realm = this)
         }
     }
 
