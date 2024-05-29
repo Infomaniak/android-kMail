@@ -286,8 +286,11 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
             threadListAdapterCallback = object : ThreadListAdapterCallback {
+
                 override var onSwipeFinished: (() -> Unit)? = { threadListViewModel.isRecoveringFinished.value = true }
+
                 override var onThreadClicked: (Thread) -> Unit = ::navigateToThread
+
                 override var onFlushClicked: ((dialogTitle: String) -> Unit)? = { dialogTitle ->
                     val trackerName = when {
                         isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
@@ -307,12 +310,13 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                         },
                     )
                 }
-                override var onLoadMoreClicked: (() -> Unit)? = {
+
+                override var onLoadMoreClicked: () -> Unit = {
                     trackThreadListEvent("loadMore")
                     mainViewModel.getOnePageOfOldMessages()
                 }
-                override var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? =
-                    ::updateAutoAdvanceNaturalThread
+
+                override var onPositionClickedChanged: (Int, Int) -> Unit = ::updateAutoAdvanceNaturalThread
             },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
