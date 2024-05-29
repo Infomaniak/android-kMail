@@ -151,10 +151,6 @@ class ThreadController @Inject constructor(
     //endregion
 
     //region Edit data
-    fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
-        delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
-    }
-
     fun saveThreads(searchMessages: List<Message>) {
         mailboxContentRealm().writeBlocking {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
@@ -308,6 +304,10 @@ class ThreadController @Inject constructor(
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
         private fun Message.getDraftLocalUuid(realm: TypedRealm): String? {
             return if (isDraft) DraftController.getDraftByMessageUid(uid, realm)?.localUuid else null
+        }
+
+        fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
+            delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
         }
         //endregion
     }

@@ -150,12 +150,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
     //endregion
 
-    //region Edit data
-    fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
-        delete(query<Message>("${Message::isFromSearch.name} == true").find())
-    }
-    //endregion
-
     companion object {
         private val isNotDraft = "${Message::isDraft.name} == false"
         private val isNotScheduled = "${Message::isScheduled.name} == false"
@@ -244,6 +238,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             messages.reversed().forEach { message ->
                 deleteMessage(context, mailbox, message, realm)
             }
+        }
+
+        fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
+            delete(query<Message>("${Message::isFromSearch.name} == true").find())
         }
         //endregion
     }
