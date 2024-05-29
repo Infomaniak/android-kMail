@@ -53,8 +53,8 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
+import com.infomaniak.mail.databinding.ItemBannerWithActionViewBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
-import com.infomaniak.mail.databinding.ItemThreadFlushFolderButtonBinding
 import com.infomaniak.mail.databinding.ItemThreadLoadMoreButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter
@@ -149,7 +149,7 @@ class ThreadListAdapter @Inject constructor(
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
-            R.layout.item_thread_flush_folder_button -> ItemThreadFlushFolderButtonBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_banner_with_action_view -> ItemBannerWithActionViewBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_load_more_button -> ItemThreadLoadMoreButtonBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
@@ -176,7 +176,7 @@ class ThreadListAdapter @Inject constructor(
         when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
-            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
+            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemBannerWithActionViewBinding).displayFlushFolderButton(item as FolderRole)
             DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
         }
     }
@@ -447,7 +447,7 @@ class ThreadListAdapter @Inject constructor(
         sectionTitle.text = title
     }
 
-    private fun ItemThreadFlushFolderButtonBinding.displayFlushFolderButton(folderRole: FolderRole) {
+    private fun ItemBannerWithActionViewBinding.displayFlushFolderButton(folderRole: FolderRole) {
 
         val (hintTextId, buttonTextId) = when (folderRole) {
             FolderRole.SPAM -> R.string.threadListSpamHint to R.string.threadListEmptySpamButton
@@ -455,12 +455,12 @@ class ThreadListAdapter @Inject constructor(
             else -> throw IllegalStateException("We are trying to flush a non-flushable folder.")
         }
 
-        flushText.text = context.getString(hintTextId)
+        root.apply {
+            description = context.getString(hintTextId)
 
-        flushButton.apply {
             val buttonText = context.getString(buttonTextId)
-            text = buttonText
-            setOnClickListener { threadListAdapterCallback?.onFlushClicked?.invoke(buttonText) }
+            actionButtonText = buttonText
+            setOnActionClickListener { threadListAdapterCallback?.onFlushClicked?.invoke(buttonText) }
         }
     }
 
@@ -561,7 +561,7 @@ class ThreadListAdapter @Inject constructor(
     override fun getViewToTouchToStartDraggingItem(item: Any, viewHolder: ThreadListViewHolder, position: Int): View? {
         return when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (viewHolder.binding as CardviewThreadItemBinding).goneHandle
-            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (viewHolder.binding as ItemThreadFlushFolderButtonBinding).goneHandle
+            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (viewHolder.binding as ItemBannerWithActionViewBinding).root.getGoneHandle()
             DisplayType.LOAD_MORE_BUTTON.layout -> (viewHolder.binding as ItemThreadLoadMoreButtonBinding).goneHandle
             else -> null
         }
@@ -666,7 +666,7 @@ class ThreadListAdapter @Inject constructor(
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
-        FLUSH_FOLDER_BUTTON(R.layout.item_thread_flush_folder_button),
+        FLUSH_FOLDER_BUTTON(R.layout.item_banner_with_action_view),
         LOAD_MORE_BUTTON(R.layout.item_thread_load_more_button),
     }
 

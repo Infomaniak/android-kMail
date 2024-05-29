@@ -226,7 +226,7 @@
     <string name="createFolderParent">Übergeordneter Ordner</string>
     <string name="dateTitle">Datum:</string>
     <string name="displayMailIssueDescription">Um Anzeigeprobleme zu beheben, aktualisieren Sie bitte die Anwendung Android System Webview.</string>
-    <string name="displayMailIssueTitle">Problem mit der Anzeige Ihrer EMails</string>
+    <string name="displayMailIssueTitle">Problem mit der Anzeige Ihrer E-Mails</string>
     <string name="draftFolder">Entwürfe</string>
     <string name="draftPrefix">(Entwurf)</string>
     <string name="emailWithoutSubjectDescription">Sie sind dabei, eine Nachricht ohne Betreff zu senden. Möchten Sie fortfahren?</string>

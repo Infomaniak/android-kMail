@@ -98,6 +98,14 @@
         <attr name="ripple" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="BannerWithActionView">
+        <attr name="description" />
+        <attr name="descriptionIcon" format="reference" />
+        <attr name="buttonText" format="string" />
+        <attr name="buttonIcon" format="reference" />
+        <attr name="isButtonAlignedWithDescription" format="boolean" />
+    </declare-styleable>
+
     <declare-styleable name="SettingRadioButtonView">
         <attr name="icon" />
         <attr name="text" />

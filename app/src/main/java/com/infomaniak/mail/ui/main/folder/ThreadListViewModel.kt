@@ -17,28 +17,33 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.app.Application
 import android.text.format.DateUtils
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.webkit.WebViewCompat
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
 class ThreadListViewModel @Inject constructor(
+    application: Application,
     private val searchUtils: SearchUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var updatedAtJob: Job? = null
 
     val isRecoveringFinished = MutableLiveData(true)
     val updatedAtTrigger = MutableLiveData<Unit>()
+    val isWebViewOutdated = MutableLiveData(false)
 
     var currentFolderCursor: String? = null
     var currentThreadsCount: Int? = null
@@ -57,5 +62,21 @@ class ThreadListViewModel @Inject constructor(
     fun deleteSearchData() = viewModelScope.launch(ioCoroutineContext) {
         // Delete Search data in case they couldn't be deleted at the end of the previous Search.
         searchUtils.deleteRealmSearchData()
+    }
+
+    fun checkWebViewVersion(canShowWebViewOutdated: Boolean) {
+        isWebViewOutdated.value = if (canShowWebViewOutdated) {
+            WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName?.let { versionName ->
+                val majorVersion = versionName.substring(0, versionName.indexOfFirst { it == '.' }).toInt()
+                // First known version of Android WebView System without bug
+                majorVersion < WEBVIEW_MIN_VERSION
+            } ?: false
+        } else {
+            false
+        }
+    }
+
+    companion object {
+        private const val WEBVIEW_MIN_VERSION = 124
     }
 }

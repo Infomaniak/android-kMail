@@ -51,7 +51,6 @@ class ItemSettingView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.ItemSettingView) {
             with(binding) {
                 action = Action.entries[getInteger(R.styleable.ItemSettingView_itemAction, 0)]
-
                 title.text = getString(R.styleable.ItemSettingView_title) ?: ""
 
                 getDrawable(R.styleable.ItemSettingView_icon).let {

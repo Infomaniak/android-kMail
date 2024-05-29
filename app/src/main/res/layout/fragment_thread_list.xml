@@ -202,92 +202,25 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
 
-                            <TextView
-                                android:id="@+id/updateDownloadedText"
-                                style="@style/BodySmall"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                                android:layout_marginTop="@dimen/marginStandardMedium"
-                                android:text="@string/updateReadyTitle"
-                                app:layout_constraintEnd_toStartOf="@+id/installUpdate"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <com.google.android.material.button.MaterialButton
+                            <com.infomaniak.mail.views.itemViews.BannerWithActionView
                                 android:id="@+id/installUpdate"
-                                style="@style/TextButton"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@string/buttonInstall"
-                                app:icon="@drawable/ic_app_update"
-                                app:iconPadding="@dimen/marginStandardSmall"
-                                app:iconSize="@dimen/marginStandardMedium"
-                                app:layout_constraintEnd_toEndOf="parent"
+                                app:buttonIcon="@drawable/ic_app_update"
+                                app:buttonText="@string/buttonInstall"
+                                app:description="@string/updateReadyTitle"
+                                app:isButtonAlignedWithDescription="true"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                            <com.google.android.material.divider.MaterialDivider
-                                android:id="@+id/installUpdateDivider"
+                            <com.infomaniak.mail.views.itemViews.BannerWithActionView
+                                android:id="@+id/webviewWarning"
                                 android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                app:dividerColor="@color/divider"
+                                android:layout_height="wrap_content"
+                                app:buttonText="@string/readMore"
+                                app:description="@string/displayMailIssueTitle"
+                                app:descriptionIcon="@drawable/ic_warning"
+                                app:isButtonAlignedWithDescription="false"
                                 app:layout_constraintTop_toBottomOf="@id/installUpdate" />
-
-                            <androidx.constraintlayout.widget.Group
-                                android:id="@+id/installUpdateGroup"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:visibility="gone"
-                                app:constraint_referenced_ids="installUpdate, installUpdateDivider, updateDownloadedText"
-                                tools:visibility="visible" />
-
-                            <ImageView
-                                android:id="@+id/warning"
-                                android:layout_width="@dimen/mediumIconSize"
-                                android:layout_height="@dimen/mediumIconSize"
-                                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                                android:src="@drawable/ic_warning"
-                                app:layout_constraintBottom_toBottomOf="@id/webviewVersion"
-                                app:layout_constraintEnd_toStartOf="@id/webviewVersion"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="@id/webviewVersion" />
-
-                            <TextView
-                                android:id="@+id/webviewVersion"
-                                style="@style/BodySmall"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/marginStandardMedium"
-                                android:layout_marginTop="@dimen/marginStandardMedium"
-                                android:drawablePadding="@dimen/marginStandardMedium"
-                                android:text="@string/displayMailIssueTitle"
-                                app:layout_constraintStart_toEndOf="@id/warning"
-                                app:layout_constraintTop_toBottomOf="@id/installUpdateDivider" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/webviewVersionReadMore"
-                                style="@style/TextButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/marginStandardVerySmall"
-                                android:text="@string/readMore"
-                                app:layout_constraintStart_toEndOf="@id/warning"
-                                app:layout_constraintTop_toBottomOf="@id/webviewVersion" />
-
-                            <com.google.android.material.divider.MaterialDivider
-                                android:id="@+id/webviewVersionDivider"
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                app:dividerColor="@color/divider"
-                                app:layout_constraintTop_toBottomOf="@id/webviewVersionReadMore" />
-
-                            <androidx.constraintlayout.widget.Group
-                                android:id="@+id/webviewVersionGroup"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:visibility="gone"
-                                app:constraint_referenced_ids="warning, webviewVersion, webviewVersionReadMore, webviewVersionDivider"
-                                tools:visibility="visible" />
 
                             <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
                                 android:id="@+id/threadsList"
@@ -297,9 +230,9 @@
                                 android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                                 app:behind_swiped_item_icon_margin="@dimen/marginStandard"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/webviewVersionDivider"
+                                app:layout_constraintTop_toBottomOf="@id/webviewWarning"
                                 tools:listitem="@layout/cardview_thread_item"
-                                tools:visibility="gone" />
+                                tools:visibility="visible" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -308,6 +241,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:visibility="gone"
+                            app:layout_anchor="@+id/swipeRefreshLayout"
+                            app:layout_anchorGravity="center"
                             tools:description="@string/emptyStateInboxDescription"
                             tools:icon="@drawable/ic_empty_state_folder"
                             tools:title="@string/emptyStateInboxTitle"

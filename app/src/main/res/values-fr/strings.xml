@@ -227,8 +227,8 @@
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>
     <string name="dateTitle">Date :</string>
-    <string name="displayMailIssueDescription">Pour corriger les problèmes d’affichages, veuillez mettre à jour l’application Android System Webview.</string>
-    <string name="displayMailIssueTitle">Problème d’affichage de vos emails</string>
+    <string name="displayMailIssueDescription">Pour corriger les problèmes d’affichage, veuillez mettre à jour l’application Android System Webview.</string>
+    <string name="displayMailIssueTitle">Problème d’affichage de vos e-mails</string>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
     <string name="emailWithoutSubjectDescription">Vous êtes sur le point d’envoyer un message sans objet. Voulez-vous continuer ?</string>
