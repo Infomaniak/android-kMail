@@ -303,7 +303,7 @@ class NotificationUtils @Inject constructor(
 
         private val TAG: String = NotificationUtils::class.java.simpleName
 
-        private const val DELAY_DEBOUNCE_NOTIF_MS = 500L
+        private const val DELAY_DEBOUNCE_NOTIF_MS = 1_500L
 
         private val defaultSmallIcon = R.drawable.ic_logo_notification
 
