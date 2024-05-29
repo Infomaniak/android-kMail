@@ -265,7 +265,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             refreshTokenError(AccountUtils.currentUser!!)
         }
 
-        override suspend fun getApiToken(): ApiToken = AccountUtils.currentUser!!.apiToken
+        override suspend fun getApiToken(): ApiToken? = AccountUtils.currentUser?.apiToken
     }
 
     override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
