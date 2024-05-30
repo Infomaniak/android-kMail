@@ -1,0 +1,3 @@
+- Add signature edition
+- Auto-advance
+- Chromebook support
