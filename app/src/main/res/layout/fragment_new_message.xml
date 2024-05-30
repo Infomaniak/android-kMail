@@ -476,21 +476,24 @@
             app:layout_constraintTop_toBottomOf="@+id/compositionNestedScrollView"
             tools:visibility="visible">
 
-            <TextView
-                style="@style/BodySmall"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_weight="1"
-                android:text="@string/externalDialogTitleRecipient"
-                android:textColor="@color/externalTagOnBackground" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/informationButton"
-                style="@style/IconButtonSmall"
+                style="@style/TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
+                android:minHeight="0dp"
+                android:paddingVertical="0dp"
+                android:text="@string/externalDialogTitleRecipient"
+                android:textColor="@color/primaryTextColor"
                 app:icon="@drawable/ic_external_information"
+                app:iconGravity="end"
                 app:iconTint="@color/externalTagOnBackground" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/closeButton"
