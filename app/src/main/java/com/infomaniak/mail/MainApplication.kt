@@ -37,6 +37,7 @@ import com.facebook.stetho.Stetho
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpClientConfig
 import com.infomaniak.lib.core.utils.CoilUtils
@@ -205,9 +206,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         AccountUtils.reloadApp = { withContext(mainDispatcher) { startActivity(getLaunchIntent()) } }
     }
 
-    private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).apply {
-        clearStack()
-    }
+    private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).clearStack()
 
     private fun configureInfomaniakCore() {
         InfomaniakCore.apply {
@@ -224,8 +223,16 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureHttpClient() {
         AccountUtils.onRefreshTokenError = refreshTokenError
-        HttpClientConfig.customInterceptors = listOf(UrlTraceInterceptor())
-        HttpClient.init(tokenInterceptorListener())
+        val tokenInterceptorListener = tokenInterceptorListener()
+        HttpClientConfig.customInterceptors = listOf(
+            UrlTraceInterceptor(),
+            AccessTokenUsageInterceptor(
+                tokenInterceptorListener = tokenInterceptorListener,
+                previousApiCall = localSettings.accessTokenApiCallRecord,
+                updateLastApiCall = { localSettings.accessTokenApiCallRecord = it },
+            ),
+        )
+        HttpClient.init(tokenInterceptorListener)
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
@@ -256,7 +263,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             refreshTokenError(AccountUtils.currentUser!!)
         }
 
-        override suspend fun getApiToken(): ApiToken = AccountUtils.currentUser!!.apiToken
+        override suspend fun getApiToken(): ApiToken? = AccountUtils.currentUser?.apiToken
+
+        override fun getCurrentUserId(): Int = AccountUtils.currentUserId
     }
 
     override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
