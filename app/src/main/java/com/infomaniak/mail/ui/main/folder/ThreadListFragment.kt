@@ -717,7 +717,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                     val currentFolder = mainViewModel.currentFolder.value
                     Sentry.withScope { scope ->
                         scope.setExtra("cursor", "$currentFolderCursor")
-                        scope.setExtra("folderRole", "${currentFolder?.role?.name}")
+                        scope.setExtra("folderRole", currentFolder?.role?.name.toString())
                         scope.setExtra("folderThreadsCount", "${currentFolder?.threads?.count()}")
                         Sentry.captureMessage(
                             "Should display threads is true but there are no threads to display",

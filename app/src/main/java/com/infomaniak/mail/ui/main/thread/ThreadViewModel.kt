@@ -274,7 +274,7 @@ class ThreadViewModel @Inject constructor(
         appContext.trackUserInfo("nbMessagesInThread", nbMessages)
 
         when (nbMessages) {
-            0 -> SentryDebug.sendEmptyThread(thread)
+            0 -> SentryDebug.sendEmptyThread(thread, "No Message in the Thread when opening it")
             1 -> appContext.trackUserInfo("oneMessagesInThread")
             else -> appContext.trackUserInfo("multipleMessagesInThread", nbMessages)
         }
