@@ -182,7 +182,7 @@ class NewMessageViewModel @Inject constructor(
             signatures = SignatureController.getAllSignatures(realm)
                 .also { signaturesCount = it.count() }
                 .toMutableList()
-                .apply { add(index = 0, element = Signature.getDummySignature(appContext)) }
+                .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox.email)) }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
 
@@ -256,7 +256,7 @@ class NewMessageViewModel @Inject constructor(
 
         signatureUtils.initSignature(
             draft = this,
-            signature = signature ?: Signature.getDummySignature(appContext, isDefault = true),
+            signature = signature ?: Signature.getDummySignature(appContext, email = currentMailbox.email, isDefault = true),
         )
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)

@@ -63,11 +63,15 @@ class Signature : RealmObject {
 
     companion object {
 
-        fun getDummySignature(context: Context, isDefault: Boolean = false) = Signature().apply {
+        fun getDummySignature(
+            context: Context,
+            email: String = AccountUtils.currentMailboxEmail!!,
+            isDefault: Boolean = false,
+        ) = Signature().apply {
             id = Draft.NO_IDENTITY
             isDummy = true
             name = context.getString(R.string.selectSignatureNone)
-            senderEmailIdn = AccountUtils.currentMailboxEmail!!
+            senderEmailIdn = email
             this.isDefault = isDefault
         }
     }
