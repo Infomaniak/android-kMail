@@ -23,7 +23,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
-import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.cache.mailboxContent.SwissTransferFileController
+import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -38,6 +39,7 @@ class DownloadAttachmentViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val attachmentController: AttachmentController,
+    private val swissTransferFileController: SwissTransferFileController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -45,11 +47,11 @@ class DownloadAttachmentViewModel @Inject constructor(
 
     private val attachmentLocalUuid
         inline get() = savedStateHandle.get<String>(DownloadAttachmentProgressDialogArgs::attachmentLocalUuid.name)!!
-
+    
     /**
      * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading
      */
-    private var attachment: Attachment? = null
+    private var attachment: Attachable? = null
 
     fun downloadAttachment() = liveData(ioCoroutineContext) {
         val downloadedAttachment = runCatching {

@@ -295,9 +295,15 @@
     <string name="failToOpenDraft">Échec de l’ouverture du brouillon</string>
     <string name="faqUrl">https://www.infomaniak.com/fr/support/faq/admin2/service-mail</string>
     <string name="favoritesFolder">Favoris</string>
+    <plurals name="fileQuantity">
+        <item quantity="one">%d fichier envoyé via SwissTransfer</item>
+        <item quantity="other">%d fichiers envoyés via SwissTransfer</item>
+        <item quantity="many">%d fichiers envoyés via SwissTransfer</item>
+    </plurals>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
+    <string name="linkingWord">et</string>
     <string name="loadingText">Chargement…</string>
     <string name="lockedMailboxBottomSheetDescription">L’accès à votre adresse mail est actuellement bloqué.\nPour plus d’informations, consultez les FAQ.</string>
     <string name="lockedMailboxBottomSheetTitle">L’adresse %s est bloquée</string>
@@ -529,6 +535,7 @@
     <string name="startActivityCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
     <string name="subjectTitle">Objet :</string>
     <string name="superCollapsedBlock">Voir tout (%d)</string>
+    <string name="swissTransferAttachmentDescription">L’expéditeur a joint un ou plusieurs fichiers volumineux, disponibles via le lien SwissTransfer.</string>
     <string name="syncCalendarsAndContactsDescription">Consultez vos contacts et calendriers directement depuis votre appareil.</string>
     <string name="syncCalendarsAndContactsTitle">Synchronisation des calendriers et contacts</string>
     <string name="syncFragmentTitle">Synchroniser vos calendriers et contacts</string>

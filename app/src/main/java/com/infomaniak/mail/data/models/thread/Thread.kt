@@ -184,7 +184,7 @@ class Thread : RealmObject {
             if (!message.isSeen) unseenMessagesCount++
             from += message.from
             to += message.to
-            if (message.hasAttachments) hasAttachments = true
+            if (message.hasAttachments || message.swissTransferUuid != null) hasAttachments = true
             if (message.isDraft) hasDrafts = true
             if (message.isFavorite) isFavorite = true
             if (message.isAnswered) isAnswered = true

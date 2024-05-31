@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -35,6 +36,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
@@ -253,6 +255,18 @@ class ThreadController @Inject constructor(
             onUpdate(getThread(threadUid, realm))
         }
 
+        private fun fetchSwissTransferContainer(uuid: String, realm: MutableRealm): SwissTransferContainer? = runCatching {
+            val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
+
+            return@runCatching if (apiResponse.isSuccess()) {
+                apiResponse.data?.apply {
+                    SwissTransferContainerController.upsertSwissTransferContainer(this, realm)
+                }
+            } else {
+                null
+            }
+        }.getOrNull()
+
         /**
          * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
          *
@@ -296,6 +310,10 @@ class ThreadController @Inject constructor(
 
                         if (apiResponse.isSuccess()) {
                             apiResponse.data?.also { remoteMessage ->
+                                val swissTransferFiles = remoteMessage.swissTransferUuid?.let { uuid ->
+                                    fetchSwissTransferContainer(uuid, realm = this)?.swissTransferFiles
+                                } ?: realmListOf()
+
                                 remoteMessage.initLocalValues(
                                     date = localMessage.date,
                                     isFullyDownloaded = true,
@@ -304,6 +322,7 @@ class ThreadController @Inject constructor(
                                     draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
                                     latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                     messageIds = localMessage.messageIds,
+                                    swissTransferFiles = swissTransferFiles
                                 )
 
                                 if (remoteMessage.hasAttachments) hasAttachmentsInThread = true
@@ -313,7 +332,6 @@ class ThreadController @Inject constructor(
                         } else {
                             handleFailure(localMessage.uid, apiResponse.error?.code)
                         }
-
                     }.onFailure {
                         // This `onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
                         handleFailure(localMessage.uid)

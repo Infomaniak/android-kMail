@@ -53,6 +53,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -268,14 +269,20 @@ class NewMessageFragment : Fragment() {
             shouldDisplayCloseButton = true,
             onDelete = ::onDeleteAttachment,
             onAttachmentClicked = {
-                trackAttachmentActionsEvent(OPEN_FROM_DRAFT_NAME)
-                it.openAttachment(
-                    context = requireContext(),
-                    navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                        navigateToDownloadProgressDialog(attachment, attachmentIntentType, NewMessageFragment::class.java.name)
-                    },
-                    snackbarManager = snackbarManager,
-                )
+                if (it is Attachment) {
+                    trackAttachmentActionsEvent(OPEN_FROM_DRAFT_NAME)
+                    it.openAttachment(
+                        context = requireContext(),
+                        navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                            navigateToDownloadProgressDialog(
+                                attachment,
+                                attachmentIntentType,
+                                NewMessageFragment::class.java.name
+                            )
+                        },
+                        snackbarManager = snackbarManager,
+                    )
+                }
             },
         )
 

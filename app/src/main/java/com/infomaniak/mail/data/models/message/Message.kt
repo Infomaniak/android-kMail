@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
@@ -132,6 +133,8 @@ class Message : RealmObject {
     var isDeletedOnApi: Boolean = false
     @Transient
     var latestCalendarEventResponse: CalendarEventResponse? = null
+    @Transient
+    var swissTransferFiles: RealmList<SwissTransferFile> = realmListOf()
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -222,6 +225,7 @@ class Message : RealmObject {
         draftLocalUuid: String?,
         latestCalendarEventResponse: CalendarEventResponse?,
         messageIds: RealmSet<String>? = null,
+        swissTransferFiles: RealmList<SwissTransferFile> = realmListOf()
     ) {
 
         this.date = date
@@ -231,12 +235,14 @@ class Message : RealmObject {
         this.isFromSearch = isFromSearch
         this.messageIds = messageIds ?: computeMessageIds()
         this.latestCalendarEventResponse = latestCalendarEventResponse
+        this.swissTransferFiles = swissTransferFiles
 
         shortUid = uid.toShortUid()
     }
 
     fun keepHeavyData(message: Message) {
         attachments = message.attachments.copyFromRealm().toRealmList()
+        swissTransferFiles = message.swissTransferFiles.copyFromRealm().toRealmList()
         latestCalendarEventResponse = message.latestCalendarEventResponse?.copyFromRealm()
         body = message.body?.copyFromRealm()
 

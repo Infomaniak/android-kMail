@@ -291,9 +291,14 @@
     <string name="failToOpenDraft">Impossibile aprire la bozza</string>
     <string name="faqUrl">https://www.infomaniak.com/it/assistenza/faq/admin2/servizio-mail</string>
     <string name="favoritesFolder">Preferiti</string>
+    <plurals name="fileQuantity">
+        <item quantity="one">%d file inviato da SwissTransfer</item>
+        <item quantity="other">%d file inviati da SwissTransfer</item>
+    </plurals>
     <string name="fromTitle">Da:</string>
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="inboxFolder">Posta in arrivo</string>
+    <string name="linkingWord">e</string>
     <string name="loadingText">Caricamento…</string>
     <string name="lockedMailboxBottomSheetDescription">L’accesso al tuo indirizzo e-mail è attualmente bloccato.\nPer ulteriori informazioni, leggi le FAQ.</string>
     <string name="lockedMailboxBottomSheetTitle">L’indirizzo e-mail %s è bloccato</string>
@@ -519,6 +524,7 @@
     <string name="startActivityCantHandleAction">Non è stata trovata alcuna applicazione in grado di gestire questa azione</string>
     <string name="subjectTitle">Oggetto:</string>
     <string name="superCollapsedBlock">Vedi tutti (%d)</string>
+    <string name="swissTransferAttachmentDescription">Il mittente ha allegato uno o più file di grandi dimensioni, disponibili tramite il link SwissTransfer.</string>
     <string name="syncCalendarsAndContactsDescription">Visualizza i contatti e il calendario direttamente dal dispositivo.</string>
     <string name="syncCalendarsAndContactsTitle">Sincronizzazione di calendari e contatti</string>
     <string name="syncFragmentTitle">Sincronizzare i calendari e i contatti</string>

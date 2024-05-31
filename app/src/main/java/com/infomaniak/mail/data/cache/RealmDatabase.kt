@@ -198,6 +198,8 @@ object RealmDatabase {
             Attachment::class,
             CalendarEventResponse::class,
             CalendarEvent::class,
+            SwissTransferContainer::class,
+            SwissTransferFile::class,
             Attendee::class,
             Signature::class,
             Bimi::class,
