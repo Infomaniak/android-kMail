@@ -19,6 +19,9 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View.OnClickListener
@@ -40,6 +43,7 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.calendar.Attendee
@@ -460,21 +464,54 @@ class ThreadAdapter(
 
     @SuppressLint("SetTextI18n")
     private fun MessageViewHolder.bindAttachment(message: Message) = with(binding) {
-        val attachments = message.attachments
+        val attachments: MutableList<Attachable> = mutableListOf()
+        attachments.addAll(message.attachments)
+        attachments.addAll(message.swissTransferFiles)
+
         val fileSize = formatAttachmentFileSize(attachments)
-        attachmentLayout.attachmentsSizeText.text = context.resources.getQuantityString(
-            R.plurals.attachmentQuantity,
-            attachments.size,
-            attachments.size,
-        ) + " ($fileSize)"
+
+        var attachmentString = ""
+        if (message.attachments.isNotEmpty()) {
+            attachmentString = context.resources.getQuantityString(
+                R.plurals.attachmentQuantity,
+                message.attachments.size,
+                message.attachments.size
+            )
+
+            if (message.swissTransferFiles.isNotEmpty()) {
+                attachmentString += " " + context.resources.getString(R.string.linkingWord) + " "
+            }
+        }
+
+        if (message.swissTransferFiles.isNotEmpty()) {
+            attachmentString += context.resources.getQuantityString(
+                R.plurals.fileQuantity,
+                message.swissTransferFiles.size,
+                message.swissTransferFiles.size
+            )
+        }
+
+        val downloadAllString = context.resources.getString(R.string.buttonDownloadAll)
+
+        val span = SpannableString("$attachmentString ($fileSize). $downloadAllString")
+
+        span.setSpan(
+            ForegroundColorSpan(context.getColor(R.color.primary_color_disabled)),
+            span.length - downloadAllString.length,
+            span.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        attachmentLayout.attachmentsSizeText.text = span
+
         attachmentAdapter.setAttachments(attachments)
-        attachmentLayout.attachmentsDownloadAllButton.setOnClickListener {
+        attachmentLayout.attachmentsInfo.setOnClickListener {
             threadAdapterCallbacks?.onDownloadAllClicked?.invoke(message)
         }
-        attachmentLayout.root.isVisible = message.attachments.isNotEmpty()
+        attachmentLayout.root.isVisible = message.attachments.isNotEmpty() || message.swissTransferFiles.isNotEmpty()
     }
 
-    private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
+    private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachable>): String {
         if (attachments.isEmpty()) return ""
 
         val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
@@ -696,8 +733,8 @@ class ThreadAdapter(
         var onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)? = null,
         var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
         var onDraftClicked: ((message: Message) -> Unit)? = null,
-        var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
-        var onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)? = null,
+        var onAttachmentClicked: ((attachment: Attachable) -> Unit)? = null,
+        var onAttachmentOptionsClicked: ((attachment: Attachable) -> Unit)? = null,
         var onDownloadAllClicked: ((message: Message) -> Unit)? = null,
         var onReplyClicked: ((Message) -> Unit)? = null,
         var onMenuClicked: ((Message) -> Unit)? = null,
@@ -732,8 +769,8 @@ class ThreadAdapter(
         override val binding: ItemMessageBinding,
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)?,
-        onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
-        onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?,
+        onAttachmentClicked: ((attachment: Attachable) -> Unit)?,
+        onAttachmentOptionsClicked: ((attachment: Attachable) -> Unit)?,
     ) : ThreadAdapterViewHolder(binding) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)

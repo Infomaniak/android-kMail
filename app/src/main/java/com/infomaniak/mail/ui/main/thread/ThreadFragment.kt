@@ -54,7 +54,9 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AutoAdvanceMode
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -244,19 +246,27 @@ class ThreadFragment : Fragment() {
                     mainViewModel.currentMailbox.value?.let { mailbox -> deleteDraft(message, mailbox) }
                 },
                 onAttachmentClicked = {
-                    trackAttachmentActionsEvent(ACTION_OPEN_NAME)
-                    it.openAttachment(
-                        context = requireContext(),
-                        navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                            navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
-                        },
-                        snackbarManager = snackbarManager,
-                    )
+                    if (it is Attachment) {
+                        trackAttachmentActionsEvent(ACTION_OPEN_NAME)
+                        it.openAttachment(
+                            context = requireContext(),
+                            navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                                navigateToDownloadProgressDialog(
+                                    attachment,
+                                    attachmentIntentType,
+                                    ThreadFragment::class.java.name
+                                )
+                            },
+                            snackbarManager = snackbarManager,
+                        )
+                    } else if (it is SwissTransferFile) {
+                        downloadSwissTransferFile(swissTransferFile = it)
+                    }
                 },
                 onAttachmentOptionsClicked = {
                     safeNavigate(
                         resId = R.id.attachmentActionsBottomSheetDialog,
-                        args = AttachmentActionsBottomSheetDialogArgs(it.localUuid).toBundle(),
+                        args = AttachmentActionsBottomSheetDialogArgs(it.localUuid, it is SwissTransferFile).toBundle(),
                     )
                 },
                 onDownloadAllClicked = { message ->
@@ -532,14 +542,33 @@ class ThreadFragment : Fragment() {
     }
 
     private fun downloadAllAttachments(message: Message) {
+        val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }
+
+        if (message.attachments.isNotEmpty()) downloadAttachments(message, allAttachmentsFileName(truncatedSubject ?: ""))
+
+        message.swissTransferUuid?.let { containerUuid ->
+            downloadSwissTransferFiles(
+                containerUuid,
+                allSwissTransferFilesName(truncatedSubject ?: "")
+            )
+        }
+    }
+
+    private fun downloadAttachments(message: Message, name: String) {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return,
             folderId = message.folderId,
             shortUid = message.shortUid,
         )
-        val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }
-        val name = allAttachmentsFileName(truncatedSubject ?: "")
         scheduleDownloadManager(url, name)
+    }
+
+    private fun downloadSwissTransferFile(swissTransferFile: SwissTransferFile) {
+        scheduleDownloadManager(swissTransferFile.downloadUrl, swissTransferFile.name)
+    }
+
+    private fun downloadSwissTransferFiles(containerUuid: String, name: String) {
+        scheduleDownloadManager(ApiRoutes.downloadUrlSwissTransferFiles(containerUuid), name)
     }
 
     private fun replyTo(message: Message) {
@@ -678,5 +707,6 @@ class ThreadFragment : Fragment() {
         private const val NEXT_CHRONOLOGICAL_THREAD = 1
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
+        private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"
     }
 }
