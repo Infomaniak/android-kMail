@@ -1047,14 +1047,14 @@ class MainViewModel @Inject constructor(
         snackbarManager.postValue(appContext.getString(snackbarTitleRes))
     }
 
-    private fun threadHasOnlyOneMessageLeftInCurrentFolder(threadUid: String): Boolean {
-        val folderId = currentFolderId ?: return false
-        return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
-    }
-
     private fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
         val isWorkingWithThread = message == null
         return isWorkingWithThread || threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())
+    }
+
+    private fun threadHasOnlyOneMessageLeftInCurrentFolder(threadUid: String): Boolean {
+        val folderId = currentFolderId ?: return false
+        return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
     }
 
     companion object {

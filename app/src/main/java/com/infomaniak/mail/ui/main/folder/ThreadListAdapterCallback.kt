@@ -21,8 +21,8 @@ import com.infomaniak.mail.data.models.thread.Thread
 
 interface ThreadListAdapterCallback {
     var onSwipeFinished: (() -> Unit)?
-    var onThreadClicked: ((thread: Thread) -> Unit)
+    var onThreadClicked: (thread: Thread) -> Unit
     var onFlushClicked: ((dialogTitle: String) -> Unit)?
-    var onLoadMoreClicked: (() -> Unit)?
-    var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)?
+    var onLoadMoreClicked: () -> Unit
+    var onPositionClickedChanged: (position: Int, previousPosition: Int) -> Unit
 }

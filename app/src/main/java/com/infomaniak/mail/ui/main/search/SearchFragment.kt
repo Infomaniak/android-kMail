@@ -150,7 +150,9 @@ class SearchFragment : TwoPaneFragment() {
             folderRole = null,
             isFolderNameVisible = true,
             threadListAdapterCallback = object : ThreadListAdapterCallback {
+
                 override var onSwipeFinished: (() -> Unit)? = null
+
                 override var onThreadClicked: (Thread) -> Unit = { thread ->
                     with(searchViewModel) {
                         if (!isLengthTooShort(currentSearchQuery)) history.value = currentSearchQuery
@@ -161,14 +163,16 @@ class SearchFragment : TwoPaneFragment() {
                         navigateToThread(thread)
                     }
                 }
-                override var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
-                override var onLoadMoreClicked: (() -> Unit)? = {
+
+                override var onFlushClicked: ((String) -> Unit)? = null
+
+                override var onLoadMoreClicked: () -> Unit = {
                     trackThreadListEvent("loadMore")
                     mainViewModel.getOnePageOfOldMessages()
                 }
-                override var onPositionClickedChanged: ((position: Int, previousPosition: Int) -> Unit)? =
-                    ::updateAutoAdvanceNaturalThread
-            }
+
+                override var onPositionClickedChanged: (Int, Int) -> Unit = ::updateAutoAdvanceNaturalThread
+            },
         )
 
         threadListAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
