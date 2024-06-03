@@ -35,6 +35,7 @@ import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -81,6 +82,12 @@ class Folder : RealmObject {
     var isHidden: Boolean = false // For children only (a children Folder is hidden if its parent is collapsed)
     @Transient
     var isCollapsed: Boolean = false // For parents only (collapsing a parent Folder will hide its children)
+    //endregion
+
+    //region UI data (Transient & Ignore)
+    @Transient
+    @Ignore
+    var shouldDisplayDivider: Boolean = false
     //endregion
 
     private val _parents by backlinks(Folder::children)

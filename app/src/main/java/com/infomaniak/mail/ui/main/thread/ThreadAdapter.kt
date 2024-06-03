@@ -169,7 +169,7 @@ class ThreadAdapter(
         val item = items[position]
 
         holder.binding.root.tag = if (item is SuperCollapsedBlock || (item is Message && item.shouldHideDivider)) {
-            IGNORE_DIVIDER_TAG
+            UiUtils.IGNORE_DIVIDER_TAG
         } else {
             null
         }
@@ -803,9 +803,6 @@ class ThreadAdapter(
     }
 
     companion object {
-
-        const val IGNORE_DIVIDER_TAG = "ignoreDividerTag"
-
         private val contextMenuTypeForHitTestResultType = mapOf(
             HitTestResult.PHONE_TYPE to ContextMenuType.PHONE,
             HitTestResult.EMAIL_TYPE to ContextMenuType.EMAIL,
