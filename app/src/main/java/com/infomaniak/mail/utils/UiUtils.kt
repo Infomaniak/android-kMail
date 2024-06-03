@@ -37,6 +37,7 @@ import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 object UiUtils {
 
     const val FULLY_SLID = 1.0f
+    const val IGNORE_DIVIDER_TAG = "ignoreDividerTag"
     const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
 
     @ColorInt
