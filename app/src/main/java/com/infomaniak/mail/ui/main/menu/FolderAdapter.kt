@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
@@ -100,6 +101,8 @@ class FolderAdapter @Inject constructor(
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
         val folder = folders[position]
+
+        root.tag = if (folder.shouldDisplayDivider) null else UiUtils.IGNORE_DIVIDER_TAG
 
         when (getItemViewType(position)) {
             DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
@@ -181,19 +184,33 @@ class FolderAdapter @Inject constructor(
     @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) = runCatchingRealm {
 
-        foldersDiffer.submitList(newFolders)
+        newCurrentFolderId?.let { currentFolderId = it }
 
-        setFoldersJob?.cancel()
-        setFoldersJob = globalCoroutineScope.launch {
-            newCurrentFolderId?.let { currentFolderId = it }
-            val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
+        var isFirstCustomFolder = true
+        val foldersWithDivider = newFolders.map { folder ->
+            folder.apply {
+                shouldDisplayDivider = if (folder.role == null && isFirstCustomFolder) {
+                    isFirstCustomFolder = false
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+        foldersDiffer.submitList(foldersWithDivider)
 
-            val isFirstTime = hasCollapsableFolder == null
-            val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
-            hasCollapsableFolder = newHasCollapsableFolder
+        if (isInMenuDrawer) {
+            setFoldersJob?.cancel()
+            setFoldersJob = globalCoroutineScope.launch {
+                val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
 
-            if (!isFirstTime && collapsableFolderExistenceHasChanged) {
-                Dispatchers.Main { notifyDataSetChanged() }
+                val isFirstTime = hasCollapsableFolder == null
+                val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
+                hasCollapsableFolder = newHasCollapsableFolder
+
+                if (!isFirstTime && collapsableFolderExistenceHasChanged) {
+                    Dispatchers.Main { notifyDataSetChanged() }
+                }
             }
         }
     }
@@ -234,7 +251,8 @@ class FolderAdapter @Inject constructor(
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
                     oldFolder.isHidden == newFolder.isHidden &&
-                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed
+                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed &&
+                    oldFolder.shouldDisplayDivider == newFolder.shouldDisplayDivider
         }.getOrDefault(false)
     }
 }

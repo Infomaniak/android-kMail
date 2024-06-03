@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
@@ -49,20 +50,24 @@ class MoveViewModel @Inject constructor(
     private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
+    var currentFolderId: String? = null
+    val allFolders = mutableListOf<Folder>()
     var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
 
     fun cancelSearch() {
         filterJob?.cancel()
     }
 
-    fun getFolderIdAndCustomFolders() = liveData(ioCoroutineContext) {
+    fun getFolders(defaultFolders: List<Folder>) = liveData(ioCoroutineContext) {
 
-        val folderId = messageUid?.let { messageController.getMessage(it)!!.folderId }
+        currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
             ?: threadController.getThread(threadsUids.first())!!.folderId
 
+        val defaultFoldersWithoutDraft = defaultFolders.filterNot { it.role == FolderRole.DRAFT }
         val customFolders = folderController.getCustomFolders().getCustomMenuFolders()
+        allFolders.addAll(defaultFoldersWithoutDraft + customFolders)
 
-        emit(folderId to customFolders)
+        emit(allFolders)
     }
 
     fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
