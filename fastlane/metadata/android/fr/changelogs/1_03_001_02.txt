@@ -1,0 +1,2 @@
+- Ajout de la possibilité de prévisualiser une pièce jointe lors de la rédaction d'un nouveau message
+- Augmentation de la durée d'attente pour éviter d'être inondé de notifications sonores et vibratoires

@@ -1,0 +1,2 @@
+- Add possibility to preview an attachment when composing a new message
+- Increase debounce to avoid being spammed with notifications sound and vibration
