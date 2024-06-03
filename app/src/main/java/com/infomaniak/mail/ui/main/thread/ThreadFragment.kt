@@ -81,6 +81,7 @@ import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
@@ -324,7 +325,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.addItemDecoration(
             DividerItemDecorator(
                 divider = InsetDrawable(dividerDrawable(requireContext()), 0),
-                shouldIgnoreView = { view -> view.tag == ThreadAdapter.IGNORE_DIVIDER_TAG },
+                shouldIgnoreView = { view -> view.tag == UiUtils.IGNORE_DIVIDER_TAG },
             ),
         )
 
