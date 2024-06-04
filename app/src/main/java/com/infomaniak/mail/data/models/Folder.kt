@@ -44,7 +44,7 @@ import kotlinx.serialization.UseSerializers
 import kotlin.math.max
 
 @Serializable
-class Folder : RealmObject {
+class Folder : RealmObject, Cloneable {
 
     //region Remote data
     @PrimaryKey
@@ -143,6 +143,8 @@ class Folder : RealmObject {
     override fun equals(other: Any?) = other === this || (other is Folder && other.id == id)
 
     override fun hashCode(): Int = id.hashCode()
+
+    public override fun clone(): Folder = super.clone() as Folder
 
     enum class FolderRole(
         @StringRes val folderNameRes: Int,
