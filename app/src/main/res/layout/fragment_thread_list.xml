@@ -193,14 +193,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="true">
-
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:nestedScrollingEnabled="true">
 
                             <com.infomaniak.mail.views.itemViews.BannerWithActionView
                                 android:id="@+id/installUpdate"
@@ -234,21 +230,20 @@
                                 tools:listitem="@layout/cardview_thread_item"
                                 tools:visibility="visible" />
 
+                            <com.infomaniak.mail.ui.main.EmptyStateView
+                                android:id="@+id/emptyStateView"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:visibility="gone"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/webviewWarning"
+                                tools:description="@string/emptyStateInboxDescription"
+                                tools:icon="@drawable/ic_empty_state_folder"
+                                tools:title="@string/emptyStateInboxTitle"
+                                tools:visibility="visible" />
+
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <com.infomaniak.mail.ui.main.EmptyStateView
-                            android:id="@+id/emptyStateView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:visibility="gone"
-                            app:layout_anchor="@+id/swipeRefreshLayout"
-                            app:layout_anchorGravity="center"
-                            tools:description="@string/emptyStateInboxDescription"
-                            tools:icon="@drawable/ic_empty_state_folder"
-                            tools:title="@string/emptyStateInboxTitle"
-                            tools:visibility="visible" />
-
-                    </FrameLayout>
                 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
                 <com.infomaniak.mail.views.BottomQuickActionBarView

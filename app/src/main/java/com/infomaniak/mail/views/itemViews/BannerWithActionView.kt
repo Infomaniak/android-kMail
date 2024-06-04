@@ -43,11 +43,7 @@ class BannerWithActionView @JvmOverloads constructor(
             binding.description.text = value
         }
 
-    var actionButtonText: CharSequence?
-        get() = binding.actionButton.text
-        set(value) {
-            binding.actionButton.text = value
-        }
+    var actionButtonText: CharSequence? by binding.actionButton::text
 
     private val baseConstraints by lazy {
         ConstraintSet().apply {

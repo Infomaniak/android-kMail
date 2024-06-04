@@ -23,4 +23,4 @@
     app:buttonIcon="@drawable/ic_bin"
     tools:buttonText="@string/threadListEmptySpamButton"
     tools:description="@string/emptyStateTrashDescription"
-    tools:isButtonAlignWithDescription="false" />
+    tools:isButtonAlignedWithDescription="false" />
