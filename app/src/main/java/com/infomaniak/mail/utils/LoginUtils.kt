@@ -92,25 +92,32 @@ class LoginUtils @Inject constructor(
 
         val context = requireContext()
 
+        suspend fun loginSuccess(user: User) {
+            context.trackAccountEvent("loggedIn")
+            mailboxController.getFirstValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+            AccountUtils.reloadApp?.invoke()
+        }
+
+        suspend fun mailboxError(errorCode: MailboxErrorCode) = withContext(mainDispatcher) {
+            when (errorCode) {
+                MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
+                MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
+            }
+        }
+
+        suspend fun apiError(apiResponse: ApiResponse<*>) = withContext(mainDispatcher) {
+            showError(context.getString(apiResponse.translatedError))
+        }
+
+        suspend fun otherError() = withContext(mainDispatcher) {
+            showError(context.getString(R.string.anErrorHasOccurred))
+        }
+
         when (val returnValue = LoginActivity.authenticateUser(context, apiToken, mailboxController)) {
-            is User -> {
-                context.trackAccountEvent("loggedIn")
-                mailboxController.getFirstValidMailbox(returnValue.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
-                AccountUtils.reloadApp?.invoke()
-                return@launch
-            }
-            is MailboxErrorCode -> withContext(mainDispatcher) {
-                when (returnValue) {
-                    MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
-                    MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
-                }
-            }
-            is ApiResponse<*> -> withContext(mainDispatcher) {
-                showError(context.getString(returnValue.translatedError))
-            }
-            else -> withContext(mainDispatcher) {
-                showError(context.getString(R.string.anErrorHasOccurred))
-            }
+            is User -> return@launch loginSuccess(returnValue)
+            is MailboxErrorCode -> mailboxError(returnValue)
+            is ApiResponse<*> -> apiError(returnValue)
+            else -> otherError()
         }
 
         infomaniakLogin.deleteToken(

@@ -313,42 +313,46 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        when (updatedDraft.action) {
-            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, updatedDraft, okHttpClient)) {
-                data?.let { data ->
-                    realmActionOnDraft = { realm ->
-                        realm.findLatest(updatedDraft)?.apply {
-                            remoteUuid = data.draftRemoteUuid
-                            messageUid = data.messageUid
-                            action = null
-                        }
+        fun executeSaveAction() = with(ApiRepository.saveDraft(mailboxUuid, updatedDraft, okHttpClient)) {
+            data?.let { data ->
+                realmActionOnDraft = { realm ->
+                    realm.findLatest(updatedDraft)?.apply {
+                        remoteUuid = data.draftRemoteUuid
+                        messageUid = data.messageUid
+                        action = null
                     }
-                    scheduledDate = dateFormatWithTimezone.format(Date())
-                    savedDraftUuid = data.draftRemoteUuid
-                } ?: run {
+                }
+                scheduledDate = dateFormatWithTimezone.format(Date())
+                savedDraftUuid = data.draftRemoteUuid
+            } ?: run {
+                retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
+            }
+        }
+
+        fun executeSendAction() = with(ApiRepository.sendDraft(mailboxUuid, updatedDraft, okHttpClient)) {
+            when {
+                isSuccess() -> {
+                    scheduledDate = data?.scheduledDate
+                    realmActionOnDraft = deleteDraftCallback(updatedDraft)
+                }
+                error?.exception is SerializationException -> {
+                    realmActionOnDraft = deleteDraftCallback(updatedDraft)
+                    Sentry.withScope { scope ->
+                        scope.setExtra("Is data null ?", "${data == null}")
+                        scope.setExtra("Error code", error?.code.toString())
+                        scope.setExtra("Error description", error?.description.toString())
+                        Sentry.captureMessage("Return JSON for SendDraft API call was modified", SentryLevel.ERROR)
+                    }
+                }
+                else -> {
                     retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
                 }
             }
-            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, updatedDraft, okHttpClient)) {
-                when {
-                    isSuccess() -> {
-                        scheduledDate = data?.scheduledDate
-                        realmActionOnDraft = deleteDraftCallback(updatedDraft)
-                    }
-                    error?.exception is SerializationException -> {
-                        realmActionOnDraft = deleteDraftCallback(updatedDraft)
-                        Sentry.withScope { scope ->
-                            scope.setExtra("Is data null ?", "${data == null}")
-                            scope.setExtra("Error code", error?.code.toString())
-                            scope.setExtra("Error description", error?.description.toString())
-                            Sentry.captureMessage("Return JSON for SendDraft API call was modified", SentryLevel.ERROR)
-                        }
-                    }
-                    else -> {
-                        retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
-                    }
-                }
-            }
+        }
+
+        when (updatedDraft.action) {
+            DraftAction.SAVE -> executeSaveAction()
+            DraftAction.SEND -> executeSendAction()
             else -> Unit
         }
 

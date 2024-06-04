@@ -145,13 +145,17 @@ object ConfettiUtils {
             displayConfetti(config, sourceRight, container)
         }
 
-        when (type) {
-            ConfettiType.COLORED_SNOW -> displaySnow(colored = true)
-            ConfettiType.INFOMANIAK -> when ((0..2).random()) {
+        fun displayInfomaniak() {
+            when ((0..2).random()) {
                 0 -> displayTada()
                 1 -> displaySnow()
                 else -> if (isInPortrait()) displaySingleGeneva() else displayDoubleGeneva()
             }
+        }
+
+        when (type) {
+            ConfettiType.COLORED_SNOW -> displaySnow(colored = true)
+            ConfettiType.INFOMANIAK -> displayInfomaniak()
         }
     }
 
