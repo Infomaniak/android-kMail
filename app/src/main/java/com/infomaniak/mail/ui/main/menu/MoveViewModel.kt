@@ -23,7 +23,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
@@ -57,15 +56,14 @@ class MoveViewModel @Inject constructor(
         filterJob?.cancel()
     }
 
-    fun getFolders(defaultFolders: List<Folder>) = liveData(ioCoroutineContext) {
+    fun getFolders() = liveData(ioCoroutineContext) {
 
         currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
             ?: threadController.getThread(threadsUids.first())!!.folderId
 
-        val defaultFoldersWithoutDraft = defaultFolders.filterNot { it.role == FolderRole.DRAFT }
-        val customFolders = folderController.getCustomFolders().getCustomMenuFolders()
+        val folders = folderController.getMoveFolders().getCustomMenuFolders()
 
-        emit(defaultFoldersWithoutDraft + customFolders)
+        emit(folders)
     }
 
     fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
