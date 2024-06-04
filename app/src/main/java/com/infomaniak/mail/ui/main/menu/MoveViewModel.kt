@@ -51,7 +51,6 @@ class MoveViewModel @Inject constructor(
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
     var currentFolderId: String? = null
-    val allFolders = mutableListOf<Folder>()
     var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
 
     fun cancelSearch() {
@@ -65,9 +64,8 @@ class MoveViewModel @Inject constructor(
 
         val defaultFoldersWithoutDraft = defaultFolders.filterNot { it.role == FolderRole.DRAFT }
         val customFolders = folderController.getCustomFolders().getCustomMenuFolders()
-        allFolders.addAll(defaultFoldersWithoutDraft + customFolders)
 
-        emit(allFolders)
+        emit(defaultFoldersWithoutDraft + customFolders)
     }
 
     fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {

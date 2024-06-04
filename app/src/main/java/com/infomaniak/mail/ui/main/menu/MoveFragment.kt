@@ -62,6 +62,7 @@ class MoveFragment : Fragment() {
 
     @Inject
     lateinit var folderController: FolderController
+
     @Inject
     lateinit var injectedFolderAdapter: FolderAdapter
 
@@ -140,10 +141,10 @@ class MoveFragment : Fragment() {
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
 
         searchTextInput.apply {
-            toggleFolderListsVisibility(text?.toString())
+            toggleFolderListsVisibility(text?.toString(), allFolders)
 
             doOnTextChanged { newQuery, _, _, _ ->
-                toggleFolderListsVisibility(newQuery?.toString())
+                toggleFolderListsVisibility(newQuery?.toString(), allFolders)
                 if (newQuery?.isNotBlank() == true) {
                     moveViewModel.filterFolders(newQuery.toString(), allFolders, shouldDebounce = true)
                 }
@@ -161,9 +162,9 @@ class MoveFragment : Fragment() {
         }
     }
 
-    private fun toggleFolderListsVisibility(query: String?) = with(moveViewModel) {
+    private fun toggleFolderListsVisibility(query: String?, allFolders: List<Folder>) {
         isSearching = !query.isNullOrBlank()
-        if (!isSearching) folderAdapter.setFolders(allFolders, currentFolderId)
+        if (!isSearching) folderAdapter.setFolders(allFolders, moveViewModel.currentFolderId)
     }
 
     private fun observeSearchResults() = with(moveViewModel) {
