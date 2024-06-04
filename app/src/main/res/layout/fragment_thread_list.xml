@@ -198,62 +198,40 @@
                         android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="true">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/updateDownloadedText"
-                                style="@style/BodySmall"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                                android:layout_marginTop="@dimen/marginStandardMedium"
-                                android:text="@string/updateReadyTitle"
-                                app:layout_constraintEnd_toStartOf="@+id/installUpdate"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <com.google.android.material.button.MaterialButton
+                            <com.infomaniak.mail.views.itemViews.BannerWithActionView
                                 android:id="@+id/installUpdate"
-                                style="@style/TextButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/buttonInstall"
-                                app:icon="@drawable/ic_app_update"
-                                app:iconPadding="@dimen/marginStandardSmall"
-                                app:iconSize="@dimen/marginStandardMedium"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <com.google.android.material.divider.MaterialDivider
-                                android:id="@+id/installUpdateDivider"
                                 android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                app:dividerColor="@color/divider"
-                                app:layout_constraintTop_toBottomOf="@id/installUpdate" />
-
-                            <androidx.constraintlayout.widget.Group
-                                android:id="@+id/installUpdateGroup"
-                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:visibility="gone"
-                                app:constraint_referenced_ids="installUpdate, installUpdateDivider, updateDownloadedText"
-                                tools:visibility="visible" />
+                                app:buttonIcon="@drawable/ic_app_update"
+                                app:buttonText="@string/buttonInstall"
+                                app:description="@string/updateReadyTitle"
+                                app:isButtonAlignedWithDescription="true" />
+
+                            <com.infomaniak.mail.views.itemViews.BannerWithActionView
+                                android:id="@+id/webviewWarning"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:buttonText="@string/readMore"
+                                app:description="@string/displayMailIssueTitle"
+                                app:descriptionIcon="@drawable/ic_warning"
+                                app:isButtonAlignedWithDescription="false" />
 
                             <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
                                 android:id="@+id/threadsList"
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
+                                android:layout_height="match_parent"
                                 android:clipToPadding="false"
                                 android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                                 app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/installUpdateDivider"
                                 tools:listitem="@layout/cardview_thread_item"
-                                tools:visibility="gone" />
+                                tools:visibility="visible" />
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                        </LinearLayout>
 
                         <com.infomaniak.mail.ui.main.EmptyStateView
                             android:id="@+id/emptyStateView"

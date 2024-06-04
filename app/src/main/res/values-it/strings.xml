@@ -225,6 +225,8 @@
     <string name="createFolderNoParent">Nessuno</string>
     <string name="createFolderParent">Cartella dei genitori</string>
     <string name="dateTitle">Data:</string>
+    <string name="displayMailIssueDescription">Per risolvere i problemi di visualizzazione, aggiornare l’applicazione Android System Webview.</string>
+    <string name="displayMailIssueTitle">Problema di visualizzazione delle email</string>
     <string name="draftFolder">Bozze</string>
     <string name="draftPrefix">(Bozza)</string>
     <string name="emailWithoutSubjectDescription">State per inviare un messaggio senza oggetto. Volete continuare?</string>
@@ -363,6 +365,7 @@
     <string name="pickerNoSelection">Nessuna selezione</string>
     <string name="popupDetachMailboxDescription">Sei sicuro di voler staccare l’indirizzo %s?</string>
     <string name="popupDetachMailboxTitle">Staccare l’indirizzo</string>
+    <string name="readMore">Per saperne di più</string>
     <string name="recentSearchesTitle">Ricerche recenti</string>
     <string name="refreshTokenError">Sei stato disconnesso</string>
     <string name="reportDisplayProblemDescription">Accettate di condividere i vostri dati con i nostri sviluppatori in modo che possano aiutarvi a risolvere il vostro problema?</string>

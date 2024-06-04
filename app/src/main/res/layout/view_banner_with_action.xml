@@ -15,43 +15,64 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
     <!-- This needs to be passed as the handle used for dragging cards around in the DragDropSwipeRecyclerview library -->
     <View
         android:id="@+id/goneHandle"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/flushText"
-        style="@style/BodySmall"
-        android:layout_width="match_parent"
+        android:id="@+id/descriptionIcon"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/description"
+        tools:drawableStartCompat="@drawable/ic_warning"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/description"
+        style="@style/BodySmall"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/alternativeMargin"
         android:layout_marginTop="@dimen/marginStandardMedium"
-        tools:text="@string/threadListTrashHint" />
+        android:layout_marginEnd="@dimen/marginStandardMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/descriptionIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginStart="@dimen/marginStandardMedium"
+        tools:text="@string/threadListSpamHint" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/flushButton"
+        android:id="@+id/actionButton"
         style="@style/TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
         app:icon="@drawable/ic_bin"
         app:iconPadding="@dimen/marginStandardSmall"
         app:iconSize="@dimen/marginStandardMedium"
+        app:layout_constraintStart_toStartOf="@id/description"
+        app:layout_constraintTop_toBottomOf="@id/description"
+        tools:icon="@null"
         tools:text="@string/threadListEmptyTrashButton" />
 
     <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        app:dividerColor="@color/divider" />
+        app:dividerColor="@color/divider"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

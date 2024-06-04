@@ -227,6 +227,8 @@
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>
     <string name="dateTitle">Date :</string>
+    <string name="displayMailIssueDescription">Pour corriger les problèmes d’affichage, veuillez mettre à jour l’application Android System Webview.</string>
+    <string name="displayMailIssueTitle">Problème d’affichage de vos e-mails</string>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
     <string name="emailWithoutSubjectDescription">Vous êtes sur le point d’envoyer un message sans objet. Voulez-vous continuer ?</string>
@@ -371,6 +373,7 @@
     <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
     <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
+    <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté</string>
     <string name="reportDisplayProblemDescription">Acceptez-vous de partager vos données avec nos développeurs pour qu’ils puissent vous aider concernant votre problème ?</string>

@@ -231,6 +231,8 @@
     <string name="createFolderNoParent">None</string>
     <string name="createFolderParent">Parent folder</string>
     <string name="dateTitle">Date:</string>
+    <string name="displayMailIssueDescription">To fix display problems, please update the Android System Webview application.</string>
+    <string name="displayMailIssueTitle">Problem displaying your emails</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
     <string name="emailWithoutSubjectDescription">You are about to send a message without a subject. Do you want to continue?</string>
@@ -369,6 +371,7 @@
     <string name="pickerNoSelection">No selection</string>
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
     <string name="popupDetachMailboxTitle">Detach mailbox</string>
+    <string name="readMore">Read more</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You have been disconnected</string>
     <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>

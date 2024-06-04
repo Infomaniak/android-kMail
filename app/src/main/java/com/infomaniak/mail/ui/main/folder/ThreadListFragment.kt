@@ -64,6 +64,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -118,12 +119,14 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
 
+    @Inject
+    lateinit var titleDialog: TitleAlertDialog
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
-
         navigateFromNotificationToNewMessage()
 
         super.onViewCreated(view, savedInstanceState)
@@ -158,6 +161,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeUpdatedAtTriggers()
         observeFlushFolderTrigger()
         observeUpdateInstall()
+        observeWebViewOutdated()
         observeLoadMoreTriggers()
     }.getOrDefault(Unit)
 
@@ -221,6 +225,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     override fun onStart() {
         super.onStart()
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
+        threadListViewModel.checkWebViewVersion(localSettings.showWebViewOutdated)
     }
 
     override fun onResume() {
@@ -610,8 +615,29 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun observeUpdateInstall() = with(binding) {
         mainViewModel.canInstallUpdate.observe(viewLifecycleOwner) { isUpdateDownloaded ->
-            installUpdateGroup.isVisible = isUpdateDownloaded
-            installUpdate.setOnClickListener { inAppUpdateManager.installDownloadedUpdate() }
+            installUpdate.isVisible = isUpdateDownloaded
+            installUpdate.setOnActionClickListener { inAppUpdateManager.installDownloadedUpdate() }
+        }
+    }
+
+    private fun observeWebViewOutdated() = with(binding) {
+        webviewWarning.setOnActionClickListener {
+            titleDialog.show(
+                title = getString(R.string.displayMailIssueTitle),
+                description = getString(R.string.displayMailIssueDescription),
+                displayLoader = false,
+                positiveButtonText = RCore.string.buttonUpdate,
+                negativeButtonText = RCore.string.buttonLater,
+                onPositiveButtonClicked = { requireContext().goToPlayStore(WEBVIEW_PACKAGE_NAME) },
+                onNegativeButtonClicked = {
+                    webviewWarning.isVisible = false
+                    localSettings.showWebViewOutdated = false
+                }
+            )
+        }
+
+        threadListViewModel.isWebViewOutdated.observe(viewLifecycleOwner) { isWebViewOutdated ->
+            webviewWarning.isVisible = isWebViewOutdated
         }
     }
 
@@ -741,5 +767,9 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         INBOX(R.drawable.ic_empty_state_inbox, R.string.emptyStateInboxTitle, R.string.emptyStateInboxDescription),
         TRASH(R.drawable.ic_empty_state_trash, R.string.emptyStateTrashTitle, R.string.emptyStateTrashDescription),
         FOLDER(R.drawable.ic_empty_state_folder, R.string.emptyStateFolderTitle, R.string.emptyStateFolderDescription),
+    }
+
+    companion object {
+        private const val WEBVIEW_PACKAGE_NAME = "com.google.android.webview"
     }
 }
