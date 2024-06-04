@@ -37,11 +37,7 @@ class BannerWithActionView @JvmOverloads constructor(
 
     private val binding by lazy { ViewBannerWithActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    var description: CharSequence?
-        get() = binding.description.text
-        set(value) {
-            binding.description.text = value
-        }
+    var description: CharSequence? by binding.description::text
 
     var actionButtonText: CharSequence? by binding.actionButton::text
 

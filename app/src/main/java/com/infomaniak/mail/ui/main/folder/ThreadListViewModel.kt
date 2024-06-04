@@ -65,14 +65,19 @@ class ThreadListViewModel @Inject constructor(
     }
 
     fun checkWebViewVersion(canShowWebViewOutdated: Boolean) {
-        isWebViewOutdated.value = if (canShowWebViewOutdated) {
+        if (canShowWebViewOutdated) {
             WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName?.let { versionName ->
-                val majorVersion = versionName.substring(0, versionName.indexOfFirst { it == '.' }).toInt()
-                // First known version of Android WebView System without bug
-                majorVersion < WEBVIEW_MIN_VERSION
-            } ?: false
+                kotlin.runCatching {
+                    versionName.substring(0, versionName.indexOfFirst { it == '.' }).toInt()
+                }.onSuccess { majorVersion ->
+                    // First known version of Android WebView System without bug
+                    isWebViewOutdated.value = majorVersion < WEBVIEW_MIN_VERSION
+                }.onFailure {
+                    isWebViewOutdated.value = true
+                }
+            }
         } else {
-            false
+            isWebViewOutdated.value = false
         }
     }
 
