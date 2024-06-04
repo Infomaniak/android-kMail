@@ -174,10 +174,18 @@ class ThreadListAdapter @Inject constructor(
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
-            DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
-            DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
-            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemBannerWithActionViewBinding).displayFlushFolderButton(item as FolderRole)
-            DisplayType.LOAD_MORE_BUTTON.layout -> (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
+            DisplayType.THREAD.layout ->{
+                (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
+            }
+            DisplayType.DATE_SEPARATOR.layout ->{
+                (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
+            }
+            DisplayType.FLUSH_FOLDER_BUTTON.layout ->{
+                (this as ItemBannerWithActionViewBinding).displayFlushFolderButton(item as FolderRole)
+            }
+            DisplayType.LOAD_MORE_BUTTON.layout ->{
+                (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
+            }
         }
     }
 
