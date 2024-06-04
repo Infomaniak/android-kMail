@@ -250,7 +250,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.toggleContentAndQuoteTheme(messageUid: String) = with(binding) {
-        val isThemeTheSame = threadAdapterState.isThemeTheSameMap[messageUid]!!
+        val isThemeTheSame = threadAdapterState.isThemeTheSameMap[messageUid] ?: false
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
         toggleFrameLayoutsTheme(isThemeTheSame)
@@ -549,7 +549,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
-        val isExpanded = threadAdapterState.isExpandedMap[message.uid]!!
+        val isExpanded = threadAdapterState.isExpandedMap[message.uid] ?: false
 
         if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
 
