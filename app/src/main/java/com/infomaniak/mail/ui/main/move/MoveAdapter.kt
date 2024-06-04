@@ -188,7 +188,7 @@ class MoveAdapter @Inject constructor(
 
         var isFirstCustomFolder = true
         val foldersWithDivider = newFolders.map { folder ->
-            folder.apply {
+            folder.clone().apply {
                 shouldDisplayDivider = if (folder.role == null && isFirstCustomFolder) {
                     isFirstCustomFolder = false
                     true
