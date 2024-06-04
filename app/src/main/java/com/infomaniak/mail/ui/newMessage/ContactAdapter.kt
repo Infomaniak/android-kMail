@@ -104,6 +104,7 @@ class ContactAdapter(
     }
 
     fun searchContacts(text: CharSequence) {
+
         fun performFiltering(constraint: CharSequence): MutableList<MatchedContact> {
             val searchTerm = constraint.standardize()
 
@@ -126,13 +127,9 @@ class ContactAdapter(
             return finalUserList
         }
 
-        fun publishResults(results: MutableList<MatchedContact>) {
-            matchedContacts = results
-            notifyDataSetChanged()
-        }
-
         searchQuery = text.toString()
-        publishResults(performFiltering(text))
+        matchedContacts = performFiltering(text)
+        notifyDataSetChanged()
     }
 
     fun removeUsedEmail(email: String): Boolean {
