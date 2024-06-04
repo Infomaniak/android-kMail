@@ -461,7 +461,9 @@ class RefreshController @Inject constructor(
                         if (uidsCount < Utils.PAGE_SIZE) {
                             it.theEndIsReached() // If we didn't even get 1 full page, it means we already reached the end.
                         } else {
-                            it.resetHistoryInfo() // If the Folder has been emptied, and the end isn't reached yet, we need to reset history info, so we'll be able to get all Messages again.
+                            // If the Folder has been emptied, and the end isn't reached yet, we need
+                            // to reset history info, so we'll be able to get all Messages again.
+                            it.resetHistoryInfo()
                         }
                     }
                 }
@@ -669,25 +671,7 @@ class RefreshController @Inject constructor(
             addedMessagesUids.add(remoteMessage.shortUid)
 
             val newThread = if (isConversationMode) {
-
-                // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
-                val existingThreads = ThreadController.getThreads(remoteMessage.messageIds, realm = this)
-                val existingMessages = getExistingMessages(existingThreads)
-
-                // Some Messages don't have references to all previous Messages of the Thread (ex: these from the iOS Mail app).
-                // Because we are missing the links between Messages, it will create multiple Threads for the same Folder.
-                // Hence, we need to find these duplicates.
-                val isThereDuplicatedThreads = isThereDuplicatedThreads(remoteMessage.messageIds, existingThreads.count())
-
-                // Create Thread in this Folder
-                val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages)
-                // Update Threads in other Folders
-                updateOtherExistingThreads(scope, remoteMessage, existingThreads, existingMessages, impactedThreadsManaged)
-
-                // Now that all other existing Threads are updated, we need to remove the duplicated Threads.
-                if (isThereDuplicatedThreads) removeDuplicatedThreads(remoteMessage.messageIds, impactedThreadsManaged)
-
-                thread
+                createNewThread(scope, remoteMessage, impactedThreadsManaged)
             } else {
                 remoteMessage.toThread()
             }
@@ -708,6 +692,31 @@ class RefreshController @Inject constructor(
         }
 
         return impactedThreadsUnmanaged
+    }
+
+    private fun MutableRealm.createNewThread(
+        scope: CoroutineScope,
+        remoteMessage: Message,
+        impactedThreadsManaged: MutableSet<Thread>,
+    ): Thread? {
+        // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
+        val existingThreads = ThreadController.getThreads(remoteMessage.messageIds, realm = this)
+        val existingMessages = getExistingMessages(existingThreads)
+
+        // Some Messages don't have references to all previous Messages of the Thread (ex: these from the iOS Mail app).
+        // Because we are missing the links between Messages, it will create multiple Threads for the same Folder.
+        // Hence, we need to find these duplicates.
+        val isThereDuplicatedThreads = isThereDuplicatedThreads(remoteMessage.messageIds, existingThreads.count())
+
+        // Create Thread in this Folder
+        val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages)
+        // Update Threads in other Folders
+        updateOtherExistingThreads(scope, remoteMessage, existingThreads, existingMessages, impactedThreadsManaged)
+
+        // Now that all other existing Threads are updated, we need to remove the duplicated Threads.
+        if (isThereDuplicatedThreads) removeDuplicatedThreads(remoteMessage.messageIds, impactedThreadsManaged)
+
+        return thread
     }
 
     private fun MutableRealm.addRemoteMessageToFolder(
@@ -957,7 +966,7 @@ class RefreshController @Inject constructor(
 
     enum class RefreshMode {
         REFRESH_FOLDER, /* Fetch activities, and also get old Messages until `NUMBER_OF_OLD_MESSAGES_TO_FETCH` is reached */
-        REFRESH_FOLDER_WITH_ROLE, /* Same as `NEW_MESSAGES`, but also check if other Folders need to be updated (Inbox, Sent, Draft, etc…) */
+        REFRESH_FOLDER_WITH_ROLE, /* Same, but also check if other Folders need to be updated (Inbox, Sent, Draft, etc…) */
         ONE_PAGE_OF_OLD_MESSAGES, /* Get 1 page of old Messages */
     }
 

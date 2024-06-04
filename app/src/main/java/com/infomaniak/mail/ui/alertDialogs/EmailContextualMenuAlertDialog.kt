@@ -35,8 +35,11 @@ class EmailContextualMenuAlertDialog @Inject constructor(
 
     override val items = listOf(
         ContextualItem(R.string.contextMenuEmailOpen) { email, _ ->
-            val mailToUri = Uri.parse(WebView.SCHEME_MAILTO + email)
-            (activityContext as MainActivity).navigateToNewMessageActivity(NewMessageActivityArgs(mailToUri = mailToUri).toBundle())
+            (activityContext as MainActivity).navigateToNewMessageActivity(
+                NewMessageActivityArgs(
+                    mailToUri = Uri.parse(WebView.SCHEME_MAILTO + email),
+                ).toBundle(),
+            )
         },
         ContextualItem(R.string.contextMenuEmailCopy) { email, snackbarManager ->
             activityContext.copyStringToClipboard(email, R.string.snackbarEmailCopiedToClipboard, snackbarManager)

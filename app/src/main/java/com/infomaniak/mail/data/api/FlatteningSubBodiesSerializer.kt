@@ -22,7 +22,7 @@ import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
 import kotlinx.serialization.json.*
 
-// Documentation: https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-json/kotlinx.serialization.json/-json-transforming-serializer/
+// Documentation on KotlinLang.org : https://chk.me/kYZiqN0
 object FlatteningSubBodiesSerializer : JsonTransformingSerializer<RealmList<SubBody>>(
     RealmListKSerializer(SubBody.serializer()),
 ) {

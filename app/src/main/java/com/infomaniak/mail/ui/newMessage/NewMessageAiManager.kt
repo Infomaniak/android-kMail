@@ -97,8 +97,8 @@ class NewMessageAiManager @Inject constructor(
     }
 
     fun observeAiPromptStatus() {
-        aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) { (shouldDisplay, shouldResetContent, becauseOfGeneration) ->
-            if (shouldDisplay) onAiPromptOpened(shouldResetContent) else onAiPromptClosed(becauseOfGeneration)
+        aiViewModel.aiPromptOpeningStatus.observe(viewLifecycleOwner) {
+            if (it.isOpened) onAiPromptOpened(it.shouldResetPrompt) else onAiPromptClosed(it.becauseOfGeneration)
         }
     }
 
