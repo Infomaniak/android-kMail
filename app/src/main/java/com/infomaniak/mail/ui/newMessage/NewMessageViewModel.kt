@@ -447,7 +447,8 @@ class NewMessageViewModel @Inject constructor(
         var bestScore = NO_MATCH
         var bestSignature: Signature? = null
         matchingEmailRecipients.forEach { recipient ->
-            val (score, signature) = computeScore(recipient, signatureEmailsMap[recipient.email]!!)
+            val signatures = signatureEmailsMap[recipient.email] ?: return@forEach
+            val (score, signature) = computeScore(recipient, signatures)
             when (score) {
                 EXACT_MATCH_AND_IS_DEFAULT -> return signature
                 else -> {
