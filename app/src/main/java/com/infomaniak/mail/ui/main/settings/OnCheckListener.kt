@@ -19,6 +19,6 @@ package com.infomaniak.mail.ui.main.settings
 
 import androidx.annotation.IdRes
 
-interface OnCheckListener {
+fun interface OnCheckListener {
     fun onChecked(@IdRes viewId: Int)
 }
