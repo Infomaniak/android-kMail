@@ -75,7 +75,7 @@ class ThreadAdapter(
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
 
-    inline val items: MutableList<Any> get() = currentList
+    inline val items: List<Any> get() = currentList
 
     //region Auto-scroll at Thread opening
     private val currentSetOfLoadedExpandedMessagesUids = mutableSetOf<String>()

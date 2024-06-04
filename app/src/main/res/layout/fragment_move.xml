@@ -91,34 +91,18 @@
                     android:hint="@string/moveSearchFieldPlaceholder" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!--<FrameLayout-->
-            <!--    android:layout_width="match_parent"-->
-            <!--    android:layout_height="match_parent">-->
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/moveFoldersLists"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/backgroundColor"
-                    android:clipToPadding="false"
-                    android:fillViewport="true"
-                    android:paddingBottom="@dimen/marginStandardMedium"
-                    android:scrollbars="none"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="6"
-                    tools:listitem="@layout/item_folder_menu_drawer" />
-                    <!--android:visibility="gone"-->
-
-                <!--<androidx.recyclerview.widget.RecyclerView-->
-                <!--    android:id="@+id/searchResultsList"-->
-                <!--    android:layout_width="match_parent"-->
-                <!--    android:layout_height="match_parent"-->
-                <!--    android:paddingBottom="@dimen/marginStandardMedium"-->
-                <!--    android:visibility="gone"-->
-                <!--    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
-                <!--    tools:itemCount="6"-->
-                <!--    tools:listitem="@layout/item_folder_menu_drawer" />-->
-            <!--</FrameLayout>-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/foldersRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/backgroundColor"
+                android:clipToPadding="false"
+                android:fillViewport="true"
+                android:paddingBottom="@dimen/marginStandardMedium"
+                android:scrollbars="none"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="6"
+                tools:listitem="@layout/item_folder_menu_drawer" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>
