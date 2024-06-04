@@ -133,7 +133,7 @@ class MoveFragment : Fragment() {
     }
 
     private fun observeFolders() {
-        moveViewModel.getFolders(mainViewModel.currentDefaultFoldersLive.value!!).observe(viewLifecycleOwner, ::setSearchBarUi)
+        moveViewModel.getFolders().observe(viewLifecycleOwner, ::setSearchBarUi)
     }
 
     private fun setSearchBarUi(allFolders: List<Folder>) = with(binding) {
