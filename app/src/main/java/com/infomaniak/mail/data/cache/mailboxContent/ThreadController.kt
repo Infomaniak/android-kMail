@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SearchUtils.Companion.convertToSearchThreads
+import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -214,6 +215,12 @@ class ThreadController @Inject constructor(
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
             return realm.query<Thread>("${Thread::uid.name} == $0", uid).first()
         }
+
+        private fun getEmptyThreadsInFolderQuery(folderId: String, realm: TypedRealm): RealmQuery<Thread> {
+            val noMessages = "${Thread::messages.name}.@size == $0"
+            return FolderController.getFolder(folderId, realm)?.threads?.query(noMessages, 0)
+                ?: realm.query<Thread>("$noMessages AND ${Thread::folderId.name} == $1", 0, folderId)
+        }
         //endregion
 
         //region Get data
@@ -325,7 +332,22 @@ class ThreadController @Inject constructor(
         }
 
         fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
-            delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
+            delete(query<Thread>("${Thread::isFromSearch.name} == true"))
+        }
+
+        fun deleteEmptyThreadsInFolder(folderId: String, realm: Realm) {
+            realm.writeBlocking {
+                val emptyThreadsQuery = getEmptyThreadsInFolderQuery(folderId, realm = this)
+                val emptyThreads = emptyThreadsQuery.find()
+                // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
+                //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
+                if (emptyThreads.isNotEmpty()) {
+                    emptyThreads.forEach {
+                        SentryDebug.sendEmptyThread(it, "No Message in a Thread when refreshing a Folder")
+                    }
+                    delete(emptyThreadsQuery)
+                }
+            }
         }
 
         private fun verifyAttachmentsValues(hasAttachmentsInThread: Boolean, messages: List<Message>, realm: MutableRealm) {

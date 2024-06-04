@@ -195,7 +195,7 @@ class ThreadListAdapter @Inject constructor(
         // If we are trying to display an empty Thread, don't. Just delete it.
         if (thread.messages.isEmpty()) {
             // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
-            //  It's possibly because we are out of sync, and the situation will resolve itself shortly? ¯\_(ツ)_/¯
+            //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
             threadListAdapterCallback?.deleteThreadInRealm?.invoke(thread.uid)
             SentryDebug.sendEmptyThread(thread, "No Message in the Thread when displaying it in ThreadList")
             return

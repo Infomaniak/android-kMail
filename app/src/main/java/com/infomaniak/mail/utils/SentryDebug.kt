@@ -118,7 +118,7 @@ object SentryDebug {
     // TODO: Added the 04/09/23. It's not supposed to be possible, but we never know…
     //  If this doesn't trigger after a certain amount of time, you can remove it.
     //
-    //  Also added in ThreadListAdapter the 31/05/24.
+    //  Also added in ThreadListAdapter & ThreadController the 04/06/24.
     fun sendEmptyThread(thread: Thread, message: String) = with(thread) {
         Sentry.withScope { scope ->
             scope.setExtra("currentUserId", "${AccountUtils.currentUserId}")

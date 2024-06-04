@@ -102,6 +102,9 @@ class RefreshController @Inject constructor(
         setupConfiguration(refreshMode, mailbox, folder, realm, okHttpClient, callbacks)
 
         return refreshWithRunCatching(refreshThreadsJob!!).also { (threads, _) ->
+
+            ThreadController.deleteEmptyThreadsInFolder(folder.id, realm)
+
             if (threads != null) {
                 onStop?.invoke()
                 SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.displayForSentry()})")
