@@ -250,7 +250,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.toggleContentAndQuoteTheme(messageUid: String) = with(binding) {
-        val isThemeTheSame = threadAdapterState.isThemeTheSameMap[messageUid] ?: false
+        val isThemeTheSame = threadAdapterState.isThemeTheSameMap[messageUid] ?: true
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
         toggleFrameLayoutsTheme(isThemeTheSame)
