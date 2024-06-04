@@ -376,7 +376,7 @@
     <string name="restoreEmailsNoBackup">Kein Backup gefunden</string>
     <string name="restoreEmailsText">Alle E-Mails werden wieder in Ihrem Posteingang landen.</string>
     <string name="restoreEmailsTitle">Wiederherstellung Ihrer E-Mails</string>
-    <string name="reviewAlertTitle">Möchten Sie Infomaniak Mail?</string>
+    <string name="reviewAlertTitle">Mögen Sie Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Auf dem Gerät speichern</string>
     <string name="saveToDriveItem">In kDrive speichern</string>
     <string name="scheduledMessagesFolder">Geplante Nachrichten</string>
