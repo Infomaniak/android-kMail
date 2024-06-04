@@ -43,7 +43,7 @@ class ContactAdapter(
 ) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<MergedContact> = emptyList()
-    private var matchedContacts = mutableListOf<MatchedContact>()
+    private var matchedContacts = listOf<MatchedContact>()
 
     private var displayAddUnknownContactButton = true
     private var searchQuery = ""
@@ -99,12 +99,13 @@ class ContactAdapter(
     }
 
     fun clear() {
-        matchedContacts.clear()
+        matchedContacts = listOf()
         notifyDataSetChanged()
     }
 
     fun searchContacts(text: CharSequence) {
-        fun performFiltering(constraint: CharSequence): MutableList<MatchedContact> {
+
+        fun performFiltering(constraint: CharSequence): List<MatchedContact> {
             val searchTerm = constraint.standardize()
 
             val finalUserList = mutableListOf<MatchedContact>()
@@ -126,13 +127,9 @@ class ContactAdapter(
             return finalUserList
         }
 
-        fun publishResults(results: MutableList<MatchedContact>) {
-            matchedContacts = results
-            notifyDataSetChanged()
-        }
-
         searchQuery = text.toString()
-        publishResults(performFiltering(text))
+        matchedContacts = performFiltering(text)
+        notifyDataSetChanged()
     }
 
     fun removeUsedEmail(email: String): Boolean {
