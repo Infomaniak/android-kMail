@@ -199,7 +199,7 @@ class ThreadController @Inject constructor(
                     ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
                     ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} == true"
                     ThreadFilter.FOLDER -> TODO()
-                    else -> throw IllegalStateException("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
+                    else -> error("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
                 }
                 realmQuery.query(withFilter)
             }

@@ -168,7 +168,7 @@ class FolderAdapter @Inject constructor(
                 onCollapseTransition?.invoke(false)
             }
             is SelectableMailboxItemView, is UnreadItemView -> {
-                throw IllegalStateException("`${this::class.simpleName}` cannot exists here. Only Folder classes are allowed")
+                error("`${this::class.simpleName}` cannot exists here. Only Folder classes are allowed")
             }
         }
 

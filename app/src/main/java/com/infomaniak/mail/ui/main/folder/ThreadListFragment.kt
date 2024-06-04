@@ -388,7 +388,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 val swipeAction = when (direction) {
                     SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
                     SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
-                    else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
+                    else -> error("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
                 val isPermanentDeleteFolder = isPermanentDeleteFolder(item.folder.role)
