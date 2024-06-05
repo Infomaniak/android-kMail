@@ -235,6 +235,10 @@ class ThreadController @Inject constructor(
         //region Edit data
         fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
+        private fun updateThread(threadUid: String, realm: MutableRealm, onUpdate: (Thread?) -> Unit) {
+            onUpdate(getThread(threadUid, realm))
+        }
+
         /**
          * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
          *
@@ -266,6 +270,8 @@ class ThreadController @Inject constructor(
             }
 
             realm.writeBlocking {
+                var hasAttachmentsInThread = false
+
                 messages.forEach { localMessage ->
 
                     if (localMessage.isFullyDownloaded()) return@forEach
@@ -284,6 +290,9 @@ class ThreadController @Inject constructor(
                                     latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                     messageIds = localMessage.messageIds,
                                 )
+
+                                if (remoteMessage.hasAttachments) hasAttachmentsInThread = true
+
                                 MessageController.upsertMessage(remoteMessage, realm = this)
                             }
                         } else {
@@ -293,6 +302,16 @@ class ThreadController @Inject constructor(
                     }.onFailure {
                         // This `runCatching / onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body
                         handleFailure(localMessage.uid)
+                    }
+
+                    if (!hasAttachmentsInThread) {
+                        messages.flatMapTo(mutableSetOf()) { it.threads }.forEach { thread ->
+                            if (thread.hasAttachments) {
+                                updateThread(thread.uid, realm = this@writeBlocking) {
+                                    it?.hasAttachments = false
+                                }
+                            }
+                        }
                     }
                 }
             }
