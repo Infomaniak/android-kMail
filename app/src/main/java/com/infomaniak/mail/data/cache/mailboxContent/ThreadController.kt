@@ -304,6 +304,7 @@ class ThreadController @Inject constructor(
                         handleFailure(localMessage.uid)
                     }
 
+                    // TODO: Remove this when the API returns the good value for `has_attachments`.
                     if (!hasAttachmentsInThread) {
                         messages.flatMapTo(mutableSetOf()) { it.threads }.forEach { thread ->
                             if (thread.hasAttachments) {
