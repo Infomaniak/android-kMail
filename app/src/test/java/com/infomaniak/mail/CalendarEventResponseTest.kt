@@ -21,6 +21,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
+import com.infomaniak.mail.data.models.calendar.CalendarEventResponse.AttachmentEventMethod
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter
@@ -141,10 +142,11 @@ class CalendarEventResponseTest {
 
     private fun getBasicCalendarEventResponse(
         userStoredEvent: CalendarEvent,
-        isUserStoredEventDeleted: Boolean,
+        hasCanceledEventMethod: Boolean,
     ): CalendarEventResponse {
         val attachmentEvent = getBasicCalendarEvent(AttendanceState.NEEDS_ACTION)
-        return CalendarEventResponse(userStoredEvent, isUserStoredEventDeleted, attachmentEvent, "REQUEST")
+        val method = if (hasCanceledEventMethod) AttachmentEventMethod.CANCEL.name else AttachmentEventMethod.REQUEST.name
+        return CalendarEventResponse(userStoredEvent, attachmentEvent, method)
     }
 
     companion object {
