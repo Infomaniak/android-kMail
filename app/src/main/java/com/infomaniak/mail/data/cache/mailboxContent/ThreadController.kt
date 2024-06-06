@@ -305,15 +305,7 @@ class ThreadController @Inject constructor(
                     }
 
                     // TODO: Remove this when the API returns the good value for `has_attachments`.
-                    if (!hasAttachmentsInThread) {
-                        messages.flatMapTo(mutableSetOf()) { it.threads }.forEach { thread ->
-                            if (thread.hasAttachments) {
-                                updateThread(thread.uid, realm = this@writeBlocking) {
-                                    it?.hasAttachments = false
-                                }
-                            }
-                        }
-                    }
+                    verifyAttachmentsValues(hasAttachmentsInThread, messages, this@writeBlocking)
                 }
             }
 
@@ -328,6 +320,18 @@ class ThreadController @Inject constructor(
 
         fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
             delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
+        }
+
+        private fun verifyAttachmentsValues(hasAttachmentsInThread: Boolean, messages: List<Message>, realm: MutableRealm) {
+            if (!hasAttachmentsInThread) {
+                messages.flatMapTo(mutableSetOf()) { it.threads }.forEach { thread ->
+                    if (thread.hasAttachments) {
+                        updateThread(thread.uid, realm) {
+                            it?.hasAttachments = false
+                        }
+                    }
+                }
+            }
         }
         //endregion
     }
