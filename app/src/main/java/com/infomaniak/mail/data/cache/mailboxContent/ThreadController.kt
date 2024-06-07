@@ -235,6 +235,10 @@ class ThreadController @Inject constructor(
         //region Edit data
         fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
+        private fun updateThread(threadUid: String, realm: MutableRealm, onUpdate: (Thread?) -> Unit) {
+            onUpdate(getThread(threadUid, realm))
+        }
+
         /**
          * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
          *
@@ -266,6 +270,8 @@ class ThreadController @Inject constructor(
             }
 
             realm.writeBlocking {
+                var hasAttachmentsInThread = false
+
                 messages.forEach { localMessage ->
 
                     if (localMessage.isFullyDownloaded()) return@forEach
@@ -284,6 +290,9 @@ class ThreadController @Inject constructor(
                                     latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                     messageIds = localMessage.messageIds,
                                 )
+
+                                if (remoteMessage.hasAttachments) hasAttachmentsInThread = true
+
                                 MessageController.upsertMessage(remoteMessage, realm = this)
                             }
                         } else {
@@ -294,6 +303,9 @@ class ThreadController @Inject constructor(
                         // This `runCatching / onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body
                         handleFailure(localMessage.uid)
                     }
+
+                    // TODO: Remove this when the API returns the good value for `has_attachments`.
+                    verifyAttachmentsValues(hasAttachmentsInThread, messages, this@writeBlocking)
                 }
             }
 
@@ -308,6 +320,16 @@ class ThreadController @Inject constructor(
 
         fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
             delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
+        }
+
+        private fun verifyAttachmentsValues(hasAttachmentsInThread: Boolean, messages: List<Message>, realm: MutableRealm) {
+            messages.flatMapTo(mutableSetOf()) { it.threads }.forEach { thread ->
+                if (thread.hasAttachments != hasAttachmentsInThread) {
+                    updateThread(thread.uid, realm) {
+                        it?.hasAttachments = hasAttachmentsInThread
+                    }
+                }
+            }
         }
         //endregion
     }
