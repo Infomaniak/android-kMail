@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menuDrawer
+package com.infomaniak.mail.ui.main.move
 
 import android.app.Application
 import androidx.lifecycle.*
