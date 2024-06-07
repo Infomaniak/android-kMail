@@ -61,7 +61,7 @@ class MoveViewModel @Inject constructor(
         currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
             ?: threadController.getThread(threadsUids.first())!!.folderId
 
-        val folders = folderController.getMoveFolders().flattenFolderChildren()
+        val folders = folderController.getMoveFolders(excludeDrafts = true).flattenFolderChildren()
 
         emit(folders)
     }

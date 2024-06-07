@@ -45,8 +45,8 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
-    fun getMoveFolders(): RealmResults<Folder> {
-        return getMoveFoldersQuery(mailboxContentRealm()).find()
+    fun getMoveFolders(excludeDrafts: Boolean = false): RealmResults<Folder> {
+        return getMoveFoldersQuery(mailboxContentRealm(), excludeDrafts).find()
     }
 
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
@@ -164,10 +164,10 @@ class FolderController @Inject constructor(
             return realm.query("NOT ${Folder::id.name} IN $0 AND $isNotSearch", exceptionsFoldersIds)
         }
 
-        private fun getMoveFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-            val isNotDraft = "${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
+        private fun getMoveFoldersQuery(realm: TypedRealm, excludeDrafts: Boolean): RealmQuery<Folder> {
+            val draftsQuery = if (excludeDrafts) " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'" else ""
             return realm
-                .query<Folder>("$isNotSearch AND $isRootFolder AND $isNotDraft")
+                .query<Folder>("$isNotSearch AND ${isRootFolder}${draftsQuery}")
                 .sort(Folder::name.name, Sort.ASCENDING)
                 .sort(Folder::isFavorite.name, Sort.DESCENDING)
                 .sort(Folder::roleOrder.name, Sort.DESCENDING)
