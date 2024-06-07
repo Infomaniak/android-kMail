@@ -30,7 +30,7 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.move.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UiUtils
@@ -79,7 +79,7 @@ class FolderAdapter @Inject constructor(
         val binding = if (viewType == DisplayType.SELECTABLE_FOLDER.layout) {
             ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
         } else {
-            ItemFolderMenuDrawerBinding.inflate(layoutInflater, parent, false)
+            ItemMenuDrawerFolderBinding.inflate(layoutInflater, parent, false)
         }
 
         return FolderViewHolder(binding)
@@ -101,7 +101,7 @@ class FolderAdapter @Inject constructor(
 
         when (getItemViewType(position)) {
             DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
-            DisplayType.MENU_DRAWER.layout -> (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
+            DisplayType.MENU_DRAWER.layout -> (this as ItemMenuDrawerFolderBinding).root.displayMenuDrawerFolder(folder)
         }
     }
 
@@ -231,7 +231,7 @@ class FolderAdapter @Inject constructor(
 
     private enum class DisplayType(val layout: Int) {
         SELECTABLE_FOLDER(R.layout.item_selectable_folder),
-        MENU_DRAWER(R.layout.item_folder_menu_drawer),
+        MENU_DRAWER(R.layout.item_menu_drawer_folder),
     }
 
     companion object {

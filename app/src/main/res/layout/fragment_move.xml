@@ -102,7 +102,7 @@
                 android:scrollbars="none"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="6"
-                tools:listitem="@layout/item_folder_menu_drawer" />
+                tools:listitem="@layout/item_menu_drawer_folder" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>
