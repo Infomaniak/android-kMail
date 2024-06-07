@@ -86,7 +86,7 @@ class MoveFragment : Fragment() {
 
     private fun setupRecyclerView() = with(binding.foldersRecyclerView) {
 
-        adapter = moveAdapter(isInMenuDrawer = false, onFolderClicked = ::onFolderSelected)
+        adapter = moveAdapter(onFolderClicked = ::onFolderSelected)
 
         val margin = resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
         addItemDecoration(
