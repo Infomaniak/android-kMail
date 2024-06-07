@@ -296,7 +296,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun displayError(status: PropositionStatus) {
-        binding.errorBlock.setTitle(status.errorRes!!)
+        binding.errorBlock.setDescription(status.errorRes!!)
         setUiVisibilityState(UiState.ERROR)
     }
 

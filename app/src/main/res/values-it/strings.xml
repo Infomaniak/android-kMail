@@ -104,7 +104,6 @@
     </plurals>
     <string name="attendeesListTitle">Elenco dei partecipanti (%d)</string>
     <string name="bccTitle">Bcc:</string>
-    <string name="blockedMailboxTitle">L’indirizzo e-mail %s è bloccato</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Password bloccata</item>
         <item quantity="other">Password bloccate</item>
@@ -294,15 +293,14 @@
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="loadingText">Caricamento…</string>
-    <plurals name="lockedMailboxDescription">
-        <item quantity="one">L’accesso al tuo indirizzo e-mail è attualmente bloccato.\nPer ulteriori informazioni, leggi le FAQ.</item>
-        <item quantity="other">Per ulteriori informazioni:</item>
-    </plurals>
+    <string name="lockedMailboxBottomSheetDescription">L’accesso al tuo indirizzo e-mail è attualmente bloccato.\nPer ulteriori informazioni, leggi le FAQ.</string>
+    <string name="lockedMailboxBottomSheetTitle">L’indirizzo e-mail %s è bloccato</string>
+    <string name="lockedMailboxScreenDescription">Per ulteriori informazioni:</string>
+    <string name="lockedMailboxScreenTitle">Alcuni indirizzi e-mail bloccati</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Indirizzo e-mail bloccato</item>
         <item quantity="other">Indirizzi e-mail bloccati</item>
     </plurals>
-    <string name="lockedMailboxTitleIB">Alcuni indirizzi e-mail bloccati</string>
     <string name="manageSignatures">Gestisci le mie firme</string>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>

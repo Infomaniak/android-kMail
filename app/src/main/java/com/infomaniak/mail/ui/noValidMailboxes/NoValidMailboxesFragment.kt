@@ -60,7 +60,9 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        noValidMailboxesBlock.description = resources.getQuantityString(R.plurals.lockedMailboxDescription, 2)
+        noValidMailboxesBlock.setTitle(R.string.lockedMailboxScreenTitle)
+        noValidMailboxesBlock.setDescription(R.string.lockedMailboxScreenDescription)
+        noValidMailboxesBlock.setButton(R.string.readFAQ)
 
         setupAdapters()
         setupListeners()
@@ -81,9 +83,9 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     }
 
     private fun setupListeners() = with(binding) {
-        noValidMailboxesBlock.setOnInformationClicked {
+        noValidMailboxesBlock.setOnActionClicked {
             trackNoValidMailboxesEvent("readFAQ")
-            context?.let { WebViewActivity.startActivity(it, Uri.parse(BuildConfig.FAQ_URL).toString()) }
+            WebViewActivity.startActivity(requireContext(), Uri.parse(BuildConfig.FAQ_URL).toString())
         }
 
         changeAccountButton.setOnClickListener {

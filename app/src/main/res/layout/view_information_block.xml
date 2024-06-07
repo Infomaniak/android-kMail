@@ -56,21 +56,27 @@
                     android:id="@+id/informationTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     style="@style/BodyMedium"
+                    tools:visibility="visible"
                     tools:text="@string/aiErrorTooManyRequests" />
 
                 <TextView
                     android:id="@+id/informationDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Body.Secondary"
+                    android:visibility="gone"
+                    style="@style/Body"
+                    tools:visibility="visible"
                     tools:text="@string/aiErrorTooManyRequests" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/informationButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     style="@style/TextButtonSecondary"
+                    tools:visibility="visible"
                     tools:text="@string/buttonLogInDifferentAccount" />
 
             </LinearLayout>
