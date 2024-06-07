@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.menuDrawer
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
-import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
+import com.infomaniak.mail.ui.main.menuDrawer.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm

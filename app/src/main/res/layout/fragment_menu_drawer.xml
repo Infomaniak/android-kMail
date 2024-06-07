@@ -154,7 +154,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.infomaniak.mail.ui.main.menu.MenuDrawerDropdownView
+            <com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerDropdownView
                 android:id="@+id/customFolders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -196,7 +196,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.infomaniak.mail.ui.main.menu.MenuDrawerDropdownView
+            <com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerDropdownView
                 android:id="@+id/advancedActions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
