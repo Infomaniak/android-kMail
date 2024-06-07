@@ -240,7 +240,7 @@
 
     <fragment
         android:id="@+id/moveFragment"
-        android:name="com.infomaniak.mail.ui.main.menuDrawer.MoveFragment"
+        android:name="com.infomaniak.mail.ui.main.move.MoveFragment"
         android:label="MoveFragment"
         tools:layout="@layout/fragment_move">
         <argument
