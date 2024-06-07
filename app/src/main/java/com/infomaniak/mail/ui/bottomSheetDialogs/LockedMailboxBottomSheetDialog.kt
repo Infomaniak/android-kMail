@@ -29,9 +29,9 @@ class LockedMailboxBottomSheetDialog : InformationBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
-        title.text = getString(R.string.blockedMailboxTitle, navigationArgs.lockedMailboxName)
-        description.text = resources.getQuantityText(R.plurals.lockedMailboxDescription, 1)
+        
+        title.text = getString(R.string.lockedMailboxBottomSheetTitle, navigationArgs.lockedMailboxName)
+        description.text = getString(R.string.lockedMailboxBottomSheetDescription)
         infoIllustration.setBackgroundResource(R.drawable.ic_invalid_mailbox)
 
         actionButton.apply {

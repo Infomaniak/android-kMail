@@ -52,12 +52,9 @@
                 app:layout_constraintTop_toBottomOf="@id/logo"
                 app:icon="@drawable/ic_warning"
                 app:showCloseIcon="false"
-                app:title="@string/lockedMailboxTitleIB"
-                app:showTitle="true"
-                tools:description="@string/lockedMailboxTitleIB"
-                app:showDescription="true"
-                app:button="@string/readFAQ"
-                app:showButton="true" />
+                tools:title="@string/lockedMailboxScreenTitle"
+                tools:description="@string/lockedMailboxScreenDescription"
+                tools:button="@string/readFAQ" />
 
             <TextView
                 android:id="@+id/invalidPasswordTitle"
@@ -126,6 +123,7 @@
                 android:visibility="gone"
                 app:constraint_referenced_ids="lockedMailboxTitle,lockedMailboxesRecyclerView"
                 tools:visibility="visible" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -151,4 +149,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

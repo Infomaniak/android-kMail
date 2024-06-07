@@ -105,7 +105,6 @@
     </plurals>
     <string name="attendeesListTitle">Liste des participants (%d)</string>
     <string name="bccTitle">Cci :</string>
-    <string name="blockedMailboxTitle">L’adresse %s est bloquée</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Mot de passe bloqué</item>
         <item quantity="other">Mots de passe bloqués</item>
@@ -298,17 +297,15 @@
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
-    <plurals name="lockedMailboxDescription">
-        <item quantity="one">L’accès à votre adresse mail est actuellement bloqué.\nPour plus d’informations, consultez les FAQ.</item>
-        <item quantity="other">Pour plus d’informations :</item>
-        <item quantity="many">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
-    </plurals>
+    <string name="lockedMailboxBottomSheetDescription">L’accès à votre adresse mail est actuellement bloqué.\nPour plus d’informations, consultez les FAQ.</string>
+    <string name="lockedMailboxBottomSheetTitle">L’adresse %s est bloquée</string>
+    <string name="lockedMailboxScreenDescription">Pour plus d’informations :</string>
+    <string name="lockedMailboxScreenTitle">Certaines de vos adresses mail sont bloquées</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Adresse mail bloquée</item>
         <item quantity="other">Adresses mail bloquées</item>
         <item quantity="many">Adresses mail bloquées</item>
     </plurals>
-    <string name="lockedMailboxTitleIB">Certaines de vos adresses mail sont bloquées</string>
     <string name="manageSignatures">Gérer mes signatures</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>

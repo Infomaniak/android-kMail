@@ -104,7 +104,6 @@
     </plurals>
     <string name="attendeesListTitle">Liste der Teilnehmer (%d)</string>
     <string name="bccTitle">Bcc:</string>
-    <string name="blockedMailboxTitle">Mailbox %s ist blockiert</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Passwort blockiert</item>
         <item quantity="other">Blockierte Passwörter</item>
@@ -294,15 +293,14 @@
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="inboxFolder">Posteingang</string>
     <string name="loadingText">Laden…</string>
-    <plurals name="lockedMailboxDescription">
-        <item quantity="one">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt.\nFür weitere Informationen, FAQ lesen.</item>
-        <item quantity="other">Für weitere Informationen:</item>
-    </plurals>
+    <string name="lockedMailboxBottomSheetDescription">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt.\nFür weitere Informationen, FAQ lesen.</string>
+    <string name="lockedMailboxBottomSheetTitle">Mailbox %s ist blockiert</string>
+    <string name="lockedMailboxScreenDescription">Für weitere Informationen:</string>
+    <string name="lockedMailboxScreenTitle">Einige Ihrer Mailboxen sind blockiert</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Blockierte E-Mail-Adresse</item>
         <item quantity="other">Gesperrte Mailadressen</item>
     </plurals>
-    <string name="lockedMailboxTitleIB">Einige Ihrer Mailboxen sind blockiert</string>
     <string name="manageSignatures">Meine Signaturen verwalten</string>
     <string name="menuDrawerAdvancedActions">Erweiterte Aktionen</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s verwendet</string>

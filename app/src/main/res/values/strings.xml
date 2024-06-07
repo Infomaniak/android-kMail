@@ -110,7 +110,6 @@
     </plurals>
     <string name="attendeesListTitle">List of attendees (%d)</string>
     <string name="bccTitle">Bcc:</string>
-    <string name="blockedMailboxTitle">Mailbox %s is blocked</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Blocked password</item>
         <item quantity="other">Blocked passwords</item>
@@ -300,15 +299,14 @@
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="inboxFolder">Inbox</string>
     <string name="loadingText">Loading…</string>
-    <plurals name="lockedMailboxDescription">
-        <item quantity="one">Access to your mailbox is currently blocked.\nFor further information, please read FAQ.</item>
-        <item quantity="other">For further information:</item>
-    </plurals>
+    <string name="lockedMailboxBottomSheetDescription">Access to your mailbox is currently blocked.\nFor further information, please read FAQ.</string>
+    <string name="lockedMailboxBottomSheetTitle">Mailbox %s is blocked</string>
+    <string name="lockedMailboxScreenDescription">For further information:</string>
+    <string name="lockedMailboxScreenTitle">Some of your mailboxes are blocked</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Blocked mailbox</item>
         <item quantity="other">Blocked mailboxes</item>
     </plurals>
-    <string name="lockedMailboxTitleIB">Some of your mailboxes are blocked</string>
     <string name="manageSignatures">Manage my signatures</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
