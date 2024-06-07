@@ -15,38 +15,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.menuDrawer
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.BackupResult
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RestoreEmailsViewModel @Inject constructor(
-    private val mailboxController: MailboxController,
+class MenuDrawerViewModel @Inject constructor(
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    val otherMailboxesLive = mailboxController.getMailboxesAsync(
+        userId = AccountUtils.currentUserId,
+        exceptionMailboxIds = listOf(AccountUtils.currentMailboxId),
+    ).asLiveData(ioCoroutineContext)
 
-    fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(ioCoroutineContext) {
-        emit(ApiRepository.getBackups(mailbox.hostingId, mailbox.mailboxName))
-    }
-
-    fun restoreEmails(date: String): LiveData<ApiResponse<Boolean>> = liveData(ioCoroutineContext) {
-        emit(ApiRepository.restoreBackup(mailbox.hostingId, mailbox.mailboxName, date))
+    fun toggleFolderCollapsingState(folderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+        FolderController.updateFolderAndChildren(folderId, mailboxContentRealm()) {
+            if (it.isRoot) it.isCollapsed = shouldCollapse else it.isHidden = shouldCollapse
+        }
     }
 }
