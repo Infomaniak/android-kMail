@@ -60,268 +60,295 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/drawerContentScrollView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/menuDrawerRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
+        android:layout_marginVertical="@dimen/marginStandardSmall"
+        android:scrollbars="none"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_menu_drawer_mailbox" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginVertical="@dimen/marginStandardSmall"
-            android:orientation="vertical">
+    <!--<androidx.core.widget.NestedScrollView-->
+    <!--    android:id="@+id/drawerContentScrollView"-->
+    <!--    android:layout_width="match_parent"-->
+    <!--    android:layout_height="match_parent"-->
+    <!--    android:scrollbars="none">-->
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/mailboxSwitcher"
-                style="@style/RoundedDecoratedTextItem">
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:layout_marginVertical="@dimen/marginStandardSmall"-->
+    <!--        android:orientation="vertical">-->
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingHorizontal="@dimen/marginStandardMedium">
+    <!--        &lt;!&ndash; mailboxes "dropdown" &ndash;&gt;-->
+    <!--        <com.google.android.material.card.MaterialCardView-->
+    <!--            android:id="@+id/mailboxSwitcher"-->
+    <!--            style="@style/RoundedDecoratedTextItem">-->
 
-                    <ImageView
-                        android:id="@+id/selectedAddressIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/contentDescriptionAccountSelection"
-                        android:src="@drawable/ic_envelope"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?android:attr/colorPrimary" />
+    <!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="match_parent"-->
+    <!--                android:paddingHorizontal="@dimen/marginStandardMedium">-->
 
-                    <TextView
-                        android:id="@+id/mailboxSwitcherText"
-                        style="@style/BodyMedium"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                        android:ellipsize="end"
-                        android:lines="1"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/mailboxExpandButton"
-                        app:layout_constraintStart_toEndOf="@id/selectedAddressIcon"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="myriam.rais@infomaniak.com" />
+    <!--                <ImageView-->
+    <!--                    android:id="@+id/selectedAddressIcon"-->
+    <!--                    android:layout_width="wrap_content"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:contentDescription="@string/contentDescriptionAccountSelection"-->
+    <!--                    android:src="@drawable/ic_envelope"-->
+    <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+    <!--                    app:layout_constraintTop_toTopOf="parent"-->
+    <!--                    app:tint="?android:attr/colorPrimary" />-->
 
-                    <ImageView
-                        android:id="@+id/mailboxExpandButton"
-                        android:layout_width="@dimen/chevronSize"
-                        android:layout_height="@dimen/chevronSize"
-                        android:contentDescription="@string/contentDescriptionButtonExpandAccountSelection"
-                        android:src="@drawable/ic_chevron_down"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:visibility="visible" />
+    <!--                <TextView-->
+    <!--                    android:id="@+id/mailboxSwitcherText"-->
+    <!--                    style="@style/BodyMedium"-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_marginHorizontal="@dimen/marginStandardMedium"-->
+    <!--                    android:ellipsize="end"-->
+    <!--                    android:lines="1"-->
+    <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                    app:layout_constraintEnd_toStartOf="@id/mailboxExpandButton"-->
+    <!--                    app:layout_constraintStart_toEndOf="@id/selectedAddressIcon"-->
+    <!--                    app:layout_constraintTop_toTopOf="parent"-->
+    <!--                    tools:text="myriam.rais@infomaniak.com" />-->
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--                <ImageView-->
+    <!--                    android:id="@+id/mailboxExpandButton"-->
+    <!--                    android:layout_width="@dimen/chevronSize"-->
+    <!--                    android:layout_height="@dimen/chevronSize"-->
+    <!--                    android:contentDescription="@string/contentDescriptionButtonExpandAccountSelection"-->
+    <!--                    android:src="@drawable/ic_chevron_down"-->
+    <!--                    android:visibility="gone"-->
+    <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                    app:layout_constraintTop_toTopOf="parent"-->
+    <!--                    tools:visibility="visible" />-->
 
-            </com.google.android.material.card.MaterialCardView>
+    <!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/mailboxList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never"
-                android:visibility="gone"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_menu_drawer_mailbox"
-                tools:visibility="visible" />
+    <!--        </com.google.android.material.card.MaterialCardView>-->
 
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/MenuDrawerDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+    <!--        &lt;!&ndash; mailboxes &ndash;&gt;-->
+    <!--        <androidx.recyclerview.widget.RecyclerView-->
+    <!--            android:id="@+id/mailboxList"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:nestedScrollingEnabled="false"-->
+    <!--            android:overScrollMode="never"-->
+    <!--            android:visibility="gone"-->
+    <!--            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
+    <!--            tools:itemCount="3"-->
+    <!--            tools:listitem="@layout/item_mailbox_menu_drawer"-->
+    <!--            tools:visibility="visible" />-->
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/defaultFoldersList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="5"
-                tools:listitem="@layout/item_menu_drawer_folder" />
+    <!--        &lt;!&ndash; divider &ndash;&gt;-->
+    <!--        <com.google.android.material.divider.MaterialDivider-->
+    <!--            style="@style/MenuDrawerDivider"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content" />-->
 
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/MenuDrawerDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+    <!--        &lt;!&ndash; default folders &ndash;&gt;-->
+    <!--        <androidx.recyclerview.widget.RecyclerView-->
+    <!--            android:id="@+id/defaultFoldersList"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:nestedScrollingEnabled="false"-->
+    <!--            android:overScrollMode="never"-->
+    <!--            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
+    <!--            tools:itemCount="5"-->
+    <!--            tools:listitem="@layout/item_menu_drawer_folder" />-->
 
-            <com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerDropdownView
-                android:id="@+id/customFolders"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:actionContentDescription="@string/buttonCreateFolder"
-                app:showIcon="true"
-                app:title="@string/buttonFolders" />
+    <!--        &lt;!&ndash; divider &ndash;&gt;-->
+    <!--        <com.google.android.material.divider.MaterialDivider-->
+    <!--            style="@style/MenuDrawerDivider"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content" />-->
 
-            <FrameLayout
-                android:id="@+id/customFoldersLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+    <!--        &lt;!&ndash; custom folders dropdown &ndash;&gt;-->
+    <!--        <com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerDropdownView-->
+    <!--            android:id="@+id/customFolders"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            app:actionContentDescription="@string/buttonCreateFolder"-->
+    <!--            app:showIcon="true"-->
+    <!--            app:title="@string/buttonFolders" />-->
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/customFoldersList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="2"
-                    tools:listitem="@layout/item_menu_drawer_folder" />
+    <!--        &lt;!&ndash; custom folders &ndash;&gt;-->
+    <!--        <FrameLayout-->
+    <!--            android:id="@+id/customFoldersLayout"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content">-->
 
-                <TextView
-                    android:id="@+id/noFolderText"
-                    style="@style/BodySmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-                    android:layout_marginVertical="@dimen/marginStandardMedium"
-                    android:paddingStart="@dimen/marginLarge"
-                    android:text="@string/noFolderTitle"
-                    tools:ignore="RtlSymmetry"
-                    tools:visibility="gone" />
+    <!--            <androidx.recyclerview.widget.RecyclerView-->
+    <!--                android:id="@+id/customFoldersList"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:nestedScrollingEnabled="false"-->
+    <!--                android:overScrollMode="never"-->
+    <!--                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
+    <!--                tools:itemCount="2"-->
+    <!--                tools:listitem="@layout/item_menu_drawer_folder" />-->
 
-            </FrameLayout>
+    <!--            <TextView-->
+    <!--                android:id="@+id/noFolderText"-->
+    <!--                style="@style/BodySmall"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
+    <!--                android:layout_marginVertical="@dimen/marginStandardMedium"-->
+    <!--                android:paddingStart="@dimen/marginLarge"-->
+    <!--                android:text="@string/noFolderTitle"-->
+    <!--                tools:ignore="RtlSymmetry"-->
+    <!--                tools:visibility="gone" />-->
 
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/MenuDrawerDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+    <!--        </FrameLayout>-->
 
-            <com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerDropdownView
-                android:id="@+id/advancedActions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:collapsedByDefault="true"
-                app:title="@string/menuDrawerAdvancedActions" />
+    <!--        &lt;!&ndash; divider &ndash;&gt;-->
+    <!--        <com.google.android.material.divider.MaterialDivider-->
+    <!--            style="@style/MenuDrawerDivider"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content" />-->
 
-            <LinearLayout
-                android:id="@+id/advancedActionsLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+    <!--        &lt;!&ndash; advanced actions dropdown &ndash;&gt;-->
+    <!--        <com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerDropdownView-->
+    <!--            android:id="@+id/advancedActions"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            app:collapsedByDefault="true"-->
+    <!--            app:title="@string/menuDrawerAdvancedActions" />-->
 
-                <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView
-                    android:id="@+id/syncAutoConfig"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_synchronize"
-                    app:maxLines="2"
-                    app:text="@string/syncCalendarsAndContactsTitle" />
+    <!--        &lt;!&ndash; advanced actions &ndash;&gt;-->
+    <!--        <LinearLayout-->
+    <!--            android:id="@+id/advancedActionsLayout"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:orientation="vertical"-->
+    <!--            android:visibility="gone">-->
 
-                <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView
-                    android:id="@+id/importMails"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_drawer_download"
-                    app:text="@string/buttonImportEmails" />
+    <!--            <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView-->
+    <!--                android:id="@+id/syncAutoConfig"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                app:icon="@drawable/ic_synchronize"-->
+    <!--                app:maxLines="2"-->
+    <!--                app:text="@string/syncCalendarsAndContactsTitle" />-->
 
-                <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView
-                    android:id="@+id/restoreMails"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_restore_arrow"
-                    app:text="@string/buttonRestoreEmails" />
+    <!--            <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView-->
+    <!--                android:id="@+id/importMails"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                app:icon="@drawable/ic_drawer_download"-->
+    <!--                app:text="@string/buttonImportEmails" />-->
 
-            </LinearLayout>
+    <!--            <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView-->
+    <!--                android:id="@+id/restoreMails"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                app:icon="@drawable/ic_restore_arrow"-->
+    <!--                app:text="@string/buttonRestoreEmails" />-->
 
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/MenuDrawerDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+    <!--        </LinearLayout>-->
 
-            <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView
-                android:id="@+id/feedback"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_feedback"
-                app:text="@string/buttonFeedback" />
+    <!--        &lt;!&ndash; divider &ndash;&gt;-->
+    <!--        <com.google.android.material.divider.MaterialDivider-->
+    <!--            style="@style/MenuDrawerDivider"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content" />-->
 
-            <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView
-                android:id="@+id/help"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_help"
-                app:text="@string/buttonHelp" />
+    <!--        &lt;!&ndash; feedback &ndash;&gt;-->
+    <!--        <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView-->
+    <!--            android:id="@+id/feedback"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            app:icon="@drawable/ic_feedback"-->
+    <!--            app:text="@string/buttonFeedback" />-->
 
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/storageDivider"
-                style="@style/MenuDrawerDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+    <!--        &lt;!&ndash; help &ndash;&gt;-->
+    <!--        <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView-->
+    <!--            android:id="@+id/help"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            app:icon="@drawable/ic_help"-->
+    <!--            app:text="@string/buttonHelp" />-->
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/storageLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardSmall"
-                android:padding="@dimen/marginStandardSmall">
+    <!--        &lt;!&ndash; divider &ndash;&gt;-->
+    <!--        <com.google.android.material.divider.MaterialDivider-->
+    <!--            android:id="@+id/storageDivider"-->
+    <!--            style="@style/MenuDrawerDivider"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content" />-->
 
-                <com.google.android.material.progressindicator.CircularProgressIndicator
-                    android:id="@+id/storageIndicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:indicatorColor="?android:attr/colorPrimary"
-                    app:indicatorSize="48dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:trackColor="@color/progressbarTrackColor"
-                    app:trackThickness="4dp"
-                    tools:progress="25" />
+    <!--        &lt;!&ndash; quotas &ndash;&gt;-->
+    <!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--            android:id="@+id/storageLayout"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginStart="@dimen/marginStandardSmall"-->
+    <!--            android:padding="@dimen/marginStandardSmall">-->
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/contentDescriptionIconStorage"
-                    android:src="@drawable/ic_drawer_inbox"
-                    app:layout_constraintBottom_toBottomOf="@id/storageIndicator"
-                    app:layout_constraintEnd_toEndOf="@id/storageIndicator"
-                    app:layout_constraintStart_toStartOf="@id/storageIndicator"
-                    app:layout_constraintTop_toTopOf="@id/storageIndicator"
-                    app:tint="?android:attr/colorPrimary" />
+    <!--            <com.google.android.material.progressindicator.CircularProgressIndicator-->
+    <!--                android:id="@+id/storageIndicator"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                app:indicatorColor="?android:attr/colorPrimary"-->
+    <!--                app:indicatorSize="48dp"-->
+    <!--                app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                app:layout_constraintStart_toStartOf="parent"-->
+    <!--                app:layout_constraintTop_toTopOf="parent"-->
+    <!--                app:trackColor="@color/progressbarTrackColor"-->
+    <!--                app:trackThickness="4dp"-->
+    <!--                tools:progress="25" />-->
 
-                <TextView
-                    android:id="@+id/storageText"
-                    style="@style/BodyMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardMedium"
-                    app:layout_constraintBottom_toBottomOf="@id/storageIndicator"
-                    app:layout_constraintStart_toEndOf="@id/storageIndicator"
-                    app:layout_constraintTop_toTopOf="@+id/storageIndicator"
-                    tools:text="60.5 Ko / 20 Go utilisés" />
+    <!--            <ImageView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:contentDescription="@string/contentDescriptionIconStorage"-->
+    <!--                android:src="@drawable/ic_drawer_inbox"-->
+    <!--                app:layout_constraintBottom_toBottomOf="@id/storageIndicator"-->
+    <!--                app:layout_constraintEnd_toEndOf="@id/storageIndicator"-->
+    <!--                app:layout_constraintStart_toStartOf="@id/storageIndicator"-->
+    <!--                app:layout_constraintTop_toTopOf="@id/storageIndicator"-->
+    <!--                app:tint="?android:attr/colorPrimary" />-->
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--            <TextView-->
+    <!--                android:id="@+id/storageText"-->
+    <!--                style="@style/BodyMedium"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginStart="@dimen/marginStandardMedium"-->
+    <!--                app:layout_constraintBottom_toBottomOf="@id/storageIndicator"-->
+    <!--                app:layout_constraintStart_toEndOf="@id/storageIndicator"-->
+    <!--                app:layout_constraintTop_toTopOf="@+id/storageIndicator"-->
+    <!--                tools:text="60.5 Ko / 20 Go utilisés" />-->
 
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/MenuDrawerDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+    <!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/appVersionName"
-                style="@style/TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginHorizontal="@dimen/marginStandardSmall"
-                android:fontFamily="@font/suisseintl_regular"
-                android:gravity="center"
-                android:minHeight="0dp"
-                android:textColor="@color/secondaryTextColor"
-                android:textSize="12sp"
-                tools:text="App version XXX (xx)" />
+    <!--        &lt;!&ndash; divider &ndash;&gt;-->
+    <!--        <com.google.android.material.divider.MaterialDivider-->
+    <!--            style="@style/MenuDrawerDivider"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content" />-->
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    <!--        &lt;!&ndash; app  version &ndash;&gt;-->
+    <!--        <com.google.android.material.button.MaterialButton-->
+    <!--            android:id="@+id/appVersionName"-->
+    <!--            style="@style/TextButton"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_gravity="center_horizontal"-->
+    <!--            android:layout_marginHorizontal="@dimen/marginStandardSmall"-->
+    <!--            android:fontFamily="@font/suisseintl_regular"-->
+    <!--            android:gravity="center"-->
+    <!--            android:minHeight="0dp"-->
+    <!--            android:textColor="@color/secondaryTextColor"-->
+    <!--            android:textSize="12sp"-->
+    <!--            tools:text="App version XXX (xx)" />-->
+
+    <!--    </LinearLayout>-->
+    <!--</androidx.core.widget.NestedScrollView>-->
 </LinearLayout>
