@@ -288,6 +288,7 @@
     <string name="externalDialogTitleRecipient">Externer Empfänger</string>
     <string name="externalTag">Extern</string>
     <string name="failToOpenDraft">Öffnen des Entwurfs fehlgeschlagen</string>
+    <string name="faqUrl">https://www.infomaniak.com/de/support/faq/admin2/mail-service</string>
     <string name="favoritesFolder">Favoriten</string>
     <string name="fromTitle">Von:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>

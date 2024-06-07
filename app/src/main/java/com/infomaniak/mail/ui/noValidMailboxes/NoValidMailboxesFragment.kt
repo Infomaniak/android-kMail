@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.noValidMailboxes
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +27,6 @@ import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.ui.WebViewActivity
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
@@ -85,7 +83,7 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     private fun setupListeners() = with(binding) {
         noValidMailboxesBlock.setOnActionClicked {
             trackNoValidMailboxesEvent("readFAQ")
-            WebViewActivity.startActivity(requireContext(), Uri.parse(BuildConfig.FAQ_URL).toString())
+            WebViewActivity.startActivity(requireContext(), getString(R.string.faqUrl))
         }
 
         changeAccountButton.setOnClickListener {
