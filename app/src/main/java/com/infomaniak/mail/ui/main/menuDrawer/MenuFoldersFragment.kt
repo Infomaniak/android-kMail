@@ -26,6 +26,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
+import com.infomaniak.mail.ui.main.move.FolderAdapter
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
