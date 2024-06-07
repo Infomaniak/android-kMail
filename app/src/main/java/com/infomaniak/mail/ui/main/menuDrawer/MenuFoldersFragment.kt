@@ -26,7 +26,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
-import com.infomaniak.mail.ui.main.move.FolderAdapter
+import com.infomaniak.mail.ui.main.move.MoveAdapter
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -35,10 +35,10 @@ import javax.inject.Inject
 abstract class MenuFoldersFragment : Fragment() {
 
     @Inject
-    lateinit var defaultFolderAdapter: FolderAdapter
+    lateinit var defaultFolderAdapter: MoveAdapter
 
     @Inject
-    lateinit var customFolderAdapter: FolderAdapter
+    lateinit var customFolderAdapter: MoveAdapter
 
     @Inject
     lateinit var folderController: FolderController
@@ -53,7 +53,7 @@ abstract class MenuFoldersFragment : Fragment() {
 
     protected abstract val isInMenuDrawer: Boolean
 
-    protected val defaultFoldersAdapter: FolderAdapter by lazy {
+    protected val defaultFoldersAdapter: MoveAdapter by lazy {
         defaultFolderAdapter(
             isInMenuDrawer,
             onFolderClicked = ::onFolderSelected,
@@ -61,7 +61,7 @@ abstract class MenuFoldersFragment : Fragment() {
         )
     }
 
-    protected val customFoldersAdapter: FolderAdapter by lazy {
+    protected val customFoldersAdapter: MoveAdapter by lazy {
         customFolderAdapter(
             isInMenuDrawer,
             onFolderClicked = ::onFolderSelected,
