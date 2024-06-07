@@ -49,7 +49,7 @@ interface MailboxListFragment {
         )
     }
 
-    fun Fragment.onValidMailboxClicked(mailboxId: Int) {
-        lifecycleScope.launch { AccountUtils.switchToMailbox(mailboxId) }
+    fun Fragment.onValidMailboxClicked(mailboxId: Int) = lifecycleScope.launch {
+        AccountUtils.switchToMailbox(mailboxId)
     }
 }

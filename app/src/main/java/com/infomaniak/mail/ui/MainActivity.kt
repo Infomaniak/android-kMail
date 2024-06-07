@@ -62,7 +62,6 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
-import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
@@ -138,9 +137,6 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
-
-    @Inject
-    lateinit var titleDialog: TitleAlertDialog
 
     @Inject
     lateinit var permissionUtils: PermissionUtils

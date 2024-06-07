@@ -74,6 +74,12 @@ class FolderAdapter @Inject constructor(
         return this
     }
 
+    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
+
+    override fun getItemViewType(position: Int): Int {
+        return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = if (viewType == DisplayType.SELECTABLE_FOLDER.layout) {
@@ -104,12 +110,6 @@ class FolderAdapter @Inject constructor(
             DisplayType.MENU_DRAWER.layout -> (this as ItemMenuDrawerFolderBinding).root.displayMenuDrawerFolder(folder)
         }
     }
-
-    override fun getItemViewType(position: Int): Int {
-        return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
-    }
-
-    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
 
     private fun UnreadFolderItemView.displayMenuDrawerFolder(folder: Folder) {
 
