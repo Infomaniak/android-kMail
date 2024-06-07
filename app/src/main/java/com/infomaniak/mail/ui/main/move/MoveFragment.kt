@@ -38,6 +38,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
+import com.infomaniak.mail.ui.main.menuDrawer.MenuFoldersFragment
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
