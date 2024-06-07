@@ -31,7 +31,7 @@ class Quotas : EmbeddedRealmObject {
     @SerialName("size")
     private var _size: Long = 0L
 
-    private val size: Long get() = _size * 1_000L // Convert from KiloOctets to Octets
+    val size: Long get() = _size * 1_000L // Convert from KiloOctets to Octets
 
     fun getText(context: Context): String {
 

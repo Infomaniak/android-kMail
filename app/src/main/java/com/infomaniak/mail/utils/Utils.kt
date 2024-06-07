@@ -92,6 +92,20 @@ object Utils {
         }
     }
 
+    fun <R> waitInitMediator(vararg liveData: LiveData<*>, constructor: (List<Any>) -> R): MediatorLiveData<R> {
+        return MediatorLiveData<R>().apply {
+            liveData.forEach { singleLiveData ->
+                addSource(singleLiveData) {
+                    if (liveData.all { it.isInitialized }) {
+                        val values = liveData.map { it.value }
+                        @Suppress("UNCHECKED_CAST")
+                        postValue(constructor(values as List<Any>))
+                    }
+                }
+            }
+        }
+    }
+
     fun openShortcutHelp(context: Context) {
         ShortcutManagerCompat.reportShortcutUsed(context, Shortcuts.SUPPORT.id)
         context.openUrl(BuildConfig.CHATBOT_URL)

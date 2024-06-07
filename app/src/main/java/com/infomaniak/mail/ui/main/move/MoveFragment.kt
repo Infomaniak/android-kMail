@@ -42,10 +42,7 @@ import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
-import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -87,7 +84,7 @@ class MoveFragment : Fragment() {
 
     private fun setupRecyclerView() = with(binding.foldersRecyclerView) {
 
-        adapter = folderAdapter(isInMenuDrawer = false, onFolderClicked = ::onFolderSelected)
+        adapter = folderAdapter(onFolderClicked = ::onFolderSelected)
 
         val margin = resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
         addItemDecoration(
@@ -116,7 +113,9 @@ class MoveFragment : Fragment() {
                 trackCreateFolderEvent("confirm")
                 mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
             },
-            onErrorCheck = ::checkForFolderCreationErrors,
+            onErrorCheck = { folderName ->
+                requireContext().checkForFolderCreationErrors(folderName, folderController)
+            },
         )
     }
 
@@ -147,17 +146,6 @@ class MoveFragment : Fragment() {
     private fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
         mainViewModel.moveThreadsOrMessageTo(folderId, threadsUids.toList(), messageUid)
         findNavController().popBackStack()
-    }
-
-    /**
-     * Asynchronously validate folder name locally
-     * @return error string, otherwise null
-     */
-    private fun checkForFolderCreationErrors(folderName: CharSequence): String? = when {
-        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
-        folderName.contains(Regex(INVALID_CHARACTERS_PATTERN)) -> getString(R.string.errorNewFolderInvalidCharacter)
-        folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
-        else -> null
     }
 
     private fun setupSearchBar(allFolders: List<Folder>, currentFolderId: String) = with(binding) {
