@@ -177,6 +177,6 @@ class Folder : RealmObject, Cloneable {
         const val DEFAULT_IS_HISTORY_COMPLETE = false
 
         const val INBOX_FOLDER_ID = "eJzz9HPyjwAABGYBgQ--"
-        const val CUSTOM_FOLDER_ROLE_ORDER = 0
+        private const val CUSTOM_FOLDER_ROLE_ORDER = 0
     }
 }
