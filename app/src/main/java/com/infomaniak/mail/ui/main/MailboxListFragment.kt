@@ -23,7 +23,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MailboxesAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.launch
 

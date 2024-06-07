@@ -32,7 +32,7 @@ import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
 import com.infomaniak.mail.ui.main.MailboxListFragment
-import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MailboxesAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

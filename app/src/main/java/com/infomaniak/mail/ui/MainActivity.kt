@@ -65,7 +65,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
-import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment
 import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
