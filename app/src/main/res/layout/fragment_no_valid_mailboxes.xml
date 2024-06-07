@@ -49,12 +49,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandard"
                 android:layout_marginTop="@dimen/marginLarge"
+                app:button="@string/readFAQ"
+                app:description="@string/lockedMailboxScreenDescription"
                 app:icon="@drawable/ic_warning"
                 app:layout_constraintTop_toBottomOf="@id/logo"
                 app:showCloseIcon="false"
-                tools:button="@string/readFAQ"
-                tools:description="@string/lockedMailboxScreenDescription"
-                tools:title="@string/lockedMailboxScreenTitle" />
+                app:title="@string/lockedMailboxScreenTitle" />
 
             <TextView
                 android:id="@+id/invalidPasswordTitle"

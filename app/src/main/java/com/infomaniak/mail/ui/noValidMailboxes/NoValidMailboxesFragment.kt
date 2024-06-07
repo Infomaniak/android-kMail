@@ -58,10 +58,6 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        noValidMailboxesBlock.setTitle(R.string.lockedMailboxScreenTitle)
-        noValidMailboxesBlock.setDescription(R.string.lockedMailboxScreenDescription)
-        noValidMailboxesBlock.setButton(R.string.readFAQ)
-
         setupAdapters()
         setupListeners()
 
