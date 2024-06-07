@@ -178,9 +178,9 @@ class FolderAdapter @Inject constructor(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) = runCatchingRealm {
+    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null, isSearching: Boolean) = runCatchingRealm {
 
-        fun foldersWithDivider(): List<Folder> {
+        fun foldersWithDividersAndIndents(): List<Folder> {
             var isFirstCustomFolder = true
             return newFolders.map { folder ->
                 folder.clone().apply {
@@ -190,6 +190,7 @@ class FolderAdapter @Inject constructor(
                     } else {
                         false
                     }
+                    shouldDisplayIndent = folder.isRoot || !isSearching
                 }
             }
         }
@@ -213,7 +214,7 @@ class FolderAdapter @Inject constructor(
         }
 
         newCurrentFolderId?.let { currentFolderId = it }
-        submitList(foldersWithDivider())
+        submitList(foldersWithDividersAndIndents())
         if (isInMenuDrawer) notifyCollapsableFolders()
     }
 
@@ -254,7 +255,8 @@ class FolderAdapter @Inject constructor(
                     oldFolder.threads.count() == newFolder.threads.count() &&
                     oldFolder.isHidden == newFolder.isHidden &&
                     oldFolder.canBeCollapsed == newFolder.canBeCollapsed &&
-                    oldFolder.shouldDisplayDivider == newFolder.shouldDisplayDivider
+                    oldFolder.shouldDisplayDivider == newFolder.shouldDisplayDivider &&
+                    oldFolder.shouldDisplayIndent == newFolder.shouldDisplayIndent
         }.getOrDefault(false)
     }
 }

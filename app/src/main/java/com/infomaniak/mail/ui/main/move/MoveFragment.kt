@@ -159,12 +159,12 @@ class MoveFragment : Fragment() {
 
     private fun toggleFolderListsVisibility(query: String?, allFolders: List<Folder>) {
         isSearching = !query.isNullOrBlank()
-        if (!isSearching) folderAdapter.setFolders(allFolders, moveViewModel.currentFolderId)
+        if (!isSearching) folderAdapter.setFolders(allFolders, moveViewModel.currentFolderId, isSearching)
     }
 
     private fun observeSearchResults() = with(moveViewModel) {
         filterResults.observe(viewLifecycleOwner) { folders ->
-            if (isSearching) folderAdapter.setFolders(folders, currentFolderId)
+            if (isSearching) folderAdapter.setFolders(folders, currentFolderId, isSearching)
         }
     }
 
