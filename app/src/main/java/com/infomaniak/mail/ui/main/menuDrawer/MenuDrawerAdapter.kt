@@ -64,9 +64,9 @@ class MenuDrawerAdapter @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
 ) : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
 
-    private inline val items: List<Any> get() = currentList
-
     private var setFoldersJob: Job? = null
+
+    private inline val items: List<Any> get() = currentList
 
     private lateinit var currentClassName: String
     private var confettiContainer: ViewGroup? = null
@@ -200,7 +200,7 @@ class MenuDrawerAdapter @Inject constructor(
     override fun getItemCount(): Int = runCatchingRealm { items.size }.getOrDefault(0)
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
-        return when (val item = items[position]) {
+        return@runCatchingRealm when (val item = items[position]) {
             is MailboxesHeader -> DisplayType.MAILBOXES_HEADER.layout
             is Mailbox -> if (item.isValid) DisplayType.MAILBOX.layout else DisplayType.INVALID_MAILBOX.layout
             is Folder -> DisplayType.FOLDER.layout
@@ -237,14 +237,10 @@ class MenuDrawerAdapter @Inject constructor(
 
         when (payload) {
             NotifyType.MAILBOXES_HEADER_CLICKED -> {
-                Log.e("TOTO", "Rebind Mailboxes header because of collapse change")
+                Log.d("Bind", "Rebind Mailboxes header because of collapse change")
                 (holder.binding as ItemMenuDrawerMailboxesHeaderBinding).updateCollapseState(items[position] as MailboxesHeader)
             }
         }
-    }
-
-    enum class NotifyType {
-        MAILBOXES_HEADER_CLICKED,
     }
 
     override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int): Unit = with(holder.binding) {
@@ -252,52 +248,50 @@ class MenuDrawerAdapter @Inject constructor(
 
         when (getItemViewType(position)) {
             DisplayType.MAILBOXES_HEADER.layout -> {
-                Log.e("TOTO", "Rebind Mailboxes header")
+                Log.d("Bind", "Rebind Mailboxes header")
                 (this as ItemMenuDrawerMailboxesHeaderBinding).displayMailboxesHeader(item as MailboxesHeader)
             }
             DisplayType.MAILBOX.layout -> {
-                Log.e("TOTO", "Rebind Mailbox (${(item as Mailbox).email})")
+                Log.d("Bind", "Rebind Mailbox (${(item as Mailbox).email})")
                 (this as ItemMenuDrawerMailboxBinding).displayMailbox(item as Mailbox)
             }
             DisplayType.INVALID_MAILBOX.layout -> {
-                Log.e("TOTO", "Rebind Invalid Mailbox (${(item as Mailbox).email})")
+                Log.d("Bind", "Rebind Invalid Mailbox (${(item as Mailbox).email})")
                 (this as ItemInvalidMailboxBinding).displayInvalidMailbox(item as Mailbox)
             }
             DisplayType.FOLDER.layout -> {
-                Log.e("TOTO", "Rebind Folder : ${(item as Folder).name}")
+                Log.d("Bind", "Rebind Folder : ${(item as Folder).name}")
                 (this as ItemMenuDrawerFolderBinding).displayFolder(item as Folder)
             }
             DisplayType.CUSTOM_FOLDERS_HEADER.layout -> {
-                Log.e("TOTO", "Rebind Folders header")
+                Log.d("Bind", "Rebind Folders header")
                 (this as ItemMenuDrawerCustomFoldersHeaderBinding).displayCustomFoldersHeader()
             }
             DisplayType.MENU_DRAWER_FOOTER.layout -> {
-                Log.e("TOTO", "Rebind Footer")
+                Log.d("Bind", "Rebind Footer")
                 (this as ItemMenuDrawerFooterBinding).displayFooter(item as MenuDrawerFooter)
             }
         }
     }
 
-    private fun ItemMenuDrawerMailboxesHeaderBinding.displayMailboxesHeader(header: MailboxesHeader) {
-        mailboxSwitcherText.text = header.mailbox?.email
+    private fun ItemMenuDrawerMailboxesHeaderBinding.displayMailboxesHeader(header: MailboxesHeader) = with(header) {
+        mailboxSwitcherText.text = mailbox?.email
 
         mailboxSwitcher.apply {
-            isClickable = header.hasMoreThanOneMailbox
-            isFocusable = header.hasMoreThanOneMailbox
+            isClickable = hasMoreThanOneMailbox
+            isFocusable = hasMoreThanOneMailbox
         }
 
-        mailboxExpandButton.apply {
-            isVisible = header.hasMoreThanOneMailbox
-        }
+        mailboxExpandButton.isVisible = hasMoreThanOneMailbox
 
-        setMailboxSwitcherTextAppearance(header.isExpanded)
+        setMailboxSwitcherTextAppearance(isExpanded)
 
         root.setOnClickListener { onMailboxesHeaderClicked() }
     }
 
-    private fun ItemMenuDrawerMailboxesHeaderBinding.updateCollapseState(header: MailboxesHeader) {
-        mailboxExpandButton.toggleChevron(!header.isExpanded)
-        setMailboxSwitcherTextAppearance(header.isExpanded)
+    private fun ItemMenuDrawerMailboxesHeaderBinding.updateCollapseState(header: MailboxesHeader) = with(header) {
+        mailboxExpandButton.toggleChevron(!isExpanded)
+        setMailboxSwitcherTextAppearance(isExpanded)
     }
 
     private fun ItemMenuDrawerMailboxesHeaderBinding.setMailboxSwitcherTextAppearance(isOpen: Boolean) {
@@ -478,6 +472,12 @@ class MenuDrawerAdapter @Inject constructor(
         }
     }
 
+    companion object {
+        private const val MAX_SUB_FOLDERS_INDENT = 2
+    }
+
+    class MenuDrawerViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
+
     private enum class DisplayType(val layout: Int) {
         MAILBOXES_HEADER(R.layout.item_menu_drawer_mailboxes_header),
         MAILBOX(R.layout.item_menu_drawer_mailbox),
@@ -490,6 +490,7 @@ class MenuDrawerAdapter @Inject constructor(
     }
 
     private data class MailboxesHeader(val mailbox: Mailbox?, val hasMoreThanOneMailbox: Boolean, val isExpanded: Boolean)
+
     private data class MenuDrawerFooter(val permissions: MailboxPermissions?, val quotas: Quotas?)
 
     private enum class ItemType {
@@ -498,11 +499,9 @@ class MenuDrawerAdapter @Inject constructor(
         DIVIDER,
     }
 
-    companion object {
-        private const val MAX_SUB_FOLDERS_INDENT = 2
+    private enum class NotifyType {
+        MAILBOXES_HEADER_CLICKED,
     }
-
-    class MenuDrawerViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
 
