@@ -323,12 +323,10 @@ class ThreadController @Inject constructor(
         }
 
         private fun verifyAttachmentsValues(hasAttachmentsInThread: Boolean, messages: List<Message>, realm: MutableRealm) {
-            if (!hasAttachmentsInThread) {
-                messages.flatMapTo(mutableSetOf()) { it.threads }.forEach { thread ->
-                    if (thread.hasAttachments) {
-                        updateThread(thread.uid, realm) {
-                            it?.hasAttachments = false
-                        }
+            messages.flatMapTo(mutableSetOf()) { it.threads }.forEach { thread ->
+                if (thread.hasAttachments != hasAttachmentsInThread) {
+                    updateThread(thread.uid, realm) {
+                        it?.hasAttachments = hasAttachmentsInThread
                     }
                 }
             }
