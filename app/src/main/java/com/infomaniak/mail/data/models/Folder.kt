@@ -147,7 +147,11 @@ class Folder : RealmObject, Cloneable {
 
     override fun hashCode(): Int = id.hashCode()
 
-    public override fun clone(): Folder = super.clone() as Folder
+    /**
+     * We've had a reference issue when modifying the `shouldDisplayDivider` of a Folder before sending it to the Adapter.
+     * Cloning it to do a deep copy resolved the issue.
+     */
+    public override fun clone() = super.clone() as Folder
 
     enum class FolderRole(
         @StringRes val folderNameRes: Int,
