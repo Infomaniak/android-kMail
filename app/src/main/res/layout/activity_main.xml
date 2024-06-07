@@ -46,7 +46,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/menuDrawerFragmentContainer"
-                android:name="com.infomaniak.mail.ui.main.menu.MenuDrawerFragment"
+                android:name="com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
