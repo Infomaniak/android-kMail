@@ -118,7 +118,7 @@
                             android:overScrollMode="never"
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             tools:itemCount="4"
-                            tools:listitem="@layout/item_folder_menu_drawer" />
+                            tools:listitem="@layout/item_menu_drawer_folder" />
 
                         <com.google.android.material.divider.MaterialDivider
                             style="@style/ItemDivider"
@@ -133,7 +133,7 @@
                             android:overScrollMode="never"
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             tools:itemCount="6"
-                            tools:listitem="@layout/item_folder_menu_drawer" />
+                            tools:listitem="@layout/item_menu_drawer_folder" />
                     </LinearLayout>
                 </androidx.core.widget.NestedScrollView>
 
@@ -145,7 +145,7 @@
                     android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="6"
-                    tools:listitem="@layout/item_folder_menu_drawer" />
+                    tools:listitem="@layout/item_menu_drawer_folder" />
             </FrameLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
