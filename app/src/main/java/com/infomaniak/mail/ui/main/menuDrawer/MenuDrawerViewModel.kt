@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -44,6 +45,9 @@ class MenuDrawerViewModel @Inject constructor(
         userId = AccountUtils.currentUserId,
         exceptionMailboxIds = listOf(AccountUtils.currentMailboxId),
     ).asLiveData(ioCoroutineContext)
+
+    val areMailboxesExpanded = MutableLiveData(false)
+    val areCustomFoldersExpanded = MutableLiveData(true)
 
     fun toggleFolderCollapsingState(folderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
         FolderController.updateFolderAndChildren(folderId, mailboxContentRealm()) {
