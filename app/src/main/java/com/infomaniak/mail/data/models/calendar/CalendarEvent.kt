@@ -102,8 +102,8 @@ class CalendarEvent() : EmbeddedRealmObject {
         result = 31 * result + isFullDay.hashCode()
         result = 31 * result + start.hashCode()
         result = 31 * result + end.hashCode()
-        result = 31 * result + _status.hashCode()
         result = 31 * result + attendees.hashCode()
+        result = 31 * result + _status.hashCode()
 
         return result
     }
