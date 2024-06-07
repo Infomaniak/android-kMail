@@ -61,7 +61,7 @@ class MoveFragment : Fragment() {
     lateinit var folderController: FolderController
 
     @Inject
-    lateinit var folderAdapter: FolderAdapter
+    lateinit var moveAdapter: MoveAdapter
 
     private var hasAlreadyTrackedSearch = false
 
@@ -84,7 +84,7 @@ class MoveFragment : Fragment() {
 
     private fun setupRecyclerView() = with(binding.foldersRecyclerView) {
 
-        adapter = folderAdapter(onFolderClicked = ::onFolderSelected)
+        adapter = moveAdapter(onFolderClicked = ::onFolderSelected)
 
         val margin = resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
         addItemDecoration(
@@ -121,14 +121,14 @@ class MoveFragment : Fragment() {
 
     private fun observeFolders() {
         moveViewModel.getCurrentFolderAndAllFolders().observe(viewLifecycleOwner) { (allFolders, currentFolderId) ->
-            folderAdapter.setFolders(allFolders, currentFolderId, isSearching = false)
+            moveAdapter.setFolders(allFolders, currentFolderId, isSearching = false)
             setupSearchBar(allFolders, currentFolderId)
         }
     }
 
     private fun observeSearchResults() {
         moveViewModel.filterResults.observe(viewLifecycleOwner) { (folders, currentFolderId) ->
-            folderAdapter.setFolders(folders, currentFolderId, isSearching = true)
+            moveAdapter.setFolders(folders, currentFolderId, isSearching = true)
         }
     }
 
@@ -159,7 +159,7 @@ class MoveFragment : Fragment() {
                 if (newQuery?.isNotBlank() == true) {
                     moveViewModel.filterFolders(newQuery.toString(), allFolders, currentFolderId, shouldDebounce = true)
                 } else {
-                    folderAdapter.setFolders(allFolders, currentFolderId, isSearching = false)
+                    moveAdapter.setFolders(allFolders, currentFolderId, isSearching = false)
                 }
 
                 if (!hasAlreadyTrackedSearch) {

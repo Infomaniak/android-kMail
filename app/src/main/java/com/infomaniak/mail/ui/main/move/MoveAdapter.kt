@@ -28,7 +28,7 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
-import com.infomaniak.mail.ui.main.move.FolderAdapter.FolderViewHolder
+import com.infomaniak.mail.ui.main.move.MoveAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
@@ -36,7 +36,7 @@ import com.infomaniak.mail.views.itemViews.SelectableItemView
 import javax.inject.Inject
 import kotlin.math.min
 
-class FolderAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
+class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
 
     private inline val folders: List<Folder> get() = currentList
 
@@ -48,7 +48,7 @@ class FolderAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder
     operator fun invoke(
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
-    ): FolderAdapter {
+    ): MoveAdapter {
         this.onFolderClicked = onFolderClicked
         this.onCollapseClicked = onCollapseClicked
 
