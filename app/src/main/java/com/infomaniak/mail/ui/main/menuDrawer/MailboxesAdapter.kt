@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.menuDrawer
 
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
@@ -31,7 +31,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
 import com.infomaniak.mail.databinding.ItemMailboxMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemSelectableMailboxBinding
-import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
+import com.infomaniak.mail.ui.main.menuDrawer.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.DecoratedItemView.SelectionStyle

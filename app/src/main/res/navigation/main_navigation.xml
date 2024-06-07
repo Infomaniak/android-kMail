@@ -240,7 +240,7 @@
 
     <fragment
         android:id="@+id/moveFragment"
-        android:name="com.infomaniak.mail.ui.main.menu.MoveFragment"
+        android:name="com.infomaniak.mail.ui.main.menuDrawer.MoveFragment"
         android:label="MoveFragment"
         tools:layout="@layout/fragment_move">
         <argument
@@ -593,7 +593,7 @@
 
     <dialog
         android:id="@+id/restoreEmailsBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.main.menu.RestoreEmailsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.menuDrawer.RestoreEmailsBottomSheetDialog"
         android:label="RestoreEmailsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_restore_emails" />
 
