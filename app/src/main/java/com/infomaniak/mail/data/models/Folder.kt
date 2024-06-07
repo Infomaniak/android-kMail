@@ -90,6 +90,9 @@ class Folder : RealmObject, Cloneable {
     @Transient
     @Ignore
     var shouldDisplayDivider: Boolean = false
+    @Transient
+    @Ignore
+    var shouldDisplayIndent: Boolean = true
     //endregion
 
     private val _parents by backlinks(Folder::children)
