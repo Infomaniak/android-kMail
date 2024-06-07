@@ -46,6 +46,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/marginStandardMedium"
-        app:icon="@drawable/ic_external_information"
-        tools:description="@string/aiEngineWarning" />
+        app:description="@string/aiEngineWarning"
+        app:icon="@drawable/ic_external_information" />
 </merge>
