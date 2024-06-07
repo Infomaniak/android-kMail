@@ -33,7 +33,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
-import com.infomaniak.mail.ui.main.move.FolderAdapter.FolderViewHolder
+import com.infomaniak.mail.ui.main.move.MoveAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
@@ -41,7 +41,7 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.min
 
-class FolderAdapter @Inject constructor(
+class MoveAdapter @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
 ) : Adapter<FolderViewHolder>() {
 
@@ -66,7 +66,7 @@ class FolderAdapter @Inject constructor(
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
         onCollapseTransition: ((Boolean) -> Unit)? = null,
-    ): FolderAdapter {
+    ): MoveAdapter {
         this.isInMenuDrawer = isInMenuDrawer
         this.shouldIndent = shouldIndent
         this.onFolderClicked = onFolderClicked
