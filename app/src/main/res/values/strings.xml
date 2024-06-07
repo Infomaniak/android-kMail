@@ -294,6 +294,7 @@
     <string name="externalDialogTitleRecipient">External recipient</string>
     <string name="externalTag">External</string>
     <string name="failToOpenDraft">Failed to open draft</string>
+    <string name="faqUrl">https://www.infomaniak.com/en/support/faq/admin2/email-service</string>
     <string name="favoritesFolder">Favorites</string>
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>

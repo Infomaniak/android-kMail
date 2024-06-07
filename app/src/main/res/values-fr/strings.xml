@@ -292,6 +292,7 @@
     <string name="externalDialogTitleRecipient">Destinataire externe</string>
     <string name="externalTag">Externe</string>
     <string name="failToOpenDraft">Échec de l’ouverture du brouillon</string>
+    <string name="faqUrl">https://www.infomaniak.com/fr/support/faq/admin2/service-mail</string>
     <string name="favoritesFolder">Favoris</string>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>

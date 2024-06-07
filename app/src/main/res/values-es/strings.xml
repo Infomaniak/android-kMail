@@ -288,6 +288,7 @@
     <string name="externalDialogTitleRecipient">Receptor externo</string>
     <string name="externalTag">Exterior</string>
     <string name="failToOpenDraft">No se ha podido abrir el borrador</string>
+    <string name="faqUrl">https://www.infomaniak.com/es/asistencia/faq/admin2/servicio-de-correo</string>
     <string name="favoritesFolder">Favoritos</string>
     <string name="fromTitle">De:</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
