@@ -53,7 +53,7 @@ class MoveFragment : MenuFoldersFragment() {
     private val moveViewModel: MoveViewModel by viewModels()
 
     @Inject
-    lateinit var searchFolderAdapter: FolderAdapter
+    lateinit var searchFolderAdapter: MoveAdapter
 
     private val searchResultsAdapter by lazy {
         searchFolderAdapter(isInMenuDrawer, shouldIndent = false, onFolderClicked = ::onFolderSelected)
