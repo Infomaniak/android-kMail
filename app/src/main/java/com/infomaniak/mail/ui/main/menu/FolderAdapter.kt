@@ -195,6 +195,9 @@ class FolderAdapter @Inject constructor(
             }
         }
 
+        /**
+         * If there was no Folder with children, and then now there's at least one, we need to indent the whole Folders list.
+         */
         fun notifyCollapsableFolders() {
             setFoldersJob?.cancel()
             setFoldersJob = globalCoroutineScope.launch {
