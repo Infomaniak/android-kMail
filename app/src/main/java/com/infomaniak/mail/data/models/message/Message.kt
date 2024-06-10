@@ -218,21 +218,17 @@ class Message : RealmObject {
     }
 
     fun initLocalValues(
-        date: RealmInstant,
-        isFullyDownloaded: Boolean,
-        isTrashed: Boolean,
-        isFromSearch: Boolean,
-        draftLocalUuid: String?,
+        messageInitialState: MessageInitialState,
         latestCalendarEventResponse: CalendarEventResponse?,
         messageIds: RealmSet<String>? = null,
         swissTransferFiles: RealmList<SwissTransferFile> = realmListOf()
     ) {
 
-        this.date = date
-        this._isFullyDownloaded = isFullyDownloaded
-        this.isTrashed = isTrashed
-        draftLocalUuid?.let { this.draftLocalUuid = it }
-        this.isFromSearch = isFromSearch
+        this.date = messageInitialState.date
+        this._isFullyDownloaded = messageInitialState.isFullyDownloaded
+        this.isTrashed = messageInitialState.isTrashed
+        messageInitialState.draftLocalUuid?.let { this.draftLocalUuid = it }
+        this.isFromSearch = messageInitialState.isFromSearch
         this.messageIds = messageIds ?: computeMessageIds()
         this.latestCalendarEventResponse = latestCalendarEventResponse
         this.swissTransferFiles = swissTransferFiles
@@ -333,4 +329,12 @@ class Message : RealmObject {
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
+
+    data class MessageInitialState(
+        val date: RealmInstant,
+        val isFullyDownloaded: Boolean,
+        val isTrashed: Boolean,
+        val isFromSearch: Boolean,
+        val draftLocalUuid: String?
+    )
 }
