@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.calendar
 
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.data.api.CalendarRealmInstantSerializer
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.realmListOf
@@ -46,7 +47,11 @@ class CalendarEvent() : EmbeddedRealmObject {
     var start: RealmInstant = Date(0).toRealmInstant()
     var end: RealmInstant = Date(0).toRealmInstant()
     var attendees: RealmList<Attendee> = realmListOf()
+    @SerialName("status")
+    private var _status: String? = null
     //endregion
+
+    val status: CalendarEventStatus? get() = Utils.enumValueOfOrNull<CalendarEventStatus>(_status)
 
     constructor(
         id: Int,
@@ -76,6 +81,7 @@ class CalendarEvent() : EmbeddedRealmObject {
         if (location != other.location) return false
         if (isFullDay != other.isFullDay) return false
         if (start != other.start) return false
+        if (_status != other._status) return false
 
         return end == other.end
     }
@@ -97,7 +103,14 @@ class CalendarEvent() : EmbeddedRealmObject {
         result = 31 * result + start.hashCode()
         result = 31 * result + end.hashCode()
         result = 31 * result + attendees.hashCode()
+        result = 31 * result + _status.hashCode()
 
         return result
+    }
+
+    enum class CalendarEventStatus(val apiValue: String) {
+        CONFIRMED("CONFIRMED"),
+        TENTATIVE("TENTATIVE"),
+        CANCELLED("CANCELLED"),
     }
 }

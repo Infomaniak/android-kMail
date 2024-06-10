@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.calendar
 
 import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.mail.data.models.calendar.CalendarEvent.CalendarEventStatus
 import com.infomaniak.mail.utils.extensions.isUserIn
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
@@ -39,12 +40,10 @@ class CalendarEventResponse() : EmbeddedRealmObject {
 
     constructor(
         userStoredEvent: CalendarEvent?,
-        isUserStoredEventDeleted: Boolean,
         attachmentEvent: CalendarEvent?,
         attachmentEventMethod: String?,
     ) : this() {
         this.userStoredEvent = userStoredEvent
-        this.isUserStoredEventDeleted = isUserStoredEventDeleted
         this.attachmentEvent = attachmentEvent
         this._attachmentEventMethod = attachmentEventMethod
     }
@@ -54,7 +53,7 @@ class CalendarEventResponse() : EmbeddedRealmObject {
 
     val calendarEvent get() = userStoredEvent ?: attachmentEvent
 
-    val isCanceled get() = isUserStoredEventDeleted || attachmentEventMethod == AttachmentEventMethod.CANCEL
+    val isCanceled get() = calendarEvent?.status == CalendarEventStatus.CANCELLED
 
     fun isReplyAuthorized(): Boolean {
         return (attachmentEventMethod == null || attachmentEventMethod == AttachmentEventMethod.REQUEST)
@@ -69,7 +68,6 @@ class CalendarEventResponse() : EmbeddedRealmObject {
     fun everythingButAttendeesIsTheSame(other: CalendarEventResponse?): Boolean {
         if (other == null) return false
 
-        if (isUserStoredEventDeleted != other.isUserStoredEventDeleted) return false
         if (_attachmentEventMethod != other._attachmentEventMethod) return false
 
         val c1 = calendarEvent
@@ -88,7 +86,6 @@ class CalendarEventResponse() : EmbeddedRealmObject {
         other as CalendarEventResponse
 
         if (userStoredEvent != other.userStoredEvent) return false
-        if (isUserStoredEventDeleted != other.isUserStoredEventDeleted) return false
         if (attachmentEvent != other.attachmentEvent) return false
 
         return _attachmentEventMethod == other._attachmentEventMethod
@@ -96,7 +93,6 @@ class CalendarEventResponse() : EmbeddedRealmObject {
 
     override fun hashCode(): Int {
         var result = userStoredEvent?.hashCode() ?: 0
-        result = 31 * result + isUserStoredEventDeleted.hashCode()
         result = 31 * result + (attachmentEvent?.hashCode() ?: 0)
         result = 31 * result + (_attachmentEventMethod?.hashCode() ?: 0)
 
