@@ -228,8 +228,9 @@ class Thread : RealmObject {
 
     }.getOrElse { throwable ->
         Sentry.withScope { scope ->
-            scope.setExtra("thread.folder.role", "${folder.role?.name}")
+            scope.setExtra("thread.folder.role", folder.role?.name.toString())
             scope.setExtra("thread.folder.id", folder.id)
+            scope.setExtra("thread.folderId", folderId)
             scope.setExtra("thread.uid", uid)
             scope.setExtra("thread.messages.count", "${messages.count()}")
             scope.setExtra("thread.duplicates.count", "${duplicates.count()}")

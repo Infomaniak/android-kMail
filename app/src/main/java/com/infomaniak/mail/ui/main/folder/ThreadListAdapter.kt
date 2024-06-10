@@ -60,6 +60,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadListViewHolder
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.utils.RealmChangesBinding
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -190,6 +191,15 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread, position: Int) {
+
+        // If we are trying to display an empty Thread, don't. Just delete it.
+        if (thread.messages.isEmpty()) {
+            // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
+            //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
+            threadListAdapterCallback?.deleteThreadInRealm?.invoke(thread.uid)
+            SentryDebug.sendEmptyThread(thread, "No Message in the Thread when displaying it in ThreadList")
+            return
+        }
 
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
         setupThreadDensityDependentUi()

@@ -1047,6 +1047,10 @@ class MainViewModel @Inject constructor(
         snackbarManager.postValue(appContext.getString(snackbarTitleRes))
     }
 
+    fun deleteThreadInRealm(threadUid: String) = viewModelScope.launch(ioCoroutineContext) {
+        threadController.deleteThread(threadUid)
+    }
+
     private fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
         val isWorkingWithThread = message == null
         return isWorkingWithThread || threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())

@@ -117,14 +117,21 @@ object SentryDebug {
     //region Send Sentry
     // TODO: Added the 04/09/23. It's not supposed to be possible, but we never know…
     //  If this doesn't trigger after a certain amount of time, you can remove it.
-    fun sendEmptyThread(thread: Thread) {
+    //
+    //  Also added in ThreadListAdapter & ThreadController the 04/06/24.
+    fun sendEmptyThread(thread: Thread, message: String) = with(thread) {
         Sentry.withScope { scope ->
-            scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
-            scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
-            scope.setExtra("folder.role", thread.folder.role?.name.toString())
-            scope.setExtra("folder.id", thread.folder.id)
-            scope.setExtra("thread.uid", "[${thread.uid}]")
-            Sentry.captureMessage("No Message in the Thread when opening it", SentryLevel.ERROR)
+            scope.setExtra("currentUserId", "${AccountUtils.currentUserId}")
+            scope.setExtra("currentMailboxEmail", AccountUtils.currentMailboxEmail.toString())
+            scope.setExtra("folderId", folderId)
+            scope.setExtra("folder.id", folder.id)
+            scope.setExtra("folder.role", folder.role?.name.toString())
+            scope.setExtra("uid", uid)
+            scope.setExtra("messages.count", "${messages.count()}")
+            scope.setExtra("duplicates.count", "${duplicates.count()}")
+            scope.setExtra("isFromSearch", "$isFromSearch")
+            scope.setExtra("hasDrafts", "$hasDrafts")
+            Sentry.captureMessage(message, SentryLevel.ERROR)
         }
     }
 
