@@ -749,11 +749,13 @@ class RefreshController @Inject constructor(
         }
 
         remoteMessage.initLocalValues(
-            date = remoteMessage.date,
-            isFullyDownloaded = false,
-            isTrashed = folder.role == FolderRole.TRASH,
-            isFromSearch = false,
-            draftLocalUuid = null,
+            Message.MessageInitialState(
+                date = remoteMessage.date,
+                isFullyDownloaded = false,
+                isTrashed = folder.role == FolderRole.TRASH,
+                isFromSearch = false,
+                draftLocalUuid = null,
+            ),
             latestCalendarEventResponse = null,
         )
 

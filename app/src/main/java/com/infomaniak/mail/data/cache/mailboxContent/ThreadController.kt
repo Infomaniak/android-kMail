@@ -99,11 +99,13 @@ class ThreadController @Inject constructor(
                 // The Search only returns Messages from TRASH if we explicitly selected this folder,
                 // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
-                    date = localMessage?.date ?: remoteMessage.date,
-                    isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
-                    isTrashed = filterFolder?.role == FolderRole.TRASH,
-                    isFromSearch = localMessage == null,
-                    draftLocalUuid = localMessage?.draftLocalUuid,
+                    Message.MessageInitialState(
+                        date = localMessage?.date ?: remoteMessage.date,
+                        isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
+                        isTrashed = filterFolder?.role == FolderRole.TRASH,
+                        isFromSearch = localMessage == null,
+                        draftLocalUuid = localMessage?.draftLocalUuid,
+                    ),
                     latestCalendarEventResponse = null,
                 )
 
@@ -315,11 +317,13 @@ class ThreadController @Inject constructor(
                                 } ?: realmListOf()
 
                                 remoteMessage.initLocalValues(
-                                    date = localMessage.date,
-                                    isFullyDownloaded = true,
-                                    isTrashed = localMessage.isTrashed,
-                                    isFromSearch = localMessage.isFromSearch,
-                                    draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                    Message.MessageInitialState(
+                                        date = localMessage.date,
+                                        isFullyDownloaded = true,
+                                        isTrashed = localMessage.isTrashed,
+                                        isFromSearch = localMessage.isFromSearch,
+                                        draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                    ),
                                     latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                     messageIds = localMessage.messageIds,
                                     swissTransferFiles = swissTransferFiles
