@@ -152,16 +152,12 @@ class FetchMessagesManager @Inject constructor(
             if (mailboxGroupNotifications.size == 1) cancel(mailbox.notificationGroupId)
         }
 
+        /**
+         * When we fetched Messages, we didn't find any new Message.
+         * It means we already got them all when we received a previous notification.
+         * We can leave safely.
+         */
         if (threadsWithNewMessages.isEmpty()) {
-            SentryDebug.sendFailedNotification(
-                reason = "No new Message",
-                sentryLevel = SentryLevel.WARNING,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
-
             realm.close()
             return
         }
