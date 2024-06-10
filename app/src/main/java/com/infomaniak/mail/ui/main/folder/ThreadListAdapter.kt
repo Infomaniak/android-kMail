@@ -95,6 +95,8 @@ class ThreadListAdapter @Inject constructor(
     private var isFolderNameVisible: Boolean = false
     private var threadListAdapterCallback: ThreadListAdapterCallback? = null
 
+    private var previousThreadClickedPosition: Int? = null
+
     //region Tablet mode
     var openedThreadPosition: Int? = null
         private set
@@ -175,16 +177,16 @@ class ThreadListAdapter @Inject constructor(
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
-            DisplayType.THREAD.layout ->{
+            DisplayType.THREAD.layout -> {
                 (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
             }
-            DisplayType.DATE_SEPARATOR.layout ->{
+            DisplayType.DATE_SEPARATOR.layout -> {
                 (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
             }
-            DisplayType.FLUSH_FOLDER_BUTTON.layout ->{
+            DisplayType.FLUSH_FOLDER_BUTTON.layout -> {
                 (this as ItemBannerWithActionViewBinding).displayFlushFolderButton(item as FolderRole)
             }
-            DisplayType.LOAD_MORE_BUTTON.layout ->{
+            DisplayType.LOAD_MORE_BUTTON.layout -> {
                 (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
             }
         }
@@ -320,9 +322,12 @@ class ThreadListAdapter @Inject constructor(
         openedThreadUid = threadUid
 
         if (oldPosition != null && oldPosition < itemCount) notifyItemChanged(oldPosition, NotificationType.SELECTED_STATE)
-        if (newPosition != null) notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
-        if (oldPosition != null && newPosition != null) {
-            threadListAdapterCallback?.onPositionClickedChanged?.invoke(newPosition, oldPosition)
+        if (newPosition != null) {
+            previousThreadClickedPosition?.let {
+                threadListAdapterCallback?.onPositionClickedChanged?.invoke(newPosition, it)
+            }
+            previousThreadClickedPosition = newPosition
+            notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
         }
     }
 
