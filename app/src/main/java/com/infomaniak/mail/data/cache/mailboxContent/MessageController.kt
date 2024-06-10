@@ -36,6 +36,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
@@ -137,6 +138,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
     fun getSortedAndNotDeletedMessagesAsync(threadUid: String): Flow<ResultsChange<Message>>? {
         return getSortedAndNotDeletedMessagesQuery(threadUid)?.asFlow()
+    }
+
+    fun getSortedAndNotDeletedMessages(threadUid: String): RealmResults<Message>? {
+        return getSortedAndNotDeletedMessagesQuery(threadUid)?.find()
     }
 
     fun getMessageAsync(messageUid: String): Flow<SingleQueryChange<Message>> {

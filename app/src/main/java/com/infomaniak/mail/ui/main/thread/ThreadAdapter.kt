@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View.OnClickListener
@@ -485,6 +486,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindContent(message: Message) {
+        Log.v("TOTO", "bindContent | splitBody is null : ${message.splitBody == null}")
         binding.messageLoader.isVisible = message.splitBody == null
         message.splitBody?.let { splitBody -> bindBody(message, hasQuote = splitBody.quote != null) }
     }
@@ -643,15 +645,19 @@ class ThreadAdapter(
     class MessageDiffCallback : DiffUtil.ItemCallback<Any>() {
 
         override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-            return when (oldItem) {
+            val result = when (oldItem) {
                 is Message -> newItem is Message && newItem.uid == oldItem.uid
                 is SuperCollapsedBlock -> newItem is SuperCollapsedBlock
                 else -> false
             }
+            if (newItem is Message && oldItem is Message) {
+                Log.e("TOTO", "areItemsTheSame: $result")
+            }
+            return result
         }
 
         override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-            return when (oldItem) {
+            val result = when (oldItem) {
                 is Message -> {
                     newItem is Message &&
                             areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
@@ -663,6 +669,10 @@ class ThreadAdapter(
                 }
                 else -> false
             }
+            if (newItem is Message && oldItem is Message) {
+                Log.d("TOTO", "areContentsTheSame: $result")
+            }
+            return result
         }
 
         override fun getChangePayload(oldItem: Any, newItem: Any): Any? {

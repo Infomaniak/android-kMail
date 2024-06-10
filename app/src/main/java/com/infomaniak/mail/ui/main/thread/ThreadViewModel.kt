@@ -98,6 +98,12 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun emitFirstBatchOfMessages(threadUid: String) = viewModelScope.launch(ioCoroutineContext) {
+        val realmResults = messageController.getSortedAndNotDeletedMessages(threadUid) ?: return@launch
+        messagesLive.postValue(mapRealmMessagesResult(realmResults, threadUid, withoutSplitting = true))
+        reassignMessagesLive(threadUid)
+    }
+
     fun reassignMessagesLive(threadUid: String) {
         reassignMessages {
             messageController.getSortedAndNotDeletedMessagesAsync(threadUid)?.map { mapRealmMessagesResult(it.list, threadUid) }
@@ -122,6 +128,7 @@ class ThreadViewModel @Inject constructor(
     private suspend fun mapRealmMessagesResult(
         messages: RealmResults<Message>,
         threadUid: String,
+        withoutSplitting: Boolean = false,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> = with(threadState) {
 
         if (messages.isEmpty()) return emptyList<Any>() to emptyList()
@@ -133,7 +140,7 @@ class ThreadViewModel @Inject constructor(
         superCollapsedBlock!!.shouldBeDisplayed = shouldBlockBeDisplayed(messages.count(), firstIndexAfterBlock)
 
         suspend fun formatListWithNewBlock(): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
-            return formatLists(messages) { index, _ ->
+            return formatLists(messages, withoutSplitting) { index, _ ->
                 when (index) {
                     0 -> MessageBehavior.DISPLAYED // First Message
                     in 1 until firstIndexAfterBlock -> MessageBehavior.COLLAPSED // All Messages that should go in block
@@ -150,7 +157,7 @@ class ThreadViewModel @Inject constructor(
 
             superCollapsedBlock!!.messagesUids.clear()
 
-            return formatLists(messages) { index, messageUid ->
+            return formatLists(messages, withoutSplitting) { index, messageUid ->
                 when {
                     index == 0 -> { // First Message
                         MessageBehavior.DISPLAYED
@@ -172,7 +179,7 @@ class ThreadViewModel @Inject constructor(
         return if (superCollapsedBlock!!.shouldBeDisplayed) {
             if (superCollapsedBlock!!.isFirstTime()) formatListWithNewBlock() else formatListWithExistingBlock()
         } else {
-            formatLists(messages) { _, _ -> MessageBehavior.DISPLAYED }
+            formatLists(messages, withoutSplitting) { _, _ -> MessageBehavior.DISPLAYED }
         }
     }
 
@@ -207,6 +214,7 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun formatLists(
         messages: List<Message>,
+        withoutSplitting: Boolean = false,
         computeBehavior: (Int, String) -> MessageBehavior,
     ): Pair<MutableList<Any>, MutableList<Message>> = with(threadState) {
 
@@ -214,10 +222,9 @@ class ThreadViewModel @Inject constructor(
         val messagesToFetch = mutableListOf<Message>()
 
         suspend fun addMessage(message: Message) {
-            splitBody(message).let {
-                items += it
-                if (!it.isFullyDownloaded()) messagesToFetch += it
-            }
+            val splitMessage = if (withoutSplitting) message else splitBody(message)
+            items += splitMessage
+            if (!splitMessage.isFullyDownloaded()) messagesToFetch += splitMessage
         }
 
         messages.forEachIndexed { index, message ->

@@ -348,7 +348,8 @@ class ThreadFragment : Fragment() {
                 initUi(threadUid, folderRole = mainViewModel.getActionFolderRole(thread))
 
                 reassignThreadLive(threadUid)
-                reassignMessagesLive(threadUid)
+
+                emitFirstBatchOfMessages(threadUid)
             }
         }
     }
