@@ -133,7 +133,7 @@ class MenuDrawerAdapter @Inject constructor(
          * If there was no Folder with children, and then now there's at least one, we need to indent the whole Folders list.
          */
         // TODO: The indent isn't working great for DEFAULT folders.
-        fun notifyCollapsableFolders() {
+        fun notifyCollapsableFolders(firstCustomFolderIndex: Int) {
             setFoldersJob?.cancel()
             setFoldersJob = globalCoroutineScope.launch {
                 val newHasCollapsableFolder = customFolders.any { it.canBeCollapsed }
@@ -143,7 +143,13 @@ class MenuDrawerAdapter @Inject constructor(
                 hasCollapsableFolder = newHasCollapsableFolder
 
                 if (!isFirstTime && collapsableFolderExistenceHasChanged) {
-                    Dispatchers.Main { notifyDataSetChanged() }
+                    Dispatchers.Main {
+                        notifyItemRangeChanged(
+                            firstCustomFolderIndex,
+                            customFolders.count(),
+                            NotifyType.COLLAPSABLE_FOLDER_EXISTENCE_HAS_CHANGED,
+                        )
+                    }
                 }
             }
         }
@@ -166,6 +172,7 @@ class MenuDrawerAdapter @Inject constructor(
             }
         }
 
+        var firstCustomFolderIndex = 0
         val items = mutableListOf<Any>().apply {
 
             // Mailboxes
@@ -183,6 +190,7 @@ class MenuDrawerAdapter @Inject constructor(
                 if (customFolders.isEmpty()) {
                     add(ItemType.EMPTY_CUSTOM_FOLDERS)
                 } else {
+                    firstCustomFolderIndex = count()
                     addAll(customFolders)
                 }
             }
@@ -193,7 +201,7 @@ class MenuDrawerAdapter @Inject constructor(
         }
 
         submitList(items)
-        notifyCollapsableFolders()
+        notifyCollapsableFolders(firstCustomFolderIndex)
         notifySelectedFolder()
     }
 
@@ -240,6 +248,11 @@ class MenuDrawerAdapter @Inject constructor(
                 Log.d("Bind", "Rebind Mailboxes header because of collapse change")
                 (holder.binding as ItemMenuDrawerMailboxesHeaderBinding).updateCollapseState(items[position] as MailboxesHeader)
             }
+            NotifyType.COLLAPSABLE_FOLDER_EXISTENCE_HAS_CHANGED -> {
+                val folder = items[position] as Folder
+                Log.d("Bind", "Rebind Custom folders because of collapse change = ${folder.name}")
+                (holder.binding as ItemMenuDrawerFolderBinding).displayFolder(folder)
+            }
         }
     }
 
@@ -253,15 +266,15 @@ class MenuDrawerAdapter @Inject constructor(
             }
             DisplayType.MAILBOX.layout -> {
                 Log.d("Bind", "Rebind Mailbox (${(item as Mailbox).email})")
-                (this as ItemMenuDrawerMailboxBinding).displayMailbox(item as Mailbox)
+                (this as ItemMenuDrawerMailboxBinding).displayMailbox(item)
             }
             DisplayType.INVALID_MAILBOX.layout -> {
                 Log.d("Bind", "Rebind Invalid Mailbox (${(item as Mailbox).email})")
-                (this as ItemInvalidMailboxBinding).displayInvalidMailbox(item as Mailbox)
+                (this as ItemInvalidMailboxBinding).displayInvalidMailbox(item)
             }
             DisplayType.FOLDER.layout -> {
                 Log.d("Bind", "Rebind Folder : ${(item as Folder).name}")
-                (this as ItemMenuDrawerFolderBinding).displayFolder(item as Folder)
+                (this as ItemMenuDrawerFolderBinding).displayFolder(item)
             }
             DisplayType.CUSTOM_FOLDERS_HEADER.layout -> {
                 Log.d("Bind", "Rebind Folders header")
@@ -325,6 +338,7 @@ class MenuDrawerAdapter @Inject constructor(
     }
 
     private fun ItemMenuDrawerFolderBinding.displayFolder(folder: Folder) = with(root) {
+
         val unread = when (folder.role) {
             FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
             FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
@@ -501,6 +515,7 @@ class MenuDrawerAdapter @Inject constructor(
 
     private enum class NotifyType {
         MAILBOXES_HEADER_CLICKED,
+        COLLAPSABLE_FOLDER_EXISTENCE_HAS_CHANGED,
     }
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
