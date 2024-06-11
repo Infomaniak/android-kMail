@@ -80,10 +80,10 @@ class MoveFragment : Fragment() {
         bindAlertToViewLifecycle(inputDialog)
         setupRecyclerView()
         setupListeners()
-        observeFolders()
         setupCreateFolderDialog()
-        observeNewFolderCreation()
+        observeFolders()
         observeSearchResults()
+        observeFolderCreation()
     }
 
     private fun setupRecyclerView() = with(binding.foldersRecyclerView) {
@@ -99,12 +99,6 @@ class MoveFragment : Fragment() {
         )
     }
 
-    override fun onStop() {
-        binding.searchTextInput.hideKeyboard()
-        moveViewModel.cancelSearch()
-        super.onStop()
-    }
-
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener {
@@ -117,11 +111,11 @@ class MoveFragment : Fragment() {
         }
     }
 
-    private fun setupCreateFolderDialog() {
+    private fun setupCreateFolderDialog() = with(navigationArgs) {
         inputDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
                 trackCreateFolderEvent("confirm")
-                mainViewModel.moveToNewFolder(folderName, navigationArgs.threadsUids.toList(), navigationArgs.messageUid)
+                mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
             },
             onErrorCheck = ::checkForFolderCreationErrors,
         )
@@ -129,6 +123,39 @@ class MoveFragment : Fragment() {
 
     private fun observeFolders() {
         moveViewModel.getFolders().observe(viewLifecycleOwner, ::setSearchBarUi)
+    }
+
+    private fun observeSearchResults() = with(moveViewModel) {
+        filterResults.observe(viewLifecycleOwner) { folders ->
+            if (isSearching) folderAdapter.setFolders(folders, currentFolderId, isSearching = true)
+        }
+    }
+
+    private fun observeFolderCreation() = with(mainViewModel) {
+
+        newFolderResultTrigger.observe(viewLifecycleOwner) {
+            inputDialog.resetLoadingAndDismiss()
+        }
+
+        isMovedToNewFolder.observe(viewLifecycleOwner) { isFolderCreated ->
+            if (isFolderCreated) findNavController().popBackStack()
+        }
+    }
+
+    private fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
+        mainViewModel.moveThreadsOrMessageTo(folderId, threadsUids.toList(), messageUid)
+        findNavController().popBackStack()
+    }
+
+    /**
+     * Asynchronously validate folder name locally
+     * @return error string, otherwise null
+     */
+    private fun checkForFolderCreationErrors(folderName: CharSequence): String? = when {
+        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
+        folderName.contains(Regex(INVALID_CHARACTERS_PATTERN)) -> getString(R.string.errorNewFolderInvalidCharacter)
+        folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
+        else -> null
     }
 
     private fun setSearchBarUi(allFolders: List<Folder>) = with(binding) {
@@ -159,36 +186,13 @@ class MoveFragment : Fragment() {
 
     private fun toggleFolderListsVisibility(query: String?, allFolders: List<Folder>) {
         isSearching = !query.isNullOrBlank()
-        if (!isSearching) folderAdapter.setFolders(allFolders, moveViewModel.currentFolderId, isSearching)
+        if (!isSearching) folderAdapter.setFolders(allFolders, moveViewModel.currentFolderId, isSearching = false)
     }
 
-    private fun observeSearchResults() = with(moveViewModel) {
-        filterResults.observe(viewLifecycleOwner) { folders ->
-            if (isSearching) folderAdapter.setFolders(folders, currentFolderId, isSearching)
-        }
-    }
-
-    private fun observeNewFolderCreation() = with(mainViewModel) {
-        newFolderResultTrigger.observe(viewLifecycleOwner) { inputDialog.resetLoadingAndDismiss() }
-        isMovedToNewFolder.observe(viewLifecycleOwner) { isFolderCreated ->
-            if (isFolderCreated) findNavController().popBackStack()
-        }
-    }
-
-    private fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
-        mainViewModel.moveThreadsOrMessageTo(folderId, threadsUids.toList(), messageUid)
-        findNavController().popBackStack()
-    }
-
-    /**
-     * Asynchronously validate folder name locally
-     * @return error string, otherwise null
-     */
-    private fun checkForFolderCreationErrors(folderName: CharSequence): String? = when {
-        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
-        folderName.contains(Regex(INVALID_CHARACTERS_PATTERN)) -> getString(R.string.errorNewFolderInvalidCharacter)
-        folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
-        else -> null
+    override fun onStop() {
+        binding.searchTextInput.hideKeyboard()
+        moveViewModel.cancelSearch()
+        super.onStop()
     }
 
     companion object {
