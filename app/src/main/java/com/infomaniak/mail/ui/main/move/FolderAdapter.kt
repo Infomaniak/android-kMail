@@ -105,7 +105,7 @@ class FolderAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder
             var isFirstCustomFolder = true
             return newFolders.map { folder ->
                 folder.clone().apply {
-                    shouldDisplayDivider = if (folder.role == null && isFirstCustomFolder) {
+                    shouldDisplayDivider = if (folder.role == null && folder.isRoot && isFirstCustomFolder) {
                         isFirstCustomFolder = false
                         true
                     } else {
