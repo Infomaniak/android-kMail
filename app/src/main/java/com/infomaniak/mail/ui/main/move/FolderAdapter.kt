@@ -178,7 +178,11 @@ class FolderAdapter @Inject constructor(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null, isSearching: Boolean) = runCatchingRealm {
+    fun setFolders(
+        newFolders: List<Folder>,
+        newCurrentFolderId: String? = null,
+        isSearching: Boolean = false,
+    ) = runCatchingRealm {
 
         fun foldersWithDividersAndIndents(): List<Folder> {
             var isFirstCustomFolder = true
