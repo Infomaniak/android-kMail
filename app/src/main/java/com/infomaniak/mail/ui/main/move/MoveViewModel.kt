@@ -52,10 +52,6 @@ class MoveViewModel @Inject constructor(
     var currentFolderId: String? = null
     var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
 
-    fun cancelSearch() {
-        filterJob?.cancel()
-    }
-
     fun getFolders() = liveData(ioCoroutineContext) {
 
         currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
@@ -80,6 +76,10 @@ class MoveViewModel @Inject constructor(
 
             filterResults.postValue(filteredFolders)
         }
+    }
+
+    fun cancelSearch() {
+        filterJob?.cancel()
     }
 
     override fun onCleared() {
