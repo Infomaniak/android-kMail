@@ -164,6 +164,8 @@ class FolderController @Inject constructor(
             return realm.query("NOT ${Folder::id.name} IN $0 AND $isNotSearch", exceptionsFoldersIds)
         }
 
+        // TODO: Check if we can remove this `excludeDrafts` parameter after
+        //  trying to merge together as much `getFoldersQuery` as possible.
         private fun getMoveFoldersQuery(realm: TypedRealm, excludeDrafts: Boolean): RealmQuery<Folder> {
             val draftsQuery = if (excludeDrafts) " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'" else ""
             return realm
