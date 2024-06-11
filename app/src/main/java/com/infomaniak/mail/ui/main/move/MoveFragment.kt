@@ -64,9 +64,7 @@ class MoveFragment : Fragment() {
     lateinit var folderController: FolderController
 
     @Inject
-    lateinit var injectedFolderAdapter: MoveAdapter
-
-    private val folderAdapter inline get() = binding.foldersRecyclerView.adapter as MoveAdapter
+    lateinit var folderAdapter: MoveAdapter
 
     private var isSearching = false
     private var hasAlreadyTrackedSearch = false
@@ -90,7 +88,7 @@ class MoveFragment : Fragment() {
 
     private fun setupRecyclerView() = with(binding.foldersRecyclerView) {
 
-        adapter = injectedFolderAdapter(
+        adapter = folderAdapter(
             isInMenuDrawer = false,
             onFolderClicked = ::onFolderSelected,
         )
