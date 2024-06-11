@@ -49,20 +49,24 @@ class MoveViewModel @Inject constructor(
     private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
-    var currentFolderId: String? = null
-    var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
+    var filterResults: MutableLiveData<Pair<List<Folder>, String>> = MutableLiveData()
 
-    fun getFolders() = liveData(ioCoroutineContext) {
+    fun getCurrentFolderAndAllFolders() = liveData(ioCoroutineContext) {
 
-        currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
+        val currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
             ?: threadController.getThread(threadsUids.first())!!.folderId
 
         val folders = folderController.getMoveFolders(excludeDrafts = true).flattenFolderChildren()
 
-        emit(folders)
+        emit(folders to currentFolderId)
     }
 
-    fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+    fun filterFolders(
+        query: String,
+        folders: List<Folder>,
+        currentFolderId: String,
+        shouldDebounce: Boolean,
+    ) = viewModelScope.launch(ioCoroutineContext) {
         filterJob?.cancel()
         filterJob = launch {
             if (shouldDebounce) {
@@ -74,7 +78,7 @@ class MoveViewModel @Inject constructor(
                 folderName.standardize().contains(query.standardize())
             }
 
-            filterResults.postValue(filteredFolders)
+            filterResults.postValue(filteredFolders to currentFolderId)
         }
     }
 

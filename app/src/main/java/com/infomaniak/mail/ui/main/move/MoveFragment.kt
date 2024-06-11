@@ -120,15 +120,15 @@ class MoveFragment : Fragment() {
         )
     }
 
-    private fun observeFolders() = with(moveViewModel) {
-        getFolders().observe(viewLifecycleOwner) { allFolders ->
+    private fun observeFolders() {
+        moveViewModel.getCurrentFolderAndAllFolders().observe(viewLifecycleOwner) { (allFolders, currentFolderId) ->
             folderAdapter.setFolders(allFolders, currentFolderId, isSearching = false)
-            setSearchBarUi(allFolders)
+            setSearchBarUi(allFolders, currentFolderId)
         }
     }
 
-    private fun observeSearchResults() = with(moveViewModel) {
-        filterResults.observe(viewLifecycleOwner) { folders ->
+    private fun observeSearchResults() {
+        moveViewModel.filterResults.observe(viewLifecycleOwner) { (folders, currentFolderId) ->
             folderAdapter.setFolders(folders, currentFolderId, isSearching = true)
         }
     }
@@ -160,7 +160,7 @@ class MoveFragment : Fragment() {
         else -> null
     }
 
-    private fun setSearchBarUi(allFolders: List<Folder>) = with(binding) {
+    private fun setSearchBarUi(allFolders: List<Folder>, currentFolderId: String) = with(binding) {
 
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
 
@@ -169,9 +169,9 @@ class MoveFragment : Fragment() {
             doOnTextChanged { newQuery, _, _, _ ->
 
                 if (newQuery?.isNotBlank() == true) {
-                    moveViewModel.filterFolders(newQuery.toString(), allFolders, shouldDebounce = true)
+                    moveViewModel.filterFolders(newQuery.toString(), allFolders, currentFolderId, shouldDebounce = true)
                 } else {
-                    folderAdapter.setFolders(allFolders, moveViewModel.currentFolderId, isSearching = false)
+                    folderAdapter.setFolders(allFolders, currentFolderId, isSearching = false)
                 }
 
                 if (!hasAlreadyTrackedSearch) {
@@ -181,7 +181,7 @@ class MoveFragment : Fragment() {
             }
 
             handleEditorSearchAction { query ->
-                moveViewModel.filterFolders(query, allFolders, shouldDebounce = false)
+                moveViewModel.filterFolders(query, allFolders, currentFolderId, shouldDebounce = false)
                 trackMoveSearchEvent(SEARCH_VALIDATE_NAME)
             }
         }
