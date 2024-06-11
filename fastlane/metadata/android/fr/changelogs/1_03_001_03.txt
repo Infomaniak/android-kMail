@@ -1,0 +1,4 @@
+- Ajout d'une bannière pour indiquer à l'utilisateur que la webview doit être mise à jour
+- Placer l'icône d'information de la bannière externe à gauche de la bannière
+- Correction de la formulation en allemand
+- Correction de l'annulation d'un événement du calendrier

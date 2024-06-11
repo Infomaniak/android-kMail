@@ -1,0 +1,4 @@
+- Add banner to tell the user the webview needs to be updated
+- Place information icon of external banner to the left of the banner
+- Correct german wording
+- Fix calendar event cancellation
