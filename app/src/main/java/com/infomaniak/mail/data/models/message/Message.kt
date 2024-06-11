@@ -170,9 +170,15 @@ class Message : RealmObject {
                         val allFoldersAreSearch = _folders.all { it.id == SEARCH_FOLDER_ID }
                         val allFoldersAreTheSame = _folders.all { it.id == _folders.firstOrNull()?.id }
                         when {
-                            allFoldersAreSearch -> "Message has multiple times the Search folder as parent, it should not be possible"
-                            allFoldersAreTheSame -> "Message has multiple times the same parent folder, it should not be possible"
-                            else -> "Message has multiple parent folders, it should not be possible"
+                            allFoldersAreSearch -> {
+                                "Message has multiple times the Search folder as parent, it should not be possible"
+                            }
+                            allFoldersAreTheSame -> {
+                                "Message has multiple times the same parent folder, it should not be possible"
+                            }
+                            else -> {
+                                "Message has multiple parent folders, it should not be possible"
+                            }
                         }
                     }
                     Sentry.captureMessage(sentryMessage)

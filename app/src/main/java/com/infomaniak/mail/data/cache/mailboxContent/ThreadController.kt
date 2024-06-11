@@ -79,7 +79,7 @@ class ThreadController @Inject constructor(
      * - Handle duplicates using the existing logic.
      * @param remoteThreads The list of API Threads that need to be processed.
      * @param filterFolder The selected Folder on which we filter the Search.
-     * @return A list of search Threads. The search only returns Messages from SPAM or TRASH if we explicitly selected those folders
+     * @return List of search Threads. The search only returns Messages from SPAM or TRASH if we explicitly selected those folders
      */
     suspend fun initAndGetSearchFolderThreads(
         remoteThreads: List<Thread>,
@@ -262,7 +262,8 @@ class ThreadController @Inject constructor(
          *
          * @param messages List of messages for which heavy data needs to be fetched.
          * @param realm The realm context in which the heavy data fetching and updates should occur.
-         * @param okHttpClient An optional OkHttpClient instance to use for making network requests. If not provided, a default client will be used.
+         * @param okHttpClient An optional OkHttpClient instance to use for making network requests.
+         *                     If not provided, a default client will be used.
          */
         fun fetchMessagesHeavyData(
             messages: List<Message>,
@@ -313,7 +314,7 @@ class ThreadController @Inject constructor(
                         }
 
                     }.onFailure {
-                        // This `runCatching / onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body
+                        // This `onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
                         handleFailure(localMessage.uid)
                     }
 

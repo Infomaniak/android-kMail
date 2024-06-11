@@ -39,8 +39,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -337,7 +337,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         binding.threadsList.apply {
             adapter = threadListAdapter
             layoutManager = LinearLayoutManager(context)
-            orientation = VERTICAL_LIST_WITH_VERTICAL_DRAGGING
+            orientation = ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
             disableDragDirection(DirectionFlag.UP)
             disableDragDirection(DirectionFlag.DOWN)
             disableDragDirection(DirectionFlag.RIGHT)

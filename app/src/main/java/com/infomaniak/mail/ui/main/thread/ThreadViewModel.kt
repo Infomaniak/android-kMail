@@ -149,13 +149,19 @@ class ThreadViewModel @Inject constructor(
 
             return formatLists(messages) { index, messageUid ->
                 when {
-                    index == 0 -> MessageBehavior.DISPLAYED // First Message
-                    previousBlock.contains(messageUid) && isStillInBlock -> MessageBehavior.COLLAPSED // All Messages already in block
+                    index == 0 -> { // First Message
+                        MessageBehavior.DISPLAYED
+                    }
+                    previousBlock.contains(messageUid) && isStillInBlock -> { // All Messages already in block
+                        MessageBehavior.COLLAPSED
+                    }
                     !previousBlock.contains(messageUid) && isStillInBlock -> { // First Message not in block
                         isStillInBlock = false
                         MessageBehavior.FIRST_AFTER_BLOCK
                     }
-                    else -> MessageBehavior.DISPLAYED // All following Messages
+                    else -> { // All following Messages
+                        MessageBehavior.DISPLAYED
+                    }
                 }
             }
         }
@@ -190,7 +196,7 @@ class ThreadViewModel @Inject constructor(
      * After all these Messages are displayed, if there's at least 2 remaining Messages, they're gonna be collapsed in the Block.
      */
     private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean = with(threadState) {
-        return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden for any reason, we mustn't ever display it again
+        return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden, we mustn't ever display it again
                 !hasSuperCollapsedBlockBeenClicked && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
@@ -307,7 +313,7 @@ class ThreadViewModel @Inject constructor(
                 // TODO: A race condition exists between the two notify in the ThreadAdapter.
                 //  The 1st notify involves sending Messages to the adapter, while the 2nd notify entails retrieving
                 //  Messages' heavy data and subsequently notifying the adapter with the `uids` of failed Messages.
-                //  Ideally, the adapter should process the 1st notify before the 2nd one, but occasionally, the order is reversed.
+                //  Ideally, the adapter should process the 1st notify before the 2nd one, but occasionally the order is reversed.
                 //  Consequently, it appears that the adapter disregards the 2nd notify,
                 //  leading to an infinite shimmering effect that we cannot escape from.
                 delay(100L)

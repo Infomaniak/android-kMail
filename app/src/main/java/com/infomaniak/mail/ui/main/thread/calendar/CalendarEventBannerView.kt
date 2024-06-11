@@ -158,7 +158,8 @@ class CalendarEventBannerView @JvmOverloads constructor(
                 "${startDate.formatDateAndHour()} -\n${displayEndDate.formatDateAndHour()}"
             }
             else -> {
-                "${startDate.formatMediumDate()} - ${displayEndDate.formatMediumDate()}\n${context.getString(R.string.calendarAllDayLong)}"
+                "${startDate.formatMediumDate()} - ${displayEndDate.formatMediumDate()}\n" +
+                        context.getString(R.string.calendarAllDayLong)
             }
         }
     }
