@@ -50,7 +50,7 @@ class AiEngineChoiceFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.backgroundColor)
-        
+
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         sharedUtils.manageAiEngineSettings(this, choiceBinding.radioGroup, "promptAiEngine") {

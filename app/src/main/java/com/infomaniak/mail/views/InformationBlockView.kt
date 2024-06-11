@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
@@ -41,22 +42,28 @@ class InformationBlockView @JvmOverloads constructor(
     var title: CharSequence?
         get() = binding.informationTitle.text
         set(value) {
-            binding.informationTitle.text = value
-            binding.informationTitle.isVisible = true
+            binding.informationTitle.apply {
+                text = value
+                isGone = value.isNullOrBlank()
+            }
         }
 
     var description: CharSequence?
         get() = binding.informationDescription.text
         set(value) {
-            binding.informationDescription.text = value
-            binding.informationDescription.isVisible = true
+            binding.informationDescription.apply {
+                text = value
+                isGone = value.isNullOrBlank()
+            }
         }
 
     var buttonLabel: CharSequence?
         get() = binding.informationButton.text
         set(value) {
-            binding.informationButton.text = value
-            binding.informationButton.isVisible = true
+            binding.informationButton.apply {
+                text = value
+                isGone = value.isNullOrBlank()
+            }
         }
 
     var icon: Drawable?
@@ -67,20 +74,10 @@ class InformationBlockView @JvmOverloads constructor(
 
     init {
         attrs?.getAttributes(context, R.styleable.InformationBlockView) {
-            binding.informationTitle.apply {
-                val text = getString(R.styleable.InformationBlockView_title)
-                if (!text.isNullOrBlank()) title = text
-            }
-            binding.informationDescription.apply {
-                val text = getString(R.styleable.InformationBlockView_description)
-                if (!text.isNullOrBlank()) description = text
-            }
-            binding.informationButton.apply {
-                val text = getString(R.styleable.InformationBlockView_button)
-                if (!text.isNullOrBlank()) buttonLabel = text
-                
-                setOnClickListener { onActionClicked?.invoke() }
-            }
+            title = getString(R.styleable.InformationBlockView_title)
+            description = getString(R.styleable.InformationBlockView_description)
+            buttonLabel = getString(R.styleable.InformationBlockView_buttonLabel)
+            binding.informationButton.setOnClickListener { onActionClicked?.invoke() }
             icon = getDrawable(R.styleable.InformationBlockView_icon)
             binding.closeButton.apply {
                 isVisible = getBoolean(R.styleable.InformationBlockView_showCloseIcon, false)
