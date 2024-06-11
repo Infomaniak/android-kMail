@@ -73,9 +73,8 @@ class MenuDrawerFragment : Fragment() {
     lateinit var inputDialog: InputAlertDialog
 
     @Inject
-    lateinit var injectedMenuDrawerAdapter: MenuDrawerAdapter
+    lateinit var menuDrawerAdapter: MenuDrawerAdapter
 
-    private val menuDrawerAdapter inline get() = binding.menuDrawerRecyclerView.adapter as MenuDrawerAdapter
     private val currentClassName: String = MenuDrawerFragment::class.java.name
 
     var exitDrawer: (() -> Unit)? = null
@@ -121,7 +120,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        binding.menuDrawerRecyclerView.adapter = injectedMenuDrawerAdapter(
+        binding.menuDrawerRecyclerView.adapter = menuDrawerAdapter(
             currentClassName = currentClassName,
             confettiContainer = (activity as? MainActivity)?.getConfettiContainer(),
             onAskingTransition = ::executeMenuDrawerTransition,
