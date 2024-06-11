@@ -65,7 +65,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private lateinit var currentClassName: String
     private var confettiContainer: ViewGroup? = null
     private var currentFolderId: String? = null
-    private var hasCollapsableFolder: Boolean? = null
+    private var hasCollapsableDefaultFolder: Boolean? = null
+    private var hasCollapsableCustomFolder: Boolean? = null
 
     private lateinit var onAskingTransition: () -> Unit
     private lateinit var onAskingToCloseDrawer: () -> Unit
@@ -140,7 +141,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             }
         }
 
-        if (hasCollapsableFolder == null) hasCollapsableFolder = customFolders.any { it.canBeCollapsed }
+        if (hasCollapsableDefaultFolder == null) hasCollapsableDefaultFolder = defaultFolders.any { it.canBeCollapsed }
+        if (hasCollapsableCustomFolder == null) hasCollapsableCustomFolder = customFolders.any { it.canBeCollapsed }
 
         val items = mutableListOf<Any>().apply {
 
@@ -350,9 +352,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 isHidden = folder.isHidden
                 isCollapsed = folder.isCollapsed
                 canBeCollapsed = folder.canBeCollapsed
+                val hasCollapsableFolder = if (folder.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder
                 setIndent(
                     indent = folderIndent,
-                    hasCollapsableFolder = hasCollapsableFolder.let { if (it == null || folder.role != null) false else it },
+                    hasCollapsableFolder = hasCollapsableFolder ?: false,
                     canBeCollapsed = canBeCollapsed,
                 )
                 setCollapsingButtonContentDescription(folderName)
