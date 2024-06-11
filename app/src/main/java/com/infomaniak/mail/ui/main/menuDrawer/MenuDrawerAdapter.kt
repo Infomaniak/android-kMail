@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
@@ -56,15 +55,10 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.toggleChevron
 import com.infomaniak.mail.views.itemViews.*
 import com.infomaniak.mail.views.itemViews.DecoratedItemView.SelectionStyle
-import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.min
 
-class MenuDrawerAdapter @Inject constructor(
-    private val globalCoroutineScope: CoroutineScope,
-) : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
-
-    private var setFoldersJob: Job? = null
+class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
 
     private inline val items: List<Any> get() = currentList
 
@@ -114,7 +108,6 @@ class MenuDrawerAdapter @Inject constructor(
         return this
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun setItems(mediatorContainer: MediatorContainer) = runCatchingRealm {
 
         val (
@@ -128,31 +121,6 @@ class MenuDrawerAdapter @Inject constructor(
             permissions,
             quotas,
         ) = mediatorContainer
-
-        /**
-         * If there was no Folder with children, and then now there's at least one, we need to indent the whole Folders list.
-         */
-        // TODO: The indent isn't working great for DEFAULT folders.
-        fun notifyCollapsableFolders(firstCustomFolderIndex: Int) {
-            setFoldersJob?.cancel()
-            setFoldersJob = globalCoroutineScope.launch {
-                val newHasCollapsableFolder = customFolders.any { it.canBeCollapsed }
-
-                val isFirstTime = hasCollapsableFolder == null
-                val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
-                hasCollapsableFolder = newHasCollapsableFolder
-
-                if (!isFirstTime && collapsableFolderExistenceHasChanged) {
-                    Dispatchers.Main {
-                        notifyItemRangeChanged(
-                            firstCustomFolderIndex,
-                            customFolders.count(),
-                            NotifyType.COLLAPSABLE_FOLDER_EXISTENCE_HAS_CHANGED,
-                        )
-                    }
-                }
-            }
-        }
 
         fun notifySelectedFolder() {
 
@@ -172,7 +140,8 @@ class MenuDrawerAdapter @Inject constructor(
             }
         }
 
-        var firstCustomFolderIndex = 0
+        if (hasCollapsableFolder == null) hasCollapsableFolder = customFolders.any { it.canBeCollapsed }
+
         val items = mutableListOf<Any>().apply {
 
             // Mailboxes
@@ -190,7 +159,6 @@ class MenuDrawerAdapter @Inject constructor(
                 if (customFolders.isEmpty()) {
                     add(ItemType.EMPTY_CUSTOM_FOLDERS)
                 } else {
-                    firstCustomFolderIndex = count()
                     addAll(customFolders)
                 }
             }
@@ -201,7 +169,6 @@ class MenuDrawerAdapter @Inject constructor(
         }
 
         submitList(items)
-        notifyCollapsableFolders(firstCustomFolderIndex)
         notifySelectedFolder()
     }
 
