@@ -99,8 +99,6 @@ class FolderAdapter @Inject constructor(
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
         val folder = folders[position]
 
-        root.tag = if (folder.shouldDisplayDivider) null else UiUtils.IGNORE_DIVIDER_TAG
-
         when (getItemViewType(position)) {
             DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
             DisplayType.MENU_DRAWER.layout -> (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
@@ -150,6 +148,7 @@ class FolderAdapter @Inject constructor(
     ) {
         val folderName = folder.getLocalizedName(context)
 
+        tag = if (folder.shouldDisplayDivider) null else UiUtils.IGNORE_DIVIDER_TAG
         text = folderName
         icon = AppCompatResources.getDrawable(context, iconId)
         setSelectedState(currentFolderId == folder.id)
