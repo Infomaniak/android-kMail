@@ -45,7 +45,7 @@ class FolderAdapter @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
 ) : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
 
-    private inline val items: List<Folder> get() = currentList
+    private inline val folders: List<Folder> get() = currentList
 
     private var setFoldersJob: Job? = null
 
@@ -87,7 +87,7 @@ class FolderAdapter @Inject constructor(
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         if (payloads.firstOrNull() == Unit) {
-            val folder = items[position]
+            val folder = folders[position]
             if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
                 (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == folder.id)
             }
@@ -97,7 +97,7 @@ class FolderAdapter @Inject constructor(
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
-        val folder = items[position]
+        val folder = folders[position]
 
         root.tag = if (folder.shouldDisplayDivider) null else UiUtils.IGNORE_DIVIDER_TAG
 
@@ -111,7 +111,7 @@ class FolderAdapter @Inject constructor(
         return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { items.size }.getOrDefault(0)
+    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
 
     private fun UnreadFolderItemView.displayMenuDrawerFolder(folder: Folder) {
 
@@ -226,7 +226,7 @@ class FolderAdapter @Inject constructor(
     }
 
     private fun notifyCurrentItem(folderId: String) {
-        val position = items.indexOfFirst { it.id == folderId }
+        val position = folders.indexOfFirst { it.id == folderId }
         notifyItemChanged(position)
     }
 
