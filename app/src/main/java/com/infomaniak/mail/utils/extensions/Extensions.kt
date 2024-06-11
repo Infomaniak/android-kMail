@@ -301,14 +301,6 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
     }
 }
 
-fun List<Folder>.getDefaultMenuFolders(): List<Folder> {
-    return sortedBy { it.role?.order }.flattenFolderChildren()
-}
-
-fun List<Folder>.getCustomMenuFolders(dismissHiddenChildren: Boolean = false): List<Folder> {
-    return flattenFolderChildren(dismissHiddenChildren)
-}
-
 fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
 
     if (isEmpty()) return this

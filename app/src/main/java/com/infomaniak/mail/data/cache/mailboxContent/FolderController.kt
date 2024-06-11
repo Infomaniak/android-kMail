@@ -45,10 +45,6 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
-    fun getCustomFolders(): RealmResults<Folder> {
-        return getCustomFoldersQuery(mailboxContentRealm()).find()
-    }
-
     fun getMoveFolders(): RealmResults<Folder> {
         return getMoveFoldersQuery(mailboxContentRealm()).find()
     }
@@ -151,7 +147,9 @@ class FolderController @Inject constructor(
 
         private fun getDefaultFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
             val hasRole = "${Folder.rolePropertyName} != nil"
-            return realm.query("$isNotSearch AND $hasRole")
+            return realm
+                .query<Folder>("$isNotSearch AND $hasRole")
+                .sort(Folder::roleOrder.name, Sort.DESCENDING)
         }
 
         private fun getCustomFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
