@@ -66,7 +66,6 @@ class MoveFragment : Fragment() {
     @Inject
     lateinit var folderAdapter: FolderAdapter
 
-    private var isSearching = false
     private var hasAlreadyTrackedSearch = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -121,13 +120,16 @@ class MoveFragment : Fragment() {
         )
     }
 
-    private fun observeFolders() {
-        moveViewModel.getFolders().observe(viewLifecycleOwner, ::setSearchBarUi)
+    private fun observeFolders() = with(moveViewModel) {
+        getFolders().observe(viewLifecycleOwner) { allFolders ->
+            folderAdapter.setFolders(allFolders, currentFolderId, isSearching = false)
+            setSearchBarUi(allFolders)
+        }
     }
 
     private fun observeSearchResults() = with(moveViewModel) {
         filterResults.observe(viewLifecycleOwner) { folders ->
-            if (isSearching) folderAdapter.setFolders(folders, currentFolderId, isSearching = true)
+            folderAdapter.setFolders(folders, currentFolderId, isSearching = true)
         }
     }
 
@@ -163,12 +165,13 @@ class MoveFragment : Fragment() {
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
 
         searchTextInput.apply {
-            toggleFolderListsVisibility(text?.toString(), allFolders)
 
             doOnTextChanged { newQuery, _, _, _ ->
-                toggleFolderListsVisibility(newQuery?.toString(), allFolders)
+
                 if (newQuery?.isNotBlank() == true) {
                     moveViewModel.filterFolders(newQuery.toString(), allFolders, shouldDebounce = true)
+                } else {
+                    folderAdapter.setFolders(allFolders, moveViewModel.currentFolderId, isSearching = false)
                 }
 
                 if (!hasAlreadyTrackedSearch) {
@@ -182,11 +185,6 @@ class MoveFragment : Fragment() {
                 trackMoveSearchEvent(SEARCH_VALIDATE_NAME)
             }
         }
-    }
-
-    private fun toggleFolderListsVisibility(query: String?, allFolders: List<Folder>) {
-        isSearching = !query.isNullOrBlank()
-        if (!isSearching) folderAdapter.setFolders(allFolders, moveViewModel.currentFolderId, isSearching = false)
     }
 
     override fun onStop() {
