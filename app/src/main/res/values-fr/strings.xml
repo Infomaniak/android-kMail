@@ -105,7 +105,6 @@
     </plurals>
     <string name="attendeesListTitle">Liste des participants (%d)</string>
     <string name="bccTitle">Cci :</string>
-    <string name="blockedMailboxTitle">L’adresse %s est bloquée</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Mot de passe bloqué</item>
         <item quantity="other">Mots de passe bloqués</item>
@@ -293,16 +292,16 @@
     <string name="externalDialogTitleRecipient">Destinataire externe</string>
     <string name="externalTag">Externe</string>
     <string name="failToOpenDraft">Échec de l’ouverture du brouillon</string>
+    <string name="faqUrl">https://www.infomaniak.com/fr/support/faq/admin2/service-mail</string>
     <string name="favoritesFolder">Favoris</string>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="loadingText">Chargement…</string>
-    <plurals name="lockedMailboxDescription">
-        <item quantity="one">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
-        <item quantity="other">L’accès à vos adresses mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
-        <item quantity="many">L’accès à votre adresse mail est actuellement bloqué. Nous vous invitons à contacter votre administrateur.</item>
-    </plurals>
+    <string name="lockedMailboxBottomSheetDescription">L’accès à votre adresse mail est actuellement bloqué.\nPour plus d’informations, consultez les FAQ.</string>
+    <string name="lockedMailboxBottomSheetTitle">L’adresse %s est bloquée</string>
+    <string name="lockedMailboxScreenDescription">Pour plus d’informations :</string>
+    <string name="lockedMailboxScreenTitle">Certaines de vos adresses mail sont bloquées</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Adresse mail bloquée</item>
         <item quantity="other">Adresses mail bloquées</item>
@@ -373,6 +372,7 @@
     <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
     <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
+    <string name="readFAQ">Consulter les FAQ</string>
     <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté</string>

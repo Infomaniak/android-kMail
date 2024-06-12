@@ -59,6 +59,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme.Pink"
         android:usesCleartextTraffic="true"
+        tools:replace="android:usesCleartextTraffic"
         tools:targetApi="UPSIDE_DOWN_CAKE">
 
         <meta-data

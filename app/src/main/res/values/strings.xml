@@ -110,7 +110,6 @@
     </plurals>
     <string name="attendeesListTitle">List of attendees (%d)</string>
     <string name="bccTitle">Bcc:</string>
-    <string name="blockedMailboxTitle">Mailbox %s is blocked</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Blocked password</item>
         <item quantity="other">Blocked passwords</item>
@@ -295,15 +294,16 @@
     <string name="externalDialogTitleRecipient">External recipient</string>
     <string name="externalTag">External</string>
     <string name="failToOpenDraft">Failed to open draft</string>
+    <string name="faqUrl">https://www.infomaniak.com/en/support/faq/admin2/email-service</string>
     <string name="favoritesFolder">Favorites</string>
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="inboxFolder">Inbox</string>
     <string name="loadingText">Loading…</string>
-    <plurals name="lockedMailboxDescription">
-        <item quantity="one">Access to your mailbox is currently blocked. Please contact your administrator.</item>
-        <item quantity="other">Access to your mailboxes is currently blocked. Please contact your administrator.</item>
-    </plurals>
+    <string name="lockedMailboxBottomSheetDescription">Access to your mailbox is currently blocked.\nFor further information, please read FAQ.</string>
+    <string name="lockedMailboxBottomSheetTitle">Mailbox %s is blocked</string>
+    <string name="lockedMailboxScreenDescription">For further information:</string>
+    <string name="lockedMailboxScreenTitle">Some of your mailboxes are blocked</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Blocked mailbox</item>
         <item quantity="other">Blocked mailboxes</item>
@@ -371,6 +371,7 @@
     <string name="pickerNoSelection">No selection</string>
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
     <string name="popupDetachMailboxTitle">Detach mailbox</string>
+    <string name="readFAQ">Read FAQ</string>
     <string name="readMore">Read more</string>
     <string name="recentSearchesTitle">Recent searches</string>
     <string name="refreshTokenError">You have been disconnected</string>

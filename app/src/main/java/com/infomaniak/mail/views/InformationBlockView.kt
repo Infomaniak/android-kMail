@@ -22,7 +22,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.annotation.StringRes
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
@@ -36,12 +36,34 @@ class InformationBlockView @JvmOverloads constructor(
 
     private val binding by lazy { ViewInformationBlockBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var onActionClicked: (() -> Unit)? = null
     private var onCloseClicked: (() -> Unit)? = null
 
-    var text: CharSequence?
-        get() = binding.informationText.text
+    var title: CharSequence?
+        get() = binding.informationTitle.text
         set(value) {
-            binding.informationText.text = value
+            binding.informationTitle.apply {
+                text = value
+                isGone = value.isNullOrBlank()
+            }
+        }
+
+    var description: CharSequence?
+        get() = binding.informationDescription.text
+        set(value) {
+            binding.informationDescription.apply {
+                text = value
+                isGone = value.isNullOrBlank()
+            }
+        }
+
+    var buttonLabel: CharSequence?
+        get() = binding.informationButton.text
+        set(value) {
+            binding.informationButton.apply {
+                text = value
+                isGone = value.isNullOrBlank()
+            }
         }
 
     var icon: Drawable?
@@ -52,7 +74,10 @@ class InformationBlockView @JvmOverloads constructor(
 
     init {
         attrs?.getAttributes(context, R.styleable.InformationBlockView) {
-            text = getString(R.styleable.InformationBlockView_text)
+            title = getString(R.styleable.InformationBlockView_title)
+            description = getString(R.styleable.InformationBlockView_description)
+            buttonLabel = getString(R.styleable.InformationBlockView_buttonLabel)
+            binding.informationButton.setOnClickListener { onActionClicked?.invoke() }
             icon = getDrawable(R.styleable.InformationBlockView_icon)
             binding.closeButton.apply {
                 isVisible = getBoolean(R.styleable.InformationBlockView_showCloseIcon, false)
@@ -61,11 +86,11 @@ class InformationBlockView @JvmOverloads constructor(
         }
     }
 
-    fun setOnCloseListener(listener: () -> Unit) {
-        onCloseClicked = listener
+    fun setOnActionClicked(listener: () -> Unit) {
+        onActionClicked = listener
     }
 
-    fun setText(@StringRes textRes: Int) {
-        text = context.getText(textRes)
+    fun setOnCloseListener(listener: () -> Unit) {
+        onCloseClicked = listener
     }
 }

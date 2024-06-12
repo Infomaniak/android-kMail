@@ -104,7 +104,6 @@
     </plurals>
     <string name="attendeesListTitle">Liste der Teilnehmer (%d)</string>
     <string name="bccTitle">Bcc:</string>
-    <string name="blockedMailboxTitle">Mailbox %s ist blockiert</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Passwort blockiert</item>
         <item quantity="other">Blockierte Passwörter</item>
@@ -289,15 +288,16 @@
     <string name="externalDialogTitleRecipient">Externer Empfänger</string>
     <string name="externalTag">Extern</string>
     <string name="failToOpenDraft">Öffnen des Entwurfs fehlgeschlagen</string>
+    <string name="faqUrl">https://www.infomaniak.com/de/support/faq/admin2/mail-service</string>
     <string name="favoritesFolder">Favoriten</string>
     <string name="fromTitle">Von:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="inboxFolder">Posteingang</string>
     <string name="loadingText">Laden…</string>
-    <plurals name="lockedMailboxDescription">
-        <item quantity="one">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</item>
-        <item quantity="other">Der Zugriff auf Ihre Mailboxen ist derzeit gesperrt. Bitte wenden Sie sich an Ihren Administrator.</item>
-    </plurals>
+    <string name="lockedMailboxBottomSheetDescription">Der Zugriff auf Ihre E-Mail-Adresse ist derzeit gesperrt.\nFür weitere Informationen, FAQ lesen.</string>
+    <string name="lockedMailboxBottomSheetTitle">Mailbox %s ist blockiert</string>
+    <string name="lockedMailboxScreenDescription">Für weitere Informationen:</string>
+    <string name="lockedMailboxScreenTitle">Einige Ihrer Mailboxen sind blockiert</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Blockierte E-Mail-Adresse</item>
         <item quantity="other">Gesperrte Mailadressen</item>
@@ -365,6 +365,7 @@
     <string name="pickerNoSelection">Keine Auswahl</string>
     <string name="popupDetachMailboxDescription">Sind Sie sicher, dass Sie die Adresse %s lösen möchten?</string>
     <string name="popupDetachMailboxTitle">Adresse abtrennen</string>
+    <string name="readFAQ">FAQ lesen</string>
     <string name="readMore">Mehr erfahren</string>
     <string name="recentSearchesTitle">Letzte Suchen</string>
     <string name="refreshTokenError">Sie wurden abgemeldet</string>

@@ -168,7 +168,9 @@
     </declare-styleable>
 
     <declare-styleable name="InformationBlockView">
-        <attr name="text" />
+        <attr name="title" />
+        <attr name="description" />
+        <attr name="buttonLabel" format="string" />
         <attr name="icon" />
         <attr name="showCloseIcon" format="boolean" />
     </declare-styleable>
