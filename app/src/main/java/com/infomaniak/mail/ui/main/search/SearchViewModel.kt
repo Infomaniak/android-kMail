@@ -38,7 +38,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.getMenuFolders
+import com.infomaniak.mail.utils.extensions.flattenFolderChildren
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.*
@@ -69,8 +69,8 @@ class SearchViewModel @Inject constructor(
     var currentSearchQuery: String = ""
         private set
 
-    val foldersLive = folderController.getRootsFoldersAsync()
-        .map { it.list.getMenuFolders() }
+    val foldersLive = folderController.getSearchFoldersAsync()
+        .map { it.list.flattenFolderChildren() }
         .asLiveData(ioCoroutineContext)
 
     private var currentFilters = mutableSetOf<ThreadFilter>()

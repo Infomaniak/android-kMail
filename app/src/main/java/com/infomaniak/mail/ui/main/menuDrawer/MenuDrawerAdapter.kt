@@ -65,8 +65,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private lateinit var currentClassName: String
     private var confettiContainer: ViewGroup? = null
     private var currentFolderId: String? = null
-    private var hasCollapsableDefaultFolder: Boolean? = null
-    private var hasCollapsableCustomFolder: Boolean? = null
+    private var hasCollapsableDefaultFolder = false
+    private var hasCollapsableCustomFolder = false
 
     private lateinit var onAskingTransition: () -> Unit
     private lateinit var onAskingToCloseDrawer: () -> Unit
@@ -116,9 +116,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             areMailboxesExpanded,
             otherMailboxes,
             currentFolder,
-            defaultFolders,
+            allFolders,
             areCustomFoldersExpanded,
-            customFolders,
             permissions,
             quotas,
         ) = mediatorContainer
@@ -141,10 +140,11 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             }
         }
 
-        if (hasCollapsableDefaultFolder == null) hasCollapsableDefaultFolder = defaultFolders.any { it.canBeCollapsed }
-        if (hasCollapsableCustomFolder == null) hasCollapsableCustomFolder = customFolders.any { it.canBeCollapsed }
-
         val items = mutableListOf<Any>().apply {
+
+            var count = 0
+            var temporaryHasCollapsableDefaultFolder = false
+            var temporaryHasCollapsableCustomFolder = false
 
             // Mailboxes
             add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
@@ -152,18 +152,30 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
             // Default Folders
             add(ItemType.DIVIDER)
-            addAll(defaultFolders)
+            while (count < allFolders.count() && (allFolders[count].role != null || !allFolders[count].isRoot)) {
+                val defaultFolder = allFolders[count]
+                if (defaultFolder.canBeCollapsed) temporaryHasCollapsableDefaultFolder = true
+                add(defaultFolder)
+                count++
+            }
 
             // Custom Folders
             add(ItemType.DIVIDER)
             add(ItemType.CUSTOM_FOLDERS_HEADER)
             if (areCustomFoldersExpanded) {
-                if (customFolders.isEmpty()) {
+                if (count == allFolders.count()) {
                     add(ItemType.EMPTY_CUSTOM_FOLDERS)
                 } else {
-                    addAll(customFolders)
+                    while (count < allFolders.count()) {
+                        val customFolder = allFolders[count]
+                        if (customFolder.canBeCollapsed) temporaryHasCollapsableCustomFolder = true
+                        add(customFolder)
+                        count++
+                    }
                 }
             }
+            hasCollapsableDefaultFolder = temporaryHasCollapsableDefaultFolder
+            hasCollapsableCustomFolder = temporaryHasCollapsableCustomFolder
 
             // Footer
             add(ItemType.DIVIDER)
@@ -355,7 +367,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 val hasCollapsableFolder = if (folder.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder
                 setIndent(
                     indent = folderIndent,
-                    hasCollapsableFolder = hasCollapsableFolder ?: false,
+                    hasCollapsableFolder = hasCollapsableFolder,
                     canBeCollapsed = canBeCollapsed,
                 )
                 setCollapsingButtonContentDescription(folderName)

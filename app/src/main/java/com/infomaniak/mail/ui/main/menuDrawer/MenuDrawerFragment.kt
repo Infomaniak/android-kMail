@@ -212,9 +212,8 @@ class MenuDrawerFragment : Fragment() {
             menuDrawerViewModel.areMailboxesExpanded,
             menuDrawerViewModel.otherMailboxesLive,
             currentFolder,
-            currentDefaultFoldersLive,
+            currentFoldersLive,
             menuDrawerViewModel.areCustomFoldersExpanded,
-            currentCustomFoldersLive,
             currentPermissionsLive,
             currentQuotasLive,
             constructor = {
@@ -226,9 +225,8 @@ class MenuDrawerFragment : Fragment() {
                     it[3] as Folder?,
                     it[4] as List<Folder>,
                     it[5] as Boolean,
-                    it[6] as List<Folder>,
-                    it[7] as MailboxPermissions?,
-                    it[8] as Quotas?,
+                    it[6] as MailboxPermissions?,
+                    it[7] as Quotas?,
                 )
             }
         ).observe(viewLifecycleOwner, menuDrawerAdapter::setItems)
@@ -261,9 +259,8 @@ class MenuDrawerFragment : Fragment() {
         val areMailboxesExpanded: Boolean,
         val otherMailboxes: List<Mailbox>,
         val currentFolder: Folder?,
-        val defaultFolders: List<Folder>,
+        val allFolders: List<Folder>,
         val areCustomFoldersExpanded: Boolean,
-        val customFolders: List<Folder>,
         val permissions: MailboxPermissions?,
         val quotas: Quotas?,
     )
