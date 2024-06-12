@@ -27,7 +27,9 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.sentry.Sentry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withTimeout
 import okhttp3.internal.toHexString
 import java.nio.charset.StandardCharsets
 
@@ -66,22 +68,13 @@ object Utils {
     suspend fun <T> executeWithTimeoutOrDefault(
         timeout: Long,
         defaultValue: T,
-        block: CoroutineScope.() -> T,
+        block: suspend CoroutineScope.() -> T,
         onTimeout: (() -> Unit)? = null,
     ): T = runCatching {
-        coroutineWithTimeout(timeout, block)
+        withTimeout(timeout, block)
     }.getOrElse {
         if (it is TimeoutCancellationException) onTimeout?.invoke() else Sentry.captureException(it)
         defaultValue
-    }
-
-    private suspend fun <T> coroutineWithTimeout(
-        timeout: Long,
-        block: CoroutineScope.() -> T,
-    ): T = withTimeout(timeout) {
-        var result: T? = null
-        CoroutineScope(Dispatchers.Default).launch { result = block() }.join()
-        result!!
     }
 
     fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1, T2>> {
