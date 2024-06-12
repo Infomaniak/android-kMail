@@ -123,7 +123,7 @@ class MoveFragment : Fragment() {
     private fun observeFolders() {
         moveViewModel.getCurrentFolderAndAllFolders().observe(viewLifecycleOwner) { (allFolders, currentFolderId) ->
             folderAdapter.setFolders(allFolders, currentFolderId, isSearching = false)
-            setSearchBarUi(allFolders, currentFolderId)
+            setupSearchBar(allFolders, currentFolderId)
         }
     }
 
@@ -160,7 +160,7 @@ class MoveFragment : Fragment() {
         else -> null
     }
 
-    private fun setSearchBarUi(allFolders: List<Folder>, currentFolderId: String) = with(binding) {
+    private fun setupSearchBar(allFolders: List<Folder>, currentFolderId: String) = with(binding) {
 
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
 
