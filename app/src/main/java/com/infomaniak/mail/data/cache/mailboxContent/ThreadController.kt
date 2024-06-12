@@ -257,18 +257,6 @@ class ThreadController @Inject constructor(
             onUpdate(getThread(threadUid, realm))
         }
 
-        private fun fetchSwissTransferContainer(uuid: String, realm: MutableRealm): SwissTransferContainer? = runCatching {
-            val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
-
-            return@runCatching if (apiResponse.isSuccess()) {
-                apiResponse.data?.apply {
-                    SwissTransferContainerController.upsertSwissTransferContainer(this, realm)
-                }
-            } else {
-                null
-            }
-        }.getOrNull()
-
         /**
          * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
          *
@@ -290,6 +278,18 @@ class ThreadController @Inject constructor(
 
             val deletedMessagesUids = mutableListOf<String>()
             val failedMessagesUids = mutableListOf<String>()
+
+            fun fetchSwissTransferContainer(uuid: String, realm: MutableRealm): SwissTransferContainer? = runCatching {
+                val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
+
+                return@runCatching if (apiResponse.isSuccess()) {
+                    apiResponse.data?.apply {
+                        SwissTransferContainerController.upsertSwissTransferContainer(swissTransferContainer = this, realm)
+                    }
+                } else {
+                    null
+                }
+            }.getOrNull()
 
             fun handleFailure(uid: String, code: String? = null) {
                 if (code == ErrorCode.MESSAGE_NOT_FOUND) {
