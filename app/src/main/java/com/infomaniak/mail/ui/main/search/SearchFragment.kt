@@ -198,12 +198,20 @@ class SearchFragment : TwoPaneFragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
-        searchViewModel.foldersLive.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
+        searchViewModel.foldersLive.observe(viewLifecycleOwner) { allFolders ->
 
-            val folders = defaultFolders.toMutableList<Any>().apply {
+            val folders = mutableListOf<Any>().apply {
                 add(0, SearchFolderElement.ALL_FOLDERS)
-                add(SearchFolderElement.DIVIDER)
-                addAll(customFolders)
+                var hasFirstCustomFolderBeenReached = false
+                var isCustomFolder: Boolean
+                allFolders.forEach { folder ->
+                    isCustomFolder = folder.role == null && folder.isRoot
+                    if (!hasFirstCustomFolderBeenReached && isCustomFolder) {
+                        hasFirstCustomFolderBeenReached = true
+                        add(SearchFolderElement.DIVIDER)
+                    }
+                    add(folder)
+                }
             }.toList()
 
             searchAdapter = SearchFolderAdapter(folders) { folder, title ->
