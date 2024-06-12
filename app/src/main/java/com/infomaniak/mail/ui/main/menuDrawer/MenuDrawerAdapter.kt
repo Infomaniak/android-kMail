@@ -17,22 +17,17 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer
 
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
-import com.infomaniak.lib.bugtracker.BugTrackerActivity
-import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.toFloat
@@ -46,11 +41,7 @@ import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment.MediatorContainer
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.ConfettiUtils
-import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.toggleChevron
 import com.infomaniak.mail.views.itemViews.*
@@ -63,7 +54,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private inline val items: List<Any> get() = currentList
 
     private lateinit var currentClassName: String
-    private var confettiContainer: ViewGroup? = null
     private var currentFolderId: String? = null
     private var hasCollapsableDefaultFolder = false
     private var hasCollapsableCustomFolder = false
@@ -78,10 +68,15 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private lateinit var onCreateFolderClicked: () -> Unit
     private lateinit var onFolderClicked: (folderId: String) -> Unit
     private lateinit var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit
+    private lateinit var onSyncAutoConfigClicked: () -> Unit
+    private lateinit var onImportMailsClicked: () -> Unit
+    private lateinit var onRestoreMailsClicked: () -> Unit
+    private lateinit var onFeedbackClicked: () -> Unit
+    private lateinit var onHelpClicked: () -> Unit
+    private lateinit var onAppVersionClicked: () -> Unit
 
     operator fun invoke(
         currentClassName: String,
-        confettiContainer: ViewGroup?,
         onAskingTransition: () -> Unit,
         onAskingToCloseDrawer: () -> Unit,
         onMailboxesHeaderClicked: () -> Unit,
@@ -92,9 +87,14 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         onCreateFolderClicked: () -> Unit,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
+        onSyncAutoConfigClicked: () -> Unit,
+        onImportMailsClicked: () -> Unit,
+        onRestoreMailsClicked: () -> Unit,
+        onFeedbackClicked: () -> Unit,
+        onHelpClicked: () -> Unit,
+        onAppVersionClicked: () -> Unit,
     ): MenuDrawerAdapter {
         this.currentClassName = currentClassName
-        this.confettiContainer = confettiContainer
         this.onAskingTransition = onAskingTransition
         this.onAskingToCloseDrawer = onAskingToCloseDrawer
         this.onMailboxesHeaderClicked = onMailboxesHeaderClicked
@@ -105,6 +105,12 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         this.onCreateFolderClicked = onCreateFolderClicked
         this.onFolderClicked = onFolderClicked
         this.onCollapseChildrenClicked = onCollapseChildrenClicked
+        this.onSyncAutoConfigClicked = onSyncAutoConfigClicked
+        this.onImportMailsClicked = onImportMailsClicked
+        this.onRestoreMailsClicked = onRestoreMailsClicked
+        this.onFeedbackClicked = onFeedbackClicked
+        this.onHelpClicked = onHelpClicked
+        this.onAppVersionClicked = onAppVersionClicked
 
         return this
     }
@@ -397,54 +403,22 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
 
         // Calendar & contacts sync
-        syncAutoConfig.setOnClickListener {
-            // context.trackSyncAutoConfigEvent("openFromMenuDrawer")
-            // launchSyncAutoConfigActivityForResult()
-            onAskingToCloseDrawer()
-        }
+        syncAutoConfig.setOnClickListener { onSyncAutoConfigClicked() }
 
         // Import mails
-        importMails.setOnClickListener {
-            context.trackMenuDrawerEvent("importEmails")
-            context.openUrl(BuildConfig.IMPORT_EMAILS_URL)
-            onAskingToCloseDrawer()
-        }
+        importMails.setOnClickListener { onImportMailsClicked() }
 
         // Restore mails
-        restoreMails.setOnClickListener {
-            context.trackMenuDrawerEvent("restoreEmails")
-            // safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = currentClassName)
+        restoreMails.apply {
+            isVisible = footer.permissions?.canRestoreEmails == true
+            setOnClickListener { onRestoreMailsClicked() }
         }
-        restoreMails.isVisible = footer.permissions?.canRestoreEmails == true
 
         // Feedback
-        feedback.setOnClickListener {
-            onAskingToCloseDrawer()
-            if (AccountUtils.currentUser?.isStaff == true) {
-                Intent(context, BugTrackerActivity::class.java).apply {
-                    putExtras(
-                        BugTrackerActivityArgs(
-                            user = AccountUtils.currentUser!!,
-                            appBuildNumber = BuildConfig.VERSION_NAME,
-                            bucketIdentifier = BuildConfig.BUGTRACKER_MAIL_BUCKET_ID,
-                            projectName = BuildConfig.BUGTRACKER_MAIL_PROJECT_NAME,
-                            repoGitHub = BuildConfig.GITHUB_REPO,
-                        ).toBundle(),
-                    )
-                }.also(context::startActivity)
-            } else {
-                context.trackMenuDrawerEvent("feedback")
-                context.openUrl(context.getString(R.string.urlUserReportAndroid))
-            }
-        }
+        feedback.setOnClickListener { onFeedbackClicked() }
 
         // Help
-        help.setOnClickListener {
-            ShortcutManagerCompat.reportShortcutUsed(context, Utils.Shortcuts.SUPPORT.id)
-            context.trackMenuDrawerEvent("help")
-            context.openUrl(BuildConfig.CHATBOT_URL)
-            onAskingToCloseDrawer()
-        }
+        help.setOnClickListener { onHelpClicked() }
 
         // Quotas
         val isLimited = footer.quotas != null
@@ -458,13 +432,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         // App version
         appVersionName.apply {
             text = "App version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-            setOnClickListener {
-                ConfettiUtils.onEasterEggConfettiClicked(
-                    container = confettiContainer,
-                    type = ConfettiType.INFOMANIAK,
-                    matomoValue = "MenuDrawer",
-                )
-            }
+            setOnClickListener { onAppVersionClicked() }
         }
     }
 
@@ -539,21 +507,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }.getOrDefault(false)
 
         override fun getChangePayload(oldItem: Any, newItem: Any): Any? {
-            // return when (oldItem) {
-            //     is MailboxesHeader -> {
-            //         if (newItem is MailboxesHeader && oldItem.isExpanded != newItem.isExpanded) {
-            //             NotifyType.MAILBOX_HEADER_IS_EXPANDED_OR_COLLAPSED
-            //         } else {
-            //             null
-            //         }
-            //     }
-            //     is Mailbox -> null
-            //     is Folder -> null
-            //     ItemType.CUSTOM_FOLDERS_HEADER -> null
-            //     ItemType.EMPTY_CUSTOM_FOLDERS -> null
-            //     else -> null
-            // }
-
             return if (newItem is MailboxesHeader && oldItem is MailboxesHeader && newItem.isExpanded != oldItem.isExpanded) {
                 NotifyType.MAILBOXES_HEADER_CLICKED
             } else {
