@@ -230,6 +230,10 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackSyncAutoConfigEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        context?.trackSyncAutoConfigEvent(name, action)
+    }
+
+    fun Context.trackSyncAutoConfigEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
         trackEvent("syncAutoConfig", name, action)
     }
 
