@@ -45,20 +45,16 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
-    fun getMoveFolders(excludeDrafts: Boolean = false): RealmResults<Folder> {
-        return getMoveFoldersQuery(mailboxContentRealm(), excludeDrafts).find()
+    fun getFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery(mailboxContentRealm()).asFlow()
     }
 
-    fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), onlyRoots = true).asFlow()
+    fun getMoveFolders(): RealmResults<Folder> {
+        return getFoldersQuery(mailboxContentRealm(), excludeDrafts = true).find()
     }
 
-    fun getDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getDefaultFoldersQuery(mailboxContentRealm()).asFlow()
-    }
-
-    fun getCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getCustomFoldersQuery(mailboxContentRealm()).asFlow()
+    fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery(mailboxContentRealm()).asFlow()
     }
 
     fun getFolder(id: String): Folder? {
@@ -137,42 +133,22 @@ class FolderController @Inject constructor(
         private val isRootFolder = "${Folder.parentsPropertyName}.@count == 0"
 
         //region Queries
-        private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = false): RealmQuery<Folder> {
+        private fun getFoldersQuery(
+            realm: TypedRealm,
+            onlyRoots: Boolean = true,
+            excludeDrafts: Boolean = false,
+        ): RealmQuery<Folder> {
             val rootsQuery = if (onlyRoots) " AND $isRootFolder" else ""
+            val draftsQuery = if (excludeDrafts) " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'" else ""
             return realm
-                .query<Folder>(isNotSearch + rootsQuery)
+                .query<Folder>("$isNotSearch${rootsQuery}${draftsQuery}")
                 .sort(Folder::name.name, Sort.ASCENDING)
                 .sort(Folder::isFavorite.name, Sort.DESCENDING)
-        }
-
-        private fun getDefaultFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-            val hasRole = "${Folder.rolePropertyName} != nil"
-            return realm
-                .query<Folder>("$isNotSearch AND $hasRole")
                 .sort(Folder::roleOrder.name, Sort.DESCENDING)
-        }
-
-        private fun getCustomFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-            val hasNoRole = "${Folder.rolePropertyName} == nil"
-            return realm
-                .query<Folder>("$isNotSearch AND $isRootFolder AND $hasNoRole")
-                .sort(Folder::name.name, Sort.ASCENDING)
-                .sort(Folder::isFavorite.name, Sort.DESCENDING)
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
             return realm.query("NOT ${Folder::id.name} IN $0 AND $isNotSearch", exceptionsFoldersIds)
-        }
-
-        // TODO: Check if we can remove this `excludeDrafts` parameter after
-        //  trying to merge together as much `getFoldersQuery` as possible.
-        private fun getMoveFoldersQuery(realm: TypedRealm, excludeDrafts: Boolean): RealmQuery<Folder> {
-            val draftsQuery = if (excludeDrafts) " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'" else ""
-            return realm
-                .query<Folder>("$isNotSearch AND ${isRootFolder}${draftsQuery}")
-                .sort(Folder::name.name, Sort.ASCENDING)
-                .sort(Folder::isFavorite.name, Sort.DESCENDING)
-                .sort(Folder::roleOrder.name, Sort.DESCENDING)
         }
 
         private fun getFolderQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Folder> {
@@ -183,7 +159,7 @@ class FolderController @Inject constructor(
         //region Get data
         private fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm): RealmResults<Folder> {
             val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
-                getFoldersQuery(realm)
+                getFoldersQuery(realm, onlyRoots = false)
             } else {
                 getFoldersQuery(exceptionsFoldersIds, realm)
             }

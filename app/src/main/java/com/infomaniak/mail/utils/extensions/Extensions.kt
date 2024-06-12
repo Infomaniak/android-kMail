@@ -287,21 +287,6 @@ fun LiveData<UiRecipients>.valueOrEmpty(): List<Recipient> = value?.recipients ?
 //endregion
 
 //region Folders
-fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
-    return toMutableList().let { list ->
-
-        val defaultFolders = list
-            .filter { it.role != null }
-            .sortedBy { it.role?.order }
-            .flattenFolderChildren()
-            .also(list::removeAll)
-
-        val customFolders = list.flattenFolderChildren()
-
-        defaultFolders to customFolders
-    }
-}
-
 fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
 
     if (isEmpty()) return this
@@ -320,11 +305,11 @@ fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): 
                     .sort(Folder::name.name, Sort.ASCENDING)
                     .find()
             }
-            inputList.addAll(0, children)
+            inputList.addAll(index = 0, children)
         } else {
             outputList.add(folder)
             val children = with(folder.children) { if (dismissHiddenChildren) filter { !it.isHidden } else this }
-            inputList.addAll(children)
+            inputList.addAll(index = 0, children)
         }
 
         return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
