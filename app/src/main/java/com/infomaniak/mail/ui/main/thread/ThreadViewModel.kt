@@ -48,6 +48,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 import kotlin.collections.set
 
@@ -105,7 +106,9 @@ class ThreadViewModel @Inject constructor(
 
     fun reassignMessagesLiveWithoutSuperCollapsedBlock(messageUid: String) {
         reassignMessages {
-            messageController.getMessagesAsync(messageUid).map { mapRealmMessagesResultWithoutSuperCollapsedBlock(it.list) }
+            messageController.getMessageAsync(messageUid).mapNotNull {
+                it.obj?.let { message -> mapRealmMessagesResultWithoutSuperCollapsedBlock(message) }
+            }
         }
     }
 
@@ -174,9 +177,9 @@ class ThreadViewModel @Inject constructor(
     }
 
     private suspend fun mapRealmMessagesResultWithoutSuperCollapsedBlock(
-        messages: RealmResults<Message>,
+        message: Message,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> {
-        return formatLists(messages) { _, _ -> MessageBehavior.DISPLAYED }
+        return formatLists(listOf(message)) { _, _ -> MessageBehavior.DISPLAYED }
     }
 
     private fun computeFirstIndexAfterBlock(thread: Thread, list: RealmResults<Message>): Int {
