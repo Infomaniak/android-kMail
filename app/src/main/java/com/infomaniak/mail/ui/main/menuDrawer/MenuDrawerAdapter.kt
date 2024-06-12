@@ -54,7 +54,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private inline val items: List<Any> get() = currentList
 
     private lateinit var currentClassName: String
-    private var currentFolderId: String? = null
     private var hasCollapsableDefaultFolder = false
     private var hasCollapsableCustomFolder = false
 
@@ -128,24 +127,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             quotas,
         ) = mediatorContainer
 
-        fun notifySelectedFolder() {
-
-            fun notifyFolder(folderId: String) {
-                val position = items.indexOfFirst { it is Folder && it.id == folderId }
-                notifyItemChanged(position)
-            }
-
-            val oldId = currentFolderId
-            val newId = currentFolder?.id
-
-            if (newId != oldId) {
-                currentFolderId = newId
-
-                oldId?.let(::notifyFolder)
-                newId?.let(::notifyFolder)
-            }
-        }
-
         val items = mutableListOf<Any>().apply {
 
             var count = 0
@@ -161,7 +142,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             while (count < allFolders.count() && (allFolders[count].role != null || !allFolders[count].isRoot)) {
                 val defaultFolder = allFolders[count]
                 if (defaultFolder.canBeCollapsed) temporaryHasCollapsableDefaultFolder = true
-                add(defaultFolder)
+                defaultFolder.clone().apply { shouldDisplayIsSelected = id == currentFolder?.id }.also(::add)
                 count++
             }
 
@@ -175,7 +156,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                     while (count < allFolders.count()) {
                         val customFolder = allFolders[count]
                         if (customFolder.canBeCollapsed) temporaryHasCollapsableCustomFolder = true
-                        add(customFolder)
+                        customFolder.clone().apply { shouldDisplayIsSelected = id == currentFolder?.id }.also(::add)
                         count++
                     }
                 }
@@ -189,7 +170,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
 
         submitList(items)
-        notifySelectedFolder()
     }
 
     override fun getItemCount(): Int = runCatchingRealm { items.size }.getOrDefault(0)
@@ -359,7 +339,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
         text = folderName
         icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(currentFolderId == folder.id)
+        setSelectedState(folder.shouldDisplayIsSelected)
 
         when (this) {
             is SelectableFolderItemView -> setIndent(folderIndent)
@@ -498,7 +478,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         newItem.threads.count() == oldItem.threads.count() &&
                         newItem.isHidden == oldItem.isHidden &&
                         newItem.canBeCollapsed == oldItem.canBeCollapsed &&
-                        newItem.shouldDisplayDivider == oldItem.shouldDisplayDivider
+                        newItem.shouldDisplayDivider == oldItem.shouldDisplayDivider &&
+                        newItem.shouldDisplayIsSelected == oldItem.shouldDisplayIsSelected
                 ItemType.CUSTOM_FOLDERS_HEADER -> true
                 ItemType.EMPTY_CUSTOM_FOLDERS -> true
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
