@@ -185,6 +185,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             return getMessageQuery(uid, realm).find()
         }
 
+        fun getMessagesByUids(messagesUids: List<String>, realm: MutableRealm): List<Message> {
+            return realm.query<Message>("${Message::uid.name} IN $0", messagesUids).find()
+        }
+
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
             return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()

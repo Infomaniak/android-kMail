@@ -33,6 +33,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
@@ -352,11 +353,18 @@ class ThreadController @Inject constructor(
         }
 
         private fun verifyAttachmentsValues(hasAttachmentsInThread: Boolean, messages: List<Message>, realm: MutableRealm) {
-            messages.flatMapTo(mutableSetOf()) { it.threads }.forEach { thread ->
+            // When this is called for the notifications, the `messages` aren't managed.
+            // In this case we need to query them to use the backlinks to get their parent's threads
+            // Otherwise, we got an IllegalStateException and the notifications aren't shown
+            val localMessages = if (messages.firstOrNull()?.isManaged() == true) {
+                messages
+            } else {
+                MessageController.getMessagesByUids(messages.map(Message::uid), realm)
+            }
+
+            localMessages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
                 if (thread.hasAttachments != hasAttachmentsInThread) {
-                    updateThread(thread.uid, realm) {
-                        it?.hasAttachments = hasAttachmentsInThread
-                    }
+                    updateThread(thread.uid, realm) { it?.hasAttachments = hasAttachmentsInThread }
                 }
             }
         }
