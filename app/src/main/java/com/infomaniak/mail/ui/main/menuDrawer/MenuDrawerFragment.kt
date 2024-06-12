@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer
 
+import android.content.Intent
 import android.os.Bundle
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -26,16 +27,22 @@ import android.transition.TransitionSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.infomaniak.lib.bugtracker.BugTrackerActivity
+import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
+import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
@@ -50,9 +57,12 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogA
 import com.infomaniak.mail.ui.main.InvalidPasswordFragmentArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ConfettiUtils
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.checkForFolderCreationErrors
+import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -122,7 +132,6 @@ class MenuDrawerFragment : Fragment() {
     private fun setupRecyclerView() {
         binding.menuDrawerRecyclerView.adapter = menuDrawerAdapter(
             currentClassName = currentClassName,
-            confettiContainer = (activity as? MainActivity)?.getConfettiContainer(),
             onAskingTransition = ::executeMenuDrawerTransition,
             onAskingToCloseDrawer = ::closeDrawer,
             onMailboxesHeaderClicked = ::onMailboxesHeaderClicked,
@@ -133,6 +142,12 @@ class MenuDrawerFragment : Fragment() {
             onCreateFolderClicked = ::onCreateFolderClicked,
             onFolderClicked = ::onFolderSelected,
             onCollapseChildrenClicked = ::onFolderCollapsed,
+            onSyncAutoConfigClicked = ::onSyncAutoConfigClicked,
+            onImportMailsClicked = ::onImportMailsClicked,
+            onRestoreMailsClicked = ::onRestoreMailsClicked,
+            onFeedbackClicked = ::onFeedbackClicked,
+            onHelpClicked = ::onHelpClicked,
+            onAppVersionClicked = ::onAppVersionClicked,
         )
     }
 
@@ -203,6 +218,60 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onFolderCollapsed(folderId: String, shouldCollapse: Boolean) {
         menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
+    }
+
+    private fun onSyncAutoConfigClicked() {
+        context?.trackSyncAutoConfigEvent("openFromMenuDrawer")
+        launchSyncAutoConfigActivityForResult()
+        closeDrawer()
+    }
+
+    private fun onImportMailsClicked() {
+        context?.trackMenuDrawerEvent("importEmails")
+        context?.openUrl(BuildConfig.IMPORT_EMAILS_URL)
+        closeDrawer()
+    }
+
+    private fun onRestoreMailsClicked() {
+        context?.trackMenuDrawerEvent("restoreEmails")
+        safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = currentClassName)
+    }
+
+    private fun onFeedbackClicked() {
+
+        if (AccountUtils.currentUser?.isStaff == true) {
+            Intent(requireContext(), BugTrackerActivity::class.java).apply {
+                putExtras(
+                    BugTrackerActivityArgs(
+                        user = AccountUtils.currentUser!!,
+                        appBuildNumber = BuildConfig.VERSION_NAME,
+                        bucketIdentifier = BuildConfig.BUGTRACKER_MAIL_BUCKET_ID,
+                        projectName = BuildConfig.BUGTRACKER_MAIL_PROJECT_NAME,
+                        repoGitHub = BuildConfig.GITHUB_REPO,
+                    ).toBundle(),
+                )
+            }.also(::startActivity)
+        } else {
+            context?.trackMenuDrawerEvent("feedback")
+            context?.openUrl(requireContext().getString(R.string.urlUserReportAndroid))
+        }
+
+        closeDrawer()
+    }
+
+    private fun onHelpClicked() {
+        ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SUPPORT.id)
+        context?.trackMenuDrawerEvent("help")
+        context?.openUrl(BuildConfig.CHATBOT_URL)
+        closeDrawer()
+    }
+
+    private fun onAppVersionClicked() {
+        ConfettiUtils.onEasterEggConfettiClicked(
+            container = (activity as? MainActivity)?.getConfettiContainer(),
+            type = ConfettiUtils.ConfettiType.INFOMANIAK,
+            matomoValue = "MenuDrawer",
+        )
     }
 
     private fun observeAllTheThingsSheSaid() = with(mainViewModel) {
