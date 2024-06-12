@@ -353,6 +353,9 @@ class ThreadController @Inject constructor(
         }
 
         private fun verifyAttachmentsValues(hasAttachmentsInThread: Boolean, messages: List<Message>, realm: MutableRealm) {
+            // When this is called for the notifications, the `messages` aren't managed.
+            // In this case we need to query them to use the backlinks to get their parent's threads
+            // Otherwise, we got an IllegalStateException and the notifications aren't shown
             val localMessages = if (messages.firstOrNull()?.isManaged() == true) {
                 messages
             } else {
