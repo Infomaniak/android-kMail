@@ -319,12 +319,15 @@ fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): 
             val children = with(folder.children) {
                 (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
                     .sort(Folder::name.name, Sort.ASCENDING)
+                    .sort(Folder::isFavorite.name, Sort.DESCENDING)
                     .find()
             }
             inputList.addAll(index = 0, children)
         } else {
             outputList.add(folder)
-            val children = with(folder.children) { if (dismissHiddenChildren) filter { !it.isHidden } else this }
+            val children = (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children)
+                .sortedBy { it.name }
+                .sortedBy { !it.isFavorite }
             inputList.addAll(index = 0, children)
         }
 
