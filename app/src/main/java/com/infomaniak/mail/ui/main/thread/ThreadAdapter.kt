@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
@@ -464,32 +465,15 @@ class ThreadAdapter(
 
     @SuppressLint("SetTextI18n")
     private fun MessageViewHolder.bindAttachment(message: Message) = with(binding) {
-        val attachments: MutableList<Attachable> = mutableListOf()
-        attachments.addAll(message.attachments)
-        attachments.addAll(message.swissTransferFiles)
+
+        val attachments = mutableListOf<Attachable>().apply {
+            addAll(message.attachments)
+            addAll(message.swissTransferFiles)
+        }
+
+        val attachmentString = computeAttachmentString(context, message)
 
         val fileSize = formatAttachmentFileSize(attachments)
-
-        var attachmentString = ""
-        if (message.attachments.isNotEmpty()) {
-            attachmentString = context.resources.getQuantityString(
-                R.plurals.attachmentQuantity,
-                message.attachments.size,
-                message.attachments.size
-            )
-
-            if (message.swissTransferFiles.isNotEmpty()) {
-                attachmentString += " " + context.resources.getString(R.string.linkingWord) + " "
-            }
-        }
-
-        if (message.swissTransferFiles.isNotEmpty()) {
-            attachmentString += context.resources.getQuantityString(
-                R.plurals.fileQuantity,
-                message.swissTransferFiles.size,
-                message.swissTransferFiles.size
-            )
-        }
 
         val downloadAllString = context.resources.getString(R.string.buttonDownloadAll)
 
@@ -499,7 +483,7 @@ class ThreadAdapter(
             ForegroundColorSpan(context.getColor(R.color.primary_color_disabled)),
             span.length - downloadAllString.length,
             span.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
         )
 
         attachmentLayout.attachmentsSizeText.text = span
@@ -509,6 +493,33 @@ class ThreadAdapter(
             threadAdapterCallbacks?.onDownloadAllClicked?.invoke(message)
         }
         attachmentLayout.root.isVisible = message.attachments.isNotEmpty() || message.swissTransferFiles.isNotEmpty()
+    }
+
+    private fun computeAttachmentString(context: Context, message: Message): String {
+
+        var attachmentString = ""
+
+        if (message.attachments.isNotEmpty()) {
+            attachmentString = context.resources.getQuantityString(
+                R.plurals.attachmentQuantity,
+                message.attachments.size,
+                message.attachments.size,
+            )
+
+            if (message.swissTransferFiles.isNotEmpty()) {
+                attachmentString += " ${context.resources.getString(R.string.linkingWord)} "
+            }
+        }
+
+        if (message.swissTransferFiles.isNotEmpty()) {
+            attachmentString += context.resources.getQuantityString(
+                R.plurals.fileQuantity,
+                message.swissTransferFiles.size,
+                message.swissTransferFiles.size,
+            )
+        }
+
+        return attachmentString
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachable>): String {

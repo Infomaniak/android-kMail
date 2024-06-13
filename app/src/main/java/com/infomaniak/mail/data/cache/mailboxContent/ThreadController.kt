@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -99,7 +100,7 @@ class ThreadController @Inject constructor(
                 // The Search only returns Messages from TRASH if we explicitly selected this folder,
                 // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
-                    Message.MessageInitialState(
+                    MessageInitialState(
                         date = localMessage?.date ?: remoteMessage.date,
                         isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
                         isTrashed = filterFolder?.role == FolderRole.TRASH,
@@ -317,7 +318,7 @@ class ThreadController @Inject constructor(
                                 } ?: realmListOf()
 
                                 remoteMessage.initLocalValues(
-                                    Message.MessageInitialState(
+                                    MessageInitialState(
                                         date = localMessage.date,
                                         isFullyDownloaded = true,
                                         isTrashed = localMessage.isTrashed,
@@ -326,10 +327,10 @@ class ThreadController @Inject constructor(
                                     ),
                                     latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                     messageIds = localMessage.messageIds,
-                                    swissTransferFiles = swissTransferFiles
+                                    swissTransferFiles = swissTransferFiles,
                                 )
 
-                                if (remoteMessage.hasAttachments) hasAttachmentsInThread = true
+                                hasAttachmentsInThread = remoteMessage.hasAttachments
 
                                 MessageController.upsertMessage(remoteMessage, realm = this)
                             }

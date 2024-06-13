@@ -254,7 +254,7 @@ class ThreadFragment : Fragment() {
                                 navigateToDownloadProgressDialog(
                                     attachment,
                                     attachmentIntentType,
-                                    ThreadFragment::class.java.name
+                                    ThreadFragment::class.java.name,
                                 )
                             },
                             snackbarManager = snackbarManager,
@@ -542,14 +542,14 @@ class ThreadFragment : Fragment() {
     }
 
     private fun downloadAllAttachments(message: Message) {
-        val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }
+        val truncatedSubject = message.subject?.let { it.substring(0..min(MAXIMUM_SUBJECT_LENGTH, it.lastIndex)) }
 
         if (message.attachments.isNotEmpty()) downloadAttachments(message, allAttachmentsFileName(truncatedSubject ?: ""))
 
         message.swissTransferUuid?.let { containerUuid ->
             downloadSwissTransferFiles(
                 containerUuid,
-                allSwissTransferFilesName(truncatedSubject ?: "")
+                allSwissTransferFilesName(truncatedSubject ?: ""),
             )
         }
     }
@@ -705,6 +705,8 @@ class ThreadFragment : Fragment() {
 
         private const val PREVIOUS_CHRONOLOGICAL_THREAD = -1
         private const val NEXT_CHRONOLOGICAL_THREAD = 1
+
+        private const val MAXIMUM_SUBJECT_LENGTH = 30
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"

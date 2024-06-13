@@ -36,7 +36,7 @@ class SwissTransferFile : EmbeddedRealmObject, Attachable {
     //region Remote data
     var uuid: String = ""
     override var name: String = ""
-    override var size: Long = 0
+    override var size: Long = 0L
     @SerialName("type")
     override var mimeType: String = ""
     //endregion

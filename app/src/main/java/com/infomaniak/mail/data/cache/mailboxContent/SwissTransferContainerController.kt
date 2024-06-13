@@ -24,7 +24,7 @@ import io.realm.kotlin.UpdatePolicy
 class SwissTransferContainerController {
 
     companion object {
-        //region Queries
+        //region Edit data
         fun upsertSwissTransferContainer(swissTransferContainer: SwissTransferContainer, realm: MutableRealm) {
             swissTransferContainer.swissTransferFiles.forEach {
                 it.initLocalValues(containerUuid = swissTransferContainer.uuid)

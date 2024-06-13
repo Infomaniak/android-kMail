@@ -38,9 +38,11 @@ class AttachmentActionsViewModel @Inject constructor(
     private val attachmentLocalUuid
         inline get() = savedStateHandle.get<String>(AttachmentActionsBottomSheetDialogArgs::attachmentLocalUuid.name)!!
 
-    val attachment: Attachable? = if (isSwissTransferFile) {
-        runCatching { swissTransferFileController.getSwissTransferFile(attachmentLocalUuid) }.getOrNull()
-    } else {
-        runCatching { attachmentController.getAttachment(attachmentLocalUuid) }.getOrNull()
-    }
+    val attachment: Attachable? = runCatching {
+        if (isSwissTransferFile) {
+            swissTransferFileController.getSwissTransferFile(attachmentLocalUuid)
+        } else {
+            attachmentController.getAttachment(attachmentLocalUuid)
+        }
+    }.getOrNull()
 }

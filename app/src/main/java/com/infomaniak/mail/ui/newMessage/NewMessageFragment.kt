@@ -277,7 +277,7 @@ class NewMessageFragment : Fragment() {
                             navigateToDownloadProgressDialog(
                                 attachment,
                                 attachmentIntentType,
-                                NewMessageFragment::class.java.name
+                                NewMessageFragment::class.java.name,
                             )
                         },
                         snackbarManager = snackbarManager,
