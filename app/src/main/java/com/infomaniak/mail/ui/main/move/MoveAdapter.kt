@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.move
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
@@ -37,7 +36,8 @@ import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -175,59 +175,19 @@ class MoveAdapter @Inject constructor(
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(
-        newFolders: List<Folder>,
-        newCurrentFolderId: String? = null,
-        isSearching: Boolean = false,
-    ) = runCatchingRealm {
-
-        fun foldersWithDividersAndIndents(): List<Folder> {
-            var isFirstCustomFolder = true
-            return newFolders.map { folder ->
-                folder.clone().apply {
-                    shouldDisplayDivider = if (folder.role == null && isFirstCustomFolder) {
-                        isFirstCustomFolder = false
-                        true
-                    } else {
-                        false
-                    }
-                    shouldDisplayIndent = folder.isRoot || !isSearching
-                }
-            }
-        }
-
-        /**
-         * If there was no Folder with children, and then now there's at least one, we need to indent the whole Folders list.
-         */
-        fun notifyCollapsableFolders() {
-            setFoldersJob?.cancel()
-            setFoldersJob = globalCoroutineScope.launch {
-                val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
-
-                val isFirstTime = hasCollapsableFolder == null
-                val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
-                hasCollapsableFolder = newHasCollapsableFolder
-
-                if (!isFirstTime && collapsableFolderExistenceHasChanged) {
-                    Dispatchers.Main { notifyDataSetChanged() }
-                }
-            }
-        }
-
+    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) = runCatchingRealm {
         newCurrentFolderId?.let { currentFolderId = it }
-        submitList(foldersWithDividersAndIndents())
-        if (isInMenuDrawer) notifyCollapsableFolders()
+        submitList(newFolders)
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
         val previousCurrentFolderId = currentFolderId
         currentFolderId = newCurrentFolderId
-        previousCurrentFolderId?.let(::notifyCurrentFolder)
-        notifyCurrentFolder(newCurrentFolderId)
+        previousCurrentFolderId?.let(::notifyFolder)
+        notifyFolder(newCurrentFolderId)
     }
 
-    private fun notifyCurrentFolder(folderId: String) {
+    private fun notifyFolder(folderId: String) {
         val position = currentList.indexOfFirst { it.id == folderId }
         notifyItemChanged(position)
     }
