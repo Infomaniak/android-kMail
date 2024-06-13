@@ -47,7 +47,7 @@ class DownloadAttachmentViewModel @Inject constructor(
 
     private val attachmentLocalUuid
         inline get() = savedStateHandle.get<String>(DownloadAttachmentProgressDialogArgs::attachmentLocalUuid.name)!!
-    
+
     /**
      * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading
      */

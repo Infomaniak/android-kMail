@@ -23,6 +23,7 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -30,6 +31,7 @@ import kotlinx.serialization.UseSerializers
 @Serializable
 class SwissTransferContainer : RealmObject {
     //region Remote data
+    @PrimaryKey
     var uuid: String = ""
     @SerialName("nbfiles")
     var nbFiles: Int = 0

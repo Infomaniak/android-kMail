@@ -221,7 +221,7 @@ class Message : RealmObject {
         messageInitialState: MessageInitialState,
         latestCalendarEventResponse: CalendarEventResponse?,
         messageIds: RealmSet<String>? = null,
-        swissTransferFiles: RealmList<SwissTransferFile> = realmListOf()
+        swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
     ) {
 
         this.date = messageInitialState.date
@@ -335,6 +335,6 @@ class Message : RealmObject {
         val isFullyDownloaded: Boolean,
         val isTrashed: Boolean,
         val isFromSearch: Boolean,
-        val draftLocalUuid: String?
+        val draftLocalUuid: String?,
     )
 }

@@ -49,7 +49,7 @@ interface Attachable {
     fun getCacheFile(
         context: Context,
         userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId
+        mailboxId: Int = AccountUtils.currentMailboxId,
     ): File
 
     enum class AttachmentType(@DrawableRes val icon: Int) {

@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
@@ -749,7 +750,7 @@ class RefreshController @Inject constructor(
         }
 
         remoteMessage.initLocalValues(
-            Message.MessageInitialState(
+            MessageInitialState(
                 date = remoteMessage.date,
                 isFullyDownloaded = false,
                 isTrashed = folder.role == FolderRole.TRASH,
