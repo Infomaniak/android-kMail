@@ -276,11 +276,12 @@ class MenuDrawerFragment : Fragment() {
 
     private fun observeAllTheThingsSheSaid() = with(mainViewModel) {
 
+        currentFolder.observeNotNull(viewLifecycleOwner, menuDrawerAdapter::notifySelectedFolder)
+
         Utils.waitInitMediator(
             currentMailbox,
             menuDrawerViewModel.areMailboxesExpanded,
             menuDrawerViewModel.otherMailboxesLive,
-            currentFolder,
             currentFoldersLive,
             menuDrawerViewModel.areCustomFoldersExpanded,
             currentPermissionsLive,
@@ -291,11 +292,10 @@ class MenuDrawerFragment : Fragment() {
                     it[0] as Mailbox?,
                     it[1] as Boolean,
                     it[2] as List<Mailbox>,
-                    it[3] as Folder?,
-                    it[4] as List<Folder>,
-                    it[5] as Boolean,
-                    it[6] as MailboxPermissions?,
-                    it[7] as Quotas?,
+                    it[3] as List<Folder>,
+                    it[4] as Boolean,
+                    it[5] as MailboxPermissions?,
+                    it[6] as Quotas?,
                 )
             }
         ).observe(viewLifecycleOwner, menuDrawerAdapter::setItems)
@@ -327,7 +327,6 @@ class MenuDrawerFragment : Fragment() {
         val currentMailbox: Mailbox?,
         val areMailboxesExpanded: Boolean,
         val otherMailboxes: List<Mailbox>,
-        val currentFolder: Folder?,
         val allFolders: List<Folder>,
         val areCustomFoldersExpanded: Boolean,
         val permissions: MailboxPermissions?,
