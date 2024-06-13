@@ -45,8 +45,6 @@ class MoveAdapter @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
 ) : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
 
-    private inline val folders: List<Folder> get() = currentList
-
     private var setFoldersJob: Job? = null
 
     private var currentFolderId: String? = null
@@ -74,7 +72,7 @@ class MoveAdapter @Inject constructor(
         return this
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
+    override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
 
     override fun getItemViewType(position: Int): Int {
         return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
@@ -93,7 +91,7 @@ class MoveAdapter @Inject constructor(
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         if (payloads.firstOrNull() == Unit) {
-            val folder = folders[position]
+            val folder = currentList[position]
             if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
                 (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == folder.id)
             }
@@ -103,7 +101,7 @@ class MoveAdapter @Inject constructor(
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
-        val folder = folders[position]
+        val folder = currentList[position]
 
         when (getItemViewType(position)) {
             DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
@@ -220,12 +218,12 @@ class MoveAdapter @Inject constructor(
     fun updateSelectedState(newCurrentFolderId: String) {
         val previousCurrentFolderId = currentFolderId
         currentFolderId = newCurrentFolderId
-        previousCurrentFolderId?.let(::notifyCurrentItem)
-        notifyCurrentItem(newCurrentFolderId)
+        previousCurrentFolderId?.let(::notifyCurrentFolder)
+        notifyCurrentFolder(newCurrentFolderId)
     }
 
-    private fun notifyCurrentItem(folderId: String) {
-        val position = folders.indexOfFirst { it.id == folderId }
+    private fun notifyCurrentFolder(folderId: String) {
+        val position = currentList.indexOfFirst { it.id == folderId }
         notifyItemChanged(position)
     }
 
