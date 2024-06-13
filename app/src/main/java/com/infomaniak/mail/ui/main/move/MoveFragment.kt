@@ -172,8 +172,8 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun observeSearchResults() {
-        moveViewModel.filterResults.observe(viewLifecycleOwner) { folders ->
-            searchResultsAdapter.setFolders(folders, currentFolderId)
+        moveViewModel.filterResults.observe(viewLifecycleOwner) { filteredFolders ->
+            searchResultsAdapter.setFolders(filteredFolders, currentFolderId)
         }
     }
 }
