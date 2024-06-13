@@ -127,8 +127,8 @@ class MoveFragment : Fragment() {
     }
 
     private fun observeSearchResults() {
-        moveViewModel.filterResults.observe(viewLifecycleOwner) { (folders, currentFolderId) ->
-            moveAdapter.setFolders(folders, currentFolderId, isSearching = true)
+        moveViewModel.filterResults.observe(viewLifecycleOwner) { (filteredFolders, currentFolderId) ->
+            moveAdapter.setFolders(filteredFolders, currentFolderId, isSearching = true)
         }
     }
 

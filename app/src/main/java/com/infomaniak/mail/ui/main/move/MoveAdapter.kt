@@ -38,8 +38,6 @@ import kotlin.math.min
 
 class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
 
-    private inline val folders: List<Folder> get() = currentList
-
     private var currentFolderId: String? = null
 
     private lateinit var onFolderClicked: (folderId: String) -> Unit
@@ -55,7 +53,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         return this
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
+    override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
 
     override fun getItemViewType(position: Int): Int = R.layout.item_selectable_folder
 
@@ -67,14 +65,14 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         if (payloads.firstOrNull() == Unit) {
-            (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == folders[position].id)
+            (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == currentList[position].id)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
-        (this as ItemSelectableFolderBinding).root.displayFolder(folders[position])
+        (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position])
     }
 
     private fun SelectableItemView.displayFolder(folder: Folder) {
