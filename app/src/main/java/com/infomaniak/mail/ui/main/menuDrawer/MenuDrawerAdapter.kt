@@ -393,6 +393,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     private fun ItemMenuDrawerFooterBinding.displayFooter(footer: MenuDrawerFooter) = with(root) {
+
         // Actions header
         advancedActions.setOnClickListener {
             onAskingTransition()
