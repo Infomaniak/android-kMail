@@ -56,7 +56,15 @@ class MoveViewModel @Inject constructor(
         val currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
             ?: threadController.getThread(threadsUids.first())!!.folderId
 
-        val folders = folderController.getMoveFolders().flattenFolderChildren()
+        var isFirstRootAndCustom = true
+        val folders = folderController.getMoveFolders().flattenFolderChildren().map { folder ->
+            folder.apply {
+                if (isRootAndCustom && isFirstRootAndCustom) {
+                    isFirstRootAndCustom = false
+                    shouldDisplayDivider = true
+                }
+            }
+        }
 
         emit(folders to currentFolderId)
     }
@@ -73,9 +81,24 @@ class MoveViewModel @Inject constructor(
                 delay(FILTER_DEBOUNCE_DURATION)
                 ensureActive()
             }
-            val filteredFolders = folders.filter { folder ->
+
+            var isFirstRootAndCustom = true
+            val filteredFolders = folders.mapNotNull { folder ->
                 val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
-                folderName.standardize().contains(query.standardize())
+                val isFound = folderName.standardize().contains(query.standardize())
+                if (isFound) {
+                    folder.clone().apply {
+                        shouldDisplayDivider = if (isRootAndCustom && isFirstRootAndCustom) {
+                            isFirstRootAndCustom = false
+                            true
+                        } else {
+                            false
+                        }
+                        shouldDisplayIndent = false
+                    }
+                } else {
+                    null
+                }
             }
 
             filterResults.postValue(filteredFolders to currentFolderId)

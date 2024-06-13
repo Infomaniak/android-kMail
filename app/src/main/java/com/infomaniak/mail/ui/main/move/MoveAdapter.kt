@@ -97,25 +97,9 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         setOnClickListener { onFolderClicked.invoke(folder.id) }
     }
 
-    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null, isSearching: Boolean) = runCatchingRealm {
-
-        fun foldersWithDividersAndIndents(): List<Folder> {
-            var isFirstCustomFolder = true
-            return newFolders.map { folder ->
-                folder.clone().apply {
-                    shouldDisplayDivider = if (folder.role == null && folder.isRoot && isFirstCustomFolder) {
-                        isFirstCustomFolder = false
-                        true
-                    } else {
-                        false
-                    }
-                    shouldDisplayIndent = folder.isRoot || !isSearching
-                }
-            }
-        }
-
+    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) = runCatchingRealm {
         newCurrentFolderId?.let { currentFolderId = it }
-        submitList(foldersWithDividersAndIndents())
+        submitList(newFolders)
     }
 
     companion object {

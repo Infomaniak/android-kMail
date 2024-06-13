@@ -116,6 +116,9 @@ class Folder : RealmObject, Cloneable {
     val isRoot: Boolean
         inline get() = !path.contains(separator)
 
+    val isRootAndCustom: Boolean
+        inline get() = role == null && isRoot
+
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,
         cursor: String?,
