@@ -180,8 +180,4 @@ class MoveFragment : Fragment() {
         moveViewModel.cancelSearch()
         super.onStop()
     }
-
-    companion object {
-        private const val INVALID_CHARACTERS_PATTERN = "[/'\"]"
-    }
 }
