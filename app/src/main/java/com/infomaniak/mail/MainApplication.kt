@@ -279,7 +279,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         return CoilUtils.newImageLoader(
             applicationContext,
             tokenInterceptorListener(),
-            customComponents = listOf(SvgDecoder.Factory())
+            customFactories = listOf(SvgDecoder.Factory())
         )
     }
 
