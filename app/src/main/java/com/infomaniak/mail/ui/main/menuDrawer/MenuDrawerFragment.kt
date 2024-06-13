@@ -58,6 +58,7 @@ import com.infomaniak.mail.ui.main.InvalidPasswordFragmentArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ConfettiUtils
+import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType.INFOMANIAK
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
@@ -269,7 +270,7 @@ class MenuDrawerFragment : Fragment() {
     private fun onAppVersionClicked() {
         ConfettiUtils.onEasterEggConfettiClicked(
             container = (activity as? MainActivity)?.getConfettiContainer(),
-            type = ConfettiUtils.ConfettiType.INFOMANIAK,
+            type = INFOMANIAK,
             matomoValue = "MenuDrawer",
         )
     }
