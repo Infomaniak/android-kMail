@@ -31,7 +31,7 @@ import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomSheetScaffoldingBinding
-import com.infomaniak.mail.ui.main.menu.SimpleSettingView
+import com.infomaniak.mail.ui.main.menuDrawer.SimpleSettingView
 import com.infomaniak.lib.core.R as RCore
 
 class BottomSheetScaffoldingView @JvmOverloads constructor(

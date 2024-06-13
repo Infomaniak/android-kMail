@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.move
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -31,9 +31,9 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
-import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
+import com.infomaniak.mail.ui.main.move.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
@@ -76,12 +76,18 @@ class FolderAdapter @Inject constructor(
         return this
     }
 
+    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
+
+    override fun getItemViewType(position: Int): Int {
+        return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = if (viewType == DisplayType.SELECTABLE_FOLDER.layout) {
             ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
         } else {
-            ItemFolderMenuDrawerBinding.inflate(layoutInflater, parent, false)
+            ItemMenuDrawerFolderBinding.inflate(layoutInflater, parent, false)
         }
 
         return FolderViewHolder(binding)
@@ -103,15 +109,9 @@ class FolderAdapter @Inject constructor(
 
         when (getItemViewType(position)) {
             DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
-            DisplayType.MENU_DRAWER.layout -> (this as ItemFolderMenuDrawerBinding).root.displayMenuDrawerFolder(folder)
+            DisplayType.MENU_DRAWER.layout -> (this as ItemMenuDrawerFolderBinding).root.displayMenuDrawerFolder(folder)
         }
     }
-
-    override fun getItemViewType(position: Int): Int {
-        return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
-    }
-
-    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
 
     private fun UnreadFolderItemView.displayMenuDrawerFolder(folder: Folder) {
 
@@ -212,7 +212,7 @@ class FolderAdapter @Inject constructor(
 
     private enum class DisplayType(val layout: Int) {
         SELECTABLE_FOLDER(R.layout.item_selectable_folder),
-        MENU_DRAWER(R.layout.item_folder_menu_drawer),
+        MENU_DRAWER(R.layout.item_menu_drawer_folder),
     }
 
     companion object {
