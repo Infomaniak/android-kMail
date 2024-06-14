@@ -59,6 +59,7 @@ class MoveViewModel @Inject constructor(
     private var allFolders = emptyList<Folder>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
     val filterResults = MutableLiveData<List<Folder>>()
+    var hasAlreadyTrackedSearch = false
 
     init {
         viewModelScope.launch(ioCoroutineContext) {
@@ -110,7 +111,7 @@ class MoveViewModel @Inject constructor(
                 val isFound = folderName.standardize().contains(query.standardize())
                 if (isFound) {
                     folder.clone().apply {
-                        shouldDisplayDivider = if (isRootAndCustom && isFirstRootAndCustom) {
+                        shouldDisplayDivider = if (isFirstRootAndCustom && isRootAndCustom) {
                             isFirstRootAndCustom = false
                             true
                         } else {
