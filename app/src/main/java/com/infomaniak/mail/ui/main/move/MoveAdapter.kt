@@ -54,7 +54,7 @@ class MoveAdapter @Inject constructor(
 
     private var setFoldersJob: Job? = null
 
-    private var currentFolderId: String? = null
+    private var sourceFolderId: String? = null
     private var hasCollapsableFolder: Boolean? = null
     private var isInMenuDrawer: Boolean = true
     private var shouldIndent: Boolean = true
@@ -100,7 +100,7 @@ class MoveAdapter @Inject constructor(
         if (payloads.firstOrNull() == Unit) {
             val folder = currentList[position]
             if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
-                (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == folder.id)
+                (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(sourceFolderId == folder.id)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -156,7 +156,7 @@ class MoveAdapter @Inject constructor(
         tag = if (folder.shouldDisplayDivider) null else UiUtils.IGNORE_DIVIDER_TAG
         text = folderName
         icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(currentFolderId == folder.id)
+        setSelectedState(sourceFolderId == folder.id)
 
         when (this) {
             is SelectableFolderItemView -> setIndent(folderIndent)
@@ -182,16 +182,16 @@ class MoveAdapter @Inject constructor(
         }
     }
 
-    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) = runCatchingRealm {
-        newCurrentFolderId?.let { currentFolderId = it }
+    fun setFolders(newFolders: List<Folder>, newSourceFolderId: String? = null) = runCatchingRealm {
+        newSourceFolderId?.let { sourceFolderId = it }
         submitList(newFolders)
     }
 
-    fun updateSelectedState(newCurrentFolderId: String) {
-        val previousCurrentFolderId = currentFolderId
-        currentFolderId = newCurrentFolderId
-        previousCurrentFolderId?.let(::notifyFolder)
-        notifyFolder(newCurrentFolderId)
+    fun updateSelectedState(newSourceFolderId: String) {
+        val oldSourceFolderId = sourceFolderId
+        sourceFolderId = newSourceFolderId
+        oldSourceFolderId?.let(::notifyFolder)
+        notifyFolder(newSourceFolderId)
     }
 
     private fun notifyFolder(folderId: String) {

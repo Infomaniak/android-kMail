@@ -80,7 +80,7 @@ class MoveFragment : Fragment() {
         setupRecyclerView()
         setupListeners()
         setupCreateFolderDialog()
-        observeFolders()
+        observeAllFolders()
         observeSearchResults()
         observeFolderCreation()
     }
@@ -120,17 +120,15 @@ class MoveFragment : Fragment() {
         )
     }
 
-    private fun observeFolders() {
-        moveViewModel.getCurrentFolderAndAllFolders().observe(viewLifecycleOwner) { (allFolders, currentFolderId) ->
-            moveAdapter.setFolders(allFolders, currentFolderId)
-            setupSearchBar(allFolders, currentFolderId)
+    private fun observeAllFolders() {
+        moveViewModel.getAllFoldersAndSourceFolder().observe(viewLifecycleOwner) { (allFolders, sourceFolderId) ->
+            moveAdapter.setFolders(allFolders, sourceFolderId)
+            setupSearchBar(allFolders)
         }
     }
 
     private fun observeSearchResults() {
-        moveViewModel.filterResults.observe(viewLifecycleOwner) { (filteredFolders, currentFolderId) ->
-            moveAdapter.setFolders(filteredFolders, currentFolderId)
-        }
+        moveViewModel.filterResults.observe(viewLifecycleOwner, moveAdapter::setFolders)
     }
 
     private fun observeFolderCreation() = with(mainViewModel) {
@@ -160,7 +158,7 @@ class MoveFragment : Fragment() {
         else -> null
     }
 
-    private fun setupSearchBar(allFolders: List<Folder>, currentFolderId: String) = with(binding) {
+    private fun setupSearchBar(allFolders: List<Folder>) = with(binding) {
 
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
 
@@ -169,9 +167,9 @@ class MoveFragment : Fragment() {
             doOnTextChanged { newQuery, _, _, _ ->
 
                 if (newQuery?.isNotBlank() == true) {
-                    moveViewModel.filterFolders(newQuery.toString(), allFolders, currentFolderId, shouldDebounce = true)
+                    moveViewModel.filterFolders(newQuery.toString(), allFolders, shouldDebounce = true)
                 } else {
-                    moveAdapter.setFolders(allFolders, currentFolderId)
+                    moveAdapter.setFolders(allFolders)
                 }
 
                 if (!hasAlreadyTrackedSearch) {
@@ -181,7 +179,7 @@ class MoveFragment : Fragment() {
             }
 
             handleEditorSearchAction { query ->
-                moveViewModel.filterFolders(query, allFolders, currentFolderId, shouldDebounce = false)
+                moveViewModel.filterFolders(query, allFolders, shouldDebounce = false)
                 trackMoveSearchEvent(SEARCH_VALIDATE_NAME)
             }
         }
