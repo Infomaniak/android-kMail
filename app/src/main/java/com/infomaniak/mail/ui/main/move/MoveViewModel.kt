@@ -18,7 +18,10 @@
 package com.infomaniak.mail.ui.main.move
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -44,42 +47,54 @@ class MoveViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private var filterJob: Job? = null
+    private var searchJob: Job? = null
 
     private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
-    var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
+    private var allFolders = emptyList<Folder>()
+    val sourceFolderIdLiveData = MutableLiveData<String>()
+    val filterResults = MutableLiveData<List<Folder>>()
 
-    fun getAllFoldersAndSourceFolder() = liveData(ioCoroutineContext) {
+    init {
+        viewModelScope.launch(ioCoroutineContext) {
 
-        fun List<Folder>.addDividerToFirstCustomFolder(): List<Folder> {
-            var needsToAddDivider = true
-            return map { folder ->
-                folder.apply {
-                    if (needsToAddDivider && isRootAndCustom) {
-                        needsToAddDivider = false
-                        shouldDisplayDivider = true
+            fun List<Folder>.addDividerToFirstCustomFolder(): List<Folder> {
+                var needsToAddDivider = true
+                return map { folder ->
+                    folder.apply {
+                        if (needsToAddDivider && isRootAndCustom) {
+                            needsToAddDivider = false
+                            shouldDisplayDivider = true
+                        }
                     }
                 }
             }
+
+            allFolders = folderController.getMoveFolders()
+                .flattenFolderChildren()
+                .addDividerToFirstCustomFolder()
+                .also(filterResults::postValue)
+
+            val sourceFolderId = messageUid?.let(messageController::getMessage)?.folderId
+                ?: threadController.getThread(threadsUids.first())!!.folderId
+
+            sourceFolderIdLiveData.postValue(sourceFolderId)
         }
-
-        val allFolders = folderController.getMoveFolders().flattenFolderChildren().addDividerToFirstCustomFolder()
-
-        val sourceFolderId = messageUid?.let(messageController::getMessage)?.folderId
-            ?: threadController.getThread(threadsUids.first())!!.folderId
-
-        emit(allFolders to sourceFolderId)
     }
 
-    fun filterFolders(
-        query: String,
-        allFolders: List<Folder>,
-        shouldDebounce: Boolean,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        filterJob?.cancel()
-        filterJob = launch {
+    fun filterFolders(query: CharSequence?, shouldDebounce: Boolean) {
+        if (query?.isNotBlank() == true) {
+            searchFolders(query, shouldDebounce)
+        } else {
+            filterResults.value = allFolders
+        }
+    }
+
+    private fun searchFolders(query: CharSequence, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+        searchJob?.cancel()
+        searchJob = launch {
+
             if (shouldDebounce) {
                 delay(FILTER_DEBOUNCE_DURATION)
                 ensureActive()
@@ -109,7 +124,7 @@ class MoveViewModel @Inject constructor(
     }
 
     fun cancelSearch() {
-        filterJob?.cancel()
+        searchJob?.cancel()
     }
 
     override fun onCleared() {
