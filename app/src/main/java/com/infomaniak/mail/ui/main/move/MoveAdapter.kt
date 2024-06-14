@@ -36,16 +36,10 @@ import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import javax.inject.Inject
 import kotlin.math.min
 
-class MoveAdapter @Inject constructor(
-    private val globalCoroutineScope: CoroutineScope,
-) : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
-
-    private var setFoldersJob: Job? = null
+class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
 
     var sourceFolderId: String? = null
     private var hasCollapsableFolder: Boolean? = null
