@@ -22,7 +22,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
@@ -82,20 +81,5 @@ abstract class MenuFoldersFragment : Fragment() {
     open fun setupAdapters() {
         defaultFoldersList.adapter = defaultFoldersAdapter
         customFoldersList.adapter = customFoldersAdapter
-    }
-
-    /**
-     * Asynchronously validate folder name locally
-     * @return error string, otherwise null
-     */
-    protected fun checkForFolderCreationErrors(folderName: CharSequence): String? = when {
-        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
-        folderName.contains(Regex(INVALID_CHARACTERS_PATTERN)) -> getString(R.string.errorNewFolderInvalidCharacter)
-        folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
-        else -> null
-    }
-
-    companion object {
-        private const val INVALID_CHARACTERS_PATTERN = "[/'\"]"
     }
 }
