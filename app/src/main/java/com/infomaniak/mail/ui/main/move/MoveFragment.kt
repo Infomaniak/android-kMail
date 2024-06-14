@@ -122,7 +122,8 @@ class MoveFragment : Fragment() {
 
     private fun observeAllFolders() {
         moveViewModel.getAllFoldersAndSourceFolder().observe(viewLifecycleOwner) { (allFolders, sourceFolderId) ->
-            moveAdapter.setFolders(allFolders, sourceFolderId)
+            moveAdapter.sourceFolderId = sourceFolderId
+            moveViewModel.filterResults.value = allFolders
             setupSearchBar(allFolders)
         }
     }
@@ -169,7 +170,7 @@ class MoveFragment : Fragment() {
                 if (newQuery?.isNotBlank() == true) {
                     moveViewModel.filterFolders(newQuery.toString(), allFolders, shouldDebounce = true)
                 } else {
-                    moveAdapter.setFolders(allFolders)
+                    moveViewModel.filterResults.value = allFolders
                 }
 
                 if (!hasAlreadyTrackedSearch) {
