@@ -174,19 +174,26 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     fun notifySelectedFolder(currentFolder: Folder) {
 
-        fun notifyFolder(folderId: String) {
-            val position = items.indexOfFirst { it is Folder && it.id == folderId }
-            notifyItemChanged(position)
-        }
-
         val oldId = currentFolderId
         val newId = currentFolder.id
 
         if (newId != oldId) {
             currentFolderId = newId
 
-            oldId?.let(::notifyFolder)
-            newId.let(::notifyFolder)
+            var oldIsFound = false
+            var newIsFound = false
+            run breaking@{
+                items.forEachIndexed { index, item ->
+                    if (item is Folder && item.id == oldId) {
+                        oldIsFound = true
+                        notifyItemChanged(index)
+                    } else if (item is Folder && item.id == newId) {
+                        newIsFound = true
+                        notifyItemChanged(index)
+                    }
+                    if (oldIsFound && newIsFound) return@breaking
+                }
+            }
         }
     }
 
