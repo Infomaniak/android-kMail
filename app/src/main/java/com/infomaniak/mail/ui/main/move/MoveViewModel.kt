@@ -49,34 +49,33 @@ class MoveViewModel @Inject constructor(
     private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
-    var filterResults: MutableLiveData<Pair<List<Folder>, String>> = MutableLiveData()
+    var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
 
-    fun getCurrentFolderAndAllFolders() = liveData(ioCoroutineContext) {
+    fun getAllFoldersAndSourceFolder() = liveData(ioCoroutineContext) {
 
         fun List<Folder>.addDividerToFirstCustomFolder(): List<Folder> {
-        var needsToAddDivider = true
-        return map { folder ->
-            folder.apply {
-                if (needsToAddDivider && isRootAndCustom) {
-                    needsToAddDivider = false
-                    shouldDisplayDivider = true
+            var needsToAddDivider = true
+            return map { folder ->
+                folder.apply {
+                    if (needsToAddDivider && isRootAndCustom) {
+                        needsToAddDivider = false
+                        shouldDisplayDivider = true
+                    }
                 }
             }
         }
-    }
-
-        val currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
-            ?: threadController.getThread(threadsUids.first())!!.folderId
 
         val allFolders = folderController.getMoveFolders().flattenFolderChildren().addDividerToFirstCustomFolder()
 
-        emit(allFolders to currentFolderId)
+        val sourceFolderId = messageUid?.let(messageController::getMessage)?.folderId
+            ?: threadController.getThread(threadsUids.first())!!.folderId
+
+        emit(allFolders to sourceFolderId)
     }
 
     fun filterFolders(
         query: String,
-        folders: List<Folder>,
-        currentFolderId: String,
+        allFolders: List<Folder>,
         shouldDebounce: Boolean,
     ) = viewModelScope.launch(ioCoroutineContext) {
         filterJob?.cancel()
@@ -87,7 +86,7 @@ class MoveViewModel @Inject constructor(
             }
 
             var isFirstRootAndCustom = true
-            val filteredFolders = folders.mapNotNull { folder ->
+            val filteredFolders = allFolders.mapNotNull { folder ->
                 val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
                 val isFound = folderName.standardize().contains(query.standardize())
                 if (isFound) {
@@ -105,7 +104,7 @@ class MoveViewModel @Inject constructor(
                 }
             }
 
-            filterResults.postValue(filteredFolders to currentFolderId)
+            filterResults.postValue(filteredFolders)
         }
     }
 
