@@ -54,7 +54,7 @@ class MoveAdapter @Inject constructor(
 
     private var setFoldersJob: Job? = null
 
-    private var sourceFolderId: String? = null
+    var sourceFolderId: String? = null
     private var hasCollapsableFolder: Boolean? = null
     private var isInMenuDrawer: Boolean = true
     private var shouldIndent: Boolean = true
