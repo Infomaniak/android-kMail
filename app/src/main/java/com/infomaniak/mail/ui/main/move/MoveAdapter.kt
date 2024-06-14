@@ -50,7 +50,7 @@ import kotlin.math.min
 
 class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
 
-    var sourceFolderId: String? = null
+    private var sourceFolderId: String? = null
     private var hasCollapsableFolder: Boolean? = null
     private var isInMenuDrawer: Boolean = true
     private var shouldIndent: Boolean = true
@@ -73,6 +73,10 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         this.onCollapseTransition = onCollapseTransition
 
         return this
+    }
+
+    fun setSourceFolderId(id: String) {
+        sourceFolderId = id
     }
 
     override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
