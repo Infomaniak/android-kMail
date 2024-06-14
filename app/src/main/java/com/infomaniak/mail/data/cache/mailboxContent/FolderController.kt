@@ -45,8 +45,8 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
-    fun getMoveFolders(excludeDrafts: Boolean = false): RealmResults<Folder> {
-        return getMoveFoldersQuery(mailboxContentRealm(), excludeDrafts).find()
+    fun getMoveFolders(): RealmResults<Folder> {
+        return getMoveFoldersQuery(mailboxContentRealm(), excludeDrafts = true).find()
     }
 
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
