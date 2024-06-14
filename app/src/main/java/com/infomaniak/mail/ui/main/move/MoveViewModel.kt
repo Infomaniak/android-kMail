@@ -61,20 +61,24 @@ class MoveViewModel @Inject constructor(
 
     fun getCurrentFolderAndAllFolders() = liveData(ioCoroutineContext) {
 
-        val currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
-            ?: threadController.getThread(threadsUids.first())!!.folderId
-
-        var isFirstRootAndCustom = true
-        val folders = folderController.getMoveFolders().flattenFolderChildren().map { folder ->
+        fun List<Folder>.addDividerToFirstCustomFolder(): List<Folder> {
+        var needsToAddDivider = true
+        return map { folder ->
             folder.apply {
-                if (isRootAndCustom && isFirstRootAndCustom) {
-                    isFirstRootAndCustom = false
+                if (needsToAddDivider && isRootAndCustom) {
+                    needsToAddDivider = false
                     shouldDisplayDivider = true
                 }
             }
         }
+    }
 
-        emit(folders to currentFolderId)
+        val currentFolderId = messageUid?.let(messageController::getMessage)?.folderId
+            ?: threadController.getThread(threadsUids.first())!!.folderId
+
+        val allFolders = folderController.getMoveFolders().flattenFolderChildren().addDividerToFirstCustomFolder()
+
+        emit(allFolders to currentFolderId)
     }
 
     fun filterFolders(
