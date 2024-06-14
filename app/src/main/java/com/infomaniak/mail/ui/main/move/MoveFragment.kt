@@ -62,8 +62,6 @@ class MoveFragment : Fragment() {
     @Inject
     lateinit var moveAdapter: MoveAdapter
 
-    private var hasAlreadyTrackedSearch = false
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMoveBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -150,9 +148,9 @@ class MoveFragment : Fragment() {
         searchTextInput.apply {
             doOnTextChanged { newQuery, _, _, _ ->
                 moveViewModel.filterFolders(newQuery, shouldDebounce = true)
-                if (!hasAlreadyTrackedSearch) {
+                if (!moveViewModel.hasAlreadyTrackedSearch) {
                     trackMoveSearchEvent("executeSearch")
-                    hasAlreadyTrackedSearch = true
+                    moveViewModel.hasAlreadyTrackedSearch = true
                 }
             }
 
