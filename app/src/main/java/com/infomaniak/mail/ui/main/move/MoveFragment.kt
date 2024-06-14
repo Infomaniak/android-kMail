@@ -41,10 +41,7 @@ import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
-import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -116,7 +113,9 @@ class MoveFragment : Fragment() {
                 trackCreateFolderEvent("confirm")
                 mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
             },
-            onErrorCheck = ::checkForFolderCreationErrors,
+            onErrorCheck = { folderName ->
+                requireContext().checkForFolderCreationErrors(folderName, folderController)
+            },
         )
     }
 
@@ -144,17 +143,6 @@ class MoveFragment : Fragment() {
         findNavController().popBackStack()
     }
 
-    /**
-     * Asynchronously validate folder name locally
-     * @return error string, otherwise null
-     */
-    private fun checkForFolderCreationErrors(folderName: CharSequence): String? = when {
-        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
-        folderName.contains(Regex(INVALID_CHARACTERS_PATTERN)) -> getString(R.string.errorNewFolderInvalidCharacter)
-        folderController.getRootFolder(folderName.toString()) != null -> context?.getString(R.string.errorNewFolderAlreadyExists)
-        else -> null
-    }
-
     private fun setupSearchBar() = with(binding) {
 
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
@@ -179,9 +167,5 @@ class MoveFragment : Fragment() {
         binding.searchTextInput.hideKeyboard()
         moveViewModel.cancelSearch()
         super.onStop()
-    }
-
-    companion object {
-        private const val INVALID_CHARACTERS_PATTERN = "[/'\"]"
     }
 }
