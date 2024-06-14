@@ -37,7 +37,6 @@ import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMoveSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
@@ -80,7 +79,8 @@ class MoveFragment : Fragment() {
         setupRecyclerView()
         setupListeners()
         setupCreateFolderDialog()
-        observeAllFolders()
+        setupSearchBar()
+        observeSourceFolderId()
         observeSearchResults()
         observeFolderCreation()
     }
@@ -120,12 +120,8 @@ class MoveFragment : Fragment() {
         )
     }
 
-    private fun observeAllFolders() {
-        moveViewModel.getAllFoldersAndSourceFolder().observe(viewLifecycleOwner) { (allFolders, sourceFolderId) ->
-            moveAdapter.sourceFolderId = sourceFolderId
-            moveViewModel.filterResults.value = allFolders
-            setupSearchBar(allFolders)
-        }
+    private fun observeSourceFolderId() {
+        moveViewModel.sourceFolderIdLiveData.observe(viewLifecycleOwner, moveAdapter::setSourceFolderId)
     }
 
     private fun observeSearchResults() {
@@ -159,20 +155,13 @@ class MoveFragment : Fragment() {
         else -> null
     }
 
-    private fun setupSearchBar(allFolders: List<Folder>) = with(binding) {
+    private fun setupSearchBar() = with(binding) {
 
         searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
 
         searchTextInput.apply {
-
             doOnTextChanged { newQuery, _, _, _ ->
-
-                if (newQuery?.isNotBlank() == true) {
-                    moveViewModel.filterFolders(newQuery.toString(), allFolders, shouldDebounce = true)
-                } else {
-                    moveViewModel.filterResults.value = allFolders
-                }
-
+                moveViewModel.filterFolders(newQuery, shouldDebounce = true)
                 if (!hasAlreadyTrackedSearch) {
                     trackMoveSearchEvent("executeSearch")
                     hasAlreadyTrackedSearch = true
@@ -180,7 +169,7 @@ class MoveFragment : Fragment() {
             }
 
             handleEditorSearchAction { query ->
-                moveViewModel.filterFolders(query, allFolders, shouldDebounce = false)
+                moveViewModel.filterFolders(query, shouldDebounce = false)
                 trackMoveSearchEvent(SEARCH_VALIDATE_NAME)
             }
         }
