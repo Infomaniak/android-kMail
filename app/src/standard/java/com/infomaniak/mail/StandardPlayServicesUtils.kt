@@ -72,9 +72,11 @@ class StandardPlayServicesUtils @Inject constructor(
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Sentry.withScope { scope ->
-                    scope.setExtra("task.exception", task.exception.toString())
-                    Sentry.captureMessage("Fetching FCM registration token failed", SentryLevel.ERROR)
+                if (task.exception?.message?.contains(SERVICE_NOT_AVAILABLE_EXCEPTION) != true) {
+                    Sentry.withScope { scope ->
+                        scope.setExtra("task.exception", task.exception.toString())
+                        Sentry.captureMessage("Fetching FCM registration token failed", SentryLevel.ERROR)
+                    }
                 }
                 SentryLog.w("firebase", "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener
@@ -91,5 +93,9 @@ class StandardPlayServicesUtils @Inject constructor(
             localSettings.firebaseToken = token
             registerUserDeviceWorkerScheduler.scheduleWork()
         }
+    }
+
+    companion object {
+        const val SERVICE_NOT_AVAILABLE_EXCEPTION = "SERVICE_NOT_AVAILABLE"
     }
 }
