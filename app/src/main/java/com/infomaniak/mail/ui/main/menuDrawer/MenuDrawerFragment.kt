@@ -58,6 +58,7 @@ import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.extensions.checkForFolderCreationErrors
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.toggleChevron
@@ -203,7 +204,9 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
                 trackCreateFolderEvent("confirm")
                 mainViewModel.createNewFolder(folderName)
             },
-            onErrorCheck = ::checkForFolderCreationErrors,
+            onErrorCheck = { folderName ->
+                requireContext().checkForFolderCreationErrors(folderName, folderController)
+            },
         )
     }
 
