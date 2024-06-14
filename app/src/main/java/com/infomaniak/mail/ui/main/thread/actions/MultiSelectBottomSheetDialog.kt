@@ -72,7 +72,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionMove -> {
                     trackMultiSelectActionEvent(ACTION_MOVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
                     animatedNavigation(
-                        ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
+                        directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
                             threadsUids = selectedThreadsUids.toTypedArray(),
                         ),
                         currentClassName = currentClassName,
@@ -98,6 +98,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             }
         }
 
+        // TODO
         // binding.postpone.setClosingOnClickListener {
         //     trackMultiSelectActionEvent(ACTION_POSTPONE_NAME, selectedThreadsCount, isFromBottomSheet = true)
         //     notYetImplemented()
