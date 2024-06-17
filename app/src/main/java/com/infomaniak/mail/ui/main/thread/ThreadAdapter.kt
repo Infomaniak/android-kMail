@@ -120,7 +120,7 @@ class ThreadAdapter(
                 shouldLoadDistantResources,
                 threadAdapterCallbacks?.onContactClicked,
                 threadAdapterCallbacks?.onAttachmentClicked,
-                threadAdapterCallbacks?.onAttachmentOptionsClicked
+                threadAdapterCallbacks?.onAttachmentOptionsClicked,
             )
         } else {
             SuperCollapsedBlockViewHolder(ItemSuperCollapsedBlockBinding.inflate(layoutInflater, parent, false))
@@ -715,7 +715,7 @@ class ThreadAdapter(
         private val shouldLoadDistantResources: Boolean,
         onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
-        onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?
+        onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?,
     ) : ThreadAdapterViewHolder(binding) {
 
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)

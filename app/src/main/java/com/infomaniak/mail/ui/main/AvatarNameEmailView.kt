@@ -89,7 +89,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
 
     private fun ViewAvatarNameEmailBinding.setNameAndEmail(
         correspondent: Correspondent,
-        isCorrespondentCertified: Boolean = false
+        isCorrespondentCertified: Boolean = false,
     ) {
         val filledSingleField = fillInUserNameAndEmail(correspondent, userName, userEmail, ignoreIsMe = !processNameAndEmail)
         if (displayAsAttendee) {

@@ -227,10 +227,7 @@ class ThreadFragment : Fragment() {
                 onContactClicked =  { recipient, bimi ->
                     safeNavigate(
                         resId = R.id.detailedContactBottomSheetDialog,
-                        args = DetailedContactBottomSheetDialogArgs(
-                            recipient = recipient,
-                            bimi
-                        ).toBundle(),
+                        args = DetailedContactBottomSheetDialogArgs(recipient, bimi).toBundle(),
                     )
                 },
                 onDraftClicked = { message ->

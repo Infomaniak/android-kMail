@@ -28,10 +28,13 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 class Bimi() : EmbeddedRealmObject, Parcelable {
+
+    //region Remote data
     @SerialName("svg_content")
     var svgContentUrl: String? = null
     @SerialName("is_certified")
     var isCertified: Boolean = false
+    //endregion
 
     constructor(svgContentUrl: String, isCertified: Boolean) : this() {
         this.svgContentUrl = svgContentUrl

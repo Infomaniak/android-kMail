@@ -30,11 +30,13 @@ import com.infomaniak.mail.ui.main.thread.DetailedRecipientAdapter.DetailedRecip
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class DetailedRecipientAdapter(
-    private val onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)?
+    private val onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)?,
 ) : Adapter<DetailedRecipientViewHolder>() {
 
     private var recipients = emptyList<Recipient>()
+
     private var bimi: Bimi? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailedRecipientViewHolder {
         return DetailedRecipientViewHolder(ItemDetailedContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }

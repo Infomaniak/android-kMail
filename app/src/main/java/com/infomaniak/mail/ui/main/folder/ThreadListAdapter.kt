@@ -402,7 +402,7 @@ class ThreadListAdapter @Inject constructor(
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
         val (recipient, bimi) = thread.computeAvatarRecipient()
-        if (bimi != null && bimi.isCertified) {
+        if (bimi?.isCertified == true) {
             expeditorAvatar.loadBimiAvatar(ApiRoutes.bimi(bimi.svgContentUrl.toString()), recipient)
         } else {
             expeditorAvatar.loadAvatar(recipient)

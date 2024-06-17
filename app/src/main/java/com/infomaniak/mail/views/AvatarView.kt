@@ -58,11 +58,11 @@ class AvatarView @JvmOverloads constructor(
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var currentCorrespondent: Correspondent? = null
-    private var isBimiShow: Boolean = false
+    private var isBimiShown: Boolean = false
 
     private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
         currentCorrespondent?.let { correspondent ->
-            if (!isBimiShow) loadAvatarUsingDictionary(correspondent, contacts)
+            if (!isBimiShown) loadAvatarUsingDictionary(correspondent, contacts)
         }
     }
 
@@ -149,15 +149,15 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
-    fun loadBimiAvatar(urlBimi: String, correspondent: Correspondent?) = with(binding.avatarImage) {
+    fun loadBimiAvatar(bimiUrl: String, correspondent: Correspondent?) = with(binding.avatarImage) {
         contentDescription = correspondent?.email.orEmpty()
-        isBimiShow = urlBimi.isNotEmpty()
+        isBimiShown = bimiUrl.isNotEmpty()
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(
                 correspondent?.email.orEmpty().hashCode(),
-                R.array.AvatarColors
+                R.array.AvatarColors,
             ),
-            avatarUrl = urlBimi,
+            avatarUrl = bimiUrl,
             initials = correspondent?.initials.orEmpty(),
             imageLoader = svgImageLoader,
             initialsColor = context.getColor(R.color.onColorfulBackground),
@@ -193,10 +193,11 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadAvatar(correspondent: Correspondent?, bimi: Bimi?) {
-        if (bimi == null || !bimi.isCertified) {
+        val svgContentUrl = bimi?.svgContentUrl
+        if (bimi == null || !bimi.isCertified || svgContentUrl.isNullOrEmpty()) {
             loadAvatar(correspondent)
         } else {
-            loadBimiAvatar(ApiRoutes.bimi(bimi.svgContentUrl.orEmpty()), correspondent)
+            loadBimiAvatar(ApiRoutes.bimi(svgContentUrl), correspondent)
         }
     }
 }
