@@ -61,7 +61,7 @@ class AppVersionCheckingTest {
         )
     )
 
-    // region toVersionNumbers()
+    //region toVersionNumbers()
     @Test
     fun parseVersionNumber_defaultFormat() {
         Assert.assertEquals(listOf(1, 0, 1), basicVersion.toVersionNumbers())
