@@ -35,7 +35,7 @@ object MatomoMail : MatomoCore {
     override val Context.tracker: Tracker get() = (this as MainApplication).matomoTracker
     override val siteId = 9
 
-    // region Tracker category
+    //region Tracker category
     private const val THREAD_ACTION_CATEGORY = "threadActions"
     private const val THREAD_BOTTOM_SHEET_ACTION_CATEGORY = "bottomSheetThreadActions"
     //endregion
