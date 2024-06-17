@@ -70,6 +70,7 @@ class Thread : RealmObject {
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
     @SerialName("has_attachments")
+    // @Transient
     var hasAttachments: Boolean = false
     @SerialName("has_drafts")
     var hasDrafts: Boolean = false
