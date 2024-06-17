@@ -568,7 +568,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun downloadSwissTransferFiles(containerUuid: String, name: String) {
-        scheduleDownloadManager(ApiRoutes.downloadUrlSwissTransferFiles(containerUuid), name)
+        scheduleDownloadManager(ApiRoutes.swissTransferContainerDownloadUrl(containerUuid), name)
     }
 
     private fun replyTo(message: Message) {

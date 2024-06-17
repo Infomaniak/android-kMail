@@ -394,7 +394,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun getSwissTransferContainer(containerUuid: String): ApiResponse<SwissTransferContainer> {
-        return callApi(url = ApiRoutes.swissTransferContainerDownloadUrl(containerUuid), method = GET)
+        return callApi(url = ApiRoutes.swissTransferContainer(containerUuid), method = GET)
     }
 
     fun downloadAttachment(resource: String): Response {
