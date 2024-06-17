@@ -138,6 +138,9 @@ class ThreadController @Inject constructor(
 
                 keepOldMessagesAndAddToSearchFolder(remoteThread, searchFolder)
 
+                // TODO: Remove this when the API returns the good value for `has_attachments`.
+                upsertThreadWithCorrectAttachmentsValue(remoteThread, realm = this)
+
                 return@map remoteThread
             }.also(searchFolder.threads::addAll)
         }
@@ -210,7 +213,7 @@ class ThreadController @Inject constructor(
                     ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
                     ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
                     ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
-                    ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} == true"
+                    ThreadFilter.ATTACHMENTS -> "(${Thread::hasAttachments.name} == true || ${Message::swissTransferUuid.name} != nil)"
                     ThreadFilter.FOLDER -> TODO()
                     else -> error("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
                 }
@@ -330,7 +333,7 @@ class ThreadController @Inject constructor(
                                     swissTransferFiles = swissTransferFiles,
                                 )
 
-                                hasAttachmentsInThread = remoteMessage.hasAttachments
+                                if (remoteMessage.hasAttachments) hasAttachmentsInThread = true
 
                                 MessageController.upsertMessage(remoteMessage, realm = this)
                             }
@@ -385,11 +388,22 @@ class ThreadController @Inject constructor(
                 MessageController.getMessagesByUids(messages.map(Message::uid), realm)
             }
 
+            val hasSwissTransferAttachment = localMessages.any { message -> message.swissTransferUuid != null }
+
             localMessages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
-                if (thread.hasAttachments != hasAttachmentsInThread) {
-                    updateThread(thread.uid, realm) { it?.hasAttachments = hasAttachmentsInThread }
+                if (thread.hasAttachments != (hasAttachmentsInThread || hasSwissTransferAttachment)) {
+                    updateThread(thread.uid, realm) {
+                        it?.hasAttachments = (hasAttachmentsInThread || hasSwissTransferAttachment)
+                    }
                 }
             }
+        }
+
+        private fun upsertThreadWithCorrectAttachmentsValue(thread: Thread, realm: MutableRealm) {
+            val hasSwissTransferAttachment = thread.messages.any { message -> message.swissTransferUuid != null }
+
+            thread.hasAttachments = thread.hasAttachments || hasSwissTransferAttachment
+            upsertThread(thread, realm)
         }
         //endregion
     }
