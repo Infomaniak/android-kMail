@@ -72,15 +72,15 @@ class MoveViewModel @Inject constructor(
                 }
             }
 
-            allFolders = folderController.getMoveFolders()
-                .flattenFolderChildren()
-                .addDividerToFirstCustomFolder()
-                .also(filterResults::postValue)
-
             val sourceFolderId = messageUid?.let(messageController::getMessage)?.folderId
                 ?: threadController.getThread(threadsUids.first())!!.folderId
 
             sourceFolderIdLiveData.postValue(sourceFolderId)
+
+            allFolders = folderController.getMoveFolders()
+                .flattenFolderChildren()
+                .addDividerToFirstCustomFolder()
+                .also(filterResults::postValue)
         }
     }
 
