@@ -1,0 +1,2 @@
+- Correction d'un problème où un message indiquant une absence de connexion Internet pouvait apparaître à tort.
+- Correction d'un problème où les notifications pouvaient être annulées sans raison apparente.

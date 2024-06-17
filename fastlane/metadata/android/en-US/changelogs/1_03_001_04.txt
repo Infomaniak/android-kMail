@@ -1,0 +1,2 @@
+- Fixed an issue where a message indicating no Internet connection could appear incorrectly.
+- Fixed an issue where notifications could be canceled without apparent reason.
