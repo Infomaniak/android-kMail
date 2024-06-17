@@ -79,7 +79,6 @@ class MoveFragment : Fragment() {
         setupListeners()
         setupCreateFolderDialog()
         setupSearchBar()
-        observeSourceFolderId()
         observeSearchResults()
         observeFolderCreation()
     }
@@ -121,12 +120,10 @@ class MoveFragment : Fragment() {
         )
     }
 
-    private fun observeSourceFolderId() {
-        moveViewModel.sourceFolderIdLiveData.observe(viewLifecycleOwner, moveAdapter::setSourceFolderId)
-    }
-
-    private fun observeSearchResults() {
-        moveViewModel.filterResults.observe(viewLifecycleOwner, moveAdapter::setFolders)
+    private fun observeSearchResults() = with(moveViewModel) {
+        Utils.waitInitMediator(sourceFolderIdLiveData, filterResults).observe(viewLifecycleOwner) { (sourceFolderId, folders) ->
+            moveAdapter.setFolders(sourceFolderId, folders)
+        }
     }
 
     private fun observeFolderCreation() = with(mainViewModel) {
