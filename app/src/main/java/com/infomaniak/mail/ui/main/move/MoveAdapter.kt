@@ -53,8 +53,9 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         return this
     }
 
-    fun setSourceFolderId(id: String) {
-        sourceFolderId = id
+    fun setFolders(newSourceFolderId: String, newFolders: List<Folder>) = runCatchingRealm {
+        sourceFolderId = newSourceFolderId
+        submitList(newFolders)
     }
 
     override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
@@ -99,11 +100,6 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         setSelectedState(sourceFolderId == folder.id)
         if (this is SelectableFolderItemView) setIndent(folderIndent)
         setOnClickListener { onFolderClicked.invoke(folder.id) }
-    }
-
-    fun setFolders(newFolders: List<Folder>, newSourceFolderId: String? = null) = runCatchingRealm {
-        newSourceFolderId?.let { sourceFolderId = it }
-        submitList(newFolders)
     }
 
     companion object {
