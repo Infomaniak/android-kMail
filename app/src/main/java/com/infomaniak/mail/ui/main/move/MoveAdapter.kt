@@ -53,7 +53,6 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
     private var sourceFolderId: String? = null
     private var hasCollapsableFolder: Boolean? = null
     private var isInMenuDrawer: Boolean = true
-    private var shouldIndent: Boolean = true
 
     private lateinit var onFolderClicked: (folderId: String) -> Unit
     private var onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null
@@ -61,13 +60,11 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
 
     operator fun invoke(
         isInMenuDrawer: Boolean,
-        shouldIndent: Boolean = true,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
         onCollapseTransition: ((Boolean) -> Unit)? = null,
     ): MoveAdapter {
         this.isInMenuDrawer = isInMenuDrawer
-        this.shouldIndent = shouldIndent
         this.onFolderClicked = onFolderClicked
         this.onCollapseClicked = onCollapseClicked
         this.onCollapseTransition = onCollapseTransition
@@ -131,7 +128,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         folder.role?.let {
             setFolderUi(folder, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
-            val indentLevel = if (shouldIndent) folder.path.split(folder.separator).size - 1 else 0
+            val indentLevel = if (folder.shouldDisplayIndent) folder.path.split(folder.separator).size - 1 else 0
             setFolderUi(
                 folder = folder,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
