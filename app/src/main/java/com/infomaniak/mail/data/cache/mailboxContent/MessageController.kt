@@ -115,7 +115,8 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                     ThreadFilter.UNSEEN -> add("${Message::isSeen.name} == false")
                     ThreadFilter.STARRED -> add("${Message::isFavorite.name} == true")
                     ThreadFilter.FOLDER -> add("${Message::folderId.name} == '$folderId'")
-                    ThreadFilter.ATTACHMENTS -> add("(${Message::hasAttachments.name} == true || ${Message::swissTransferUuid.name} != nil)")
+                    ThreadFilter.ATTACHMENTS ->
+                        add("(${Message::hasAttachments.name} == true || ${Message::swissTransferUuid.name} != nil)")
                     else -> Unit
                 }
             }
