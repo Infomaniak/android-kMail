@@ -213,7 +213,8 @@ class ThreadController @Inject constructor(
                     ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
                     ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
                     ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
-                    ThreadFilter.ATTACHMENTS -> "(${Thread::hasAttachments.name} == true || ${Message::swissTransferUuid.name} != nil)"
+                    ThreadFilter.ATTACHMENTS ->
+                        "(${Thread::hasAttachments.name} == true || ${Message::swissTransferUuid.name} != nil)"
                     ThreadFilter.FOLDER -> TODO()
                     else -> error("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
                 }
@@ -286,12 +287,10 @@ class ThreadController @Inject constructor(
             fun fetchSwissTransferContainer(uuid: String, realm: MutableRealm): SwissTransferContainer? = runCatching {
                 val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
 
-                return@runCatching if (apiResponse.isSuccess()) {
-                    apiResponse.data?.apply {
-                        SwissTransferContainerController.upsertSwissTransferContainer(swissTransferContainer = this, realm)
-                    }
-                } else {
-                    null
+                if (!apiResponse.isSuccess()) return@runCatching null
+
+                return@runCatching apiResponse.data?.apply {
+                    SwissTransferContainerController.upsertSwissTransferContainer(swissTransferContainer = this, realm)
                 }
             }.getOrNull()
 
