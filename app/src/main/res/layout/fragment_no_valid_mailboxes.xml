@@ -50,11 +50,11 @@
                 android:layout_marginHorizontal="@dimen/marginStandard"
                 android:layout_marginTop="@dimen/marginLarge"
                 app:buttonLabel="@string/readFAQ"
-                app:description="@string/lockedMailboxScreenDescription"
+                app:description="@string/lockedMailboxViewDescription"
                 app:icon="@drawable/ic_warning"
                 app:layout_constraintTop_toBottomOf="@id/logo"
                 app:showCloseIcon="false"
-                app:title="@string/lockedMailboxScreenTitle" />
+                app:title="@string/lockedMailboxViewTitle" />
 
             <TextView
                 android:id="@+id/invalidPasswordTitle"

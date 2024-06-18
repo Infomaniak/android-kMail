@@ -302,12 +302,12 @@
     <string name="loadingText">Loading…</string>
     <string name="lockedMailboxBottomSheetDescription">Access to your mailbox is currently blocked.\nFor further information, please read FAQ.</string>
     <string name="lockedMailboxBottomSheetTitle">Mailbox %s is blocked</string>
-    <string name="lockedMailboxScreenDescription">For further information:</string>
-    <string name="lockedMailboxScreenTitle">Some of your mailboxes are blocked</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Blocked mailbox</item>
         <item quantity="other">Blocked mailboxes</item>
     </plurals>
+    <string name="lockedMailboxViewDescription">For further information:</string>
+    <string name="lockedMailboxViewTitle">Some of your mailboxes are blocked</string>
     <string name="manageSignatures">Manage my signatures</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
