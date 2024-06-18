@@ -22,6 +22,8 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.SwissTransferContainer
+import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.calendar.Attendee
