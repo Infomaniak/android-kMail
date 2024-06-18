@@ -496,30 +496,22 @@ class ThreadAdapter(
     }
 
     private fun computeAttachmentString(context: Context, message: Message): String {
+        val attachmentsCount = message.attachments.size
+        val filesCount = message.swissTransferFiles.size
 
-        var attachmentString = ""
+        return buildString {
+            if (attachmentsCount > 0) {
+                append(context.resources.getQuantityString(R.plurals.attachmentQuantity, attachmentsCount, attachmentsCount))
 
-        if (message.attachments.isNotEmpty()) {
-            attachmentString = context.resources.getQuantityString(
-                R.plurals.attachmentQuantity,
-                message.attachments.size,
-                message.attachments.size,
-            )
+                if (filesCount > 0) {
+                    append(" ${context.resources.getString(R.string.linkingWord)} ")
+                }
+            }
 
-            if (message.swissTransferFiles.isNotEmpty()) {
-                attachmentString += " ${context.resources.getString(R.string.linkingWord)} "
+            if (filesCount > 0) {
+                append(context.resources.getQuantityString(R.plurals.fileQuantity, filesCount, filesCount))
             }
         }
-
-        if (message.swissTransferFiles.isNotEmpty()) {
-            attachmentString += context.resources.getQuantityString(
-                R.plurals.fileQuantity,
-                message.swissTransferFiles.size,
-                message.swissTransferFiles.size,
-            )
-        }
-
-        return attachmentString
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachable>): String {

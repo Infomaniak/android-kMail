@@ -21,17 +21,15 @@ import com.infomaniak.mail.data.models.SwissTransferContainer
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 
-class SwissTransferContainerController {
+object SwissTransferContainerController {
 
-    companion object {
-        //region Edit data
-        fun upsertSwissTransferContainer(swissTransferContainer: SwissTransferContainer, realm: MutableRealm) {
-            swissTransferContainer.swissTransferFiles.forEach {
-                it.initLocalValues(containerUuid = swissTransferContainer.uuid)
-            }
-
-            realm.copyToRealm(swissTransferContainer, UpdatePolicy.ALL)
+    //region Edit data
+    fun upsertSwissTransferContainer(swissTransferContainer: SwissTransferContainer, realm: MutableRealm) {
+        swissTransferContainer.swissTransferFiles.forEach {
+            it.initLocalValues(containerUuid = swissTransferContainer.uuid)
         }
-        //endregion
+
+        realm.copyToRealm(swissTransferContainer, UpdatePolicy.ALL)
     }
+    //endregion
 }
