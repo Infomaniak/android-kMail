@@ -300,13 +300,13 @@
     <string name="loadingText">Chargement…</string>
     <string name="lockedMailboxBottomSheetDescription">L’accès à votre adresse mail est actuellement bloqué.\nPour plus d’informations, consultez les FAQ.</string>
     <string name="lockedMailboxBottomSheetTitle">L’adresse %s est bloquée</string>
-    <string name="lockedMailboxScreenDescription">Pour plus d’informations :</string>
-    <string name="lockedMailboxScreenTitle">Certaines de vos adresses mail sont bloquées</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Adresse mail bloquée</item>
         <item quantity="other">Adresses mail bloquées</item>
         <item quantity="many">Adresses mail bloquées</item>
     </plurals>
+    <string name="lockedMailboxViewDescription">Pour plus d’informations :</string>
+    <string name="lockedMailboxViewTitle">Certaines de vos adresses mail sont bloquées</string>
     <string name="manageSignatures">Gérer mes signatures</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>

@@ -296,12 +296,12 @@
     <string name="loadingText">Caricamento…</string>
     <string name="lockedMailboxBottomSheetDescription">L’accesso al tuo indirizzo e-mail è attualmente bloccato.\nPer ulteriori informazioni, leggi le FAQ.</string>
     <string name="lockedMailboxBottomSheetTitle">L’indirizzo e-mail %s è bloccato</string>
-    <string name="lockedMailboxScreenDescription">Per ulteriori informazioni:</string>
-    <string name="lockedMailboxScreenTitle">Alcuni indirizzi e-mail bloccati</string>
     <plurals name="lockedMailboxTitle">
         <item quantity="one">Indirizzo e-mail bloccato</item>
         <item quantity="other">Indirizzi e-mail bloccati</item>
     </plurals>
+    <string name="lockedMailboxViewDescription">Per ulteriori informazioni:</string>
+    <string name="lockedMailboxViewTitle">Alcuni indirizzi e-mail bloccati</string>
     <string name="manageSignatures">Gestisci le mie firme</string>
     <string name="menuDrawerAdvancedActions">Azioni avanzate</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s usato</string>
