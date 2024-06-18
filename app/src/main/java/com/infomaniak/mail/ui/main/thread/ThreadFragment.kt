@@ -54,6 +54,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AutoAdvanceMode
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwissTransferFile
@@ -245,24 +246,7 @@ class ThreadFragment : Fragment() {
                     trackMessageActionsEvent("deleteDraft")
                     mainViewModel.currentMailbox.value?.let { mailbox -> deleteDraft(message, mailbox) }
                 },
-                onAttachmentClicked = {
-                    if (it is Attachment) {
-                        trackAttachmentActionsEvent(ACTION_OPEN_NAME)
-                        it.openAttachment(
-                            context = requireContext(),
-                            navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                                navigateToDownloadProgressDialog(
-                                    attachment,
-                                    attachmentIntentType,
-                                    ThreadFragment::class.java.name,
-                                )
-                            },
-                            snackbarManager = snackbarManager,
-                        )
-                    } else if (it is SwissTransferFile) {
-                        downloadSwissTransferFile(swissTransferFile = it)
-                    }
-                },
+                onAttachmentClicked = ::onAttachmentClicked,
                 onAttachmentOptionsClicked = {
                     safeNavigate(
                         resId = R.id.attachmentActionsBottomSheetDialog,
@@ -333,6 +317,25 @@ class ThreadFragment : Fragment() {
 
         binding.messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+    }
+
+    private fun onAttachmentClicked(attachable: Attachable) {
+        if (attachable is Attachment) {
+            trackAttachmentActionsEvent(ACTION_OPEN_NAME)
+            attachable.openAttachment(
+                context = requireContext(),
+                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                    navigateToDownloadProgressDialog(
+                        attachment,
+                        attachmentIntentType,
+                        ThreadFragment::class.java.name,
+                    )
+                },
+                snackbarManager = snackbarManager,
+            )
+        } else if (attachable is SwissTransferFile) {
+            downloadSwissTransferFile(swissTransferFile = attachable)
+        }
     }
 
     private fun setupDialogs() {
@@ -548,8 +551,8 @@ class ThreadFragment : Fragment() {
 
         message.swissTransferUuid?.let { containerUuid ->
             downloadSwissTransferFiles(
-                containerUuid,
-                allSwissTransferFilesName(truncatedSubject ?: ""),
+                containerUuid = containerUuid,
+                name = allSwissTransferFilesName(truncatedSubject ?: ""),
             )
         }
     }
