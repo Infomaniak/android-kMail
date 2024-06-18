@@ -817,8 +817,8 @@ class NewMessageViewModel @Inject constructor(
             val localAttachment = attachments
                 /**
                  * If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
-                 * But an Attachment only has an `uploadLocalUri` if the user added it to the Draft.
-                 * If it was added by forwarding a Message, it's doesn't have a `uploadLocalUri`, so we don't check this.
+                 * But an Attachment only has an `uploadLocalUri` if the user added it by himself to the Draft.
+                 * If it was added by Message forwarding, it won't have any `uploadLocalUri`, so we don't check this.
                  */
                 .filter { it.uploadLocalUri != null && it.uploadLocalUri == uiAttachment.uploadLocalUri }
                 .also {
