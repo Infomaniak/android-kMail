@@ -96,6 +96,6 @@ class StandardPlayServicesUtils @Inject constructor(
     }
 
     companion object {
-        const val SERVICE_NOT_AVAILABLE_EXCEPTION = "SERVICE_NOT_AVAILABLE"
+        private const val SERVICE_NOT_AVAILABLE_EXCEPTION = "SERVICE_NOT_AVAILABLE"
     }
 }
