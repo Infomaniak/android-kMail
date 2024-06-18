@@ -222,19 +222,19 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun onSyncAutoConfigClicked() {
-        context?.trackSyncAutoConfigEvent("openFromMenuDrawer")
+        trackSyncAutoConfigEvent("openFromMenuDrawer")
         launchSyncAutoConfigActivityForResult()
         closeDrawer()
     }
 
     private fun onImportMailsClicked() {
-        context?.trackMenuDrawerEvent("importEmails")
+        trackMenuDrawerEvent("importEmails")
         context?.openUrl(BuildConfig.IMPORT_EMAILS_URL)
         closeDrawer()
     }
 
     private fun onRestoreMailsClicked() {
-        context?.trackMenuDrawerEvent("restoreEmails")
+        trackMenuDrawerEvent("restoreEmails")
         safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = currentClassName)
     }
 
@@ -253,7 +253,7 @@ class MenuDrawerFragment : Fragment() {
                 )
             }.also(::startActivity)
         } else {
-            context?.trackMenuDrawerEvent("feedback")
+            trackMenuDrawerEvent("feedback")
             context?.openUrl(requireContext().getString(R.string.urlUserReportAndroid))
         }
 
@@ -262,7 +262,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onHelpClicked() {
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SUPPORT.id)
-        context?.trackMenuDrawerEvent("help")
+        trackMenuDrawerEvent("help")
         context?.openUrl(BuildConfig.CHATBOT_URL)
         closeDrawer()
     }
