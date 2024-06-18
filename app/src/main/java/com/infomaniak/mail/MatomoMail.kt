@@ -208,10 +208,6 @@ object MatomoMail : MatomoCore {
         trackEvent("invalidPasswordMailbox", name)
     }
 
-    fun Fragment.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
-        context?.trackExternalEvent(name, action, value)
-    }
-
     fun Context.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
         trackEvent("externals", name, action, value)
     }
@@ -229,10 +225,6 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackSyncAutoConfigEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        context?.trackSyncAutoConfigEvent(name, action)
-    }
-
-    fun Context.trackSyncAutoConfigEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
         trackEvent("syncAutoConfig", name, action)
     }
 
