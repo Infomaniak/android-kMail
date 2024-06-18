@@ -103,7 +103,8 @@ class MenuDrawerFragment : Fragment() {
         setupCreateFolderDialog()
         setupRecyclerView()
 
-        observeAllTheThingsSheSaid()
+        observeListData()
+        observeCurrentFolder()
         observeCurrentMailbox()
         observeNewFolderCreation()
     }
@@ -275,9 +276,7 @@ class MenuDrawerFragment : Fragment() {
         )
     }
 
-    private fun observeAllTheThingsSheSaid() = with(mainViewModel) {
-
-        currentFolder.observeNotNull(viewLifecycleOwner, menuDrawerAdapter::notifySelectedFolder)
+    private fun observeListData() = with(mainViewModel) {
 
         Utils.waitInitMediator(
             currentMailbox,
@@ -300,6 +299,10 @@ class MenuDrawerFragment : Fragment() {
                 )
             }
         ).observe(viewLifecycleOwner, menuDrawerAdapter::setItems)
+    }
+
+    private fun observeCurrentFolder() {
+        mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner, menuDrawerAdapter::notifySelectedFolder)
     }
 
     private fun observeCurrentMailbox() {
