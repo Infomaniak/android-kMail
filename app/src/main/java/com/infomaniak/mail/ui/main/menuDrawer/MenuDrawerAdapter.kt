@@ -442,10 +442,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
     }
 
-    companion object {
-        private const val MAX_SUB_FOLDERS_INDENT = 2
-    }
-
     class MenuDrawerViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 
     private enum class DisplayType(val layout: Int) {
@@ -519,5 +515,9 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 null
             }
         }
+    }
+
+    companion object {
+        private const val MAX_SUB_FOLDERS_INDENT = 2
     }
 }
