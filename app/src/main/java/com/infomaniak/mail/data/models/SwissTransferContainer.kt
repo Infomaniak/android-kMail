@@ -34,7 +34,7 @@ class SwissTransferContainer : RealmObject {
     @PrimaryKey
     var uuid: String = ""
     @SerialName("nbfiles")
-    var nbFiles: Int = 0
+    var filesNumber: Int = 0
     var size: Long = 0L
     var expiredDate: String = ""
     @SerialName("files")

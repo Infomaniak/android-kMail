@@ -320,21 +320,24 @@ class ThreadFragment : Fragment() {
     }
 
     private fun onAttachmentClicked(attachable: Attachable) {
-        if (attachable is Attachment) {
-            trackAttachmentActionsEvent(ACTION_OPEN_NAME)
-            attachable.openAttachment(
-                context = requireContext(),
-                navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                    navigateToDownloadProgressDialog(
-                        attachment,
-                        attachmentIntentType,
-                        ThreadFragment::class.java.name,
-                    )
-                },
-                snackbarManager = snackbarManager,
-            )
-        } else if (attachable is SwissTransferFile) {
-            downloadSwissTransferFile(swissTransferFile = attachable)
+        when (attachable) {
+            is Attachment -> {
+                trackAttachmentActionsEvent(ACTION_OPEN_NAME)
+                attachable.openAttachment(
+                    context = requireContext(),
+                    navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                        navigateToDownloadProgressDialog(
+                            attachment,
+                            attachmentIntentType,
+                            ThreadFragment::class.java.name,
+                        )
+                    },
+                    snackbarManager = snackbarManager,
+                )
+            }
+            is SwissTransferFile -> {
+                downloadSwissTransferFile(swissTransferFile = attachable)
+            }
         }
     }
 
@@ -547,7 +550,7 @@ class ThreadFragment : Fragment() {
     private fun downloadAllAttachments(message: Message) {
         val truncatedSubject = message.subject?.let { it.substring(0..min(MAXIMUM_SUBJECT_LENGTH, it.lastIndex)) }
 
-        if (message.attachments.isNotEmpty()) downloadAttachments(message, allAttachmentsFileName(truncatedSubject ?: ""))
+        if (message.hasAttachments) downloadAttachments(message, allAttachmentsFileName(truncatedSubject ?: ""))
 
         message.swissTransferUuid?.let { containerUuid ->
             downloadSwissTransferFiles(

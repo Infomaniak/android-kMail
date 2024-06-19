@@ -23,7 +23,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
-import com.infomaniak.mail.data.cache.mailboxContent.SwissTransferFileController
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils
@@ -39,7 +38,6 @@ class DownloadAttachmentViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val attachmentController: AttachmentController,
-    private val swissTransferFileController: SwissTransferFileController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 

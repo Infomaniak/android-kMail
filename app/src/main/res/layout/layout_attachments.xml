@@ -40,17 +40,15 @@
         android:id="@+id/attachmentsInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/marginStandardMedium"
-        android:clickable="true"
-        android:focusable="true"
         android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="@dimen/marginStandardMedium"
         android:paddingVertical="@dimen/marginStandardSmall"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/attachmentsRecyclerView">
 
         <TextView
-            android:id="@+id/icon"
+            android:id="@+id/attachmentsIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:drawableStartCompat="@drawable/ic_attachment"
@@ -58,10 +56,10 @@
 
         <TextView
             android:id="@+id/attachmentsSizeText"
+            style="@style/Body.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardSmall"
-            style="@style/Body.Secondary"
             tools:text="2 pièces jointes et 2 fichiers envoyées via SwissTransfer (3 MB). Tout télécharger" />
 
     </LinearLayout>

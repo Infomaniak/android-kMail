@@ -19,8 +19,12 @@ package com.infomaniak.mail.data.models
 
 import android.content.Context
 import androidx.annotation.DrawableRes
+import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.AttachableMimeTypeUtils
+import com.infomaniak.mail.utils.Utils
 import java.io.File
 
 interface Attachable {
@@ -31,11 +35,11 @@ interface Attachable {
     var resource: String?
     var localUuid: String
 
-    val downloadUrl get() = ""
+    val downloadUrl get() = ApiRoutes.resource(resource!!)
 
-    val safeMimeType get() = ""
+    val safeMimeType get() = if (mimeType == Utils.MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
 
-    fun getFileTypeFromMimeType(): AttachmentType
+    fun getFileTypeFromMimeType(): AttachmentType = AttachableMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
     fun hasUsableCache(
         context: Context,
