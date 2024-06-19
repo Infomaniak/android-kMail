@@ -186,7 +186,7 @@ class FolderController @Inject constructor(
         }
 
         fun getOrCreateSearchFolder(realm: MutableRealm): Folder {
-            return getFolderQuery(Folder::id.name, SEARCH_FOLDER_ID, realm).find() ?: let {
+            return getFolderQuery(Folder::id.name, SEARCH_FOLDER_ID, realm).find() ?: run {
                 realm.copyToRealm(Folder().apply { id = SEARCH_FOLDER_ID })
             }
         }
