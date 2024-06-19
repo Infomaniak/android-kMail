@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewCompat
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.SearchUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,18 +66,15 @@ class ThreadListViewModel @Inject constructor(
     }
 
     fun checkWebViewVersion(canShowWebViewOutdated: Boolean) {
-        isWebViewOutdated.value = if (canShowWebViewOutdated) {
+        val (webViewVersionName, webViewMajorVersion) =
             WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName?.let { versionName ->
-                val majorVersion = runCatching {
-                    versionName.substring(0, versionName.indexOfFirst { it == '.' }).toInt()
-                }.getOrElse {
-                    0
-                }
-                majorVersion < WEBVIEW_MIN_VERSION
-            } ?: true
-        } else {
-            false
-        }
+                val majorVersion = runCatching { versionName.substringBefore('.').toInt() }.getOrDefault(0)
+                versionName to majorVersion
+            } ?: (null to 0)
+
+        val badMajorVersion = webViewMajorVersion < WEBVIEW_MIN_VERSION
+        if (badMajorVersion) SentryDebug.sendWebViewVersionName(webViewVersionName, webViewMajorVersion)
+        isWebViewOutdated.value = canShowWebViewOutdated && badMajorVersion
     }
 
     companion object {

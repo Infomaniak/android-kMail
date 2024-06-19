@@ -305,6 +305,17 @@ object SentryDebug {
             Sentry.captureMessage("Credentials issue when trying to auto-sync user", SentryLevel.ERROR)
         }
     }
+
+    fun sendWebViewVersionName(webViewVersionName: String?, majorVersion: Int) {
+        Sentry.withScope { scope ->
+            scope.setExtra("webViewVersionName", webViewVersionName.toString())
+            scope.setExtra("majorVersion", "$majorVersion")
+            Sentry.captureMessage(
+                "WebView version name might be null on some devices. Checking that the version name is ok.",
+                SentryLevel.INFO,
+            )
+        }
+    }
     //endregion
 
     //region Utils
