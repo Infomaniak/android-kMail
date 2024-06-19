@@ -242,7 +242,7 @@ object SentryDebug {
         return orphanThreads
     }
 
-    fun sendOrphanDrafts(realm: TypedRealm) {
+    fun sendOrphanDrafts(realm: TypedRealm): RealmResults<Draft> {
         val orphanDrafts = DraftController.getOrphanDrafts(realm)
         if (orphanDrafts.isNotEmpty()) {
             Sentry.withScope { scope ->
@@ -259,6 +259,7 @@ object SentryDebug {
                 Sentry.captureMessage("We found some orphan Drafts.", SentryLevel.ERROR)
             }
         }
+        return orphanDrafts
     }
 
     fun sendOverScrolledMessage(clientWidth: Int, scrollWidth: Int, messageUid: String) {

@@ -197,7 +197,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         mailboxContentRealm.executeRealmCallbacks(realmActionsOnDraft)
 
-        SentryDebug.sendOrphanDrafts(mailboxContentRealm)
+        mailboxContentRealm.writeBlocking {
+            val orphans = SentryDebug.sendOrphanDrafts(realm = this)
+            delete(orphans)
+        }
 
         showDraftErrorNotification(isTrackedDraftSuccess, trackedDraftErrorMessageResId, trackedDraftAction)
 
