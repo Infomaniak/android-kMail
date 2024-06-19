@@ -148,7 +148,6 @@ object SentryDebug {
 
             scope.level = sentryLevel
 
-            scope.setTag("reason", reason)
             scope.setExtra("userId", "${userId?.toString()}")
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("mailboxId", "${mailboxId?.toString()}")
@@ -156,7 +155,7 @@ object SentryDebug {
             scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
             scope.setExtra("messageUid", "$messageUid")
 
-            val message = "We received a Notification, but we failed to show it"
+            val message = "Failed Notif : $reason"
 
             throwable?.let {
                 scope.setExtra("message", message)
