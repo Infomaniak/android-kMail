@@ -665,6 +665,10 @@ class RefreshController @Inject constructor(
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
 
+            if (remoteMessage.uid.substringAfter('@') != folder.id) {
+                SentryDebug.sendMessageInWrongFolder(remoteMessage, folder, realm = this)
+            }
+
             val shouldSkipThisMessage = addRemoteMessageToFolder(remoteMessage, folder, folderMessages)
             if (shouldSkipThisMessage) return@forEach
 

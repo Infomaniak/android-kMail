@@ -186,6 +186,7 @@ class Message : RealmObject {
                 _folders.first()
             }
         }
+    val foldersForSentry get() = _folders // TODO: Remove this when no Sentry needs it.
 
     inline val sender get() = from.firstOrNull()
 

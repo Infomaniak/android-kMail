@@ -21,6 +21,7 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft
@@ -190,6 +191,23 @@ object SentryDebug {
                     )
                 }
             }
+        }
+    }
+
+    fun sendMessageInWrongFolder(remoteMessage: Message, folder: Folder, realm: TypedRealm) {
+        val localMessage = MessageController.getMessage(remoteMessage.uid, realm)
+        Sentry.withScope { scope ->
+            scope.setExtra(
+                "localMessageFolders",
+                "${localMessage?.foldersForSentry?.joinToString { "${it.role?.name} | ${it.id}" }}",
+            )
+            scope.setExtra("remoteMessageUid", remoteMessage.uid)
+            scope.setExtra("folderRole", "${folder.role?.name}")
+            scope.setExtra("folderId", folder.id)
+            Sentry.captureMessage(
+                "Message is in wrong Folder (related to 'Message has multiple parent folders'",
+                SentryLevel.ERROR,
+            )
         }
     }
 
