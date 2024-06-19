@@ -185,8 +185,10 @@ object AttachmentExtensions {
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
                 // The API version of an Attachment doesn't have the `uploadLocalUri` & `localUuid`, so we need to back them up.
-                remoteAttachment.uploadLocalUri = uploadLocalUri
-                remoteAttachment.localUuid = localUuid
+                remoteAttachment.initLocalValues(
+                    uri = uploadLocalUri,
+                    uuid = localUuid,
+                )
 
                 delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
                 draft.attachments.add(remoteAttachment)
