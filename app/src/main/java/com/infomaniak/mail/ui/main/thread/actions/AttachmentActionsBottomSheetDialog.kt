@@ -21,7 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -69,8 +69,8 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
         if (attachment is SwissTransferFile) {
             with(binding) {
-                openWithItem.isVisible = false
-                kDriveItem.isVisible = false
+                openWithItem.isGone = true
+                kDriveItem.isGone = true
             }
         }
 

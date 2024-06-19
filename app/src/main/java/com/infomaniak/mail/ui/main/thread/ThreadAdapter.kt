@@ -477,39 +477,43 @@ class ThreadAdapter(
 
         val downloadAllString = context.resources.getString(R.string.buttonDownloadAll)
 
-        val span = SpannableString("$attachmentString ($fileSize). $downloadAllString")
+        val totalAttachmentsSize = SpannableString("$attachmentString ($fileSize). $downloadAllString").apply {
+            setSpan(
+                ForegroundColorSpan(context.getColor(R.color.primary_color_disabled)),
+                length - downloadAllString.length,
+                length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
 
-        span.setSpan(
-            ForegroundColorSpan(context.getColor(R.color.primary_color_disabled)),
-            span.length - downloadAllString.length,
-            span.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
-
-        attachmentLayout.attachmentsSizeText.text = span
+        attachmentLayout.attachmentsSizeText.text = totalAttachmentsSize
 
         attachmentAdapter.setAttachments(attachments)
         attachmentLayout.attachmentsInfo.setOnClickListener {
             threadAdapterCallbacks?.onDownloadAllClicked?.invoke(message)
         }
-        attachmentLayout.root.isVisible = message.attachments.isNotEmpty() || message.swissTransferFiles.isNotEmpty()
+        attachmentLayout.root.isVisible = message.attachments.isNotEmpty() || message.hasSwissTransferFiles
     }
 
     private fun computeAttachmentString(context: Context, message: Message): String {
         val attachmentsCount = message.attachments.size
-        val filesCount = message.swissTransferFiles.size
+        val swissTransferFilesCount = message.swissTransferFiles.size
 
         return buildString {
             if (attachmentsCount > 0) {
                 append(context.resources.getQuantityString(R.plurals.attachmentQuantity, attachmentsCount, attachmentsCount))
 
-                if (filesCount > 0) {
-                    append(" ${context.resources.getString(R.string.linkingWord)} ")
-                }
+                if (swissTransferFilesCount > 0) append(" ${context.resources.getString(R.string.linkingWord)} ")
             }
 
-            if (filesCount > 0) {
-                append(context.resources.getQuantityString(R.plurals.fileQuantity, filesCount, filesCount))
+            if (swissTransferFilesCount > 0) {
+                append(
+                    context.resources.getQuantityString(
+                        R.plurals.fileQuantity,
+                        swissTransferFilesCount,
+                        swissTransferFilesCount
+                    )
+                )
             }
         }
     }

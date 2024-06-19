@@ -153,6 +153,11 @@ class Message : RealmObject {
     var shouldHideDivider: Boolean = false
     //endregion
 
+    val hasSwissTransferFiles get() = swissTransferFiles.isNotEmpty()
+
+    val hasAttachable: Boolean
+        get() = hasAttachments || swissTransferUuid != null
+
     val threads by backlinks(Thread::messages)
 
     private val threadsDuplicatedIn by backlinks(Thread::duplicates)

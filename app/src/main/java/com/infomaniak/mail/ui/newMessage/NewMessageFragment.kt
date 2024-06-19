@@ -269,20 +269,20 @@ class NewMessageFragment : Fragment() {
             shouldDisplayCloseButton = true,
             onDelete = ::onDeleteAttachment,
             onAttachmentClicked = {
-                if (it is Attachment) {
-                    trackAttachmentActionsEvent(OPEN_FROM_DRAFT_NAME)
-                    it.openAttachment(
-                        context = requireContext(),
-                        navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                            navigateToDownloadProgressDialog(
-                                attachment,
-                                attachmentIntentType,
-                                NewMessageFragment::class.java.name,
-                            )
-                        },
-                        snackbarManager = snackbarManager,
-                    )
-                }
+                if (it !is Attachment) return@AttachmentAdapter
+
+                trackAttachmentActionsEvent(OPEN_FROM_DRAFT_NAME)
+                it.openAttachment(
+                    context = requireContext(),
+                    navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                        navigateToDownloadProgressDialog(
+                            attachment,
+                            attachmentIntentType,
+                            NewMessageFragment::class.java.name,
+                        )
+                    },
+                    snackbarManager = snackbarManager,
+                )
             },
         )
 

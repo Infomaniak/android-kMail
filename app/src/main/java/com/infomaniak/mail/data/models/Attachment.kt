@@ -21,12 +21,8 @@ import android.content.Context
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.lib.core.utils.guessMimeType
-import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.models.Attachable.AttachmentType
 import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -70,10 +66,6 @@ class Attachment : EmbeddedRealmObject, Attachable {
 
     val disposition: AttachmentDisposition?
         get() = enumValueOfOrNull<AttachmentDisposition>(_disposition)
-
-    override val downloadUrl get() = ApiRoutes.resource(resource!!)
-
-    override val safeMimeType get() = if (mimeType == Utils.MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
 
     fun initLocalValues(name: String, size: Long, mimeType: String, uri: String): Attachment {
         this.name = name

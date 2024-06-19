@@ -18,11 +18,6 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.guessMimeType
-import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.models.Attachable.AttachmentType
-import com.infomaniak.mail.utils.AttachableMimeTypeUtils
-import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -48,17 +43,11 @@ class SwissTransferFile : EmbeddedRealmObject, Attachable {
     override var localUuid: String = UUID.randomUUID().toString()
     //endregion
 
-    override val downloadUrl get() = ApiRoutes.resource(resource!!)
+    override fun hasUsableCache(context: Context, file: File?, userId: Int, mailboxId: Int) = false
 
-    override val safeMimeType get() = if (mimeType == Utils.MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
+    override fun isInlineCachedFile(context: Context) = false
 
-    override fun getFileTypeFromMimeType(): AttachmentType = AttachableMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
-
-    override fun hasUsableCache(context: Context, file: File?, userId: Int, mailboxId: Int): Boolean = false
-
-    override fun isInlineCachedFile(context: Context): Boolean = false
-
-    override fun getCacheFile(context: Context, userId: Int, mailboxId: Int): File = File("")
+    override fun getCacheFile(context: Context, userId: Int, mailboxId: Int) = File("")
 
     fun initLocalValues(containerUuid: String) {
         resource = "/api/swisstransfer/containers/$containerUuid/files/$uuid"

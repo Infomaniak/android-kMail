@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
@@ -213,8 +214,9 @@ class ThreadController @Inject constructor(
                     ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
                     ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
                     ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
-                    ThreadFilter.ATTACHMENTS ->
+                    ThreadFilter.ATTACHMENTS -> {
                         "(${Thread::hasAttachments.name} == true || ${Message::swissTransferUuid.name} != nil)"
+                    }
                     ThreadFilter.FOLDER -> TODO()
                     else -> error("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
                 }
@@ -284,14 +286,15 @@ class ThreadController @Inject constructor(
             val deletedMessagesUids = mutableListOf<String>()
             val failedMessagesUids = mutableListOf<String>()
 
-            fun fetchSwissTransferContainer(uuid: String, realm: MutableRealm): SwissTransferContainer? = runCatching {
+            fun fetchSwissTransferContainer(uuid: String): SwissTransferContainer? = runCatching {
                 val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
 
-                if (!apiResponse.isSuccess()) return@runCatching null
-
-                return@runCatching apiResponse.data?.apply {
-                    SwissTransferContainerController.upsertSwissTransferContainer(swissTransferContainer = this, realm)
+                if (apiResponse.isSuccess()) {
+                    return@runCatching apiResponse.data
                 }
+
+                SentryLog.e(TAG, "Could not fetch SwissTransfer container")
+                return@runCatching null
             }.getOrNull()
 
             fun handleFailure(uid: String, code: String? = null) {
@@ -316,7 +319,13 @@ class ThreadController @Inject constructor(
                         if (apiResponse.isSuccess()) {
                             apiResponse.data?.also { remoteMessage ->
                                 val swissTransferFiles = remoteMessage.swissTransferUuid?.let { uuid ->
-                                    fetchSwissTransferContainer(uuid, realm = this)?.swissTransferFiles
+                                    val swissTransferContainer = fetchSwissTransferContainer(uuid)
+
+                                    swissTransferContainer?.let {
+                                        SwissTransferContainerController.upsertSwissTransferContainer(it, realm = this)
+                                    }
+
+                                    swissTransferContainer?.swissTransferFiles
                                 } ?: realmListOf()
 
                                 remoteMessage.initLocalValues(
@@ -332,7 +341,7 @@ class ThreadController @Inject constructor(
                                     swissTransferFiles = swissTransferFiles,
                                 )
 
-                                if (remoteMessage.hasAttachments) hasAttachmentsInThread = true
+                                if (remoteMessage.hasAttachable) hasAttachmentsInThread = true
 
                                 MessageController.upsertMessage(remoteMessage, realm = this)
                             }
@@ -387,23 +396,21 @@ class ThreadController @Inject constructor(
                 MessageController.getMessagesByUids(messages.map(Message::uid), realm)
             }
 
-            val hasSwissTransferAttachment = localMessages.any { message -> message.swissTransferUuid != null }
-
             localMessages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
-                if (thread.hasAttachments != (hasAttachmentsInThread || hasSwissTransferAttachment)) {
+                if (thread.hasAttachments != hasAttachmentsInThread) {
                     updateThread(thread.uid, realm) {
-                        it?.hasAttachments = (hasAttachmentsInThread || hasSwissTransferAttachment)
+                        it?.hasAttachments = hasAttachmentsInThread
                     }
                 }
             }
         }
 
         private fun upsertThreadWithCorrectAttachmentsValue(thread: Thread, realm: MutableRealm) {
-            val hasSwissTransferAttachment = thread.messages.any { message -> message.swissTransferUuid != null }
-
-            thread.hasAttachments = thread.hasAttachments || hasSwissTransferAttachment
+            thread.hasAttachments = thread.messages.any { message -> message.hasAttachable }
             upsertThread(thread, realm)
         }
         //endregion
+
+        private const val TAG = "ThreadController"
     }
 }

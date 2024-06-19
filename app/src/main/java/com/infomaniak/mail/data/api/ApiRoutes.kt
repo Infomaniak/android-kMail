@@ -252,7 +252,7 @@ object ApiRoutes {
     }
 
     fun swissTransferContainerDownloadUrl(containerUuid: String): String {
-        return "$MAIL_API/api/swisstransfer/containers/$containerUuid/files/download"
+        return "${swissTransferContainer(containerUuid)}/files/download"
     }
     //endregion
 
