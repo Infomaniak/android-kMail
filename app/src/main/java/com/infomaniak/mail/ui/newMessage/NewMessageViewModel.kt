@@ -711,10 +711,10 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun uploadAttachmentsToServer() = viewModelScope.launch(ioDispatcher) {
+    fun uploadAttachmentsToServer(uiAttachments: List<Attachment>) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
         val localDraft = mailboxContentRealm().writeBlocking {
-            DraftController.getDraft(localUuid, realm = this)?.also { it.updateDraftAttachmentsFromLiveData() }
+            DraftController.getDraft(localUuid, realm = this)?.also { it.updateDraftAttachmentsWithLiveData(uiAttachments) }
         } ?: return@launch
 
         runCatching {
@@ -780,7 +780,7 @@ class NewMessageViewModel @Inject constructor(
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
 
-        updateDraftAttachmentsFromLiveData()
+        updateDraftAttachmentsWithLiveData(attachmentsLiveData.valueOrEmpty())
 
         subject = subjectValue
 
@@ -811,8 +811,9 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun Draft.updateDraftAttachmentsFromLiveData() {
-        val updatedAttachments = attachmentsLiveData.valueOrEmpty().map { uiAttachment ->
+    private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>) {
+
+        val updatedAttachments = uiAttachments.map { uiAttachment ->
             // If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
             val localAttachment = attachments.filter { it.uploadLocalUri == uiAttachment.uploadLocalUri }
                 .also {
