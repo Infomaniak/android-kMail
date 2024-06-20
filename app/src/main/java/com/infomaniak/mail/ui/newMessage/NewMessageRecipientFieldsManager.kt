@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.newMessage
 import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -125,11 +124,13 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     fun setOnFocusChangedListeners() = with(binding) {
         val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
         subjectTextField.onFocusChangeListener = listener
-        bodyTextField.onFocusChangeListener = listener
+        // TODO: Test if this works well
+        editor.onFocusChangeListener = listener
     }
 
     fun focusBodyField() {
-        binding.bodyTextField.showKeyboard()
+        // TODO: Test if this works well
+        binding.editor.requestFocusAndOpenKeyboard()
     }
 
     fun focusToField() {

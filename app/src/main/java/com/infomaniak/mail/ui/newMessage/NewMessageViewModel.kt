@@ -28,6 +28,8 @@ import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.richhtmleditor.EditorReloader
+import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
 import com.infomaniak.mail.MatomoMail.OPEN_LOCAL_DRAFT
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -109,6 +111,9 @@ class NewMessageViewModel @Inject constructor(
     val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
+
+    val editorReloader = EditorReloader(viewModelScope)
+    val editorBodyLoader = SingleLiveEvent<String>()
 
     var lastOnStopSubjectValue = ""
     var lastOnStopBodyValue = ""
@@ -375,6 +380,8 @@ class NewMessageViewModel @Inject constructor(
         bccLiveData.postValue(UiRecipients(recipients = bcc))
 
         attachmentsLiveData.postValue(attachments)
+
+        editorBodyLoader.postValue(uiBody)
 
         uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
@@ -901,6 +908,12 @@ class NewMessageViewModel @Inject constructor(
             recipients = valueOrEmpty().toMutableList().apply { update(this) },
             otherFieldsAreEmpty = value!!.otherFieldsAreEmpty,
         )
+    }
+
+    fun saveEditorHtml(editor: RichHtmlEditorWebView) {
+        editor.exportHtml {
+            viewModelScope.launch { editorBodyLoader.postValue(it) }
+        }
     }
 
     enum class ImportationResult {
