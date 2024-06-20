@@ -89,6 +89,8 @@ dependencies {
     implementation project(path: ':Core:Stores')
     implementation project(path: ':HtmlCleaner')
 
+    implementation libs.rich.html.editor
+
     implementation libs.realm.kotlin.base
 
     standardImplementation libs.firebase.messaging.ktx

@@ -44,6 +44,7 @@ import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -92,7 +93,7 @@ class NewMessageAiManager @Inject constructor(
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
             subject?.let(subjectTextField::setText)
-            bodyTextField.setText(content)
+            editor.setHtml(content)
         }
     }
 
@@ -221,12 +222,18 @@ class NewMessageAiManager @Inject constructor(
         closeAiPrompt(becauseOfGeneration = true)
         resetAiProposition()
 
-        fragment.safeNavigate(
-            NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
-                isSubjectBlank = fragment.isSubjectBlank(),
-                isBodyBlank = binding.bodyTextField.text?.isBlank() == true,
-            ),
-        )
+        // TODO: Find out if body is empty
+        // TODO: Review this part
+        binding.editor.exportHtml { it
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                fragment.safeNavigate(
+                    NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
+                        isSubjectBlank = fragment.isSubjectBlank(),
+                        isBodyBlank = it.isBlank(),
+                    ),
+                )
+            }
+        }
     }
 
     fun openAiPrompt() {

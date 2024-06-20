@@ -284,34 +284,20 @@
                         tools:listitem="@layout/item_attachment"
                         tools:visibility="visible" />
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/bodyLayout"
+                    <FrameLayout
+                        android:id="@+id/editorLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:boxBackgroundColor="@android:color/transparent"
-                        app:boxBackgroundMode="none"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="false"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
-                        app:placeholderText="@string/newMessagePlaceholderTitle"
-                        app:placeholderTextColor="@color/tertiaryTextColor">
+                        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/bodyTextField"
-                            style="@style/Body"
+                        <com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
+                            android:id="@+id/editor"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="top"
-                            android:hint="@string/newMessagePlaceholderTitle"
-                            android:inputType="textMultiLine|textCapSentences"
-                            android:nextFocusUp="@id/subjectTextField"
-                            android:paddingBottom="0dp"
-                            android:visibility="gone"
-                            tools:visibility="visible" />
+                            android:layout_height="wrap_content" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
+                    </FrameLayout>
 
                     <LinearLayout
                         android:id="@+id/bodyLoader"
@@ -367,7 +353,7 @@
                         android:layout_marginBottom="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/bodyLayout" />
+                        app:layout_constraintTop_toBottomOf="@id/editorLayout" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/removeSignature"
@@ -472,7 +458,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/editor"
+            app:layout_constraintBottom_toTopOf="@+id/editorToolbar"
             app:layout_constraintTop_toBottomOf="@+id/compositionNestedScrollView"
             tools:visibility="visible">
 
@@ -506,7 +492,7 @@
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/editor"
+            android:id="@+id/editorToolbar"
             style="@style/CardViewMail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

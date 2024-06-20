@@ -25,21 +25,10 @@ import android.os.Parcelable
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
-import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.lib.core.utils.getFileNameAndSize
-import com.infomaniak.lib.core.utils.guessMimeType
-import com.infomaniak.lib.core.utils.parcelableArrayListExtra
-import com.infomaniak.lib.core.utils.parcelableExtra
-import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
 import com.infomaniak.mail.MatomoMail.OPEN_LOCAL_DRAFT
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -68,27 +57,12 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.EXACT_MATCH
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.EXACT_MATCH_AND_IS_DEFAULT
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.NO_MATCH
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.ONLY_EMAIL_MATCH
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.ONLY_EMAIL_MATCH_AND_IS_DEFAULT
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
-import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.MessageBodyUtils
-import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.findSpecificAttachment
-import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.htmlToText
-import com.infomaniak.mail.utils.extensions.isEmail
-import com.infomaniak.mail.utils.extensions.textToHtml
-import com.infomaniak.mail.utils.extensions.valueOrEmpty
-import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -98,7 +72,6 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -106,6 +79,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import javax.inject.Inject
 
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
@@ -136,6 +110,8 @@ class NewMessageViewModel @Inject constructor(
     val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
+
+    val editorBodyLoader = SingleLiveEvent<String>()
 
     var lastOnStopSubjectValue = ""
     var lastOnStopBodyValue = ""
@@ -404,6 +380,8 @@ class NewMessageViewModel @Inject constructor(
         bccLiveData.postValue(UiRecipients(recipients = bcc))
 
         attachmentsLiveData.postValue(attachments)
+
+        editorBodyLoader.postValue(uiBody)
 
         uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
@@ -953,6 +931,12 @@ class NewMessageViewModel @Inject constructor(
             recipients = valueOrEmpty().toMutableList().apply { update(this) },
             otherFieldsAreEmpty = value!!.otherFieldsAreEmpty,
         )
+    }
+
+    fun saveEditorHtml(editor: RichHtmlEditorWebView) {
+        editor.exportHtml {
+            viewModelScope.launch { editorBodyLoader.postValue(it) }
+        }
     }
 
     enum class ImportationResult {

@@ -72,15 +72,8 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
-import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
-import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -172,6 +165,7 @@ class NewMessageFragment : Fragment() {
         observeAttachments()
         observeImportAttachmentsResult()
         observeOpenAttachment()
+        observeBodyLoader()
         observeUiSignature()
         observeUiQuote()
 
@@ -298,6 +292,13 @@ class NewMessageFragment : Fragment() {
             }
         })
 
+        editor.apply {
+            enableAlgorithmicDarkening(true)
+            if (context.isNightModeEnabled()) editor.addCss(context.readRawResource(R.raw.custom_dark_mode))
+
+            addCss(context.readRawResource(R.raw.style))
+        }
+
         setupSendButton()
         externalsManager.setupExternalBanner()
 
@@ -313,7 +314,6 @@ class NewMessageFragment : Fragment() {
                 if (draft != null) {
                     showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty())
                     binding.subjectTextField.setText(draft.subject)
-                    binding.bodyTextField.setText(draft.uiBody)
                 } else {
                     requireActivity().apply {
                         showToast(R.string.failToOpenDraft)
@@ -328,7 +328,7 @@ class NewMessageFragment : Fragment() {
 
         fromMailAddress.isVisible = true
         subjectTextField.isVisible = true
-        bodyTextField.isVisible = true
+        editor.isVisible = true
 
         fromLoader.isGone = true
         subjectLoader.isGone = true
@@ -535,6 +535,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun observeBodyLoader() {
+        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner) {
+            binding.editor.setHtml(it)
+        }
+    }
+
     private fun observeUiSignature() = with(binding) {
         newMessageViewModel.uiSignatureLiveData.observe(viewLifecycleOwner) { signature ->
             if (signature == null) {
@@ -555,6 +561,11 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        newMessageViewModel.saveEditorHtml(binding.editor)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onStop() = with(newMessageViewModel) {
 
         /**
@@ -564,8 +575,9 @@ class NewMessageFragment : Fragment() {
          * If we are not (ex: AI fragments), we get them from the ViewModel.
          * Hence, here, we save them to the ViewModel when stopping the NewMessageFragment.
          */
-        lastOnStopSubjectValue = binding.subjectTextField.text.toString()
-        lastOnStopBodyValue = binding.bodyTextField.text.toString()
+        val (subject, body) = getSubjectAndBodyValues()
+        lastOnStopSubjectValue = subject
+        lastOnStopBodyValue = body
 
         super.onStop()
     }
@@ -625,6 +637,7 @@ class NewMessageFragment : Fragment() {
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
 
     fun getSubjectAndBodyValues(): Pair<String, String> = with(binding) {
-        return subjectTextField.text.toString() to bodyTextField.text.toString()
+        // TODO: Access the html from the editor
+        return subjectTextField.text.toString() to "TODO support exporting editor's content"//bodyTextField.text.toString()
     }
 }
