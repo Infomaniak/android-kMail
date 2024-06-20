@@ -617,12 +617,7 @@ class NewMessageViewModel @Inject constructor(
             snackbarManager = snackbarManager,
         )?.let { file ->
             Pair(
-                attachment.initLocalValues(
-                    name = fileName,
-                    size = file.length(),
-                    mimeType = file.path.guessMimeType(),
-                    uri = file.toUri().toString(),
-                ),
+                attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
                 fileSize > availableSpace,
             )
         }
