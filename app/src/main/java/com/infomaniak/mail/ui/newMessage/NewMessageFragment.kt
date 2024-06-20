@@ -496,7 +496,7 @@ class NewMessageFragment : Fragment() {
                 observeImportAttachments()
             } else if (attachments.count() > attachmentAdapter.itemCount) {
                 // If we are adding Attachments, directly upload them to save time when sending/saving the Draft.
-                newMessageViewModel.uploadAttachmentsToServer()
+                newMessageViewModel.uploadAttachmentsToServer(attachments)
             }
 
             // When removing an Attachment, both counts will be the same, because the Adapter is already notified.
