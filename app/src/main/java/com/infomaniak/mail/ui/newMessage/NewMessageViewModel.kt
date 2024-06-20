@@ -816,12 +816,12 @@ class NewMessageViewModel @Inject constructor(
         /**
          * If :
          * - we are in FORWARD mode,
-         * - all Attachments have no `uploadLocalUri` (meaning they are all from the original forwarded Message),
-         * - there quantity is the same in UI and in Realm,
+         * - none got added (all Attachments are already uploaded, meaning they are all from the original forwarded Message),
+         * - none got removed (their quantity is the same in UI and in Realm),
          * Then it means the Attachments list hasn't been edited by the user, so we have nothing to do here.
          */
         val isForwardingUneditedAttachmentsList = draftMode == DraftMode.FORWARD &&
-                uiAttachments.all { it.uploadLocalUri == null } &&
+                uiAttachments.all { it.isAlreadyUploaded } &&
                 uiAttachments.count() == attachments.count()
         if (isForwardingUneditedAttachmentsList) return
 
@@ -844,7 +844,7 @@ class NewMessageViewModel @Inject constructor(
              * some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of
              * the Attachment, this data will be lost forever and we won't be able to save/send the Draft.
              */
-            return@map if (localAttachment?.uuid != null) localAttachment.copyFromRealm() else uiAttachment
+            return@map if (localAttachment?.isAlreadyUploaded == true) localAttachment.copyFromRealm() else uiAttachment
         }
 
         attachments.apply {

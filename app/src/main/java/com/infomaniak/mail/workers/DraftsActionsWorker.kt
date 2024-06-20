@@ -285,7 +285,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val updatedDraft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!
         // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
         updatedDraft.attachments.forEach { attachment ->
-            if (attachment.uuid.isBlank()) {
+            if (!attachment.isAlreadyUploaded) {
 
                 Sentry.withScope { scope ->
                     scope.setExtra("attachmentUuid", attachment.uuid)
