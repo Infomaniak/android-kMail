@@ -818,7 +818,7 @@ class NewMessageViewModel @Inject constructor(
          * - we are in FORWARD mode,
          * - all Attachments have no `uploadLocalUri` (meaning they are all from the original forwarded Message),
          * - there quantity is the same in UI and in Realm,
-         * Then it means the Attachments list hasn't be edited by the user, so we have nothing to do here.
+         * Then it means the Attachments list hasn't been edited by the user, so we have nothing to do here.
          */
         if (draftMode == DraftMode.FORWARD &&
             uiAttachments.all { it.uploadLocalUri == null } &&
