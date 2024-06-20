@@ -63,6 +63,8 @@ class Attachment : EmbeddedRealmObject {
     var uploadLocalUri: String? = null
     //endregion
 
+    val isAlreadyUploaded: Boolean get() = uuid.isNotBlank()
+
     val isCalendarEvent: Boolean get() = AttachmentMimeTypeUtils.calendarMatches.contains(mimeType)
 
     val disposition: AttachmentDisposition?

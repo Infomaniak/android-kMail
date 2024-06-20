@@ -127,6 +127,7 @@ object AttachmentExtensions {
             intentType = intentType,
         ).toBundle()
     }
+    //endregion
 
     suspend fun Attachment.startUpload(
         draftLocalUuid: String,
@@ -187,13 +188,22 @@ object AttachmentExtensions {
                 // The API version of an Attachment doesn't have the `uploadLocalUri` & `localUuid`, so we need to back them up.
                 remoteAttachment.backupLocalData(oldAttachment = this@updateLocalAttachment)
 
-                delete(draft.attachments.first { localAttachment -> localAttachment.uploadLocalUri == uploadLocalUri })
-                draft.attachments.add(remoteAttachment)
+                draft.attachments.apply {
+                    delete(findSpecificAttachment(attachment = this@updateLocalAttachment)!!)
+                    add(remoteAttachment)
+                }
             }
         }
     }
 
-    //endregion
+    fun List<Attachment>.findSpecificAttachment(attachment: Attachment) = this
+        .filter { it.localUuid == attachment.localUuid }
+        .also {
+            // TODO: If this Sentry never triggers, remove it and replace the
+            //  `filter { … }.also { … }.firstOrNull()` with `singleOrNull { … }`
+            if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same localUuid")
+        }
+        .firstOrNull()
 
     enum class AttachmentIntentType {
         OPEN_WITH,
