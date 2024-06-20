@@ -820,12 +820,10 @@ class NewMessageViewModel @Inject constructor(
          * - there quantity is the same in UI and in Realm,
          * Then it means the Attachments list hasn't been edited by the user, so we have nothing to do here.
          */
-        if (draftMode == DraftMode.FORWARD &&
-            uiAttachments.all { it.uploadLocalUri == null } &&
-            uiAttachments.count() == attachments.count()
-        ) {
-            return
-        }
+        val isForwardingUneditedAttachmentsList = draftMode == DraftMode.FORWARD &&
+                uiAttachments.all { it.uploadLocalUri == null } &&
+                uiAttachments.count() == attachments.count()
+        if (isForwardingUneditedAttachmentsList) return
 
         val updatedAttachments = uiAttachments.map { uiAttachment ->
             val localAttachment = attachments
