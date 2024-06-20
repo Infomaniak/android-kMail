@@ -44,14 +44,14 @@ object ContactUtils {
     }
 
     private fun Context.getLocalEmails(): Map<Long, Set<String>> {
-        val mailDictionary: MutableMap<Long, MutableSet<String>> = mutableMapOf()
+        val mailDictionary = mutableMapOf<Long, MutableSet<String>>()
         val projection = arrayOf(Email.CONTACT_ID, Email.ADDRESS)
         val contentUri = Email.CONTENT_URI
 
         contentResolver.query(contentUri, projection, null, null, null)?.use { cursor ->
             while (cursor.moveToNext()) {
+                val address = cursor.getString(cursor.getColumnIndexOrThrow(Email.ADDRESS)) ?: continue
                 val id = cursor.getLong(cursor.getColumnIndexOrThrow(Email.CONTACT_ID))
-                val address = cursor.getString(cursor.getColumnIndexOrThrow(Email.ADDRESS))
 
                 mailDictionary[id]?.add(address) ?: run { mailDictionary[id] = mutableSetOf(address) }
             }

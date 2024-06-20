@@ -36,8 +36,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * When user doesn't have PlayServices, we can't receive push notifications via
- * `ProcessMessageNotificationsWorker`. So we have to routinely fetch Messages.
+ * When the user doesn't have PlayServices, we can't receive push notifications via `ProcessMessageNotificationsWorker`.
+ * So we have to routinely fetch Messages (every ~15 min).
+ *
+ * This Worker is also used to fetch Messages every few hours (~4h),
+ * even if the user has PlayServices, to be sure that we are up-to-date.
  */
 @HiltWorker
 class SyncMailboxesWorker @AssistedInject constructor(
