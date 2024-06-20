@@ -60,6 +60,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.findSpecificAttachment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -826,18 +827,8 @@ class NewMessageViewModel @Inject constructor(
         if (isForwardingUneditedAttachmentsList) return
 
         val updatedAttachments = uiAttachments.map { uiAttachment ->
-            val localAttachment = attachments
-                /**
-                 * If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
-                 * But an Attachment only has an `uploadLocalUri` if the user added it by himself to the Draft.
-                 * If it was added by Message forwarding, it won't have any `uploadLocalUri`, so we don't check this.
-                 */
-                .filter { it.uploadLocalUri != null && it.uploadLocalUri == uiAttachment.uploadLocalUri }
-                .also {
-                    // If this Sentry never triggers, remove it and replace the
-                    // `attachments.filter { … }.also { … }.firstOrNull()` with `attachments.singleOrNull { … }`
-                    if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same uploadLocalUri")
-                }.firstOrNull()
+
+            val localAttachment = attachments.findSpecificAttachment(uiAttachment)
 
             /**
              * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly already be
