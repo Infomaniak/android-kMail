@@ -20,7 +20,6 @@ package com.infomaniak.mail.utils
 import android.os.Bundle
 import androidx.navigation.NavController
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
@@ -242,13 +241,12 @@ object SentryDebug {
         return orphanThreads
     }
 
-    fun sendOrphanDrafts(realm: TypedRealm) {
-        val orphanDrafts = DraftController.getOrphanDrafts(realm)
-        if (orphanDrafts.isNotEmpty()) {
+    fun sendOrphanDrafts(orphans: List<Draft>) {
+        if (orphans.isNotEmpty()) {
             Sentry.withScope { scope ->
                 scope.setExtra(
                     "orphanDrafts",
-                    orphanDrafts.joinToString {
+                    orphans.joinToString {
                         if (it.messageUid == null) {
                             "${Draft::localUuid.name}: [${it.localUuid}]"
                         } else {
