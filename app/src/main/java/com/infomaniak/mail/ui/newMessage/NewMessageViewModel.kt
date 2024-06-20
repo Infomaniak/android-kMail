@@ -813,9 +813,26 @@ class NewMessageViewModel @Inject constructor(
 
     private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>) {
 
+        /**
+         * If :
+         * - we are in FORWARD mode,
+         * - all Attachments have no `uploadLocalUri` (meaning they are all from the original forwarded Message),
+         * - there quantity is the same in UI and in Realm,
+         * Then it means the Attachments list hasn't been edited by the user, so we have nothing to do here.
+         */
+        val isForwardingUneditedAttachmentsList = draftMode == DraftMode.FORWARD &&
+                uiAttachments.all { it.uploadLocalUri == null } &&
+                uiAttachments.count() == attachments.count()
+        if (isForwardingUneditedAttachmentsList) return
+
         val updatedAttachments = uiAttachments.map { uiAttachment ->
-            // If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
-            val localAttachment = attachments.filter { it.uploadLocalUri == uiAttachment.uploadLocalUri }
+            val localAttachment = attachments
+                /**
+                 * If a localAttachment has the same `uploadLocalUri` than a UI one, it means it represents the same Attachment.
+                 * But an Attachment only has an `uploadLocalUri` if the user added it by himself to the Draft.
+                 * If it was added by Message forwarding, it won't have any `uploadLocalUri`, so we don't check this.
+                 */
+                .filter { it.uploadLocalUri != null && it.uploadLocalUri == uiAttachment.uploadLocalUri }
                 .also {
                     // If this Sentry never triggers, remove it and replace the
                     // `attachments.filter { … }.also { … }.firstOrNull()` with `attachments.singleOrNull { … }`
