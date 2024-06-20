@@ -53,4 +53,4 @@ suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: DraftCont
     return true
 }
 
-private fun Draft.getNotUploadedAttachments(): List<Attachment> = attachments.filter { !it.isAlreadyUploaded }
+private fun Draft.getNotUploadedAttachments(): List<Attachment> = attachments.filterNot { it.isAlreadyUploaded }
