@@ -336,6 +336,7 @@ class ThreadFragment : Fragment() {
                 )
             }
             is SwissTransferFile -> {
+                trackAttachmentActionsEvent("openSwissTransfer")
                 downloadSwissTransferFile(swissTransferFile = attachable)
             }
         }
