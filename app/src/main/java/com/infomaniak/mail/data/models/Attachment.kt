@@ -81,6 +81,15 @@ class Attachment : EmbeddedRealmObject {
         return this
     }
 
+    /**
+     * After uploading an Attachment, we replace the local version with the remote one.
+     * The remote one doesn't know about local data, so we have to backup them.
+     */
+    fun backupLocalData(oldAttachment: Attachment) {
+        localUuid = oldAttachment.localUuid
+        uploadLocalUri = oldAttachment.uploadLocalUri
+    }
+
     fun getFileTypeFromMimeType(): AttachmentType = AttachmentMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
     fun hasUsableCache(
