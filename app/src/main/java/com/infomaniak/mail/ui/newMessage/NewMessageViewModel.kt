@@ -41,6 +41,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.UploadStatus
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -719,7 +720,7 @@ class NewMessageViewModel @Inject constructor(
         } ?: return@launch
 
         runCatching {
-            localDraft.uploadAttachments(currentMailbox, draftController, mailboxContentRealm())
+            uploadAttachmentsWithMutex(localDraft, currentMailbox, draftController, mailboxContentRealm())
         }.onFailure(Sentry::captureException)
     }
 
@@ -822,7 +823,7 @@ class NewMessageViewModel @Inject constructor(
          * Then it means the Attachments list hasn't been edited by the user, so we have nothing to do here.
          */
         val isForwardingUneditedAttachmentsList = draftMode == DraftMode.FORWARD &&
-                uiAttachments.all { it.isAlreadyUploaded } &&
+                uiAttachments.all { it.uploadStatus == UploadStatus.FINISHED } &&
                 uiAttachments.count() == attachments.count()
         if (isForwardingUneditedAttachmentsList) return
 
@@ -831,11 +832,15 @@ class NewMessageViewModel @Inject constructor(
             val localAttachment = attachments.findSpecificAttachment(uiAttachment)
 
             /**
-             * The DraftsActionWorker will possibly upload the Attachments beforehand, so there will possibly already be
-             * some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of
-             * the Attachment, this data will be lost forever and we won't be able to save/send the Draft.
+             * The DraftsActionWorker will possibly start uploading the Attachments beforehand, so there will possibly already
+             * be some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of the
+             * Attachment, this data will be lost forever and we won't be able to save/send the Draft.
              */
-            return@map if (localAttachment?.isAlreadyUploaded == true) localAttachment.copyFromRealm() else uiAttachment
+            return@map if (localAttachment != null && localAttachment.uploadStatus != UploadStatus.AWAITING) {
+                localAttachment.copyFromRealm()
+            } else {
+                uiAttachment
+            }
         }
 
         attachments.apply {

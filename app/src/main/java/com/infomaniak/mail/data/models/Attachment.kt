@@ -61,9 +61,12 @@ class Attachment : EmbeddedRealmObject {
     var localUuid: String = UUID.randomUUID().toString()
     @Transient
     var uploadLocalUri: String? = null
+    @Transient
+    private var _uploadStatus: String = UploadStatus.AWAITING.name
     //endregion
 
-    val isAlreadyUploaded: Boolean get() = uuid.isNotBlank()
+    val uploadStatus: UploadStatus
+        get() = enumValueOf<UploadStatus>(_uploadStatus)
 
     val isCalendarEvent: Boolean get() = AttachmentMimeTypeUtils.calendarMatches.contains(mimeType)
 
@@ -87,9 +90,14 @@ class Attachment : EmbeddedRealmObject {
      * After uploading an Attachment, we replace the local version with the remote one.
      * The remote one doesn't know about local data, so we have to backup them.
      */
-    fun backupLocalData(oldAttachment: Attachment) {
+    fun backupLocalData(oldAttachment: Attachment, uploadStatus: UploadStatus) {
         localUuid = oldAttachment.localUuid
         uploadLocalUri = oldAttachment.uploadLocalUri
+        setUploadStatus(uploadStatus)
+    }
+
+    fun setUploadStatus(uploadStatus: UploadStatus) {
+        _uploadStatus = uploadStatus.name
     }
 
     fun getFileTypeFromMimeType(): AttachmentType = AttachmentMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
@@ -126,6 +134,12 @@ class Attachment : EmbeddedRealmObject {
     enum class AttachmentDisposition {
         INLINE,
         ATTACHMENT,
+    }
+
+    enum class UploadStatus {
+        AWAITING,
+        ONGOING,
+        FINISHED,
     }
 
     enum class AttachmentType(@DrawableRes val icon: Int) {
