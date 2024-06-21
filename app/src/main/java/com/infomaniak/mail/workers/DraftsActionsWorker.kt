@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.Attachment.UploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -44,7 +45,6 @@ import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
-import com.infomaniak.mail.utils.extensions.uploadAttachments
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.MutableRealm
@@ -148,8 +148,8 @@ class DraftsActionsWorker @AssistedInject constructor(
             if (isTargetDraft) trackedDraftAction = draft.action
 
             runCatching {
-                draft.uploadAttachments(mailbox, draftController, mailboxContentRealm)
-                with(executeDraftAction(draft, mailbox.uuid)) {
+                val updatedDraft = uploadAttachmentsWithMutex(draft, mailbox, draftController, mailboxContentRealm)
+                with(executeDraftAction(updatedDraft, mailbox.uuid)) {
                     if (isSuccess) {
                         if (isTargetDraft) {
                             remoteUuidOfTrackedDraft = savedDraftUuid
@@ -286,23 +286,22 @@ class DraftsActionsWorker @AssistedInject constructor(
         var scheduledDate: String? = null
         var savedDraftUuid: String? = null
 
-        val updatedDraft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!
         // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
-        updatedDraft.attachments.forEach { attachment ->
-            if (!attachment.isAlreadyUploaded) {
+        draft.attachments.forEach { attachment ->
+            if (attachment.uploadStatus != UploadStatus.FINISHED) {
 
                 Sentry.withScope { scope ->
                     scope.setExtra("attachmentUuid", attachment.uuid)
-                    scope.setExtra("attachmentsCount", "${updatedDraft.attachments.count()}")
+                    scope.setExtra("attachmentsCount", "${draft.attachments.count()}")
                     scope.setExtra(
                         "attachmentsUuids to attachmentsLocalUuid",
-                        "${updatedDraft.attachments.map { it.uuid to it.localUuid }}",
+                        "${draft.attachments.map { it.uuid to it.localUuid }}",
                     )
-                    scope.setExtra("draftUuid", "${updatedDraft.remoteUuid}")
-                    scope.setExtra("draftLocalUuid", updatedDraft.localUuid)
+                    scope.setExtra("draftUuid", "${draft.remoteUuid}")
+                    scope.setExtra("draftLocalUuid", draft.localUuid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     Sentry.captureMessage(
-                        "We tried to [${updatedDraft.action?.name}] a Draft, but an Attachment didn't have its `uuid`.",
+                        "We tried to [${draft.action?.name}] a Draft, but an Attachment wasn't uploaded.",
                         SentryLevel.ERROR,
                     )
                 }
@@ -317,10 +316,10 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        fun executeSaveAction() = with(ApiRepository.saveDraft(mailboxUuid, updatedDraft, okHttpClient)) {
+        fun executeSaveAction() = with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
             data?.let { data ->
                 realmActionOnDraft = { realm ->
-                    realm.findLatest(updatedDraft)?.apply {
+                    realm.findLatest(draft)?.apply {
                         remoteUuid = data.draftRemoteUuid
                         messageUid = data.messageUid
                         action = null
@@ -333,14 +332,14 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        fun executeSendAction() = with(ApiRepository.sendDraft(mailboxUuid, updatedDraft, okHttpClient)) {
+        fun executeSendAction() = with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
             when {
                 isSuccess() -> {
                     scheduledDate = data?.scheduledDate
-                    realmActionOnDraft = deleteDraftCallback(updatedDraft)
+                    realmActionOnDraft = deleteDraftCallback(draft)
                 }
                 error?.exception is SerializationException -> {
-                    realmActionOnDraft = deleteDraftCallback(updatedDraft)
+                    realmActionOnDraft = deleteDraftCallback(draft)
                     Sentry.withScope { scope ->
                         scope.setExtra("Is data null ?", "${data == null}")
                         scope.setExtra("Error code", error?.code.toString())
@@ -354,7 +353,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        when (updatedDraft.action) {
+        when (draft.action) {
             DraftAction.SAVE -> executeSaveAction()
             DraftAction.SEND -> executeSendAction()
             else -> Unit
@@ -384,12 +383,17 @@ class DraftsActionsWorker @AssistedInject constructor(
     private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
         updateSignatures(mailbox, mailboxContentRealm)
+
         val signature = SignatureController.getDefaultSignatureWithFallback(realm = mailboxContentRealm)
         mailboxContentRealm.writeBlocking {
             draftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature?.id?.toString() }
         }
 
-        return executeDraftAction(draft, mailboxUuid, isFirstTime = false)
+        return executeDraftAction(
+            draft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!,
+            mailboxUuid = mailboxUuid,
+            isFirstTime = false,
+        )
     }
 
     private fun deleteDraftCallback(draft: Draft): (MutableRealm) -> Unit = { realm ->

@@ -33,6 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.UploadStatus
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
@@ -134,7 +135,7 @@ object AttachmentExtensions {
         mailbox: Mailbox,
         draftController: DraftController,
         realm: Realm,
-    ): Boolean {
+    ) {
         val attachmentFile = getUploadLocalFile().also {
             if (it?.exists() != true) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
@@ -142,7 +143,7 @@ object AttachmentExtensions {
             }
         }
 
-        val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return false
+        val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
             .addUnsafeNonAscii("x-ws-attachment-filename", name)
@@ -168,8 +169,6 @@ object AttachmentExtensions {
 
             apiResponse.throwErrorAsException()
         }
-
-        return true
     }
 
     private fun Attachment.updateLocalAttachment(
@@ -185,8 +184,12 @@ object AttachmentExtensions {
                 SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (uuids to localUris): $uuidToLocalUri")
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
-                // The API version of an Attachment doesn't have the `uploadLocalUri` & `localUuid`, so we need to back them up.
-                remoteAttachment.backupLocalData(oldAttachment = this@updateLocalAttachment)
+                remoteAttachment.backupLocalData(oldAttachment = this@updateLocalAttachment, UploadStatus.FINISHED)
+
+                SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment name: ${remoteAttachment.name}")
+                SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment uuid: ${remoteAttachment.uuid}")
+                SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment localUuid: ${remoteAttachment.localUuid}")
+                SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment uploadLocalUri: ${remoteAttachment.uploadLocalUri}")
 
                 draft.attachments.apply {
                     delete(findSpecificAttachment(attachment = this@updateLocalAttachment)!!)
