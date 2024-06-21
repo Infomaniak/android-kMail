@@ -186,7 +186,6 @@ object AttachmentExtensions {
 
                 remoteAttachment.backupLocalData(oldAttachment = this@updateLocalAttachment, UploadStatus.FINISHED)
 
-                SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment name: ${remoteAttachment.name}")
                 SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment uuid: ${remoteAttachment.uuid}")
                 SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment localUuid: ${remoteAttachment.localUuid}")
                 SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment uploadLocalUri: ${remoteAttachment.uploadLocalUri}")
