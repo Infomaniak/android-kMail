@@ -55,6 +55,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
@@ -113,8 +114,7 @@ class NewMessageViewModel @Inject constructor(
 
     val editorBodyLoader = SingleLiveEvent<String>()
 
-    var lastOnStopSubjectValue = ""
-    var lastOnStopBodyValue = ""
+    val subjectAndBody = SingleLiveEvent<Pair<String, String>>()
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -745,21 +745,14 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
-    fun executeDraftActionWhenStopping(
-        action: DraftAction,
-        isFinishing: Boolean,
-        isTaskRoot: Boolean,
-        subjectValue: String,
-        uiBodyValue: String,
-        startWorkerCallback: () -> Unit,
-    ) = globalCoroutineScope.launch(ioDispatcher) {
-
-        val localUuid = draftLocalUuid ?: return@launch
+    // TODO: See if this still makes sens to define here
+    suspend fun executeDraftActionWhenStopping(draftSaveConfiguration: DraftSaveConfiguration) = with(draftSaveConfiguration) {
+        val localUuid = draftLocalUuid ?: return@with
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
         if (action == DraftAction.SAVE && isSnapshotTheSame(subject, uiBodyValue)) {
             if (isFinishing && isNewMessage) removeDraftFromRealm(localUuid)
-            return@launch
+            return@with
         }
 
         val hasFailed = mailboxContentRealm().writeBlocking {
@@ -769,7 +762,7 @@ class NewMessageViewModel @Inject constructor(
             return@writeBlocking false
         }
 
-        if (hasFailed) return@launch
+        if (hasFailed) return@with
 
         showDraftToastToUser(action, isFinishing, isTaskRoot)
         startWorkerCallback()

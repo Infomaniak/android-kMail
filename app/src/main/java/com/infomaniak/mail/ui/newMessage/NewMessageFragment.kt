@@ -566,18 +566,15 @@ class NewMessageFragment : Fragment() {
         super.onSaveInstanceState(outState)
     }
 
-    override fun onStop() = with(newMessageViewModel) {
-
+    override fun onStop() {
         /**
          * When the Activity is being stopped, we save the Draft.
          * We then need the up-to-date subject & body values.
-         * If we are in the NewMessageFragment when stopping, it's easy, we just get them from the binding.
-         * If we are not (ex: AI fragments), we get them from the ViewModel.
-         * Hence, here, we save them to the ViewModel when stopping the NewMessageFragment.
          */
-        val (subject, body) = getSubjectAndBodyValues()
-        lastOnStopSubjectValue = subject
-        lastOnStopBodyValue = body
+        val subject = binding.subjectTextField.text.toString()
+        binding.editor.exportHtml { html ->
+            newMessageViewModel.subjectAndBody.postValue(subject to html)
+        }
 
         super.onStop()
     }
