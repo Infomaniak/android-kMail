@@ -24,6 +24,7 @@ import android.view.View
 import android.webkit.WebView
 import androidx.activity.viewModels
 import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.lifecycle.Observer
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.BuildConfig
@@ -32,6 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -40,6 +42,9 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -58,6 +63,14 @@ class NewMessageActivity : BaseActivity() {
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
+
+
+    @Inject
+    lateinit var globalCoroutineScope: CoroutineScope
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,26 +137,43 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun saveDraft() {
-
-        val fragment = getCurrentFragment(R.id.newMessageHostFragment)
-
-        val (subjectValue, uiBodyValue) = if (fragment is NewMessageFragment) {
-            fragment.getSubjectAndBodyValues()
-        } else with(newMessageViewModel) {
-            lastOnStopSubjectValue to lastOnStopBodyValue
-        }
-
-        newMessageViewModel.executeDraftActionWhenStopping(
+        // TODO: Init all fields at the same time in the constructor?
+        val draftSaveConfiguration = DraftSaveConfiguration(
             action = if (newMessageViewModel.shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = isFinishing,
             isTaskRoot = isTaskRoot,
-            subjectValue = subjectValue,
-            uiBodyValue = uiBodyValue,
             startWorkerCallback = ::startWorker,
         )
+
+        val observer = object : Observer<Pair<String, String>> {
+            override fun onChanged(value: Pair<String, String>) {
+                newMessageViewModel.subjectAndBody.removeObserver(this)
+
+                val (subject, body) = value
+                draftSaveConfiguration.apply {
+                    subjectValue = subject
+                    uiBodyValue = body
+                }
+
+                globalCoroutineScope.launch(ioDispatcher) {
+                    newMessageViewModel.executeDraftActionWhenStopping(draftSaveConfiguration)
+                }
+            }
+        }
+
+        newMessageViewModel.subjectAndBody.observeForever(observer)
     }
 
     private fun startWorker() {
         draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
+
+    class DraftSaveConfiguration(
+        val action: DraftAction,
+        val isFinishing: Boolean,
+        val isTaskRoot: Boolean,
+        var subjectValue: String = "",
+        var uiBodyValue: String = "",
+        val startWorkerCallback: () -> Unit,
+    )
 }
