@@ -465,11 +465,12 @@ class ThreadAdapter(
 
     @SuppressLint("SetTextI18n")
     private fun MessageViewHolder.bindAttachment(message: Message) = with(binding) {
-
-        val attachments = mutableListOf<Attachable>().apply {
-            addAll(message.attachments)
-            addAll(message.swissTransferFiles)
+        if (!message.hasAttachable) {
+            attachmentLayout.root.isVisible = false
+            return@with
         }
+
+        val attachments = message.attachments + message.swissTransferFiles
 
         val attachmentString = computeAttachmentString(context, message)
 
@@ -492,7 +493,8 @@ class ThreadAdapter(
         attachmentLayout.attachmentsInfo.setOnClickListener {
             threadAdapterCallbacks?.onDownloadAllClicked?.invoke(message)
         }
-        attachmentLayout.root.isVisible = message.attachments.isNotEmpty() || message.hasSwissTransferFiles
+
+        attachmentLayout.root.isVisible = true
     }
 
     private fun computeAttachmentString(context: Context, message: Message): String {
