@@ -22,7 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.MediaStore
+import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
@@ -75,7 +75,7 @@ object AttachmentExtensions {
             component = ComponentName(DRIVE_PACKAGE, SAVE_EXTERNAL_ACTIVITY_CLASS)
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(MediaStore.MediaColumns.DATE_MODIFIED, lastModifiedDate)
+            putExtra(FileColumns.DATE_MODIFIED, lastModifiedDate)
             setDataAndType(uri, safeMimeType)
         }
     }
