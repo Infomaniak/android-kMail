@@ -42,8 +42,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -263,10 +261,8 @@ class NewMessageFragment : Fragment() {
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(signatureWebView.settings, true)
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(quoteWebView.settings, true)
-        }
+        signatureWebView.enableAlgorithmicDarkening(true)
+        quoteWebView.enableAlgorithmicDarkening(true)
 
         attachmentsRecyclerView.adapter = AttachmentAdapter(
             shouldDisplayCloseButton = true,

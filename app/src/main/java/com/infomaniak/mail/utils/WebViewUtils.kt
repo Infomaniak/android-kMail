@@ -22,8 +22,6 @@ import android.content.Context
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomStyle
@@ -33,6 +31,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getJsBridgeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
+import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.readRawResource
 
 class WebViewUtils(context: Context) {
@@ -152,10 +151,7 @@ class WebViewUtils(context: Context) {
         }
 
         fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean) {
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-                WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSame)
-            }
-
+            enableAlgorithmicDarkening(isThemeTheSame)
             if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
         }
 

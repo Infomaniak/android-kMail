@@ -35,8 +35,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
@@ -285,9 +283,7 @@ class ThreadAdapter(
     }
 
     private fun WebView.applyWebViewContent(uid: String, bodyWebView: String, type: String) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, threadAdapterState.isThemeTheSameMap[uid]!!)
-        }
+        enableAlgorithmicDarkening(threadAdapterState.isThemeTheSameMap[uid]!!)
 
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
         styledBody = processMailDisplay(styledBody, uid, isForPrinting)

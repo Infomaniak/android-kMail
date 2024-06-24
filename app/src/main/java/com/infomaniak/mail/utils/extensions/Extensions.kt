@@ -51,6 +51,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -618,4 +620,10 @@ fun ViewPager2.removeOverScrollForApiBelow31() {
 fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean): Int? {
     val index = indexOfFirst(predicate)
     return if (index == -1) null else index
+}
+
+fun WebView.enableAlgorithmicDarkening(isEnabled: Boolean) {
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+        WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isEnabled)
+    }
 }
