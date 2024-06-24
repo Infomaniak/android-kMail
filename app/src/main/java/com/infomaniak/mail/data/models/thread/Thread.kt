@@ -69,8 +69,6 @@ class Thread : RealmObject {
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
-    @SerialName("has_attachments")
-    var hasAttachments: Boolean = false
     @SerialName("has_drafts")
     var hasDrafts: Boolean = false
     @SerialName("flagged")
@@ -92,6 +90,8 @@ class Thread : RealmObject {
     var messagesIds: RealmSet<String> = realmSetOf()
     @Transient
     var isFromSearch: Boolean = false
+    @Transient
+    var hasAttachable: Boolean = false
     //endregion
 
     private val _folders by backlinks(Folder::threads)
@@ -168,11 +168,11 @@ class Thread : RealmObject {
         unseenMessagesCount = 0
         from = realmListOf()
         to = realmListOf()
-        hasAttachments = false
         hasDrafts = false
         isFavorite = false
         isAnswered = false
         isForwarded = false
+        hasAttachable = false
     }
 
     private fun updateThread() {
@@ -184,11 +184,11 @@ class Thread : RealmObject {
             if (!message.isSeen) unseenMessagesCount++
             from += message.from
             to += message.to
-            if (message.hasAttachable) hasAttachments = true
             if (message.isDraft) hasDrafts = true
             if (message.isFavorite) isFavorite = true
             if (message.isAnswered) isAnswered = true
             if (message.isForwarded) isForwarded = true
+            if (message.hasAttachable) hasAttachable = true
         }
 
         date = messages.last { it.folderId == folderId }.date

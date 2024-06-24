@@ -217,7 +217,7 @@ class ThreadListAdapter @Inject constructor(
 
             draftPrefix.isVisible = hasDrafts
 
-            iconAttachment.isVisible = hasAttachments
+            iconAttachment.isVisible = hasAttachable
             iconCalendar.isGone = true // TODO: See with API when we should display this icon
             iconFavorite.isVisible = isFavorite
 
