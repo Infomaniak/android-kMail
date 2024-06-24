@@ -31,11 +31,32 @@
         tools:email="steph.guy@ik.me"
         tools:name="@tools:sample/full_names" />
 
+    <LinearLayout
+        android:id="@+id/containerInfoCertified"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/marginStandardMedium"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/iconCertified"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:src="@drawable/ic_certified"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            style="@style/Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/expeditorAuthenticationDescription" />
+    </LinearLayout>
+
     <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
         android:id="@+id/writeMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginStandardMedium"
         app:icon="@drawable/ic_contact_action_write"
         app:text="@string/contactActionWriteEmail"
         app:visibleDivider="false" />

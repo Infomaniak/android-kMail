@@ -275,6 +275,7 @@
     <string name="errorUnableToCreateFolder">No se puede crear la carpeta</string>
     <string name="errorUnableToFlushFolder">Imposible vaciar la carpeta</string>
     <string name="errorUserAlreadySynchronized">El usuario ya está sincronizado</string>
+    <string name="expeditorAuthenticationDescription">Se ha autentificado el origen del remitente.</string>
     <string name="externalDialogConfirmButton">Comprendo</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">El remitente %s no forma parte de tu organización ni de tus contactos. Ten cuidado si compartes información sensible.</item>
