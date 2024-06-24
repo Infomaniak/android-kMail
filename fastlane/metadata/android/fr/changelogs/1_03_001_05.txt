@@ -1,0 +1,4 @@
+- Correction d'une NPE lors de l'obtention de l'email d'un contact local
+- Ne remplace plus les pièces jointes par la première lors du transfert d'un message.
+- Correction de concurrence lors du téléchargement de pièces jointes
+- Ajout de la date de dernière modification dans l'URI lors de l'envoi d'une pièce jointe à kDrive

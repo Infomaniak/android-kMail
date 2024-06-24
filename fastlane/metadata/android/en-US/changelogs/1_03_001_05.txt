@@ -1,0 +1,4 @@
+- Fix NPE when trying to get local contact email
+- Don't shadow-replace Attachments with the 1st one when forwarding a Message
+- Add UploadStatus + Mutex to avoid concurrency when uploading Attachments
+- Add last modified date in URI when sending attachment to kDrive
