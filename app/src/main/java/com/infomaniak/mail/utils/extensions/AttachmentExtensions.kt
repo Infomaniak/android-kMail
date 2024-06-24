@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
@@ -66,11 +67,15 @@ object AttachmentExtensions {
     }
 
     private fun Attachment.saveToDriveIntent(context: Context): Intent {
-        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
+        val fileFromCache = getCacheFile(context)
+        val lastModifiedDate = fileFromCache.lastModified()
+        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), fileFromCache)
+
         return Intent().apply {
             component = ComponentName(DRIVE_PACKAGE, SAVE_EXTERNAL_ACTIVITY_CLASS)
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(FileColumns.DATE_MODIFIED, lastModifiedDate)
             setDataAndType(uri, safeMimeType)
         }
     }
