@@ -42,24 +42,9 @@ class AppVersionCheckingTest {
     private val invalidParseVersion = "invalid_parse_version"
     private val invalidEmptyVersion = ""
 
-    private val defaultAppVersion = AppVersion(
-        mediumVersion,
-        arrayOf(AppPublishedVersion(tag = greatVersion, _type = "production"))
-    )
-    private val invalidMinimalAppVersion = AppVersion(
-        mediumVersion,
-        arrayOf(
-            AppPublishedVersion(tag = basicVersion, _type = "production"),
-            AppPublishedVersion(tag = greaterVersion, _type = "beta"),
-        )
-    )
-    private val invalidFormatAppVersion = AppVersion(
-        invalidCommaVersion,
-        arrayOf(
-            AppPublishedVersion(tag = basicVersion, _type = "production"),
-            AppPublishedVersion(tag = greaterVersion, _type = "beta"),
-        )
-    )
+    private val defaultAppVersion = AppVersion(mediumVersion, listOf(AppPublishedVersion(tag = greatVersion)))
+    private val invalidMinimalAppVersion = AppVersion(mediumVersion, listOf(AppPublishedVersion(tag = basicVersion)))
+    private val invalidFormatAppVersion = AppVersion(invalidCommaVersion, listOf(AppPublishedVersion(tag = basicVersion)))
 
     //region toVersionNumbers()
     @Test
