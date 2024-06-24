@@ -61,6 +61,8 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettin
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -249,7 +251,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.toggleContentAndQuoteTheme(messageUid: String) = with(binding) {
-        val isThemeTheSame = threadAdapterState.isThemeTheSameMap[messageUid] ?: true
+        val isThemeTheSame = isThemeTheSameForMessageUid(messageUid)
         bodyWebView.toggleWebViewTheme(isThemeTheSame)
         fullMessageWebView.toggleWebViewTheme(isThemeTheSame)
         toggleFrameLayoutsTheme(isThemeTheSame)
@@ -284,7 +286,7 @@ class ThreadAdapter(
     }
 
     private fun WebView.applyWebViewContent(uid: String, bodyWebView: String, type: String) {
-        enableAlgorithmicDarkening(threadAdapterState.isThemeTheSameMap[uid]!!)
+        enableAlgorithmicDarkening(isThemeTheSameForMessageUid(uid))
 
         var styledBody = if (type == TEXT_PLAIN) createHtmlForPlainText(bodyWebView) else bodyWebView
         styledBody = processMailDisplay(styledBody, uid, isForPrinting)
@@ -295,9 +297,25 @@ class ThreadAdapter(
         loadDataWithBaseURL("", styledBody, TEXT_HTML, Utils.UTF_8, "")
     }
 
+    private fun isThemeTheSameForMessageUid(messageUid: String) = threadAdapterState.isThemeTheSameMap[messageUid] ?: run {
+        Sentry.withScope { scope ->
+            val mapStringRepresentation = threadAdapterState.isThemeTheSameMap
+                .map { (key, value) -> "($key -> $value)" }
+                .joinToString(prefix = "[", postfix = "]")
+
+            scope.setExtra("isThemeTheSameMap", mapStringRepresentation)
+            scope.setExtra("looking for messageUid", messageUid)
+
+            // TODO: Find the cause. The bug probably affects other parts of the code that do not crash
+            Sentry.captureMessage("Missing message uid inside isThemeTheSameMap", SentryLevel.ERROR)
+        }
+
+        true
+    }
+
     private fun WebView.processMailDisplay(styledBody: String, uid: String, isForPrinting: Boolean): String {
         val isDisplayedInDark =
-            context.isNightModeEnabled() && threadAdapterState.isThemeTheSameMap[uid] == true && !isForPrinting
+            context.isNightModeEnabled() && isThemeTheSameForMessageUid(uid) && !isForPrinting
         return if (isForPrinting) {
             webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, items.first() as Message))
         } else {
