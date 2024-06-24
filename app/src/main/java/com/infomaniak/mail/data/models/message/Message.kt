@@ -135,6 +135,8 @@ class Message : RealmObject {
     var latestCalendarEventResponse: CalendarEventResponse? = null
     @Transient
     var swissTransferFiles: RealmList<SwissTransferFile> = realmListOf()
+    @Transient
+    var hasAttachable: Boolean = false
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -152,11 +154,6 @@ class Message : RealmObject {
     @Ignore
     var shouldHideDivider: Boolean = false
     //endregion
-
-    val hasSwissTransferFiles get() = swissTransferFiles.isNotEmpty()
-
-    val hasAttachable: Boolean
-        get() = hasAttachments || swissTransferUuid != null
 
     val threads by backlinks(Thread::messages)
 
@@ -239,6 +236,7 @@ class Message : RealmObject {
         this.swissTransferFiles = swissTransferFiles
 
         shortUid = uid.toShortUid()
+        hasAttachable = hasAttachments || swissTransferUuid != null
     }
 
     fun keepHeavyData(message: Message) {
