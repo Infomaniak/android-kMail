@@ -19,11 +19,7 @@ package com.infomaniak.mail.ui.main.menuDrawer
 
 import android.content.Intent
 import android.os.Bundle
-import android.transition.ChangeBounds
-import android.transition.Fade
-import android.transition.Fade.IN
 import android.transition.TransitionManager
-import android.transition.TransitionSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -134,7 +130,6 @@ class MenuDrawerFragment : Fragment() {
     private fun setupRecyclerView() {
         binding.menuDrawerRecyclerView.adapter = menuDrawerAdapter(
             currentClassName = currentClassName,
-            onAskingTransition = ::executeMenuDrawerTransition,
             onAskingToCloseDrawer = ::closeDrawer,
             onMailboxesHeaderClicked = ::onMailboxesHeaderClicked,
             onValidMailboxClicked = ::onValidMailboxClicked,
@@ -153,15 +148,6 @@ class MenuDrawerFragment : Fragment() {
         )
     }
 
-    private fun executeMenuDrawerTransition() {
-        val transition = TransitionSet()
-            .addTransition(ChangeBounds())
-            .addTransition(Fade(IN))
-            .setDuration(MENU_DRAWER_TRANSITION_DURATION)
-
-        TransitionManager.beginDelayedTransition(binding.menuDrawerRecyclerView, transition)
-    }
-
     fun onDrawerOpened() {
         trackScreen()
     }
@@ -178,7 +164,6 @@ class MenuDrawerFragment : Fragment() {
     private fun onMailboxesHeaderClicked() = with(menuDrawerViewModel) {
         val isExpanded = !(areMailboxesExpanded.value ?: false)
         trackMenuDrawerEvent("mailboxes", isExpanded)
-        executeMenuDrawerTransition()
         areMailboxesExpanded.value = isExpanded
     }
 
@@ -204,7 +189,6 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onCustomFoldersHeaderClicked(isCollapsed: Boolean) {
         trackMenuDrawerEvent("customFolders", !isCollapsed)
-        executeMenuDrawerTransition()
         menuDrawerViewModel.areCustomFoldersExpanded.value = !isCollapsed
     }
 
