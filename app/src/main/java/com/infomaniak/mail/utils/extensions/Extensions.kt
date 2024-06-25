@@ -609,7 +609,7 @@ fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
  * @return error string, otherwise null
  */
 private val invalidCharactersRegex by lazy { Regex("[/'\"]") }
-fun Context.checkForFolderCreationErrors(folderName: CharSequence, folderController: FolderController): String? {
+fun Context.getFolderCreationError(folderName: CharSequence, folderController: FolderController): String? {
     return when {
         folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
         folderName.contains(invalidCharactersRegex) -> getString(R.string.errorNewFolderInvalidCharacter)
