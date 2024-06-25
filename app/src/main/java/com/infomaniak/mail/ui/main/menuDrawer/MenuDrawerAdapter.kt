@@ -194,7 +194,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { items.size }.getOrDefault(0)
+    override fun getItemCount(): Int = items.size
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return@runCatchingRealm when (val item = items[position]) {
