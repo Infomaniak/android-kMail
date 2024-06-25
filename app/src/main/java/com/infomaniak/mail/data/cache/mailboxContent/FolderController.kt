@@ -53,10 +53,6 @@ class FolderController @Inject constructor(
         return getFoldersQuery(mailboxContentRealm(), withoutChildren = true, withoutDrafts = true).find()
     }
 
-    fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
-    }
-
     fun getFolder(id: String): Folder? {
         return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).find()
     }

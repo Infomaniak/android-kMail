@@ -69,7 +69,7 @@ class SearchViewModel @Inject constructor(
     var currentSearchQuery: String = ""
         private set
 
-    val foldersLive = folderController.getSearchFoldersAsync()
+    val foldersLive = folderController.getFoldersAsync()
         .map { it.list.flattenFolderChildren() }
         .asLiveData(ioCoroutineContext)
 
