@@ -59,7 +59,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private var hasCollapsableDefaultFolder = false
     private var hasCollapsableCustomFolder = false
 
-    private lateinit var onAskingTransition: () -> Unit
     private lateinit var onAskingToCloseDrawer: () -> Unit
     private lateinit var onMailboxesHeaderClicked: () -> Unit
     private lateinit var onValidMailboxClicked: (Int) -> Unit
@@ -78,7 +77,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     operator fun invoke(
         currentClassName: String,
-        onAskingTransition: () -> Unit,
         onAskingToCloseDrawer: () -> Unit,
         onMailboxesHeaderClicked: () -> Unit,
         onValidMailboxClicked: (Int) -> Unit,
@@ -96,7 +94,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         onAppVersionClicked: () -> Unit,
     ): MenuDrawerAdapter {
         this.currentClassName = currentClassName
-        this.onAskingTransition = onAskingTransition
         this.onAskingToCloseDrawer = onAskingToCloseDrawer
         this.onMailboxesHeaderClicked = onMailboxesHeaderClicked
         this.onValidMailboxClicked = onValidMailboxClicked
@@ -404,7 +401,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
         // Actions header
         advancedActions.setOnClickListener {
-            onAskingTransition()
             context.trackMenuDrawerEvent("advancedActions", value = (!advancedActions.isCollapsed).toFloat())
             advancedActionsLayout.isGone = advancedActions.isCollapsed
         }
