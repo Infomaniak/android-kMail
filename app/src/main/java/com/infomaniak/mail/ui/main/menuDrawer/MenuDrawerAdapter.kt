@@ -180,17 +180,16 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
             var oldIsFound = false
             var newIsFound = false
-            run breaking@{
-                items.forEachIndexed { index, item ->
-                    if (item is Folder && item.id == oldId) {
-                        oldIsFound = true
-                        notifyItemChanged(index)
-                    } else if (item is Folder && item.id == newId) {
-                        newIsFound = true
-                        notifyItemChanged(index)
-                    }
-                    if (oldIsFound && newIsFound) return@breaking
+            for (index in items.indices) {
+                val item = items[index]
+                if (item is Folder && item.id == oldId) {
+                    oldIsFound = true
+                    notifyItemChanged(index)
+                } else if (item is Folder && item.id == newId) {
+                    newIsFound = true
+                    notifyItemChanged(index)
                 }
+                if (oldIsFound && newIsFound) break
             }
         }
     }
