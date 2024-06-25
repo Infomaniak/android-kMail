@@ -112,7 +112,7 @@ class MoveFragment : Fragment() {
                 mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
             },
             onErrorCheck = { folderName ->
-                requireContext().checkForFolderCreationErrors(folderName, folderController)
+                requireContext().getFolderCreationError(folderName, folderController)
             },
         )
     }
