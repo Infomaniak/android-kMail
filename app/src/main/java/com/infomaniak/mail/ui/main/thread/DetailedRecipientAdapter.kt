@@ -56,7 +56,7 @@ class DetailedRecipientAdapter(
 
     fun updateList(newList: List<Recipient>, newBimi: Bimi? = null) {
         recipients = newList
-        this.bimi = newBimi
+        bimi = newBimi
     }
 
     class DetailedRecipientViewHolder(val binding: ItemDetailedContactBinding) : ViewHolder(binding.root)
