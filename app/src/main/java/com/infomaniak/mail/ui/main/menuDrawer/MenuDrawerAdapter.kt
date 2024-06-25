@@ -370,7 +370,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 initOnCollapsableClickListener { onCollapseChildrenClicked(folder.id, isCollapsed) }
                 isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
                 unreadCount = unread?.count ?: 0
-                isHidden = folder.isHidden
                 isCollapsed = folder.isCollapsed
                 canBeCollapsed = folder.canBeCollapsed
                 val hasCollapsableFolder = if (folder.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder
@@ -495,7 +494,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         newItem.path == oldItem.path &&
                         newItem.unreadCountDisplay == oldItem.unreadCountDisplay &&
                         newItem.threads.count() == oldItem.threads.count() &&
-                        newItem.isHidden == oldItem.isHidden &&
                         newItem.canBeCollapsed == oldItem.canBeCollapsed &&
                         newItem.shouldDisplayDivider == oldItem.shouldDisplayDivider
                 ItemType.CUSTOM_FOLDERS_HEADER -> true

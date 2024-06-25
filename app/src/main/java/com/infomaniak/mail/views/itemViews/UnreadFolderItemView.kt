@@ -32,12 +32,6 @@ class UnreadFolderItemView @JvmOverloads constructor(
 
     private var onCollapsedFolderClicked: OnClickListener? = null
 
-    var isHidden = false
-        set(value) {
-            field = value
-            binding.root.isVisible = !value
-        }
-
     override var isCollapsed = false
         set(value) {
             field = value
