@@ -234,12 +234,12 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
         when (payload) {
             NotifyType.MAILBOXES_HEADER_CLICKED -> {
-                Log.d("Bind", "Rebind Mailboxes header because of collapse change")
+                Log.d("Bind", "Bind Mailboxes header because of collapse change")
                 (holder.binding as ItemMenuDrawerMailboxesHeaderBinding).updateCollapseState(items[position] as MailboxesHeader)
             }
             NotifyType.COLLAPSABLE_FOLDER_EXISTENCE_HAS_CHANGED -> {
                 val folder = items[position] as Folder
-                Log.d("Bind", "Rebind Custom folders because of collapse change = ${folder.name}")
+                Log.d("Bind", "Bind Custom folders because of collapse change = ${folder.name}")
                 (holder.binding as ItemMenuDrawerFolderBinding).displayFolder(folder)
             }
         }
@@ -250,27 +250,27 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
         when (getItemViewType(position)) {
             DisplayType.MAILBOXES_HEADER.layout -> {
-                Log.d("Bind", "Rebind Mailboxes header")
+                Log.d("Bind", "Bind Mailboxes header")
                 (this as ItemMenuDrawerMailboxesHeaderBinding).displayMailboxesHeader(item as MailboxesHeader)
             }
             DisplayType.MAILBOX.layout -> {
-                Log.d("Bind", "Rebind Mailbox (${(item as Mailbox).email})")
+                Log.d("Bind", "Bind Mailbox (${(item as Mailbox).email})")
                 (this as ItemMenuDrawerMailboxBinding).displayMailbox(item)
             }
             DisplayType.INVALID_MAILBOX.layout -> {
-                Log.d("Bind", "Rebind Invalid Mailbox (${(item as Mailbox).email})")
+                Log.d("Bind", "Bind Invalid Mailbox (${(item as Mailbox).email})")
                 (this as ItemInvalidMailboxBinding).displayInvalidMailbox(item)
             }
             DisplayType.FOLDER.layout -> {
-                Log.d("Bind", "Rebind Folder : ${(item as Folder).name}")
+                Log.d("Bind", "Bind Folder : ${(item as Folder).name}")
                 (this as ItemMenuDrawerFolderBinding).displayFolder(item)
             }
             DisplayType.CUSTOM_FOLDERS_HEADER.layout -> {
-                Log.d("Bind", "Rebind Folders header")
+                Log.d("Bind", "Bind Folders header")
                 (this as ItemMenuDrawerCustomFoldersHeaderBinding).displayCustomFoldersHeader()
             }
             DisplayType.MENU_DRAWER_FOOTER.layout -> {
-                Log.d("Bind", "Rebind Footer")
+                Log.d("Bind", "Bind Footer")
                 (this as ItemMenuDrawerFooterBinding).displayFooter(item as MenuDrawerFooter)
             }
         }
