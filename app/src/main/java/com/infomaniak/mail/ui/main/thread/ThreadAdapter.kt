@@ -41,6 +41,7 @@ import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -337,19 +338,23 @@ class ThreadAdapter(
             shortMessageDate.text = ""
         } else {
             val firstSender = message.sender
-            userAvatar.loadAvatar(firstSender)
+
             expeditorName.apply {
                 text = firstSender?.let { context.getPrettyNameAndEmail(it).first }
                     ?: run { context.getString(R.string.unknownRecipientTitle) }
                 setTextAppearance(R.style.BodyMedium)
             }
+
+            userAvatar.loadAvatar(firstSender, message.bimi)
+            iconCertified.isVisible = message.bimi?.isCertified ?: false
+
             shortMessageDate.text = mailFormattedDate(context, messageDate)
         }
 
         val listener: OnClickListener? = message.sender?.let { recipient ->
             OnClickListener {
                 context.trackMessageEvent("selectAvatar")
-                threadAdapterCallbacks?.onContactClicked?.invoke(recipient)
+                threadAdapterCallbacks?.onContactClicked?.invoke(recipient, message.bimi)
             }
         }
 
@@ -397,7 +402,7 @@ class ThreadAdapter(
 
     private fun MessageViewHolder.bindRecipientDetails(message: Message, messageDate: Date) = with(binding) {
 
-        fromAdapter.updateList(message.from.toList())
+        fromAdapter.updateList(message.from.toList(), message.bimi)
         toAdapter.updateList(message.to.toList())
 
         val ccIsNotEmpty = message.cc.isNotEmpty()
@@ -670,7 +675,7 @@ class ThreadAdapter(
 
     data class ThreadAdapterCallbacks(
         var onBodyWebViewFinishedLoading: (() -> Unit)? = null,
-        var onContactClicked: ((contact: Recipient) -> Unit)? = null,
+        var onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)? = null,
         var onDeleteDraftClicked: ((message: Message) -> Unit)? = null,
         var onDraftClicked: ((message: Message) -> Unit)? = null,
         var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null,
@@ -708,7 +713,7 @@ class ThreadAdapter(
     private class MessageViewHolder(
         override val binding: ItemMessageBinding,
         private val shouldLoadDistantResources: Boolean,
-        onContactClicked: ((contact: Recipient) -> Unit)?,
+        onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)?,
         onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
         onAttachmentOptionsClicked: ((attachment: Attachment) -> Unit)?,
     ) : ThreadAdapterViewHolder(binding) {

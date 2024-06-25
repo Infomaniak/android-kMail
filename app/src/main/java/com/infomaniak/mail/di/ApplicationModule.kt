@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import coil.ImageLoader
 import com.infomaniak.lib.stores.AppUpdateScheduler
 import com.infomaniak.lib.stores.StoresSettingsRepository
 import com.infomaniak.mail.MainApplication
@@ -74,4 +75,8 @@ object ApplicationModule {
         appContext: Context,
         workManager: WorkManager,
     ): AppUpdateScheduler = AppUpdateScheduler(appContext, workManager)
+
+    @Provides
+    @Singleton
+    fun providesSvgImageLoader(mainApplication: MainApplication): ImageLoader = mainApplication.createSvgImageLoader()
 }

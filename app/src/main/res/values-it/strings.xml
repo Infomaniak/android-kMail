@@ -275,6 +275,7 @@
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
     <string name="errorUserAlreadySynchronized">L’utente è già sincronizzato</string>
+    <string name="expeditorAuthenticationDescription">L’origine del mittente è stata autenticata.</string>
     <string name="externalDialogConfirmButton">Capisco</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Il mittente %s non fa parte della vostra organizzazione o dei vostri contatti. Fate attenzione se state condividendo informazioni sensibili.</item>

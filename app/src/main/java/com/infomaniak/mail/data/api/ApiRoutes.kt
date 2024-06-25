@@ -261,4 +261,8 @@ object ApiRoutes {
     fun resource(resource: String): String {
         return "$MAIL_API$resource"
     }
+
+    fun bimi(bimi: String): String {
+        return "$MAIL_API$bimi"
+    }
 }

@@ -281,6 +281,7 @@
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
     <string name="errorUserAlreadySynchronized">User is already synchronized</string>
+    <string name="expeditorAuthenticationDescription">The sender’s origin has been authenticated.</string>
     <string name="externalDialogConfirmButton">I understand</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">The sender %s is not part of your organization or your contacts. Be careful if you are sharing sensitive information.</item>

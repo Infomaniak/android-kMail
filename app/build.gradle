@@ -113,6 +113,8 @@ dependencies {
 
     implementation libs.sentry.android.fragment
 
+    implementation libs.coil.svg
+
     // Test
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

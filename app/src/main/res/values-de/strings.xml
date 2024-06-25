@@ -275,6 +275,7 @@
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
     <string name="errorUserAlreadySynchronized">Benutzer ist bereits synchronisiert</string>
+    <string name="expeditorAuthenticationDescription">Die Herkunft dieses Absenders wurde authentifiziert.</string>
     <string name="externalDialogConfirmButton">Ich habe verstanden</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">Der Absender %s gehört nicht zu Ihrer Organisation oder Ihren Kontakten. Seien Sie vorsichtig, wenn Sie sensible Informationen weitergeben.</item>

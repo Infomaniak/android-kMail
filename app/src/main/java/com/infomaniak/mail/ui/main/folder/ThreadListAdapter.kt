@@ -49,6 +49,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -400,7 +401,12 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
-        expeditorAvatar.loadAvatar(thread.computeAvatarRecipient())
+        val (recipient, bimi) = thread.computeAvatarRecipient()
+        if (bimi?.isCertified == true) {
+            expeditorAvatar.loadBimiAvatar(ApiRoutes.bimi(bimi.svgContentUrl.toString()), recipient)
+        } else {
+            expeditorAvatar.loadAvatar(recipient)
+        }
     }
 
     private fun CardviewThreadItemBinding.formatRecipientNames(recipients: List<Recipient>): String {

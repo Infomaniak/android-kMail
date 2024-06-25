@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import coil.decode.SvgDecoder
 import com.facebook.stetho.Stetho
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
@@ -272,6 +273,14 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     fun resetLastAppClosing() {
         lastAppClosingTime = null
+    }
+
+    fun createSvgImageLoader(): ImageLoader {
+        return CoilUtils.newImageLoader(
+            applicationContext,
+            tokenInterceptorListener(),
+            customFactories = listOf(SvgDecoder.Factory())
+        )
     }
 
     companion object {

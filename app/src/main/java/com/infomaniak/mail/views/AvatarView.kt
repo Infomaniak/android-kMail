@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.lifecycle.Observer
+import coil.ImageLoader
 import coil.imageLoader
 import coil.load
 import com.infomaniak.lib.core.models.user.User
@@ -33,6 +34,8 @@ import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarBinding
@@ -55,13 +58,19 @@ class AvatarView @JvmOverloads constructor(
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var currentCorrespondent: Correspondent? = null
+    private var isBimiShown: Boolean = false
 
     private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
-        currentCorrespondent?.let { correspondent -> loadAvatarUsingDictionary(correspondent, contacts) }
+        currentCorrespondent?.let { correspondent ->
+            if (!isBimiShown) loadAvatarUsingDictionary(correspondent, contacts)
+        }
     }
 
     @Inject
     lateinit var avatarMergedContactData: AvatarMergedContactData
+
+    @Inject
+    lateinit var svgImageLoader: ImageLoader
 
     var strokeWidth: Float
         get() = binding.avatarImage.strokeWidth
@@ -140,6 +149,21 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
+    fun loadBimiAvatar(bimiUrl: String, correspondent: Correspondent?) = with(binding.avatarImage) {
+        contentDescription = correspondent?.email.orEmpty()
+        isBimiShown = bimiUrl.isNotEmpty()
+        loadAvatar(
+            backgroundColor = context.getBackgroundColorBasedOnId(
+                correspondent?.email.orEmpty().hashCode(),
+                R.array.AvatarColors,
+            ),
+            avatarUrl = bimiUrl,
+            initials = correspondent?.initials.orEmpty(),
+            imageLoader = svgImageLoader,
+            initialsColor = context.getColor(R.color.onColorfulBackground),
+        )
+    }
+
     fun setImageDrawable(drawable: Drawable?) = binding.avatarImage.setImageDrawable(drawable)
 
     private fun searchInMergedContact(correspondent: Correspondent, contacts: MergedContactDictionary): MergedContact? {
@@ -165,6 +189,15 @@ class AvatarView @JvmOverloads constructor(
                 imageLoader = context.imageLoader,
                 initialsColor = color,
             )
+        }
+    }
+
+    fun loadAvatar(correspondent: Correspondent?, bimi: Bimi?) {
+        val svgContentUrl = bimi?.svgContentUrl
+        if (bimi == null || !bimi.isCertified || svgContentUrl.isNullOrEmpty()) {
+            loadAvatar(correspondent)
+        } else {
+            loadBimiAvatar(ApiRoutes.bimi(svgContentUrl), correspondent)
         }
     }
 }

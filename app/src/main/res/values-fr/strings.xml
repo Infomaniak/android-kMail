@@ -277,6 +277,7 @@
     <string name="errorUnableToCreateFolder">Impossible de créer le dossier</string>
     <string name="errorUnableToFlushFolder">Impossible de vider le dossier</string>
     <string name="errorUserAlreadySynchronized">L’utilisateur est déjà synchronisé</string>
+    <string name="expeditorAuthenticationDescription">La provenance de cet expéditeur a été authentifiée.</string>
     <string name="externalDialogConfirmButton">J’ai compris</string>
     <plurals name="externalDialogDescriptionExpeditor">
         <item quantity="one">L’expéditeur %s ne fait pas partie de votre organisation ni de vos contacts. Soyez vigilant si vous partagez des informations sensibles.</item>

@@ -64,14 +64,32 @@
         app:layout_constraintStart_toEndOf="@id/avatarLayout"
         app:layout_constraintTop_toTopOf="@id/avatarLayout">
 
-        <TextView
-            android:id="@+id/userName"
-            style="@style/AvatarNameEmailPrimary"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/recipientLayout"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            tools:text="@tools:sample/full_names" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
+
+            <TextView
+                android:id="@+id/userName"
+                style="@style/AvatarNameEmailPrimary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="@tools:sample/full_names" />
+
+            <ImageView
+                android:id="@+id/iconCertified"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:src="@drawable/ic_certified"
+                tools:ignore="ContentDescription" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/userEmail"

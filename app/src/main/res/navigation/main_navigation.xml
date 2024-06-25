@@ -182,6 +182,10 @@
         <argument
             android:name="recipient"
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient" />
+        <argument
+            android:name="bimi"
+            app:argType="com.infomaniak.mail.data.models.Bimi"
+            app:nullable="true" />
     </dialog>
 
     <dialog

@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.SEARCH_FOLDER_ID
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -97,6 +98,7 @@ class Message : RealmObject {
     var size: Int = 0
     @SerialName("has_unsubscribe_link")
     var hasUnsubscribeLink: Boolean? = null
+    var bimi : Bimi? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.

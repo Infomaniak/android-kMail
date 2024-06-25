@@ -23,16 +23,19 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ItemDetailedContactBinding
 import com.infomaniak.mail.ui.main.thread.DetailedRecipientAdapter.DetailedRecipientViewHolder
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class DetailedRecipientAdapter(
-    private val onContactClicked: ((contact: Recipient) -> Unit)?,
+    private val onContactClicked: ((contact: Recipient, bimi: Bimi?) -> Unit)?,
 ) : Adapter<DetailedRecipientViewHolder>() {
 
     private var recipients = emptyList<Recipient>()
+
+    private var bimi: Bimi? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailedRecipientViewHolder {
         return DetailedRecipientViewHolder(ItemDetailedContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -45,14 +48,15 @@ class DetailedRecipientAdapter(
 
         name.setOnClickListener {
             context.trackMessageEvent("selectRecipient")
-            onContactClicked?.invoke(recipient)
+            onContactClicked?.invoke(recipient, bimi)
         }
     }
 
     override fun getItemCount(): Int = recipients.count()
 
-    fun updateList(newList: List<Recipient>) {
+    fun updateList(newList: List<Recipient>, newBimi: Bimi? = null) {
         recipients = newList
+        bimi = newBimi
     }
 
     class DetailedRecipientViewHolder(val binding: ItemDetailedContactBinding) : ViewHolder(binding.root)
