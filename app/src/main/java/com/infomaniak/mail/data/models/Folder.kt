@@ -81,7 +81,7 @@ class Folder : RealmObject, Cloneable {
     @Transient
     var isCollapsed: Boolean = false // For parents only (collapsing a parent Folder will hide its children)
     @Transient
-    var roleOrder: Int = CUSTOM_FOLDER_ROLE_ORDER
+    var roleOrder: Int = role?.order ?: CUSTOM_FOLDER_ROLE_ORDER
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -135,7 +135,6 @@ class Folder : RealmObject, Cloneable {
         this.isHistoryComplete = isHistoryComplete
         this.isHidden = isHidden
         this.isCollapsed = isCollapsed
-        this.roleOrder = role?.order ?: CUSTOM_FOLDER_ROLE_ORDER
     }
 
     fun resetLocalValues() {
