@@ -465,35 +465,29 @@ class ThreadAdapter(
 
     @SuppressLint("SetTextI18n")
     private fun MessageViewHolder.bindAttachment(message: Message) = with(binding) {
+
         if (!message.hasAttachable) {
             attachmentLayout.root.isVisible = false
             return@with
         }
 
         val attachments = message.attachments + message.swissTransferFiles
-
         val attachmentString = computeAttachmentString(context, message)
-
         val fileSize = formatAttachmentFileSize(attachments)
-
         val downloadAllString = context.resources.getString(R.string.buttonDownloadAll)
-
         val totalAttachmentsSize = SpannableString("$attachmentString ($fileSize). $downloadAllString").apply {
             setSpan(
                 ForegroundColorSpan(context.getColor(R.color.primary_color_disabled)),
                 length - downloadAllString.length,
                 length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
         }
 
-        attachmentLayout.attachmentsSizeText.text = totalAttachmentsSize
-
         attachmentAdapter.setAttachments(attachments)
-        attachmentLayout.attachmentsInfo.setOnClickListener {
-            threadAdapterCallbacks?.onDownloadAllClicked?.invoke(message)
-        }
 
+        attachmentLayout.attachmentsSizeText.text = totalAttachmentsSize
+        attachmentLayout.attachmentsInfo.setOnClickListener { threadAdapterCallbacks?.onDownloadAllClicked?.invoke(message) }
         attachmentLayout.root.isVisible = true
     }
 
@@ -513,8 +507,8 @@ class ThreadAdapter(
                     context.resources.getQuantityString(
                         R.plurals.fileQuantity,
                         swissTransferFilesCount,
-                        swissTransferFilesCount
-                    )
+                        swissTransferFilesCount,
+                    ),
                 )
             }
         }
@@ -523,9 +517,9 @@ class ThreadAdapter(
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachable>): String {
         if (attachments.isEmpty()) return ""
 
-        val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
-            attachment.size
-        }.reduce { accumulator: Long, size: Long -> accumulator + size }
+        val totalAttachmentsFileSizeInBytes = attachments
+            .map { attachment -> attachment.size }
+            .reduce { accumulator, size -> accumulator + size }
 
         return context.formatShortFileSize(totalAttachmentsFileSizeInBytes)
     }
