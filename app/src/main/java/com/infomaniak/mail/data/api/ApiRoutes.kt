@@ -175,9 +175,10 @@ object ApiRoutes {
         return "${getMessages(mailboxUuid, folderId)}/activities?signature=$cursor"
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String, info: PaginationInfo?): String {
+    fun getMessagesUids(mailboxUuid: String, folderId: String, info: PaginationInfo?, shouldGetAll: Boolean): String {
         val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids?"
-        val quantity = "messages=${Utils.PAGE_SIZE}"
+        // TODO: Use the correct parameter instead of this magical `getAll=true`
+        val quantity = if (shouldGetAll) "getAll=true" else "messages=${Utils.PAGE_SIZE}"
         val offset = info?.offsetUid?.let { "&uid_offset=$it" } ?: ""
         val direction = info?.direction?.let { "&direction=$it" } ?: ""
 

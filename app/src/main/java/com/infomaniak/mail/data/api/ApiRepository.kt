@@ -260,9 +260,10 @@ object ApiRepository : ApiRepositoryCore() {
         folderId: String,
         okHttpClient: OkHttpClient?,
         info: PaginationInfo?,
+        shouldGetAll: Boolean,
     ): ApiResponse<NewMessagesResult> {
         return callApi(
-            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, info),
+            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, info, shouldGetAll),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )

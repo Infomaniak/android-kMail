@@ -72,10 +72,19 @@ class Folder : RealmObject, Cloneable {
     var threads = realmListOf<Thread>()
     @Transient
     var messages = realmListOf<Message>()
+
+    /**
+     * List of old Messages UIDs of this Folder that we need to fetch.
+     * When first opening the Folder, we get the full list of UIDs, and we store it.
+     * Then, we'll be able to go through it as we want to fetch the old Messages.
+     */
+    @Transient
+    var oldMessagesUidsToFetch = realmListOf<Int>()
     @Transient
     var remainingOldMessagesToFetch: Int = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
     @Transient
     var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
+
     @Transient
     var isHidden: Boolean = false // For children only (a children Folder is hidden if its parent is collapsed)
     @Transient
@@ -113,6 +122,7 @@ class Folder : RealmObject, Cloneable {
         unreadCount: Int,
         threads: RealmList<Thread>,
         messages: RealmList<Message>,
+        oldMessagesUidsToFetch: RealmList<Int>,
         remainingOldMessagesToFetch: Int,
         isHistoryComplete: Boolean,
         isHidden: Boolean,
@@ -124,6 +134,7 @@ class Folder : RealmObject, Cloneable {
         this.unreadCountLocal = unreadCount
         this.threads.addAll(threads)
         this.messages.addAll(messages)
+        this.oldMessagesUidsToFetch.addAll(oldMessagesUidsToFetch)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
         this.isHistoryComplete = isHistoryComplete
         this.isHidden = isHidden
@@ -138,6 +149,7 @@ class Folder : RealmObject, Cloneable {
         unreadCountLocal = 0
         threads = realmListOf()
         messages = realmListOf()
+        oldMessagesUidsToFetch = realmListOf()
         remainingOldMessagesToFetch = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
         isHistoryComplete = DEFAULT_IS_HISTORY_COMPLETE
         isHidden = false

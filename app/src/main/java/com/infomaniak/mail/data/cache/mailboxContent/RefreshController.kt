@@ -47,6 +47,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.RealmSet
 import io.sentry.Sentry
@@ -155,10 +156,10 @@ class RefreshController @Inject constructor(
             delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
             ensureActive()
 
-            val (_, threads) = if (retryStrategy.iteration == Iteration.ABORT_MISSION) {
-                realm.fetchOneNewPage(scope = this, failedFolder, shouldUpdateCursor = true)
+            val threads = if (retryStrategy.iteration == Iteration.ABORT_MISSION) {
+                realm.refresh(scope = this, failedFolder)
             } else {
-                realm.fetchOneNewPage(scope = this, failedFolder, retryStrategy.fibonacci)
+                realm.fetchOneNewPage(scope = this, failedFolder, retryStrategy.fibonacci).second
             }
 
             val isSameFolder = failedFolder.id == initialFolder.id
@@ -318,7 +319,8 @@ class RefreshController @Inject constructor(
         val previousCursor = folder.cursor
 
         impactedThreads += if (previousCursor == null) {
-            fetchOneNewPage(scope, folder, shouldUpdateCursor = true).second
+            fetchOldMessagesUids(scope, folder)
+            fetchOneOldPage(scope, folder).second
         } else {
             fetchActivities(scope, folder, previousCursor)
         }
@@ -328,17 +330,15 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
-    private suspend fun Realm.fetchOneOldPage(scope: CoroutineScope, folder: Folder) {
-        fetchOnePage(scope, folder, Direction.IN_THE_PAST, shouldUpdateCursor = false)
-    }
+    private fun Realm.fetchOldMessagesUids(scope: CoroutineScope, folder: Folder) {
 
-    private suspend fun Realm.fetchOneNewPage(
-        scope: CoroutineScope,
-        folder: Folder,
-        fibonacci: Int = 1,
-        shouldUpdateCursor: Boolean = false,
-    ): Pair<Int, Set<Thread>> {
-        return fetchOnePage(scope, folder, Direction.TO_THE_FUTURE, shouldUpdateCursor, fibonacci)
+        val result = getMessagesUids(folder.id, shouldGetAll = true)!!
+        scope.ensureActive()
+
+        FolderController.updateFolder(folder.id, realm = this) {
+            it.oldMessagesUidsToFetch.addAll(result.addedShortUids)
+            it.cursor = result.cursor
+        }
     }
 
     private suspend fun Realm.fetchAllOldPages(scope: CoroutineScope, folder: Folder) {
@@ -353,6 +353,24 @@ class RefreshController @Inject constructor(
             fetchOneOldPage(scope, folder)
             remainingOldMessagesToFetch = remainingCount()
         }
+    }
+
+    private suspend fun Realm.fetchOneOldPage(scope: CoroutineScope, folder: Folder): Pair<Int, Set<Thread>> {
+
+        val impactedThreads = mutableSetOf<Thread>()
+
+        val allUids = folder.oldMessagesUidsToFetch
+        // TODO: Check if the `toIndex` is correct.
+        val uidsToFetch = allUids.subList(0, Utils.PAGE_SIZE)
+        // TODO: Check if the `fromIndex` & `toIndex` are corrects.
+        val remainingUids = allUids.subList(Utils.PAGE_SIZE, allUids.count())
+        val uidsCount = uidsToFetch.count()
+
+        impactedThreads += handleAddedUids(scope, folder, uidsToFetch, folder.cursor!!)
+        updateFolder(folder.id, Direction.IN_THE_PAST, uidsCount, remainingUids = remainingUids)
+        sendSentryOrphans(folder)
+
+        return uidsCount to impactedThreads
     }
 
     private suspend fun Realm.fetchAllNewPages(scope: CoroutineScope, folder: Folder): Set<Thread> {
@@ -371,29 +389,18 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
-    private suspend fun Realm.fetchOnePage(
-        scope: CoroutineScope,
-        folder: Folder,
-        direction: Direction,
-        shouldUpdateCursor: Boolean,
-        fibonacci: Int = 1,
-    ): Pair<Int, Set<Thread>> {
+    private suspend fun Realm.fetchOneNewPage(scope: CoroutineScope, folder: Folder, fibonacci: Int = 1): Pair<Int, Set<Thread>> {
+
+        val direction = Direction.TO_THE_FUTURE
 
         fun Realm.getPaginationInfo(): PaginationInfo? {
-            return if (shouldUpdateCursor) {
-                null
-            } else {
-                when (direction) {
-                    Direction.IN_THE_PAST -> MessageController.getOldestMessage(folder.id, realm = this)
-                    Direction.TO_THE_FUTURE -> MessageController.getNewestMessage(
-                        folderId = folder.id,
-                        fibonacci = fibonacci,
-                        realm = this,
-                        endOfMessagesReached = { endOfMessagesReached = true },
-                    )
-                }?.shortUid?.let { offsetUid ->
-                    PaginationInfo(offsetUid, direction.apiCallValue)
-                }
+            return MessageController.getNewestMessage(
+                folderId = folder.id,
+                fibonacci = fibonacci,
+                realm = this,
+                endOfMessagesReached = { endOfMessagesReached = true },
+            )?.shortUid?.let { offsetUid ->
+                PaginationInfo(offsetUid, direction.apiCallValue)
             }
         }
 
@@ -416,7 +423,7 @@ class RefreshController @Inject constructor(
         scope.ensureActive()
 
         impactedThreads += handleAddedUids(scope, folder, newMessages.addedShortUids, newMessages.cursor)
-        updateFolder(folder.id, direction, uidsCount, paginationInfo, shouldUpdateCursor, newMessages.cursor)
+        updateFolder(folder.id, direction, uidsCount, paginationInfo)
         sendSentryOrphans(folder)
 
         return uidsCount to impactedThreads
@@ -426,9 +433,8 @@ class RefreshController @Inject constructor(
         folderId: String,
         direction: Direction,
         uidsCount: Int,
-        paginationInfo: PaginationInfo?,
-        shouldUpdateCursor: Boolean,
-        cursor: String,
+        paginationInfo: PaginationInfo? = null,
+        remainingUids: List<Int>? = null,
     ) {
 
         fun Folder.theEndIsReached() {
@@ -450,6 +456,7 @@ class RefreshController @Inject constructor(
                     } else {
                         it.remainingOldMessagesToFetch = max(it.remainingOldMessagesToFetch - uidsCount, 0)
                     }
+                    it.oldMessagesUidsToFetch = remainingUids!!.toRealmList()
                 }
 
                 Direction.TO_THE_FUTURE -> {
@@ -468,11 +475,6 @@ class RefreshController @Inject constructor(
                         }
                     }
                 }
-            }
-
-            if (shouldUpdateCursor) {
-                SentryDebug.addCursorBreadcrumb("fetchOnePage", it, cursor)
-                it.cursor = cursor
             }
         }
     }
@@ -864,8 +866,12 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region API calls
-    private fun getMessagesUids(folderId: String, info: PaginationInfo?): NewMessagesResult? {
-        return with(ApiRepository.getMessagesUids(mailbox.uuid, folderId, okHttpClient, info)) {
+    private fun getMessagesUids(
+        folderId: String,
+        info: PaginationInfo? = null,
+        shouldGetAll: Boolean = false,
+    ): NewMessagesResult? {
+        return with(ApiRepository.getMessagesUids(mailbox.uuid, folderId, okHttpClient, info, shouldGetAll)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
         }

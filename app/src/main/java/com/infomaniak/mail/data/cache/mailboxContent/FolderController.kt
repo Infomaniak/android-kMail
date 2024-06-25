@@ -119,6 +119,7 @@ class FolderController @Inject constructor(
                     localFolder.unreadCountLocal,
                     localFolder.threads,
                     localFolder.messages,
+                    localFolder.oldMessagesUidsToFetch,
                     localFolder.remainingOldMessagesToFetch,
                     localFolder.isHistoryComplete,
                     localFolder.isHidden,

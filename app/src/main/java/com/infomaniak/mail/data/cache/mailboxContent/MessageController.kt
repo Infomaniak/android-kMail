@@ -156,18 +156,13 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         private val isNotScheduled = "${Message::isScheduled.name} == false"
 
         //region Queries
-        private fun getOldestOrNewestMessagesQuery(
-            folderId: String,
-            sort: Sort,
-            realm: TypedRealm,
-            limit: Int = 1,
-        ): RealmQuery<Message> {
+        private fun getNewestMessagesQuery(folderId: String, realm: TypedRealm, limit: Int = 1): RealmQuery<Message> {
 
             val byFolderId = "${Message::folderId.name} == $0"
             val isNotFromSearch = "${Message::isFromSearch.name} == false"
 
             return realm.query<Message>("$byFolderId AND $isNotFromSearch", folderId)
-                .sort(Message::shortUid.name, sort)
+                .sort(Message::shortUid.name, Sort.DESCENDING)
                 .limit(limit)
         }
 
@@ -194,19 +189,15 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
         }
 
-        fun getOldestMessage(folderId: String, realm: TypedRealm): Message? {
-            return getOldestOrNewestMessagesQuery(folderId, Sort.ASCENDING, realm).first().find()
-        }
-
         fun getNewestMessage(folderId: String, fibonacci: Int, realm: TypedRealm, endOfMessagesReached: () -> Unit): Message? {
-            return getOldestOrNewestMessagesQuery(folderId, Sort.DESCENDING, realm, fibonacci)
+            return getNewestMessagesQuery(folderId, realm, fibonacci)
                 .find()
                 .also { if (it.count() < fibonacci) endOfMessagesReached() }
                 .lastOrNull()
         }
 
         fun getNewestMessages(folderId: String, limit: Int, realm: MutableRealm): List<Message> {
-            return getOldestOrNewestMessagesQuery(folderId, Sort.DESCENDING, realm, limit).find()
+            return getNewestMessagesQuery(folderId, realm, limit).find()
         }
         //endregion
 
