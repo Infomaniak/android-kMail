@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.toFloat
@@ -399,7 +400,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         setOnActionClickListener { onCreateFolderClicked() }
     }
 
-    private fun ItemMenuDrawerFooterBinding.displayFooter(footer: MenuDrawerFooter) = with(root) {
+    private fun ItemMenuDrawerFooterBinding.displayFooter(footer: MenuDrawerFooter) {
 
         // Actions header
         advancedActions.setOnClickListener {
