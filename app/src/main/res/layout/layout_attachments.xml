@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:drawableStartCompat="@drawable/ic_attachment"
-            app:tint="@color/iconColor" />
+            app:drawableTint="@color/iconColor" />
 
         <TextView
             android:id="@+id/attachmentsSizeText"
