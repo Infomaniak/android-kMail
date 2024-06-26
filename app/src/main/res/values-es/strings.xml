@@ -203,8 +203,10 @@
     <string name="contentDescriptionIconCalendar">Tiene evento Calendario</string>
     <string name="contentDescriptionIconFavorite">Es favorito</string>
     <string name="contentDescriptionIconFolderSelected">Carpeta seleccionada</string>
+    <string name="contentDescriptionIconForward">Reenviado</string>
     <string name="contentDescriptionIconInvalidPassword">Desbloquear la dirección de correo electrónico</string>
     <string name="contentDescriptionIconNewMail">Nuevo</string>
+    <string name="contentDescriptionIconReply">Respuesta</string>
     <string name="contentDescriptionIconStorage">Estado de almacenamiento</string>
     <string name="contentDescriptionOpenMailActions">Acciones de mensajes abiertos</string>
     <string name="contentDescriptionSelectedItem">Selección</string>

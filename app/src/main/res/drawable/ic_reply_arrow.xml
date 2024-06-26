@@ -1,0 +1,26 @@
+<!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M9.615,7.8C9.615,7.8 22.943,6.132 23.941,19.385C23.972,19.801 23.404,19.963 23.169,19.618C18.199,12.322 9.615,15 9.615,15V19.145C9.615,19.402 9.313,19.54 9.119,19.372L0.347,11.799C0.163,11.641 0.162,11.357 0.343,11.197L9.116,3.441C9.31,3.27 9.615,3.407 9.615,3.666V7.8Z" />
+</vector>
