@@ -69,12 +69,12 @@ class AvatarView @JvmOverloads constructor(
     }
 
     @Inject
-    lateinit var _avatarMergedContactData: AvatarMergedContactData
+    lateinit var avatarMergedContactData: AvatarMergedContactData
 
     private val contactsFromViewModel: MergedContactDictionary
         get() {
             // Avoid lateinit property has not been initialized in preview
-            return if (isInEditMode) emptyMap() else _avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+            return if (isInEditMode) emptyMap() else avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
         }
 
     @Inject
@@ -111,13 +111,13 @@ class AvatarView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
-        _avatarMergedContactData.mergedContactLiveData.observeForever(mergedContactObserver)
+        avatarMergedContactData.mergedContactLiveData.observeForever(mergedContactObserver)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
-        _avatarMergedContactData.mergedContactLiveData.removeObserver(mergedContactObserver)
+        avatarMergedContactData.mergedContactLiveData.removeObserver(mergedContactObserver)
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
