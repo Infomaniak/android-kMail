@@ -58,16 +58,24 @@ class AvatarView @JvmOverloads constructor(
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var currentCorrespondent: Correspondent? = null
-    private var isBimiShown: Boolean = false
+    private var currentBimi: Bimi? = null
 
     private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
-        currentCorrespondent?.let { correspondent ->
-            if (!isBimiShown) loadAvatarUsingDictionary(correspondent, contacts)
+        val displayType = getAvatarDisplayType(currentCorrespondent, currentBimi)
+
+        if (displayType == AvatarDisplayType.CUSTOM_AVATAR || displayType == AvatarDisplayType.INITIALS) {
+            loadAvatarUsingDictionary(currentCorrespondent!!, contacts)
         }
     }
 
     @Inject
     lateinit var avatarMergedContactData: AvatarMergedContactData
+
+    private val contactsFromViewModel: MergedContactDictionary
+        get() {
+            // Avoid lateinit property has not been initialized in preview
+            return if (isInEditMode) emptyMap() else avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+        }
 
     @Inject
     lateinit var svgImageLoader: ImageLoader
@@ -129,14 +137,29 @@ class AvatarView @JvmOverloads constructor(
         )
     }
 
-    fun loadAvatar(correspondent: Correspondent?) {
-        if (correspondent == null) {
-            loadUnknownUserAvatar()
-        } else {
-            // Avoid lateinit property has not been initialized in preview
-            val contactsFromViewModel = if (isInEditMode) emptyMap() else avatarMergedContactData.mergedContactLiveData.value
-            loadAvatarUsingDictionary(correspondent, contacts = contactsFromViewModel ?: emptyMap())
+    fun loadAvatar(correspondent: Correspondent?, bimi: Bimi? = null) {
+
+        fun loadSimpleCorrespondent(correspondent: Correspondent) {
+            loadAvatarUsingDictionary(correspondent, contacts = contactsFromViewModel)
             currentCorrespondent = correspondent
+        }
+
+        currentBimi = bimi
+
+        when (getAvatarDisplayType(correspondent, bimi)) {
+            AvatarDisplayType.UNKNOWN_CORRESPONDENT -> loadUnknownUserAvatar()
+            AvatarDisplayType.CUSTOM_AVATAR -> loadSimpleCorrespondent(correspondent!!)
+            AvatarDisplayType.BIMI -> loadBimiAvatar(ApiRoutes.bimi(bimi!!.svgContentUrl!!), correspondent!!)
+            AvatarDisplayType.INITIALS -> loadSimpleCorrespondent(correspondent!!)
+        }
+    }
+
+    private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?): AvatarDisplayType {
+        return when {
+            correspondent == null -> AvatarDisplayType.UNKNOWN_CORRESPONDENT
+            correspondent.hasMergedContactAvatar(contactsFromViewModel) -> AvatarDisplayType.CUSTOM_AVATAR
+            bimi?.isDisplayable() == true -> AvatarDisplayType.BIMI
+            else -> AvatarDisplayType.INITIALS
         }
     }
 
@@ -149,16 +172,15 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
-    fun loadBimiAvatar(bimiUrl: String, correspondent: Correspondent?) = with(binding.avatarImage) {
-        contentDescription = correspondent?.email.orEmpty()
-        isBimiShown = bimiUrl.isNotEmpty()
+    private fun loadBimiAvatar(bimiUrl: String, correspondent: Correspondent) = with(binding.avatarImage) {
+        contentDescription = correspondent.email
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(
-                correspondent?.email.orEmpty().hashCode(),
+                correspondent.email.hashCode(),
                 R.array.AvatarColors,
             ),
             avatarUrl = bimiUrl,
-            initials = correspondent?.initials.orEmpty(),
+            initials = correspondent.initials,
             imageLoader = svgImageLoader,
             initialsColor = context.getColor(R.color.onColorfulBackground),
         )
@@ -169,6 +191,10 @@ class AvatarView @JvmOverloads constructor(
     private fun searchInMergedContact(correspondent: Correspondent, contacts: MergedContactDictionary): MergedContact? {
         val recipientsForEmail = contacts[correspondent.email]
         return recipientsForEmail?.getOrElse(correspondent.name) { recipientsForEmail.entries.elementAt(0).value }
+    }
+
+    private fun Correspondent.hasMergedContactAvatar(contacts: MergedContactDictionary): Boolean {
+        return searchInMergedContact(correspondent = this, contacts)?.avatar != null
     }
 
     private fun loadAvatarUsingDictionary(correspondent: Correspondent, contacts: MergedContactDictionary) {
@@ -192,12 +218,10 @@ class AvatarView @JvmOverloads constructor(
         }
     }
 
-    fun loadAvatar(correspondent: Correspondent?, bimi: Bimi?) {
-        val svgContentUrl = bimi?.svgContentUrl
-        if (bimi == null || !bimi.isCertified || svgContentUrl.isNullOrEmpty()) {
-            loadAvatar(correspondent)
-        } else {
-            loadBimiAvatar(ApiRoutes.bimi(svgContentUrl), correspondent)
-        }
+    enum class AvatarDisplayType {
+        UNKNOWN_CORRESPONDENT,
+        CUSTOM_AVATAR,
+        BIMI,
+        INITIALS,
     }
 }
