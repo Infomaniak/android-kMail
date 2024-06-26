@@ -526,6 +526,7 @@ class ThreadAdapter(
 
     private fun MessageViewHolder.bindContent(message: Message) {
         binding.messageLoader.isVisible = message.splitBody == null
+        binding.attachmentLayout.attachmentsInfo.isVisible = message.isFullyDownloaded()
         message.splitBody?.let { splitBody -> bindBody(message, hasQuote = splitBody.quote != null) }
     }
 
