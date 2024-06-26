@@ -217,6 +217,12 @@ class ThreadListAdapter @Inject constructor(
 
             draftPrefix.isVisible = hasDrafts
 
+            if (thread.isAnswered) {
+                iconReply.isVisible = true
+            } else if (thread.isForwarded) {
+                iconForward.isVisible = true
+            }
+
             iconAttachment.isVisible = hasAttachable
             iconCalendar.isGone = true // TODO: See with API when we should display this icon
             iconFavorite.isVisible = isFavorite
