@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Core project files" pattern="file[Infomaniak_Mail.Core*]:*//*" />
+</component>
