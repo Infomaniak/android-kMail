@@ -251,9 +251,18 @@ class Message : RealmObject {
         driveUrl = message.driveUrl
     }
 
-    // We had a bug once where we lost the Attachments.
-    // So if it happens again, we need to fully download the Message again.
-    fun isFullyDownloaded(): Boolean = if (hasAttachments && attachments.isEmpty()) false else _isFullyDownloaded
+    // If we are supposed to have Attachable (via `hasAttachments` or `swissTransferUuid`),
+    // but the lists are empty, we need to fully download the Message again.
+    fun isFullyDownloaded(): Boolean {
+        return if (
+            (hasAttachments && attachments.isEmpty()) ||
+            (swissTransferUuid != null && swissTransferFiles.isEmpty())
+        ) {
+            false
+        } else {
+            _isFullyDownloaded
+        }
+    }
 
     private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {
         return if (isManaged()) copyFromRealm(depth) else this
