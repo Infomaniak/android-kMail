@@ -217,6 +217,9 @@ class ThreadListAdapter @Inject constructor(
 
             draftPrefix.isVisible = hasDrafts
 
+            iconReply.isGone = true
+            iconForward.isGone = true
+
             if (thread.isAnswered) {
                 iconReply.isVisible = true
             } else if (thread.isForwarded) {
