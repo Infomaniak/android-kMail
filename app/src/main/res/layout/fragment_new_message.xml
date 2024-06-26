@@ -486,7 +486,7 @@
                 android:minHeight="0dp"
                 android:paddingVertical="0dp"
                 android:text="@string/externalDialogTitleRecipient"
-                android:textColor="@color/primaryTextColor"
+                android:textColor="@color/externalTagOnBackground"
                 app:icon="@drawable/ic_external_information"
                 app:iconGravity="end"
                 app:iconTint="@color/externalTagOnBackground" />
