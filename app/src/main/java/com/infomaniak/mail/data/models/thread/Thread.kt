@@ -186,8 +186,14 @@ class Thread : RealmObject {
             to += message.to
             if (message.isDraft) hasDrafts = true
             if (message.isFavorite) isFavorite = true
-            if (message.isAnswered) isAnswered = true
-            if (message.isForwarded) isForwarded = true
+            if (message.isAnswered) {
+                isAnswered = true
+                isForwarded = false
+            }
+            if (message.isForwarded) {
+                isForwarded = true
+                isAnswered = false
+            }
             if (message.hasAttachable) hasAttachable = true
         }
 
