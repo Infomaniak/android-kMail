@@ -517,9 +517,7 @@ class ThreadAdapter(
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachable>): String {
         if (attachments.isEmpty()) return ""
 
-        val totalAttachmentsFileSizeInBytes = attachments
-            .map { attachment -> attachment.size }
-            .reduce { accumulator, size -> accumulator + size }
+        val totalAttachmentsFileSizeInBytes = attachments.sumOf { it.size }
 
         return context.formatShortFileSize(totalAttachmentsFileSizeInBytes)
     }
