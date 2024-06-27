@@ -187,7 +187,7 @@ class LoginFragment : Fragment() {
 
     private fun resetLoginButtons() = with(binding) {
         connectButtonProgressTimer.cancel()
-        connectButton.hideProgress(RCore.string.connect)
+        connectButton.hideProgressCatching(RCore.string.connect)
         signInButton.isEnabled = true
     }
 
@@ -198,7 +198,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun startProgress() {
-        binding.connectButton.showProgress(getCurrentOnPrimary())
+        binding.connectButton.showProgressCatching(getCurrentOnPrimary())
     }
 
     private fun getCurrentOnPrimary(): Int? = introViewModel.updatedAccentColor.value?.first?.getOnPrimary(requireContext())

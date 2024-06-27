@@ -110,7 +110,7 @@ class InvalidPasswordFragment : Fragment() {
             passwordInputLayout.error = getString(error)
             passwordInput.text = null
             updatePasswordButtonProgressTimer.cancel()
-            confirmButton.hideProgress(R.string.buttonConfirm)
+            confirmButton.hideProgressCatching(R.string.buttonConfirm)
         }
 
         invalidPasswordViewModel.detachMailboxResult.observe(viewLifecycleOwner) { error ->
@@ -142,6 +142,6 @@ class InvalidPasswordFragment : Fragment() {
     }
 
     private fun startProgress() {
-        binding.confirmButton.showProgress()
+        binding.confirmButton.showProgressCatching()
     }
 }

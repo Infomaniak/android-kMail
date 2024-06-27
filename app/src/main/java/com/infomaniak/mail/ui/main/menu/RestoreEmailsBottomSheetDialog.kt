@@ -114,7 +114,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         val formattedDate = formattedDates?.get(date) ?: date
         restoreEmailViewModel.restoreEmails(formattedDate).observe(viewLifecycleOwner) { apiResponse ->
             restoreEmailsButtonProgressTimer.cancel()
-            binding.restoreMailsButton.hideProgress(R.string.buttonConfirmRestoreEmails)
+            binding.restoreMailsButton.hideProgressCatching(R.string.buttonConfirmRestoreEmails)
             showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else apiResponse.translatedError)
             findNavController().popBackStack()
         }
@@ -126,6 +126,6 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun startProgress() {
-        binding.restoreMailsButton.showProgress()
+        binding.restoreMailsButton.showProgressCatching()
     }
 }

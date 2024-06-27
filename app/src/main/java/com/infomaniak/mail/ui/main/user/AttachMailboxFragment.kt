@@ -126,11 +126,11 @@ class AttachMailboxFragment : Fragment() {
 
             passwordInput.text = null
             attachMailboxButtonProgressTimer.cancel()
-            attachMailboxButton.hideProgress(R.string.buttonAttachMailbox)
+            attachMailboxButton.hideProgressCatching(R.string.buttonAttachMailbox)
         }
     }
 
     private fun startProgress() {
-        binding.attachMailboxButton.showProgress()
+        binding.attachMailboxButton.showProgressCatching()
     }
 }
