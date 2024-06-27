@@ -142,6 +142,6 @@ class InvalidPasswordFragment : Fragment() {
     }
 
     private fun startProgress() {
-        binding.confirmButton.showProgress()
+        binding.confirmButton.showProgressCatching()
     }
 }

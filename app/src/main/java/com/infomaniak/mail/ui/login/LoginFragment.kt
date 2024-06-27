@@ -198,7 +198,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun startProgress() {
-        binding.connectButton.showProgress(getCurrentOnPrimary())
+        binding.connectButton.showProgressCatching(getCurrentOnPrimary())
     }
 
     private fun getCurrentOnPrimary(): Int? = introViewModel.updatedAccentColor.value?.first?.getOnPrimary(requireContext())

@@ -28,7 +28,7 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideProgress
 import com.infomaniak.lib.core.utils.initProgress
-import com.infomaniak.lib.core.utils.showProgress
+import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.mail.R
 
 abstract class BaseAlertDialog(activityContext: Context) : DefaultLifecycleObserver {
@@ -45,7 +45,7 @@ abstract class BaseAlertDialog(activityContext: Context) : DefaultLifecycleObser
     fun startLoading() {
         alertDialog.setCancelable(false)
         negativeButton.isEnabled = false
-        Utils.createRefreshTimer(onTimerFinish = positiveButton::showProgress).start()
+        Utils.createRefreshTimer(onTimerFinish = positiveButton::showProgressCatching).start()
     }
 
     fun resetLoadingAndDismiss() = with(alertDialog) {

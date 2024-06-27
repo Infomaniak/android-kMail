@@ -126,6 +126,6 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun startProgress() {
-        binding.restoreMailsButton.showProgress()
+        binding.restoreMailsButton.showProgressCatching()
     }
 }

@@ -131,6 +131,6 @@ class AttachMailboxFragment : Fragment() {
     }
 
     private fun startProgress() {
-        binding.attachMailboxButton.showProgress()
+        binding.attachMailboxButton.showProgressCatching()
     }
 }
