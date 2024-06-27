@@ -220,8 +220,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toStartOf="@+id/mailSubject"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/mailSubject"
-                    tools:visibility="visible">
+                    app:layout_constraintTop_toTopOf="@+id/mailSubject">
 
                     <ImageView
                         android:id="@+id/iconForward"
@@ -229,7 +228,7 @@
                         android:layout_height="@dimen/mediumIconSize"
                         android:layout_marginEnd="@dimen/marginStandardSmall"
                         android:contentDescription="@string/contentDescriptionIconForward"
-                        android:src="@drawable/ic_forward_arrow"
+                        android:src="@drawable/ic_forward_arrow_filled"
                         android:visibility="gone"
                         app:tint="@color/iconColorPrimaryText"
                         tools:visibility="visible" />
@@ -240,7 +239,7 @@
                         android:layout_height="@dimen/mediumIconSize"
                         android:layout_marginEnd="@dimen/marginStandardSmall"
                         android:contentDescription="@string/contentDescriptionIconReply"
-                        android:src="@drawable/ic_reply_arrow"
+                        android:src="@drawable/ic_reply_arrow_filled"
                         android:visibility="gone"
                         app:tint="@color/iconColorPrimaryText" />
 
