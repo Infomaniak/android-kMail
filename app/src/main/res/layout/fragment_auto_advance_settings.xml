@@ -46,6 +46,7 @@
                     android:id="@+id/lastThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_auto_advance_arrow_up"
                     app:text="@string/settingsAutoAdvancePreviousThreadTitle"
                     app:value="lastThread" />
 
@@ -55,6 +56,7 @@
                     android:id="@+id/nextThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_auto_advance_arrow_down"
                     app:text="@string/settingsAutoAdvanceFollowingThreadTitle"
                     app:value="nextThread" />
 
@@ -64,6 +66,7 @@
                     android:id="@+id/listThread"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_auto_advance_list_conversation"
                     app:text="@string/settingsAutoAdvanceListOfThreadsTitle"
                     app:value="listThread" />
 
@@ -73,6 +76,7 @@
                     android:id="@+id/lastAction"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_auto_advance_last_action"
                     app:text="@string/settingsAutoAdvanceNaturalThreadTitle"
                     app:value="lastAction" />
 
