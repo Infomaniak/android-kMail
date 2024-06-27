@@ -26,7 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.hideProgress
+import com.infomaniak.lib.core.utils.hideProgressCatching
 import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.mail.R
@@ -50,7 +50,7 @@ abstract class BaseAlertDialog(activityContext: Context) : DefaultLifecycleObser
 
     fun resetLoadingAndDismiss() = with(alertDialog) {
         if (isShowing) {
-            positiveButton.hideProgress(R.string.buttonCreate)
+            positiveButton.hideProgressCatching(R.string.buttonCreate)
             negativeButton.isEnabled = true
             setCancelable(true)
             dismiss()
