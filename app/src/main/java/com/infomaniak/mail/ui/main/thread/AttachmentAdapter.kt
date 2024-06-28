@@ -23,6 +23,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
@@ -32,11 +33,11 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
     private val onDelete: ((position: Int) -> Unit)? = null,
-    private val onAttachmentClicked: ((Attachment) -> Unit)? = null,
-    private val onAttachmentOptionsClicked: ((Attachment) -> Unit)? = null,
+    private val onAttachmentClicked: ((Attachable) -> Unit)? = null,
+    private val onAttachmentOptionsClicked: ((Attachable) -> Unit)? = null,
 ) : Adapter<AttachmentViewHolder>() {
 
-    private val attachments: MutableList<Attachment> = mutableListOf()
+    private val attachments: MutableList<Attachable> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -77,7 +78,7 @@ class AttachmentAdapter(
 
     override fun getItemCount(): Int = runCatchingRealm { attachments.count() }.getOrDefault(0)
 
-    fun setAttachments(newList: List<Attachment>) = runCatchingRealm {
+    fun setAttachments(newList: List<Attachable>) = runCatchingRealm {
         attachments.clear()
         attachments.addAll(newList)
     }

@@ -17,9 +17,9 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.data.models.Attachment.AttachmentType
+import com.infomaniak.mail.data.models.Attachable.AttachmentType
 
-object AttachmentMimeTypeUtils {
+object AttachableMimeTypeUtils {
 
     private val pdfMatches = mimeTypeSetOf(
         "application/pdf",

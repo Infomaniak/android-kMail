@@ -18,11 +18,14 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -35,6 +38,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
@@ -97,11 +101,13 @@ class ThreadController @Inject constructor(
                 // The Search only returns Messages from TRASH if we explicitly selected this folder,
                 // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
-                    date = localMessage?.date ?: remoteMessage.date,
-                    isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
-                    isTrashed = filterFolder?.role == FolderRole.TRASH,
-                    isFromSearch = localMessage == null,
-                    draftLocalUuid = localMessage?.draftLocalUuid,
+                    MessageInitialState(
+                        date = localMessage?.date ?: remoteMessage.date,
+                        isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
+                        isTrashed = filterFolder?.role == FolderRole.TRASH,
+                        isFromSearch = localMessage == null,
+                        draftLocalUuid = localMessage?.draftLocalUuid,
+                    ),
                     latestCalendarEventResponse = null,
                 )
 
@@ -109,6 +115,9 @@ class ThreadController @Inject constructor(
 
                 remoteThread.messagesIds += remoteMessage.messageIds
                 searchFolder.messages.add(remoteMessage)
+
+                // TODO: Remove this when the API returns the good value for `has_attachments`.
+                if (remoteMessage.hasAttachable) remoteThread.hasAttachable = true
             }
         }
 
@@ -205,7 +214,7 @@ class ThreadController @Inject constructor(
                     ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
                     ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
                     ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
-                    ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} == true"
+                    ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachable.name} == true"
                     ThreadFilter.FOLDER -> TODO()
                     else -> error("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
                 }
@@ -275,6 +284,15 @@ class ThreadController @Inject constructor(
             val deletedMessagesUids = mutableListOf<String>()
             val failedMessagesUids = mutableListOf<String>()
 
+            fun fetchSwissTransferContainer(uuid: String): SwissTransferContainer? = runCatching {
+                val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
+
+                if (apiResponse.isSuccess()) return@runCatching apiResponse.data
+
+                SentryLog.e(TAG, "Could not fetch SwissTransfer container")
+                return@runCatching null
+            }.getOrNull()
+
             fun handleFailure(uid: String, code: String? = null) {
                 if (code == ErrorCode.MESSAGE_NOT_FOUND) {
                     MessageController.getMessage(uid, realm)?.isDeletedOnApi = true
@@ -285,7 +303,7 @@ class ThreadController @Inject constructor(
             }
 
             realm.writeBlocking {
-                var hasAttachmentsInThread = false
+                var hasAttachableInThread = false
 
                 messages.forEach { localMessage ->
 
@@ -296,31 +314,40 @@ class ThreadController @Inject constructor(
 
                         if (apiResponse.isSuccess()) {
                             apiResponse.data?.also { remoteMessage ->
+                                val swissTransferFiles = remoteMessage.swissTransferUuid?.let { uuid ->
+                                    fetchSwissTransferContainer(uuid)?.let { container ->
+                                        SwissTransferContainerController.upsertSwissTransferContainer(container, realm = this)
+                                        container.swissTransferFiles
+                                    }
+                                } ?: realmListOf()
+
                                 remoteMessage.initLocalValues(
-                                    date = localMessage.date,
-                                    isFullyDownloaded = true,
-                                    isTrashed = localMessage.isTrashed,
-                                    isFromSearch = localMessage.isFromSearch,
-                                    draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                    MessageInitialState(
+                                        date = localMessage.date,
+                                        isFullyDownloaded = true,
+                                        isTrashed = localMessage.isTrashed,
+                                        isFromSearch = localMessage.isFromSearch,
+                                        draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                    ),
                                     latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                     messageIds = localMessage.messageIds,
+                                    swissTransferFiles = swissTransferFiles,
                                 )
 
-                                if (remoteMessage.hasAttachments) hasAttachmentsInThread = true
+                                if (remoteMessage.hasAttachable) hasAttachableInThread = true
 
                                 MessageController.upsertMessage(remoteMessage, realm = this)
                             }
                         } else {
                             handleFailure(localMessage.uid, apiResponse.error?.code)
                         }
-
                     }.onFailure {
                         // This `onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
                         handleFailure(localMessage.uid)
                     }
 
                     // TODO: Remove this when the API returns the good value for `has_attachments`.
-                    verifyAttachmentsValues(hasAttachmentsInThread, messages, this@writeBlocking)
+                    verifyAttachmentsValues(hasAttachableInThread, messages, this@writeBlocking)
                 }
             }
 
@@ -352,7 +379,7 @@ class ThreadController @Inject constructor(
             }
         }
 
-        private fun verifyAttachmentsValues(hasAttachmentsInThread: Boolean, messages: List<Message>, realm: MutableRealm) {
+        private fun verifyAttachmentsValues(hasAttachableInThread: Boolean, messages: List<Message>, realm: MutableRealm) {
             // When this is called for the notifications, the `messages` aren't managed.
             // In this case we need to query them to use the backlinks to get their parent's threads
             // Otherwise, we got an IllegalStateException and the notifications aren't shown
@@ -363,11 +390,15 @@ class ThreadController @Inject constructor(
             }
 
             localMessages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
-                if (thread.hasAttachments != hasAttachmentsInThread) {
-                    updateThread(thread.uid, realm) { it?.hasAttachments = hasAttachmentsInThread }
+                if (thread.hasAttachable != hasAttachableInThread) {
+                    updateThread(thread.uid, realm) {
+                        it?.hasAttachable = hasAttachableInThread
+                    }
                 }
             }
         }
         //endregion
+
+        private const val TAG = "ThreadController"
     }
 }

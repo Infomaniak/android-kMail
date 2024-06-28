@@ -393,6 +393,10 @@ object ApiRepository : ApiRepositoryCore() {
         return ApiResponse(result = ApiResponseStatus.ERROR, translatedError = R.string.anErrorHasOccurred)
     }
 
+    fun getSwissTransferContainer(containerUuid: String): ApiResponse<SwissTransferContainer> {
+        return callApi(url = ApiRoutes.swissTransferContainer(containerUuid), method = GET)
+    }
+
     fun downloadAttachment(resource: String): Response {
         val request = Request.Builder()
             .url(ApiRoutes.resource(resource))

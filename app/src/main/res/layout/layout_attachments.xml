@@ -28,7 +28,7 @@
         android:clipToPadding="false"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/alternativeMargin"
-        android:paddingBottom="@dimen/marginStandardMedium"
+        android:paddingBottom="@dimen/marginStandardSmall"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,38 +36,31 @@
         app:layout_goneMarginTop="@dimen/marginStandardSmall"
         tools:listitem="@layout/item_attachment" />
 
-    <ImageView
-        android:id="@+id/attachmentsIcon"
-        android:layout_width="@dimen/mediumIconSize"
-        android:layout_height="@dimen/mediumIconSize"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:importantForAccessibility="no"
-        android:src="@drawable/ic_attachment"
-        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
+    <LinearLayout
+        android:id="@+id/attachmentsInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="@dimen/marginStandardMedium"
+        android:paddingVertical="@dimen/marginStandardSmall"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
-        app:tint="@color/iconColor" />
+        app:layout_constraintTop_toBottomOf="@+id/attachmentsRecyclerView">
 
-    <TextView
-        android:id="@+id/attachmentsSizeText"
-        style="@style/BodySmall.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-        app:layout_constraintEnd_toStartOf="@id/attachmentsDownloadAllButton"
-        app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
-        tools:text="4 pièces jointes (3 MB)" />
+        <TextView
+            android:id="@+id/attachmentsIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:drawableStartCompat="@drawable/ic_attachment"
+            app:drawableTint="@color/iconColor" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/attachmentsDownloadAllButton"
-        style="@style/TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="0dp"
-        android:text="@string/buttonDownloadAll"
-        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
-        app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
-        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText" />
+        <TextView
+            android:id="@+id/attachmentsSizeText"
+            style="@style/Body.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardSmall"
+            tools:text="2 pièces jointes et 2 fichiers envoyées via SwissTransfer (3 MB). Tout télécharger" />
 
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

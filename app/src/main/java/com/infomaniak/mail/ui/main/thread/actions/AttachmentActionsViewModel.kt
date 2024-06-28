@@ -20,17 +20,29 @@ package com.infomaniak.mail.ui.main.thread.actions
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
+import com.infomaniak.mail.data.cache.mailboxContent.SwissTransferFileController
+import com.infomaniak.mail.data.models.Attachable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class AttachmentActionsViewModel @Inject constructor(
     attachmentController: AttachmentController,
+    swissTransferFileController: SwissTransferFileController,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    private val isSwissTransferFile
+        inline get() = savedStateHandle.get<Boolean>(AttachmentActionsBottomSheetDialogArgs::isSwissTransferFile.name)!!
 
     private val attachmentLocalUuid
         inline get() = savedStateHandle.get<String>(AttachmentActionsBottomSheetDialogArgs::attachmentLocalUuid.name)!!
 
-    val attachment = runCatching { attachmentController.getAttachment(attachmentLocalUuid) }.getOrNull()
+    val attachment: Attachable? = runCatching {
+        if (isSwissTransferFile) {
+            swissTransferFileController.getSwissTransferFile(attachmentLocalUuid)
+        } else {
+            attachmentController.getAttachment(attachmentLocalUuid)
+        }
+    }.getOrNull()
 }
