@@ -1,0 +1,48 @@
+<!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:tint="@color/iconColor"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M18.359,7C17.278,5.69 15.819,4.746 14.182,4.297C12.544,3.847 10.807,3.914 9.209,4.488C7.611,5.062 6.229,6.115 5.251,7.504C4.274,8.892 3.748,10.549 3.747,12.247V14.5"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M5.997,17.908C7.131,19.109 8.599,19.943 10.212,20.3C11.825,20.658 13.508,20.523 15.043,19.913C16.578,19.303 17.895,18.246 18.823,16.879C19.751,15.513 20.247,13.899 20.247,12.247V10.747"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M0.747,11.497L3.747,14.497L6.747,11.497"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M23.247,13.747L20.247,10.747L17.247,13.747"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
