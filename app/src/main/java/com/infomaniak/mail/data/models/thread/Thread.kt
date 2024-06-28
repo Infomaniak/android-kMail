@@ -189,10 +189,20 @@ class Thread : RealmObject {
             if (message.isAnswered) {
                 isAnswered = true
                 isForwarded = false
-            }
-            if (message.isForwarded) {
+            } else if (message.isForwarded) {
                 isForwarded = true
                 isAnswered = false
+            } else { // Even if the message has not been answered or forwarded, one of its duplicates may have been.
+                duplicates.filter { it.messageId == message.messageId }.forEach {
+                    if (it.isAnswered) {
+                        isAnswered = true
+                        isForwarded = false
+                    }
+                    if (it.isForwarded) {
+                        isForwarded = true
+                        isAnswered = false
+                    }
+                }
             }
             if (message.hasAttachable) hasAttachable = true
         }
