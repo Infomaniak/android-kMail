@@ -61,7 +61,8 @@ class AvatarView @JvmOverloads constructor(
     private var currentCorrespondent: Correspondent? = null
     private var currentBimi: Bimi? = null
 
-    private val liveData = Utils.waitInitMediator(
+    // We use waitInitMediator over MediatorLiveData because we know both live data will be initialized very quickly anyway
+    private val avatarMediatorLiveData = Utils.waitInitMediator(
         avatarMergedContactData.mergedContactLiveData,
         avatarMergedContactData.isBimiEnabledLiveData,
     )
@@ -118,14 +119,14 @@ class AvatarView @JvmOverloads constructor(
         super.onAttachedToWindow()
         if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
 
-        liveData.observeForever(mediatorObserver)
+        avatarMediatorLiveData.observeForever(mediatorObserver)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
 
-        liveData.removeObserver(mediatorObserver)
+        avatarMediatorLiveData.removeObserver(mediatorObserver)
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
