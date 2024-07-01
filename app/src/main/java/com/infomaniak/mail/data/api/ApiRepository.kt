@@ -364,8 +364,8 @@ object ApiRepository : ApiRepositoryCore() {
         "output" to "mail",
     )
 
-    fun checkFeatureFlag(featureFlag: FeatureFlag, currentMailboxUuid: String): ApiResponse<Map<String, Boolean>> {
-        return callApi(ApiRoutes.featureFlag(featureFlag.apiName, currentMailboxUuid), GET)
+    fun getFeatureFlags(currentMailboxUuid: String): ApiResponse<List<String>> {
+        return callApi(ApiRoutes.featureFlags(currentMailboxUuid), GET)
     }
 
     fun getCredentialsPassword(): ApiResponse<InfomaniakPassword> = runCatching {

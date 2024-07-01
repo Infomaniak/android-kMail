@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.getColorOrNull
 import com.infomaniak.mail.utils.extensions.getTransparentColor
@@ -60,13 +61,18 @@ class AvatarView @JvmOverloads constructor(
     private var currentCorrespondent: Correspondent? = null
     private var currentBimi: Bimi? = null
 
-    private val mergedContactObserver = Observer<MergedContactDictionary> { contacts ->
-        val displayType = getAvatarDisplayType(currentCorrespondent, currentBimi)
+    private val liveData = Utils.waitInitMediator(
+        avatarMergedContactData.mergedContactLiveData,
+        avatarMergedContactData.isBimiEnabledLiveData,
+    )
 
-        if (displayType == AvatarDisplayType.CUSTOM_AVATAR || displayType == AvatarDisplayType.INITIALS) {
-            loadAvatarUsingDictionary(currentCorrespondent!!, contacts)
-        }
+    private val mediatorObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
+        val displayType = getAvatarDisplayType(currentCorrespondent, currentBimi, isBimiEnabled)
+        if (displayType == AvatarDisplayType.UNKNOWN_CORRESPONDENT) return@Observer
+
+        handleDisplayType(displayType, currentCorrespondent, currentBimi, contacts)
     }
+
 
     @Inject
     lateinit var avatarMergedContactData: AvatarMergedContactData
@@ -111,13 +117,15 @@ class AvatarView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
-        avatarMergedContactData.mergedContactLiveData.observeForever(mergedContactObserver)
+
+        liveData.observeForever(mediatorObserver)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
-        avatarMergedContactData.mergedContactLiveData.removeObserver(mergedContactObserver)
+
+        liveData.removeObserver(mediatorObserver)
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
@@ -138,27 +146,36 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadAvatar(correspondent: Correspondent?, bimi: Bimi? = null) {
-
-        fun loadSimpleCorrespondent(correspondent: Correspondent) {
-            loadAvatarUsingDictionary(correspondent, contacts = contactsFromViewModel)
-            currentCorrespondent = correspondent
-        }
-
         currentBimi = bimi
 
-        when (getAvatarDisplayType(correspondent, bimi)) {
+        val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
+        val avatarDisplayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
+
+        handleDisplayType(avatarDisplayType, correspondent, bimi, contactsFromViewModel)
+    }
+
+    private fun handleDisplayType(
+        avatarDisplayType: AvatarDisplayType,
+        correspondent: Correspondent?,
+        bimi: Bimi?,
+        contacts: MergedContactDictionary,
+    ) {
+        when (avatarDisplayType) {
             AvatarDisplayType.UNKNOWN_CORRESPONDENT -> loadUnknownUserAvatar()
-            AvatarDisplayType.CUSTOM_AVATAR -> loadSimpleCorrespondent(correspondent!!)
+            AvatarDisplayType.CUSTOM_AVATAR,
+            AvatarDisplayType.INITIALS -> {
+                loadAvatarUsingDictionary(correspondent!!, contacts)
+                currentCorrespondent = correspondent
+            }
             AvatarDisplayType.BIMI -> loadBimiAvatar(ApiRoutes.bimi(bimi!!.svgContentUrl!!), correspondent!!)
-            AvatarDisplayType.INITIALS -> loadSimpleCorrespondent(correspondent!!)
         }
     }
 
-    private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?): AvatarDisplayType {
+    private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?, isBimiEnabled: Boolean): AvatarDisplayType {
         return when {
             correspondent == null -> AvatarDisplayType.UNKNOWN_CORRESPONDENT
             correspondent.hasMergedContactAvatar(contactsFromViewModel) -> AvatarDisplayType.CUSTOM_AVATAR
-            bimi?.isDisplayable() == true -> AvatarDisplayType.BIMI
+            bimi?.isDisplayable(isBimiEnabled) == true -> AvatarDisplayType.BIMI
             else -> AvatarDisplayType.INITIALS
         }
     }

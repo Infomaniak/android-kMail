@@ -38,6 +38,7 @@ import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
+import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import org.jsoup.Jsoup
@@ -49,6 +50,7 @@ class SharedUtils @Inject constructor(
     private val refreshController: RefreshController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
+    private val avatarMergedContactData: AvatarMergedContactData,
 ) {
 
     @Inject
@@ -118,12 +120,14 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun updateAiFeatureFlag(mailboxObjectId: String, mailboxUuid: String) {
-        with(ApiRepository.checkFeatureFlag(FeatureFlag.AI, mailboxUuid)) {
+    fun updateFeatureFlags(
+        mailboxObjectId: String,
+        mailboxUuid: String,
+    ) {
+        with(ApiRepository.getFeatureFlags(mailboxUuid)) {
             if (isSuccess()) {
-                val isEnabled = data?.get("is_enabled") == true
-                mailboxController.updateMailbox(mailboxObjectId) {
-                    if (isEnabled) it.featureFlags.add(FeatureFlag.AI) else it.featureFlags.remove(FeatureFlag.AI)
+                mailboxController.updateMailbox(mailboxObjectId) { mailbox ->
+                    mailbox.featureFlags.overrideFeatureFlags(featureFlags = data ?: emptyList())
                 }
             }
         }

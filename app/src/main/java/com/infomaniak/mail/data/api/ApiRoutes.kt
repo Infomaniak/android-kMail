@@ -250,8 +250,8 @@ object ApiRoutes {
         return "?mailbox_uuid=$mailboxUuid"
     }
 
-    fun featureFlag(featureName: String, mailboxUuid: String): String {
-        return "$MAIL_API/api/feature-flag/check/${featureName}${mailboxUuidParameter(mailboxUuid)}"
+    fun featureFlags(mailboxUuid: String): String {
+        return "$MAIL_API/api/feature-flag/check${mailboxUuidParameter(mailboxUuid)}"
     }
 
     fun ping(): String {
