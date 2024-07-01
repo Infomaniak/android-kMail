@@ -154,6 +154,30 @@ class AvatarView @JvmOverloads constructor(
         handleDisplayType(avatarDisplayType, correspondent, bimi, contactsFromViewModel)
     }
 
+    fun loadAvatar(mergedContact: MergedContact) {
+        binding.avatarImage.baseLoadAvatar(mergedContact)
+    }
+
+    fun loadUnknownUserAvatar() {
+        currentCorrespondent = null
+        binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
+    }
+
+    private fun loadBimiAvatar(bimiUrl: String, correspondent: Correspondent) = with(binding.avatarImage) {
+        contentDescription = correspondent.email
+        currentCorrespondent = null
+        loadAvatar(
+            backgroundColor = context.getBackgroundColorBasedOnId(
+                correspondent.email.hashCode(),
+                R.array.AvatarColors,
+            ),
+            avatarUrl = bimiUrl,
+            initials = correspondent.initials,
+            imageLoader = svgImageLoader,
+            initialsColor = context.getColor(R.color.onColorfulBackground),
+        )
+    }
+
     private fun handleDisplayType(
         avatarDisplayType: AvatarDisplayType,
         correspondent: Correspondent?,
@@ -178,30 +202,6 @@ class AvatarView @JvmOverloads constructor(
             bimi?.isDisplayable(isBimiEnabled) == true -> AvatarDisplayType.BIMI
             else -> AvatarDisplayType.INITIALS
         }
-    }
-
-    fun loadAvatar(mergedContact: MergedContact) {
-        binding.avatarImage.baseLoadAvatar(mergedContact)
-    }
-
-    fun loadUnknownUserAvatar() {
-        currentCorrespondent = null
-        binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
-    }
-
-    private fun loadBimiAvatar(bimiUrl: String, correspondent: Correspondent) = with(binding.avatarImage) {
-        contentDescription = correspondent.email
-        currentCorrespondent = null
-        loadAvatar(
-            backgroundColor = context.getBackgroundColorBasedOnId(
-                correspondent.email.hashCode(),
-                R.array.AvatarColors,
-            ),
-            avatarUrl = bimiUrl,
-            initials = correspondent.initials,
-            imageLoader = svgImageLoader,
-            initialsColor = context.getColor(R.color.onColorfulBackground),
-        )
     }
 
     fun setImageDrawable(drawable: Drawable?) = binding.avatarImage.setImageDrawable(drawable)
