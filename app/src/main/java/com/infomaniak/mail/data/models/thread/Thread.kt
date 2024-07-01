@@ -187,8 +187,14 @@ class Thread : RealmObject {
             if (message.hasAttachments) hasAttachments = true
             if (message.isDraft) hasDrafts = true
             if (message.isFavorite) isFavorite = true
-            if (message.isAnswered) isAnswered = true
-            if (message.isForwarded) isForwarded = true
+            if (message.isAnswered) {
+                isAnswered = true
+                isForwarded = false
+            }
+            if (message.isForwarded) {
+                isForwarded = true
+                isAnswered = false
+            }
         }
 
         date = messages.last { it.folderId == folderId }.date

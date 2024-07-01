@@ -209,6 +209,18 @@ class ThreadListAdapter @Inject constructor(
 
         displayFolderName(thread)
 
+        // This method is only useful for old threads already stored in Realm, where they
+        // could be both answered and forwarded (for new threads, this is impossible).
+        fun computeReplyAndForwardIcon(isAnswered: Boolean, isForwarded: Boolean): Pair<Boolean, Boolean> {
+            return if (isAnswered) {
+                Pair(true, false)
+            } else if (isForwarded) {
+                Pair(false, true)
+            } else {
+                Pair(false, false)
+            }
+        }
+
         with(thread) {
             expeditor.text = formatRecipientNames(computeDisplayedRecipients())
             mailSubject.text = context.formatSubject(subject)
@@ -216,6 +228,11 @@ class ThreadListAdapter @Inject constructor(
             mailDate.text = formatDate(context)
 
             draftPrefix.isVisible = hasDrafts
+
+            computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded).let { (iconReplyIsVisible, iconForwardIsVisible) ->
+                iconReply.isVisible = iconReplyIsVisible
+                iconForward.isVisible = iconForwardIsVisible
+            }
 
             iconAttachment.isVisible = hasAttachments
             iconCalendar.isGone = true // TODO: See with API when we should display this icon
