@@ -22,6 +22,7 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -116,7 +117,16 @@ class NewMessageViewModel @Inject constructor(
     val editorReloader = EditorReloader(viewModelScope)
     val editorBodyLoader = SingleLiveEvent<String>()
 
-    val subjectAndBody = SingleLiveEvent<Pair<String, String>>()
+    // val subjectAndBody = SingleLiveEvent<Pair<String, String>>()
+
+    val subjectAndBody = object : SingleLiveEvent<String>() {
+        override fun observeForever(observer: Observer<in String>) {
+            if (hasActiveObservers()) Log.w(Companion.TAG, "Multiple observers registered but only one will be notified of changes.")
+
+            // Observe the internal MutableLiveData
+            super.observeForever { t -> if (pending.compareAndSet(true, false)) observer.onChanged(t) }
+        }
+    }
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -736,6 +746,8 @@ class NewMessageViewModel @Inject constructor(
         val localUuid = draftLocalUuid ?: return@with
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
+        Log.e("gibran", "executeDraftActionWhenStopping - action: ${action}")
+        Log.e("gibran", "executeDraftActionWhenStopping - isSnapshotTheSame(subject, uiBodyValue): ${isSnapshotTheSame(subject, uiBodyValue)}")
         if (action == DraftAction.SAVE && isSnapshotTheSame(subject, uiBodyValue)) {
             if (isFinishing && isNewMessage) removeDraftFromRealm(localUuid)
             return@with

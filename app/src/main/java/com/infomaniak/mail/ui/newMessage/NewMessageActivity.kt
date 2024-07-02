@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.viewModels
@@ -137,6 +138,7 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun saveDraft() {
+        Log.e("gibran", "saveDraft: ", );
         // TODO: Init all fields at the same time in the constructor?
         val draftSaveConfiguration = DraftSaveConfiguration(
             action = if (newMessageViewModel.shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
@@ -147,6 +149,7 @@ class NewMessageActivity : BaseActivity() {
 
         val observer = object : Observer<Pair<String, String>> {
             override fun onChanged(value: Pair<String, String>) {
+                Log.e("gibran", "saveDraft: observed subject and body", );
                 newMessageViewModel.subjectAndBody.removeObserver(this)
 
                 val (subject, body) = value
