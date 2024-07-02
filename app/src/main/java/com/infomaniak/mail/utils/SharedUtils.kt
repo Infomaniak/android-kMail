@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -38,7 +37,6 @@ import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
-import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import org.jsoup.Jsoup
@@ -50,7 +48,6 @@ class SharedUtils @Inject constructor(
     private val refreshController: RefreshController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
-    private val avatarMergedContactData: AvatarMergedContactData,
 ) {
 
     @Inject
