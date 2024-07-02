@@ -72,7 +72,6 @@ class AvatarView @JvmOverloads constructor(
             )
         }
 
-
     private val avatarUpdateObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
         val (correspondent, bimi) = state
         val displayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
