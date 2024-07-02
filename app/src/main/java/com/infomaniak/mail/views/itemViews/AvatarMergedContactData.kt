@@ -29,6 +29,7 @@ import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
 import javax.inject.Inject
@@ -56,5 +57,6 @@ class AvatarMergedContactData @Inject constructor(
             mailbox?.featureFlags?.contains(FeatureFlag.BIMI)
         }
         .filterNotNull()
+        .distinctUntilChanged()
         .asLiveData(ioCoroutineContext)
 }
