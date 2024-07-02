@@ -58,8 +58,7 @@ class AvatarView @JvmOverloads constructor(
 
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private var currentCorrespondent: Correspondent? = null
-    private var currentBimi: Bimi? = null
+    private var internalState = InternalState(null, null)
 
     // We use waitInitMediator over MediatorLiveData because we know both live data will be initialized very quickly anyway
     private val avatarMediatorLiveData = Utils.waitInitMediator(
@@ -68,10 +67,11 @@ class AvatarView @JvmOverloads constructor(
     )
 
     private val mediatorObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
-        val displayType = getAvatarDisplayType(currentCorrespondent, currentBimi, isBimiEnabled)
-        if (displayType == AvatarDisplayType.UNKNOWN_CORRESPONDENT) return@Observer
+        val (correspondent, bimi) = internalState
+        val displayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
 
-        handleDisplayType(displayType, currentCorrespondent, currentBimi, contacts)
+        if (displayType == AvatarDisplayType.UNKNOWN_CORRESPONDENT) return@Observer
+        handleDisplayType(displayType, correspondent, bimi, contacts)
     }
 
 
@@ -147,7 +147,6 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadAvatar(correspondent: Correspondent?, bimi: Bimi? = null) {
-        currentBimi = bimi
 
         val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
         val avatarDisplayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
@@ -160,19 +159,19 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadUnknownUserAvatar() {
-        currentCorrespondent = null
+        internalState.setInternalState(null, null)
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
-    private fun loadBimiAvatar(bimiUrl: String, correspondent: Correspondent) = with(binding.avatarImage) {
+    private fun loadBimiAvatar(bimi: Bimi, correspondent: Correspondent) = with(binding.avatarImage) {
+        internalState.setInternalState(correspondent, bimi)
         contentDescription = correspondent.email
-        currentCorrespondent = correspondent
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(
                 correspondent.email.hashCode(),
                 R.array.AvatarColors,
             ),
-            avatarUrl = bimiUrl,
+            avatarUrl = ApiRoutes.bimi(bimi.svgContentUrl!!),
             initials = correspondent.initials,
             imageLoader = svgImageLoader,
             initialsColor = context.getColor(R.color.onColorfulBackground),
@@ -188,11 +187,8 @@ class AvatarView @JvmOverloads constructor(
         when (avatarDisplayType) {
             AvatarDisplayType.UNKNOWN_CORRESPONDENT -> loadUnknownUserAvatar()
             AvatarDisplayType.CUSTOM_AVATAR,
-            AvatarDisplayType.INITIALS -> {
-                loadAvatarUsingDictionary(correspondent!!, contacts)
-                currentCorrespondent = correspondent
-            }
-            AvatarDisplayType.BIMI -> loadBimiAvatar(ApiRoutes.bimi(bimi!!.svgContentUrl!!), correspondent!!)
+            AvatarDisplayType.INITIALS -> loadAvatarUsingDictionary(correspondent!!, contacts, bimi)
+            AvatarDisplayType.BIMI -> loadBimiAvatar(bimi!!, correspondent!!)
         }
     }
 
@@ -216,7 +212,8 @@ class AvatarView @JvmOverloads constructor(
         return searchInMergedContact(correspondent = this, contacts)?.avatar != null
     }
 
-    private fun loadAvatarUsingDictionary(correspondent: Correspondent, contacts: MergedContactDictionary) {
+    private fun loadAvatarUsingDictionary(correspondent: Correspondent, contacts: MergedContactDictionary, bimi: Bimi?) {
+        internalState.setInternalState(correspondent, bimi)
         val mergedContact = searchInMergedContact(correspondent, contacts)
         binding.avatarImage.baseLoadAvatar(correspondent = mergedContact ?: correspondent)
     }
@@ -234,6 +231,13 @@ class AvatarView @JvmOverloads constructor(
                 imageLoader = context.imageLoader,
                 initialsColor = color,
             )
+        }
+    }
+
+    private data class InternalState(var correspondent: Correspondent?, var bimi: Bimi?) {
+        fun setInternalState(correspondent: Correspondent?, bimi: Bimi?) {
+            this.correspondent = correspondent
+            this.bimi = bimi
         }
     }
 
