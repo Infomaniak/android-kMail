@@ -166,7 +166,7 @@ class AvatarView @JvmOverloads constructor(
 
     private fun loadBimiAvatar(bimiUrl: String, correspondent: Correspondent) = with(binding.avatarImage) {
         contentDescription = correspondent.email
-        currentCorrespondent = null
+        currentCorrespondent = correspondent
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(
                 correspondent.email.hashCode(),
