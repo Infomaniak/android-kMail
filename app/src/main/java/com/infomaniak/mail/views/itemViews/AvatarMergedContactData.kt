@@ -52,10 +52,7 @@ class AvatarMergedContactData @Inject constructor(
 
     val isBimiEnabledLiveData = mailboxController
         .getMailboxAsync(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-        .mapLatest {
-            val mailbox = it.obj
-            mailbox?.featureFlags?.contains(FeatureFlag.BIMI)
-        }
+        .mapLatest { it.obj?.featureFlags?.contains(FeatureFlag.BIMI) }
         .filterNotNull()
         .distinctUntilChanged()
         .asLiveData(ioCoroutineContext)

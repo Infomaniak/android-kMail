@@ -117,14 +117,11 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun updateFeatureFlags(
-        mailboxObjectId: String,
-        mailboxUuid: String,
-    ) {
+    fun updateFeatureFlags(mailboxObjectId: String, mailboxUuid: String) {
         with(ApiRepository.getFeatureFlags(mailboxUuid)) {
             if (isSuccess()) {
                 mailboxController.updateMailbox(mailboxObjectId) { mailbox ->
-                    mailbox.featureFlags.overrideFeatureFlags(featureFlags = data ?: emptyList())
+                    mailbox.featureFlags.setFeatureFlags(featureFlags = data ?: emptyList())
                 }
             }
         }

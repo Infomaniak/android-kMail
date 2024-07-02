@@ -66,12 +66,12 @@ class AvatarView @JvmOverloads constructor(
         avatarMergedContactData.isBimiEnabledLiveData,
     )
 
-    private val mediatorObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
+    private val avatarUpdateObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
         val (correspondent, bimi) = internalState
         val displayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
 
         if (displayType == AvatarDisplayType.UNKNOWN_CORRESPONDENT) return@Observer
-        handleDisplayType(displayType, correspondent, bimi, contacts)
+        loadAvatarByDisplayType(displayType, correspondent, bimi, contacts)
     }
 
 
@@ -83,6 +83,8 @@ class AvatarView @JvmOverloads constructor(
             // Avoid lateinit property has not been initialized in preview
             return if (isInEditMode) emptyMap() else avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
         }
+
+    private val isBimiEnabled: Boolean get() = !isInEditMode && avatarMergedContactData.isBimiEnabledLiveData.value == true
 
     @Inject
     lateinit var svgImageLoader: ImageLoader
@@ -119,14 +121,14 @@ class AvatarView @JvmOverloads constructor(
         super.onAttachedToWindow()
         if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
 
-        avatarMediatorLiveData.observeForever(mediatorObserver)
+        avatarMediatorLiveData.observeForever(avatarUpdateObserver)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         if (isInEditMode) return // Avoid lateinit property has not been initialized in preview
 
-        avatarMediatorLiveData.removeObserver(mediatorObserver)
+        avatarMediatorLiveData.removeObserver(avatarUpdateObserver)
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.root.setOnClickListener(onClickListener)
@@ -147,11 +149,9 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadAvatar(correspondent: Correspondent?, bimi: Bimi? = null) {
-
-        val isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false
         val avatarDisplayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
 
-        handleDisplayType(avatarDisplayType, correspondent, bimi, contactsFromViewModel)
+        loadAvatarByDisplayType(avatarDisplayType, correspondent, bimi, contactsFromViewModel)
     }
 
     fun loadAvatar(mergedContact: MergedContact) {
@@ -178,7 +178,7 @@ class AvatarView @JvmOverloads constructor(
         )
     }
 
-    private fun handleDisplayType(
+    private fun loadAvatarByDisplayType(
         avatarDisplayType: AvatarDisplayType,
         correspondent: Correspondent?,
         bimi: Bimi?,
