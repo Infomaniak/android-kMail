@@ -41,7 +41,7 @@ class Bimi() : EmbeddedRealmObject, Parcelable {
         this.isCertified = isCertified
     }
 
-    fun isDisplayable(): Boolean = isCertified && svgContentUrl?.isNotEmpty() == true
+    fun isDisplayable(isBimiEnabled: Boolean): Boolean = isBimiEnabled && isCertified && svgContentUrl?.isNotEmpty() == true
 
     companion object : Parceler<Bimi> {
 

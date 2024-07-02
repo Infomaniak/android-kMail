@@ -124,12 +124,9 @@ class Mailbox : RealmObject {
             return _featureFlags.contains(featureFlag.apiName)
         }
 
-        fun add(featureFlag: FeatureFlag): Boolean {
-            return _featureFlags.add(featureFlag.apiName)
-        }
-
-        fun remove(featureFlag: FeatureFlag): Boolean {
-            return _featureFlags.remove(featureFlag.apiName)
+        fun setFeatureFlags(featureFlags: List<String>) = with(_featureFlags){
+            clear()
+            addAll(featureFlags)
         }
     }
 }
