@@ -236,6 +236,10 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        binding.editor.exportHtml { html ->
+            newMessageViewModel.editorBodyLoader.postValue(html)
+        }
+
         addressListPopupWindow = null
         quoteWebView?.destroyAndClearHistory()
         quoteWebView = null
@@ -557,11 +561,6 @@ class NewMessageFragment : Fragment() {
                 quoteWebView.loadContent(quote, quoteGroup)
             }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        newMessageViewModel.saveEditorHtml(binding.editor)
-        super.onSaveInstanceState(outState)
     }
 
     override fun onStop() {
