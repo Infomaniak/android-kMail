@@ -58,7 +58,7 @@ class AvatarView @JvmOverloads constructor(
 
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private var internalState = InternalState(null, null)
+    private var state = State()
 
     // We use waitInitMediator over MediatorLiveData because we know both live data will be initialized very quickly anyway
     private val avatarMediatorLiveData = Utils.waitInitMediator(
@@ -67,13 +67,12 @@ class AvatarView @JvmOverloads constructor(
     )
 
     private val avatarUpdateObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
-        val (correspondent, bimi) = internalState
+        val (correspondent, bimi) = state
         val displayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
 
         if (displayType == AvatarDisplayType.UNKNOWN_CORRESPONDENT) return@Observer
         loadAvatarByDisplayType(displayType, correspondent, bimi, contacts)
     }
-
 
     @Inject
     lateinit var avatarMergedContactData: AvatarMergedContactData
@@ -159,12 +158,12 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadUnknownUserAvatar() {
-        internalState.setInternalState(null, null)
+        state.update(correspondent = null, bimi = null)
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
     private fun loadBimiAvatar(bimi: Bimi, correspondent: Correspondent) = with(binding.avatarImage) {
-        internalState.setInternalState(correspondent, bimi)
+        state.update(correspondent, bimi)
         contentDescription = correspondent.email
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(
@@ -213,7 +212,7 @@ class AvatarView @JvmOverloads constructor(
     }
 
     private fun loadAvatarUsingDictionary(correspondent: Correspondent, contacts: MergedContactDictionary, bimi: Bimi?) {
-        internalState.setInternalState(correspondent, bimi)
+        state.update(correspondent, bimi)
         val mergedContact = searchInMergedContact(correspondent, contacts)
         binding.avatarImage.baseLoadAvatar(correspondent = mergedContact ?: correspondent)
     }
@@ -234,8 +233,11 @@ class AvatarView @JvmOverloads constructor(
         }
     }
 
-    private data class InternalState(var correspondent: Correspondent?, var bimi: Bimi?) {
-        fun setInternalState(correspondent: Correspondent?, bimi: Bimi?) {
+    private data class State(
+        var correspondent: Correspondent? = null,
+        var bimi: Bimi? = null,
+    ) {
+        fun update(correspondent: Correspondent?, bimi: Bimi?) {
             this.correspondent = correspondent
             this.bimi = bimi
         }
