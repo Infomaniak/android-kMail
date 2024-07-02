@@ -17,14 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.move
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -34,41 +32,30 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.move.MoveAdapter.FolderViewHolder
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.*
-import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.min
 
-class MoveAdapter @Inject constructor(
-    private val globalCoroutineScope: CoroutineScope,
-) : Adapter<FolderViewHolder>() {
+class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
 
-    private val foldersDiffer = AsyncListDiffer(this, FolderDiffCallback())
-
-    private inline val folders get() = foldersDiffer.currentList
-
-    private var currentFolderId: String? = null
+    private var sourceFolderId: String? = null
     private var hasCollapsableFolder: Boolean? = null
-
     private var isInMenuDrawer: Boolean = true
-    private var shouldIndent: Boolean = true
+
     private lateinit var onFolderClicked: (folderId: String) -> Unit
     private var onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null
     private var onCollapseTransition: ((Boolean) -> Unit)? = null
 
-    private var setFoldersJob: Job? = null
-
     operator fun invoke(
         isInMenuDrawer: Boolean,
-        shouldIndent: Boolean = true,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
         onCollapseTransition: ((Boolean) -> Unit)? = null,
     ): MoveAdapter {
         this.isInMenuDrawer = isInMenuDrawer
-        this.shouldIndent = shouldIndent
         this.onFolderClicked = onFolderClicked
         this.onCollapseClicked = onCollapseClicked
         this.onCollapseTransition = onCollapseTransition
@@ -76,7 +63,11 @@ class MoveAdapter @Inject constructor(
         return this
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { folders.size }.getOrDefault(0)
+    fun setSourceFolderId(id: String) {
+        sourceFolderId = id
+    }
+
+    override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
 
     override fun getItemViewType(position: Int): Int {
         return if (isInMenuDrawer) DisplayType.MENU_DRAWER.layout else DisplayType.SELECTABLE_FOLDER.layout
@@ -95,9 +86,9 @@ class MoveAdapter @Inject constructor(
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         if (payloads.firstOrNull() == Unit) {
-            val folder = folders[position]
+            val folder = currentList[position]
             if (getItemViewType(position) == DisplayType.SELECTABLE_FOLDER.layout) {
-                (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(currentFolderId == folder.id)
+                (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(sourceFolderId == folder.id)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -105,7 +96,7 @@ class MoveAdapter @Inject constructor(
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
-        val folder = folders[position]
+        val folder = currentList[position]
 
         when (getItemViewType(position)) {
             DisplayType.SELECTABLE_FOLDER.layout -> (this as ItemSelectableFolderBinding).root.displayFolder(folder)
@@ -128,7 +119,7 @@ class MoveAdapter @Inject constructor(
         folder.role?.let {
             setFolderUi(folder, it.folderIconRes, unread, it.matomoValue)
         } ?: run {
-            val indentLevel = if (shouldIndent) folder.path.split(folder.separator).size - 1 else 0
+            val indentLevel = if (folder.shouldDisplayIndent) folder.path.split(folder.separator).size - 1 else 0
             setFolderUi(
                 folder = folder,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
@@ -150,9 +141,10 @@ class MoveAdapter @Inject constructor(
     ) {
         val folderName = folder.getLocalizedName(context)
 
+        tag = if (folder.shouldDisplayDivider) null else UiUtils.IGNORE_DIVIDER_TAG
         text = folderName
         icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(currentFolderId == folder.id)
+        setSelectedState(sourceFolderId == folder.id)
 
         when (this) {
             is SelectableFolderItemView -> setIndent(folderIndent)
@@ -178,35 +170,20 @@ class MoveAdapter @Inject constructor(
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String? = null) = runCatchingRealm {
-
-        foldersDiffer.submitList(newFolders)
-
-        setFoldersJob?.cancel()
-        setFoldersJob = globalCoroutineScope.launch {
-            newCurrentFolderId?.let { currentFolderId = it }
-            val newHasCollapsableFolder = newFolders.any { it.canBeCollapsed }
-
-            val isFirstTime = hasCollapsableFolder == null
-            val collapsableFolderExistenceHasChanged = newHasCollapsableFolder != hasCollapsableFolder
-            hasCollapsableFolder = newHasCollapsableFolder
-
-            if (!isFirstTime && collapsableFolderExistenceHasChanged) {
-                Dispatchers.Main { notifyDataSetChanged() }
-            }
-        }
+    fun setFolders(newFolders: List<Folder>, newSourceFolderId: String? = null) = runCatchingRealm {
+        newSourceFolderId?.let { sourceFolderId = it }
+        submitList(newFolders)
     }
 
-    fun updateSelectedState(newCurrentFolderId: String) {
-        val previousCurrentFolderId = currentFolderId
-        currentFolderId = newCurrentFolderId
-        previousCurrentFolderId?.let(::notifyCurrentItem)
-        notifyCurrentItem(newCurrentFolderId)
+    fun updateSelectedState(newSourceFolderId: String) {
+        val oldSourceFolderId = sourceFolderId
+        sourceFolderId = newSourceFolderId
+        oldSourceFolderId?.let(::notifyFolder)
+        notifyFolder(newSourceFolderId)
     }
 
-    private fun notifyCurrentItem(folderId: String) {
-        val position = folders.indexOfFirst { it.id == folderId }
+    private fun notifyFolder(folderId: String) {
+        val position = currentList.indexOfFirst { it.id == folderId }
         notifyItemChanged(position)
     }
 
@@ -234,7 +211,9 @@ class MoveAdapter @Inject constructor(
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
                     oldFolder.isHidden == newFolder.isHidden &&
-                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed
+                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed &&
+                    oldFolder.shouldDisplayDivider == newFolder.shouldDisplayDivider &&
+                    oldFolder.shouldDisplayIndent == newFolder.shouldDisplayIndent
         }.getOrDefault(false)
     }
 }

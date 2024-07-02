@@ -45,8 +45,8 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
-    fun getCustomFolders(): RealmResults<Folder> {
-        return getCustomFoldersQuery(mailboxContentRealm()).find()
+    fun getMoveFolders(): RealmResults<Folder> {
+        return getMoveFoldersQuery(mailboxContentRealm(), excludeDrafts = true).find()
     }
 
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
@@ -147,7 +147,9 @@ class FolderController @Inject constructor(
 
         private fun getDefaultFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
             val hasRole = "${Folder.rolePropertyName} != nil"
-            return realm.query("$isNotSearch AND $hasRole")
+            return realm
+                .query<Folder>("$isNotSearch AND $hasRole")
+                .sort(Folder::roleOrder.name, Sort.DESCENDING)
         }
 
         private fun getCustomFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
@@ -160,6 +162,17 @@ class FolderController @Inject constructor(
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
             return realm.query("NOT ${Folder::id.name} IN $0 AND $isNotSearch", exceptionsFoldersIds)
+        }
+
+        // TODO: Check if we can remove this `excludeDrafts` parameter after
+        //  trying to merge together as much `getFoldersQuery` as possible.
+        private fun getMoveFoldersQuery(realm: TypedRealm, excludeDrafts: Boolean): RealmQuery<Folder> {
+            val draftsQuery = if (excludeDrafts) " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'" else ""
+            return realm
+                .query<Folder>("$isNotSearch AND ${isRootFolder}${draftsQuery}")
+                .sort(Folder::name.name, Sort.ASCENDING)
+                .sort(Folder::isFavorite.name, Sort.DESCENDING)
+                .sort(Folder::roleOrder.name, Sort.DESCENDING)
         }
 
         private fun getFolderQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Folder> {

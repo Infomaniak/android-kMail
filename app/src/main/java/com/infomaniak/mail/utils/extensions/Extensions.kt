@@ -71,6 +71,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -301,14 +302,6 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
 
         defaultFolders to customFolders
     }
-}
-
-fun List<Folder>.getDefaultMenuFolders(): List<Folder> {
-    return sortedBy { it.role?.order }.flattenFolderChildren()
-}
-
-fun List<Folder>.getCustomMenuFolders(dismissHiddenChildren: Boolean = false): List<Folder> {
-    return flattenFolderChildren(dismissHiddenChildren)
 }
 
 fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
@@ -595,6 +588,20 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
 
 fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
     alertDialog.bindAlertToLifecycle(viewLifecycleOwner)
+}
+
+/**
+ * Asynchronously validate folder name locally
+ * @return error string, otherwise null
+ */
+private val invalidCharactersRegex by lazy { Regex("[/'\"]") }
+fun Context.getFolderCreationError(folderName: CharSequence, folderController: FolderController): String? {
+    return when {
+        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
+        folderName.contains(invalidCharactersRegex) -> getString(R.string.errorNewFolderInvalidCharacter)
+        folderController.getRootFolder(folderName.toString()) != null -> getString(R.string.errorNewFolderAlreadyExists)
+        else -> null
+    }
 }
 
 fun Context.getTransparentColor() = getColor(android.R.color.transparent)

@@ -98,7 +98,6 @@ class MainViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var refreshEverythingJob: Job? = null
 
-    // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isInternetAvailable = MutableLiveData<Boolean>()
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
@@ -138,12 +137,12 @@ class MainViewModel @Inject constructor(
     }.asLiveData(ioCoroutineContext)
 
     val currentDefaultFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
-        objectId?.let { folderController.getDefaultFoldersAsync().map { it.list.getDefaultMenuFolders() } } ?: emptyFlow()
+        objectId?.let { folderController.getDefaultFoldersAsync().map { it.list.flattenFolderChildren() } } ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
     val currentCustomFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
         objectId
-            ?.let { folderController.getCustomFoldersAsync().map { it.list.getCustomMenuFolders(dismissHiddenChildren = true) } }
+            ?.let { folderController.getCustomFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) } }
             ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
