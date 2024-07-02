@@ -59,7 +59,7 @@ class AvatarView @JvmOverloads constructor(
 
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private var state = State()
+    private val state = State()
 
     // We use waitInitMediator over MediatorLiveData because we know both live data will be initialized very quickly anyway
     private val avatarMediatorLiveData =
