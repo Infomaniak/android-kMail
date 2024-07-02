@@ -62,9 +62,9 @@ class AvatarView @JvmOverloads constructor(
     private val state = State()
 
     // We use waitInitMediator over MediatorLiveData because we know both live data will be initialized very quickly anyway
-    private val avatarMediatorLiveData =
+    private val avatarMediatorLiveData: MutableLiveData<Pair<MergedContactDictionary, Boolean>> =
         if (isInEditMode) {
-            MutableLiveData<Pair<MergedContactDictionary, Boolean>>(null)
+            MutableLiveData()
         } else {
             Utils.waitInitMediator(
                 avatarMergedContactData.mergedContactLiveData,
