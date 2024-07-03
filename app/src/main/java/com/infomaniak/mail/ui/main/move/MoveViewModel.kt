@@ -107,21 +107,12 @@ class MoveViewModel @Inject constructor(
                 ensureActive()
             }
 
-            var isFirstRootAndCustom = true
-            var hasAnyFolderBeenFound = false
             val filteredFolders = mutableListOf<Any>().apply {
                 allFolders.forEach { folder ->
                     if (folder !is Folder) return@forEach
                     val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
                     val isFound = folderName.standardize().contains(query.standardize())
-                    if (isFound) {
-                        if (isFirstRootAndCustom && folder.isRootAndCustom) {
-                            isFirstRootAndCustom = false
-                            if (hasAnyFolderBeenFound) add(Unit)
-                        }
-                        add(folder)
-                        hasAnyFolderBeenFound = true
-                    }
+                    if (isFound) add(folder)
                 }
             }
 
