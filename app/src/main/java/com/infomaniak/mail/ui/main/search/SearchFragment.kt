@@ -51,7 +51,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
-import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallback
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
@@ -149,7 +149,7 @@ class SearchFragment : TwoPaneFragment() {
         threadListAdapter(
             folderRole = null,
             isFolderNameVisible = true,
-            threadListAdapterCallback = object : ThreadListAdapterCallback {
+            callbacks = object : ThreadListAdapterCallbacks {
 
                 override var onSwipeFinished: (() -> Unit)? = null
 

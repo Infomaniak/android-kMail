@@ -93,7 +93,7 @@ class ThreadListAdapter @Inject constructor(
     private var folderRole: FolderRole? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
     private var isFolderNameVisible: Boolean = false
-    private var threadListAdapterCallback: ThreadListAdapterCallback? = null
+    private var callbacks: ThreadListAdapterCallbacks? = null
 
     private var previousThreadClickedPosition: Int? = null
 
@@ -110,14 +110,14 @@ class ThreadListAdapter @Inject constructor(
 
     operator fun invoke(
         folderRole: FolderRole?,
-        threadListAdapterCallback: ThreadListAdapterCallback,
+        callbacks: ThreadListAdapterCallbacks,
         multiSelection: MultiSelectionListener<Thread>? = null,
         isFolderNameVisible: Boolean = false,
     ) {
         this.folderRole = folderRole
         this.multiSelection = multiSelection
         this.isFolderNameVisible = isFolderNameVisible
-        this.threadListAdapterCallback = threadListAdapterCallback
+        this.callbacks = callbacks
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -198,7 +198,7 @@ class ThreadListAdapter @Inject constructor(
         if (thread.messages.isEmpty()) {
             // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
             //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
-            threadListAdapterCallback?.deleteThreadInRealm?.invoke(thread.uid)
+            callbacks?.deleteThreadInRealm?.invoke(thread.uid)
             SentryDebug.sendEmptyThread(thread, "No Message in the Thread when displaying it in ThreadList")
             return
         }
@@ -321,7 +321,7 @@ class ThreadListAdapter @Inject constructor(
         if (multiSelection?.isEnabled == true) {
             toggleMultiSelectedThread(thread)
         } else {
-            threadListAdapterCallback?.onThreadClicked?.invoke(thread)
+            callbacks?.onThreadClicked?.invoke(thread)
             // If the Thread is `onlyOneDraft`, we'll directly navigate to the NewMessageActivity.
             // It means that we won't go to the ThreadFragment, so there's no need to select anything.
             if (thread.uid != openedThreadUid && !thread.isOnlyOneDraft) selectNewThread(position, thread.uid)
@@ -338,7 +338,7 @@ class ThreadListAdapter @Inject constructor(
         if (oldPosition != null && oldPosition < itemCount) notifyItemChanged(oldPosition, NotificationType.SELECTED_STATE)
         if (newPosition != null) {
             previousThreadClickedPosition?.let {
-                threadListAdapterCallback?.onPositionClickedChanged?.invoke(newPosition, it)
+                callbacks?.onPositionClickedChanged?.invoke(newPosition, it)
             }
             previousThreadClickedPosition = newPosition
             notifyItemChanged(newPosition, NotificationType.SELECTED_STATE)
@@ -498,14 +498,14 @@ class ThreadListAdapter @Inject constructor(
 
             val buttonText = context.getString(buttonTextId)
             actionButtonText = buttonText
-            setOnActionClickListener { threadListAdapterCallback?.onFlushClicked?.invoke(buttonText) }
+            setOnActionClickListener { callbacks?.onFlushClicked?.invoke(buttonText) }
         }
     }
 
     private fun ItemThreadLoadMoreButtonBinding.displayLoadMoreButton() {
         loadMoreButton.setOnClickListener {
             if (dataSet.last() is Unit) dataSet = dataSet.toMutableList().apply { removeLastOrNull() }
-            threadListAdapterCallback?.onLoadMoreClicked?.invoke()
+            callbacks?.onLoadMoreClicked?.invoke()
         }
     }
 
@@ -582,7 +582,7 @@ class ThreadListAdapter @Inject constructor(
 
     override fun onSwipeAnimationFinished(viewHolder: ThreadListViewHolder) {
         viewHolder.isSwipedOverHalf = false
-        threadListAdapterCallback?.onSwipeFinished?.invoke()
+        callbacks?.onSwipeFinished?.invoke()
         unblockOtherSwipes()
     }
 
