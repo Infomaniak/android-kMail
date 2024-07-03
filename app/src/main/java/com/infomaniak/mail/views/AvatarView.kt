@@ -24,6 +24,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import coil.ImageLoader
@@ -62,14 +63,11 @@ class AvatarView @JvmOverloads constructor(
     private val state = State()
 
     // We use waitInitMediator over MediatorLiveData because we know both live data will be initialized very quickly anyway
-    private val avatarMediatorLiveData: MutableLiveData<Pair<MergedContactDictionary, Boolean>> =
+    private val avatarMediatorLiveData: LiveData<Pair<MergedContactDictionary, Boolean>> =
         if (isInEditMode) {
             MutableLiveData()
         } else {
-            Utils.waitInitMediator(
-                avatarMergedContactData.mergedContactLiveData,
-                avatarMergedContactData.isBimiEnabledLiveData,
-            )
+            Utils.waitInitMediator(avatarMergedContactData.mergedContactLiveData, avatarMergedContactData.isBimiEnabledLiveData)
         }
 
     private val avatarUpdateObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
