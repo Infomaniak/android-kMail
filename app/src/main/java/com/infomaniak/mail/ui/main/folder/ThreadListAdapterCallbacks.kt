@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.main.folder
 
 import com.infomaniak.mail.data.models.thread.Thread
 
-interface ThreadListAdapterCallback {
+interface ThreadListAdapterCallbacks {
     var onSwipeFinished: (() -> Unit)?
     var onThreadClicked: (thread: Thread) -> Unit
     var onFlushClicked: ((dialogTitle: String) -> Unit)?
