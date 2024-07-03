@@ -35,7 +35,6 @@ import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -82,15 +81,6 @@ class Folder : RealmObject, Cloneable {
     var isCollapsed: Boolean = false // For parents only (collapsing a parent Folder will hide its children)
     @Transient
     var roleOrder: Int = role?.order ?: CUSTOM_FOLDER_ROLE_ORDER
-    //endregion
-
-    //region UI data (Transient & Ignore)
-    @Transient
-    @Ignore
-    var shouldDisplayDivider: Boolean = false
-    @Transient
-    @Ignore
-    var shouldDisplayIndent: Boolean = true
     //endregion
 
     private val _parents by backlinks(Folder::children)
@@ -161,12 +151,6 @@ class Folder : RealmObject, Cloneable {
     override fun equals(other: Any?) = other === this || (other is Folder && other.id == id)
 
     override fun hashCode(): Int = id.hashCode()
-
-    /**
-     * We've had a reference issue when modifying the `shouldDisplayDivider` of a Folder before sending it to the Adapter.
-     * Cloning it to do a deep copy resolved the issue.
-     */
-    public override fun clone() = super.clone() as Folder
 
     enum class FolderRole(
         @StringRes val folderNameRes: Int,

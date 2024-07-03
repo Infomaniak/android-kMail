@@ -307,8 +307,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         newItem.path == oldItem.path &&
                         newItem.unreadCountDisplay == oldItem.unreadCountDisplay &&
                         newItem.threads.count() == oldItem.threads.count() &&
-                        newItem.canBeCollapsed == oldItem.canBeCollapsed &&
-                        newItem.shouldDisplayDivider == oldItem.shouldDisplayDivider
+                        newItem.canBeCollapsed == oldItem.canBeCollapsed
                 ItemType.CUSTOM_FOLDERS_HEADER -> true
                 ItemType.EMPTY_CUSTOM_FOLDERS -> true
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
