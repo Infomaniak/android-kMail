@@ -345,7 +345,7 @@ class MainViewModel @Inject constructor(
 
     private fun updateFeatureFlag(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Features flags")
-        sharedUtils.updateAiFeatureFlag(mailbox.objectId, mailbox.uuid)
+        sharedUtils.updateFeatureFlags(mailbox.objectId, mailbox.uuid)
     }
 
     private fun updateExternalMailInfo(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {

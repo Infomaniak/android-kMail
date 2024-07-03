@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -118,12 +117,11 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun updateAiFeatureFlag(mailboxObjectId: String, mailboxUuid: String) {
-        with(ApiRepository.checkFeatureFlag(FeatureFlag.AI, mailboxUuid)) {
+    fun updateFeatureFlags(mailboxObjectId: String, mailboxUuid: String) {
+        with(ApiRepository.getFeatureFlags(mailboxUuid)) {
             if (isSuccess()) {
-                val isEnabled = data?.get("is_enabled") == true
-                mailboxController.updateMailbox(mailboxObjectId) {
-                    if (isEnabled) it.featureFlags.add(FeatureFlag.AI) else it.featureFlags.remove(FeatureFlag.AI)
+                mailboxController.updateMailbox(mailboxObjectId) { mailbox ->
+                    mailbox.featureFlags.setFeatureFlags(featureFlags = data ?: emptyList())
                 }
             }
         }
