@@ -63,6 +63,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.ui.newMessage.EditorContentManager.HtmlPayload
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
@@ -106,6 +107,9 @@ class NewMessageFragment : Fragment() {
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
+
+    @Inject
+    lateinit var editorContentManager: EditorContentManager
 
     @Inject
     lateinit var aiManager: NewMessageAiManager
@@ -186,12 +190,14 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initManagers() {
+        editorContentManager.initValues(binding.editor)
 
         aiManager.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
             fragment = this@NewMessageFragment,
             aiViewModel = aiViewModel,
+            editorContentManager = editorContentManager,
         )
 
         externalsManager.initValues(
@@ -234,7 +240,7 @@ class NewMessageFragment : Fragment() {
 
     override fun onDestroyView() {
         binding.editor.exportHtml { html ->
-            newMessageViewModel.editorBodyLoader.postValue(html)
+            newMessageViewModel.editorBodyLoader.postValue(HtmlPayload(html, isSanitized = true))
         }
 
         addressListPopupWindow = null
@@ -540,9 +546,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeBodyLoader() {
-        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner) {
-            binding.editor.setHtml(it)
-        }
+        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner, editorContentManager::setHtml)
     }
 
     private fun observeUiSignature() = with(binding) {

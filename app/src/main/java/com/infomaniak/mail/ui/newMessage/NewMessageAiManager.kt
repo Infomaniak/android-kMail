@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import com.infomaniak.mail.ui.newMessage.EditorContentManager.HtmlPayload
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
@@ -62,6 +63,9 @@ class NewMessageAiManager @Inject constructor(
     private var _aiViewModel: AiViewModel? = null
     private inline val aiViewModel: AiViewModel get() = _aiViewModel!!
 
+    private var _editorContentManager: EditorContentManager? = null
+    private inline val editorContentManager: EditorContentManager get() = _editorContentManager!!
+
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
     private val black by lazy { context.getColor(RCore.color.black) }
@@ -75,6 +79,7 @@ class NewMessageAiManager @Inject constructor(
         binding: FragmentNewMessageBinding,
         fragment: NewMessageFragment,
         aiViewModel: AiViewModel,
+        editorContentManager: EditorContentManager,
     ) {
         super.initValues(
             newMessageViewModel = newMessageViewModel,
@@ -82,18 +87,20 @@ class NewMessageAiManager @Inject constructor(
             fragment = fragment,
             freeReferences = {
                 _aiViewModel = null
+                _editorContentManager = null
                 valueAnimator?.cancel()
                 valueAnimator = null
             },
         )
 
         _aiViewModel = aiViewModel
+        _editorContentManager = editorContentManager
     }
 
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
             subject?.let(subjectTextField::setText)
-            editor.setHtml(content)
+            editorContentManager.setHtml(HtmlPayload(content, isSanitized = false))
         }
     }
 
@@ -224,7 +231,7 @@ class NewMessageAiManager @Inject constructor(
 
         // TODO: Find out if body is empty
         // TODO: Review this part
-        binding.editor.exportHtml { it
+        binding.editor.exportHtml {
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                 fragment.safeNavigate(
                     NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(

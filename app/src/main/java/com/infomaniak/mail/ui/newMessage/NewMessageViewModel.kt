@@ -54,6 +54,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.EditorContentManager.HtmlPayload
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -111,7 +112,7 @@ class NewMessageViewModel @Inject constructor(
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
 
-    val editorBodyLoader = SingleLiveEvent<String>()
+    val editorBodyLoader = SingleLiveEvent<HtmlPayload>()
 
     private val _subjectAndBodyChannel: Channel<Pair<String, String>> = Channel(capacity = CONFLATED)
     private val subjectAndBodyChannel: ReceiveChannel<Pair<String, String>> = _subjectAndBodyChannel
@@ -307,6 +308,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         draft.apply {
+            // TODO: Remove htmlToText
             uiBody = body.htmlToText()
             uiSignature = signature
             uiQuote = quote
@@ -382,7 +384,7 @@ class NewMessageViewModel @Inject constructor(
 
         attachmentsLiveData.postValue(attachments)
 
-        editorBodyLoader.postValue(uiBody)
+        editorBodyLoader.postValue(HtmlPayload(uiBody, isSanitized = false))
 
         uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
