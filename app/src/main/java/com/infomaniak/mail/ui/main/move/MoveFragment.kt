@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.move
 
-import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +29,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
@@ -39,7 +37,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
-import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
@@ -80,16 +77,7 @@ class MoveFragment : Fragment() {
     }
 
     private fun setupRecyclerView() = with(binding.foldersRecyclerView) {
-
         adapter = moveAdapter(onFolderClicked = ::onFolderSelected)
-
-        val margin = resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
-        addItemDecoration(
-            DividerItemDecorator(
-                divider = InsetDrawable(UiUtils.dividerDrawable(requireContext()), margin, 0, margin, 0),
-                shouldIgnoreView = { view -> view.tag == UiUtils.IGNORE_DIVIDER_TAG },
-            ),
-        )
     }
 
     private fun setupListeners() = with(binding) {

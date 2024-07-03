@@ -52,24 +52,26 @@ class MoveViewModel @Inject constructor(
     private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
-    private var allFolders = emptyList<Folder>()
+    private var allFolders = emptyList<Any>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
-    val filterResults = MutableLiveData<List<Folder>>()
+    val filterResults = MutableLiveData<List<Any>>()
     var hasAlreadyTrackedSearch = false
 
     init {
         viewModelScope.launch(ioCoroutineContext) {
 
-            fun List<Folder>.addDividerToFirstCustomFolder(): List<Folder> {
+            fun List<Folder>.addDividerToFirstCustomFolder(): List<Any> {
+                val folders = this
+                val items = mutableListOf<Any>()
                 var needsToAddDivider = true
-                return map { folder ->
-                    folder.apply {
-                        if (needsToAddDivider && isRootAndCustom) {
-                            needsToAddDivider = false
-                            shouldDisplayDivider = true
-                        }
+                folders.forEach { folder ->
+                    if (needsToAddDivider && folder.isRootAndCustom) {
+                        needsToAddDivider = false
+                        items.add(Unit)
                     }
+                    items.add(folder)
                 }
+                return items
             }
 
             val sourceFolderId = messageUid?.let(messageController::getMessage)?.folderId
@@ -102,21 +104,20 @@ class MoveViewModel @Inject constructor(
             }
 
             var isFirstRootAndCustom = true
-            val filteredFolders = allFolders.mapNotNull { folder ->
-                val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
-                val isFound = folderName.standardize().contains(query.standardize())
-                if (isFound) {
-                    folder.clone().apply {
-                        shouldDisplayDivider = if (isFirstRootAndCustom && isRootAndCustom) {
+            var hasAnyFolderBeenFound = false
+            val filteredFolders = mutableListOf<Any>().apply {
+                allFolders.forEach { folder ->
+                    if (folder !is Folder) return@forEach
+                    val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
+                    val isFound = folderName.standardize().contains(query.standardize())
+                    if (isFound) {
+                        if (isFirstRootAndCustom && folder.isRootAndCustom) {
                             isFirstRootAndCustom = false
-                            true
-                        } else {
-                            false
+                            if (hasAnyFolderBeenFound) add(Unit)
                         }
-                        shouldDisplayIndent = false
+                        add(folder)
+                        hasAnyFolderBeenFound = true
                     }
-                } else {
-                    null
                 }
             }
 
