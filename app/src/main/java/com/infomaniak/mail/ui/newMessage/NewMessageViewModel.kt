@@ -72,11 +72,11 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.update
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -113,7 +113,8 @@ class NewMessageViewModel @Inject constructor(
 
     val editorBodyLoader = SingleLiveEvent<String>()
 
-    val subjectAndBody = SingleLiveEvent<Pair<String, String>>()
+    val subjectAndBody: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
+    private var subjectAndBodyJob: Job? = null
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -744,8 +745,26 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
-    // TODO: See if this still makes sens to define here
-    suspend fun executeDraftActionWhenStopping(draftSaveConfiguration: DraftSaveConfiguration) = with(draftSaveConfiguration) {
+    fun saveBodyAndSubject(subject: String, html: String) {
+        viewModelScope.launch(ioCoroutineContext) {
+            subjectAndBody.update { subject to html }
+        }
+    }
+
+    fun waitForBodyAndSubjectToExecuteDraftAction(draftSaveConfiguration: DraftSaveConfiguration) {
+        subjectAndBodyJob?.cancel()
+        subjectAndBodyJob = globalCoroutineScope.launch(globalCoroutineScope.handler) {
+            // TODO: When the flow has a previous already collected value and we start collecting it again, do not collect the
+            //  previous value again
+            subjectAndBody.filterNotNull().collect { (subject, body) ->
+                draftSaveConfiguration.addSubjectAndBody(subject, body)
+                executeDraftAction(draftSaveConfiguration)
+                cancel()
+            }
+        }
+    }
+
+    private suspend fun executeDraftAction(draftSaveConfiguration: DraftSaveConfiguration) = with(draftSaveConfiguration) {
         val localUuid = draftLocalUuid ?: return@with
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 

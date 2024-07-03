@@ -24,7 +24,6 @@ import android.view.View
 import android.webkit.WebView
 import androidx.activity.viewModels
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.lifecycle.Observer
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.BuildConfig
@@ -44,7 +43,6 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -137,7 +135,6 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun saveDraft() {
-        // TODO: Init all fields at the same time in the constructor?
         val draftSaveConfiguration = DraftSaveConfiguration(
             action = if (newMessageViewModel.shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = isFinishing,
@@ -145,35 +142,27 @@ class NewMessageActivity : BaseActivity() {
             startWorkerCallback = ::startWorker,
         )
 
-        val observer = object : Observer<Pair<String, String>> {
-            override fun onChanged(value: Pair<String, String>) {
-                newMessageViewModel.subjectAndBody.removeObserver(this)
-
-                val (subject, body) = value
-                draftSaveConfiguration.apply {
-                    subjectValue = subject
-                    uiBodyValue = body
-                }
-
-                globalCoroutineScope.launch(ioDispatcher) {
-                    newMessageViewModel.executeDraftActionWhenStopping(draftSaveConfiguration)
-                }
-            }
-        }
-
-        newMessageViewModel.subjectAndBody.observeForever(observer)
+        newMessageViewModel.waitForBodyAndSubjectToExecuteDraftAction(draftSaveConfiguration)
     }
 
     private fun startWorker() {
         draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
-    class DraftSaveConfiguration(
+    data class DraftSaveConfiguration(
         val action: DraftAction,
         val isFinishing: Boolean,
         val isTaskRoot: Boolean,
-        var subjectValue: String = "",
-        var uiBodyValue: String = "",
         val startWorkerCallback: () -> Unit,
-    )
+    ) {
+        var subjectValue: String = ""
+            private set
+        var uiBodyValue: String = ""
+            private set
+
+        fun addSubjectAndBody(subject: String, body: String) {
+            subjectValue = subject
+            uiBodyValue = body
+        }
+    }
 }

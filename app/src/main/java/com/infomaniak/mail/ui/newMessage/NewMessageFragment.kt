@@ -572,7 +572,7 @@ class NewMessageFragment : Fragment() {
          */
         val subject = binding.subjectTextField.text.toString()
         binding.editor.exportHtml { html ->
-            newMessageViewModel.subjectAndBody.postValue(subject to html)
+            newMessageViewModel.saveBodyAndSubject(subject, html)
         }
 
         super.onStop()
