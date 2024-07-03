@@ -73,10 +73,10 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
@@ -113,7 +113,8 @@ class NewMessageViewModel @Inject constructor(
 
     val editorBodyLoader = SingleLiveEvent<String>()
 
-    val subjectAndBody: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
+    private val _subjectAndBodyChannel: Channel<Pair<String, String>> = Channel(capacity = CONFLATED)
+    private val subjectAndBodyChannel: ReceiveChannel<Pair<String, String>> = _subjectAndBodyChannel
     private var subjectAndBodyJob: Job? = null
 
     var isAutoCompletionOpened = false
@@ -747,20 +748,16 @@ class NewMessageViewModel @Inject constructor(
 
     fun saveBodyAndSubject(subject: String, html: String) {
         viewModelScope.launch(ioCoroutineContext) {
-            subjectAndBody.update { subject to html }
+            _subjectAndBodyChannel.send(subject to html)
         }
     }
 
     fun waitForBodyAndSubjectToExecuteDraftAction(draftSaveConfiguration: DraftSaveConfiguration) {
         subjectAndBodyJob?.cancel()
-        subjectAndBodyJob = globalCoroutineScope.launch(globalCoroutineScope.handler) {
-            // TODO: When the flow has a previous already collected value and we start collecting it again, do not collect the
-            //  previous value again
-            subjectAndBody.filterNotNull().collect { (subject, body) ->
-                draftSaveConfiguration.addSubjectAndBody(subject, body)
-                executeDraftAction(draftSaveConfiguration)
-                cancel()
-            }
+        subjectAndBodyJob = globalCoroutineScope.launch {
+            val (subject, body) = subjectAndBodyChannel.receive()
+            draftSaveConfiguration.addSubjectAndBody(subject, body)
+            executeDraftAction(draftSaveConfiguration)
         }
     }
 
