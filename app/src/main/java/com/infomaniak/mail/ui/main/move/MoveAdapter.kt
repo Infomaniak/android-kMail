@@ -27,16 +27,15 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.move.MoveAdapter.FolderViewHolder
-import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 import com.infomaniak.mail.views.itemViews.SelectableItemView
 import javax.inject.Inject
-import kotlin.math.min
 
-class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
+class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(FolderDiffCallback()) {
 
     private var selectedFolderId: String? = null
 
@@ -53,46 +52,56 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         return this
     }
 
-    fun setFolders(newSelectedFolderId: String, newFolders: List<Folder>) = runCatchingRealm {
+    fun setFolders(newSelectedFolderId: String, newFolders: List<Any>) = runCatchingRealm {
         selectedFolderId = newSelectedFolderId
         submitList(newFolders)
     }
 
     override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
 
+    override fun getItemViewType(position: Int): Int = runCatchingRealm {
+        return when (currentList[position]) {
+            is Folder -> DisplayType.FOLDER.layout
+            else -> DisplayType.DIVIDER.layout
+        }
+    }.getOrDefault(super.getItemViewType(position))
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
+        val binding = if (viewType == DisplayType.FOLDER.layout) {
+            ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
+        } else {
+            ItemDividerHorizontalBinding.inflate(layoutInflater, parent, false)
+        }
         return FolderViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         if (payloads.firstOrNull() == Unit) {
-            (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(selectedFolderId == currentList[position].id)
+            val isSelected = selectedFolderId == (currentList[position] as Folder).id
+            (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(isSelected)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
-        (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position])
+        val item = currentList[position]
+        if (item is Folder) (this as ItemSelectableFolderBinding).root.displayFolder(item)
     }
 
     private fun SelectableItemView.displayFolder(folder: Folder) {
         folder.role?.let {
             setFolderUi(folder, it.folderIconRes)
         } ?: run {
-            val indentLevel = if (folder.shouldDisplayIndent) folder.path.split(folder.separator).size - 1 else 0
             setFolderUi(
                 folder = folder,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
-                folderIndent = min(indentLevel, Folder.MAX_SUB_FOLDERS_INDENT),
             )
         }
     }
 
     private fun SelectableItemView.setFolderUi(folder: Folder, @DrawableRes iconId: Int, folderIndent: Int = 0) {
-        tag = if (folder.shouldDisplayDivider) null else UiUtils.IGNORE_DIVIDER_TAG
         text = folder.getLocalizedName(context)
         icon = AppCompatResources.getDrawable(context, iconId)
         setSelectedState(selectedFolderId == folder.id)
@@ -102,22 +111,30 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
 
     class FolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 
-    private class FolderDiffCallback : DiffUtil.ItemCallback<Folder>() {
+    private enum class DisplayType(val layout: Int) {
+        FOLDER(R.layout.item_selectable_folder),
+        DIVIDER(R.layout.item_divider_horizontal),
+    }
 
-        override fun areItemsTheSame(oldFolder: Folder, newFolder: Folder) = runCatchingRealm {
-            return oldFolder.id == newFolder.id
+    private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
+
+        override fun areItemsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
+            return when {
+                oldItem is Unit && newItem is Unit -> true
+                oldItem is Folder && newItem is Folder && oldItem.id == newItem.id -> true
+                else -> false
+            }
         }.getOrDefault(false)
 
-        override fun areContentsTheSame(oldFolder: Folder, newFolder: Folder) = runCatchingRealm {
-            oldFolder.name == newFolder.name &&
+        override fun areContentsTheSame(oldFolder: Any, newFolder: Any) = runCatchingRealm {
+            oldFolder is Folder && newFolder is Folder &&
+                    oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
                     oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
                     oldFolder.isHidden == newFolder.isHidden &&
-                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed &&
-                    oldFolder.shouldDisplayDivider == newFolder.shouldDisplayDivider &&
-                    oldFolder.shouldDisplayIndent == newFolder.shouldDisplayIndent
+                    oldFolder.canBeCollapsed == newFolder.canBeCollapsed
         }.getOrDefault(false)
     }
 }
