@@ -19,4 +19,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="1dp"
+    android:layout_marginStart="@dimen/dividerHorizontalPadding"
+    android:layout_marginEnd="@dimen/dividerHorizontalPadding"
     app:dividerColor="@color/dividerColor" />
