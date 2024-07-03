@@ -32,7 +32,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
-import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.BaseActivity
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -41,8 +40,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -61,14 +58,6 @@ class NewMessageActivity : BaseActivity() {
 
     @Inject
     lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
-
-
-    @Inject
-    lateinit var globalCoroutineScope: CoroutineScope
-
-    @Inject
-    @IoDispatcher
-    lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

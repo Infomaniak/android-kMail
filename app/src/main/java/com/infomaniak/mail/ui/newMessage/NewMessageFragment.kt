@@ -631,9 +631,4 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
-
-    fun getSubjectAndBodyValues(): Pair<String, String> = with(binding) {
-        // TODO: Access the html from the editor
-        return subjectTextField.text.toString() to "TODO support exporting editor's content"//bodyTextField.text.toString()
-    }
 }
