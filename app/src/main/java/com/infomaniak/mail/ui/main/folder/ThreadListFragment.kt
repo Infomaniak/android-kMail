@@ -304,7 +304,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private fun setupAdapter() {
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
-            threadListAdapterCallback = object : ThreadListAdapterCallback {
+            callbacks = object : ThreadListAdapterCallbacks {
 
                 override var onSwipeFinished: (() -> Unit)? = { threadListViewModel.isRecoveringFinished.value = true }
 
