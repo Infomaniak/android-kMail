@@ -763,7 +763,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun saveBodyAndSubject(subject: String, html: String) {
-        viewModelScope.launch(ioCoroutineContext) {
+        globalCoroutineScope.launch {
             _subjectAndBodyChannel.send(subject to html)
         }
     }
