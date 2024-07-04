@@ -542,31 +542,31 @@ class NewMessageViewModel @Inject constructor(
             return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
         }
 
+        /**
+         * Each customer app is free to do what it wants, so we sometimes receive empty `mailTo` fields.
+         * Instead of ignoring them, we return `null` so we can check the recipients inside the Intent.
+         *
+         * If the string obtained through the mailto uri is blank, this method needs to make sure to return null.
+         */
         fun String.splitToRecipientList() = split(",", ";").mapNotNull {
             val email = it.trim()
             if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
-        }
+        }.takeIf { it.isNotEmpty() }
 
         fun Intent.getRecipientsFromIntent(recipientsFlag: String): List<Recipient>? {
             return getStringArrayExtra(recipientsFlag)?.map { Recipient().initLocalValues(it, it) }
         }
 
-        /**
-         * Each customer app is free to do what it wants, so we sometimes receive empty `mailTo` fields.
-         * Instead of ignoring them, we return `null`.
-         */
-        fun String.nullIfEmpty() = takeIf(String::isNotEmpty)
-
         val mailToIntent = runCatching { MailTo.parse(uri!!) }.getOrNull()
         if (mailToIntent == null && intent?.hasExtra(Intent.EXTRA_EMAIL) != true) return
 
-        val splitTo = mailToIntent?.to?.nullIfEmpty()?.splitToRecipientList()
+        val splitTo = mailToIntent?.to?.splitToRecipientList()
             ?: intent?.getRecipientsFromIntent(Intent.EXTRA_EMAIL)
             ?: emptyList()
-        val splitCc = mailToIntent?.cc?.nullIfEmpty()?.splitToRecipientList()
+        val splitCc = mailToIntent?.cc?.splitToRecipientList()
             ?: intent?.getRecipientsFromIntent(Intent.EXTRA_CC)
             ?: emptyList()
-        val splitBcc = mailToIntent?.bcc?.nullIfEmpty()?.splitToRecipientList()
+        val splitBcc = mailToIntent?.bcc?.splitToRecipientList()
             ?: intent?.getRecipientsFromIntent(Intent.EXTRA_BCC)
             ?: emptyList()
 
@@ -575,8 +575,8 @@ class NewMessageViewModel @Inject constructor(
             cc.addAll(splitCc)
             bcc.addAll(splitBcc)
 
-            subject = mailToIntent?.subject?.nullIfEmpty() ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            uiBody = mailToIntent?.body?.nullIfEmpty() ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            subject = mailToIntent?.subject?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+            uiBody = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
         }
     }
 
