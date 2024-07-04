@@ -552,8 +552,8 @@ class NewMessageViewModel @Inject constructor(
         }
 
         /**
-         * Each customer app is free to do what he wants, so we sometimes receive mailto fields that are empty,
-         * so we don't want to ignore them, so we return null.
+         * Each customer app is free to do what it wants, so we sometimes receive empty `mailTo` fields.
+         * Instead of ignoring them, we return `null`.
          */
         fun String.nullIfEmpty() = ifEmpty { null }
 
