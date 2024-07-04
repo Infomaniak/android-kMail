@@ -215,21 +215,13 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int, payloads: MutableList<Any>) {
-        when (payloads.firstOrNull()) {
-            NotifyType.MAILBOXES_HEADER_CLICKED -> MailboxesHeaderItem.displayWithPayload(
+        if (payloads.firstOrNull() == NotifyType.MAILBOXES_HEADER_CLICKED) {
+            MailboxesHeaderItem.displayWithPayload(
                 item = items[position],
                 binding = holder.binding,
             )
-            NotifyType.COLLAPSABLE_FOLDER_EXISTENCE_HAS_CHANGED -> FolderItem.displayWithPayload(
-                item = items[position],
-                binding = holder.binding,
-                currentFolderId = currentFolderId,
-                hasCollapsableDefaultFolder = hasCollapsableDefaultFolder,
-                hasCollapsableCustomFolder = hasCollapsableCustomFolder,
-                onFolderClicked = onFolderClicked,
-                onCollapseChildrenClicked = onCollapseChildrenClicked,
-            )
-            else -> super.onBindViewHolder(holder, position, payloads)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
         }
     }
 
@@ -290,7 +282,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     private enum class NotifyType {
         MAILBOXES_HEADER_CLICKED,
-        COLLAPSABLE_FOLDER_EXISTENCE_HAS_CHANGED, // TODO: This seems to never be notified ??
     }
 
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
