@@ -542,10 +542,16 @@ class NewMessageViewModel @Inject constructor(
             return nameAndEmail?.let { (name, email) -> if (email.isEmail()) Recipient().initLocalValues(email, name) else null }
         }
 
+        /**
+         * Each customer app is free to do what it wants, so we sometimes receive empty `mailTo` fields.
+         * Instead of ignoring them, we return `null` so we can check the recipients inside the Intent.
+         *
+         * If the string obtained through the mailto uri is blank, this method needs to make sure to return null.
+         */
         fun String.splitToRecipientList() = split(",", ";").mapNotNull {
             val email = it.trim()
             if (email.isEmail()) Recipient().initLocalValues(email, email) else parseEmailWithName(email)
-        }
+        }.takeIf { it.isNotEmpty() }
 
         fun Intent.getRecipientsFromIntent(recipientsFlag: String): List<Recipient>? {
             return getStringArrayExtra(recipientsFlag)?.map { Recipient().initLocalValues(it, it) }
@@ -569,8 +575,8 @@ class NewMessageViewModel @Inject constructor(
             cc.addAll(splitCc)
             bcc.addAll(splitBcc)
 
-            subject = mailToIntent?.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            uiBody = mailToIntent?.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            subject = mailToIntent?.subject?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+            uiBody = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
         }
     }
 
