@@ -63,29 +63,6 @@ object FolderItem {
         )
     }
 
-    fun displayWithPayload(
-        item: Any,
-        binding: ViewBinding,
-        currentFolderId: String?,
-        hasCollapsableDefaultFolder: Boolean,
-        hasCollapsableCustomFolder: Boolean,
-        onFolderClicked: (folderId: String) -> Unit,
-        onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
-    ) {
-        item as Folder
-        binding as ItemMenuDrawerFolderBinding
-
-        Log.d("Bind", "Bind Custom folders because of collapse change = ${item.name}")
-        binding.displayFolder(
-            item,
-            currentFolderId,
-            hasCollapsableDefaultFolder,
-            hasCollapsableCustomFolder,
-            onFolderClicked,
-            onCollapseChildrenClicked,
-        )
-    }
-
     private fun ItemMenuDrawerFolderBinding.displayFolder(
         folder: Folder,
         currentFolderId: String?,
