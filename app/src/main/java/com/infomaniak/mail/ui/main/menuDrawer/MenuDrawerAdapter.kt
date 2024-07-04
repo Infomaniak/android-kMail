@@ -181,14 +181,18 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             var oldIsFound = false
             var newIsFound = false
             for (index in items.indices) {
+
                 val item = items[index]
-                if (item is Folder && item.id == oldId) {
+                if (item !is Folder) continue
+
+                if (item.id == oldId) {
                     oldIsFound = true
                     notifyItemChanged(index)
-                } else if (item is Folder && item.id == newId) {
+                } else if (item.id == newId) {
                     newIsFound = true
                     notifyItemChanged(index)
                 }
+
                 if (oldIsFound && newIsFound) break
             }
         }
@@ -204,7 +208,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             ItemType.CUSTOM_FOLDERS_HEADER -> DisplayType.CUSTOM_FOLDERS_HEADER.layout
             ItemType.EMPTY_CUSTOM_FOLDERS -> DisplayType.EMPTY_CUSTOM_FOLDERS.layout
             is MenuDrawerFooter -> DisplayType.MENU_DRAWER_FOOTER.layout
-            else -> DisplayType.DIVIDER.layout
+            ItemType.DIVIDER -> DisplayType.DIVIDER.layout
+            else -> throw IllegalStateException("Failed to find a viewType for MenuDrawer item")
         }
     }.getOrDefault(super.getItemViewType(position))
 
@@ -218,7 +223,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             DisplayType.CUSTOM_FOLDERS_HEADER.layout -> ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)
             DisplayType.EMPTY_CUSTOM_FOLDERS.layout -> ItemMenuDrawerEmptyCustomFoldersBinding.inflate(inflater, parent, false)
             DisplayType.MENU_DRAWER_FOOTER.layout -> ItemMenuDrawerFooterBinding.inflate(inflater, parent, false)
-            else -> ItemMenuDrawerDividerBinding.inflate(inflater, parent, false)
+            DisplayType.DIVIDER.layout -> ItemMenuDrawerDividerBinding.inflate(inflater, parent, false)
+            else -> throw IllegalStateException("Failed to find a binding for MenuDrawer viewType")
         }
 
         return MenuDrawerViewHolder(binding)
@@ -468,7 +474,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
 
         override fun areItemsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
-            return when (oldItem) {
+            when (oldItem) {
                 is MailboxesHeader -> newItem is MailboxesHeader && newItem.mailbox?.objectId == oldItem.mailbox?.objectId
                 is Mailbox -> newItem is Mailbox && newItem.objectId == oldItem.objectId
                 is Folder -> newItem is Folder && newItem.id == oldItem.id
@@ -476,12 +482,12 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 ItemType.EMPTY_CUSTOM_FOLDERS -> newItem == ItemType.EMPTY_CUSTOM_FOLDERS
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter
                 ItemType.DIVIDER -> newItem == ItemType.DIVIDER
-                else -> false
+                else -> throw IllegalStateException("oldItem wasn't any known item type (in MenuDrawer `areItemsTheSame`)")
             }
         }.getOrDefault(false)
 
         override fun areContentsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
-            return when (oldItem) {
+            when (oldItem) {
                 is MailboxesHeader -> newItem is MailboxesHeader
                         && newItem.hasMoreThanOneMailbox == oldItem.hasMoreThanOneMailbox
                         && newItem.isExpanded == oldItem.isExpanded
@@ -498,7 +504,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 ItemType.CUSTOM_FOLDERS_HEADER -> true
                 ItemType.EMPTY_CUSTOM_FOLDERS -> true
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
-                else -> false
+                ItemType.DIVIDER -> false
+                else -> throw IllegalStateException("oldItem wasn't any known item type (in MenuDrawer `areContentsTheSame`)")
             }
         }.getOrDefault(false)
 
