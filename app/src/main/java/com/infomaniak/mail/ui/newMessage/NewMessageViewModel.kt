@@ -555,7 +555,7 @@ class NewMessageViewModel @Inject constructor(
          * Each customer app is free to do what it wants, so we sometimes receive empty `mailTo` fields.
          * Instead of ignoring them, we return `null`.
          */
-        fun String.nullIfEmpty() = ifEmpty { null }
+        fun String.nullIfEmpty() = takeIf(String::isNotEmpty)
 
         val mailToIntent = runCatching { MailTo.parse(uri!!) }.getOrNull()
         if (mailToIntent == null && intent?.hasExtra(Intent.EXTRA_EMAIL) != true) return
