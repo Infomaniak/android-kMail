@@ -34,6 +34,8 @@ import kotlin.math.min
 
 object FolderItem {
 
+    private const val MAX_SUB_FOLDERS_INDENT = 2
+
     @Suppress("MayBeConstant")
     val viewType = R.layout.item_menu_drawer_folder
 
@@ -86,7 +88,7 @@ object FolderItem {
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
                 trackerName = "customFolder",
                 trackerValue = indentLevel.toFloat(),
-                folderIndent = min(indentLevel, Folder.MAX_SUB_FOLDERS_INDENT),
+                folderIndent = min(indentLevel, MAX_SUB_FOLDERS_INDENT),
             )
         }
 
