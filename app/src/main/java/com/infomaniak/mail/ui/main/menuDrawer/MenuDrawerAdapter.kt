@@ -192,7 +192,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             ItemType.EMPTY_CUSTOM_FOLDERS -> EmptyFoldersItem.viewType
             is MenuDrawerFooter -> FooterItem.viewType
             ItemType.DIVIDER -> DividerItem.viewType
-            else -> throw IllegalStateException("Failed to find a viewType for MenuDrawer item")
+            else -> error("Failed to find a viewType for MenuDrawer item")
         }
     }.getOrDefault(super.getItemViewType(position))
 
@@ -208,7 +208,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             EmptyFoldersItem.viewType -> EmptyFoldersItem.binding(inflater, parent)
             FooterItem.viewType -> FooterItem.binding(inflater, parent)
             DividerItem.viewType -> DividerItem.binding(inflater, parent)
-            else -> throw IllegalStateException("Failed to find a binding for MenuDrawer viewType")
+            else -> error("Failed to find a binding for MenuDrawer viewType")
         }
 
         return MenuDrawerViewHolder(binding)
@@ -295,7 +295,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 ItemType.EMPTY_CUSTOM_FOLDERS -> newItem == ItemType.EMPTY_CUSTOM_FOLDERS
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter
                 ItemType.DIVIDER -> newItem == ItemType.DIVIDER
-                else -> throw IllegalStateException("oldItem wasn't any known item type (in MenuDrawer `areItemsTheSame`)")
+                else -> error("oldItem wasn't any known item type (in MenuDrawer `areItemsTheSame`)")
             }
         }.getOrDefault(false)
 
@@ -318,7 +318,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 ItemType.EMPTY_CUSTOM_FOLDERS -> true
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
                 ItemType.DIVIDER -> false
-                else -> throw IllegalStateException("oldItem wasn't any known item type (in MenuDrawer `areContentsTheSame`)")
+                else -> error("oldItem wasn't any known item type (in MenuDrawer `areContentsTheSame`)")
             }
         }.getOrDefault(false)
 
