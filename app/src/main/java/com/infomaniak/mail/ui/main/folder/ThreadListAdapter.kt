@@ -212,12 +212,10 @@ class ThreadListAdapter @Inject constructor(
         // This method is only useful for old threads already stored in Realm, where they
         // could be both answered and forwarded (for new threads, this is impossible).
         fun computeReplyAndForwardIcon(isAnswered: Boolean, isForwarded: Boolean): Pair<Boolean, Boolean> {
-            return if (isAnswered) {
-                Pair(true, false)
-            } else if (isForwarded) {
-                Pair(false, true)
-            } else {
-                Pair(false, false)
+            return when {
+                isAnswered -> true to false
+                isForwarded -> false to true
+                else -> false to false
             }
         }
 
