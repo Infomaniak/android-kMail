@@ -26,6 +26,7 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.itemViews.*
@@ -72,40 +73,49 @@ object FolderItem {
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) = with(root) {
 
-        val unread = when (folder.role) {
-            Folder.FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
-            Folder.FolderRole.SENT, Folder.FolderRole.TRASH -> UnreadDisplay(0)
-            else -> folder.unreadCountDisplay
-        }
+        data class RoleDependantParameters(
+            var iconId: Int,
+            var trackerName: String,
+            var trackerValue: Float?,
+            var folderIndent: Int,
+        )
 
-        folder.role?.let {
-            setFolderUi(
-                folder = folder,
+        val (iconId, trackerName, trackerValue, folderIndent) = folder.role?.let {
+            RoleDependantParameters(
                 iconId = it.folderIconRes,
-                unread = unread,
-                currentFolderId = currentFolderId,
-                hasCollapsableDefaultFolder = hasCollapsableDefaultFolder,
-                hasCollapsableCustomFolder = hasCollapsableCustomFolder,
-                onFolderClicked = onFolderClicked,
-                onCollapseChildrenClicked = onCollapseChildrenClicked,
                 trackerName = it.matomoValue,
+                trackerValue = null,
+                folderIndent = 0,
             )
         } ?: run {
             val indentLevel = folder.path.split(folder.separator).size - 1
-            setFolderUi(
-                folder = folder,
+            RoleDependantParameters(
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
-                unread = unread,
-                currentFolderId = currentFolderId,
-                hasCollapsableDefaultFolder = hasCollapsableDefaultFolder,
-                hasCollapsableCustomFolder = hasCollapsableCustomFolder,
-                onFolderClicked = onFolderClicked,
-                onCollapseChildrenClicked = onCollapseChildrenClicked,
                 trackerName = "customFolder",
                 trackerValue = indentLevel.toFloat(),
                 folderIndent = min(indentLevel, Folder.MAX_SUB_FOLDERS_INDENT),
             )
         }
+
+        val unread = when (folder.role) {
+            FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
+            FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
+            else -> folder.unreadCountDisplay
+        }
+
+        setFolderUi(
+            folder,
+            iconId,
+            unread,
+            currentFolderId,
+            hasCollapsableDefaultFolder,
+            hasCollapsableCustomFolder,
+            onFolderClicked,
+            onCollapseChildrenClicked,
+            trackerName,
+            trackerValue,
+            folderIndent,
+        )
     }
 
     private fun SelectableItemView.setFolderUi(
@@ -118,8 +128,8 @@ object FolderItem {
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
         trackerName: String,
-        trackerValue: Float? = null,
-        folderIndent: Int = 0,
+        trackerValue: Float?,
+        folderIndent: Int,
     ) {
         val folderName = folder.getLocalizedName(context)
 
