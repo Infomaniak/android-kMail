@@ -124,9 +124,7 @@ class DraftController @Inject constructor(
         val prefix = when (draftMode) {
             DraftMode.REPLY, DraftMode.REPLY_ALL -> if (subject.isReply()) "" else PREFIX_REPLY
             DraftMode.FORWARD -> if (subject.isForward()) "" else PREFIX_FORWARD
-            DraftMode.NEW_MAIL -> {
-                throw IllegalStateException("`${DraftMode::class.simpleName}` cannot be `${DraftMode.NEW_MAIL.name}` here.")
-            }
+            DraftMode.NEW_MAIL -> error("`${DraftMode::class.simpleName}` cannot be `${DraftMode.NEW_MAIL.name}` here.")
         }
 
         return prefix + subject

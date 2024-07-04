@@ -492,7 +492,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 notYetImplemented()
                 true
             }
-            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
+            SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
         }
 
         val shouldKeepItemBecauseOfNoConnection = isInternetAvailable.value == false
