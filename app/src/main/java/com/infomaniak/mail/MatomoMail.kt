@@ -168,6 +168,10 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackCreateFolderEvent(name: String) {
+        context?.trackCreateFolderEvent(name)
+    }
+
+    fun Context.trackCreateFolderEvent(name: String) {
         trackEvent("createFolder", name)
     }
 

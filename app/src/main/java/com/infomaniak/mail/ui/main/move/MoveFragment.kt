@@ -39,10 +39,10 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.getFolderCreationError
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -58,7 +58,7 @@ class MoveFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
-    lateinit var inputDialog: InputAlertDialog
+    lateinit var createFolderDialog: CreateFolderDialog
 
     @Inject
     lateinit var folderController: FolderController
@@ -74,7 +74,7 @@ class MoveFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
-        bindAlertToViewLifecycle(inputDialog)
+        bindAlertToViewLifecycle(createFolderDialog)
         setupRecyclerView()
         setupListeners()
         setupCreateFolderDialog()
@@ -100,22 +100,14 @@ class MoveFragment : Fragment() {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener {
             trackCreateFolderEvent("fromMove")
-            inputDialog.show(
-                title = R.string.newFolderDialogTitle,
-                hint = R.string.newFolderDialogHint,
-                confirmButtonText = R.string.newFolderDialogMovePositiveButton,
-            )
+            createFolderDialog.show(confirmButtonText = R.string.newFolderDialogMovePositiveButton)
         }
     }
 
     private fun setupCreateFolderDialog() = with(navigationArgs) {
-        inputDialog.setCallbacks(
+        createFolderDialog.setCallbacks(
             onPositiveButtonClicked = { folderName ->
-                trackCreateFolderEvent("confirm")
                 mainViewModel.moveToNewFolder(folderName, threadsUids.toList(), messageUid)
-            },
-            onErrorCheck = { folderName ->
-                requireContext().getFolderCreationError(folderName, folderController)
             },
         )
     }
@@ -129,7 +121,7 @@ class MoveFragment : Fragment() {
     private fun observeFolderCreation() = with(mainViewModel) {
 
         newFolderResultTrigger.observe(viewLifecycleOwner) {
-            inputDialog.resetLoadingAndDismiss()
+            createFolderDialog.resetLoadingAndDismiss()
         }
 
         isMovedToNewFolder.observe(viewLifecycleOwner) { isFolderCreated ->
