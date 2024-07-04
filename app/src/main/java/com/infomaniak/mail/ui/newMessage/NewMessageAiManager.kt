@@ -39,7 +39,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
-import com.infomaniak.mail.ui.newMessage.EditorContentManager.HtmlPayload
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
@@ -100,7 +99,7 @@ class NewMessageAiManager @Inject constructor(
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
             subject?.let(subjectTextField::setText)
-            editorContentManager.setHtml(HtmlPayload(content, isSanitized = false))
+            editorContentManager.setContent(BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML, isSanitized = false))
         }
     }
 

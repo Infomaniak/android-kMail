@@ -63,7 +63,6 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
-import com.infomaniak.mail.ui.newMessage.EditorContentManager.HtmlPayload
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
@@ -240,7 +239,7 @@ class NewMessageFragment : Fragment() {
 
     override fun onDestroyView() {
         binding.editor.exportHtml { html ->
-            newMessageViewModel.editorBodyLoader.postValue(HtmlPayload(html, isSanitized = true))
+            newMessageViewModel.editorBodyLoader.postValue(BodyContentPayload(html, BodyContentType.HTML, isSanitized = true))
         }
 
         addressListPopupWindow = null
@@ -546,7 +545,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeBodyLoader() {
-        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner, editorContentManager::setHtml)
+        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner, editorContentManager::setContent)
     }
 
     private fun observeUiSignature() = with(binding) {

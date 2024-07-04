@@ -23,6 +23,8 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.ui.newMessage.BodyContentPayload
+import com.infomaniak.mail.ui.newMessage.BodyContentType
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
@@ -92,7 +94,7 @@ class Draft : RealmObject {
     //region UI data (Transient & Ignore)
     @Transient
     @Ignore
-    var uiBody: String = ""
+    var uiBody: BodyContentPayload = BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML, isSanitized = true)
     @Transient
     @Ignore
     var uiSignature: String? = null

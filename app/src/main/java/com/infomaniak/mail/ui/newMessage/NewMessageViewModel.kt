@@ -54,7 +54,6 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.newMessage.EditorContentManager.HtmlPayload
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -62,8 +61,11 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.findSpecificAttachment
+import com.infomaniak.mail.utils.extensions.appContext
+import com.infomaniak.mail.utils.extensions.htmlToText
+import com.infomaniak.mail.utils.extensions.isEmail
+import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -112,7 +114,7 @@ class NewMessageViewModel @Inject constructor(
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
 
-    val editorBodyLoader = SingleLiveEvent<HtmlPayload>()
+    val editorBodyLoader = SingleLiveEvent<BodyContentPayload>()
 
     private val _subjectAndBodyChannel: Channel<Pair<String, String>> = Channel(capacity = CONFLATED)
     private val subjectAndBodyChannel: ReceiveChannel<Pair<String, String>> = _subjectAndBodyChannel
@@ -208,7 +210,7 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox, realm)
 
             realm.writeBlocking { draftController.upsertDraft(it, realm = this) }
-            it.saveSnapshot()
+            it.saveSnapshot(it.uiBody.content)
             it.initLiveData(signatures)
 
             initResult.postValue(InitResult(it, signatures))
@@ -268,7 +270,7 @@ class NewMessageViewModel @Inject constructor(
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
 
-        body = getWholeBody()
+        body = getWholeBody("", uiSignature, uiQuote)
     }
 
     private fun saveNavArgsToSavedState(localUuid: String) {
@@ -280,6 +282,20 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun splitSignatureAndQuoteFromBody(draft: Draft) {
+        val (body, signature, quote) = when (draft.mimeType) {
+            Utils.TEXT_PLAIN -> Triple(BodyContentPayload(draft.body, BodyContentType.TEXT_PLAIN_WITHOUT_HTML), null, null)
+            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(draft)
+            else -> error("Cannot load an email which is not of type text/plain or text/html")
+        }
+
+        draft.apply {
+            uiBody = body
+            uiSignature = signature
+            uiQuote = quote
+        }
+    }
+
+    private fun splitSignatureAndQuoteFromHtml(draft: Draft): Triple<BodyContentPayload, String?, String?> {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
             return getElementsByClass(divClassName).firstOrNull()?.let {
@@ -307,12 +323,7 @@ class NewMessageViewModel @Inject constructor(
             doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        draft.apply {
-            // TODO: Remove htmlToText
-            uiBody = body.htmlToText()
-            uiSignature = signature
-            uiQuote = quote
-        }
+        return Triple(BodyContentPayload(body, BodyContentType.HTML, isSanitized = false), signature, quote)
     }
 
     private fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
@@ -357,14 +368,14 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.saveSnapshot() {
+    private fun Draft.saveSnapshot(uiBodyValue: String) {
         snapshot = DraftSnapshot(
             identityId = identityId,
             to = to.toSet(),
             cc = cc.toSet(),
             bcc = bcc.toSet(),
             subject = subject,
-            uiBody = uiBody,
+            uiBody = uiBodyValue,
             attachmentsLocalUuids = attachments.map { it.localUuid }.toSet(),
         )
     }
@@ -384,7 +395,7 @@ class NewMessageViewModel @Inject constructor(
 
         attachmentsLiveData.postValue(attachments)
 
-        editorBodyLoader.postValue(HtmlPayload(uiBody, isSanitized = false))
+        editorBodyLoader.postValue(uiBody)
 
         uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
@@ -518,7 +529,7 @@ class NewMessageViewModel @Inject constructor(
             handleMailTo(draft, intent.data, intent)
         } else if (hasExtra(Intent.EXTRA_TEXT)) {
             getStringExtra(Intent.EXTRA_SUBJECT)?.let { draft.subject = it }
-            getStringExtra(Intent.EXTRA_TEXT)?.let { draft.uiBody = it }
+            getStringExtra(Intent.EXTRA_TEXT)?.let { draft.uiBody = BodyContentPayload(it, BodyContentType.TEXT_PLAIN_WITH_HTML) }
         }
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
@@ -586,7 +597,10 @@ class NewMessageViewModel @Inject constructor(
             bcc.addAll(splitBcc)
 
             subject = mailToIntent?.subject?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            uiBody = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+
+            val bodyContent: String? = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT)
+            val mailToPayload = bodyContent?.let { BodyContentPayload(it, BodyContentType.TEXT_PLAIN_WITH_HTML) }
+            uiBody = mailToPayload ?: BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
         }
     }
 
@@ -774,7 +788,7 @@ class NewMessageViewModel @Inject constructor(
 
         val hasFailed = mailboxContentRealm().writeBlocking {
             DraftController.getDraft(localUuid, realm = this)
-                ?.updateDraftFromLiveData(action, isFinishing, subject, uiBodyValue, realm = this@writeBlocking)
+                ?.updateDraftBeforeSavingRemotely(action, isFinishing, subject, uiBodyValue, realm = this@writeBlocking)
                 ?: return@writeBlocking true
             return@writeBlocking false
         }
@@ -798,7 +812,7 @@ class NewMessageViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private fun Draft.updateDraftFromLiveData(
+    private fun Draft.updateDraftBeforeSavingRemotely(
         draftAction: DraftAction,
         isFinishing: Boolean,
         subjectValue: String?,
@@ -820,11 +834,9 @@ class NewMessageViewModel @Inject constructor(
 
         subject = subjectValue
 
-        uiBody = uiBodyValue
-        uiSignature = uiSignatureLiveData.value
-        uiQuote = uiQuoteLiveData.value
-
-        body = getWholeBody()
+        val signature = uiSignatureLiveData.value
+        val quote = uiQuoteLiveData.value
+        body = getWholeBody(uiBodyValue, signature, quote)
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -842,11 +854,10 @@ class NewMessageViewModel @Inject constructor(
         if (!isFinishing) {
             copyFromRealm()
                 .apply {
-                    uiBody = this@updateDraftFromLiveData.uiBody
-                    uiSignature = this@updateDraftFromLiveData.uiSignature
-                    uiQuote = this@updateDraftFromLiveData.uiQuote
+                    uiSignature = signature
+                    uiQuote = quote
                 }
-                .saveSnapshot()
+                .saveSnapshot(uiBodyValue)
             isNewMessage = false
         }
     }
@@ -889,7 +900,7 @@ class NewMessageViewModel @Inject constructor(
         SentryDebug.addAttachmentsBreadcrumb(draft = this, step)
     }
 
-    private fun Draft.getWholeBody(): String = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
+    private fun getWholeBody(body: String, signature: String?, quote: String?): String = body + (signature ?: "") + (quote ?: "")
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->

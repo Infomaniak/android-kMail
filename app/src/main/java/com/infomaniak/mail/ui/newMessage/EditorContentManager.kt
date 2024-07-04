@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import android.text.Html
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
 import dagger.hilt.android.scopes.FragmentScoped
@@ -31,17 +32,32 @@ class EditorContentManager @Inject constructor() {
         this.editor = editor
     }
 
-    fun setHtml(htmlPayload: HtmlPayload) = with(htmlPayload) {
-        if (isSanitized) setSanitizedHtml(html) else setUnsanitizedHtml(html)
+    fun setContent(bodyContentPayload: BodyContentPayload) {
+        when (bodyContentPayload.type) {
+            BodyContentType.HTML -> setHtml(bodyContentPayload.content, bodyContentPayload.isSanitized!!)
+            BodyContentType.TEXT_PLAIN_WITH_HTML -> setPlainTextAndInterpretHtml(bodyContentPayload.content)
+            BodyContentType.TEXT_PLAIN_WITHOUT_HTML -> setPlainTextAndEscapeHtml(bodyContentPayload.content)
+        }
     }
 
-    private fun setUnsanitizedHtml(html: String) {
-        setSanitizedHtml(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html)).html())
+    private fun setHtml(html: String, isSanitized: Boolean) {
+        val sanitizedHtml = if (isSanitized) html else html.sanitize()
+        setSanitizedHtml(sanitizedHtml)
     }
 
-    private fun setSanitizedHtml(html: String) {
-        editor.setHtml(html)
-    }
+    private fun setPlainTextAndInterpretHtml(text: String) = setSanitizedHtml(text.replaceNewLines().sanitize())
 
-    data class HtmlPayload(val html: String, val isSanitized: Boolean)
+    private fun setPlainTextAndEscapeHtml(text: String) = setSanitizedHtml(text.escapeHtmlCharacters().replaceNewLines())
+
+    private fun setSanitizedHtml(html: String) = editor.setHtml(html)
+
+    private fun String.escapeHtmlCharacters(): String = Html.escapeHtml(this)
+
+    private fun String.replaceNewLines(): String = replace(NEW_LINES_REGEX, "<br>")
+
+    private fun String.sanitize(): String = HtmlSanitizer.getInstance().sanitize(Jsoup.parse(this)).html()
+
+    companion object {
+        val NEW_LINES_REGEX = "(\\r\\n|\\n)".toRegex()
+    }
 }
