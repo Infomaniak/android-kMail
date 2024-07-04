@@ -510,7 +510,7 @@ class ThreadListAdapter @Inject constructor(
         val (hintTextId, buttonTextId) = when (folderRole) {
             FolderRole.SPAM -> R.string.threadListSpamHint to R.string.threadListEmptySpamButton
             FolderRole.TRASH -> R.string.threadListTrashHint to R.string.threadListEmptyTrashButton
-            else -> throw IllegalStateException("We are trying to flush a non-flushable folder.")
+            else -> error("We are trying to flush a non-flushable folder.")
         }
 
         root.apply {
