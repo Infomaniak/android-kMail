@@ -48,7 +48,7 @@ import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.InvalidPasswordFragmentArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
@@ -58,7 +58,6 @@ import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType.INFOMANIAK
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.getFolderCreationError
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,7 +76,7 @@ class MenuDrawerFragment : Fragment() {
     lateinit var folderController: FolderController
 
     @Inject
-    lateinit var inputDialog: InputAlertDialog
+    lateinit var createFolderDialog: CreateFolderDialog
 
     @Inject
     lateinit var menuDrawerAdapter: MenuDrawerAdapter
@@ -93,7 +92,7 @@ class MenuDrawerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bindAlertToViewLifecycle(inputDialog)
+        bindAlertToViewLifecycle(createFolderDialog)
 
         setupListeners()
         setupCreateFolderDialog()
@@ -116,15 +115,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun setupCreateFolderDialog() {
-        inputDialog.setCallbacks(
-            onPositiveButtonClicked = { folderName ->
-                trackCreateFolderEvent("confirm")
-                mainViewModel.createNewFolder(folderName)
-            },
-            onErrorCheck = { folderName ->
-                requireContext().getFolderCreationError(folderName, folderController)
-            },
-        )
+        createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
     }
 
     private fun setupRecyclerView() {
@@ -194,7 +185,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onCreateFolderClicked() {
         trackCreateFolderEvent("fromMenuDrawer")
-        inputDialog.show(R.string.newFolderDialogTitle, R.string.newFolderDialogHint, R.string.buttonCreate)
+        createFolderDialog.show()
     }
 
     private fun onFolderSelected(folderId: String) {
@@ -302,7 +293,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeNewFolderCreation() {
-        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { inputDialog.resetLoadingAndDismiss() }
+        mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetLoadingAndDismiss() }
     }
 
     override fun onDestroyView() {

@@ -38,7 +38,7 @@ import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @ActivityScoped
-class InputAlertDialog @Inject constructor(
+open class InputAlertDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseAlertDialog(activityContext) {
