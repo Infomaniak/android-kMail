@@ -551,16 +551,22 @@ class NewMessageViewModel @Inject constructor(
             return getStringArrayExtra(recipientsFlag)?.map { Recipient().initLocalValues(it, it) }
         }
 
+        /**
+         * Each customer app is free to do what he wants, so we sometimes receive mailto fields that are empty,
+         * so we don't want to ignore them, so we return null.
+         */
+        fun String.nullIfEmpty() = ifEmpty { null }
+
         val mailToIntent = runCatching { MailTo.parse(uri!!) }.getOrNull()
         if (mailToIntent == null && intent?.hasExtra(Intent.EXTRA_EMAIL) != true) return
 
-        val splitTo = mailToIntent?.to?.splitToRecipientList()
+        val splitTo = mailToIntent?.to?.nullIfEmpty()?.splitToRecipientList()
             ?: intent?.getRecipientsFromIntent(Intent.EXTRA_EMAIL)
             ?: emptyList()
-        val splitCc = mailToIntent?.cc?.splitToRecipientList()
+        val splitCc = mailToIntent?.cc?.nullIfEmpty()?.splitToRecipientList()
             ?: intent?.getRecipientsFromIntent(Intent.EXTRA_CC)
             ?: emptyList()
-        val splitBcc = mailToIntent?.bcc?.splitToRecipientList()
+        val splitBcc = mailToIntent?.bcc?.nullIfEmpty()?.splitToRecipientList()
             ?: intent?.getRecipientsFromIntent(Intent.EXTRA_BCC)
             ?: emptyList()
 
@@ -569,8 +575,8 @@ class NewMessageViewModel @Inject constructor(
             cc.addAll(splitCc)
             bcc.addAll(splitBcc)
 
-            subject = mailToIntent?.subject ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            uiBody = mailToIntent?.body ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            subject = mailToIntent?.subject?.nullIfEmpty() ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
+            uiBody = mailToIntent?.body?.nullIfEmpty() ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
         }
     }
 
