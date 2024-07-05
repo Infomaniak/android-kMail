@@ -97,6 +97,14 @@ internal class BodyCleaner {
 
     fun clean(dirtyDocument: Document): Document {
         val cleanedDocument = cleaner.clean(dirtyDocument)
+
+        // Cleaner.clean() nests two bodies inside one-another. To fix this, unwrap one of them so we don't end up with nested bodies
+        val body = cleanedDocument.body()
+        val hasNestedBodies = body.childNodeSize() == 1
+                && body.childrenSize() == 1
+                && body.children()[0].tagName().lowercase() == "body"
+        if (hasNestedBodies) body.unwrap()
+
         copyDocumentType(dirtyDocument, cleanedDocument)
         return cleanedDocument
     }
