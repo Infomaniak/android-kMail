@@ -88,7 +88,9 @@
                 android:layout_height="16dp"
                 android:layout_marginStart="@dimen/marginStandardSmall"
                 android:src="@drawable/ic_certified"
-                tools:ignore="ContentDescription" />
+                android:visibility="gone"
+                tools:ignore="ContentDescription"
+                tools:visibility="visible" />
         </LinearLayout>
 
         <TextView
