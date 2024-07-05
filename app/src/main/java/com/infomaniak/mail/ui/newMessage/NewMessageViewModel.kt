@@ -806,6 +806,10 @@ class NewMessageViewModel @Inject constructor(
          */
         messageUid?.let { MessageController.getMessage(uid = it, realm)?.draftLocalUuid = localUuid }
 
+        // If we opened a text/plain draft, we will now convert it as text/html as we send it because we only support editing
+        // text/html drafts.
+        mimeType = Utils.TEXT_HTML
+
         // Only if `!isFinishing`, because if we are finishing, well… We're out of here so we don't care about all of that.
         if (!isFinishing) {
             copyFromRealm()
