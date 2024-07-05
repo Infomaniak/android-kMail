@@ -22,6 +22,7 @@ import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
 import dagger.hilt.android.scopes.FragmentScoped
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import javax.inject.Inject
 
 @FragmentScoped
@@ -55,7 +56,25 @@ class EditorContentManager @Inject constructor() {
 
     private fun String.replaceNewLines(): String = replace(NEW_LINES_REGEX, "<br>")
 
-    private fun String.sanitize(): String = HtmlSanitizer.getInstance().sanitize(Jsoup.parse(this)).html()
+    private fun String.sanitize(): String = HtmlSanitizer.getInstance()
+        .sanitize(Jsoup.parse(this))
+        .apply { outputSettings().prettyPrint(false) }
+        .extractHtmlWithoutDocumentWrapping()
+
+    private fun Document.extractHtmlWithoutDocumentWrapping(): String {
+        val html = root().firstElementChild() ?: return html()
+        val nodeSize = html.childNodeSize()
+        val elements = html.children()
+        val elementSize = elements.count()
+
+        val canRemoveDocumentWrapping = nodeSize == 2
+                && elementSize == 2
+                && elements[0].tagName().uppercase() == "HEAD"
+                && elements[0].childNodeSize() == 0
+                && elements[1].tagName().uppercase() == "BODY"
+
+        return if (canRemoveDocumentWrapping) body().html() else html()
+    }
 
     companion object {
         val NEW_LINES_REGEX = "(\\r\\n|\\n)".toRegex()
