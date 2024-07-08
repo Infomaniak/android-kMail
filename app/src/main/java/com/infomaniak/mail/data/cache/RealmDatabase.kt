@@ -22,6 +22,8 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.SwissTransferContainer
+import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.calendar.Attendee
@@ -163,7 +165,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 1L
         const val MAILBOX_INFO_SCHEMA_VERSION = 5L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 14L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 15L
         //endregion
 
         //region Configurations names
@@ -198,6 +200,8 @@ object RealmDatabase {
             Attachment::class,
             CalendarEventResponse::class,
             CalendarEvent::class,
+            SwissTransferContainer::class,
+            SwissTransferFile::class,
             Attendee::class,
             Signature::class,
             Bimi::class,

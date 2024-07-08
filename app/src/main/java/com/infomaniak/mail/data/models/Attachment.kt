@@ -18,17 +18,11 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import androidx.annotation.DrawableRes
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.lib.core.utils.guessMimeType
-import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.AttachmentMimeTypeUtils
+import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.Utils.MIMETYPE_UNKNOWN
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -37,28 +31,28 @@ import java.io.File
 import java.util.UUID
 
 @Serializable
-class Attachment : EmbeddedRealmObject {
+class Attachment : EmbeddedRealmObject, Attachable {
 
     //region Remote data
     var uuid: String = ""
     @SerialName("mime_type")
-    var mimeType: String = ""
-    var size: Long = 0L
-    var name: String = ""
+    override var mimeType: String = ""
+    override var size: Long = 0L
+    override var name: String = ""
     @SerialName("disposition")
     private var _disposition: String? = null
     @SerialName("content_id")
     var contentId: String? = null
     @SerialName("original_content_id")
     var originalContentId: String? = null
-    var resource: String? = null
+    override var resource: String? = null
     @SerialName("drive_url")
     var driveUrl: String? = null
     //endregion
 
     //region Local data (Transient)
     @Transient
-    var localUuid: String = UUID.randomUUID().toString()
+    override var localUuid: String = UUID.randomUUID().toString()
     @Transient
     var uploadLocalUri: String? = null
     @Transient
@@ -68,14 +62,10 @@ class Attachment : EmbeddedRealmObject {
     val uploadStatus: UploadStatus
         get() = enumValueOf<UploadStatus>(_uploadStatus)
 
-    val isCalendarEvent: Boolean get() = AttachmentMimeTypeUtils.calendarMatches.contains(mimeType)
+    val isCalendarEvent: Boolean get() = AttachableMimeTypeUtils.calendarMatches.contains(mimeType)
 
     val disposition: AttachmentDisposition?
         get() = enumValueOfOrNull<AttachmentDisposition>(_disposition)
-
-    inline val downloadUrl get() = ApiRoutes.resource(resource!!)
-
-    inline val safeMimeType get() = if (mimeType == MIMETYPE_UNKNOWN) name.guessMimeType() else mimeType
 
     fun initLocalValues(name: String, size: Long, mimeType: String, uri: String): Attachment {
         this.name = name
@@ -100,27 +90,18 @@ class Attachment : EmbeddedRealmObject {
         _uploadStatus = uploadStatus.name
     }
 
-    fun getFileTypeFromMimeType(): AttachmentType = AttachmentMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
+    override fun getFileTypeFromMimeType() = AttachableMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
 
-    fun hasUsableCache(
-        context: Context,
-        file: File? = null,
-        userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId,
-    ): Boolean {
+    override fun hasUsableCache(context: Context, file: File?, userId: Int, mailboxId: Int): Boolean {
         val cachedFile = file ?: getCacheFile(context, userId, mailboxId)
         return cachedFile.length() > 0 && cachedFile.canRead()
     }
 
-    fun isInlineCachedFile(context: Context): Boolean {
+    override fun isInlineCachedFile(context: Context): Boolean {
         return getCacheFile(context).exists() && disposition == AttachmentDisposition.INLINE
     }
 
-    fun getCacheFile(
-        context: Context,
-        userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId,
-    ): File {
+    override fun getCacheFile(context: Context, userId: Int, mailboxId: Int): File {
         val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, extractPathFromResource(), userId, mailboxId)
         return File(cacheFolder, name)
     }
@@ -140,21 +121,5 @@ class Attachment : EmbeddedRealmObject {
         AWAITING,
         ONGOING,
         FINISHED,
-    }
-
-    enum class AttachmentType(@DrawableRes val icon: Int) {
-        ARCHIVE(R.drawable.ic_file_zip),
-        AUDIO(R.drawable.ic_file_audio),
-        CALENDAR(R.drawable.ic_file_calendar),
-        CODE(R.drawable.ic_file_code),
-        FONT(R.drawable.ic_file_font),
-        IMAGE(R.drawable.ic_file_image),
-        PDF(R.drawable.ic_file_pdf),
-        POINTS(R.drawable.ic_file_office_graph),
-        SPREADSHEET(R.drawable.ic_file_office_sheet),
-        TEXT(R.drawable.ic_file_text),
-        VCARD(R.drawable.ic_file_vcard),
-        VIDEO(R.drawable.ic_file_video),
-        UNKNOWN(R.drawable.ic_file_unknown),
     }
 }

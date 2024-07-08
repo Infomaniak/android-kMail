@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
@@ -132,6 +133,10 @@ class Message : RealmObject {
     var isDeletedOnApi: Boolean = false
     @Transient
     var latestCalendarEventResponse: CalendarEventResponse? = null
+    @Transient
+    var swissTransferFiles: RealmList<SwissTransferFile> = realmListOf()
+    @Transient
+    var hasAttachable: Boolean = false
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -215,28 +220,28 @@ class Message : RealmObject {
     }
 
     fun initLocalValues(
-        date: RealmInstant,
-        isFullyDownloaded: Boolean,
-        isTrashed: Boolean,
-        isFromSearch: Boolean,
-        draftLocalUuid: String?,
+        messageInitialState: MessageInitialState,
         latestCalendarEventResponse: CalendarEventResponse?,
         messageIds: RealmSet<String>? = null,
+        swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
     ) {
 
-        this.date = date
-        this._isFullyDownloaded = isFullyDownloaded
-        this.isTrashed = isTrashed
-        draftLocalUuid?.let { this.draftLocalUuid = it }
-        this.isFromSearch = isFromSearch
+        this.date = messageInitialState.date
+        this._isFullyDownloaded = messageInitialState.isFullyDownloaded
+        this.isTrashed = messageInitialState.isTrashed
+        messageInitialState.draftLocalUuid?.let { this.draftLocalUuid = it }
+        this.isFromSearch = messageInitialState.isFromSearch
         this.messageIds = messageIds ?: computeMessageIds()
         this.latestCalendarEventResponse = latestCalendarEventResponse
+        this.swissTransferFiles = swissTransferFiles
 
         shortUid = uid.toShortUid()
+        hasAttachable = hasAttachments || swissTransferUuid != null
     }
 
     fun keepHeavyData(message: Message) {
         attachments = message.attachments.copyFromRealm().toRealmList()
+        swissTransferFiles = message.swissTransferFiles.copyFromRealm().toRealmList()
         latestCalendarEventResponse = message.latestCalendarEventResponse?.copyFromRealm()
         body = message.body?.copyFromRealm()
 
@@ -246,9 +251,18 @@ class Message : RealmObject {
         driveUrl = message.driveUrl
     }
 
-    // We had a bug once where we lost the Attachments.
-    // So if it happens again, we need to fully download the Message again.
-    fun isFullyDownloaded(): Boolean = if (hasAttachments && attachments.isEmpty()) false else _isFullyDownloaded
+    // If we are supposed to have Attachable (via `hasAttachments` or `swissTransferUuid`),
+    // but the lists are empty, we need to fully download the Message again.
+    fun isFullyDownloaded(): Boolean {
+        return if (
+            (hasAttachments && attachments.isEmpty()) ||
+            (swissTransferUuid != null && swissTransferFiles.isEmpty())
+        ) {
+            false
+        } else {
+            _isFullyDownloaded
+        }
+    }
 
     private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {
         return if (isManaged()) copyFromRealm(depth) else this
@@ -327,4 +341,12 @@ class Message : RealmObject {
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
+
+    data class MessageInitialState(
+        val date: RealmInstant,
+        val isFullyDownloaded: Boolean,
+        val isTrashed: Boolean,
+        val isFromSearch: Boolean,
+        val draftLocalUuid: String?,
+    )
 }

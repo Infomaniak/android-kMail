@@ -54,7 +54,10 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AutoAdvanceMode
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Attachable
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -243,20 +246,11 @@ class ThreadFragment : Fragment() {
                     trackMessageActionsEvent("deleteDraft")
                     mainViewModel.currentMailbox.value?.let { mailbox -> deleteDraft(message, mailbox) }
                 },
-                onAttachmentClicked = {
-                    trackAttachmentActionsEvent(ACTION_OPEN_NAME)
-                    it.openAttachment(
-                        context = requireContext(),
-                        navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
-                            navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
-                        },
-                        snackbarManager = snackbarManager,
-                    )
-                },
+                onAttachmentClicked = ::onAttachmentClicked,
                 onAttachmentOptionsClicked = {
                     safeNavigate(
                         resId = R.id.attachmentActionsBottomSheetDialog,
-                        args = AttachmentActionsBottomSheetDialogArgs(it.localUuid).toBundle(),
+                        args = AttachmentActionsBottomSheetDialogArgs(it.localUuid, it is SwissTransferFile).toBundle(),
                     )
                 },
                 onDownloadAllClicked = { message ->
@@ -323,6 +317,29 @@ class ThreadFragment : Fragment() {
 
         binding.messagesList.recycledViewPool.setMaxRecycledViews(0, 0)
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+    }
+
+    private fun onAttachmentClicked(attachable: Attachable) {
+        when (attachable) {
+            is Attachment -> {
+                trackAttachmentActionsEvent(ACTION_OPEN_NAME)
+                attachable.openAttachment(
+                    context = requireContext(),
+                    navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
+                        navigateToDownloadProgressDialog(
+                            attachment,
+                            attachmentIntentType,
+                            ThreadFragment::class.java.name,
+                        )
+                    },
+                    snackbarManager = snackbarManager,
+                )
+            }
+            is SwissTransferFile -> {
+                trackAttachmentActionsEvent("openSwissTransfer")
+                downloadSwissTransferFile(swissTransferFile = attachable)
+            }
+        }
     }
 
     private fun setupDialogs() {
@@ -532,14 +549,33 @@ class ThreadFragment : Fragment() {
     }
 
     private fun downloadAllAttachments(message: Message) {
+        val truncatedSubject = message.subject?.let { it.substring(0..min(MAXIMUM_SUBJECT_LENGTH, it.lastIndex)) }
+
+        if (message.hasAttachments) downloadAttachments(message, allAttachmentsFileName(truncatedSubject ?: ""))
+
+        message.swissTransferUuid?.let { containerUuid ->
+            downloadSwissTransferFiles(
+                containerUuid = containerUuid,
+                name = allSwissTransferFilesName(truncatedSubject ?: ""),
+            )
+        }
+    }
+
+    private fun downloadAttachments(message: Message, name: String) {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return,
             folderId = message.folderId,
             shortUid = message.shortUid,
         )
-        val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }
-        val name = allAttachmentsFileName(truncatedSubject ?: "")
         scheduleDownloadManager(url, name)
+    }
+
+    private fun downloadSwissTransferFile(swissTransferFile: SwissTransferFile) {
+        scheduleDownloadManager(swissTransferFile.downloadUrl, swissTransferFile.name)
+    }
+
+    private fun downloadSwissTransferFiles(containerUuid: String, name: String) {
+        scheduleDownloadManager(ApiRoutes.swissTransferContainerDownloadUrl(containerUuid), name)
     }
 
     private fun replyTo(message: Message) {
@@ -677,6 +713,9 @@ class ThreadFragment : Fragment() {
         private const val PREVIOUS_CHRONOLOGICAL_THREAD = -1
         private const val NEXT_CHRONOLOGICAL_THREAD = 1
 
+        private const val MAXIMUM_SUBJECT_LENGTH = 30
+
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
+        private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"
     }
 }

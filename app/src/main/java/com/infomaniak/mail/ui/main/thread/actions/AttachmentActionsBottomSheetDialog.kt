@@ -21,13 +21,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
+import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.databinding.BottomSheetAttachmentActionsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -64,29 +67,38 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             return@with
         }
 
+        if (attachment is SwissTransferFile) {
+            with(binding) {
+                openWithItem.isGone = true
+                kDriveItem.isGone = true
+            }
+        }
+
         permissionUtils.registerDownloadManagerPermission(this@AttachmentActionsBottomSheetDialog)
         binding.attachmentDetails.setDetails(attachment)
         setupListeners(attachment)
     }
 
-    private fun setupListeners(attachment: Attachment) = with(binding) {
+    private fun setupListeners(attachment: Attachable) = with(binding) {
+        if (attachment is Attachment) {
+            openWithItem.setClosingOnClickListener {
+                trackAttachmentActionsEvent("openFromBottomsheet")
+                attachment.openAttachment(
+                    context = context,
+                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
+                    snackbarManager = snackbarManager,
+                )
+            }
+            kDriveItem.setClosingOnClickListener {
+                trackAttachmentActionsEvent("saveToKDrive")
+                attachment.executeIntent(
+                    context = context,
+                    intentType = AttachmentIntentType.SAVE_TO_DRIVE,
+                    navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
+                )
+            }
+        }
 
-        openWithItem.setClosingOnClickListener {
-            trackAttachmentActionsEvent("openFromBottomsheet")
-            attachment.openAttachment(
-                context = context,
-                navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-                snackbarManager = snackbarManager,
-            )
-        }
-        kDriveItem.setClosingOnClickListener {
-            trackAttachmentActionsEvent("saveToKDrive")
-            attachment.executeIntent(
-                context = context,
-                intentType = AttachmentIntentType.SAVE_TO_DRIVE,
-                navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
-            )
-        }
         deviceItem.setOnClickListener {
             trackAttachmentActionsEvent("download")
             scheduleDownloadManager(attachment.downloadUrl, attachment.name)
