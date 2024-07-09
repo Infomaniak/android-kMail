@@ -1,0 +1,5 @@
+- Add Bimi feature
+- Lighten version API call
+- Prevent showing and hiding progress crashes
+- Avoid uploading forwards attachments
+- SwissTransfer attachments are now seen as regular attachments

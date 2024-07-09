@@ -1,0 +1,5 @@
+- Ajout de la fonctionnalité Bimi
+- Alléger l'appel API des versions de l'app
+- Prévenir les crashs liés à l'affichage et au masquage de la progression
+- Correction du retéléchargement des pièces jointes des transferts
+- Les pièces jointes SwissTransfer sont maintenant vues comme des pièces jointes normales
