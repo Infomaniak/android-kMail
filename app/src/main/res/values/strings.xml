@@ -491,6 +491,7 @@
     <string name="settingsTransferEmailsDescription">When forwarding an email, choose the display mode that suits you best</string>
     <string name="settingsTransferEmailsTitle">Transfer emails</string>
     <string name="settingsTransferInBody">In the message body</string>
+    <string name="shareEmail">Share email</string>
     <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
     <string name="snackbarCalendarChoiceSent">Response taken into account</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>

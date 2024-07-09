@@ -485,6 +485,7 @@
     <string name="settingsTransferEmailsDescription">Wenn Sie eine E-Mail weiterleiten, wählen Sie den Anzeigemodus, der Ihnen am besten gefällt</string>
     <string name="settingsTransferEmailsTitle">E-Mails übertragen</string>
     <string name="settingsTransferInBody">Im Nachrichtentext</string>
+    <string name="shareEmail">E-Mail austauschen</string>
     <string name="snackbarBlockUserConfirmation">Absender ist jetzt blockiert</string>
     <string name="snackbarCalendarChoiceSent">Antwort berücksichtigt</string>
     <string name="snackbarContactSaved">Neuer Kontakt erfolgreich registriert</string>
