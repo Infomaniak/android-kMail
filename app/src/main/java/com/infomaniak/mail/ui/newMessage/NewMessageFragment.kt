@@ -70,6 +70,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -78,9 +79,10 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
+import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
+import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
-import com.infomaniak.mail.utils.extensions.readRawResource
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
@@ -92,6 +94,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.google.android.material.R as RMaeterial
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -348,10 +351,12 @@ class NewMessageFragment : Fragment() {
     private fun initEditorUi() {
         binding.editorWebView.apply {
             enableAlgorithmicDarkening(isEnabled = true)
-            if (context.isNightModeEnabled()) addCss(context.readRawResource(R.raw.custom_dark_mode))
+            if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
 
-            addCss(context.readRawResource(R.raw.style))
-            addCss(context.readRawResource(R.raw.editor_style))
+            addCss(context.loadCss(R.raw.style))
+
+            val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaeterial.attr.colorPrimary))
+            addCss(context.loadCss(R.raw.editor_style, customColors))
 
             val isPlaceholderVisible = combine(
                 isEmptyFlow.filterNotNull(),

@@ -203,6 +203,27 @@ fun Context.formatSubject(subject: String?): String {
 
 fun Context.readRawResource(@RawRes resId: Int): String = Scanner(resources.openRawResource(resId)).useDelimiter("\\A").next()
 
+fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
+    var css = readRawResource(cssResId)
+
+    if (customColors.isNotEmpty()) {
+        var header = ":root {\n"
+        customColors.forEach { (variableName, color) ->
+            header += formatCssVariable(variableName, color)
+        }
+        header += "}\n\n"
+
+        css = header + css
+    }
+
+    return css
+}
+
+private fun formatCssVariable(variableName: String, color: Int): String {
+    val formattedColor = Utils.colorToHexRepresentation(color)
+    return "$variableName: $formattedColor;\n"
+}
+
 fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     addAnimatorListener(object : Animator.AnimatorListener {
         override fun onAnimationStart(animation: Animator) = Unit

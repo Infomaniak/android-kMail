@@ -32,7 +32,7 @@ import com.infomaniak.mail.utils.HtmlFormatter.Companion.getPrintMailStyle
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getResizeScript
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getSignatureMarginStyle
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
-import com.infomaniak.mail.utils.extensions.readRawResource
+import com.infomaniak.mail.utils.extensions.loadCss
 
 class WebViewUtils(context: Context) {
 
@@ -156,7 +156,7 @@ class WebViewUtils(context: Context) {
         }
 
         private fun WebView.addBackgroundJs() {
-            val css = context.readRawResource(R.raw.custom_dark_mode)
+            val css = context.loadCss(R.raw.custom_dark_mode)
             evaluateJavascript(
                 """ var style = document.createElement('style')
                 document.head.appendChild(style)
