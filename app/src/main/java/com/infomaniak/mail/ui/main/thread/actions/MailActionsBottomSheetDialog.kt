@@ -53,6 +53,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onFavorite() = Unit
         override fun onReportJunk() = Unit
         override fun onPrint() = Unit
+        override fun onShare() = Unit
         override fun onReportDisplayProblem() = Unit
         //endregion
     }
@@ -70,6 +71,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         postpone.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPostpone() }
         favorite.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onFavorite() }
         reportJunk.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportJunk() }
+        share.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onShare() }
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
 
@@ -124,6 +126,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onFavorite()
         fun onReportJunk()
         fun onPrint()
+        fun onShare()
         fun onReportDisplayProblem()
 
         fun onReply()

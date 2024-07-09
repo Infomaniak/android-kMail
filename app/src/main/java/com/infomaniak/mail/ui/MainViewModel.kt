@@ -17,7 +17,9 @@
  */
 package com.infomaniak.mail.ui
 
+import android.app.Activity
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
@@ -1059,6 +1061,19 @@ class MainViewModel @Inject constructor(
     private fun threadHasOnlyOneMessageLeftInCurrentFolder(threadUid: String): Boolean {
         val folderId = currentFolderId ?: return false
         return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
+    }
+
+    fun shareThreadUrl(messageUid: String, activityContext: Context) {
+        val message = messageController.getMessage(messageUid) ?: return
+
+        viewModelScope.launch(ioCoroutineContext) {
+            val mailboxUuid = currentMailbox.value?.uuid!!
+            val response = ApiRepository.getShareLink(mailboxUuid, message.folderId, message.shortUid)
+
+            if (response.isSuccess() && response.data != null) {
+                response.data!!.url?.let { activityContext.shareString(it) }
+            }
+        }
     }
 
     companion object {

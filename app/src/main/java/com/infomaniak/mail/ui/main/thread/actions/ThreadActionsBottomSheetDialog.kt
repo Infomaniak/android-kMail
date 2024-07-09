@@ -35,6 +35,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SHARE_LINK_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
@@ -187,6 +188,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onPrint() {
                 trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
                 notYetImplemented()
+            }
+
+            override fun onShare() {
+                activity?.let {
+                    trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
+                    mainViewModel.shareThreadUrl(messageUidToReply, activityContext = it)
+                }
             }
 
             override fun onReportDisplayProblem() {

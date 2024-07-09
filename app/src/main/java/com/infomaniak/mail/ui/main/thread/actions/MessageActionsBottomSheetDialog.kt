@@ -33,7 +33,9 @@ import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SHARE_LINK_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
+import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -160,6 +162,13 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         args = PrintMailFragmentArgs(messageUid).toBundle(),
                         currentClassName = MessageActionsBottomSheetDialog::class.java.name,
                     )
+                }
+
+                override fun onShare() {
+                    activity?.let {
+                        trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
+                        mainViewModel.shareThreadUrl(message.uid, activityContext = it)
+                    }
                 }
 
                 override fun onReportDisplayProblem() {
