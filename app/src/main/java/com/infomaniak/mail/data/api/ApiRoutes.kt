@@ -275,4 +275,8 @@ object ApiRoutes {
     fun bimi(bimi: String): String {
         return "$MAIL_API$bimi"
     }
+
+    fun shareLink(mailboxUuid: String, folderId: String, mailId: Int): String {
+        return "${message(mailboxUuid, folderId, mailId)}/share"
+    }
 }
