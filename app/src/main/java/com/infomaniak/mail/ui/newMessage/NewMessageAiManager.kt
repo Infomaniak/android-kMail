@@ -99,7 +99,10 @@ class NewMessageAiManager @Inject constructor(
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
             subject?.let(subjectTextField::setText)
-            editorContentManager.setContent(BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML, isSanitized = false))
+            editorContentManager.setContent(
+                editor,
+                BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML, isSanitized = false)
+            )
         }
     }
 

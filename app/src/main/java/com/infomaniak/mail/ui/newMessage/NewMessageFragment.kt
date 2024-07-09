@@ -189,8 +189,6 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initManagers() {
-        editorContentManager.initValues(binding.editor)
-
         aiManager.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
@@ -545,7 +543,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeBodyLoader() {
-        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner, editorContentManager::setContent)
+        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner) {
+            editorContentManager.setContent(binding.editor, it)
+        }
     }
 
     private fun observeUiSignature() = with(binding) {
