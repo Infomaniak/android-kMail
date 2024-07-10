@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
@@ -1062,15 +1061,16 @@ class MainViewModel @Inject constructor(
         return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
     }
 
-    fun shareThreadUrl(messageUid: String, activityContext: Context) {
-        val message = messageController.getMessage(messageUid) ?: return
-        val mailboxUuid = currentMailbox.value?.uuid ?: return
+    fun shareThreadUrl(messageUid: String, startShareActivity: ((String) -> Unit)) {
+        messageController.getMessage(messageUid)?.let { message ->
+            val mailboxUuid = currentMailbox.value?.uuid ?: return
 
-        viewModelScope.launch(ioCoroutineContext) {
-            val response = ApiRepository.getShareLink(mailboxUuid, message.folderId, message.shortUid)
+            viewModelScope.launch(ioCoroutineContext) {
+                val response = ApiRepository.getShareLink(mailboxUuid, message.folderId, message.shortUid)
 
-            if (response.isSuccess() && response.data != null) {
-                activityContext.shareString(response.data!!.url)
+                if (response.isSuccess() && response.data != null) {
+                    startShareActivity.invoke(response.data!!.url)
+                }
             }
         }
     }

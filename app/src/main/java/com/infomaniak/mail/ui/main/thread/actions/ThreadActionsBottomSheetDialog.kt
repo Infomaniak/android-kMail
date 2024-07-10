@@ -44,10 +44,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
-import com.infomaniak.mail.utils.extensions.animatedNavigation
-import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.extensions.notYetImplemented
-import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -191,9 +188,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onShare() {
-                activity?.let {
+                activity?.apply {
                     trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
-                    mainViewModel.shareThreadUrl(messageUidToReply, activityContext = it)
+                    mainViewModel.shareThreadUrl(messageUidToReply, ::shareString)
                 }
             }
 
