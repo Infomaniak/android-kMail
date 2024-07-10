@@ -21,10 +21,11 @@ import android.os.Build
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
@@ -42,8 +43,6 @@ import com.infomaniak.mail.utils.ErrorCode.TOO_MANY_REQUESTS
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -69,18 +68,6 @@ class AiViewModel @Inject constructor(
 
     val aiPropositionStatusLiveData = MutableLiveData<PropositionStatus>()
     val aiOutputToInsert = SingleLiveEvent<Pair<String?, String>>()
-
-    private val _subjectAndBodyStatus: MutableLiveData<SubjectAndBodyStatus> = MutableLiveData()
-    val subjectAndBodyStatusExportation: LiveData<Unit> = _subjectAndBodyStatus.map {}
-
-    val isBodyBlank
-        get() = _subjectAndBodyStatus.value?.isBodyBlank ?: true.also {
-            Sentry.captureMessage("Tried to insert a proposition before having exported the editor's body", SentryLevel.ERROR)
-        }
-    val isSubjectBlank
-        get() = _subjectAndBodyStatus.value?.isSubjectBlank ?: true.also {
-            Sentry.captureMessage("Tried to insert a proposition before having exported the editor's subject", SentryLevel.ERROR)
-        }
 
     fun generateNewAiProposition(
         currentMailboxUuid: String,
@@ -194,16 +181,6 @@ class AiViewModel @Inject constructor(
     private fun List<AiMessage>.excludingContextMessage(): List<AiMessage> = filterNot { it.type == "context" }
 
     fun getLastMessage(): String = history.last().content
-
-    fun checkIfBodyIsEmptyForAiInsertion(editor: RichHtmlEditorWebView, isSubjectBlank: Boolean) {
-        viewModelScope.launch {
-            editor.exportHtml { body ->
-                _subjectAndBodyStatus.postValue(SubjectAndBodyStatus(isSubjectBlank, body.isBlank()))
-            }
-        }
-    }
-
-    private data class SubjectAndBodyStatus(val isSubjectBlank: Boolean, val isBodyBlank: Boolean)
 
     enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?, val matomoValue: String) {
         MODIFY(R.id.modify, null, "edit"),

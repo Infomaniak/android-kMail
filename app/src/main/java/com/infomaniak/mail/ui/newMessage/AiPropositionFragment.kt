@@ -34,6 +34,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
@@ -47,7 +48,6 @@ import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.postfixWithTag
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -66,6 +66,8 @@ class AiPropositionFragment : Fragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+
+    private val navigationArgs: AiPropositionFragmentArgs by navArgs()
 
     private var currentRequestJob: Job? = null
 
@@ -123,7 +125,7 @@ class AiPropositionFragment : Fragment() {
         if (!aiViewModel.isHistoryEmpty()) propositionTextView.text = aiViewModel.getLastMessage()
 
         insertPropositionButton.setOnClickListener {
-            if (aiViewModel.isBodyBlank) {
+            if (navigationArgs.isBodyBlank) {
                 choosePropositionAndPopBack()
             } else {
                 trackAiWriterEvent("replacePropositionDialog")
@@ -179,7 +181,7 @@ class AiPropositionFragment : Fragment() {
 
         val (subject, content) = aiViewModel.splitBodyAndSubject(getLastMessage())
 
-        if (subject == null || aiViewModel.isSubjectBlank) {
+        if (subject == null || navigationArgs.isSubjectBlank) {
             applyProposition(subject, content)
         } else {
             trackAiWriterEvent("replaceSubjectDialog")
@@ -203,7 +205,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun trackInsertionType() {
-        if (aiViewModel.isBodyBlank) {
+        if (navigationArgs.isBodyBlank) {
             trackAiWriterEvent("insertProposition", TrackerAction.DATA)
         } else {
             trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
@@ -255,10 +257,7 @@ class AiPropositionFragment : Fragment() {
             }
         }
 
-        Utils.waitInitMediator(
-            aiViewModel.aiPropositionStatusLiveData,
-            aiViewModel.subjectAndBodyStatusExportation,
-        ).observe(viewLifecycleOwner) { (propositionStatus, _) ->
+        aiViewModel.aiPropositionStatusLiveData.observe(viewLifecycleOwner) { propositionStatus ->
             if (propositionStatus == null) {
                 setUiVisibilityState(UiState.LOADING)
                 return@observe
