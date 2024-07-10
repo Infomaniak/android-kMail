@@ -55,6 +55,7 @@ object MatomoMail : MatomoCore {
     const val ACTION_FAVORITE_NAME = "favorite"
     const val ACTION_SPAM_NAME = "spam"
     const val ACTION_PRINT_NAME = "print"
+    const val ACTION_SHARE_LINK_NAME = "shareLink"
     const val ACTION_POSTPONE_NAME = "postpone"
     const val ADD_MAILBOX_NAME = "addMailbox"
     const val DISCOVER_LATER = "discoverLater"

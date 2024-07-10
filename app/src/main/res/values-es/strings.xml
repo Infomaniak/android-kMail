@@ -485,6 +485,7 @@
     <string name="settingsTransferEmailsDescription">Cuando reenvíe un correo electrónico, elija el modo de visualización que más le convenga</string>
     <string name="settingsTransferEmailsTitle">Transferir correos electrónicos</string>
     <string name="settingsTransferInBody">En el cuerpo del mensaje</string>
+    <string name="shareEmail">Compartir correo electrónico</string>
     <string name="snackbarBlockUserConfirmation">El remitente está bloqueado</string>
     <string name="snackbarCalendarChoiceSent">Respuesta tenida en cuenta</string>
     <string name="snackbarContactSaved">Nuevo contacto registrado correctamente</string>

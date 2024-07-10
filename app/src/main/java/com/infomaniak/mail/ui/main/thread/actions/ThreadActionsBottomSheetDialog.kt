@@ -35,6 +35,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SHARE_LINK_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
@@ -43,10 +44,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
-import com.infomaniak.mail.utils.extensions.animatedNavigation
-import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.extensions.notYetImplemented
-import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -187,6 +185,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onPrint() {
                 trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
                 notYetImplemented()
+            }
+
+            override fun onShare() {
+                activity?.apply {
+                    trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
+                    mainViewModel.shareThreadUrl(messageUidToReply, ::shareString)
+                }
             }
 
             override fun onReportDisplayProblem() {

@@ -493,6 +493,7 @@
     <string name="settingsTransferEmailsDescription">Lorsque vous transférez un e-mail, choisissez le mode d’affichage qui vous convient le mieux</string>
     <string name="settingsTransferEmailsTitle">Transférer les e-mails</string>
     <string name="settingsTransferInBody">Dans le corps du message</string>
+    <string name="shareEmail">Partager l’e-mail</string>
     <string name="snackbarBlockUserConfirmation">L’expéditeur est maintenant bloqué</string>
     <string name="snackbarCalendarChoiceSent">Réponse prise en compte</string>
     <string name="snackbarContactSaved">Nouveau contact enregistré avec succès</string>

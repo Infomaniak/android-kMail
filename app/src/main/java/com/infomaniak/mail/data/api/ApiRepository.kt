@@ -424,6 +424,10 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
+    fun getShareLink(mailboxUuid: String, folderId: String, mailId: Int): ApiResponse<ShareThread> {
+        return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
+    }
+
     /**
      * RealmLists cannot be null, so they have to be empty when there is no data.
      * But the Infomaniak Mail API doesn't support empty lists, so we have to replace them with a `null` value.

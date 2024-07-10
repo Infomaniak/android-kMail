@@ -485,6 +485,7 @@
     <string name="settingsTransferEmailsDescription">Quando si inoltra un’e-mail, scegliere la modalità di visualizzazione più adatta.</string>
     <string name="settingsTransferEmailsTitle">Trasferimento di e-mail</string>
     <string name="settingsTransferInBody">Nel corpo del messaggio</string>
+    <string name="shareEmail">Condividi e-mail</string>
     <string name="snackbarBlockUserConfirmation">Il mittente è ora bloccato</string>
     <string name="snackbarCalendarChoiceSent">Risposta presa in considerazione</string>
     <string name="snackbarContactSaved">Nuovo contatto registrato con successo</string>

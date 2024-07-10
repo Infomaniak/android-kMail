@@ -1061,6 +1061,20 @@ class MainViewModel @Inject constructor(
         return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
     }
 
+    fun shareThreadUrl(messageUid: String, startShareActivity: ((String) -> Unit)) {
+        messageController.getMessage(messageUid)?.let { message ->
+            val mailboxUuid = currentMailbox.value?.uuid ?: return
+
+            viewModelScope.launch(ioCoroutineContext) {
+                val response = ApiRepository.getShareLink(mailboxUuid, message.folderId, message.shortUid)
+
+                if (response.isSuccess() && response.data != null) {
+                    startShareActivity.invoke(response.data!!.url)
+                }
+            }
+        }
+    }
+
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
