@@ -20,6 +20,6 @@ package com.infomaniak.mail.data.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ShareThread {
-    var url: String? = null
-}
+data class ShareThread(
+    val url: String
+)

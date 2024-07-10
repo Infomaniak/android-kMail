@@ -1065,13 +1065,13 @@ class MainViewModel @Inject constructor(
 
     fun shareThreadUrl(messageUid: String, activityContext: Context) {
         val message = messageController.getMessage(messageUid) ?: return
+        val mailboxUuid = currentMailbox.value?.uuid ?: return
 
         viewModelScope.launch(ioCoroutineContext) {
-            val mailboxUuid = currentMailbox.value?.uuid!!
             val response = ApiRepository.getShareLink(mailboxUuid, message.folderId, message.shortUid)
 
             if (response.isSuccess() && response.data != null) {
-                response.data!!.url?.let { activityContext.shareString(it) }
+                response.data!!.url.let { activityContext.shareString(it) }
             }
         }
     }
