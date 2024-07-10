@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui
 
-import android.app.Activity
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.*
@@ -1071,7 +1070,7 @@ class MainViewModel @Inject constructor(
             val response = ApiRepository.getShareLink(mailboxUuid, message.folderId, message.shortUid)
 
             if (response.isSuccess() && response.data != null) {
-                response.data!!.url.let { activityContext.shareString(it) }
+                activityContext.shareString(response.data!!.url)
             }
         }
     }
