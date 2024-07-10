@@ -25,8 +25,11 @@ import com.google.firebase.messaging.RemoteMessage
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -80,12 +83,15 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         SentryLog.d(TAG, "onMessageReceived: mailboxId=$mailboxId")
         SentryLog.d(TAG, "onMessageReceived: messageUid=$messageUid")
 
-        if (mainApplication.isAppInBackground) {
-            processMessageInBackground(userId, mailboxId, messageUid)
-        } else {
-            processMessageInForeground(userId, mailboxId)
+        // This is to avoid doing some processing when we never opened a specific Mailbox.
+        val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
+        FolderController.getFolder(FolderRole.INBOX, realm)?.cursor?.let {
+            if (mainApplication.isAppInBackground) {
+                processMessageInBackground(userId, mailboxId, messageUid)
+            } else {
+                processMessageInForeground(userId, mailboxId)
+            }
         }
-
     }
 
     private fun processMessageInForeground(userId: Int, mailboxId: Int) {
