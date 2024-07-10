@@ -353,9 +353,8 @@ class NewMessageFragment : Fragment() {
             enableAlgorithmicDarkening(isEnabled = true)
             if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
 
-            addCss(context.loadCss(R.raw.style))
-
             val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaeterial.attr.colorPrimary))
+            addCss(context.loadCss(R.raw.style, customColors))
             addCss(context.loadCss(R.raw.editor_style, customColors))
 
             val isPlaceholderVisible = combine(
