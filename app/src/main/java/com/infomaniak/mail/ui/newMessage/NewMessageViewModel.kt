@@ -323,7 +323,7 @@ class NewMessageViewModel @Inject constructor(
             doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        return Triple(BodyContentPayload(body, BodyContentType.HTML, isSanitized = false), signature, quote)
+        return Triple(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
     }
 
     private fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {

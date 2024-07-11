@@ -21,10 +21,8 @@ package com.infomaniak.mail.ui.newMessage
 /**
  * @param content The string representation of the body in either html or plain text format.
  * @param type The type of representation of [content]. Each type will lead to different processing of the content.
- * @param isSanitized Is only required and cannot be omitted when [type] is [BodyContentType.HTML]. This describes whether or not
- * the HTML can skip sanitization when we know it's already been sanitized earlier.
  */
-data class BodyContentPayload(val content: String, val type: BodyContentType, val isSanitized: Boolean? = null) {
+data class BodyContentPayload(val content: String, val type: BodyContentType) {
     companion object {
         fun emptyBody(): BodyContentPayload {
             return BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
@@ -32,4 +30,4 @@ data class BodyContentPayload(val content: String, val type: BodyContentType, va
     }
 }
 
-enum class BodyContentType { HTML, TEXT_PLAIN_WITH_HTML, TEXT_PLAIN_WITHOUT_HTML }
+enum class BodyContentType { HTML_SANITIZED, HTML_UNSANITIZED, TEXT_PLAIN_WITH_HTML, TEXT_PLAIN_WITHOUT_HTML }

@@ -30,16 +30,14 @@ class EditorContentManager @Inject constructor() {
 
     fun setContent(editor: RichHtmlEditorWebView, bodyContentPayload: BodyContentPayload) = with(editor) {
         when (bodyContentPayload.type) {
-            BodyContentType.HTML -> setHtml(bodyContentPayload.content, bodyContentPayload.isSanitized!!)
+            BodyContentType.HTML_SANITIZED -> setSanitizedHtml(bodyContentPayload.content)
+            BodyContentType.HTML_UNSANITIZED -> setUnsanitizedHtml(bodyContentPayload.content)
             BodyContentType.TEXT_PLAIN_WITH_HTML -> setPlainTextAndInterpretHtml(bodyContentPayload.content)
             BodyContentType.TEXT_PLAIN_WITHOUT_HTML -> setPlainTextAndEscapeHtml(bodyContentPayload.content)
         }
     }
 
-    private fun RichHtmlEditorWebView.setHtml(html: String, isSanitized: Boolean) {
-        val sanitizedHtml = if (isSanitized) html else html.sanitize()
-        setSanitizedHtml(sanitizedHtml)
-    }
+    private fun RichHtmlEditorWebView.setUnsanitizedHtml(html: String) = setSanitizedHtml(html.sanitize())
 
     private fun RichHtmlEditorWebView.setPlainTextAndInterpretHtml(text: String) {
         setSanitizedHtml(text.replaceNewLines().sanitize())

@@ -241,7 +241,7 @@ class NewMessageFragment : Fragment() {
 
     override fun onDestroyView() {
         binding.editor.exportHtml { html ->
-            newMessageViewModel.editorBodyLoader.postValue(BodyContentPayload(html, BodyContentType.HTML, isSanitized = true))
+            newMessageViewModel.editorBodyLoader.postValue(BodyContentPayload(html, BodyContentType.HTML_SANITIZED))
         }
 
         addressListPopupWindow = null
