@@ -88,7 +88,7 @@ class AiPropositionFragment : Fragment() {
         return FragmentAiPropositionBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
@@ -175,7 +175,7 @@ class AiPropositionFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        val (subject, content) = splitBodyAndSubject(getLastMessage())
+        val (subject, content) = aiViewModel.splitBodyAndSubject(getLastMessage())
 
         if (subject == null || navigationArgs.isSubjectBlank) {
             applyProposition(subject, content)
@@ -206,17 +206,6 @@ class AiPropositionFragment : Fragment() {
         } else {
             trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
         }
-    }
-
-    private fun splitBodyAndSubject(proposition: String): Pair<String?, String> {
-        val match = MATCH_SUBJECT_REGEX.find(proposition)
-
-        val content = match?.groups?.get("content")?.value ?: return null to proposition
-        val subject = match.groups["subject"]?.value?.trim()
-
-        if (subject.isNullOrBlank()) return null to proposition
-
-        return subject to content
     }
 
     private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
@@ -381,6 +370,5 @@ class AiPropositionFragment : Fragment() {
 
     companion object {
         private const val REPLACEMENT_DURATION = 150L
-        private val MATCH_SUBJECT_REGEX = Regex("^[^:]+:(?<subject>.+?)\\n\\s*(?<content>.+)", RegexOption.DOT_MATCHES_ALL)
     }
 }
