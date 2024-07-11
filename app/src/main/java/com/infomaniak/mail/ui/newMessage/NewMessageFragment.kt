@@ -40,6 +40,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -77,6 +78,9 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -304,6 +308,11 @@ class NewMessageFragment : Fragment() {
             if (context.isNightModeEnabled()) editor.addCss(context.readRawResource(R.raw.custom_dark_mode))
 
             addCss(context.readRawResource(R.raw.style))
+
+            isEmptyFlow
+                .filterNotNull()
+                .onEach { isEditorEmpty -> newMessagePlaceholder.isVisible = isEditorEmpty }
+                .launchIn(lifecycleScope)
         }
 
         setupSendButton()
