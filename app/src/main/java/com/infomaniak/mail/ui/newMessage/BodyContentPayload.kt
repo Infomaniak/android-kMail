@@ -24,6 +24,12 @@ package com.infomaniak.mail.ui.newMessage
  * @param isSanitized Is only required and cannot be omitted when [type] is [BodyContentType.HTML]. This describes whether or not
  * the HTML can skip sanitization when we know it's already been sanitized earlier.
  */
-data class BodyContentPayload(val content: String, val type: BodyContentType, val isSanitized: Boolean? = null)
+data class BodyContentPayload(val content: String, val type: BodyContentType, val isSanitized: Boolean? = null) {
+    companion object {
+        fun emptyBody(): BodyContentPayload {
+            return BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
+        }
+    }
+}
 
 enum class BodyContentType { HTML, TEXT_PLAIN_WITH_HTML, TEXT_PLAIN_WITHOUT_HTML }

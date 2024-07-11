@@ -600,7 +600,7 @@ class NewMessageViewModel @Inject constructor(
 
             val bodyContent: String? = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT)
             val mailToPayload = bodyContent?.let { BodyContentPayload(it, BodyContentType.TEXT_PLAIN_WITH_HTML) }
-            uiBody = mailToPayload ?: BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
+            uiBody = mailToPayload ?: BodyContentPayload.emptyBody()
         }
     }
 
