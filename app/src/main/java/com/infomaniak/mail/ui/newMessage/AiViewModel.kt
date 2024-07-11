@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import android.os.Build
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
@@ -87,6 +88,30 @@ class AiViewModel @Inject constructor(
 
         ensureActive()
         handleAiResult(apiResponse, userMessage, isUsingPreviousMessageAsContext = previousMessageBodyPlainText != null)
+    }
+
+    fun splitBodyAndSubject(proposition: String): Pair<String?, String> {
+        return getSubjectAndContent(MATCH_SUBJECT_REGEX.find(proposition), proposition)
+    }
+
+    private fun getSubjectAndContent(match: MatchResult?, proposition: String): Pair<String?, String> {
+        val (subject, content) = match?.let {
+            // The method get on MatchGroupCollection is not available on API25
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N_MR1) {
+                val destructuredList = it.destructured.toList()
+                destructuredList[INDEX_AI_PROPOSITION_SUBJECT] to destructuredList[INDEX_AI_PROPOSITION_CONTENT].trim()
+            } else {
+                val subject = it.groups["subject"]?.value?.trim()
+                val content = it.groups["content"]?.value
+                subject to content
+            }
+        } ?: (null to proposition)
+
+        return if (subject.isNullOrBlank() || content == null) {
+            null to proposition
+        } else {
+            subject to content
+        }
     }
 
     private fun handleAiResult(
@@ -161,5 +186,11 @@ class AiViewModel @Inject constructor(
         CONTEXT_TOO_LONG(R.string.aiErrorContextMaxTokenReached),
         RATE_LIMIT_EXCEEDED(R.string.aiErrorTooManyRequests),
         MISSING_CONTENT(R.string.aiErrorUnknown),
+    }
+
+    companion object {
+        private val MATCH_SUBJECT_REGEX = Regex("^[^:]+:(?<subject>.+?)\\n\\s*(?<content>.+)", RegexOption.DOT_MATCHES_ALL)
+        private val INDEX_AI_PROPOSITION_SUBJECT = 0
+        private val INDEX_AI_PROPOSITION_CONTENT = 1
     }
 }
