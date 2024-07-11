@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.os.Build
 import androidx.annotation.IdRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -91,27 +92,33 @@ class AiViewModel @Inject constructor(
     }
 
     fun splitBodyAndSubject(proposition: String): Pair<String?, String> {
-        return getSubjectAndContent(MATCH_SUBJECT_REGEX.find(proposition), proposition)
+        val match = MATCH_SUBJECT_REGEX.find(proposition)
+        // The method get on MatchGroupCollection is not available on API25
+        return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N_MR1) {
+            splitBodyAndSubjectForAPI25(match, proposition)
+        } else {
+            splitBodyAndSubjectAfterAPI25(match, proposition)
+        }
     }
 
-    private fun getSubjectAndContent(match: MatchResult?, proposition: String): Pair<String?, String> {
-        val (subject, content) = match?.let {
-            // The method get on MatchGroupCollection is not available on API25
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N_MR1) {
-                val destructuredList = it.destructured.toList()
-                destructuredList[INDEX_AI_PROPOSITION_SUBJECT] to destructuredList[INDEX_AI_PROPOSITION_CONTENT].trim()
-            } else {
-                val subject = it.groups["subject"]?.value?.trim()
-                val content = it.groups["content"]?.value
-                subject to content
-            }
-        } ?: (null to proposition)
+    private fun splitBodyAndSubjectForAPI25(match: MatchResult?, proposition: String): Pair<String?, String> {
+        val destructuredList = match?.destructured?.toList()
+        val content = destructuredList?.getOrNull(INDEX_AI_PROPOSITION_CONTENT) ?: return null to proposition
+        val subject = destructuredList.getOrNull(INDEX_AI_PROPOSITION_SUBJECT)?.trim()
 
-        return if (subject.isNullOrBlank() || content == null) {
-            null to proposition
-        } else {
-            subject to content
-        }
+        if (subject.isNullOrBlank()) return null to proposition
+
+        return subject to content
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun splitBodyAndSubjectAfterAPI25(match: MatchResult?, proposition: String): Pair<String?, String> {
+        val content = match?.groups?.get("content")?.value ?: return null to proposition
+        val subject = match.groups["subject"]?.value?.trim()
+
+        if (subject.isNullOrBlank()) return null to proposition
+
+        return subject to content
     }
 
     private fun handleAiResult(
