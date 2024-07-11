@@ -308,6 +308,7 @@ class NewMessageFragment : Fragment() {
             if (context.isNightModeEnabled()) editor.addCss(context.readRawResource(R.raw.custom_dark_mode))
 
             addCss(context.readRawResource(R.raw.style))
+            addCss(context.readRawResource(R.raw.editor_style))
 
             isEmptyFlow
                 .filterNotNull()

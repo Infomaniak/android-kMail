@@ -288,6 +288,7 @@
                         android:id="@+id/editorLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView">
@@ -297,18 +298,24 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-                        <TextView
-                            android:id="@+id/newMessagePlaceholder"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginStart="@dimen/marginStandardMedium"
-                            android:text="@string/newMessagePlaceholderTitle"
-                            android:textColor="@color/tertiaryTextColor"
-                            android:visibility="gone"
-                            tools:visibility="visible" />
-
                     </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/newMessagePlaceholder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/marginStandardMedium"
+                        android:layout_marginTop="@dimen/marginStandardMedium"
+                        android:text="@string/newMessagePlaceholderTitle"
+                        android:textColor="@color/tertiaryTextColor"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="@id/editorLayout"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/editorLayout"
+                        tools:visibility="visible" />
 
                     <LinearLayout
                         android:id="@+id/bodyLoader"
