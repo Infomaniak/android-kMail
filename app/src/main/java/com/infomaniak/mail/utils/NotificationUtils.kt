@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -161,6 +162,7 @@ class NotificationUtils @Inject constructor(
         showNotifications(scope, mailboxId, notificationManagerCompat)
     }
 
+    @SuppressLint("WrongConstant")
     private fun getContentIntent(
         payload: NotificationPayload,
         isUndo: Boolean,
@@ -240,6 +242,7 @@ class NotificationUtils @Inject constructor(
         }
     }
 
+    @SuppressLint("WrongConstant")
     private fun NotificationCompat.Builder.addActions(payload: NotificationPayload) {
 
         fun createBroadcastAction(@StringRes title: Int, intent: Intent): NotificationCompat.Action {
