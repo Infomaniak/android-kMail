@@ -65,6 +65,11 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
                 EditorAction.LINK -> fragment.notYetImplemented()
                 EditorAction.CLOCK -> fragment.notYetImplemented()
                 EditorAction.AI -> aiManager.openAiPrompt()
+                EditorAction.BOLD -> {}
+                EditorAction.ITALIC -> {}
+                EditorAction.UNDERLINE -> {}
+                EditorAction.STRIKE_THROUGH -> {}
+                EditorAction.UNORDERED_LIST -> {}
             }
         }
     }
@@ -82,6 +87,12 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
         linkEditor(editorLink, EditorAction.LINK)
         linkEditor(editorClock, EditorAction.CLOCK)
         linkEditor(editorAi, EditorAction.AI)
+
+        linkEditor(buttonBold, EditorAction.BOLD)
+        linkEditor(buttonItalic, EditorAction.ITALIC)
+        linkEditor(buttonUnderline, EditorAction.UNDERLINE)
+        linkEditor(buttonStrikeThrough, EditorAction.STRIKE_THROUGH)
+        linkEditor(buttonList, EditorAction.UNORDERED_LIST)
     }
 
     fun setupEditorFormatActionsToggle() = with(binding) {
@@ -115,10 +126,10 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
         LINK("addLink"),
         CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
         AI("aiWriter"),
-        // BOLD("bold"),
-        // ITALIC("italic"),
-        // UNDERLINE("underline"),
-        // STRIKE_THROUGH("strikeThrough"),
-        // UNORDERED_LIST("unorderedList"),
+        BOLD("bold"),
+        ITALIC("italic"),
+        UNDERLINE("underline"),
+        STRIKE_THROUGH("strikeThrough"),
+        UNORDERED_LIST("unorderedList"),
     }
 }

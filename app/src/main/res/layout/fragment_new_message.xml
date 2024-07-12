@@ -513,7 +513,7 @@
             android:id="@+id/editorToolbar"
             style="@style/CardViewMail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/newMessageToolbarHeight"
             android:backgroundTint="@color/newMessageBackgroundColor"
             app:cardElevation="@dimen/newMessageBottomBarElevation"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -532,23 +532,21 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/editorTextOptions"
                     style="@style/EditorIconButton"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/newMessageToolbarItemWidth"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/buttonTextOptionsOpen"
-                    android:visibility="gone"
                     app:icon="@drawable/ic_editor_text_options"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/editorAttachment"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/editorAttachment"
                     style="@style/EditorIconButton"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/newMessageToolbarItemWidth"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/buttonAttachment"
                     app:icon="@drawable/ic_attachment"
@@ -560,7 +558,7 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/editorCamera"
                     style="@style/EditorIconButton"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/newMessageToolbarItemWidth"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/buttonCamera"
                     android:visibility="gone"
@@ -568,27 +566,24 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/editorLink"
                     app:layout_constraintStart_toEndOf="@+id/editorAttachment"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/editorLink"
                     style="@style/EditorIconButton"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/newMessageToolbarItemWidth"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/buttonHyperlink"
-                    android:visibility="gone"
                     app:icon="@drawable/ic_editor_link"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/editorClock"
                     app:layout_constraintStart_toEndOf="@+id/editorCamera"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/editorClock"
                     style="@style/EditorIconButton"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/newMessageToolbarItemWidth"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/buttonSchedule"
                     android:visibility="gone"
@@ -596,13 +591,12 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/editorAi"
                     app:layout_constraintStart_toEndOf="@+id/editorLink"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/editorAi"
                     style="@style/EditorIconButton"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/newMessageToolbarItemWidth"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/buttonSchedule"
                     android:theme="@style/AiCursorAndPrimaryColorTheme"
@@ -610,72 +604,78 @@
                     app:icon="@drawable/ic_ai_magic_wand"
                     app:iconTint="@color/aiColor"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/editorBold"
+                    app:layout_constraintEnd_toStartOf="@id/formatOptionsLayout"
                     app:layout_constraintStart_toEndOf="@+id/editorClock"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
-                <com.infomaniak.mail.ui.newMessage.ToggleableTextFormatterItemView
-                    android:id="@+id/editorBold"
+                <HorizontalScrollView
+                    android:id="@+id/formatOptionsLayout"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:contentDescription="@string/buttonBold"
-                    app:icon="@drawable/ic_editor_bold"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/editorItalic"
-                    app:layout_constraintStart_toEndOf="@+id/editorAi"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintEnd_toStartOf="@id/formatOptionsDivider"
+                    app:layout_constraintStart_toEndOf="@id/editorTextOptions"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <com.infomaniak.mail.ui.newMessage.ToggleableTextFormatterItemView
-                    android:id="@+id/editorItalic"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/buttonItalic"
-                    app:icon="@drawable/ic_editor_italic"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/editorUnderline"
-                    app:layout_constraintStart_toEndOf="@+id/editorBold"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
 
-                <com.infomaniak.mail.ui.newMessage.ToggleableTextFormatterItemView
-                    android:id="@+id/editorUnderline"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/buttonUnderline"
-                    app:icon="@drawable/ic_editor_underline"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/editorStrikeThrough"
-                    app:layout_constraintStart_toEndOf="@+id/editorItalic"
-                    app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonList"
+                            style="@style/EditorFormatButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_editor_list" />
 
-                <com.infomaniak.mail.ui.newMessage.ToggleableTextFormatterItemView
-                    android:id="@+id/editorStrikeThrough"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/buttonStrikeThrough"
-                    app:icon="@drawable/ic_editor_strikethrough"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/editorList"
-                    app:layout_constraintStart_toEndOf="@+id/editorUnderline"
-                    app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonBold"
+                            style="@style/EditorFormatButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_editor_bold" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editorList"
-                    style="@style/EditorIconButton"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/buttonBulletPoint"
-                    android:minWidth="0dp"
-                    app:icon="@drawable/ic_editor_list"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonItalic"
+                            style="@style/EditorFormatButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_editor_italic" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonUnderline"
+                            style="@style/EditorFormatButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_editor_underline" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonStrikeThrough"
+                            style="@style/EditorFormatButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_editor_strikethrough" />
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/formatOptionsDivider"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="@dimen/marginStandardSmall"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/sendButton"
-                    app:layout_constraintStart_toEndOf="@+id/editorStrikeThrough"
+                    app:layout_constraintStart_toEndOf="@id/formatOptionsLayout"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/sendButton"
                     style="@style/IconButton"
                     android:layout_width="80dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="end"
                     android:contentDescription="@string/send"
                     app:icon="@drawable/ic_send"
@@ -688,17 +688,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
-                    app:constraint_referenced_ids="editorBold,editorItalic,editorUnderline,editorStrikeThrough,editorList" />
+                    app:constraint_referenced_ids="formatOptionsLayout,formatOptionsDivider"
+                    tools:visibility="visible" />
 
                 <androidx.constraintlayout.widget.Group
                     android:id="@+id/editorActions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="editorAttachment" />
+                    app:constraint_referenced_ids="editorAttachment,editorAi,editorLink"
+                    tools:visibility="gone" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView

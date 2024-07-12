@@ -45,6 +45,8 @@
     <dimen name="textButtonPrimaryMediumHeight">40dp</dimen>
     <dimen name="mediumButtonHorizontalMargin">20dp</dimen>
     <dimen name="threadHorizontalMargin">@dimen/marginStandardMedium</dimen>
+    <dimen name="newMessageToolbarItemWidth">64dp</dimen>
+    <dimen name="newMessageToolbarHeight">48dp</dimen>
 
     <!-- Menu Drawer -->
     <dimen name="decoratedItemViewHeight">48dp</dimen>
