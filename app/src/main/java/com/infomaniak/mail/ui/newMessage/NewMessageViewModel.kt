@@ -116,8 +116,13 @@ class NewMessageViewModel @Inject constructor(
 
     val editorBodyLoader = SingleLiveEvent<BodyContentPayload>()
 
-    private val _subjectAndBodyChannel: Channel<Pair<String, String>> = Channel(capacity = CONFLATED)
-    private val subjectAndBodyChannel: ReceiveChannel<Pair<String, String>> = _subjectAndBodyChannel
+    // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
+    // 2. Inserting the AI proposition navigates back to NewMessageFragment.
+    // 3. When saving or sending the draft now, the channel still holds the previous body as it wasn't consumed.
+    // channelExpirationIdTarget lets us identify and discard outdated messages, ensuring the correct message is processed.
+    private var channelExpirationIdTarget = 0
+    private val _subjectAndBodyChannel: Channel<Triple<String, String, Int>> = Channel(capacity = CONFLATED)
+    private val subjectAndBodyChannel: ReceiveChannel<Triple<String, String, Int>> = _subjectAndBodyChannel
     private var subjectAndBodyJob: Job? = null
 
     var isAutoCompletionOpened = false
@@ -764,14 +769,28 @@ class NewMessageViewModel @Inject constructor(
 
     fun saveBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch {
-            _subjectAndBodyChannel.send(subject to html)
+            _subjectAndBodyChannel.send(Triple(subject, html, channelExpirationIdTarget))
         }
+    }
+
+    fun discardOldBodyAndSubjectChannelMessages() {
+        channelExpirationIdTarget++
     }
 
     fun waitForBodyAndSubjectToExecuteDraftAction(draftSaveConfiguration: DraftSaveConfiguration) {
         subjectAndBodyJob?.cancel()
         subjectAndBodyJob = globalCoroutineScope.launch {
-            val (subject, body) = subjectAndBodyChannel.receive()
+            val subject: String
+            val body: String
+            while (true) {
+                val (receivedSubject, receivedBody, expirationId) = subjectAndBodyChannel.receive()
+                if (expirationId == channelExpirationIdTarget) {
+                    subject = receivedSubject
+                    body = receivedBody
+                    break
+                }
+            }
+
             draftSaveConfiguration.addSubjectAndBody(subject, body)
             executeDraftAction(draftSaveConfiguration)
         }

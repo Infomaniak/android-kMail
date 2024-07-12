@@ -578,6 +578,11 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        newMessageViewModel.discardOldBodyAndSubjectChannelMessages()
+    }
+
     override fun onStop() {
         /**
          * When the Activity is being stopped, we save the Draft.
