@@ -228,7 +228,7 @@
                         android:layout_height="@dimen/mediumIconSize"
                         android:layout_marginEnd="@dimen/marginStandardSmall"
                         android:contentDescription="@string/contentDescriptionIconForward"
-                        android:src="@drawable/ic_forward_arrow_filled"
+                        android:src="@drawable/ic_email_action_forward_filled"
                         android:visibility="gone"
                         app:tint="@color/iconColorPrimaryText"
                         tools:visibility="visible" />
@@ -239,7 +239,7 @@
                         android:layout_height="@dimen/mediumIconSize"
                         android:layout_marginEnd="@dimen/marginStandardSmall"
                         android:contentDescription="@string/contentDescriptionIconReply"
-                        android:src="@drawable/ic_reply_arrow_filled"
+                        android:src="@drawable/ic_email_action_reply_filled"
                         android:visibility="gone"
                         app:tint="@color/iconColorPrimaryText" />
 
