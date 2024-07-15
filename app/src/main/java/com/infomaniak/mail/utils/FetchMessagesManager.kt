@@ -183,19 +183,10 @@ class FetchMessagesManager @Inject constructor(
             )
             return
         }
-        if (message.isSeen) {
-            // If the Message has already been seen before receiving the Notification, we don't want to display it.
-            // We can leave safely.
-            SentryDebug.sendFailedNotification(
-                reason = "Message already seen",
-                sentryLevel = SentryLevel.INFO,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
-            return
-        }
+
+        // If the Message has already been seen before receiving the Notification, we don't want to display it.
+        // We can leave safely.
+        if (message.isSeen) return
 
         val formattedPreview = message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
         val body = if (message.body?.value.isNullOrBlank()) {
