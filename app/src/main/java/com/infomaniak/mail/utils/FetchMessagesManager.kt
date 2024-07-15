@@ -186,7 +186,6 @@ class FetchMessagesManager @Inject constructor(
 
         // If the Message has already been seen before receiving the Notification, we don't want to display it.
         // We can leave safely.
-        // It can happened very simply if you open a message on the webmail for example
         if (message.isSeen) return
 
         val formattedPreview = message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
