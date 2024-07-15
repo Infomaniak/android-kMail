@@ -51,6 +51,7 @@ class FetchMessagesManager @Inject constructor(
 
     private lateinit var coroutineScope: CoroutineScope
 
+    // We can arrive here for mailboxes we did not opened yet. That's why we check before doing anything.
     suspend fun execute(
         scope: CoroutineScope,
         userId: Int,
@@ -69,16 +70,6 @@ class FetchMessagesManager @Inject constructor(
             // If we can't find the INBOX in Realm, it means the user never opened this Mailbox.
             // We don't want to display Notifications in this case.
             // We can leave safely.
-            // But if a user never opened this Mailbox, we shouldn't have register it to receive Notifications. So this shouldn't happen.
-            SentryDebug.sendFailedNotification(
-                reason = "No Folder in Realm",
-                sentryLevel = SentryLevel.WARNING,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
-
             realm.close()
             return
         }
@@ -87,16 +78,6 @@ class FetchMessagesManager @Inject constructor(
             // We only want to display Notifications about Mailboxes that the User opened at least once.
             // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
             // We can leave safely.
-            // But if a user never opened this Mailbox, we shouldn't have register it to receive Notifications. So this shouldn't happen.
-            SentryDebug.sendFailedNotification(
-                reason = "Folder's cursor is null",
-                sentryLevel = SentryLevel.WARNING,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
-
             realm.close()
             return
         }

@@ -78,20 +78,25 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             )
             return@withContext Result.success()
         }
-
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
 
-        MessageController.getMessage(messageUid, mailboxContentRealm)?.let {
-            // If the Message is already in Realm, it means we already fetched it when we received a previous Notification.
-            // So we've already shown it in a previous batch of Notifications.
-            // We can leave safely.
-            return@withContext Result.success()
+        return@withContext runCatching {
+            MessageController.getMessage(messageUid, mailboxContentRealm)?.let {
+                // If the Message is already in Realm, it means we already fetched it when we received a previous Notification.
+                // So we've already shown it in a previous batch of Notifications.
+                // We can leave safely.
+                return@runCatching Result.success()
+            }
+
+            fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
+
+            SentryLog.i(TAG, "Work finished")
+            Result.success()
+        }.getOrElse {
+            Result.failure()
+        }.also {
+            mailboxContentRealm.close()
         }
-
-        fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
-
-        SentryLog.i(TAG, "Work finished")
-        return@withContext Result.success()
     }
 
     @Singleton
