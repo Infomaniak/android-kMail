@@ -37,6 +37,8 @@ object MessageBodyUtils {
 
     private const val QUOTE_DETECTION_TIMEOUT = 1_500L
 
+    private const val MESSAGE_LENGTH_LIMIT = 104_448
+
     private val quoteDescriptors = arrayOf(
         "blockquote[type=cite]", // macOS and iOS mail client
         // The reply and forward #divRplyFwdMsg div only contains the header, the previous message body is written right next to
@@ -67,8 +69,20 @@ object MessageBodyUtils {
             timeout = QUOTE_DETECTION_TIMEOUT,
             defaultValue = SplitBody(bodyContent),
             block = {
-                val (content, quotes) = splitContentAndQuotes(htmlDocument = Jsoup.parse(bodyContent))
-                if (quotes.isEmpty() || quotes.all { it.isBlank() }) SplitBody(bodyContent) else SplitBody(content, bodyContent)
+                val htmlDocument = Jsoup.parse(bodyContent)
+
+                if (htmlDocument.text().length > MESSAGE_LENGTH_LIMIT) {
+                    val content = bodyContent.substring(0, MESSAGE_LENGTH_LIMIT)
+                    return@executeWithTimeoutOrDefault SplitBody(content)
+                }
+
+                val (content, quotes) = splitContentAndQuotes(htmlDocument)
+
+                if (quotes.isEmpty() || quotes.all { it.isBlank() }) {
+                    SplitBody(bodyContent)
+                } else {
+                    SplitBody(content, bodyContent)
+                }
             },
             onTimeout = {
                 Sentry.withScope { scope ->
