@@ -21,7 +21,7 @@ import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.UploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -98,7 +98,7 @@ class DraftController @Inject constructor(
                 ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
                     draft.attachments += attachment.apply {
                         resource = previousMessage.attachments.find { it.name == name }?.resource
-                        setUploadStatus(Attachment.UploadStatus.FINISHED)
+                        setUploadStatus(UploadStatus.FINISHED)
                     }
                 }
 
