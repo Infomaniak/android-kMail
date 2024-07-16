@@ -1,0 +1,3 @@
+- Ajout de la fonctionnalité de lien de partage de courrier
+- Correction d'un crash sur l'API 25 lors de l'utilisation de `MatchResult`
+- Vérification de si une boîte aux lettres a déjà été ouverte une fois avant d'essayer de rafraîchir ses messages
