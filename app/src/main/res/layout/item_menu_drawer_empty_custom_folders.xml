@@ -25,5 +25,4 @@
     android:layout_marginVertical="@dimen/marginStandardMedium"
     android:paddingStart="@dimen/marginLarge"
     android:text="@string/noFolderTitle"
-    tools:ignore="RtlSymmetry"
-    tools:visibility="gone" />
+    tools:ignore="RtlSymmetry" />
