@@ -226,6 +226,26 @@ class RefreshController @Inject constructor(
 
         sendMessageNotFoundSentry(failedFolder)
 
+        fun computeFibonacci() {
+            val nextFibonacci = FIBONACCI_SEQUENCE.firstOrNull { it > strategy.fibonacci }
+            if (nextFibonacci == null || endOfMessagesReached) {
+                realm.writeBlocking {
+                    FolderController.getFolder(id = failedFolder.id, realm = this)?.apply {
+                        delete(messages)
+                        delete(threads)
+                        lastUpdatedAt = null
+                        cursor = null
+                        unreadCountLocal = 0
+                        remainingOldMessagesToFetch = Folder.DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
+                        isHistoryComplete = Folder.DEFAULT_IS_HISTORY_COMPLETE
+                    }
+                }
+                strategy.iteration = Iteration.ABORT_MISSION
+            } else {
+                strategy.fibonacci = nextFibonacci
+            }
+        }
+
         when (strategy.iteration) {
             Iteration.FIRST_TIME -> {
                 strategy.iteration = Iteration.SECOND_TIME
@@ -237,23 +257,7 @@ class RefreshController @Inject constructor(
                 }
             }
             Iteration.FIBONACCI_TIME -> {
-                val nextFibonacci = FIBONACCI_SEQUENCE.firstOrNull { it > strategy.fibonacci }
-                if (nextFibonacci == null || endOfMessagesReached) {
-                    realm.writeBlocking {
-                        FolderController.getFolder(id = failedFolder.id, realm = this)?.apply {
-                            delete(messages)
-                            delete(threads)
-                            lastUpdatedAt = null
-                            cursor = null
-                            unreadCountLocal = 0
-                            remainingOldMessagesToFetch = Folder.DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
-                            isHistoryComplete = Folder.DEFAULT_IS_HISTORY_COMPLETE
-                        }
-                    }
-                    strategy.iteration = Iteration.ABORT_MISSION
-                } else {
-                    strategy.fibonacci = nextFibonacci
-                }
+                computeFibonacci()
             }
             Iteration.ABORT_MISSION -> {
                 handleAllExceptions(exception)

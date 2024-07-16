@@ -71,6 +71,117 @@ object IlluColors {
         colorPaths(pathsToColor, position)
     }
 
+    private fun computeIlluOnBoardingColors(commonColor1: Int, commonColor2: Int, commonColor3: Int, commonColor4: Int) = listOf(
+        IlluColors(keyPath(Category.IPHONESCREEN, 18), commonColor1),
+        IlluColors(keyPath(Category.IPHONESCREEN, 22), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 25), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 26), commonColor3),
+        IlluColors(keyPath(Category.IPHONESCREEN, 27), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 28), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 29), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 30), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 31), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 32), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 33), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 34), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 35), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 36), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 37), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 38), commonColor2),
+        IlluColors(keyPath(Category.IPHONESCREEN, 39), commonColor4),
+        IlluColors(keyPath(Category.IPHONESCREEN, 44), commonColor1),
+        IlluColors(keyPath(Category.IPHONESCREEN, 49), commonColor4),
+        IlluColors(keyPath(Category.IPHONESCREEN, 50), commonColor1),
+        IlluColors(keyPath(Category.IPHONESCREEN, 62), commonColor1),
+        IlluColors(keyPath(Category.IPHONESCREEN, 68), commonColor1),
+        IlluColors(keyPath(Category.IPHONESCREEN, 70), commonColor1),
+    )
+
+    private fun computeIlluOnBoarding234Colors(commonColor1: Int, commonColor2: Int, commonColor5: Int, commonColor6: Int) =
+        listOf(
+            IlluColors(keyPath(Category.IPHONESCREEN, 73), commonColor6),
+            IlluColors(keyPath(Category.IPHONESCREEN, 74), commonColor1),
+            IlluColors(keyPath(Category.IPHONESCREEN, 75), commonColor5),
+            IlluColors(keyPath(Category.IPHONESCREEN, 76), commonColor2),
+        )
+
+    private fun computeIlluOnBoarding1Colors(commonColor1: Int, commonColor5: Int, commonColor6: Int) = listOf(
+        IlluColors(keyPath(Category.POINT, 1, 1), commonColor5),
+        IlluColors(keyPath(Category.POINT, 1, 2), commonColor5),
+        IlluColors(keyPath(Category.POINT, 1, 3), commonColor5),
+        IlluColors(keyPath(Category.POINT, 1, 4), commonColor5),
+        IlluColors(keyPath(Category.POINT, 1, 5), commonColor5),
+        IlluColors(keyPath(Category.POINT, 1, 6), commonColor5),
+        IlluColors(keyPath(Category.IPHONESCREEN, 56), commonColor1),
+        IlluColors(keyPath(Category.IPHONESCREEN, 67), commonColor6),
+        IlluColors(keyPath(Category.IPHONESCREEN, 69), commonColor5),
+    )
+
+    private fun computeIlluOnBoarding2Colors(
+        commonColor1: Int,
+        commonColor2: Int,
+        commonColor4: Int,
+        commonColor5: Int,
+        commonColor7: Int,
+        commonColor8: Int
+    ) = listOf(
+        IlluColors(keyPath(Category.NOTIFICATION, 5, 2), commonColor4),
+        IlluColors(keyPath(Category.NOTIFICATION, 6, 2), commonColor1),
+        IlluColors(keyPath(Category.NOTIFICATION, 9, 2), commonColor7),
+        IlluColors(keyPath(Category.NOTIFICATION, 10, 2), commonColor7),
+        IlluColors(keyPath(Category.NOTIFICATION, 12, 2), commonColor5),
+        IlluColors(keyPath(Category.NOTIFICATION, 13, 2), commonColor2),
+        IlluColors(keyPath(Category.NOTIFICATION, 14, 2), commonColor1),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 1), commonColor8),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 5, 1), commonColor8),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 6, 1), commonColor8),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 7, 1), commonColor5),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 8, 1), commonColor2),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 9, 1), commonColor2),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 10, 1), commonColor2),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 13, 1), commonColor5),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 14, 1), commonColor8),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 5, 2), commonColor4),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 6, 2), commonColor1),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 9, 2), commonColor7),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 10, 2), commonColor7),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 12, 2), commonColor5),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 13, 2), commonColor2),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 14, 2), commonColor1),
+        IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 2), commonColor1),
+        IlluColors(KeyPath("MOVING NOTIF 2 TITLE", "Groupe 1", "Fond 1"), commonColor2),
+        IlluColors(KeyPath("MOVING NOTIF 2 PREVIEW", "Groupe 1", "Fond 1"), commonColor2),
+        IlluColors(keyPath(Category.ARCHIVES, 1), commonColor5),
+        IlluColors(keyPath(Category.ARCHIVES, 2), commonColor5),
+        IlluColors(keyPath(Category.ARCHIVES, 3), commonColor5),
+        IlluColors(keyPath(Category.ARCHIVES, 4), commonColor5),
+    )
+
+    private fun computeIlluOnBoarding3Colors(commonColor2: Int, commonColor3: Int, commonColor5: Int) = listOf(
+        IlluColors(keyPath(Category.NOTIFICATION, 1, 2), commonColor2),
+        IlluColors(keyPath(Category.NOTIFICATION, 2, 2), commonColor2),
+        IlluColors(keyPath(Category.NOTIFICATION, 3, 2), commonColor5),
+        IlluColors(keyPath(Category.NOTIFICATION, 1, 3), commonColor2),
+        IlluColors(keyPath(Category.NOTIFICATION, 2, 3), commonColor2),
+        IlluColors(keyPath(Category.NOTIFICATION, 3, 3), commonColor5),
+        IlluColors(keyPath(Category.NOTIFICATION, 1, 4), commonColor2),
+        IlluColors(keyPath(Category.NOTIFICATION, 2, 4), commonColor2),
+        IlluColors(keyPath(Category.NOTIFICATION, 3, 4), commonColor5),
+        IlluColors(keyPath(Category.STAR, 2), commonColor3),
+        IlluColors(keyPath(Category.BIN, 7), commonColor3),
+        IlluColors(keyPath(Category.CLOCK, 5), commonColor3),
+    )
+
+    private fun computeIlluOnBoarding4Colors(commonColor1: Int, commonColor4: Int, commonColor9: Int, commonColor10: Int) =
+        listOf(
+            IlluColors(keyPath(Category.WOMAN, 5), commonColor4),
+            IlluColors(keyPath(Category.WOMAN, 6), commonColor1),
+            IlluColors(keyPath(Category.MEN, 5), commonColor4),
+            IlluColors(keyPath(Category.MEN, 6), commonColor1),
+            IlluColors(keyPath(Category.LETTER, 3), commonColor9),
+            IlluColors(keyPath(Category.LETTER, 4), commonColor10),
+        )
+
     private fun Context.getAccentIndependentPathsToColor(): IlluOnBoardingColors {
         val commonColor1 = getColor(R.color.commonColor1)
         val commonColor2 = getColor(R.color.commonColor2)
@@ -83,107 +194,18 @@ object IlluColors {
         val commonColor9 = getColor(R.color.commonColor9)
         val commonColor10 = getColor(R.color.commonColor10)
 
-        val illuOnBoardingColors = listOf(
-            IlluColors(keyPath(Category.IPHONESCREEN, 18), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 22), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 25), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 26), commonColor3),
-            IlluColors(keyPath(Category.IPHONESCREEN, 27), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 28), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 29), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 30), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 31), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 32), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 33), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 34), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 35), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 36), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 37), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 38), commonColor2),
-            IlluColors(keyPath(Category.IPHONESCREEN, 39), commonColor4),
-            IlluColors(keyPath(Category.IPHONESCREEN, 44), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 49), commonColor4),
-            IlluColors(keyPath(Category.IPHONESCREEN, 50), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 62), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 68), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 70), commonColor1),
-        )
+        val illuOnBoardingColors = computeIlluOnBoardingColors(commonColor1, commonColor2, commonColor3, commonColor4)
 
-        val illuOnBoarding234Colors = listOf(
-            IlluColors(keyPath(Category.IPHONESCREEN, 73), commonColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 74), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 75), commonColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 76), commonColor2),
-        )
+        val illuOnBoarding234Colors = computeIlluOnBoarding234Colors(commonColor1, commonColor2, commonColor5, commonColor6)
 
-        val illuOnBoarding1Colors = listOf(
-            IlluColors(keyPath(Category.POINT, 1, 1), commonColor5),
-            IlluColors(keyPath(Category.POINT, 1, 2), commonColor5),
-            IlluColors(keyPath(Category.POINT, 1, 3), commonColor5),
-            IlluColors(keyPath(Category.POINT, 1, 4), commonColor5),
-            IlluColors(keyPath(Category.POINT, 1, 5), commonColor5),
-            IlluColors(keyPath(Category.POINT, 1, 6), commonColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 56), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 67), commonColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 69), commonColor5),
-        )
+        val illuOnBoarding1Colors = computeIlluOnBoarding1Colors(commonColor1, commonColor5, commonColor6)
 
-        val illuOnBoarding2Colors = listOf(
-            IlluColors(keyPath(Category.NOTIFICATION, 5, 2), commonColor4),
-            IlluColors(keyPath(Category.NOTIFICATION, 6, 2), commonColor1),
-            IlluColors(keyPath(Category.NOTIFICATION, 9, 2), commonColor7),
-            IlluColors(keyPath(Category.NOTIFICATION, 10, 2), commonColor7),
-            IlluColors(keyPath(Category.NOTIFICATION, 12, 2), commonColor5),
-            IlluColors(keyPath(Category.NOTIFICATION, 13, 2), commonColor2),
-            IlluColors(keyPath(Category.NOTIFICATION, 14, 2), commonColor1),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 4, 1), commonColor8),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 5, 1), commonColor8),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 6, 1), commonColor8),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 7, 1), commonColor5),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 8, 1), commonColor2),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 9, 1), commonColor2),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 10, 1), commonColor2),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 13, 1), commonColor5),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 14, 1), commonColor8),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 5, 2), commonColor4),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 6, 2), commonColor1),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 9, 2), commonColor7),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 10, 2), commonColor7),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 12, 2), commonColor5),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 13, 2), commonColor2),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 14, 2), commonColor1),
-            IlluColors(keyPath(Category.MOVINGNOTIFICATION, 15, 2), commonColor1),
-            IlluColors(KeyPath("MOVING NOTIF 2 TITLE", "Groupe 1", "Fond 1"), commonColor2),
-            IlluColors(KeyPath("MOVING NOTIF 2 PREVIEW", "Groupe 1", "Fond 1"), commonColor2),
-            IlluColors(keyPath(Category.ARCHIVES, 1), commonColor5),
-            IlluColors(keyPath(Category.ARCHIVES, 2), commonColor5),
-            IlluColors(keyPath(Category.ARCHIVES, 3), commonColor5),
-            IlluColors(keyPath(Category.ARCHIVES, 4), commonColor5),
-        )
+        val illuOnBoarding2Colors =
+            computeIlluOnBoarding2Colors(commonColor1, commonColor2, commonColor4, commonColor5, commonColor7, commonColor8)
 
-        val illuOnBoarding3Colors = listOf(
-            IlluColors(keyPath(Category.NOTIFICATION, 1, 2), commonColor2),
-            IlluColors(keyPath(Category.NOTIFICATION, 2, 2), commonColor2),
-            IlluColors(keyPath(Category.NOTIFICATION, 3, 2), commonColor5),
-            IlluColors(keyPath(Category.NOTIFICATION, 1, 3), commonColor2),
-            IlluColors(keyPath(Category.NOTIFICATION, 2, 3), commonColor2),
-            IlluColors(keyPath(Category.NOTIFICATION, 3, 3), commonColor5),
-            IlluColors(keyPath(Category.NOTIFICATION, 1, 4), commonColor2),
-            IlluColors(keyPath(Category.NOTIFICATION, 2, 4), commonColor2),
-            IlluColors(keyPath(Category.NOTIFICATION, 3, 4), commonColor5),
-            IlluColors(keyPath(Category.STAR, 2), commonColor3),
-            IlluColors(keyPath(Category.BIN, 7), commonColor3),
-            IlluColors(keyPath(Category.CLOCK, 5), commonColor3),
-        )
+        val illuOnBoarding3Colors = computeIlluOnBoarding3Colors(commonColor2, commonColor3, commonColor5)
 
-        val illuOnBoarding4Colors = listOf(
-            IlluColors(keyPath(Category.WOMAN, 5), commonColor4),
-            IlluColors(keyPath(Category.WOMAN, 6), commonColor1),
-            IlluColors(keyPath(Category.MEN, 5), commonColor4),
-            IlluColors(keyPath(Category.MEN, 6), commonColor1),
-            IlluColors(keyPath(Category.LETTER, 3), commonColor9),
-            IlluColors(keyPath(Category.LETTER, 4), commonColor10),
-        )
+        val illuOnBoarding4Colors = computeIlluOnBoarding4Colors(commonColor1, commonColor4, commonColor9, commonColor10)
 
         return IlluOnBoardingColors(
             illuOnBoardingColors,

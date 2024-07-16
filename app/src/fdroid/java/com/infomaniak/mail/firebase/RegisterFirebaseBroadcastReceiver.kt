@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2023-2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,10 @@
  */
 package com.infomaniak.mail.firebase
 
+import androidx.fragment.app.FragmentActivity
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.IRegisterFirebaseBroadcastReceiver
 
-class RegisterFirebaseBroadcastReceiver : IRegisterFirebaseBroadcastReceiver
+class RegisterFirebaseBroadcastReceiver : IRegisterFirebaseBroadcastReceiver {
+    override fun initFirebaseBroadcastReceiver(activity: FragmentActivity, mainViewModel: MainViewModel) = Unit
+}
