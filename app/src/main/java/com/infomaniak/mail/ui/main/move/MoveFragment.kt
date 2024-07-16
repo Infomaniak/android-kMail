@@ -36,7 +36,6 @@ import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMoveSearchEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
@@ -59,9 +58,6 @@ class MoveFragment : Fragment() {
 
     @Inject
     lateinit var createFolderDialog: CreateFolderDialog
-
-    @Inject
-    lateinit var folderController: FolderController
 
     @Inject
     lateinit var moveAdapter: MoveAdapter
