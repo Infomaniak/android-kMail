@@ -116,7 +116,6 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.menuDrawerRecyclerView.adapter = menuDrawerAdapter(
-            currentClassName = currentClassName,
             onAskingToCloseDrawer = ::closeDrawer,
             onMailboxesHeaderClicked = ::onMailboxesHeaderClicked,
             onValidMailboxClicked = ::onValidMailboxClicked,
