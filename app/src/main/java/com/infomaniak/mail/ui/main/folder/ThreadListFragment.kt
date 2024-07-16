@@ -708,24 +708,26 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
         val shouldDisplayThreadsView = isBooting || areThereThreads || isFilterEnabled || (isCursorNull && isNetworkConnected)
 
-        when {
-            shouldDisplayThreadsView -> {
-                binding.emptyStateView.isGone = true
-                binding.threadsList.isVisible = true
+        fun computeShouldDisplayThreadsView() {
+            binding.emptyStateView.isGone = true
+            binding.threadsList.isVisible = true
 
-                if (!areThereThreads && !isFilterEnabled && !isBooting) {
-                    val currentFolder = mainViewModel.currentFolder.value
-                    Sentry.withScope { scope ->
-                        scope.setExtra("cursor", "$currentFolderCursor")
-                        scope.setExtra("folderRole", currentFolder?.role?.name.toString())
-                        scope.setExtra("folderThreadsCount", "${currentFolder?.threads?.count()}")
-                        Sentry.captureMessage(
-                            "Should display threads is true but there are no threads to display",
-                            SentryLevel.WARNING,
-                        )
-                    }
+            if (!areThereThreads && !isFilterEnabled && !isBooting) {
+                val currentFolder = mainViewModel.currentFolder.value
+                Sentry.withScope { scope ->
+                    scope.setExtra("cursor", "$currentFolderCursor")
+                    scope.setExtra("folderRole", currentFolder?.role?.name.toString())
+                    scope.setExtra("folderThreadsCount", "${currentFolder?.threads?.count()}")
+                    Sentry.captureMessage(
+                        "Should display threads is true but there are no threads to display",
+                        SentryLevel.WARNING,
+                    )
                 }
             }
+        }
+
+        when {
+            shouldDisplayThreadsView -> computeShouldDisplayThreadsView()
             isCursorNull -> setEmptyState(EmptyState.NETWORK)
             isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
             isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)

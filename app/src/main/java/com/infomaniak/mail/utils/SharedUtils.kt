@@ -59,7 +59,8 @@ class SharedUtils @Inject constructor(
      * @param threads The Threads to mark as read
      * @param message The Message to mark as read
      * @param callbacks The callbacks for when the refresh of Threads begins/ends
-     * @param shouldRefreshThreads Sometimes, we don't want to refresh Threads after doing this action. For example, when replying to a Message.
+     * @param shouldRefreshThreads Sometimes, we don't want to refresh Threads after doing this action. For example, when replying
+     * to a Message.
      */
     suspend fun markAsSeen(
         mailbox: Mailbox,

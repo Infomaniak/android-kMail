@@ -41,7 +41,8 @@ import io.realm.kotlin.types.RealmObject
  * closed.
  *
  * If the adapter contains Realm model classes with a primary key that is either an [Int] or a [Long], call
- * `setHasStableIds(true)` in the constructor and override [RecyclerView.Adapter.getItemId] as described by the Javadoc in that method.
+ * `setHasStableIds(true)` in the constructor and override [RecyclerView.Adapter.getItemId] as described by
+ * the Javadoc in that method.
  *
  * @param T type of [RealmObject] stored in the adapter.
  * @param VH type of [RecyclerView.ViewHolder] used in the adapter.

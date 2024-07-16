@@ -134,8 +134,14 @@ class NotificationUtils @Inject constructor(
         @StringRes errorMessageRes: Int,
         action: DraftAction,
     ): NotificationCompat.Builder = with(appContext) {
+        val resource = if (action == DraftAction.SEND) {
+            R.string.notificationTitleCouldNotSendDraft
+        } else {
+            R.string.notificationTitleCouldNotSaveDraft
+        }
+
         return buildGeneralNotification(
-            title = getString(if (action == DraftAction.SEND) R.string.notificationTitleCouldNotSendDraft else R.string.notificationTitleCouldNotSaveDraft),
+            title = getString(resource),
             description = getString(errorMessageRes),
         )
     }
