@@ -701,14 +701,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {
 
-        val areThereThreads = (currentThreadsCount ?: 0) > 0
-        val isFilterEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
-        val isCursorNull = currentFolderCursor == null
-        val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
-        val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
-        val shouldDisplayThreadsView = isBooting || areThereThreads || isFilterEnabled || (isCursorNull && isNetworkConnected)
-
-        fun computeShouldDisplayThreadsView() {
+        fun computeShouldDisplayThreadsView(areThereThreads: Boolean, isFilterEnabled: Boolean, isBooting: Boolean) {
             binding.emptyStateView.isGone = true
             binding.threadsList.isVisible = true
 
@@ -726,8 +719,15 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             }
         }
 
+        val areThereThreads = (currentThreadsCount ?: 0) > 0
+        val isFilterEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
+        val isCursorNull = currentFolderCursor == null
+        val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
+        val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
+        val shouldDisplayThreadsView = isBooting || areThereThreads || isFilterEnabled || (isCursorNull && isNetworkConnected)
+
         when {
-            shouldDisplayThreadsView -> computeShouldDisplayThreadsView()
+            shouldDisplayThreadsView -> computeShouldDisplayThreadsView(areThereThreads, isFilterEnabled, isBooting)
             isCursorNull -> setEmptyState(EmptyState.NETWORK)
             isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
             isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
