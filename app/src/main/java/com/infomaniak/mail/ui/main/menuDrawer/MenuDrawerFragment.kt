@@ -40,7 +40,6 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -71,9 +70,6 @@ class MenuDrawerFragment : Fragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
-
-    @Inject
-    lateinit var folderController: FolderController
 
     @Inject
     lateinit var createFolderDialog: CreateFolderDialog
