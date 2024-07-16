@@ -230,7 +230,9 @@ fun WebView.initWebViewClientAndBridge(
 
     val cidDictionary = mutableMapOf<String, Attachment>().apply {
         attachments.forEach {
-            if (it.contentId?.isNotBlank() == true) this[it.contentId!!] = it
+            it.contentId?.let { cid ->
+                if (cid.isNotBlank()) this[cid] = it
+            }
         }
     }
 
