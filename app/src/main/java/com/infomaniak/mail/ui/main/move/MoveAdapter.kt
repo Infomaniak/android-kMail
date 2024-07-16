@@ -38,7 +38,7 @@ import kotlin.math.min
 
 class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(FolderDiffCallback()) {
 
-    private var sourceFolderId: String? = null
+    private var selectedFolderId: String? = null
 
     private lateinit var onFolderClicked: (folderId: String) -> Unit
     private var onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null
@@ -53,8 +53,8 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         return this
     }
 
-    fun setFolders(newSourceFolderId: String, newFolders: List<Folder>) = runCatchingRealm {
-        sourceFolderId = newSourceFolderId
+    fun setFolders(newSelectedFolderId: String, newFolders: List<Folder>) = runCatchingRealm {
+        selectedFolderId = newSelectedFolderId
         submitList(newFolders)
     }
 
@@ -70,7 +70,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         if (payloads.firstOrNull() == Unit) {
-            (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(sourceFolderId == currentList[position].id)
+            (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(selectedFolderId == currentList[position].id)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -97,7 +97,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
         tag = if (folder.shouldDisplayDivider) null else UiUtils.IGNORE_DIVIDER_TAG
         text = folder.getLocalizedName(context)
         icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(sourceFolderId == folder.id)
+        setSelectedState(selectedFolderId == folder.id)
         if (this is SelectableFolderItemView) setIndent(folderIndent)
         setOnClickListener { onFolderClicked.invoke(folder.id) }
     }
