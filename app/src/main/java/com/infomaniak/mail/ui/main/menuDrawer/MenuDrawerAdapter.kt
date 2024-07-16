@@ -37,7 +37,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     private inline val items: List<Any> get() = currentList
 
-    private lateinit var currentClassName: String
     private var currentFolderId: String? = null
     private var hasCollapsableDefaultFolder = false
     private var hasCollapsableCustomFolder = false
@@ -59,7 +58,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private lateinit var onAppVersionClicked: () -> Unit
 
     operator fun invoke(
-        currentClassName: String,
         onAskingToCloseDrawer: () -> Unit,
         onMailboxesHeaderClicked: () -> Unit,
         onValidMailboxClicked: (Int) -> Unit,
@@ -76,7 +74,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         onHelpClicked: () -> Unit,
         onAppVersionClicked: () -> Unit,
     ): MenuDrawerAdapter {
-        this.currentClassName = currentClassName
         this.onAskingToCloseDrawer = onAskingToCloseDrawer
         this.onMailboxesHeaderClicked = onMailboxesHeaderClicked
         this.onValidMailboxClicked = onValidMailboxClicked
