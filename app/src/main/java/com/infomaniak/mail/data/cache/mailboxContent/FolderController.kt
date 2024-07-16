@@ -45,7 +45,7 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
-    fun getFoldersAsync(): Flow<ResultsChange<Folder>> {
+    fun getRootFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
     }
 
