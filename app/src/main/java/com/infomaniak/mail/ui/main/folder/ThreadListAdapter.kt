@@ -209,8 +209,8 @@ class ThreadListAdapter @Inject constructor(
 
         displayFolderName(thread)
 
-        // This method is only useful for old threads already stored in Realm, where they
-        // could be both answered and forwarded (for new threads, this is impossible).
+        // This method is only useful for old Threads already stored in Realm, where they
+        // could be both answered and forwarded (for new Threads, this is impossible).
         fun computeReplyAndForwardIcon(isAnswered: Boolean, isForwarded: Boolean): Pair<Boolean, Boolean> {
             return when {
                 isAnswered -> true to false
@@ -227,10 +227,9 @@ class ThreadListAdapter @Inject constructor(
 
             draftPrefix.isVisible = hasDrafts
 
-            computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded).let { (iconReplyIsVisible, iconForwardIsVisible) ->
-                iconReply.isVisible = iconReplyIsVisible
-                iconForward.isVisible = iconForwardIsVisible
-            }
+            val (isIconReplyVisible, isIconForwardVisible) = computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded)
+            iconReply.isVisible = isIconReplyVisible
+            iconForward.isVisible = isIconForwardVisible
 
             iconAttachment.isVisible = hasAttachable
             iconCalendar.isGone = true // TODO: See with API when we should display this icon
