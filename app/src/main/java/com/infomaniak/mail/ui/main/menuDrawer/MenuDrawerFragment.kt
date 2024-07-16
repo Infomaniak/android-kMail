@@ -306,8 +306,4 @@ class MenuDrawerFragment : Fragment() {
         val permissions: MailboxPermissions?,
         val quotas: Quotas?,
     )
-
-    companion object {
-        private const val MENU_DRAWER_TRANSITION_DURATION = 250L
-    }
 }
