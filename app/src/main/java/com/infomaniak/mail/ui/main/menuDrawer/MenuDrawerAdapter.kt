@@ -35,8 +35,6 @@ import javax.inject.Inject
 
 class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
 
-    private inline val items: List<Any> get() = currentList
-
     private var currentFolderId: String? = null
     private var hasCollapsableDefaultFolder = false
     private var hasCollapsableCustomFolder = false
@@ -160,9 +158,9 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
             var oldIsFound = false
             var newIsFound = false
-            for (index in items.indices) {
+            for (index in currentList.indices) {
 
-                val item = items[index]
+                val item = currentList[index]
                 if (item !is Folder) continue
 
                 if (item.id == oldId) {
@@ -178,10 +176,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = currentList.size
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
-        return@runCatchingRealm when (val item = items[position]) {
+        return@runCatchingRealm when (val item = currentList[position]) {
             is MailboxesHeader -> MailboxesHeaderItem.viewType
             is Mailbox -> if (item.isValid) MailboxItem.viewType else InvalidMailboxItem.viewType
             is Folder -> FolderItem.viewType
@@ -214,7 +212,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() == NotifyType.MAILBOXES_HEADER_CLICKED) {
             MailboxesHeaderItem.displayWithPayload(
-                item = items[position],
+                item = currentList[position],
                 binding = holder.binding,
             )
         } else {
@@ -223,7 +221,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int): Unit = with(holder.binding) {
-        val item = items[position]
+        val item = currentList[position]
 
         when (getItemViewType(position)) {
             MailboxesHeaderItem.viewType -> MailboxesHeaderItem.display(
