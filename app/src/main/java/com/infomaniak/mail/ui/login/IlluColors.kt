@@ -97,13 +97,17 @@ object IlluColors {
         IlluColors(keyPath(Category.IPHONESCREEN, 70), commonColor1),
     )
 
-    private fun computeIlluOnBoarding234Colors(commonColor1: Int, commonColor2: Int, commonColor5: Int, commonColor6: Int) =
-        listOf(
-            IlluColors(keyPath(Category.IPHONESCREEN, 73), commonColor6),
-            IlluColors(keyPath(Category.IPHONESCREEN, 74), commonColor1),
-            IlluColors(keyPath(Category.IPHONESCREEN, 75), commonColor5),
-            IlluColors(keyPath(Category.IPHONESCREEN, 76), commonColor2),
-        )
+    private fun computeIlluOnBoarding234Colors(
+        commonColor1: Int,
+        commonColor2: Int,
+        commonColor5: Int,
+        commonColor6: Int,
+    ) = listOf(
+        IlluColors(keyPath(Category.IPHONESCREEN, 73), commonColor6),
+        IlluColors(keyPath(Category.IPHONESCREEN, 74), commonColor1),
+        IlluColors(keyPath(Category.IPHONESCREEN, 75), commonColor5),
+        IlluColors(keyPath(Category.IPHONESCREEN, 76), commonColor2),
+    )
 
     private fun computeIlluOnBoarding1Colors(commonColor1: Int, commonColor5: Int, commonColor6: Int) = listOf(
         IlluColors(keyPath(Category.POINT, 1, 1), commonColor5),
@@ -123,7 +127,7 @@ object IlluColors {
         commonColor4: Int,
         commonColor5: Int,
         commonColor7: Int,
-        commonColor8: Int
+        commonColor8: Int,
     ) = listOf(
         IlluColors(keyPath(Category.NOTIFICATION, 5, 2), commonColor4),
         IlluColors(keyPath(Category.NOTIFICATION, 6, 2), commonColor1),
@@ -172,15 +176,19 @@ object IlluColors {
         IlluColors(keyPath(Category.CLOCK, 5), commonColor3),
     )
 
-    private fun computeIlluOnBoarding4Colors(commonColor1: Int, commonColor4: Int, commonColor9: Int, commonColor10: Int) =
-        listOf(
-            IlluColors(keyPath(Category.WOMAN, 5), commonColor4),
-            IlluColors(keyPath(Category.WOMAN, 6), commonColor1),
-            IlluColors(keyPath(Category.MEN, 5), commonColor4),
-            IlluColors(keyPath(Category.MEN, 6), commonColor1),
-            IlluColors(keyPath(Category.LETTER, 3), commonColor9),
-            IlluColors(keyPath(Category.LETTER, 4), commonColor10),
-        )
+    private fun computeIlluOnBoarding4Colors(
+        commonColor1: Int,
+        commonColor4: Int,
+        commonColor9: Int,
+        commonColor10: Int,
+    ) = listOf(
+        IlluColors(keyPath(Category.WOMAN, 5), commonColor4),
+        IlluColors(keyPath(Category.WOMAN, 6), commonColor1),
+        IlluColors(keyPath(Category.MEN, 5), commonColor4),
+        IlluColors(keyPath(Category.MEN, 6), commonColor1),
+        IlluColors(keyPath(Category.LETTER, 3), commonColor9),
+        IlluColors(keyPath(Category.LETTER, 4), commonColor10),
+    )
 
     private fun Context.getAccentIndependentPathsToColor(): IlluOnBoardingColors {
         val commonColor1 = getColor(R.color.commonColor1)
