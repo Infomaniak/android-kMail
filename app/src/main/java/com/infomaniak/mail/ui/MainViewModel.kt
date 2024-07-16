@@ -159,7 +159,7 @@ class MainViewModel @Inject constructor(
 
     val currentFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
         objectId
-            ?.let { folderController.getFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) } }
+            ?.let { folderController.getRootFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) } }
             ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
