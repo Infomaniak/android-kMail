@@ -102,102 +102,104 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun setupListeners(thread: Thread, messageUidToReply: String) = with(navigationArgs) {
-        initOnClickListener(object : OnActionClick {
-            //region Main actions
-            override fun onReply() {
-                trackBottomSheetThreadActionsEvent(ACTION_REPLY_NAME)
-                safeNavigateToNewMessageActivity(
-                    draftMode = DraftMode.REPLY,
-                    previousMessageUid = messageUidToReply,
-                    currentClassName = currentClassName,
-                    shouldLoadDistantResources = shouldLoadDistantResources,
-                )
-            }
-
-            override fun onReplyAll() {
-                trackBottomSheetThreadActionsEvent(ACTION_REPLY_ALL_NAME)
-                safeNavigateToNewMessageActivity(
-                    draftMode = DraftMode.REPLY_ALL,
-                    previousMessageUid = messageUidToReply,
-                    currentClassName = currentClassName,
-                    shouldLoadDistantResources = shouldLoadDistantResources,
-                )
-            }
-
-            override fun onForward() {
-                trackBottomSheetThreadActionsEvent(ACTION_FORWARD_NAME)
-                safeNavigateToNewMessageActivity(
-                    draftMode = DraftMode.FORWARD,
-                    previousMessageUid = messageUidToReply,
-                    currentClassName = currentClassName,
-                    shouldLoadDistantResources = shouldLoadDistantResources,
-                )
-            }
-
-            override fun onDelete() {
-                descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
-                    trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
-                    mainViewModel.deleteThread(threadUid)
-                }
-            }
-            //endregion
-
-            //region Actions
-            override fun onArchive() = with(mainViewModel) {
-                trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
-                archiveThread(threadUid)
-            }
-
-            override fun onReadUnread() {
-                trackBottomSheetThreadActionsEvent(ACTION_MARK_AS_SEEN_NAME, value = thread.unseenMessagesCount == 0)
-                mainViewModel.toggleThreadSeenStatus(threadUid)
-                twoPaneViewModel.closeThread()
-            }
-
-            override fun onMove() {
-                trackBottomSheetThreadActionsEvent(ACTION_MOVE_NAME)
-                animatedNavigation(R.id.moveFragment, MoveFragmentArgs(arrayOf(threadUid)).toBundle(), currentClassName)
-            }
-
-            override fun onPostpone() {
-                trackBottomSheetThreadActionsEvent(ACTION_POSTPONE_NAME)
-                notYetImplemented()
-            }
-
-            override fun onFavorite() {
-                trackBottomSheetThreadActionsEvent(ACTION_FAVORITE_NAME, thread.isFavorite)
-                mainViewModel.toggleThreadFavoriteStatus(threadUid)
-            }
-
-            override fun onReportJunk() {
-                if (isFromSpam) {
-                    trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
-                    mainViewModel.toggleThreadSpamStatus(threadUid)
-                } else {
-                    safeNavigate(
-                        resId = R.id.junkBottomSheetDialog,
-                        args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
+        initOnClickListener(
+            listener = object : OnActionClick {
+                //region Main actions
+                override fun onReply() {
+                    trackBottomSheetThreadActionsEvent(ACTION_REPLY_NAME)
+                    safeNavigateToNewMessageActivity(
+                        draftMode = DraftMode.REPLY,
+                        previousMessageUid = messageUidToReply,
                         currentClassName = currentClassName,
+                        shouldLoadDistantResources = shouldLoadDistantResources,
                     )
                 }
-            }
 
-            override fun onPrint() {
-                trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
-                notYetImplemented()
-            }
-
-            override fun onShare() {
-                activity?.apply {
-                    trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
-                    mainViewModel.shareThreadUrl(messageUidToReply, ::shareString)
+                override fun onReplyAll() {
+                    trackBottomSheetThreadActionsEvent(ACTION_REPLY_ALL_NAME)
+                    safeNavigateToNewMessageActivity(
+                        draftMode = DraftMode.REPLY_ALL,
+                        previousMessageUid = messageUidToReply,
+                        currentClassName = currentClassName,
+                        shouldLoadDistantResources = shouldLoadDistantResources,
+                    )
                 }
-            }
 
-            override fun onReportDisplayProblem() {
-                notYetImplemented()
-            }
-            //endregion
-        })
+                override fun onForward() {
+                    trackBottomSheetThreadActionsEvent(ACTION_FORWARD_NAME)
+                    safeNavigateToNewMessageActivity(
+                        draftMode = DraftMode.FORWARD,
+                        previousMessageUid = messageUidToReply,
+                        currentClassName = currentClassName,
+                        shouldLoadDistantResources = shouldLoadDistantResources,
+                    )
+                }
+
+                override fun onDelete() {
+                    descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+                        trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
+                        mainViewModel.deleteThread(threadUid)
+                    }
+                }
+                //endregion
+
+                //region Actions
+                override fun onArchive() = with(mainViewModel) {
+                    trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
+                    archiveThread(threadUid)
+                }
+
+                override fun onReadUnread() {
+                    trackBottomSheetThreadActionsEvent(ACTION_MARK_AS_SEEN_NAME, value = thread.unseenMessagesCount == 0)
+                    mainViewModel.toggleThreadSeenStatus(threadUid)
+                    twoPaneViewModel.closeThread()
+                }
+
+                override fun onMove() {
+                    trackBottomSheetThreadActionsEvent(ACTION_MOVE_NAME)
+                    animatedNavigation(R.id.moveFragment, MoveFragmentArgs(arrayOf(threadUid)).toBundle(), currentClassName)
+                }
+
+                override fun onPostpone() {
+                    trackBottomSheetThreadActionsEvent(ACTION_POSTPONE_NAME)
+                    notYetImplemented()
+                }
+
+                override fun onFavorite() {
+                    trackBottomSheetThreadActionsEvent(ACTION_FAVORITE_NAME, thread.isFavorite)
+                    mainViewModel.toggleThreadFavoriteStatus(threadUid)
+                }
+
+                override fun onReportJunk() {
+                    if (isFromSpam) {
+                        trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
+                        mainViewModel.toggleThreadSpamStatus(threadUid)
+                    } else {
+                        safeNavigate(
+                            resId = R.id.junkBottomSheetDialog,
+                            args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
+                            currentClassName = currentClassName,
+                        )
+                    }
+                }
+
+                override fun onPrint() {
+                    trackBottomSheetThreadActionsEvent(ACTION_PRINT_NAME)
+                    notYetImplemented()
+                }
+
+                override fun onShare() {
+                    activity?.apply {
+                        trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
+                        mainViewModel.shareThreadUrl(messageUidToReply, ::shareString)
+                    }
+                }
+
+                override fun onReportDisplayProblem() {
+                    notYetImplemented()
+                }
+                //endregion
+            },
+        )
     }
 }
