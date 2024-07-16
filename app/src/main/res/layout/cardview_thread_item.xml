@@ -213,6 +213,38 @@
                     app:layout_constraintTop_toTopOf="@id/expeditor"
                     tools:text="@tools:sample/date/hhmm" />
 
+                <FrameLayout
+                    android:id="@+id/iconReplyOrForwardLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@+id/mailSubject"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/mailSubject">
+
+                    <ImageView
+                        android:id="@+id/iconForward"
+                        android:layout_width="@dimen/mediumIconSize"
+                        android:layout_height="@dimen/mediumIconSize"
+                        android:layout_marginEnd="@dimen/marginStandardSmall"
+                        android:contentDescription="@string/contentDescriptionIconForward"
+                        android:src="@drawable/ic_email_action_forward_filled"
+                        android:visibility="gone"
+                        app:tint="@color/iconColorPrimaryText"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/iconReply"
+                        android:layout_width="@dimen/mediumIconSize"
+                        android:layout_height="@dimen/mediumIconSize"
+                        android:layout_marginEnd="@dimen/marginStandardSmall"
+                        android:contentDescription="@string/contentDescriptionIconReply"
+                        android:src="@drawable/ic_email_action_reply_filled"
+                        android:visibility="gone"
+                        app:tint="@color/iconColorPrimaryText" />
+
+                </FrameLayout>
+
                 <TextView
                     android:id="@+id/mailSubject"
                     style="@style/Body"
@@ -221,9 +253,9 @@
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintEnd_toStartOf="@id/folderNameCompactMode"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/expeditor"
+                    app:layout_constraintEnd_toStartOf="@+id/folderNameCompactMode"
+                    app:layout_constraintStart_toEndOf="@+id/iconReplyOrForwardLayout"
+                    app:layout_constraintTop_toBottomOf="@+id/expeditor"
                     tools:text="@tools:sample/lorem[10]" />
 
                 <TextView
