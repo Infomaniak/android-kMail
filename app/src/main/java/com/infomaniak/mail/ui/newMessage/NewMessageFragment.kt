@@ -94,7 +94,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.google.android.material.R as RMaeterial
+import com.google.android.material.R as RMaterial
 
 @AndroidEntryPoint
 class NewMessageFragment : Fragment() {
@@ -353,7 +353,7 @@ class NewMessageFragment : Fragment() {
             enableAlgorithmicDarkening(isEnabled = true)
             if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
 
-            val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaeterial.attr.colorPrimary))
+            val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaterial.attr.colorPrimary))
             addCss(context.loadCss(R.raw.style, customColors))
             addCss(context.loadCss(R.raw.editor_style, customColors))
 
