@@ -91,8 +91,8 @@ object FolderItem {
         }
 
         val unread = when (folder.role) {
-            FolderRole.DRAFT -> UnreadDisplay(folder.threads.count())
-            FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(0)
+            FolderRole.DRAFT -> UnreadDisplay(count = folder.threads.count())
+            FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(count = 0)
             else -> folder.unreadCountDisplay
         }
 
