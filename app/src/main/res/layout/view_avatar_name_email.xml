@@ -64,7 +64,7 @@
         app:layout_constraintStart_toEndOf="@id/avatarLayout"
         app:layout_constraintTop_toTopOf="@id/avatarLayout">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/recipientLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -75,11 +75,15 @@
             <TextView
                 android:id="@+id/userName"
                 style="@style/AvatarNameEmailPrimary"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iconCertified"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/full_names" />
 
             <ImageView
@@ -89,9 +93,13 @@
                 android:layout_marginStart="@dimen/marginStandardSmall"
                 android:src="@drawable/ic_certified"
                 android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/userName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/userName"
+                app:layout_constraintTop_toTopOf="@+id/userName"
                 tools:ignore="ContentDescription"
                 tools:visibility="visible" />
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/userEmail"
