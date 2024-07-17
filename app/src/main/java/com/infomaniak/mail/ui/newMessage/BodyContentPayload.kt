@@ -17,16 +17,13 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-
 /**
  * @param content The string representation of the body in either html or plain text format.
  * @param type The type of representation of [content]. Each type will lead to different processing of the content.
  */
 data class BodyContentPayload(val content: String, val type: BodyContentType) {
     companion object {
-        fun emptyBody(): BodyContentPayload {
-            return BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
-        }
+        fun emptyBody(): BodyContentPayload = BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
     }
 }
 

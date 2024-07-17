@@ -240,6 +240,7 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
         binding.editor.exportHtml { html ->
             newMessageViewModel.editorBodyLoader.postValue(BodyContentPayload(html, BodyContentType.HTML_SANITIZED))
         }
@@ -553,8 +554,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeBodyLoader() {
-        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner) {
-            editorContentManager.setContent(binding.editor, it)
+        newMessageViewModel.editorBodyLoader.observe(viewLifecycleOwner) { body ->
+            editorContentManager.setContent(binding.editor, body)
         }
     }
 

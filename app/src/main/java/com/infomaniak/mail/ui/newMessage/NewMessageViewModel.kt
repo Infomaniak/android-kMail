@@ -603,7 +603,7 @@ class NewMessageViewModel @Inject constructor(
 
             subject = mailToIntent?.subject?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
 
-            val bodyContent: String? = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT)
+            val bodyContent = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT)
             val mailToPayload = bodyContent?.let { BodyContentPayload(it, BodyContentType.TEXT_PLAIN_WITH_HTML) }
             uiBody = mailToPayload ?: BodyContentPayload.emptyBody()
         }
@@ -768,7 +768,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun saveBodyAndSubject(subject: String, html: String) {
-        globalCoroutineScope.launch {
+        globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(Triple(subject, html, channelExpirationIdTarget))
         }
     }
@@ -779,7 +779,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun waitForBodyAndSubjectToExecuteDraftAction(draftSaveConfiguration: DraftSaveConfiguration) {
         subjectAndBodyJob?.cancel()
-        subjectAndBodyJob = globalCoroutineScope.launch {
+        subjectAndBodyJob = globalCoroutineScope.launch(ioDispatcher) {
             val subject: String
             val body: String
             while (true) {

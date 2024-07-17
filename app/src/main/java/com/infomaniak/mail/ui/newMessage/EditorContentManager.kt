@@ -37,6 +37,8 @@ class EditorContentManager @Inject constructor() {
         }
     }
 
+    private fun RichHtmlEditorWebView.setSanitizedHtml(html: String) = setHtml(html)
+
     private fun RichHtmlEditorWebView.setUnsanitizedHtml(html: String) = setSanitizedHtml(html.sanitize())
 
     private fun RichHtmlEditorWebView.setPlainTextAndInterpretHtml(text: String) {
@@ -46,8 +48,6 @@ class EditorContentManager @Inject constructor() {
     private fun RichHtmlEditorWebView.setPlainTextAndEscapeHtml(text: String) {
         setSanitizedHtml(text.escapeHtmlCharacters().replaceNewLines())
     }
-
-    private fun RichHtmlEditorWebView.setSanitizedHtml(html: String) = setHtml(html)
 
     private fun String.escapeHtmlCharacters(): String = Html.escapeHtml(this)
 
@@ -74,6 +74,6 @@ class EditorContentManager @Inject constructor() {
     }
 
     companion object {
-        val NEW_LINES_REGEX = "(\\r\\n|\\n)".toRegex()
+        private val NEW_LINES_REGEX = "(\\r\\n|\\n)".toRegex()
     }
 }
