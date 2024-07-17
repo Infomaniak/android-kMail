@@ -36,22 +36,13 @@ object MailboxItem {
         return ItemMenuDrawerMailboxBinding.inflate(inflater, parent, false)
     }
 
-    fun display(
-        item: Any,
-        binding: ViewBinding,
-        onValidMailboxClicked: (Int) -> Unit,
-    ) {
-        item as Mailbox
-        binding as ItemMenuDrawerMailboxBinding
-
-        SentryLog.d("Bind", "Bind Mailbox (${item.email})")
-        binding.displayMailbox(item, onValidMailboxClicked)
-    }
-
-    private fun ItemMenuDrawerMailboxBinding.displayMailbox(
+    fun displayMailbox(
         mailbox: Mailbox,
+        binding: ItemMenuDrawerMailboxBinding,
         onValidMailboxClicked: (Int) -> Unit,
-    ) = with(root) {
+    ) = with(binding.root) {
+        SentryLog.d("Bind", "Bind Mailbox (${mailbox.email})")
+
         text = mailbox.email
         unreadCount = mailbox.unreadCountDisplay.count
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille

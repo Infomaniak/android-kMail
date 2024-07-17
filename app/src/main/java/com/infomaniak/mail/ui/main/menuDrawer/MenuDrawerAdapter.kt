@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.databinding.*
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment.MediatorContainer
 import com.infomaniak.mail.ui.main.menuDrawer.items.*
@@ -211,9 +212,9 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() == NotifyType.MAILBOXES_HEADER_CLICKED) {
-            MailboxesHeaderItem.displayWithPayload(
-                item = currentList[position],
-                binding = holder.binding,
+            MailboxesHeaderItem.updateCollapseState(
+                header = currentList[position] as MailboxesHeader,
+                binding = holder.binding as ItemMenuDrawerMailboxesHeaderBinding,
             )
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -224,39 +225,39 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         val item = currentList[position]
 
         when (getItemViewType(position)) {
-            MailboxesHeaderItem.viewType -> MailboxesHeaderItem.display(
-                item = item,
-                binding = this,
+            MailboxesHeaderItem.viewType -> MailboxesHeaderItem.displayMailboxesHeader(
+                header = item as MailboxesHeader,
+                binding = this as ItemMenuDrawerMailboxesHeaderBinding,
                 onMailboxesHeaderClicked = onMailboxesHeaderClicked,
             )
-            MailboxItem.viewType -> MailboxItem.display(
-                item = item,
-                binding = this,
+            MailboxItem.viewType -> MailboxItem.displayMailbox(
+                mailbox = item as Mailbox,
+                binding = this as ItemMenuDrawerMailboxBinding,
                 onValidMailboxClicked = onValidMailboxClicked,
             )
-            InvalidMailboxItem.viewType -> InvalidMailboxItem.display(
-                item = item,
-                binding = this,
+            InvalidMailboxItem.viewType -> InvalidMailboxItem.displayInvalidMailbox(
+                mailbox = item as Mailbox,
+                binding = this as ItemInvalidMailboxBinding,
                 onLockedMailboxClicked = onLockedMailboxClicked,
                 onInvalidPasswordMailboxClicked = onInvalidPasswordMailboxClicked,
             )
-            FolderItem.viewType -> FolderItem.display(
-                item = item,
-                binding = this,
+            FolderItem.viewType -> FolderItem.displayFolder(
+                folder = item as Folder,
+                binding = this as ItemMenuDrawerFolderBinding,
                 currentFolderId = currentFolderId,
                 hasCollapsableDefaultFolder = hasCollapsableDefaultFolder,
                 hasCollapsableCustomFolder = hasCollapsableCustomFolder,
                 onFolderClicked = onFolderClicked,
                 onCollapseChildrenClicked = onCollapseChildrenClicked,
             )
-            FoldersHeaderItem.viewType -> FoldersHeaderItem.display(
-                binding = this,
+            FoldersHeaderItem.viewType -> FoldersHeaderItem.displayCustomFoldersHeader(
+                binding = this as ItemMenuDrawerCustomFoldersHeaderBinding,
                 onCustomFoldersHeaderClicked = onCustomFoldersHeaderClicked,
                 onCreateFolderClicked = onCreateFolderClicked,
             )
-            FooterItem.viewType -> FooterItem.display(
-                item = item,
-                binding = this,
+            FooterItem.viewType -> FooterItem.displayFooter(
+                footer = item as MenuDrawerFooter,
+                binding = this as ItemMenuDrawerFooterBinding,
                 onSyncAutoConfigClicked = onSyncAutoConfigClicked,
                 onImportMailsClicked = onImportMailsClicked,
                 onRestoreMailsClicked = onRestoreMailsClicked,
