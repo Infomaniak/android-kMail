@@ -120,7 +120,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(Fol
 
         override fun areItemsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
             return when {
-                oldItem is Unit && newItem is Unit -> true
+                oldItem is Unit && newItem is Unit -> true // Unit is for Divider item. They don't have any content, so always true.
                 oldItem is Folder && newItem is Folder && oldItem.id == newItem.id -> true
                 else -> false
             }
