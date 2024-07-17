@@ -78,22 +78,18 @@ object Utils {
     }
 
     fun <T1, T2> waitInitMediator(liveData1: LiveData<T1>, liveData2: LiveData<T2>): MediatorLiveData<Pair<T1, T2>> {
-
-        fun areLiveDataInitialized() = liveData1.isInitialized && liveData2.isInitialized
-
-        fun MediatorLiveData<Pair<T1, T2>>.postIfInit() {
-            @Suppress("UNCHECKED_CAST")
-            if (areLiveDataInitialized()) postValue((liveData1.value as T1) to (liveData2.value as T2))
-        }
-
-        return MediatorLiveData<Pair<T1, T2>>().apply {
-            addSource(liveData1) { postIfInit() }
-            addSource(liveData2) { postIfInit() }
-        }
+        return waitInitMediator(
+            liveData1,
+            liveData2,
+            constructor = {
+                @Suppress("UNCHECKED_CAST")
+                it[0] as T1 to it[1] as T2
+            },
+        )
     }
 
-    fun <R> waitInitMediator(vararg liveData: LiveData<*>, constructor: (List<Any>) -> R): MediatorLiveData<R> {
-        return MediatorLiveData<R>().apply {
+    fun <T> waitInitMediator(vararg liveData: LiveData<*>, constructor: (List<Any>) -> T): MediatorLiveData<T> {
+        return MediatorLiveData<T>().apply {
             liveData.forEach { singleLiveData ->
                 addSource(singleLiveData) {
                     if (liveData.all { it.isInitialized }) {
