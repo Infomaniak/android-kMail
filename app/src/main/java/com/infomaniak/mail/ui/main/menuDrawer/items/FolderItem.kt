@@ -29,7 +29,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.utils.UnreadDisplay
-import com.infomaniak.mail.views.itemViews.*
+import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import kotlin.math.min
 
 object FolderItem {
@@ -108,7 +108,7 @@ object FolderItem {
         )
     }
 
-    private fun SelectableItemView.setFolderUi(
+    private fun UnreadFolderItemView.setFolderUi(
         folder: Folder,
         roleDependantParameters: RoleDependantParameters,
         unread: UnreadDisplay?,
@@ -126,26 +126,18 @@ object FolderItem {
         icon = AppCompatResources.getDrawable(context, iconId)
         setSelectedState(folder.id == currentFolderId)
 
-        when (this) {
-            is SelectableFolderItemView -> setIndent(folderIndent)
-            is UnreadFolderItemView -> {
-                initOnCollapsableClickListener { onCollapseChildrenClicked(folder.id, isCollapsed) }
-                isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
-                unreadCount = unread?.count ?: 0
-                isCollapsed = folder.isCollapsed
-                canBeCollapsed = folder.canBeCollapsed
-                val hasCollapsableFolder = if (folder.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder
-                setIndent(
-                    indent = folderIndent,
-                    hasCollapsableFolder = hasCollapsableFolder,
-                    canBeCollapsed = canBeCollapsed,
-                )
-                setCollapsingButtonContentDescription(folderName)
-            }
-            is SelectableMailboxItemView, is UnreadItemView -> {
-                error("`${this::class.simpleName}` cannot exists here. Only Folder classes are allowed")
-            }
-        }
+        initOnCollapsableClickListener { onCollapseChildrenClicked(folder.id, isCollapsed) }
+        isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
+        unreadCount = unread?.count ?: 0
+        isCollapsed = folder.isCollapsed
+        canBeCollapsed = folder.canBeCollapsed
+        val hasCollapsableFolder = if (folder.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder
+        setIndent(
+            indent = folderIndent,
+            hasCollapsableFolder = hasCollapsableFolder,
+            canBeCollapsed = canBeCollapsed,
+        )
+        setCollapsingButtonContentDescription(folderName)
 
         setOnClickListener {
             context.trackMenuDrawerEvent(trackerName, value = trackerValue)
