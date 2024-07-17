@@ -73,14 +73,7 @@ object FolderItem {
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) = with(root) {
 
-        data class RoleDependantParameters(
-            var iconId: Int,
-            var trackerName: String,
-            var trackerValue: Float?,
-            var folderIndent: Int,
-        )
-
-        val (iconId, trackerName, trackerValue, folderIndent) = folder.role?.let {
+        val roleDependantParameters = folder.role?.let {
             RoleDependantParameters(
                 iconId = it.folderIconRes,
                 trackerName = it.matomoValue,
@@ -105,33 +98,29 @@ object FolderItem {
 
         setFolderUi(
             folder,
-            iconId,
+            roleDependantParameters,
             unread,
             currentFolderId,
             hasCollapsableDefaultFolder,
             hasCollapsableCustomFolder,
             onFolderClicked,
             onCollapseChildrenClicked,
-            trackerName,
-            trackerValue,
-            folderIndent,
         )
     }
 
     private fun SelectableItemView.setFolderUi(
         folder: Folder,
-        @DrawableRes iconId: Int,
+        roleDependantParameters: RoleDependantParameters,
         unread: UnreadDisplay?,
         currentFolderId: String?,
         hasCollapsableDefaultFolder: Boolean,
         hasCollapsableCustomFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
-        trackerName: String,
-        trackerValue: Float?,
-        folderIndent: Int,
     ) {
+
         val folderName = folder.getLocalizedName(context)
+        val (iconId, trackerName, trackerValue, folderIndent) = roleDependantParameters
 
         text = folderName
         icon = AppCompatResources.getDrawable(context, iconId)
@@ -163,4 +152,11 @@ object FolderItem {
             onFolderClicked.invoke(folder.id)
         }
     }
+
+    private data class RoleDependantParameters(
+        @DrawableRes var iconId: Int,
+        var trackerName: String,
+        var trackerValue: Float?,
+        var folderIndent: Int,
+    )
 }
