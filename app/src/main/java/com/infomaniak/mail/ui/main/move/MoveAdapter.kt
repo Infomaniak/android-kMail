@@ -84,8 +84,9 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(Fol
     }.getOrDefault(Unit)
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
-        val item = currentList[position]
-        if (item is Folder) (this as ItemSelectableFolderBinding).root.displayFolder(item)
+        if (getItemViewType(position) == DisplayType.FOLDER.layout) {
+            (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as Folder)
+        }
     }
 
     private fun SelectableFolderItemView.displayFolder(folder: Folder) {
