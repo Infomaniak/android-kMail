@@ -29,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="2dp"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
+        android:nextFocusRight="@+id/newMessageFab"
         app:cardCornerRadius="@null"
         app:cardPreventCornerOverlap="false"
         app:shapeAppearanceOverlay="@style/RoundedDecoratedTextItemShapeAppearance">
