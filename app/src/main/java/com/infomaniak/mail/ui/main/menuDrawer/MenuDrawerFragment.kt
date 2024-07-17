@@ -147,7 +147,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun onMailboxesHeaderClicked() = with(menuDrawerViewModel) {
-        val isExpanded = !(areMailboxesExpanded.value ?: false)
+        val isExpanded = !areMailboxesExpanded.value!!
         trackMenuDrawerEvent("mailboxes", isExpanded)
         areMailboxesExpanded.value = isExpanded
     }
