@@ -91,11 +91,13 @@ class AvatarNameEmailView @JvmOverloads constructor(
         correspondent: Correspondent,
         isCorrespondentCertified: Boolean = false,
     ) {
-        val filledSingleField = fillInUserNameAndEmail(correspondent, userName, userEmail, ignoreIsMe = !processNameAndEmail)
-        if (displayAsAttendee) {
-            val userNameTextColor = if (filledSingleField) R.style.AvatarNameEmailSecondary else R.style.AvatarNameEmailPrimary
-            userName.setTextAppearance(userNameTextColor)
+        val isSingleField = fillInUserNameAndEmail(correspondent, userName, userEmail, ignoreIsMe = !processNameAndEmail)
+        val textAppearance = if (displayAsAttendee) {
+            if (isSingleField) R.style.AvatarNameEmailSecondary else R.style.AvatarNameEmailPrimary
+        } else {
+            R.style.AvatarNameEmailPrimary
         }
+        userName.setTextAppearance(textAppearance)
 
         iconCertified.isVisible = isCorrespondentCertified
     }
