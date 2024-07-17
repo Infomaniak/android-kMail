@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -30,6 +29,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
+import com.infomaniak.mail.views.itemViews.setFolderUi
 import kotlin.math.min
 
 object FolderItem {
@@ -124,9 +124,7 @@ object FolderItem {
         val folderName = folder.getLocalizedName(context)
         val (iconId, trackerName, trackerValue, folderIndent) = roleDependantParameters
 
-        text = folderName
-        icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(folder.id == currentFolderId)
+        setFolderUi(folder, iconId, isSelected = folder.id == currentFolderId)
 
         initOnCollapsableClickListener { onCollapseChildrenClicked(folder.id, isCollapsed) }
         isPastilleDisplayed = unread?.shouldDisplayPastille ?: false

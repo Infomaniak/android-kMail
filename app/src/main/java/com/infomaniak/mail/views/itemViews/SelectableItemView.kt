@@ -20,8 +20,10 @@ package com.infomaniak.mail.views.itemViews
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.google.android.material.R as RMaterial
 
@@ -49,4 +51,10 @@ sealed class SelectableItemView @JvmOverloads constructor(
 
         setEndIcon(if (isSelected) checkIcon else null, R.string.contentDescriptionSelectedItem)
     }
+}
+
+fun SelectableItemView.setFolderUi(folder: Folder, @DrawableRes iconId: Int, isSelected: Boolean) {
+    text = folder.getLocalizedName(context)
+    icon = AppCompatResources.getDrawable(context, iconId)
+    setSelectedState(isSelected)
 }
