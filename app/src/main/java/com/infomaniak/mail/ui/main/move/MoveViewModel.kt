@@ -81,12 +81,15 @@ class MoveViewModel @Inject constructor(
         if (query?.isNotBlank() == true) {
             searchFolders(query, shouldDebounce)
         } else {
+            cancelSearch()
             filterResults.value = allFolders
         }
     }
 
     private fun searchFolders(query: CharSequence, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
-        searchJob?.cancel()
+
+        cancelSearch()
+
         searchJob = launch {
 
             if (shouldDebounce) {
@@ -96,6 +99,7 @@ class MoveViewModel @Inject constructor(
 
             val filteredFolders = mutableListOf<Any>().apply {
                 allFolders.forEach { folder ->
+                    ensureActive()
                     if (folder !is Folder) return@forEach
                     val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
                     val isFound = folderName.standardize().contains(query.standardize())
