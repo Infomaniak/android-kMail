@@ -17,10 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
@@ -44,7 +44,7 @@ object MailboxItem {
         item as Mailbox
         binding as ItemMenuDrawerMailboxBinding
 
-        Log.d("Bind", "Bind Mailbox (${item.email})")
+        SentryLog.d("Bind", "Bind Mailbox (${item.email})")
         binding.displayMailbox(item, onValidMailboxClicked)
     }
 

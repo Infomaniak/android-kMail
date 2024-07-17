@@ -17,12 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
@@ -53,7 +53,7 @@ object FolderItem {
         item as Folder
         binding as ItemMenuDrawerFolderBinding
 
-        Log.d("Bind", "Bind Folder : ${item.name}")
+        SentryLog.d("Bind", "Bind Folder : ${item.name}")
         binding.displayFolder(
             item,
             currentFolderId,
