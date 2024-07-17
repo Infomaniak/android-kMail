@@ -93,7 +93,7 @@ class MenuDrawerFragment : Fragment() {
         setupCreateFolderDialog()
         setupRecyclerView()
 
-        observeListData()
+        observeMenuDrawerData()
         observeCurrentFolder()
         observeCurrentMailbox()
         observeNewFolderCreation()
@@ -245,7 +245,7 @@ class MenuDrawerFragment : Fragment() {
         )
     }
 
-    private fun observeListData() = with(mainViewModel) {
+    private fun observeMenuDrawerData() = with(mainViewModel) {
 
         Utils.waitInitMediator(
             currentMailbox,
