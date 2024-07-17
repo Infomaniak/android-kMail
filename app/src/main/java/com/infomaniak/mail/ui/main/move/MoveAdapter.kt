@@ -19,8 +19,6 @@ package com.infomaniak.mail.ui.main.move
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -32,7 +30,7 @@ import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
 import com.infomaniak.mail.ui.main.move.MoveAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
-import com.infomaniak.mail.views.itemViews.SelectableItemView
+import com.infomaniak.mail.views.itemViews.setFolderUi
 import javax.inject.Inject
 
 class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(FolderDiffCallback()) {
@@ -90,22 +88,20 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(Fol
         if (item is Folder) (this as ItemSelectableFolderBinding).root.displayFolder(item)
     }
 
-    private fun SelectableItemView.displayFolder(folder: Folder) {
+    private fun SelectableFolderItemView.displayFolder(folder: Folder) {
+
+        val isSelected = folder.id == selectedFolderId
+
         folder.role?.let {
-            setFolderUi(folder, it.folderIconRes)
+            setFolderUi(folder, it.folderIconRes, isSelected)
         } ?: run {
             setFolderUi(
                 folder = folder,
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
+                isSelected = isSelected,
             )
         }
-    }
 
-    private fun SelectableItemView.setFolderUi(folder: Folder, @DrawableRes iconId: Int, folderIndent: Int = 0) {
-        text = folder.getLocalizedName(context)
-        icon = AppCompatResources.getDrawable(context, iconId)
-        setSelectedState(selectedFolderId == folder.id)
-        if (this is SelectableFolderItemView) setIndent(folderIndent)
         setOnClickListener { onFolderClicked.invoke(folder.id) }
     }
 
