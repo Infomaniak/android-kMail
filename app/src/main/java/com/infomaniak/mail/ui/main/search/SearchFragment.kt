@@ -207,10 +207,8 @@ class SearchFragment : TwoPaneFragment() {
             val folders = mutableListOf<Any>().apply {
                 add(0, SearchFolderElement.ALL_FOLDERS)
                 var hasFirstCustomFolderBeenReached = false
-                var isCustomFolder: Boolean
                 allFolders.forEach { folder ->
-                    isCustomFolder = folder.role == null && folder.isRoot
-                    if (!hasFirstCustomFolderBeenReached && isCustomFolder) {
+                    if (!hasFirstCustomFolderBeenReached && folder.isRootAndCustom) {
                         hasFirstCustomFolderBeenReached = true
                         add(SearchFolderElement.DIVIDER)
                     }
