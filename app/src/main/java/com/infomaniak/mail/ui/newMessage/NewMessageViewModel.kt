@@ -230,7 +230,7 @@ class NewMessageViewModel @Inject constructor(
             if (draft.identityId.isNullOrBlank()) {
                 draft.identityId = SignatureController.getDefaultSignatureWithFallback(realm, draftMode)?.id?.toString()
             }
-            if (draft.body.isNotEmpty()) splitSignatureAndQuoteFromBody(draft)
+            splitSignatureAndQuoteFromBody(draft)
         }
     }
 
@@ -274,8 +274,6 @@ class NewMessageViewModel @Inject constructor(
         )
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
-
-        body = getWholeBody("", uiSignature, uiQuote)
     }
 
     private fun saveNavArgsToSavedState(localUuid: String) {
@@ -287,9 +285,12 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun splitSignatureAndQuoteFromBody(draft: Draft) {
+        val remoteBody = draft.body
+        if (remoteBody.isEmpty()) return
+
         val (body, signature, quote) = when (draft.mimeType) {
-            Utils.TEXT_PLAIN -> Triple(BodyContentPayload(draft.body, BodyContentType.TEXT_PLAIN_WITHOUT_HTML), null, null)
-            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(draft)
+            Utils.TEXT_PLAIN -> Triple(BodyContentPayload(remoteBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML), null, null)
+            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody)
             else -> error("Cannot load an email which is not of type text/plain or text/html")
         }
 
@@ -300,7 +301,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun splitSignatureAndQuoteFromHtml(draft: Draft): Triple<BodyContentPayload, String?, String?> {
+    private fun splitSignatureAndQuoteFromHtml(draftBody: String): Triple<BodyContentPayload, String?, String?> {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
             return getElementsByClass(divClassName).firstOrNull()?.let {
@@ -316,12 +317,12 @@ class NewMessageViewModel @Inject constructor(
             return if (index == -1) Int.MAX_VALUE else index
         }
 
-        val doc = Jsoup.parse(draft.body).also { it.outputSettings().prettyPrint(false) }
+        val doc = Jsoup.parse(draftBody).also { it.outputSettings().prettyPrint(false) }
 
-        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
+        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
 
-        val replyPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val replyPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val forwardPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
         val (body, quote) = if (replyPosition < forwardPosition) {
             doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         } else {
@@ -855,7 +856,7 @@ class NewMessageViewModel @Inject constructor(
 
         val signature = uiSignatureLiveData.value
         val quote = uiQuoteLiveData.value
-        body = getWholeBody(uiBodyValue, signature, quote)
+        body = assembleWholeBody(uiBodyValue, signature, quote)
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -919,7 +920,8 @@ class NewMessageViewModel @Inject constructor(
         SentryDebug.addAttachmentsBreadcrumb(draft = this, step)
     }
 
-    private fun getWholeBody(body: String, signature: String?, quote: String?): String = body + (signature ?: "") + (quote ?: "")
+    private fun assembleWholeBody(body: String, signature: String?, quote: String?): String =
+        body + (signature ?: "") + (quote ?: "")
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
