@@ -63,18 +63,22 @@ object MailboxesHeaderItem {
         header: MailboxesHeader,
         onMailboxesHeaderClicked: () -> Unit,
     ) = with(header) {
-        mailboxSwitcherText.text = mailbox?.email
 
-        mailboxSwitcher.apply {
+        root.apply {
+            if (hasMoreThanOneMailbox) {
+                setOnClickListener { onMailboxesHeaderClicked() }
+            } else {
+                setOnClickListener(null)
+            }
             isClickable = hasMoreThanOneMailbox
             isFocusable = hasMoreThanOneMailbox
+            setOnClickListener { onMailboxesHeaderClicked() }
         }
 
-        mailboxExpandButton.isVisible = hasMoreThanOneMailbox
-
+        mailboxSwitcherText.text = mailbox?.email
         setMailboxSwitcherTextAppearance(isExpanded)
 
-        root.setOnClickListener { onMailboxesHeaderClicked() }
+        mailboxExpandButton.isVisible = hasMoreThanOneMailbox
     }
 
     private fun ItemMenuDrawerMailboxesHeaderBinding.updateCollapseState(header: MailboxesHeader) = with(header) {
