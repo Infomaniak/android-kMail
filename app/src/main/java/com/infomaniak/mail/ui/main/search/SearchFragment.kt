@@ -204,17 +204,11 @@ class SearchFragment : TwoPaneFragment() {
 
         searchViewModel.foldersLive.observe(viewLifecycleOwner) { allFolders ->
 
-            val folders = mutableListOf<Any>().apply {
-                add(0, SearchFolderElement.ALL_FOLDERS)
-                var hasFirstCustomFolderBeenReached = false
-                allFolders.forEach { folder ->
-                    if (!hasFirstCustomFolderBeenReached && folder.isRootAndCustom) {
-                        hasFirstCustomFolderBeenReached = true
-                        add(SearchFolderElement.DIVIDER)
-                    }
-                    add(folder)
-                }
-            }.toList()
+            val folders = allFolders
+                .addDividerBeforeFirstCustomFolder(dividerType = SearchFolderElement.DIVIDER)
+                .toMutableList()
+                .apply { add(0, SearchFolderElement.ALL_FOLDERS) }
+                .toList()
 
             searchAdapter = SearchFolderAdapter(folders) { folder, title ->
                 onFolderSelected(folder, title)
