@@ -218,19 +218,11 @@ class RefreshController @Inject constructor(
             }
         }
 
-        suspend fun retry(failedFolder: Folder, retryStrategy: RetryStrategy): Pair<Set<Thread>?, Throwable?> {
-            return retryWithRunCatching(job, failedFolder, retryStrategy, returnThreads)
-        }
-
-        val failedFolder = exception.folder
-
-        sendMessageNotFoundSentry(failedFolder)
-
-        fun computeFibonacci() {
+        fun computeFibonacci(folderId:String) {
             val nextFibonacci = FIBONACCI_SEQUENCE.firstOrNull { it > strategy.fibonacci }
             if (nextFibonacci == null || endOfMessagesReached) {
                 realm.writeBlocking {
-                    FolderController.getFolder(id = failedFolder.id, realm = this)?.apply {
+                    FolderController.getFolder(id = folderId, realm = this)?.apply {
                         delete(messages)
                         delete(threads)
                         lastUpdatedAt = null
@@ -246,6 +238,14 @@ class RefreshController @Inject constructor(
             }
         }
 
+        suspend fun retry(failedFolder: Folder, retryStrategy: RetryStrategy): Pair<Set<Thread>?, Throwable?> {
+            return retryWithRunCatching(job, failedFolder, retryStrategy, returnThreads)
+        }
+
+        val failedFolder = exception.folder
+
+        sendMessageNotFoundSentry(failedFolder)
+
         when (strategy.iteration) {
             Iteration.FIRST_TIME -> {
                 strategy.iteration = Iteration.SECOND_TIME
@@ -257,7 +257,7 @@ class RefreshController @Inject constructor(
                 }
             }
             Iteration.FIBONACCI_TIME -> {
-                computeFibonacci()
+                computeFibonacci(failedFolder.id)
             }
             Iteration.ABORT_MISSION -> {
                 handleAllExceptions(exception)

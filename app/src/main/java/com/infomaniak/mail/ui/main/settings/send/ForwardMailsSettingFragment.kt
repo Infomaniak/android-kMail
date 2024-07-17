@@ -55,9 +55,7 @@ class ForwardMailsSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, emailForwarding ->
             notYetImplemented()
-            when (emailForwarding) {
-                is EmailForwarding -> localSettings.emailForwarding = emailForwarding
-            }
+            if (emailForwarding is EmailForwarding) localSettings.emailForwarding = emailForwarding
         }
     }
 }
