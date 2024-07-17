@@ -17,11 +17,11 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxesHeaderBinding
@@ -44,7 +44,7 @@ object MailboxesHeaderItem {
         item as MailboxesHeader
         binding as ItemMenuDrawerMailboxesHeaderBinding
 
-        Log.d("Bind", "Bind Mailboxes header")
+        SentryLog.d("Bind", "Bind Mailboxes header")
         binding.displayMailboxesHeader(item, onMailboxesHeaderClicked)
     }
 
@@ -55,7 +55,7 @@ object MailboxesHeaderItem {
         item as MailboxesHeader
         binding as ItemMenuDrawerMailboxesHeaderBinding
 
-        Log.d("Bind", "Bind Mailboxes header because of collapse change")
+        SentryLog.d("Bind", "Bind Mailboxes header because of collapse change")
         binding.updateCollapseState(item)
     }
 

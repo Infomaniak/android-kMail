@@ -17,10 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
 
@@ -40,7 +40,7 @@ object FoldersHeaderItem {
     ) {
         binding as ItemMenuDrawerCustomFoldersHeaderBinding
 
-        Log.d("Bind", "Bind Custom Folders header")
+        SentryLog.d("Bind", "Bind Custom Folders header")
         binding.displayCustomFoldersHeader(onCustomFoldersHeaderClicked, onCreateFolderClicked)
     }
 
