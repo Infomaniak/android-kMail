@@ -36,33 +36,14 @@ object MailboxesHeaderItem {
         return ItemMenuDrawerMailboxesHeaderBinding.inflate(inflater, parent, false)
     }
 
-    fun display(
-        item: Any,
-        binding: ViewBinding,
-        onMailboxesHeaderClicked: () -> Unit,
-    ) {
-        item as MailboxesHeader
-        binding as ItemMenuDrawerMailboxesHeaderBinding
-
-        SentryLog.d("Bind", "Bind Mailboxes header")
-        binding.displayMailboxesHeader(item, onMailboxesHeaderClicked)
-    }
-
-    fun displayWithPayload(
-        item: Any,
-        binding: ViewBinding,
-    ) {
-        item as MailboxesHeader
-        binding as ItemMenuDrawerMailboxesHeaderBinding
-
-        SentryLog.d("Bind", "Bind Mailboxes header because of collapse change")
-        binding.updateCollapseState(item)
-    }
-
-    private fun ItemMenuDrawerMailboxesHeaderBinding.displayMailboxesHeader(
+    fun displayMailboxesHeader(
         header: MailboxesHeader,
+        binding: ItemMenuDrawerMailboxesHeaderBinding,
         onMailboxesHeaderClicked: () -> Unit,
-    ) = with(header) {
+    ) = with(binding) {
+        SentryLog.d("Bind", "Bind Mailboxes header")
+
+        val (mailbox, hasMoreThanOneMailbox, isExpanded) = header
 
         root.apply {
             if (hasMoreThanOneMailbox) {
@@ -81,9 +62,14 @@ object MailboxesHeaderItem {
         mailboxExpandButton.isVisible = hasMoreThanOneMailbox
     }
 
-    private fun ItemMenuDrawerMailboxesHeaderBinding.updateCollapseState(header: MailboxesHeader) = with(header) {
-        mailboxExpandButton.toggleChevron(!isExpanded)
-        setMailboxSwitcherTextAppearance(isExpanded)
+    fun updateCollapseState(
+        header: MailboxesHeader,
+        binding: ItemMenuDrawerMailboxesHeaderBinding,
+    ) = with(binding) {
+        SentryLog.d("Bind", "Bind Mailboxes header because of collapse change")
+
+        mailboxExpandButton.toggleChevron(!header.isExpanded)
+        setMailboxSwitcherTextAppearance(header.isExpanded)
     }
 
     private fun ItemMenuDrawerMailboxesHeaderBinding.setMailboxSwitcherTextAppearance(isOpen: Boolean) {

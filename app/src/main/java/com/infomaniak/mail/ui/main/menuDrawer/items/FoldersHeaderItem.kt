@@ -33,21 +33,13 @@ object FoldersHeaderItem {
         return ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)
     }
 
-    fun display(
-        binding: ViewBinding,
+    fun displayCustomFoldersHeader(
+        binding: ItemMenuDrawerCustomFoldersHeaderBinding,
         onCustomFoldersHeaderClicked: (Boolean) -> Unit,
         onCreateFolderClicked: () -> Unit,
-    ) {
-        binding as ItemMenuDrawerCustomFoldersHeaderBinding
-
+    ) = with(binding.root) {
         SentryLog.d("Bind", "Bind Custom Folders header")
-        binding.displayCustomFoldersHeader(onCustomFoldersHeaderClicked, onCreateFolderClicked)
-    }
 
-    private fun ItemMenuDrawerCustomFoldersHeaderBinding.displayCustomFoldersHeader(
-        onCustomFoldersHeaderClicked: (Boolean) -> Unit,
-        onCreateFolderClicked: () -> Unit,
-    ) = with(root) {
         setOnClickListener { onCustomFoldersHeaderClicked(isCollapsed) }
         setOnActionClickListener { onCreateFolderClicked() }
     }
