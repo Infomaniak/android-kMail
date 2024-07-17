@@ -43,37 +43,16 @@ object FolderItem {
         return ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)
     }
 
-    fun display(
-        item: Any,
-        binding: ViewBinding,
+    fun displayFolder(
+        folder: Folder,
+        binding: ItemMenuDrawerFolderBinding,
         currentFolderId: String?,
         hasCollapsableDefaultFolder: Boolean,
         hasCollapsableCustomFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
-        item as Folder
-        binding as ItemMenuDrawerFolderBinding
-
-        SentryLog.d("Bind", "Bind Folder : ${item.name}")
-        binding.displayFolder(
-            item,
-            currentFolderId,
-            hasCollapsableDefaultFolder,
-            hasCollapsableCustomFolder,
-            onFolderClicked,
-            onCollapseChildrenClicked,
-        )
-    }
-
-    private fun ItemMenuDrawerFolderBinding.displayFolder(
-        folder: Folder,
-        currentFolderId: String?,
-        hasCollapsableDefaultFolder: Boolean,
-        hasCollapsableCustomFolder: Boolean,
-        onFolderClicked: (folderId: String) -> Unit,
-        onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
-    ) = with(root) {
+        SentryLog.d("Bind", "Bind Folder : ${folder.name}")
 
         val roleDependantParameters = folder.role?.let {
             RoleDependantParameters(
@@ -98,7 +77,7 @@ object FolderItem {
             else -> folder.unreadCountDisplay
         }
 
-        setFolderUi(
+        binding.root.setFolderUi(
             folder,
             roleDependantParameters,
             unread,
