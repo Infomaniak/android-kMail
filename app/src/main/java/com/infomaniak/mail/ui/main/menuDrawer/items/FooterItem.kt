@@ -41,40 +41,17 @@ object FooterItem {
         return ItemMenuDrawerFooterBinding.inflate(inflater, parent, false)
     }
 
-    fun display(
-        item: Any,
-        binding: ViewBinding,
-        onSyncAutoConfigClicked: () -> Unit,
-        onImportMailsClicked: () -> Unit,
-        onRestoreMailsClicked: () -> Unit,
-        onFeedbackClicked: () -> Unit,
-        onHelpClicked: () -> Unit,
-        onAppVersionClicked: () -> Unit,
-    ) {
-        item as MenuDrawerFooter
-        binding as ItemMenuDrawerFooterBinding
-
-        SentryLog.d("Bind", "Bind Footer")
-        binding.displayFooter(
-            item,
-            onSyncAutoConfigClicked,
-            onImportMailsClicked,
-            onRestoreMailsClicked,
-            onFeedbackClicked,
-            onHelpClicked,
-            onAppVersionClicked,
-        )
-    }
-
-    private fun ItemMenuDrawerFooterBinding.displayFooter(
+    fun displayFooter(
         footer: MenuDrawerFooter,
+        binding: ItemMenuDrawerFooterBinding,
         onSyncAutoConfigClicked: () -> Unit,
         onImportMailsClicked: () -> Unit,
         onRestoreMailsClicked: () -> Unit,
         onFeedbackClicked: () -> Unit,
         onHelpClicked: () -> Unit,
         onAppVersionClicked: () -> Unit,
-    ) {
+    ) = with(binding) {
+        SentryLog.d("Bind", "Bind Footer")
 
         // Actions header
         advancedActions.setOnClickListener {
