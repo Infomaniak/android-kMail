@@ -284,21 +284,14 @@
                         tools:listitem="@layout/item_attachment"
                         tools:visibility="visible" />
 
-                    <FrameLayout
-                        android:id="@+id/editorLayout"
+                    <com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
+                        android:id="@+id/editor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/marginStandardMedium"
+                        android:layout_marginTop="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView">
-
-                        <com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
-                            android:id="@+id/editor"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                    </FrameLayout>
+                        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView" />
 
                     <TextView
                         android:id="@+id/newMessagePlaceholder"
@@ -306,15 +299,14 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="@dimen/marginStandardMedium"
-                        android:layout_marginTop="@dimen/marginStandardMedium"
                         android:text="@string/newMessagePlaceholderTitle"
                         android:textColor="@color/tertiaryTextColor"
                         android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/editorLayout"
+                        app:layout_constraintBottom_toBottomOf="@id/editor"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/editorLayout"
+                        app:layout_constraintTop_toTopOf="@id/editor"
                         tools:visibility="visible" />
 
                     <LinearLayout
@@ -371,7 +363,7 @@
                         android:layout_marginBottom="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/editorLayout" />
+                        app:layout_constraintTop_toBottomOf="@id/editor" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/removeSignature"
