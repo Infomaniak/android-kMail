@@ -35,24 +35,14 @@ object InvalidMailboxItem {
         return ItemInvalidMailboxBinding.inflate(inflater, parent, false)
     }
 
-    fun display(
-        item: Any,
-        binding: ViewBinding,
-        onLockedMailboxClicked: (String) -> Unit,
-        onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
-    ) {
-        item as Mailbox
-        binding as ItemInvalidMailboxBinding
-
-        SentryLog.d("Bind", "Bind Invalid Mailbox (${item.email})")
-        binding.displayInvalidMailbox(item, onLockedMailboxClicked, onInvalidPasswordMailboxClicked)
-    }
-
-    private fun ItemInvalidMailboxBinding.displayInvalidMailbox(
+    fun displayInvalidMailbox(
         mailbox: Mailbox,
+        binding: ItemInvalidMailboxBinding,
         onLockedMailboxClicked: (String) -> Unit,
         onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
-    ) = with(root) {
+    ) = with(binding.root) {
+        SentryLog.d("Bind", "Bind Invalid Mailbox (${mailbox.email})")
+
         text = mailbox.email
         itemStyle = DecoratedItemView.SelectionStyle.MENU_DRAWER
         isPasswordOutdated = !mailbox.isPasswordValid
