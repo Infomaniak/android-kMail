@@ -17,12 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.toFloat
@@ -54,7 +54,7 @@ object FooterItem {
         item as MenuDrawerFooter
         binding as ItemMenuDrawerFooterBinding
 
-        Log.d("Bind", "Bind Footer")
+        SentryLog.d("Bind", "Bind Footer")
         binding.displayFooter(
             item,
             onSyncAutoConfigClicked,
