@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.flattenFolderChildren
 import com.infomaniak.mail.utils.extensions.standardize
@@ -64,20 +65,6 @@ class MoveViewModel @Inject constructor(
     init {
         viewModelScope.launch(ioCoroutineContext) {
 
-            fun List<Folder>.addDividerToFirstCustomFolder(): List<Any> {
-                val folders = this
-                val items = mutableListOf<Any>()
-                var needsToAddDivider = true
-                folders.forEach { folder ->
-                    if (needsToAddDivider && folder.isRootAndCustom) {
-                        needsToAddDivider = false
-                        items.add(Unit)
-                    }
-                    items.add(folder)
-                }
-                return items
-            }
-
             val sourceFolderId = messageUid?.let(messageController::getMessage)?.folderId
                 ?: threadController.getThread(threadsUids.first())!!.folderId
 
@@ -85,7 +72,7 @@ class MoveViewModel @Inject constructor(
 
             allFolders = folderController.getMoveFolders()
                 .flattenFolderChildren()
-                .addDividerToFirstCustomFolder()
+                .addDividerBeforeFirstCustomFolder(dividerType = Unit)
                 .also(filterResults::postValue)
         }
     }
