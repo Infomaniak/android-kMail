@@ -60,8 +60,6 @@ class MoveAdapter @Inject constructor() : ListAdapter<Folder, FolderViewHolder>(
 
     override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
 
-    override fun getItemViewType(position: Int): Int = R.layout.item_selectable_folder
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
