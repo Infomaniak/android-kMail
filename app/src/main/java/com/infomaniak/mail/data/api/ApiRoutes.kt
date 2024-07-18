@@ -176,13 +176,20 @@ object ApiRoutes {
     }
 
     fun getMessagesUids(mailboxUuid: String, folderId: String, info: PaginationInfo?, shouldGetAll: Boolean): String {
-        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids?"
-        // TODO: Use the correct parameter instead of this magical `getAll=true`
-        val quantity = if (shouldGetAll) "getAll=true" else "messages=${Utils.PAGE_SIZE}"
-        val offset = info?.offsetUid?.let { "&uid_offset=$it" } ?: ""
-        val direction = info?.direction?.let { "&direction=$it" } ?: ""
 
-        return "${endpoint}${quantity}${offset}${direction}"
+        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids?"
+
+        val parameters = if (shouldGetAll) {
+            "messages=${Utils.NUMBER_OF_OLD_UIDS_TO_FETCH}&order_by=date_desc"
+        } else {
+            val quantity = "messages=${Utils.PAGE_SIZE}"
+            val offset = info?.offsetUid?.let { "&uid_offset=$it" } ?: ""
+            val direction = info?.direction?.let { "&direction=$it" } ?: ""
+
+            "${quantity}${offset}${direction}"
+        }
+
+        return "${endpoint}${parameters}"
     }
 
     fun getMessagesByUids(mailboxUuid: String, folderId: String, uids: List<Int>): String {

@@ -447,7 +447,7 @@ object ApiRepository : ApiRepositoryCore() {
      */
     private fun <T, R> batchOver(
         values: List<T>,
-        limit: Int = Utils.MESSAGES_UIDS_SIZE,
+        limit: Int = Utils.MAX_UIDS_PER_CALL,
         perform: (List<T>) -> ApiResponse<R>,
     ): List<ApiResponse<R>> {
         return values.chunked(limit).map(perform)
