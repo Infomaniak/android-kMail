@@ -359,16 +359,15 @@ class RefreshController @Inject constructor(
 
     private suspend fun Realm.fetchOneOldPage(scope: CoroutineScope, folder: Folder): Pair<Int, Set<Thread>> {
 
-        val impactedThreads = mutableSetOf<Thread>()
-
         val allUids = folder.oldMessagesUidsToFetch
-        // TODO: Check if the `toIndex` is correct.
-        val uidsToFetch = allUids.subList(0, Utils.PAGE_SIZE)
-        // TODO: Check if the `fromIndex` & `toIndex` are corrects.
-        val remainingUids = allUids.subList(Utils.PAGE_SIZE, allUids.count())
+        val (uidsToFetch, remainingUids) = if (allUids.count() > Utils.PAGE_SIZE) {
+            allUids.subList(0, Utils.PAGE_SIZE) to allUids.subList(Utils.PAGE_SIZE, allUids.count())
+        } else {
+            allUids to emptyList<Int>()
+        }
         val uidsCount = uidsToFetch.count()
 
-        impactedThreads += handleAddedUids(scope, folder, uidsToFetch, folder.cursor!!)
+        val impactedThreads = handleAddedUids(scope, folder, uidsToFetch, folder.cursor!!)
         updateFolder(folder.id, Direction.IN_THE_PAST, uidsCount, remainingUids = remainingUids)
         sendSentryOrphans(folder)
 
