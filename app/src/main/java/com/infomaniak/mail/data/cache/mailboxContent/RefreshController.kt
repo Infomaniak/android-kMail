@@ -225,7 +225,7 @@ class RefreshController @Inject constructor(
             val nextFibonacci = FIBONACCI_SEQUENCE.firstOrNull { it > strategy.fibonacci }
             if (nextFibonacci == null || endOfMessagesReached) {
                 realm.writeBlocking {
-                    FolderController.getFolder(id = folderId, realm = this)?.apply {
+                    getUpToDateFolder(folderId).apply {
                         delete(messages)
                         delete(threads)
                         resetLocalValues()
@@ -322,12 +322,14 @@ class RefreshController @Inject constructor(
 
         impactedThreads += if (previousCursor == null) {
             fetchOldMessagesUids(scope, folder)
-            fetchOneOldPage(scope, folder).second
+            fetchOneOldPage(scope, getUpToDateFolder(folder.id))
+                .also { FolderController.updateFolder(folder.id, realm = this) { it.lastUpdatedAt = Date().toRealmInstant() } }
+                .second
         } else {
             fetchActivities(scope, folder, previousCursor)
         }
 
-        if (folder.remainingOldMessagesToFetch > 0) fetchAllOldPages(scope, folder)
+        if (folder.remainingOldMessagesToFetch > 0) fetchAllOldPages(scope, folder.id)
 
         return impactedThreads
     }
@@ -338,22 +340,20 @@ class RefreshController @Inject constructor(
         scope.ensureActive()
 
         FolderController.updateFolder(folder.id, realm = this) {
-            it.oldMessagesUidsToFetch.addAll(result.addedShortUids)
+            it.oldMessagesUidsToFetch = result.addedShortUids.toRealmList()
             it.cursor = result.cursor
         }
     }
 
-    private suspend fun Realm.fetchAllOldPages(scope: CoroutineScope, folder: Folder) {
+    private suspend fun Realm.fetchAllOldPages(scope: CoroutineScope, folderId: String) {
 
-        fun remainingCount() = FolderController.getFolder(folder.id, realm = this)?.remainingOldMessagesToFetch ?: -1
+        var folder = getUpToDateFolder(folderId)
 
-        var remainingOldMessagesToFetch = remainingCount()
-
-        while (remainingOldMessagesToFetch > 0) {
+        while (folder.remainingOldMessagesToFetch > 0) {
             scope.ensureActive()
 
             fetchOneOldPage(scope, folder)
-            remainingOldMessagesToFetch = remainingCount()
+            folder = getUpToDateFolder(folderId)
         }
     }
 
@@ -501,7 +501,7 @@ class RefreshController @Inject constructor(
                 refreshUnreadCount(folderId, realm = this)
             }
 
-            FolderController.getFolder(folder.id, realm = this)?.let {
+            getUpToDateFolder(folder.id).let {
                 it.lastUpdatedAt = Date().toRealmInstant()
                 it.unreadCountRemote = activities.unreadCountRemote
                 SentryDebug.addCursorBreadcrumb("fetchActivities", it, activities.cursor)
@@ -516,7 +516,7 @@ class RefreshController @Inject constructor(
 
     private fun refreshUnreadCount(id: String, realm: MutableRealm) {
 
-        val folder = FolderController.getFolder(id, realm) ?: return
+        val folder = realm.getUpToDateFolder(id)
 
         val unreadCount = ThreadController.getUnreadThreadsCount(folder)
         folder.unreadCountLocal = unreadCount
@@ -527,6 +527,8 @@ class RefreshController @Inject constructor(
             }
         }
     }
+
+    private fun TypedRealm.getUpToDateFolder(id: String) = FolderController.getFolder(id, realm = this)!!
     //endregion
 
     //region Added Messages
