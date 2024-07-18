@@ -41,7 +41,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
-import kotlin.math.max
 
 @Serializable
 class Folder : RealmObject, Cloneable {
@@ -81,7 +80,7 @@ class Folder : RealmObject, Cloneable {
     @Transient
     var oldMessagesUidsToFetch = realmListOf<Int>()
     @Transient
-    var remainingOldMessagesToFetch: Int = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
+    var remainingOldMessagesToFetch: Int = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
     @Transient
     var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
 
@@ -134,7 +133,7 @@ class Folder : RealmObject, Cloneable {
         this.unreadCountLocal = unreadCount
         this.threads.addAll(threads)
         this.messages.addAll(messages)
-        this.oldMessagesUidsToFetch.addAll(oldMessagesUidsToFetch)
+        this.oldMessagesUidsToFetch = oldMessagesUidsToFetch
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
         this.isHistoryComplete = isHistoryComplete
         this.isHidden = isHidden
@@ -150,7 +149,7 @@ class Folder : RealmObject, Cloneable {
         threads = realmListOf()
         messages = realmListOf()
         oldMessagesUidsToFetch = realmListOf()
-        remainingOldMessagesToFetch = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
+        remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
         isHistoryComplete = DEFAULT_IS_HISTORY_COMPLETE
         isHidden = false
         isCollapsed = false
@@ -189,9 +188,6 @@ class Folder : RealmObject, Cloneable {
         val rolePropertyName = Folder::_role.name
         val parentsPropertyName = Folder::_parents.name
 
-        // We start by downloading 1 page when 1st opening a Folder, before trying to download old Messages.
-        // So when trying to get old Messages, we need to fetch 1 less page. Hence this computation.
-        val DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH = max(Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH - Utils.PAGE_SIZE, 0)
         const val DEFAULT_IS_HISTORY_COMPLETE = false
 
         const val INBOX_FOLDER_ID = "eJzz9HPyjwAABGYBgQ--"

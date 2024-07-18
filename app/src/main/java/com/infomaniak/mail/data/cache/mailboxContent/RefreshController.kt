@@ -445,7 +445,7 @@ class RefreshController @Inject constructor(
         }
 
         fun Folder.resetHistoryInfo() {
-            remainingOldMessagesToFetch = Folder.DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
+            remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
             isHistoryComplete = Folder.DEFAULT_IS_HISTORY_COMPLETE
         }
 
