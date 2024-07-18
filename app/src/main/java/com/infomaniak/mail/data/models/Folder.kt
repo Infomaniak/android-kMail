@@ -71,8 +71,6 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     @Transient
     var messages: RealmList<Message> = realmListOf()
-    // We start by downloading 1 page when 1st opening a Folder, before trying to download old Messages.
-    // So when trying to get old Messages, we need to fetch 1 less page. Hence this computation.
     @Transient
     var remainingOldMessagesToFetch: Int = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
     @Transient
@@ -124,6 +122,18 @@ class Folder : RealmObject {
         this.isCollapsed = isCollapsed
     }
 
+    fun resetLocalValues() {
+        lastUpdatedAt = null
+        cursor = null
+        unreadCountLocal = 0
+        threads = realmListOf()
+        messages = realmListOf()
+        remainingOldMessagesToFetch = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
+        isHistoryComplete = DEFAULT_IS_HISTORY_COMPLETE
+        isHidden = false
+        isCollapsed = false
+    }
+
     fun getLocalizedName(context: Context): String {
         return role?.folderNameRes?.let(context::getString) ?: name
     }
@@ -157,6 +167,8 @@ class Folder : RealmObject {
         val rolePropertyName = Folder::_role.name
         val parentsPropertyName = Folder::_parents.name
 
+        // We start by downloading 1 page when 1st opening a Folder, before trying to download old Messages.
+        // So when trying to get old Messages, we need to fetch 1 less page. Hence this computation.
         val DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH = max(Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH - Utils.PAGE_SIZE, 0)
         const val DEFAULT_IS_HISTORY_COMPLETE = false
 

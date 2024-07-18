@@ -36,14 +36,14 @@ import java.nio.charset.StandardCharsets
 object Utils {
 
     val UTF_8: String = StandardCharsets.UTF_8.name()
-    const val TEXT_HTML: String = "text/html"
-    const val TEXT_PLAIN: String = "text/plain"
+    const val TEXT_HTML = "text/html"
+    const val TEXT_PLAIN = "text/plain"
     /** The MIME type for data whose type is otherwise unknown. */
     const val MIMETYPE_UNKNOWN = "application/octet-stream"
 
-    const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500
+    const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500 // Number of Messages we want to fetch when 1st opening a Folder
     /** Beware: the API refuses a PAGE_SIZE bigger than 200. */
-    const val PAGE_SIZE: Int = 50
+    const val PAGE_SIZE = 50
     const val DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN = 500L
 
     const val TAG_SEPARATOR = " "

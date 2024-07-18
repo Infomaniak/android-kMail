@@ -218,18 +218,14 @@ class RefreshController @Inject constructor(
             }
         }
 
-        fun computeFibonacci(folderId:String) {
+        fun computeFibonacci(folderId: String) {
             val nextFibonacci = FIBONACCI_SEQUENCE.firstOrNull { it > strategy.fibonacci }
             if (nextFibonacci == null || endOfMessagesReached) {
                 realm.writeBlocking {
                     FolderController.getFolder(id = folderId, realm = this)?.apply {
                         delete(messages)
                         delete(threads)
-                        lastUpdatedAt = null
-                        cursor = null
-                        unreadCountLocal = 0
-                        remainingOldMessagesToFetch = Folder.DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
-                        isHistoryComplete = Folder.DEFAULT_IS_HISTORY_COMPLETE
+                        resetLocalValues()
                     }
                 }
                 strategy.iteration = Iteration.ABORT_MISSION
@@ -972,7 +968,6 @@ class RefreshController @Inject constructor(
             ),
         )
     }
-
     //endregion
 
     enum class RefreshMode {
