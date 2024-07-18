@@ -31,19 +31,15 @@ import androidx.annotation.FloatRange
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
-import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
-import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
-import com.infomaniak.lib.core.utils.hasPermissions
-import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
@@ -193,7 +189,6 @@ class MainActivity : BaseActivity() {
             localSettings.accentColor.theme,
         )
 
-        observeNetworkStatus()
         observeDeletedMessages()
         observeDeleteThreadTrigger()
         observeDraftWorkerResults()
@@ -222,21 +217,6 @@ class MainActivity : BaseActivity() {
             onUserWantToReview = { trackInAppReviewEvent("like") },
             onUserWantToGiveFeedback = { trackInAppReviewEvent("dislike") },
         )
-    }
-
-    private fun observeNetworkStatus() {
-        LiveDataNetworkStatus(context = this).distinctUntilChanged().observe(this) { isAvailable ->
-
-            SentryLog.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
-
-            Breadcrumb().apply {
-                category = "Network"
-                message = "Internet access is available : $isAvailable"
-                level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
-            }.also(Sentry::addBreadcrumb)
-
-            mainViewModel.isInternetAvailable.value = isAvailable
-        }
     }
 
     private fun observeDeletedMessages() = with(mainViewModel) {

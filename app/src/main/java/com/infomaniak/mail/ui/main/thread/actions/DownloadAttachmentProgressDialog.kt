@@ -24,6 +24,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,6 +36,8 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.getIntentOrGoToPlayStore
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DownloadAttachmentProgressDialog : DialogFragment() {
@@ -76,8 +79,14 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     }
 
     private fun popBackStackWithError() {
-        val title = if (mainViewModel.isInternetAvailable.value == true) R.string.anErrorHasOccurred else R.string.noConnection
-        showSnackbar(title)
-        findNavController().popBackStack()
+        // We have to use the Flow instead of the LiveData here since the mainViewModel is not the same instance as the one in the
+        // MainActivity. So, instead of observing the LiveData in order to make it "active", we use the Flow.
+        lifecycleScope.launch {
+            mainViewModel.isNetworkAvailable.first { it != null }?.let { isNetworkAvailable ->
+                val title = if (isNetworkAvailable) R.string.anErrorHasOccurred else R.string.noConnection
+                showSnackbar(title)
+                findNavController().popBackStack()
+            }
+        }
     }
 }

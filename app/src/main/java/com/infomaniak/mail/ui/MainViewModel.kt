@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.networking.NetworkAvailability
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
@@ -99,7 +100,6 @@ class MainViewModel @Inject constructor(
     private var refreshEverythingJob: Job? = null
 
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isInternetAvailable = MutableLiveData<Boolean>()
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
@@ -168,6 +168,17 @@ class MainViewModel @Inject constructor(
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
+
+    val isNetworkAvailable = NetworkAvailability(appContext).isNetworkAvailable
+        .mapLatest {
+            SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
+            it
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = null
+        )
 
     private var currentThreadsLiveJob: Job? = null
 
@@ -1091,5 +1102,6 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
+        private const val TIMEOUT_MS_NETWORK_AVAILABILITY_MS = 500L
     }
 }
