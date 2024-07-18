@@ -452,12 +452,15 @@ class RefreshController @Inject constructor(
 
             when (direction) {
                 Direction.IN_THE_PAST -> {
-                    if (uidsCount < Utils.PAGE_SIZE) {
+                    it.oldMessagesUidsToFetch = remainingUids!!.toRealmList()
+                    if (
+                        it.oldMessagesUidsToFetch.isEmpty() // When reaching the end of a Folder the 1st time
+                        || uidsCount < Utils.PAGE_SIZE // When reaching the end of a Folder after being emptied
+                    ) {
                         it.theEndIsReached()
                     } else {
                         it.remainingOldMessagesToFetch = max(it.remainingOldMessagesToFetch - uidsCount, 0)
                     }
-                    it.oldMessagesUidsToFetch = remainingUids!!.toRealmList()
                 }
 
                 Direction.TO_THE_FUTURE -> {
