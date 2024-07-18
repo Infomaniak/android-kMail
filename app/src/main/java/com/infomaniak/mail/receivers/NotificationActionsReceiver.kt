@@ -188,7 +188,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER,
                 mailbox = mailbox,
-                folder = folder,
+                folderId = folder.id,
                 realm = realm,
             )
         }

@@ -90,11 +90,13 @@ class RefreshController @Inject constructor(
     suspend fun refreshThreads(
         refreshMode: RefreshMode,
         mailbox: Mailbox,
-        folder: Folder,
+        folderId: String,
         okHttpClient: OkHttpClient? = null,
         realm: Realm,
         callbacks: RefreshCallbacks? = null,
     ): Pair<Set<Thread>?, Throwable?> {
+
+        val folder = FolderController.getFolder(folderId, realm)!!
 
         SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.displayForSentry()})")
 

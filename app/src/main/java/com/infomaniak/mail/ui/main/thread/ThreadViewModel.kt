@@ -343,7 +343,7 @@ class ThreadViewModel @Inject constructor(
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = mailbox,
-                folder = message.folder,
+                folderId = message.folder.id,
                 realm = realm,
             )
         }

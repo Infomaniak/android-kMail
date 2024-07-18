@@ -90,7 +90,7 @@ class FetchMessagesManager @Inject constructor(
         val threadsWithNewMessages = refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
-            folder = folder,
+            folderId = folder.id,
             okHttpClient = okHttpClient,
             realm = realm,
         ).let { (threads, throwable) ->

@@ -425,7 +425,7 @@ class MainViewModel @Inject constructor(
         refreshController.refreshThreads(
             refreshMode = RefreshMode.ONE_PAGE_OF_OLD_MESSAGES,
             mailbox = currentMailbox.value!!,
-            folder = currentFolder.value!!,
+            folderId = currentFolderId!!,
             realm = mailboxContentRealm(),
             callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
         )
@@ -449,14 +449,13 @@ class MainViewModel @Inject constructor(
         showSwipeRefreshLayout: Boolean = true,
     ) {
         if (mailbox == null || folderId == null) return
-        val folder = folderController.getFolder(folderId) ?: return
 
         val callbacks = if (showSwipeRefreshLayout) RefreshCallbacks(::onDownloadStart, ::onDownloadStop) else null
 
         refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
-            folder = folder,
+            folderId = folderId,
             realm = mailboxContentRealm(),
             callbacks = callbacks,
         )
@@ -1100,7 +1099,7 @@ class MainViewModel @Inject constructor(
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = currentMailbox.value!!,
-                folder = folder,
+                folderId = folder.id,
                 realm = mailboxContentRealm(),
             )
         }
@@ -1114,14 +1113,14 @@ class MainViewModel @Inject constructor(
         val realm = mailboxContentRealm()
 
         val foldersToUpdate = realm.writeBlocking {
-            uids.mapNotNull { MessageController.getMessage(it, realm = this)?.folder?.copyFromRealm() }.toSet()
+            uids.mapNotNull { MessageController.getMessage(it, realm = this)?.folder?.copyFromRealm()?.id }.toSet()
         }
 
-        foldersToUpdate.forEach { folder ->
+        foldersToUpdate.forEach { folderId ->
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER,
                 mailbox = mailbox,
-                folder = folder,
+                folderId = folderId,
                 realm = realm,
             )
         }
