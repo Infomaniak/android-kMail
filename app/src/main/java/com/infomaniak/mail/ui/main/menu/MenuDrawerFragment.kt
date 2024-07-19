@@ -41,6 +41,7 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
@@ -300,7 +301,9 @@ class MenuDrawerFragment : MenuFoldersFragment(), MailboxListFragment {
                 binding.noFolderText.isVisible = customFolders.isEmpty()
                 val newCurrentFolderId = currentFolder?.id ?: return@observe
                 binding.customFoldersList.post {
-                    customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
+                    val sortedCustomFolders = customFolders.sortedWith(compareBy { it.name.lowercase().removeAccents() })
+
+                    customFoldersAdapter.setFolders(sortedCustomFolders, newCurrentFolderId)
                 }
             }
         }
