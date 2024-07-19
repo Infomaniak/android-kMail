@@ -175,7 +175,7 @@ object ApiRoutes {
         return "${getMessages(mailboxUuid, folderId)}/activities?signature=$cursor"
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String, info: PaginationInfo?, shouldGetAll: Boolean): String {
+    fun getMessagesUids(mailboxUuid: String, folderId: String, shouldGetAll: Boolean, info: PaginationInfo?): String {
 
         val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids?"
 

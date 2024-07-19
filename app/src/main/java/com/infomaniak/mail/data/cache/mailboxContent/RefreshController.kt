@@ -877,7 +877,7 @@ class RefreshController @Inject constructor(
         info: PaginationInfo? = null,
         shouldGetAll: Boolean = false,
     ): NewMessagesResult? {
-        return with(ApiRepository.getMessagesUids(mailbox.uuid, folderId, okHttpClient, info, shouldGetAll)) {
+        return with(ApiRepository.getMessagesUids(mailbox.uuid, folderId, okHttpClient, shouldGetAll, info)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
         }

@@ -259,11 +259,11 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxUuid: String,
         folderId: String,
         okHttpClient: OkHttpClient?,
-        info: PaginationInfo?,
         shouldGetAll: Boolean,
+        info: PaginationInfo?,
     ): ApiResponse<NewMessagesResult> {
         return callApi(
-            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, info, shouldGetAll),
+            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, shouldGetAll, info),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )
