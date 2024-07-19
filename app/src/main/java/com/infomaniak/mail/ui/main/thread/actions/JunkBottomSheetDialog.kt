@@ -21,10 +21,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
@@ -58,12 +60,29 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         observeReportPhishingResult()
+        observeExpeditorsResult(threadUid)
     }
 
-    fun observeReportPhishingResult() {
+    private fun observeReportPhishingResult() {
         mainViewModel.reportPhishingTrigger.observe(viewLifecycleOwner) {
             descriptionDialog.resetLoadingAndDismiss()
             findNavController().popBackStack()
+        }
+    }
+
+    private fun observeExpeditorsResult(threadUid: String) = with(binding) {
+        mainViewModel.hasOtherExpeditors(threadUid).observe(viewLifecycleOwner) { hasOtherExpeditors ->
+            if (hasOtherExpeditors) {
+                blockSender.setClosingOnClickListener {
+                    safeNavigate(
+                        resId = R.id.userToBlockBottomSheetDialog,
+                        args = UserToBlockBottomSheetDialogArgs(threadUid).toBundle(),
+                        currentClassName = JunkBottomSheetDialog::class.java.name,
+                    )
+                }
+            } else {
+                blockSender.isGone = true
+            }
         }
     }
 
@@ -81,11 +100,6 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
                 description = getString(R.string.reportPhishingDescription),
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUid, message) },
             )
-        }
-
-        blockSender.setClosingOnClickListener {
-            trackBottomSheetThreadActionsEvent("blockUser")
-            mainViewModel.blockUser(message)
         }
     }
 }

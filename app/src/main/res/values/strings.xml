@@ -110,6 +110,7 @@
     </plurals>
     <string name="attendeesListTitle">List of attendees (%d)</string>
     <string name="bccTitle">Bcc:</string>
+    <string name="blockAnExpeditorTitle">Block a sender</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Blocked password</item>
         <item quantity="other">Blocked passwords</item>
