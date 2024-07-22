@@ -47,6 +47,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.RealmSet
@@ -317,19 +318,35 @@ class RefreshController @Inject constructor(
 
     private suspend fun Realm.refresh(scope: CoroutineScope, folder: Folder): Set<Thread> {
 
-        val impactedThreads = mutableSetOf<Thread>()
-        val previousCursor = folder.cursor
+        var upToDateFolder = folder
+        val previousCursor = upToDateFolder.cursor
 
-        impactedThreads += if (previousCursor == null) {
-            fetchOldMessagesUids(scope, folder)
-            fetchOneOldPage(scope, getUpToDateFolder(folder.id))
-                .also { FolderController.updateFolder(folder.id, realm = this) { it.lastUpdatedAt = Date().toRealmInstant() } }
-                .second
-        } else {
-            fetchActivities(scope, folder, previousCursor)
+        suspend fun fetchFirstPage(): Set<Thread> {
+            fetchOldMessagesUids(scope, upToDateFolder)
+            upToDateFolder = getUpToDateFolder(upToDateFolder.id)
+            val threads = fetchOneOldPage(scope, upToDateFolder).second
+            FolderController.updateFolder(upToDateFolder.id, realm = this) { it.lastUpdatedAt = Date().toRealmInstant() }
+            return threads
         }
 
-        if (folder.remainingOldMessagesToFetch > 0) fetchAllOldPages(scope, folder.id)
+        val impactedThreads = when {
+            previousCursor == null -> {
+                fetchFirstPage()
+            }
+            upToDateFolder.messages.isEmpty() -> {
+                // If the Folder has been emptied, we need to reset the whole history, and start over.
+                FolderController.updateFolder(upToDateFolder.id, realm = this) {
+                    it.oldMessagesUidsToFetch = realmListOf()
+                    it.remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
+                }
+                fetchFirstPage()
+            }
+            else -> {
+                fetchActivities(scope, upToDateFolder, previousCursor)
+            }
+        }
+
+        if (upToDateFolder.remainingOldMessagesToFetch > 0) fetchAllOldPages(scope, upToDateFolder.id)
 
         return impactedThreads
     }
@@ -368,7 +385,7 @@ class RefreshController @Inject constructor(
         val uidsCount = uidsToFetch.count()
 
         val impactedThreads = handleAddedUids(scope, folder, uidsToFetch, folder.cursor!!)
-        updateFolder(folder.id, Direction.IN_THE_PAST, uidsCount, remainingUids = remainingUids)
+        updateFolder(folder.id, Direction.IN_THE_PAST, uidsCount, remainingUids)
         sendSentryOrphans(folder)
 
         return uidsCount to impactedThreads
@@ -417,67 +434,38 @@ class RefreshController @Inject constructor(
             }
         }
 
-        val impactedThreads = mutableSetOf<Thread>()
         val paginationInfo = getPaginationInfo().also(::addSentryBreadcrumbAboutPaginationInfo)
+
         val newMessages = getNewMessages(paginationInfo)
         val uidsCount = newMessages.addedShortUids.count()
         scope.ensureActive()
 
-        impactedThreads += handleAddedUids(scope, folder, newMessages.addedShortUids, newMessages.cursor)
-        updateFolder(folder.id, direction, uidsCount, paginationInfo)
+        val oldMessagesUidsToFetch = getUpToDateFolder(folder.id).oldMessagesUidsToFetch
+        val remainingUids = oldMessagesUidsToFetch.subtract(newMessages.addedShortUids.toSet()).toList()
+
+        val impactedThreads = handleAddedUids(scope, folder, newMessages.addedShortUids, newMessages.cursor)
+        updateFolder(folder.id, direction, uidsCount, remainingUids)
         sendSentryOrphans(folder)
 
         return uidsCount to impactedThreads
     }
 
-    private fun Realm.updateFolder(
-        folderId: String,
-        direction: Direction,
-        uidsCount: Int,
-        paginationInfo: PaginationInfo? = null,
-        remainingUids: List<Int>? = null,
-    ) {
-
-        fun Folder.theEndIsReached() {
-            remainingOldMessagesToFetch = 0
-            isHistoryComplete = true
-        }
-
-        fun Folder.resetHistoryInfo() {
-            remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
-            isHistoryComplete = Folder.DEFAULT_IS_HISTORY_COMPLETE
-        }
+    private fun Realm.updateFolder(folderId: String, direction: Direction, uidsCount: Int, remainingUids: List<Int>) {
 
         FolderController.updateFolder(folderId, realm = this) {
 
+            it.oldMessagesUidsToFetch = remainingUids.toRealmList()
+
             when (direction) {
                 Direction.IN_THE_PAST -> {
-                    it.oldMessagesUidsToFetch = remainingUids!!.toRealmList()
-                    if (
-                        it.oldMessagesUidsToFetch.isEmpty() // When reaching the end of a Folder the 1st time
-                        || uidsCount < Utils.PAGE_SIZE // When reaching the end of a Folder after being emptied
-                    ) {
-                        it.theEndIsReached()
+                    it.remainingOldMessagesToFetch = if (it.oldMessagesUidsToFetch.isEmpty()) {
+                        0
                     } else {
-                        it.remainingOldMessagesToFetch = max(it.remainingOldMessagesToFetch - uidsCount, 0)
+                        max(it.remainingOldMessagesToFetch - uidsCount, 0)
                     }
                 }
-
                 Direction.TO_THE_FUTURE -> {
                     it.lastUpdatedAt = Date().toRealmInstant()
-
-                    // If we try to get new Messages, but `paginationInfo` is null, it's either because :
-                    // - it's the 1st opening of this Folder,
-                    // - or that the Folder has been emptied.
-                    if (paginationInfo == null) {
-                        if (uidsCount < Utils.PAGE_SIZE) {
-                            it.theEndIsReached() // If we didn't even get 1 full page, it means we already reached the end.
-                        } else {
-                            // If the Folder has been emptied, and the end isn't reached yet, we need
-                            // to reset history info, so we'll be able to get all Messages again.
-                            it.resetHistoryInfo()
-                        }
-                    }
                 }
             }
         }
@@ -513,7 +501,13 @@ class RefreshController @Inject constructor(
 
         sendSentryOrphans(folder, previousCursor)
 
-        return fetchAllNewPages(scope, folder)
+        val upToDateFolder = getUpToDateFolder(folder.id)
+        // If the Folder has been emptied, we need to reset the whole history, and start over.
+        return if (upToDateFolder.messages.isEmpty()) {
+            refresh(scope, upToDateFolder)
+        } else {
+            fetchAllNewPages(scope, upToDateFolder)
+        }
     }
 
     private fun refreshUnreadCount(id: String, realm: MutableRealm) {

@@ -655,7 +655,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         Utils.waitInitMediator(currentFilter, currentFolderLive).observe(viewLifecycleOwner) { (filter, folder) ->
             val shouldDisplayLoadMore = filter == ThreadFilter.ALL
                     && folder.cursor != null
-                    && !folder.isHistoryComplete
+                    && folder.oldMessagesUidsToFetch.isNotEmpty()
                     && folder.threads.isNotEmpty()
             threadListAdapter.updateLoadMore(shouldDisplayLoadMore)
         }

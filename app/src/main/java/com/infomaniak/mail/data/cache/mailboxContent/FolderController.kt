@@ -121,7 +121,6 @@ class FolderController @Inject constructor(
                     localFolder.messages,
                     localFolder.oldMessagesUidsToFetch,
                     localFolder.remainingOldMessagesToFetch,
-                    localFolder.isHistoryComplete,
                     localFolder.isHidden,
                     isCollapsed,
                 )

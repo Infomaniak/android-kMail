@@ -81,8 +81,6 @@ class Folder : RealmObject, Cloneable {
     var oldMessagesUidsToFetch = realmListOf<Int>()
     @Transient
     var remainingOldMessagesToFetch: Int = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
-    @Transient
-    var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
 
     @Transient
     var isHidden: Boolean = false // For children only (a children Folder is hidden if its parent is collapsed)
@@ -123,7 +121,6 @@ class Folder : RealmObject, Cloneable {
         messages: RealmList<Message>,
         oldMessagesUidsToFetch: RealmList<Int>,
         remainingOldMessagesToFetch: Int,
-        isHistoryComplete: Boolean,
         isHidden: Boolean,
         isCollapsed: Boolean,
     ) {
@@ -135,7 +132,6 @@ class Folder : RealmObject, Cloneable {
         this.messages.addAll(messages)
         this.oldMessagesUidsToFetch = oldMessagesUidsToFetch
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
-        this.isHistoryComplete = isHistoryComplete
         this.isHidden = isHidden
         this.isCollapsed = isCollapsed
 
@@ -150,7 +146,6 @@ class Folder : RealmObject, Cloneable {
         messages = realmListOf()
         oldMessagesUidsToFetch = realmListOf()
         remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
-        isHistoryComplete = DEFAULT_IS_HISTORY_COMPLETE
         isHidden = false
         isCollapsed = false
     }
@@ -187,8 +182,6 @@ class Folder : RealmObject, Cloneable {
     companion object {
         val rolePropertyName = Folder::_role.name
         val parentsPropertyName = Folder::_parents.name
-
-        const val DEFAULT_IS_HISTORY_COMPLETE = false
 
         const val INBOX_FOLDER_ID = "eJzz9HPyjwAABGYBgQ--"
         private const val CUSTOM_FOLDER_ROLE_ORDER = 0
