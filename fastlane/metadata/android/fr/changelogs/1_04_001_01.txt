@@ -1,0 +1,2 @@
+- Ajout des icônes de transfert et de réponse sur les discussions
+- Correction du nom de l'expéditeur coupé
