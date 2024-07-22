@@ -50,8 +50,6 @@ object Utils {
 
     const val SCHEME_SMSTO = "smsto:"
 
-    const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
-
     fun colorToHexRepresentation(color: Int) = "#" + color.toHexString().substring(2 until 8)
 
     fun isPermanentDeleteFolder(role: FolderRole?): Boolean {

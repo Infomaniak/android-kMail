@@ -23,7 +23,7 @@ import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
-import com.infomaniak.mail.utils.Utils.PRIMARY_COLOR_CODE
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.readRawResource
