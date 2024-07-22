@@ -115,21 +115,22 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.menuDrawerRecyclerView.adapter = menuDrawerAdapter(
-            onAskingToCloseDrawer = ::closeDrawer,
-            onMailboxesHeaderClicked = ::onMailboxesHeaderClicked,
-            onValidMailboxClicked = ::onValidMailboxClicked,
-            onInvalidPasswordMailboxClicked = ::onInvalidPasswordMailboxClicked,
-            onLockedMailboxClicked = ::onLockedMailboxClicked,
-            onCustomFoldersHeaderClicked = ::onCustomFoldersHeaderClicked,
-            onCreateFolderClicked = ::onCreateFolderClicked,
-            onFolderClicked = ::onFolderSelected,
-            onCollapseChildrenClicked = ::onFolderCollapsed,
-            onSyncAutoConfigClicked = ::onSyncAutoConfigClicked,
-            onImportMailsClicked = ::onImportMailsClicked,
-            onRestoreMailsClicked = ::onRestoreMailsClicked,
-            onFeedbackClicked = ::onFeedbackClicked,
-            onHelpClicked = ::onHelpClicked,
-            onAppVersionClicked = ::onAppVersionClicked,
+            callbacks = object : MenuDrawerAdapterCallbacks {
+                override var onMailboxesHeaderClicked: () -> Unit = ::onMailboxesHeaderClicked
+                override var onValidMailboxClicked: (Int) -> Unit = ::onValidMailboxClicked
+                override var onLockedMailboxClicked: (String) -> Unit = ::onLockedMailboxClicked
+                override var onInvalidPasswordMailboxClicked: (Mailbox) -> Unit = ::onInvalidPasswordMailboxClicked
+                override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
+                override var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
+                override var onCustomFoldersHeaderClicked: (Boolean) -> Unit = ::onCustomFoldersHeaderClicked
+                override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
+                override var onSyncAutoConfigClicked: () -> Unit = ::onSyncAutoConfigClicked
+                override var onImportMailsClicked: () -> Unit = ::onImportMailsClicked
+                override var onRestoreMailsClicked: () -> Unit = ::onRestoreMailsClicked
+                override var onFeedbackClicked: () -> Unit = ::onFeedbackClicked
+                override var onHelpClicked: () -> Unit = ::onHelpClicked
+                override var onAppVersionClicked: () -> Unit = ::onAppVersionClicked
+            },
         )
     }
 
@@ -152,8 +153,8 @@ class MenuDrawerFragment : Fragment() {
         areMailboxesExpanded.value = isExpanded
     }
 
-    private fun onValidMailboxClicked(mailboxId: Int) = lifecycleScope.launch {
-        AccountUtils.switchToMailbox(mailboxId)
+    private fun onValidMailboxClicked(mailboxId: Int) {
+        lifecycleScope.launch { AccountUtils.switchToMailbox(mailboxId) }
     }
 
     private fun onInvalidPasswordMailboxClicked(mailbox: Mailbox) {
