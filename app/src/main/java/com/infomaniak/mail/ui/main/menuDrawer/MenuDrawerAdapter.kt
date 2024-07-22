@@ -40,55 +40,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     private var hasCollapsableDefaultFolder = false
     private var hasCollapsableCustomFolder = false
 
-    private lateinit var onAskingToCloseDrawer: () -> Unit
-    private lateinit var onMailboxesHeaderClicked: () -> Unit
-    private lateinit var onValidMailboxClicked: (Int) -> Unit
-    private lateinit var onLockedMailboxClicked: (String) -> Unit
-    private lateinit var onInvalidPasswordMailboxClicked: (Mailbox) -> Unit
-    private lateinit var onCustomFoldersHeaderClicked: (Boolean) -> Unit
-    private lateinit var onCreateFolderClicked: () -> Unit
-    private lateinit var onFolderClicked: (folderId: String) -> Unit
-    private lateinit var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit
-    private lateinit var onSyncAutoConfigClicked: () -> Unit
-    private lateinit var onImportMailsClicked: () -> Unit
-    private lateinit var onRestoreMailsClicked: () -> Unit
-    private lateinit var onFeedbackClicked: () -> Unit
-    private lateinit var onHelpClicked: () -> Unit
-    private lateinit var onAppVersionClicked: () -> Unit
+    private lateinit var callbacks: MenuDrawerAdapterCallbacks
 
-    operator fun invoke(
-        onAskingToCloseDrawer: () -> Unit,
-        onMailboxesHeaderClicked: () -> Unit,
-        onValidMailboxClicked: (Int) -> Unit,
-        onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
-        onLockedMailboxClicked: (String) -> Unit,
-        onCustomFoldersHeaderClicked: (Boolean) -> Unit,
-        onCreateFolderClicked: () -> Unit,
-        onFolderClicked: (folderId: String) -> Unit,
-        onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
-        onSyncAutoConfigClicked: () -> Unit,
-        onImportMailsClicked: () -> Unit,
-        onRestoreMailsClicked: () -> Unit,
-        onFeedbackClicked: () -> Unit,
-        onHelpClicked: () -> Unit,
-        onAppVersionClicked: () -> Unit,
-    ): MenuDrawerAdapter {
-        this.onAskingToCloseDrawer = onAskingToCloseDrawer
-        this.onMailboxesHeaderClicked = onMailboxesHeaderClicked
-        this.onValidMailboxClicked = onValidMailboxClicked
-        this.onInvalidPasswordMailboxClicked = onInvalidPasswordMailboxClicked
-        this.onLockedMailboxClicked = onLockedMailboxClicked
-        this.onCustomFoldersHeaderClicked = onCustomFoldersHeaderClicked
-        this.onCreateFolderClicked = onCreateFolderClicked
-        this.onFolderClicked = onFolderClicked
-        this.onCollapseChildrenClicked = onCollapseChildrenClicked
-        this.onSyncAutoConfigClicked = onSyncAutoConfigClicked
-        this.onImportMailsClicked = onImportMailsClicked
-        this.onRestoreMailsClicked = onRestoreMailsClicked
-        this.onFeedbackClicked = onFeedbackClicked
-        this.onHelpClicked = onHelpClicked
-        this.onAppVersionClicked = onAppVersionClicked
-
+    operator fun invoke(callbacks: MenuDrawerAdapterCallbacks): MenuDrawerAdapter {
+        this.callbacks = callbacks
         return this
     }
 
@@ -228,18 +183,18 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             MailboxesHeaderItem.viewType -> MailboxesHeaderItem.displayMailboxesHeader(
                 header = item as MailboxesHeader,
                 binding = this as ItemMenuDrawerMailboxesHeaderBinding,
-                onMailboxesHeaderClicked = onMailboxesHeaderClicked,
+                onMailboxesHeaderClicked = callbacks.onMailboxesHeaderClicked,
             )
             MailboxItem.viewType -> MailboxItem.displayMailbox(
                 mailbox = item as Mailbox,
                 binding = this as ItemMenuDrawerMailboxBinding,
-                onValidMailboxClicked = onValidMailboxClicked,
+                onValidMailboxClicked = callbacks.onValidMailboxClicked,
             )
             InvalidMailboxItem.viewType -> InvalidMailboxItem.displayInvalidMailbox(
                 mailbox = item as Mailbox,
                 binding = this as ItemInvalidMailboxBinding,
-                onLockedMailboxClicked = onLockedMailboxClicked,
-                onInvalidPasswordMailboxClicked = onInvalidPasswordMailboxClicked,
+                onLockedMailboxClicked = callbacks.onLockedMailboxClicked,
+                onInvalidPasswordMailboxClicked = callbacks.onInvalidPasswordMailboxClicked,
             )
             FolderItem.viewType -> FolderItem.displayFolder(
                 folder = item as Folder,
@@ -247,23 +202,23 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 currentFolderId = currentFolderId,
                 hasCollapsableDefaultFolder = hasCollapsableDefaultFolder,
                 hasCollapsableCustomFolder = hasCollapsableCustomFolder,
-                onFolderClicked = onFolderClicked,
-                onCollapseChildrenClicked = onCollapseChildrenClicked,
+                onFolderClicked = callbacks.onFolderClicked,
+                onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
             )
             FoldersHeaderItem.viewType -> FoldersHeaderItem.displayCustomFoldersHeader(
                 binding = this as ItemMenuDrawerCustomFoldersHeaderBinding,
-                onCustomFoldersHeaderClicked = onCustomFoldersHeaderClicked,
-                onCreateFolderClicked = onCreateFolderClicked,
+                onCustomFoldersHeaderClicked = callbacks.onCustomFoldersHeaderClicked,
+                onCreateFolderClicked = callbacks.onCreateFolderClicked,
             )
             FooterItem.viewType -> FooterItem.displayFooter(
                 footer = item as MenuDrawerFooter,
                 binding = this as ItemMenuDrawerFooterBinding,
-                onSyncAutoConfigClicked = onSyncAutoConfigClicked,
-                onImportMailsClicked = onImportMailsClicked,
-                onRestoreMailsClicked = onRestoreMailsClicked,
-                onFeedbackClicked = onFeedbackClicked,
-                onHelpClicked = onHelpClicked,
-                onAppVersionClicked = onAppVersionClicked,
+                onSyncAutoConfigClicked = callbacks.onSyncAutoConfigClicked,
+                onImportMailsClicked = callbacks.onImportMailsClicked,
+                onRestoreMailsClicked = callbacks.onRestoreMailsClicked,
+                onFeedbackClicked = callbacks.onFeedbackClicked,
+                onHelpClicked = callbacks.onHelpClicked,
+                onAppVersionClicked = callbacks.onAppVersionClicked,
             )
         }
     }
