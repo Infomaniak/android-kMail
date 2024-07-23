@@ -144,7 +144,7 @@ object ApiRoutes {
     }
     //endregion
 
-    //region Messages from Folder/Message
+    //region Message from Folder/Message
     private fun message(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${folder(mailboxUuid, folderId)}/message/$shortUid"
     }
@@ -162,7 +162,7 @@ object ApiRoutes {
     }
     //endregion
 
-    //region Message from Folder/Mobile
+    //region Messages from Folder/Mobile
     private fun getMessages(mailboxUuid: String, folderId: String): String {
         return "${folder(mailboxUuid, folderId)}/mobile"
     }
@@ -172,11 +172,12 @@ object ApiRoutes {
     }
 
     fun getMessagesUids(mailboxUuid: String, folderId: String, info: PaginationInfo?): String {
-        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids?messages=${Utils.PAGE_SIZE}"
+        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids?"
+        val quantity = "messages=${Utils.PAGE_SIZE}"
         val offset = info?.offsetUid?.let { "&uid_offset=$it" } ?: ""
         val direction = info?.direction?.let { "&direction=$it" } ?: ""
 
-        return "${endpoint}${offset}${direction}"
+        return "${endpoint}${quantity}${offset}${direction}"
     }
 
     fun getMessagesByUids(mailboxUuid: String, folderId: String, uids: List<Int>): String {
@@ -184,7 +185,7 @@ object ApiRoutes {
     }
     //endregion
 
-    //region Message from Mailbox
+    //region Messages from Mailbox
     private fun messages(mailboxUuid: String): String {
         return "${mailMailbox(mailboxUuid)}/message"
     }
