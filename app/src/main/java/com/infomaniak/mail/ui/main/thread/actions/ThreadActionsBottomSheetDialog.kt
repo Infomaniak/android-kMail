@@ -60,6 +60,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private var folderRole: FolderRole? = null
     private var isFromArchive: Boolean = false
     private var isFromSpam: Boolean = false
+    private var isFromDraft: Boolean = false
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -72,11 +73,15 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             folderRole = mainViewModel.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
             isFromSpam = folderRole == FolderRole.SPAM
-
-            setMarkAsReadUi(thread.unseenMessagesCount == 0)
-            setArchiveUi(isFromArchive)
-            setFavoriteUi(thread.isFavorite)
-            setJunkUi()
+            isFromDraft = folderRole == FolderRole.DRAFT
+            if (isFromDraft) {
+                setDraftUi(thread.uid)
+            } else {
+                setMarkAsReadUi(thread.unseenMessagesCount == 0)
+                setArchiveUi(isFromArchive)
+                setFavoriteUi(thread.isFavorite)
+                setJunkUi()
+            }
         }
 
         binding.postpone.isGone = true
@@ -85,6 +90,17 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             result?.let { (thread, messageUidToReply) ->
                 setupListeners(thread, messageUidToReply)
             } ?: findNavController().popBackStack()
+        }
+    }
+
+    private fun setDraftUi(threadUid: String) = with(binding) {
+        mainActions.isGone = true
+        move.isGone = true
+        share.isGone = true
+        delete.isVisible = true
+
+        delete.setOnClickListener {
+            deleteThread(threadUid)
         }
     }
 
@@ -99,6 +115,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         setText(text)
         setIconResource(icon)
         isVisible = true
+    }
+
+    private fun deleteThread(threadUid: String) {
+        descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+            trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
+            mainViewModel.deleteThread(threadUid)
+        }
     }
 
     private fun setupListeners(thread: Thread, messageUidToReply: String) = with(navigationArgs) {
@@ -135,10 +158,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onDelete() {
-                descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
-                    trackBottomSheetThreadActionsEvent(ACTION_DELETE_NAME)
-                    mainViewModel.deleteThread(threadUid)
-                }
+                deleteThread(threadUid)
             }
             //endregion
 
