@@ -23,6 +23,7 @@ import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -81,6 +82,8 @@ class Folder : RealmObject, Cloneable {
     var isCollapsed: Boolean = false // For parents only (collapsing a parent Folder will hide its children)
     @Transient
     var roleOrder: Int = role?.order ?: CUSTOM_FOLDER_ROLE_ORDER
+    @Transient
+    var sortedName: String = name
     //endregion
 
     private val _parents by backlinks(Folder::children)
@@ -125,6 +128,8 @@ class Folder : RealmObject, Cloneable {
         this.isHistoryComplete = isHistoryComplete
         this.isHidden = isHidden
         this.isCollapsed = isCollapsed
+
+        this.sortedName = this.name.lowercase().removeAccents()
     }
 
     fun resetLocalValues() {
