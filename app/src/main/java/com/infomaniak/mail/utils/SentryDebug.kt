@@ -154,15 +154,8 @@ object SentryDebug {
             scope.setExtra("mailbox.email", "[${mailbox?.email}]")
             scope.setExtra("currentMailboxEmail", "[${AccountUtils.currentMailboxEmail}]")
             scope.setExtra("messageUid", "$messageUid")
-
-            val message = "Failed Notif : $reason"
-
-            throwable?.let {
-                scope.setExtra("message", message)
-                Sentry.captureException(it)
-            } ?: run {
-                Sentry.captureMessage(message)
-            }
+            throwable?.let { scope.setExtra("throwable", it.stackTraceToString()) }
+            Sentry.captureMessage("Failed Notif : $reason")
         }
     }
 
