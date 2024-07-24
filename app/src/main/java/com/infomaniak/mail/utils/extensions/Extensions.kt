@@ -358,14 +358,14 @@ fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): 
 /**
  * These 2 `sortFolders()` functions should always implement the same sort logic.
  */
-fun RealmQuery<Folder>.sortFolders() = sort(Folder::name.name, Sort.ASCENDING)
+fun RealmQuery<Folder>.sortFolders() = sort(Folder::sortedName.name, Sort.ASCENDING)
     .sort(Folder::isFavorite.name, Sort.DESCENDING)
     .sort(Folder::roleOrder.name, Sort.DESCENDING)
 
 /**
  * These 2 `sortFolders()` functions should always implement the same sort logic.
  */
-fun List<Folder>.sortFolders() = sortedBy { it.name }
+fun List<Folder>.sortFolders() = sortedBy { it.sortedName }
     .sortedByDescending { it.isFavorite }
     .sortedByDescending { it.roleOrder }
 
