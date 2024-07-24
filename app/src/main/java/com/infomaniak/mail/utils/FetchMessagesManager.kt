@@ -38,6 +38,7 @@ import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
 import io.realm.kotlin.Realm
 import io.sentry.SentryLevel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
 import javax.inject.Inject
@@ -92,20 +93,23 @@ class FetchMessagesManager @Inject constructor(
             okHttpClient = okHttpClient,
             realm = realm,
         ).let { (threads, throwable) ->
-            if (threads == null) {
-                SentryDebug.sendFailedNotification(
-                    reason = "RefreshThreads failed",
-                    sentryLevel = SentryLevel.ERROR,
-                    userId = userId,
-                    mailboxId = mailbox.mailboxId,
-                    messageUid = sentryMessageUid,
-                    mailbox = mailbox,
-                    throwable = throwable,
-                )
 
+            if (threads == null) {
+                if (throwable !is CancellationException) {
+                    SentryDebug.sendFailedNotification(
+                        reason = "RefreshThreads failed",
+                        sentryLevel = SentryLevel.ERROR,
+                        userId = userId,
+                        mailboxId = mailbox.mailboxId,
+                        messageUid = sentryMessageUid,
+                        mailbox = mailbox,
+                        throwable = throwable,
+                    )
+                }
                 realm.close()
                 return
             }
+
             return@let threads.toList()
         }
 
