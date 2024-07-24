@@ -261,7 +261,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun focusLastChip() {
         val count = contactChipAdapter.itemCount
         // chipsRecyclerView.children.last() won't work because they are not always ordered correctly
-        if (count > 0) binding.chipsRecyclerView.getChildAt(count - 1).requestFocusFromTouch()
+        if (count > 0) binding.chipsRecyclerView.getChildAt(count - 1)?.requestFocusFromTouch()
     }
 
     private fun focusTextField() {
