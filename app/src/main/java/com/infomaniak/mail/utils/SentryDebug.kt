@@ -299,10 +299,11 @@ object SentryDebug {
         }
     }
 
-    fun sendWebViewVersionName(webViewVersionName: String?, majorVersion: Int) {
+    fun sendWebViewVersionName(webViewPackageName: String?, webViewVersionName: String?, majorVersion: Int) {
         Sentry.withScope { scope ->
-            scope.setExtra("webViewVersionName", webViewVersionName.toString())
-            scope.setExtra("majorVersion", "$majorVersion")
+            scope.setTag("webViewPackageName", "$webViewPackageName")
+            scope.setTag("webViewVersionName", "$webViewVersionName")
+            scope.setTag("majorVersion", "$majorVersion")
             Sentry.captureMessage(
                 "WebView version name might be null on some devices. Checking that the version name is ok.",
                 SentryLevel.INFO,
