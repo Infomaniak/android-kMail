@@ -124,7 +124,7 @@ class Mailbox : RealmObject {
             return _featureFlags.contains(featureFlag.apiName)
         }
 
-        fun setFeatureFlags(featureFlags: List<String>) = with(_featureFlags){
+        fun setFeatureFlags(featureFlags: List<String>) = with(_featureFlags) {
             clear()
             addAll(featureFlags)
         }

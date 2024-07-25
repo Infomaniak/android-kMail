@@ -18,7 +18,11 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -29,7 +33,11 @@ import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.getCustomMenuFolders
 import com.infomaniak.mail.utils.extensions.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel

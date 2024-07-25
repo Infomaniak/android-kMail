@@ -19,7 +19,13 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.os.Build
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.lib.core.utils.FormatData
+import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.formatWithLocal
+import com.infomaniak.lib.core.utils.isThisYear
+import com.infomaniak.lib.core.utils.isToday
+import com.infomaniak.lib.core.utils.isYesterday
 import com.infomaniak.mail.R
 import java.time.format.FormatStyle
 import java.util.Date

@@ -30,8 +30,15 @@ import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.LocalSettings.AiEngine
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
-import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
+import com.infomaniak.mail.data.models.AttachmentsToForwardResult
+import com.infomaniak.mail.data.models.BackupResult
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.InfomaniakPassword
+import com.infomaniak.mail.data.models.MoveResult
+import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.ShareThread
+import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult

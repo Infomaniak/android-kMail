@@ -20,7 +20,11 @@ package com.infomaniak.mail.ui.main.folder
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.IdRes
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
