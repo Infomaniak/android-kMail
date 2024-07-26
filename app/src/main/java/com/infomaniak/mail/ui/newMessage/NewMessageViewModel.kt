@@ -596,9 +596,12 @@ class NewMessageViewModel @Inject constructor(
 
         uris.forEach { uri ->
             val availableSpace = ATTACHMENTS_MAX_SIZE - attachmentsSize
-            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace) ?: return@forEach
+            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace)
 
-            if (hasSizeLimitBeenReached) result = ImportationResult.ATTACHMENTS_TOO_BIG
+            if (hasSizeLimitBeenReached) {
+                result = ImportationResult.ATTACHMENTS_TOO_BIG
+                return@forEach
+            }
 
             attachment?.let {
                 newAttachments.add(it)
@@ -611,9 +614,9 @@ class NewMessageViewModel @Inject constructor(
         return newAttachments
     }
 
-    private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
+    private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean> {
 
-        val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null
+        val (fileName, fileSize) = appContext.getFileNameAndSize(uri) ?: return null to false
         val attachment = Attachment()
 
         return LocalStorageUtils.saveAttachmentToUploadDir(
@@ -628,7 +631,7 @@ class NewMessageViewModel @Inject constructor(
                 attachment.initLocalValues(fileName, file.length(), file.path.guessMimeType(), file.toUri().toString()),
                 fileSize > availableSpace,
             )
-        }
+        } ?: (null to false)
     }
 
     private fun RealmList<Recipient>.flagRecipientsAsAutomaticallyEntered() {
