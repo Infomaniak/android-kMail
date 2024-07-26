@@ -29,7 +29,6 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager.LayoutParams
 import android.webkit.WebView
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
@@ -94,10 +93,7 @@ class NewMessageFragment : Fragment() {
     private val aiViewModel: AiViewModel by activityViewModels()
 
     private val filePicker = FilePicker(fragment = this).apply {
-        initCallback { uris ->
-            activity?.window?.setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-            newMessageViewModel.importAttachmentsLiveData.value = uris
-        }
+        initCallback { uris -> newMessageViewModel.importAttachmentsLiveData.value = uris }
     }
 
     private var addressListPopupWindow: ListPopupWindow? = null
