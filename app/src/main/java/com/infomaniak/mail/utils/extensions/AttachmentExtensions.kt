@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
@@ -189,7 +190,7 @@ object AttachmentExtensions {
                 SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (uuids to localUris): $uuidToLocalUri")
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
-                remoteAttachment.backupLocalData(oldAttachment = this@updateLocalAttachment, UploadStatus.FINISHED)
+                remoteAttachment.backupLocalData(oldAttachment = this@updateLocalAttachment, UploadStatus.FINISHED, draft)
 
                 SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment uuid: ${remoteAttachment.uuid}")
                 SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment localUuid: ${remoteAttachment.localUuid}")
@@ -199,6 +200,8 @@ object AttachmentExtensions {
                     delete(findSpecificAttachment(attachment = this@updateLocalAttachment)!!)
                     add(remoteAttachment)
                 }
+
+                SentryDebug.addAttachmentsBreadcrumb(draft)
             }
         }
     }

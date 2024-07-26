@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -100,6 +101,7 @@ class DraftController @Inject constructor(
                         resource = previousMessage.attachments.find { it.name == name }?.resource
                         setUploadStatus(UploadStatus.FINISHED)
                     }
+                    SentryDebug.addAttachmentsBreadcrumb(draft)
                 }
 
                 draft.uiQuote = replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)

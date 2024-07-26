@@ -339,6 +339,8 @@ class NewMessageViewModel @Inject constructor(
         }
 
         if (mailToUri != null) handleMailTo(draft, mailToUri)
+
+        SentryDebug.addAttachmentsBreadcrumb(draft)
     }
 
     private fun Draft.flagRecipientsAsAutomaticallyEntered() {
@@ -882,6 +884,8 @@ class NewMessageViewModel @Inject constructor(
             clear()
             addAll(updatedAttachments)
         }
+
+        SentryDebug.addAttachmentsBreadcrumb(draft = this)
     }
 
     private fun Draft.getWholeBody(): String = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")

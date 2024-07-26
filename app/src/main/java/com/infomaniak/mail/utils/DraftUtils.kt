@@ -52,7 +52,7 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
     fun setUploadStatus(attachment: Attachment, uploadStatus: UploadStatus) {
         realm.writeBlocking {
             draftController.updateDraft(localUuid, realm = this) {
-                it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus)
+                it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it)
             }
         }
     }
