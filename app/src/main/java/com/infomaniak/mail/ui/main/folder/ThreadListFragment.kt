@@ -597,8 +597,9 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
+            SentryLog.i("UI", "Received cursor: ${folder.cursor} | (${folder.displayForSentry()})")
             currentFolderCursor = folder.cursor
-            SentryLog.i("UI", "Received cursor: $currentFolderCursor | (${folder.displayForSentry()})")
+            threadListViewModel.currentThreadsCount = folder.threads.count()
             updateThreadsVisibility()
             updateUnreadCount(folder.unreadCountLocal)
             checkLastUpdateDay()
@@ -701,11 +702,19 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {
 
-        fun computeShouldDisplayThreadsView(areThereThreads: Boolean, isFilterEnabled: Boolean, isBooting: Boolean) {
-            binding.emptyStateView.isGone = true
-            binding.threadsList.isVisible = true
+        fun displayThreadsView(
+            areThereThreads: Boolean,
+            isFilterEnabled: Boolean,
+            isBooting: Boolean,
+            isWaitingFirstThreads: Boolean,
+        ) {
 
-            if (!areThereThreads && !isFilterEnabled && !isBooting) {
+            with(binding) {
+                emptyStateView.isGone = true
+                threadsList.isVisible = true
+            }
+
+            if (!areThereThreads && !isFilterEnabled && !isBooting && !isWaitingFirstThreads) {
                 val currentFolder = mainViewModel.currentFolder.value
                 Sentry.withScope { scope ->
                     scope.setExtra("cursor", "$currentFolderCursor")
@@ -724,11 +733,12 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         val isCursorNull = currentFolderCursor == null
         val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
         val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
-        val shouldDisplayThreadsView = isBooting || areThereThreads || isFilterEnabled || (isCursorNull && isNetworkConnected)
+        val isWaitingFirstThreads = isCursorNull && isNetworkConnected
+        val shouldDisplayThreadsView = isBooting || isWaitingFirstThreads || areThereThreads || isFilterEnabled
 
         when {
-            shouldDisplayThreadsView -> computeShouldDisplayThreadsView(areThereThreads, isFilterEnabled, isBooting)
-            isCursorNull -> setEmptyState(EmptyState.NETWORK)
+            shouldDisplayThreadsView -> displayThreadsView(areThereThreads, isFilterEnabled, isBooting, isWaitingFirstThreads)
+            isCursorNull || !isNetworkConnected -> setEmptyState(EmptyState.NETWORK)
             isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
             isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
             else -> setEmptyState(EmptyState.FOLDER)
