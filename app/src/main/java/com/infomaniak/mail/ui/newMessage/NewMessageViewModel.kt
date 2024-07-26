@@ -116,7 +116,7 @@ class NewMessageViewModel @Inject constructor(
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
 
-    val editorBodyLoader = SingleLiveEvent<BodyContentPayload>()
+    val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
 
     // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
     // 2. Inserting the AI proposition navigates back to NewMessageFragment.
@@ -407,7 +407,7 @@ class NewMessageViewModel @Inject constructor(
 
         attachmentsLiveData.postValue(attachments)
 
-        editorBodyLoader.postValue(uiBody)
+        editorBodyInitializer.postValue(uiBody)
 
         uiSignatureLiveData.postValue(uiSignature)
         uiQuoteLiveData.postValue(uiQuote)
