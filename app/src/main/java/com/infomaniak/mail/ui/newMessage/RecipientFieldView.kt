@@ -168,11 +168,11 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    fun hideLoader() = with(binding) {
-        textInput.isVisible = true
-        chevronContainer.isVisible = true
+    fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {
+        textInput.isGone = isShimmering
+        chevronContainer.isGone = isShimmering
 
-        loader.isGone = true
+        loader.isVisible = isShimmering
     }
 
     fun showKeyboardInTextInput() {

@@ -79,6 +79,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -144,6 +146,9 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<InitResult>()
+
+    private val _isShimmering = MutableStateFlow(true)
+    val isShimmering: StateFlow<Boolean> = _isShimmering
 
     val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -217,6 +222,7 @@ class NewMessageViewModel @Inject constructor(
             realm.writeBlocking { draftController.upsertDraft(it, realm = this) }
             it.saveSnapshot(it.uiBody.content)
             it.initLiveData(signatures)
+            _isShimmering.emit(false)
 
             initResult.postValue(InitResult(it, signatures))
         }

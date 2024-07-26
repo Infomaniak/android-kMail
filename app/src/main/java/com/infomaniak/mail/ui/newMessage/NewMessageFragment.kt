@@ -78,9 +78,11 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -175,6 +177,7 @@ class NewMessageFragment : Fragment() {
         observeBodyLoader()
         observeUiSignature()
         observeUiQuote()
+        observeShimmering()
 
         editorManager.observeEditorActions()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
@@ -190,6 +193,26 @@ class NewMessageFragment : Fragment() {
             observeContacts()
             observeCcAndBccVisibility()
         }
+    }
+
+    private fun observeShimmering() {
+        lifecycleScope.launch {
+            newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
+        }
+    }
+
+    private fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {
+        fromMailAddress.isGone = isShimmering
+        subjectTextField.isGone = isShimmering
+        editor.isGone = isShimmering
+
+        fromLoader.isVisible = isShimmering
+        subjectLoader.isVisible = isShimmering
+        bodyLoader.isVisible = isShimmering
+
+        toField.setShimmerVisibility(isShimmering)
+        ccField.setShimmerVisibility(isShimmering)
+        bccField.setShimmerVisibility(isShimmering)
     }
 
     private fun initManagers() {
@@ -311,9 +334,13 @@ class NewMessageFragment : Fragment() {
             addCss(context.readRawResource(R.raw.style))
             addCss(context.readRawResource(R.raw.editor_style))
 
-            isEmptyFlow
-                .filterNotNull()
-                .onEach { isEditorEmpty -> newMessagePlaceholder.isVisible = isEditorEmpty }
+            val isPlaceholderVisible = combine(
+                isEmptyFlow.filterNotNull(),
+                newMessageViewModel.isShimmering,
+            ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
+
+            isPlaceholderVisible
+                .onEach { isVisible -> newMessagePlaceholder.isVisible = isVisible }
                 .launchIn(lifecycleScope)
         }
 
@@ -340,21 +367,6 @@ class NewMessageFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun hideLoader() = with(binding) {
-
-        fromMailAddress.isVisible = true
-        subjectTextField.isVisible = true
-        editor.isVisible = true
-
-        fromLoader.isGone = true
-        subjectLoader.isGone = true
-        bodyLoader.isGone = true
-
-        toField.hideLoader()
-        ccField.hideLoader()
-        bccField.hideLoader()
     }
 
     private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean) = with(recipientFieldsManager) {
@@ -460,7 +472,6 @@ class NewMessageFragment : Fragment() {
 
     private fun observeInitResult() {
         newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
-            hideLoader()
             configureUiWithDraftData(draft)
             setupFromField(signatures)
             editorManager.setupEditorActions()
