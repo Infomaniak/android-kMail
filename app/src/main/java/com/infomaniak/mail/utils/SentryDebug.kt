@@ -115,16 +115,15 @@ object SentryDebug {
         fun format(index: Int): String = (index + 1).countPad()
 
         data[count() + "email".keyPad()] = AccountUtils.currentMailboxEmail.toString()
+
         data[count() + "draft".keyPad() + " - localUuid"] = localUuid
         data[count() + "draft".keyPad() + " - remoteUuid"] = remoteUuid.toString()
         data[count() + "draft".keyPad() + " - action"] = action?.name.toString()
-
-        val draftMode = when {
+        data[count() + "draft".keyPad() + " - mode"] = when {
             inReplyToUid != null -> "REPLY or REPLY_ALL"
             forwardedUid != null -> "FORWARD"
             else -> "NEW_MAIL"
         }
-        data[count() + "draft".keyPad() + " - mode"] = draftMode
 
         data[count() + "attachments".keyPad() + " - count"] = attachments.count()
 
