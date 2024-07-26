@@ -85,7 +85,6 @@ class NewMessageAiManager @Inject constructor(
             fragment = fragment,
             freeReferences = {
                 _aiViewModel = null
-                _editorContentManager = null
                 valueAnimator?.cancel()
                 valueAnimator = null
             },

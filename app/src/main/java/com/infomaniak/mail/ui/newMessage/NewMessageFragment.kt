@@ -327,6 +327,18 @@ class NewMessageFragment : Fragment() {
             }
         })
 
+        initEditorUi()
+
+        setupSendButton()
+        externalsManager.setupExternalBanner()
+
+        scrim.setOnClickListener {
+            scrim.isClickable = false
+            aiManager.closeAiPrompt()
+        }
+    }
+
+    private fun initEditorUi() = with(binding) {
         editor.apply {
             enableAlgorithmicDarkening(true)
             if (context.isNightModeEnabled()) editor.addCss(context.readRawResource(R.raw.custom_dark_mode))
@@ -342,14 +354,6 @@ class NewMessageFragment : Fragment() {
             isPlaceholderVisible
                 .onEach { isVisible -> newMessagePlaceholder.isVisible = isVisible }
                 .launchIn(lifecycleScope)
-        }
-
-        setupSendButton()
-        externalsManager.setupExternalBanner()
-
-        scrim.setOnClickListener {
-            scrim.isClickable = false
-            aiManager.closeAiPrompt()
         }
     }
 

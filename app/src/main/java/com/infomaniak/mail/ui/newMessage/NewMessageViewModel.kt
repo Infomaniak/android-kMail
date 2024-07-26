@@ -123,8 +123,8 @@ class NewMessageViewModel @Inject constructor(
     // 3. When saving or sending the draft now, the channel still holds the previous body as it wasn't consumed.
     // channelExpirationIdTarget lets us identify and discard outdated messages, ensuring the correct message is processed.
     private var channelExpirationIdTarget = 0
-    private val _subjectAndBodyChannel: Channel<Triple<String, String, Int>> = Channel(capacity = CONFLATED)
-    private val subjectAndBodyChannel: ReceiveChannel<Triple<String, String, Int>> = _subjectAndBodyChannel
+    private val _subjectAndBodyChannel: Channel<SubjectAndBodyData> = Channel(capacity = CONFLATED)
+    private val subjectAndBodyChannel: ReceiveChannel<SubjectAndBodyData> = _subjectAndBodyChannel
     private var subjectAndBodyJob: Job? = null
 
     var isAutoCompletionOpened = false
@@ -776,7 +776,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun saveBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
-            _subjectAndBodyChannel.send(Triple(subject, html, channelExpirationIdTarget))
+            _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
         }
     }
 
@@ -790,6 +790,7 @@ class NewMessageViewModel @Inject constructor(
             val subject: String
             val body: String
             while (true) {
+                // receive() is a blocking call as long as it has no data
                 val (receivedSubject, receivedBody, expirationId) = subjectAndBodyChannel.receive()
                 if (expirationId == channelExpirationIdTarget) {
                     subject = receivedSubject
@@ -1020,6 +1021,8 @@ class NewMessageViewModel @Inject constructor(
         var uiBody: String,
         val attachmentsLocalUuids: Set<String>,
     )
+
+    private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
 
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName

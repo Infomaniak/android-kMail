@@ -22,9 +22,15 @@ package com.infomaniak.mail.ui.newMessage
  * @param type The type of representation of [content]. Each type will lead to different processing of the content.
  */
 data class BodyContentPayload(val content: String, val type: BodyContentType) {
+
     companion object {
-        fun emptyBody(): BodyContentPayload = BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
+        fun emptyBody() = BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
     }
 }
 
-enum class BodyContentType { HTML_SANITIZED, HTML_UNSANITIZED, TEXT_PLAIN_WITH_HTML, TEXT_PLAIN_WITHOUT_HTML }
+enum class BodyContentType {
+    HTML_SANITIZED,
+    HTML_UNSANITIZED,
+    TEXT_PLAIN_WITH_HTML,
+    TEXT_PLAIN_WITHOUT_HTML,
+}

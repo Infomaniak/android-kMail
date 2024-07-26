@@ -56,16 +56,15 @@ class EditorContentManager @Inject constructor() {
     private fun String.sanitize(): String = HtmlSanitizer.getInstance()
         .sanitize(Jsoup.parse(this))
         .apply { outputSettings().prettyPrint(false) }
-        .extractHtmlWithoutDocumentWrapping()
+        .getHtmlWithoutDocumentWrapping()
 
-    private fun Document.extractHtmlWithoutDocumentWrapping(): String {
+    private fun Document.getHtmlWithoutDocumentWrapping(): String {
         val html = root().firstElementChild() ?: return html()
         val nodeSize = html.childNodeSize()
         val elements = html.children()
-        val elementSize = elements.count()
 
         val canRemoveDocumentWrapping = nodeSize == 2
-                && elementSize == 2
+                && elements.count() == 2
                 && elements[0].tagName().uppercase() == "HEAD"
                 && elements[0].childNodeSize() == 0
                 && elements[1].tagName().uppercase() == "BODY"
