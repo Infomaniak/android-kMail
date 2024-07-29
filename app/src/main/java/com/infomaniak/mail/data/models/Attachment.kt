@@ -21,8 +21,10 @@ import android.content.Context
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -80,13 +82,14 @@ class Attachment : EmbeddedRealmObject, Attachable {
      * After uploading an Attachment, we replace the local version with the remote one.
      * The remote one doesn't know about local data, so we have to backup them.
      */
-    fun backupLocalData(oldAttachment: Attachment, uploadStatus: UploadStatus) {
+    fun backupLocalData(oldAttachment: Attachment, uploadStatus: UploadStatus, draft: Draft) {
         localUuid = oldAttachment.localUuid
         uploadLocalUri = oldAttachment.uploadLocalUri
-        setUploadStatus(uploadStatus)
+        setUploadStatus(uploadStatus, draft, "backupLocalData -> setUploadStatus")
     }
 
-    fun setUploadStatus(uploadStatus: UploadStatus) {
+    fun setUploadStatus(uploadStatus: UploadStatus, draft: Draft? = null, step: String = "") {
+        draft?.let { SentryDebug.addAttachmentsBreadcrumb(it, step) }
         _uploadStatus = uploadStatus.name
     }
 

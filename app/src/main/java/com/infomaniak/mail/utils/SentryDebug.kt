@@ -104,11 +104,44 @@ object SentryDebug {
         )
     }
 
+    fun addAttachmentsBreadcrumb(draft: Draft, step: String) = with(draft) {
+
+        var count = 1
+        val data = mutableMapOf<String, Any>()
+
+        fun String.keyPad(): String = padStart(length = 15)
+        fun Int.countPad(): String = toString().padStart(length = 2, '0')
+        fun count(): String = "${count.countPad().also { count++ }}."
+        fun format(index: Int): String = (index + 1).countPad()
+
+        data[count() + "step".keyPad()] = step
+        data[count() + "email".keyPad()] = AccountUtils.currentMailboxEmail.toString()
+
+        data[count() + "draft".keyPad() + " - localUuid"] = localUuid
+        data[count() + "draft".keyPad() + " - remoteUuid"] = remoteUuid.toString()
+        data[count() + "draft".keyPad() + " - action"] = action?.name.toString()
+        data[count() + "draft".keyPad() + " - mode"] = when {
+            inReplyToUid != null -> "REPLY or REPLY_ALL"
+            forwardedUid != null -> "FORWARD"
+            else -> "NEW_MAIL"
+        }
+
+        data[count() + "attachments".keyPad() + " - count"] = attachments.count()
+
+        attachments.forEachIndexed { index, it ->
+            data[count() + "attachment #${format(index)}".keyPad()] =
+                "localUuid: ${it.localUuid} | uuid: ${it.uuid} | uploadLocalUri: ${it.uploadLocalUri}"
+            data[count() + "attachment #${format(index)}".keyPad()] = "uploadStatus: ${it.uploadStatus.name} | size: ${it.size}"
+        }
+
+        addInfoBreadcrumb(category = "Attachments_Situation", data = data)
+    }
+
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {
         Breadcrumb().apply {
             this.category = category
             this.message = message
-            data?.let { it.forEach { (key, value) -> this.data[key] = value } }
+            data?.let { it.forEach { (key, value) -> this.setData(key, value) } }
             this.level = SentryLevel.INFO
         }.also(Sentry::addBreadcrumb)
     }

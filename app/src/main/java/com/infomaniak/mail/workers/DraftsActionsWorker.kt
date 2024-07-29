@@ -302,34 +302,24 @@ class DraftsActionsWorker @AssistedInject constructor(
         var scheduledDate: String? = null
         var savedDraftUuid: String? = null
 
-        // TODO: Remove this whole `draft.attachments.forEach { … }` when the Attachment issue is fixed.
-        draft.attachments.forEach { attachment ->
-            if (attachment.uploadStatus != UploadStatus.FINISHED) {
+        SentryDebug.addAttachmentsBreadcrumb(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
 
-                Sentry.withScope { scope ->
-                    scope.setExtra("attachmentUuid", attachment.uuid)
-                    scope.setExtra("attachmentsCount", "${draft.attachments.count()}")
-                    scope.setExtra(
-                        "attachmentsUuids to attachmentsLocalUuid",
-                        "${draft.attachments.map { it.uuid to it.localUuid }}",
-                    )
-                    scope.setExtra("draftUuid", "${draft.remoteUuid}")
-                    scope.setExtra("draftLocalUuid", draft.localUuid)
-                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    Sentry.captureMessage(
-                        "We tried to [${draft.action?.name}] a Draft, but an Attachment wasn't uploaded.",
-                        SentryLevel.ERROR,
-                    )
-                }
+        // TODO: Remove this whole `draft.attachments.any { … }` + `addAttachmentsBreadcrumb()`
+        //  when the Attachments issue is fixed.
+        if (draft.attachments.any { it.uploadStatus != UploadStatus.FINISHED }) {
 
-                return DraftActionResult(
-                    realmActionOnDraft = null,
-                    scheduledDate = null,
-                    errorMessageResId = R.string.errorCorruptAttachment,
-                    savedDraftUuid = null,
-                    isSuccess = false,
-                )
-            }
+            Sentry.captureMessage(
+                "We tried to [${draft.action?.name}] a Draft, but an Attachment wasn't uploaded.",
+                SentryLevel.ERROR,
+            )
+
+            return DraftActionResult(
+                realmActionOnDraft = null,
+                scheduledDate = null,
+                errorMessageResId = R.string.errorCorruptAttachment,
+                savedDraftUuid = null,
+                isSuccess = false,
+            )
         }
 
         fun executeSaveAction() = with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {

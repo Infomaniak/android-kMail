@@ -49,10 +49,10 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
 
     fun getAwaitingAttachments(): List<Attachment> = attachments.filter { it.uploadStatus == UploadStatus.AWAITING }
 
-    fun setUploadStatus(attachment: Attachment, uploadStatus: UploadStatus) {
+    fun setUploadStatus(attachment: Attachment, uploadStatus: UploadStatus, step: String) {
         realm.writeBlocking {
             draftController.updateDraft(localUuid, realm = this) {
-                it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus)
+                it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it, step)
             }
         }
     }
@@ -69,10 +69,10 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
 
     attachmentsToUpload.forEach { attachment ->
         runCatching {
-            setUploadStatus(attachment, UploadStatus.ONGOING)
+            setUploadStatus(attachment, UploadStatus.ONGOING, step = "before starting upload")
             attachment.startUpload(localUuid, mailbox, draftController, realm)
         }.onFailure { exception ->
-            setUploadStatus(attachment, UploadStatus.AWAITING)
+            setUploadStatus(attachment, UploadStatus.AWAITING, step = "after failing upload")
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
             if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
             throw exception
