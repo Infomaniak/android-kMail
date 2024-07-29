@@ -1,0 +1,2 @@
+- Stop importing Attachments when size limit is reached
+- Fix Editor toolbar being displayed under the keyboard
