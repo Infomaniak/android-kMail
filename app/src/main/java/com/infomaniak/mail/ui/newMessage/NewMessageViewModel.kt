@@ -68,11 +68,16 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.EXACT_MATCH
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.EXACT_MATCH_AND_IS_DEFAULT
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.NO_MATCH
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.ONLY_EMAIL_MATCH
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.ONLY_EMAIL_MATCH_AND_IS_DEFAULT
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.Utils
@@ -93,6 +98,7 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -100,7 +106,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import javax.inject.Inject
 
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
