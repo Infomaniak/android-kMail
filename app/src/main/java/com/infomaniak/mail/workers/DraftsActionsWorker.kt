@@ -304,7 +304,8 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         SentryDebug.addAttachmentsBreadcrumb(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
 
-        // TODO: Remove this whole `draft.attachments.any { … }` + `addAttachmentsBreadcrumb()` when the Attachments issue is fixed.
+        // TODO: Remove this whole `draft.attachments.any { … }` + `addAttachmentsBreadcrumb()`
+        //  when the Attachments issue is fixed.
         if (draft.attachments.any { it.uploadStatus != UploadStatus.FINISHED }) {
 
             Sentry.captureMessage(
