@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.cache
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.AppSettings.Companion.DEFAULT_ID
 import com.infomaniak.mail.data.models.Attachment
@@ -46,6 +45,8 @@ import com.infomaniak.mail.utils.LocalStorageUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.internal.platform.WeakReference
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -232,7 +233,10 @@ object RealmDatabase {
             .build()
 
         fun mailboxContent(mailboxId: Int, userId: Int): RealmConfiguration {
-            if (mailboxId == DEFAULT_ID) SentryLog.e(TAG, "RealmConfiguration problem with mailbox content, default ID is used.")
+            if (mailboxId == DEFAULT_ID) Sentry.captureMessage(
+                "RealmConfiguration problem with mailbox content, default ID is used.",
+                SentryLevel.ERROR
+            )
 
             return RealmConfiguration.Builder(mailboxContentSet)
                 .name(mailboxContentDbName(userId, mailboxId))
