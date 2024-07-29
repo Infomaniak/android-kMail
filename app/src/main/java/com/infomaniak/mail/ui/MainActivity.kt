@@ -70,10 +70,15 @@ import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
+import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
+import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint

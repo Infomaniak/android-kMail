@@ -29,7 +29,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings

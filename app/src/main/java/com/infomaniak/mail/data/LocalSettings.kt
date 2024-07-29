@@ -20,7 +20,11 @@ package com.infomaniak.mail.data
 import android.content.Context
 import android.os.Build
 import android.view.ContextThemeWrapper
-import androidx.annotation.*
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor.ApiCallRecord

@@ -21,7 +21,16 @@ package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
 import android.os.Build
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
+import com.infomaniak.lib.core.utils.FORMAT_DATE_HOUR_MINUTE
+import com.infomaniak.lib.core.utils.FORMAT_DATE_SHORT_DAY_ONE_CHAR
+import com.infomaniak.lib.core.utils.FormatData
+import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.formatWithLocal
+import com.infomaniak.lib.core.utils.isInTheFuture
+import com.infomaniak.lib.core.utils.isThisYear
+import com.infomaniak.lib.core.utils.isToday
+import com.infomaniak.lib.core.utils.isYesterday
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -38,7 +47,12 @@ import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
-import io.realm.kotlin.ext.*
+import io.realm.kotlin.ext.backlinks
+import io.realm.kotlin.ext.copyFromRealm
+import io.realm.kotlin.ext.isManaged
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.realmSetOf
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
