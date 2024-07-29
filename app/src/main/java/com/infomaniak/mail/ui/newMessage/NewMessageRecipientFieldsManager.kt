@@ -24,7 +24,9 @@ import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.*
+import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.BCC
+import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.CC
+import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType.TO
 import com.infomaniak.mail.utils.extensions.copyRecipientEmailToClipboard
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
