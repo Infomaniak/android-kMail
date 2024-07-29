@@ -101,7 +101,7 @@ class DraftController @Inject constructor(
                         resource = previousMessage.attachments.find { it.name == name }?.resource
                         setUploadStatus(UploadStatus.FINISHED)
                     }
-                    SentryDebug.addAttachmentsBreadcrumb(draft)
+                    SentryDebug.addAttachmentsBreadcrumb(draft, step = "set previousMessage when reply/replyAll/Forward")
                 }
 
                 draft.uiQuote = replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)

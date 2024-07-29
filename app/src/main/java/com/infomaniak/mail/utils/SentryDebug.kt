@@ -104,7 +104,7 @@ object SentryDebug {
         )
     }
 
-    fun addAttachmentsBreadcrumb(draft: Draft) = with(draft) {
+    fun addAttachmentsBreadcrumb(draft: Draft, step: String) = with(draft) {
 
         var count = 1
         val data = mutableMapOf<String, Any>()
@@ -114,6 +114,7 @@ object SentryDebug {
         fun count(): String = "${count.countPad().also { count++ }}."
         fun format(index: Int): String = (index + 1).countPad()
 
+        data[count() + "step".keyPad()] = step
         data[count() + "email".keyPad()] = AccountUtils.currentMailboxEmail.toString()
 
         data[count() + "draft".keyPad() + " - localUuid"] = localUuid

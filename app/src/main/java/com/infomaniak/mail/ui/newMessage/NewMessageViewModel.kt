@@ -340,7 +340,7 @@ class NewMessageViewModel @Inject constructor(
 
         if (mailToUri != null) handleMailTo(draft, mailToUri)
 
-        SentryDebug.addAttachmentsBreadcrumb(draft)
+        SentryDebug.addAttachmentsBreadcrumb(draft, step = "populate Draft with external mail data")
     }
 
     private fun Draft.flagRecipientsAsAutomaticallyEntered() {
@@ -749,7 +749,12 @@ class NewMessageViewModel @Inject constructor(
     fun uploadAttachmentsToServer(uiAttachments: List<Attachment>) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
         val localDraft = mailboxContentRealm().writeBlocking {
-            DraftController.getDraft(localUuid, realm = this)?.also { it.updateDraftAttachmentsWithLiveData(uiAttachments) }
+            DraftController.getDraft(localUuid, realm = this)?.also {
+                it.updateDraftAttachmentsWithLiveData(
+                    uiAttachments = uiAttachments,
+                    step = "observeAttachments -> uploadAttachmentsToServer",
+                )
+            }
         } ?: return@launch
 
         runCatching {
@@ -815,7 +820,10 @@ class NewMessageViewModel @Inject constructor(
         cc = ccLiveData.valueOrEmpty().toRealmList()
         bcc = bccLiveData.valueOrEmpty().toRealmList()
 
-        updateDraftAttachmentsWithLiveData(attachmentsLiveData.valueOrEmpty())
+        updateDraftAttachmentsWithLiveData(
+            uiAttachments = attachmentsLiveData.valueOrEmpty(),
+            step = "executeDraftActionWhenStopping (action = ${draftAction.name}) -> updateDraftFromLiveData",
+        )
 
         subject = subjectValue
 
@@ -850,7 +858,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>) {
+    private fun Draft.updateDraftAttachmentsWithLiveData(uiAttachments: List<Attachment>, step: String) {
 
         /**
          * If :
@@ -885,7 +893,7 @@ class NewMessageViewModel @Inject constructor(
             addAll(updatedAttachments)
         }
 
-        SentryDebug.addAttachmentsBreadcrumb(draft = this)
+        SentryDebug.addAttachmentsBreadcrumb(draft = this, step)
     }
 
     private fun Draft.getWholeBody(): String = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")

@@ -85,11 +85,11 @@ class Attachment : EmbeddedRealmObject, Attachable {
     fun backupLocalData(oldAttachment: Attachment, uploadStatus: UploadStatus, draft: Draft) {
         localUuid = oldAttachment.localUuid
         uploadLocalUri = oldAttachment.uploadLocalUri
-        setUploadStatus(uploadStatus, draft)
+        setUploadStatus(uploadStatus, draft, "backupLocalData -> setUploadStatus")
     }
 
-    fun setUploadStatus(uploadStatus: UploadStatus, draft: Draft? = null) {
-        draft?.let(SentryDebug::addAttachmentsBreadcrumb)
+    fun setUploadStatus(uploadStatus: UploadStatus, draft: Draft? = null, step: String = "") {
+        draft?.let { SentryDebug.addAttachmentsBreadcrumb(it, step) }
         _uploadStatus = uploadStatus.name
     }
 

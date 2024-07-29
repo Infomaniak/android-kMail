@@ -302,7 +302,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         var scheduledDate: String? = null
         var savedDraftUuid: String? = null
 
-        SentryDebug.addAttachmentsBreadcrumb(draft)
+        SentryDebug.addAttachmentsBreadcrumb(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
 
         // TODO: Remove this whole `draft.attachments.any { … }` + `addAttachmentsBreadcrumb()` when the Attachments issue is fixed.
         if (draft.attachments.any { it.uploadStatus != UploadStatus.FINISHED }) {
