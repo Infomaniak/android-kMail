@@ -53,6 +53,7 @@ import com.infomaniak.lib.core.R as RCore
 @FragmentScoped
 class NewMessageAiManager @Inject constructor(
     @ActivityContext private val activityContext: Context,
+    private val editorContentManager: EditorContentManager,
     private val localSettings: LocalSettings,
 ) : NewMessageManager() {
 
@@ -60,9 +61,6 @@ class NewMessageAiManager @Inject constructor(
 
     private var _aiViewModel: AiViewModel? = null
     private inline val aiViewModel: AiViewModel get() = _aiViewModel!!
-
-    private var _editorContentManager: EditorContentManager? = null
-    private inline val editorContentManager: EditorContentManager get() = _editorContentManager!!
 
     private val animationDuration by lazy { resources.getInteger(R.integer.aiPromptAnimationDuration).toLong() }
     private val scrimOpacity by lazy { ResourcesCompat.getFloat(context.resources, R.dimen.scrimOpacity) }
@@ -77,7 +75,6 @@ class NewMessageAiManager @Inject constructor(
         binding: FragmentNewMessageBinding,
         fragment: NewMessageFragment,
         aiViewModel: AiViewModel,
-        editorContentManager: EditorContentManager,
     ) {
         super.initValues(
             newMessageViewModel = newMessageViewModel,
@@ -91,7 +88,6 @@ class NewMessageAiManager @Inject constructor(
         )
 
         _aiViewModel = aiViewModel
-        _editorContentManager = editorContentManager
     }
 
     fun observeAiOutput() = with(binding) {

@@ -221,7 +221,6 @@ class NewMessageFragment : Fragment() {
             binding = binding,
             fragment = this@NewMessageFragment,
             aiViewModel = aiViewModel,
-            editorContentManager = editorContentManager,
         )
 
         externalsManager.initValues(
