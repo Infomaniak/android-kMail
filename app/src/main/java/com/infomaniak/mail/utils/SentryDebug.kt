@@ -109,29 +109,58 @@ object SentryDebug {
         var count = 1
         val data = mutableMapOf<String, Any>()
 
-        fun String.keyPad(): String = padStart(length = 15)
-        fun Int.countPad(): String = toString().padStart(length = 2, '0')
-        fun count(): String = "${count.countPad().also { count++ }}."
-        fun format(index: Int): String = (index + 1).countPad()
+        fun Int.countPadding(): String = toString().padStart(length = 2, '0')
 
-        data[count() + "step".keyPad()] = step
-        data[count() + "email".keyPad()] = AccountUtils.currentMailboxEmail.toString()
+        fun addData(category: String, key: String = "", value: String) {
+            data[count.countPadding() + "." + category.padStart(length = 15) + key] = value
+            count++
+        }
 
-        data[count() + "draft".keyPad() + " - localUuid"] = localUuid
-        data[count() + "draft".keyPad() + " - remoteUuid"] = remoteUuid.toString()
-        data[count() + "draft".keyPad() + " - action"] = action?.name.toString()
-        data[count() + "draft".keyPad() + " - mode"] = when {
+        fun addStepData(value: String) {
+            addData(category = "step", value = value)
+        }
+
+        fun addEmailData(value: String) {
+            addData(category = "email", value = value)
+        }
+
+        fun addDraftData(key: String, value: String) {
+            addData(category = "draft", key = " - $key", value = value)
+        }
+
+        fun addAttachmentsData(key: String, value: String) {
+            addData(category = "attachments", key = " - $key", value = value)
+        }
+
+        fun addAttachmentData(index: Int, value: String) {
+            addData(category = "attachment #${(index + 1).countPadding()}", value = value)
+        }
+
+        addStepData(value = step)
+        addEmailData(value = AccountUtils.currentMailboxEmail.toString())
+
+        addDraftData(key = "localUuid", value = localUuid)
+        addDraftData(key = "remoteUuid", value = remoteUuid.toString())
+        addDraftData(key = "action", value = action?.name.toString())
+
+        val draftMode = when {
             inReplyToUid != null -> "REPLY or REPLY_ALL"
             forwardedUid != null -> "FORWARD"
             else -> "NEW_MAIL"
         }
+        addDraftData(key = "mode", value = draftMode)
 
-        data[count() + "attachments".keyPad() + " - count"] = attachments.count()
+        addAttachmentsData(key = "count", value = attachments.count().toString())
 
         attachments.forEachIndexed { index, it ->
-            data[count() + "attachment #${format(index)}".keyPad()] =
-                "localUuid: ${it.localUuid} | uuid: ${it.uuid} | uploadLocalUri: ${it.uploadLocalUri}"
-            data[count() + "attachment #${format(index)}".keyPad()] = "uploadStatus: ${it.uploadStatus.name} | size: ${it.size}"
+            addAttachmentData(
+                index = index,
+                value = "localUuid: ${it.localUuid} | uuid: ${it.uuid} | uploadLocalUri: ${it.uploadLocalUri}",
+            )
+            addAttachmentData(
+                index = index,
+                value = "uploadStatus: ${it.uploadStatus.name} | size: ${it.size}",
+            )
         }
 
         addInfoBreadcrumb(category = "Attachments_Situation", data = data)
