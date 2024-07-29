@@ -89,7 +89,7 @@ object RealmDatabase {
     val mailboxInfo get() = Realm.open(RealmConfig.mailboxInfo)
 
     val newMailboxContentInstance get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-    fun newMailboxContentInstance(userId: Int, mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(mailboxId, userId))
+    fun newMailboxContentInstance(userId: Int, mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(userId, mailboxId))
 
     class MailboxContent {
         operator fun invoke() = runBlocking(Dispatchers.IO) {
@@ -142,7 +142,7 @@ object RealmDatabase {
 
     //region Delete Realm
     fun deleteMailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) {
-        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId, userId))
+        Realm.deleteRealm(RealmConfig.mailboxContent(userId, mailboxId))
     }
 
     fun removeUserData(context: Context, userId: Int) {
@@ -232,11 +232,11 @@ object RealmDatabase {
             .migration(MAILBOX_INFO_MIGRATION)
             .build()
 
-        fun mailboxContent(mailboxId: Int, userId: Int): RealmConfiguration {
-            if (mailboxId == DEFAULT_ID) Sentry.captureMessage(
-                "RealmConfiguration problem with mailbox content, default ID is used.",
-                SentryLevel.ERROR
-            )
+        fun mailboxContent(userId: Int, mailboxId: Int): RealmConfiguration {
+
+            if (mailboxId == DEFAULT_ID) {
+                Sentry.captureMessage("RealmConfiguration problem with mailbox content, default ID is used.", SentryLevel.ERROR)
+            }
 
             return RealmConfiguration.Builder(mailboxContentSet)
                 .name(mailboxContentDbName(userId, mailboxId))
