@@ -18,7 +18,9 @@
 package com.infomaniak.mail.data.cache
 
 import android.content.Context
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.AppSettings.Companion.DEFAULT_ID
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
@@ -229,12 +231,15 @@ object RealmDatabase {
             .migration(MAILBOX_INFO_MIGRATION)
             .build()
 
-        fun mailboxContent(mailboxId: Int, userId: Int) = RealmConfiguration
-            .Builder(mailboxContentSet)
-            .name(mailboxContentDbName(userId, mailboxId))
-            .schemaVersion(MAILBOX_CONTENT_SCHEMA_VERSION)
-            .migration(MAILBOX_CONTENT_MIGRATION)
-            .build()
+        fun mailboxContent(mailboxId: Int, userId: Int): RealmConfiguration {
+            if (mailboxId == DEFAULT_ID) SentryLog.e(TAG, "RealmConfiguration problem with mailbox content, default ID is used.")
+
+            return RealmConfiguration.Builder(mailboxContentSet)
+                .name(mailboxContentDbName(userId, mailboxId))
+                .schemaVersion(MAILBOX_CONTENT_SCHEMA_VERSION)
+                .migration(MAILBOX_CONTENT_MIGRATION)
+                .build()
+        }
         //endregion
     }
 }
