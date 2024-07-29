@@ -72,8 +72,15 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
+import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
+import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
+import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
+import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel

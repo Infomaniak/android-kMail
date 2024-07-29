@@ -19,7 +19,11 @@ package com.infomaniak.mail.utils
 
 import io.realm.kotlin.internal.interop.ErrorCode
 import io.sentry.Sentry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlin.coroutines.CoroutineContext
 
 val CoroutineScope.handler

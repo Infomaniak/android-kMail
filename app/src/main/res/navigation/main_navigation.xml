@@ -622,8 +622,8 @@
         android:label="AttachmentActionsBottomSheetDialog">
         <argument
             android:name="isSwissTransferFile"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            app:argType="boolean" />
         <argument
             android:name="attachmentLocalUuid"
             app:argType="string" />

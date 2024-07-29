@@ -28,9 +28,14 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.core.utils.hideProgressCatching
+import com.infomaniak.lib.core.utils.initProgress
+import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding

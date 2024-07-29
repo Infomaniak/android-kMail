@@ -53,7 +53,11 @@ import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ErrorCode
+import com.infomaniak.mail.utils.LogoutUser
+import com.infomaniak.mail.utils.NotificationUtils
+import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.SentryEvent

@@ -29,7 +29,12 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.models.ai.*
+import com.infomaniak.mail.data.models.ai.AiMessage
+import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
+import com.infomaniak.mail.data.models.ai.AiResult
+import com.infomaniak.mail.data.models.ai.AssistantMessage
+import com.infomaniak.mail.data.models.ai.ContextMessage
+import com.infomaniak.mail.data.models.ai.UserMessage
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus.*
 import com.infomaniak.mail.utils.ErrorCode
