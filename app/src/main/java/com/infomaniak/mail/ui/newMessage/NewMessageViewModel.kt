@@ -295,7 +295,7 @@ class NewMessageViewModel @Inject constructor(
         if (remoteBody.isEmpty()) return
 
         val (body, signature, quote) = when (draft.mimeType) {
-            Utils.TEXT_PLAIN -> Triple(BodyContentPayload(remoteBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML), null, null)
+            Utils.TEXT_PLAIN -> BodyData(BodyContentPayload(remoteBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML), null, null)
             Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody)
             else -> error("Cannot load an email which is not of type text/plain or text/html")
         }
@@ -307,7 +307,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun splitSignatureAndQuoteFromHtml(draftBody: String): Triple<BodyContentPayload, String?, String?> {
+    private fun splitSignatureAndQuoteFromHtml(draftBody: String): BodyData {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
             return getElementsByClass(divClassName).firstOrNull()?.let {
@@ -335,7 +335,7 @@ class NewMessageViewModel @Inject constructor(
             doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        return Triple(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
+        return BodyData(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
     }
 
     private fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
@@ -774,7 +774,7 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
-    fun saveBodyAndSubject(subject: String, html: String) {
+    fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
         }
@@ -863,7 +863,7 @@ class NewMessageViewModel @Inject constructor(
 
         val signature = uiSignatureLiveData.value
         val quote = uiQuoteLiveData.value
-        body = assembleWholeBody(uiBodyValue, signature, quote)
+        body = uiBodyValue + (signature ?: "") + (quote ?: "")
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -926,9 +926,6 @@ class NewMessageViewModel @Inject constructor(
 
         SentryDebug.addAttachmentsBreadcrumb(draft = this, step)
     }
-
-    private fun assembleWholeBody(body: String, signature: String?, quote: String?): String =
-        body + (signature ?: "") + (quote ?: "")
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
@@ -1023,6 +1020,8 @@ class NewMessageViewModel @Inject constructor(
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
+
+    private data class BodyData(val body: BodyContentPayload, val signature: String?, val quote: String?)
 
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName

@@ -339,7 +339,7 @@ class NewMessageFragment : Fragment() {
 
     private fun initEditorUi() = with(binding) {
         editor.apply {
-            enableAlgorithmicDarkening(true)
+            enableAlgorithmicDarkening(isEnabled = true)
             if (context.isNightModeEnabled()) editor.addCss(context.readRawResource(R.raw.custom_dark_mode))
 
             addCss(context.readRawResource(R.raw.style))
@@ -599,13 +599,12 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onStop() {
-        /**
-         * When the Activity is being stopped, we save the Draft.
-         * We then need the up-to-date subject & body values.
-         */
+        // When the Activity is being stopped, we save the Draft. To do this, we need to know the subject and body values but
+        // these values might not be accessible anymore by then. We store them right now before potentially loosing access to them
+        // in case we need to save the Draft when they're inaccessible.
         val subject = binding.subjectTextField.text.toString()
         binding.editor.exportHtml { html ->
-            newMessageViewModel.saveBodyAndSubject(subject, html)
+            newMessageViewModel.storeBodyAndSubject(subject, html)
         }
 
         super.onStop()
