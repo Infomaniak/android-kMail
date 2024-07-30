@@ -30,7 +30,15 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
-import com.infomaniak.mail.data.LocalSettings.SwipeAction.*
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.ARCHIVE
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.DELETE
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.FAVORITE
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.MOVE
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.NONE
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.POSTPONE
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.QUICKACTIONS_MENU
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.READ_UNREAD
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.SPAM
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint

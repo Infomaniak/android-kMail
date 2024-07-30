@@ -26,7 +26,9 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ThreadDensity.*
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity.LARGE
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity.NORMAL
 import com.infomaniak.mail.databinding.FragmentThreadListDensitySettingBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint

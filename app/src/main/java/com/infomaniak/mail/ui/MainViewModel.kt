@@ -69,8 +69,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.getCustomMenuFolders
-import com.infomaniak.mail.utils.extensions.getDefaultMenuFolders
+import com.infomaniak.mail.utils.extensions.flattenFolderChildren
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity

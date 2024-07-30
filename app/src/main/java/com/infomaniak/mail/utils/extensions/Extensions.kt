@@ -104,11 +104,11 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ApiErrorException
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
-import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
 import io.realm.kotlin.MutableRealm
@@ -121,7 +121,6 @@ import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.encodeToString
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
