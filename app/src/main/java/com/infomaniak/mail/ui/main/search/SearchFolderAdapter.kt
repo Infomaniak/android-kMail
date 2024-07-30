@@ -34,8 +34,7 @@ import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 
 class SearchFolderAdapter(
-    val folders: List<Any>,
-    val onClickListener: (folder: Folder?, title: String) -> Unit,
+    val folders: List<Any>
 ) : ListAdapter {
 
     private var selectedFolder: Folder? = null
@@ -77,10 +76,7 @@ class SearchFolderAdapter(
                 val entryName: String = context.getLocalizedNameOrAllFolders(folder)
                 text = entryName
                 icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_all_folders)
-
                 setSelectedState(folder == selectedFolder)
-
-                setOnClickListener { onClickListener(folder, entryName) }
             }
         }
     }

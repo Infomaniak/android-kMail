@@ -393,6 +393,7 @@
         <item name="closeIconTint">@color/chip_unread_text_color</item>
         <item name="iconStartPadding">@dimen/marginStandardSmall</item>
         <item name="strokeColor">?attr/colorPrimary</item>
+        <item name="rippleColor">?attr/colorControlHighlight</item>
     </style>
 
     <style name="UnreadChip" parent="ChipNoCheckedIconBase">
