@@ -41,7 +41,11 @@ import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.InputAlertDialog
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.getFolderCreationError
+import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
+import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

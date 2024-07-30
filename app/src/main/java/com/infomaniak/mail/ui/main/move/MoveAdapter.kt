@@ -40,11 +40,6 @@ import com.infomaniak.mail.views.itemViews.SelectableItemView
 import com.infomaniak.mail.views.itemViews.SelectableMailboxItemView
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import com.infomaniak.mail.views.itemViews.UnreadItemView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.invoke
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.min
 
