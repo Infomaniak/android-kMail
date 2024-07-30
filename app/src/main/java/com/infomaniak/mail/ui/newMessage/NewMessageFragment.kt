@@ -337,10 +337,10 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initEditorUi() = with(binding) {
-        editor.apply {
+    private fun initEditorUi() {
+        binding.editor.apply {
             enableAlgorithmicDarkening(isEnabled = true)
-            if (context.isNightModeEnabled()) editor.addCss(context.readRawResource(R.raw.custom_dark_mode))
+            if (context.isNightModeEnabled()) addCss(context.readRawResource(R.raw.custom_dark_mode))
 
             addCss(context.readRawResource(R.raw.style))
             addCss(context.readRawResource(R.raw.editor_style))
@@ -351,7 +351,7 @@ class NewMessageFragment : Fragment() {
             ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
 
             isPlaceholderVisible
-                .onEach { isVisible -> newMessagePlaceholder.isVisible = isVisible }
+                .onEach { isVisible -> binding.newMessagePlaceholder.isVisible = isVisible }
                 .launchIn(lifecycleScope)
         }
     }
