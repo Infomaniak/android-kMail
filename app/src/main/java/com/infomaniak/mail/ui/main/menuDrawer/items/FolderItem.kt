@@ -32,14 +32,14 @@ import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import kotlin.math.min
 
-object FolderItem {
+object FolderItem : MenuDrawerBaseItem {
 
     private const val MAX_SUB_FOLDERS_INDENT = 2
 
     @Suppress("MayBeConstant")
-    val viewType = R.layout.item_menu_drawer_folder
+    override val viewType = R.layout.item_menu_drawer_folder
 
-    fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
+    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
         return ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)
     }
 

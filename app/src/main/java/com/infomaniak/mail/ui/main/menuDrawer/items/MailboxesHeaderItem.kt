@@ -27,12 +27,12 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxesHeaderBinding
 import com.infomaniak.mail.utils.extensions.toggleChevron
 
-object MailboxesHeaderItem {
+object MailboxesHeaderItem : MenuDrawerBaseItem {
 
     @Suppress("MayBeConstant")
-    val viewType = R.layout.item_menu_drawer_mailboxes_header
+    override val viewType = R.layout.item_menu_drawer_mailboxes_header
 
-    fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
+    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
         return ItemMenuDrawerMailboxesHeaderBinding.inflate(inflater, parent, false)
     }
 
