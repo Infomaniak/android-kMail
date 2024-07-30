@@ -25,11 +25,23 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.databinding.*
+import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxesHeaderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment.MediatorContainer
-import com.infomaniak.mail.ui.main.menuDrawer.items.*
+import com.infomaniak.mail.ui.main.menuDrawer.items.DividerItem
+import com.infomaniak.mail.ui.main.menuDrawer.items.EmptyFoldersItem
+import com.infomaniak.mail.ui.main.menuDrawer.items.FolderItem
+import com.infomaniak.mail.ui.main.menuDrawer.items.FoldersHeaderItem
+import com.infomaniak.mail.ui.main.menuDrawer.items.FooterItem
 import com.infomaniak.mail.ui.main.menuDrawer.items.FooterItem.MenuDrawerFooter
+import com.infomaniak.mail.ui.main.menuDrawer.items.InvalidMailboxItem
+import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxItem
+import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxesHeaderItem
 import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxesHeaderItem.MailboxesHeader
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import javax.inject.Inject
@@ -200,8 +212,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 folder = item as Folder,
                 binding = this as ItemMenuDrawerFolderBinding,
                 currentFolderId = currentFolderId,
-                hasCollapsableDefaultFolder = hasCollapsableDefaultFolder,
-                hasCollapsableCustomFolder = hasCollapsableCustomFolder,
+                hasCollapsableFolder = if (item.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder,
                 onFolderClicked = callbacks.onFolderClicked,
                 onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
             )
