@@ -60,6 +60,7 @@ import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
