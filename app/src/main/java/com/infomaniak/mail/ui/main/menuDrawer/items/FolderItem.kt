@@ -47,8 +47,7 @@ object FolderItem {
         folder: Folder,
         binding: ItemMenuDrawerFolderBinding,
         currentFolderId: String?,
-        hasCollapsableDefaultFolder: Boolean,
-        hasCollapsableCustomFolder: Boolean,
+        hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
@@ -82,8 +81,7 @@ object FolderItem {
             roleDependantParameters,
             unread,
             currentFolderId,
-            hasCollapsableDefaultFolder,
-            hasCollapsableCustomFolder,
+            hasCollapsableFolder,
             onFolderClicked,
             onCollapseChildrenClicked,
         )
@@ -94,8 +92,7 @@ object FolderItem {
         roleDependantParameters: RoleDependantParameters,
         unread: UnreadDisplay?,
         currentFolderId: String?,
-        hasCollapsableDefaultFolder: Boolean,
-        hasCollapsableCustomFolder: Boolean,
+        hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
@@ -110,7 +107,6 @@ object FolderItem {
         unreadCount = unread?.count ?: 0
         isCollapsed = folder.isCollapsed
         canBeCollapsed = folder.canBeCollapsed
-        val hasCollapsableFolder = if (folder.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder
         setIndent(
             indent = folderIndent,
             hasCollapsableFolder = hasCollapsableFolder,
