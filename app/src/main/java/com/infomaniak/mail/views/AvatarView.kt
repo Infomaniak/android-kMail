@@ -240,6 +240,11 @@ class AvatarView @JvmOverloads constructor(
         }
     }
 
+    fun setFocusableTest() {
+        binding.test.isFocusable = true
+        binding.avatarImage.isFocusable = false
+    }
+
     private data class State(
         var correspondent: Correspondent? = null,
         var bimi: Bimi? = null,
