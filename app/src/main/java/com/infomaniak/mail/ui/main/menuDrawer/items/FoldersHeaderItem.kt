@@ -24,12 +24,12 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
 
-object FoldersHeaderItem {
+object FoldersHeaderItem : MenuDrawerBaseItem {
 
     @Suppress("MayBeConstant")
-    val viewType = R.layout.view_menu_drawer_dropdown
+    override val viewType = R.layout.view_menu_drawer_dropdown
 
-    fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
+    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
         return ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)
     }
 
