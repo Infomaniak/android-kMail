@@ -26,12 +26,12 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
 import com.infomaniak.mail.views.itemViews.DecoratedItemView
 
-object InvalidMailboxItem {
+object InvalidMailboxItem : MenuDrawerBaseItem {
 
     @Suppress("MayBeConstant")
-    val viewType = R.layout.item_invalid_mailbox
+    override val viewType = R.layout.item_invalid_mailbox
 
-    fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
+    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
         return ItemInvalidMailboxBinding.inflate(inflater, parent, false)
     }
 
