@@ -23,12 +23,12 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerEmptyCustomFoldersBinding
 
-object EmptyFoldersItem {
+object EmptyFoldersItem : MenuDrawerBaseItem {
 
     @Suppress("MayBeConstant")
-    val viewType = R.layout.item_menu_drawer_empty_custom_folders
+    override val viewType = R.layout.item_menu_drawer_empty_custom_folders
 
-    fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
+    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
         return ItemMenuDrawerEmptyCustomFoldersBinding.inflate(inflater, parent, false)
     }
 }

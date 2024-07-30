@@ -32,12 +32,12 @@ import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
 
-object FooterItem {
+object FooterItem : MenuDrawerBaseItem {
 
     @Suppress("MayBeConstant")
-    val viewType = R.layout.item_menu_drawer_footer
+    override val viewType = R.layout.item_menu_drawer_footer
 
-    fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
+    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
         return ItemMenuDrawerFooterBinding.inflate(inflater, parent, false)
     }
 
