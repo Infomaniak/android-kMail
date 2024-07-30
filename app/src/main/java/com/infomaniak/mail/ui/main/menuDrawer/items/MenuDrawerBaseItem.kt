@@ -20,15 +20,10 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
-import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.ItemMenuDrawerDividerBinding
 
-object DividerItem : MenuDrawerBaseItem {
+interface MenuDrawerBaseItem {
 
-    @Suppress("MayBeConstant")
-    override val viewType = R.layout.item_menu_drawer_divider
+    val viewType: Int
 
-    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
-        return ItemMenuDrawerDividerBinding.inflate(inflater, parent, false)
-    }
+    fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding
 }
