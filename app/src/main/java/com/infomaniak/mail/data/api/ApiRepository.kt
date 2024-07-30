@@ -20,7 +20,11 @@ package com.infomaniak.mail.data.api
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.*
+import com.infomaniak.lib.core.api.ApiController.ApiMethod.DELETE
+import com.infomaniak.lib.core.api.ApiController.ApiMethod.GET
+import com.infomaniak.lib.core.api.ApiController.ApiMethod.PATCH
+import com.infomaniak.lib.core.api.ApiController.ApiMethod.POST
+import com.infomaniak.lib.core.api.ApiController.ApiMethod.PUT
 import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus

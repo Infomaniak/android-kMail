@@ -22,7 +22,9 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.*
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.ONE_PAGE_OF_OLD_MESSAGES
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.REFRESH_FOLDER
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.REFRESH_FOLDER_WITH_ROLE
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RetryStrategy.Iteration
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder

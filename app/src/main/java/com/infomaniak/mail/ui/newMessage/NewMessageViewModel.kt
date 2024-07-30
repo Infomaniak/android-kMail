@@ -71,7 +71,11 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.EXACT_MATCH
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.EXACT_MATCH_AND_IS_DEFAULT
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.NO_MATCH
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.ONLY_EMAIL_MATCH
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.ONLY_EMAIL_MATCH_AND_IS_DEFAULT
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
