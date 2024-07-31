@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.extensions.copyListToRealm
 import com.infomaniak.mail.utils.extensions.flattenFolderChildren
+import com.infomaniak.mail.utils.extensions.sortFolders
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -34,7 +35,6 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
@@ -136,11 +136,7 @@ class FolderController @Inject constructor(
         ): RealmQuery<Folder> {
             val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
             val draftsQuery = if (withoutDrafts) " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'" else ""
-            return realm
-                .query<Folder>("$isNotSearch${rootsQuery}${draftsQuery}")
-                .sort(Folder::name.name, Sort.ASCENDING)
-                .sort(Folder::isFavorite.name, Sort.DESCENDING)
-                .sort(Folder::roleOrder.name, Sort.DESCENDING)
+            return realm.query<Folder>("$isNotSearch${rootsQuery}${draftsQuery}").sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
