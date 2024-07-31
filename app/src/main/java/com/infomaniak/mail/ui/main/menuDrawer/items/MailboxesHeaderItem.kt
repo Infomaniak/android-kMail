@@ -29,7 +29,6 @@ import com.infomaniak.mail.utils.extensions.toggleChevron
 
 object MailboxesHeaderItem : MenuDrawerBaseItem {
 
-    @Suppress("MayBeConstant")
     override val viewType = R.layout.item_menu_drawer_mailboxes_header
 
     override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
