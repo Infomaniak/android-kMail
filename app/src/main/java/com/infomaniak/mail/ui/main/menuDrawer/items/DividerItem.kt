@@ -25,7 +25,6 @@ import com.infomaniak.mail.databinding.ItemMenuDrawerDividerBinding
 
 object DividerItem : MenuDrawerBaseItem {
 
-    @Suppress("MayBeConstant")
     override val viewType = R.layout.item_menu_drawer_divider
 
     override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
