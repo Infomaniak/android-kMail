@@ -27,18 +27,21 @@ object JsoupParserUtil {
     private const val BYTE_TO_MEGABYTE_DIVIDER: Float = 1024f * 1024f
 
     fun jsoupParseWithLog(value: String): Document {
-        return measureMemoryUsage(SENTRY_LOG_TAG, actionName = "parsing") {
+        return measureAndLogMemoryUsage(SENTRY_LOG_TAG, actionName = "parsing") {
             Jsoup.parse(value)
         }
     }
 
     fun jsoupParseBodyFragmentWithLog(value: String): Document {
-        return measureMemoryUsage(SENTRY_LOG_TAG, actionName = "parsing body fragment") {
+        return measureAndLogMemoryUsage(SENTRY_LOG_TAG, actionName = "parsing body fragment") {
             Jsoup.parseBodyFragment(value)
         }
     }
-
-    fun <R> measureMemoryUsage(tag: String, actionName: String, block: () -> R): R {
+    
+    /**
+     * Measures and logs to sentry the used and available RAM of the JVM
+     */
+    fun <R> measureAndLogMemoryUsage(tag: String, actionName: String, block: () -> R): R {
         val (usedMemoryBefore, maxMemoryBefore) = getMemoryUsage()
         SentryLog.i(tag, "Before $actionName, used / available: $usedMemoryBefore / $maxMemoryBefore MB")
 
