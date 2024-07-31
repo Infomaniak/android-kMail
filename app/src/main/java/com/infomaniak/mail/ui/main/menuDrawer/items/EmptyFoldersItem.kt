@@ -25,7 +25,6 @@ import com.infomaniak.mail.databinding.ItemMenuDrawerEmptyCustomFoldersBinding
 
 object EmptyFoldersItem : MenuDrawerBaseItem {
 
-    @Suppress("MayBeConstant")
     override val viewType = R.layout.item_menu_drawer_empty_custom_folders
 
     override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {

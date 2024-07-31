@@ -26,7 +26,6 @@ import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
 
 object FoldersHeaderItem : MenuDrawerBaseItem {
 
-    @Suppress("MayBeConstant")
     override val viewType = R.layout.view_menu_drawer_dropdown
 
     override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {

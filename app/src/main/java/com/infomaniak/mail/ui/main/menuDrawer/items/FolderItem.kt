@@ -36,7 +36,6 @@ object FolderItem : MenuDrawerBaseItem {
 
     private const val MAX_SUB_FOLDERS_INDENT = 2
 
-    @Suppress("MayBeConstant")
     override val viewType = R.layout.item_menu_drawer_folder
 
     override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
