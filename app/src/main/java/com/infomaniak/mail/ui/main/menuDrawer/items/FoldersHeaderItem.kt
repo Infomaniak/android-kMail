@@ -21,12 +21,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 
 class FoldersHeaderItem(
     inflater: LayoutInflater,
-    parent: ViewGroup
-) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)) {
+    parent: ViewGroup,
+) : MenuDrawerViewHolder(ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)) {
 
     fun displayCustomFoldersHeader(
         binding: ItemMenuDrawerCustomFoldersHeaderBinding,

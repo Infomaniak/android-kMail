@@ -24,12 +24,12 @@ import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxBinding
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 
 class MailboxViewHolder(
     inflater: LayoutInflater,
-    parent: ViewGroup
-) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerMailboxBinding.inflate(inflater, parent, false)) {
+    parent: ViewGroup,
+) : MenuDrawerViewHolder(ItemMenuDrawerMailboxBinding.inflate(inflater, parent, false)) {
 
     fun displayMailbox(
         mailbox: Mailbox,
