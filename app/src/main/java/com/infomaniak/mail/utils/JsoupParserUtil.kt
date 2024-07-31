@@ -37,18 +37,18 @@ object JsoupParserUtil {
             Jsoup.parseBodyFragment(value)
         }
     }
-    
+
     /**
      * Measures and logs to sentry the used and available RAM of the JVM
      */
     fun <R> measureAndLogMemoryUsage(tag: String, actionName: String, block: () -> R): R {
         val (usedMemoryBefore, maxMemoryBefore) = getMemoryUsage()
-        SentryLog.i(tag, "Before $actionName, used / available: $usedMemoryBefore / $maxMemoryBefore MB")
+        SentryLog.i(tag, "Before $actionName, used / available - $usedMemoryBefore / $maxMemoryBefore MB")
 
         val result = block()
 
         val (usedMemoryAfter, maxMemoryAfter) = getMemoryUsage()
-        SentryLog.i(tag, "After $actionName, used / available: $usedMemoryAfter / $maxMemoryAfter MB")
+        SentryLog.i(tag, "After $actionName, used / available - $usedMemoryAfter / $maxMemoryAfter MB")
 
         return result
     }
