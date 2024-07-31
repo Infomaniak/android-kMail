@@ -20,20 +20,17 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxesHeaderBinding
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
 import com.infomaniak.mail.utils.extensions.toggleChevron
 
-object MailboxesHeaderItem : MenuDrawerBaseItem {
-
-    override val viewType = R.layout.item_menu_drawer_mailboxes_header
-
-    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
-        return ItemMenuDrawerMailboxesHeaderBinding.inflate(inflater, parent, false)
-    }
+class MailboxesHeaderViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup
+) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerMailboxesHeaderBinding.inflate(inflater, parent, false)) {
 
     fun displayMailboxesHeader(
         header: MailboxesHeader,

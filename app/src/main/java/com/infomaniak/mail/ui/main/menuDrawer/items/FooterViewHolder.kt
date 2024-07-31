@@ -21,24 +21,20 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
 
-object FooterItem : MenuDrawerBaseItem {
-
-    override val viewType = R.layout.item_menu_drawer_footer
-
-    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
-        return ItemMenuDrawerFooterBinding.inflate(inflater, parent, false)
-    }
+class FooterViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup
+) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerFooterBinding.inflate(inflater, parent, false)) {
 
     fun displayFooter(
         footer: MenuDrawerFooter,

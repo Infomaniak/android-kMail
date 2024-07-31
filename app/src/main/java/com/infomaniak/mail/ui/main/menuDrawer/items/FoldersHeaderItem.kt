@@ -19,18 +19,14 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
 
-object FoldersHeaderItem : MenuDrawerBaseItem {
-
-    override val viewType = R.layout.view_menu_drawer_dropdown
-
-    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
-        return ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)
-    }
+class FoldersHeaderItem(
+    inflater: LayoutInflater,
+    parent: ViewGroup
+) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)) {
 
     fun displayCustomFoldersHeader(
         binding: ItemMenuDrawerCustomFoldersHeaderBinding,
