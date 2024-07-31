@@ -27,6 +27,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle.State
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.infomaniak.lib.bugtracker.BugTrackerActivity
@@ -59,6 +61,9 @@ import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -249,9 +254,8 @@ class MenuDrawerFragment : Fragment() {
     private fun observeMenuDrawerData() = with(mainViewModel) {
 
         Utils.waitInitMediator(
-            currentMailbox,
+            mailboxesLive,
             menuDrawerViewModel.areMailboxesExpanded,
-            menuDrawerViewModel.otherMailboxesLive,
             currentFoldersLive,
             menuDrawerViewModel.areCustomFoldersExpanded,
             currentPermissionsLive,
@@ -259,16 +263,20 @@ class MenuDrawerFragment : Fragment() {
             constructor = {
                 @Suppress("UNCHECKED_CAST")
                 MediatorContainer(
-                    it[0] as Mailbox?,
+                    it[0] as List<Mailbox>,
                     it[1] as Boolean,
-                    it[2] as List<Mailbox>,
-                    it[3] as List<Folder>,
-                    it[4] as Boolean,
-                    it[5] as MailboxPermissions?,
-                    it[6] as Quotas?,
+                    it[2] as List<Folder>,
+                    it[3] as Boolean,
+                    it[4] as MailboxPermissions?,
+                    it[5] as Quotas?,
                 )
             }
-        ).observe(viewLifecycleOwner, menuDrawerAdapter::setItems)
+        )
+            .asFlow()
+            .map(menuDrawerAdapter::formatList)
+            .flowOn(Dispatchers.IO)
+            .asLiveData()
+            .observe(viewLifecycleOwner, menuDrawerAdapter::submitList)
     }
 
     private fun observeCurrentFolder() {
@@ -297,9 +305,8 @@ class MenuDrawerFragment : Fragment() {
     }
 
     data class MediatorContainer(
-        val currentMailbox: Mailbox?,
+        val mailboxes: List<Mailbox>,
         val areMailboxesExpanded: Boolean,
-        val otherMailboxes: List<Mailbox>,
         val allFolders: List<Folder>,
         val areCustomFoldersExpanded: Boolean,
         val permissions: MailboxPermissions?,
