@@ -314,13 +314,13 @@ class NotificationUtils @Inject constructor(
         addAction(replyAction)
     }
 
-    @Suppress("MayBeConstant")
     companion object : NotificationUtilsCore() {
 
         private val TAG: String = NotificationUtils::class.java.simpleName
 
         private const val DELAY_DEBOUNCE_NOTIF_MS = 1_500L
 
+        @Suppress("MayBeConstant")
         private val defaultSmallIcon = R.drawable.ic_logo_notification
 
         const val DRAFT_ACTIONS_ID = 1

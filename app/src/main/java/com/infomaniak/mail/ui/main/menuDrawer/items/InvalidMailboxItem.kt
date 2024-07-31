@@ -28,7 +28,6 @@ import com.infomaniak.mail.views.itemViews.DecoratedItemView
 
 object InvalidMailboxItem : MenuDrawerBaseItem {
 
-    @Suppress("MayBeConstant")
     override val viewType = R.layout.item_invalid_mailbox
 
     override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
