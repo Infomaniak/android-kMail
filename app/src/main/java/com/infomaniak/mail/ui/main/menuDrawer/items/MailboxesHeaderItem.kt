@@ -45,11 +45,6 @@ object MailboxesHeaderItem : MenuDrawerBaseItem {
         val (mailbox, hasMoreThanOneMailbox, isExpanded) = header
 
         root.apply {
-            if (hasMoreThanOneMailbox) {
-                setOnClickListener { onMailboxesHeaderClicked() }
-            } else {
-                setOnClickListener(null)
-            }
             isClickable = hasMoreThanOneMailbox
             isFocusable = hasMoreThanOneMailbox
             setOnClickListener { onMailboxesHeaderClicked() }
