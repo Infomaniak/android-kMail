@@ -19,15 +19,10 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.viewbinding.ViewBinding
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerEmptyCustomFoldersBinding
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
 
-object EmptyFoldersItem : MenuDrawerBaseItem {
-
-    override val viewType = R.layout.item_menu_drawer_empty_custom_folders
-
-    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
-        return ItemMenuDrawerEmptyCustomFoldersBinding.inflate(inflater, parent, false)
-    }
-}
+class EmptyFoldersItem(
+    inflater: LayoutInflater,
+    parent: ViewGroup
+) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerEmptyCustomFoldersBinding.inflate(inflater, parent, false))

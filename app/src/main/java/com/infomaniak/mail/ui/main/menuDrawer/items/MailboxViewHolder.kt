@@ -19,21 +19,17 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxBinding
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
 
-object MailboxItem : MenuDrawerBaseItem {
-
-    override val viewType = R.layout.item_menu_drawer_mailbox
-
-    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
-        return ItemMenuDrawerMailboxBinding.inflate(inflater, parent, false)
-    }
+class MailboxViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup
+) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerMailboxBinding.inflate(inflater, parent, false)) {
 
     fun displayMailbox(
         mailbox: Mailbox,
