@@ -116,6 +116,7 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
@@ -314,28 +315,40 @@ fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): 
 
         val folder = inputList.removeFirst()
 
-        if (folder.isManaged()) {
+        val children = if (folder.isManaged()) {
             outputList.add(folder.copyFromRealm(1u))
-            val children = with(folder.children) {
+            with(folder.children) {
                 (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
-                    .sort(Folder::name.name, Sort.ASCENDING)
-                    .sort(Folder::isFavorite.name, Sort.DESCENDING)
+                    .sortFolders()
                     .find()
             }
-            inputList.addAll(index = 0, children)
         } else {
             outputList.add(folder)
-            val children = (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children)
-                .sortedBy { it.name }
-                .sortedBy { !it.isFavorite }
-            inputList.addAll(index = 0, children)
+            (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children)
+                .sortFolders()
         }
+
+        inputList.addAll(index = 0, children)
 
         return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
     }
 
     return formatFolderWithAllChildren(toMutableList())
 }
+
+/**
+ * These 2 `sortFolders()` functions should always implement the same sort logic.
+ */
+fun RealmQuery<Folder>.sortFolders() = sort(Folder::name.name, Sort.ASCENDING)
+    .sort(Folder::isFavorite.name, Sort.DESCENDING)
+    .sort(Folder::roleOrder.name, Sort.DESCENDING)
+
+/**
+ * These 2 `sortFolders()` functions should always implement the same sort logic.
+ */
+fun List<Folder>.sortFolders() = sortedBy { it.name }
+    .sortedByDescending { it.isFavorite }
+    .sortedByDescending { it.roleOrder }
 
 fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> {
     val folders = this
