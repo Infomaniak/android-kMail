@@ -22,13 +22,13 @@ import android.view.ViewGroup
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.views.itemViews.DecoratedItemView
 
 class InvalidMailboxViewHolder(
     inflater: LayoutInflater,
-    parent: ViewGroup
-) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemInvalidMailboxBinding.inflate(inflater, parent, false)) {
+    parent: ViewGroup,
+) : MenuDrawerViewHolder(ItemInvalidMailboxBinding.inflate(inflater, parent, false)) {
 
     fun displayInvalidMailbox(
         mailbox: Mailbox,

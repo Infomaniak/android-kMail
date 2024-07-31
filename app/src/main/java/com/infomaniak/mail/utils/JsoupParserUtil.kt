@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document
 object JsoupParserUtil {
 
     private const val SENTRY_LOG_TAG = "Jsoup memory usage"
-    private const val BYTE_TO_MEGABYTE_DIVIDER: Float = 1024f * 1024f
+    private const val BYTE_TO_MEGABYTE_DIVIDER = 1_024.0f * 1_024.0f
 
     fun jsoupParseWithLog(value: String): Document {
         return measureAndLogMemoryUsage(SENTRY_LOG_TAG, actionName = "parsing") {

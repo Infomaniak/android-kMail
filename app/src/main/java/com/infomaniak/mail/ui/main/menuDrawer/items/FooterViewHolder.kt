@@ -29,12 +29,12 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 
 class FooterViewHolder(
     inflater: LayoutInflater,
-    parent: ViewGroup
-) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerFooterBinding.inflate(inflater, parent, false)) {
+    parent: ViewGroup,
+) : MenuDrawerViewHolder(ItemMenuDrawerFooterBinding.inflate(inflater, parent, false)) {
 
     fun displayFooter(
         footer: MenuDrawerFooter,
