@@ -61,7 +61,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         return this
     }
 
-    fun formatList(mediatorContainer: MediatorContainer) = mutableListOf<Any>().apply {
+    fun formatList(mediatorContainer: MediatorContainer) = buildList {
         runCatchingRealm {
 
             val (
