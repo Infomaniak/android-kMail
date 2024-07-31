@@ -44,6 +44,7 @@ import com.infomaniak.mail.ui.main.menuDrawer.items.InvalidMailboxViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxesHeaderViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.MailboxesHeaderViewHolder.MailboxesHeader
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import javax.inject.Inject
 
@@ -60,25 +61,26 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         return this
     }
 
-    fun setItems(mediatorContainer: MediatorContainer) = runCatchingRealm {
+    fun formatList(mediatorContainer: MediatorContainer) = mutableListOf<Any>().apply {
+        runCatchingRealm {
 
-        val (
-            currentMailbox,
-            areMailboxesExpanded,
-            otherMailboxes,
-            allFolders,
-            areCustomFoldersExpanded,
-            permissions,
-            quotas,
-        ) = mediatorContainer
-
-        val items = mutableListOf<Any>().apply {
+            val (
+                mailboxes,
+                areMailboxesExpanded,
+                allFolders,
+                areCustomFoldersExpanded,
+                permissions,
+                quotas,
+            ) = mediatorContainer
 
             var count = 0
             var temporaryHasCollapsableDefaultFolder = false
             var temporaryHasCollapsableCustomFolder = false
 
             // Mailboxes
+            val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
+            val otherMailboxes = mailboxes.toMutableList()
+            val currentMailbox = otherMailboxes.removeAt(currentMailboxIndex)
             add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
             if (areMailboxesExpanded) addAll(otherMailboxes)
 
@@ -113,8 +115,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             add(ItemType.DIVIDER)
             add(MenuDrawerFooter(permissions, quotas))
         }
-
-        submitList(items)
     }
 
     fun notifySelectedFolder(currentFolder: Folder) {
