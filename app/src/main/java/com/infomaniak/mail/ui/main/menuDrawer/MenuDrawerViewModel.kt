@@ -19,13 +19,10 @@ package com.infomaniak.mail.ui.main.menuDrawer
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,16 +32,10 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuDrawerViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-
-    val otherMailboxesLive = mailboxController.getMailboxesAsync(
-        userId = AccountUtils.currentUserId,
-        exceptionMailboxIds = listOf(AccountUtils.currentMailboxId),
-    ).asLiveData(ioCoroutineContext)
 
     val areMailboxesExpanded = MutableLiveData(false)
     val areCustomFoldersExpanded = MutableLiveData(true)
