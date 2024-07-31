@@ -20,27 +20,22 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
-import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import kotlin.math.min
 
-object FolderItem : MenuDrawerBaseItem {
-
-    private const val MAX_SUB_FOLDERS_INDENT = 2
-
-    override val viewType = R.layout.item_menu_drawer_folder
-
-    override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
-        return ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)
-    }
+class FolderViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup
+) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)) {
 
     fun displayFolder(
         folder: Folder,
@@ -125,4 +120,8 @@ object FolderItem : MenuDrawerBaseItem {
         var trackerValue: Float?,
         var folderIndent: Int,
     )
+
+    companion object {
+        private const val MAX_SUB_FOLDERS_INDENT = 2
+    }
 }
