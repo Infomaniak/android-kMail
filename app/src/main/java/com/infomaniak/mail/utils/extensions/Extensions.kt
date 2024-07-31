@@ -358,16 +358,16 @@ fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): 
 
 fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> {
     val folders = this
-    val items = mutableListOf<Any>()
     var needsToAddDivider = true
-    folders.forEach { folder ->
-        if (needsToAddDivider && folder.isRootAndCustom) {
-            needsToAddDivider = false
-            items.add(dividerType)
+    return buildList {
+        folders.forEach { folder ->
+            if (needsToAddDivider && folder.isRootAndCustom) {
+                needsToAddDivider = false
+                add(dividerType)
+            }
+            add(folder)
         }
-        items.add(folder)
     }
-    return items
 }
 //endregion
 
