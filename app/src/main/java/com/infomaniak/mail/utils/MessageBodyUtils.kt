@@ -22,11 +22,11 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 object MessageBodyUtils {
@@ -67,7 +67,7 @@ object MessageBodyUtils {
             timeout = QUOTE_DETECTION_TIMEOUT,
             defaultValue = SplitBody(bodyContent),
             block = {
-                val (content, quotes) = splitContentAndQuotes(htmlDocument = Jsoup.parse(bodyContent))
+                val (content, quotes) = splitContentAndQuotes(htmlDocument = jsoupParseWithLog(bodyContent))
                 if (quotes.isEmpty() || quotes.all { it.isBlank() }) SplitBody(bodyContent) else SplitBody(content, bodyContent)
             },
             onTimeout = {

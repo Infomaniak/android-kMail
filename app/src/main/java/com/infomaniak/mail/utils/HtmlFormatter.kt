@@ -22,9 +22,9 @@ import androidx.annotation.RawRes
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.readRawResource
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
@@ -63,7 +63,7 @@ class HtmlFormatter(private val html: String) {
         printData = data
     }
 
-    fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(Jsoup.parse(html))) {
+    fun inject(): String = with(HtmlSanitizer.getInstance().sanitize(jsoupParseWithLog(html))) {
         outputSettings().prettyPrint(true)
         head().apply {
             injectCss()
