@@ -27,27 +27,27 @@ object JsoupParserUtil {
     private const val BYTE_TO_MEGABYTE_DIVIDER: Float = 1024f * 1024f
 
     fun jsoupParseWithLog(value: String): Document {
-        val (usedMemoryBefore, maxMemoryBefore) = getMemoryUsage()
-        SentryLog.i(SENTRY_LOG_TAG, "Before parsing, used / available: $usedMemoryBefore / $maxMemoryBefore MB")
-
-        val doc = Jsoup.parse(value)
-
-        val (usedMemoryAfter, maxMemoryAfter) = getMemoryUsage()
-        SentryLog.i(SENTRY_LOG_TAG, "After parsing, used / available: $usedMemoryAfter / $maxMemoryAfter MB")
-
-        return doc
+        return measureMemoryUsage(SENTRY_LOG_TAG, actionName = "parsing") {
+            Jsoup.parse(value)
+        }
     }
 
     fun jsoupParseBodyFragmentWithLog(value: String): Document {
-        val (usedMemoryBefore, maxMemoryBefore) = getMemoryUsage()
-        SentryLog.i(SENTRY_LOG_TAG, "Before parsing body fragment, used / available: $usedMemoryBefore / $maxMemoryBefore MB")
+        return measureMemoryUsage(SENTRY_LOG_TAG, actionName = "parsing body fragment") {
+            Jsoup.parseBodyFragment(value)
+        }
+    }
 
-        val doc = Jsoup.parseBodyFragment(value)
+    fun <R> measureMemoryUsage(tag: String, actionName: String, block: () -> R): R {
+        val (usedMemoryBefore, maxMemoryBefore) = getMemoryUsage()
+        SentryLog.i(tag, "Before $actionName, used / available: $usedMemoryBefore / $maxMemoryBefore MB")
+
+        val result = block()
 
         val (usedMemoryAfter, maxMemoryAfter) = getMemoryUsage()
-        SentryLog.i(SENTRY_LOG_TAG, "After parsing body fragment, used / available: $usedMemoryAfter / $maxMemoryAfter MB")
+        SentryLog.i(tag, "After $actionName, used / available: $usedMemoryAfter / $maxMemoryAfter MB")
 
-        return doc
+        return result
     }
 
     private fun getMemoryUsage(): Pair<Float, Float> {
