@@ -20,9 +20,9 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.infomaniak.mail.databinding.ItemMenuDrawerDividerBinding
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 
 class DividerItemViewHolder(
     inflater: LayoutInflater,
-    parent: ViewGroup
-) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerDividerBinding.inflate(inflater, parent, false))
+    parent: ViewGroup,
+) : MenuDrawerViewHolder(ItemMenuDrawerDividerBinding.inflate(inflater, parent, false))

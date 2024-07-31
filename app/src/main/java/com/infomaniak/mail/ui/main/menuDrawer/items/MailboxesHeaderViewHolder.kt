@@ -24,13 +24,13 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxesHeaderBinding
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.utils.extensions.toggleChevron
 
 class MailboxesHeaderViewHolder(
     inflater: LayoutInflater,
-    parent: ViewGroup
-) : MenuDrawerAdapter.MenuDrawerViewHolder(ItemMenuDrawerMailboxesHeaderBinding.inflate(inflater, parent, false)) {
+    parent: ViewGroup,
+) : MenuDrawerViewHolder(ItemMenuDrawerMailboxesHeaderBinding.inflate(inflater, parent, false)) {
 
     fun displayMailboxesHeader(
         header: MailboxesHeader,
