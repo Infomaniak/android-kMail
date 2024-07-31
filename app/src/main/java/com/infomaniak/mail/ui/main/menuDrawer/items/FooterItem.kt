@@ -34,7 +34,6 @@ import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
 
 object FooterItem : MenuDrawerBaseItem {
 
-    @Suppress("MayBeConstant")
     override val viewType = R.layout.item_menu_drawer_footer
 
     override fun binding(inflater: LayoutInflater, parent: ViewGroup): ViewBinding {
