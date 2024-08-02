@@ -24,12 +24,12 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseBodyFragmentWithLog
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.MailDateFormatUtils.formatForHeader
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.toDate
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
@@ -106,7 +106,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
             }
         }
 
-        return html?.let(Jsoup::parse)
+        return html?.let(::jsoupParseWithLog)
     }
 
     private fun Document.doOnHtmlImage(actionOnImage: (Element) -> Unit) {
