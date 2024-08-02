@@ -285,7 +285,7 @@
                         tools:visibility="visible" />
 
                     <com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
-                        android:id="@+id/editor"
+                        android:id="@+id/editorWebView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/marginStandardMedium"
@@ -302,11 +302,11 @@
                         android:text="@string/newMessagePlaceholderTitle"
                         android:textColor="@color/tertiaryTextColor"
                         android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/editor"
+                        app:layout_constraintBottom_toBottomOf="@id/editorWebView"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/editor"
+                        app:layout_constraintTop_toTopOf="@id/editorWebView"
                         tools:visibility="visible" />
 
                     <LinearLayout
@@ -363,7 +363,7 @@
                         android:layout_marginBottom="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/editor" />
+                        app:layout_constraintTop_toBottomOf="@id/editorWebView" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/removeSignature"

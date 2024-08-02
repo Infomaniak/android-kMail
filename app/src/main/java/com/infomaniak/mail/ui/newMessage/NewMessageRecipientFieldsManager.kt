@@ -124,12 +124,12 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     fun setOnFocusChangedListeners() = with(binding) {
         val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
         subjectTextField.onFocusChangeListener = listener
-        editor.onFocusChangeListener = listener
+        editorWebView.onFocusChangeListener = listener
     }
 
     fun focusBodyField() {
         // TODO: Make it so keyboard is kept open through configuration changes whenever the editor gets focused
-        binding.editor.requestFocusAndOpenKeyboard()
+        binding.editorWebView.requestFocusAndOpenKeyboard()
     }
 
     fun focusToField() {

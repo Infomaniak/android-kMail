@@ -73,8 +73,16 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
+import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
+import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
+import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
+import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
+import com.infomaniak.mail.utils.extensions.readRawResource
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -204,7 +212,7 @@ class NewMessageFragment : Fragment() {
     private fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {
         fromMailAddress.isGone = isShimmering
         subjectTextField.isGone = isShimmering
-        editor.isGone = isShimmering
+        editorWebView.isGone = isShimmering
 
         fromLoader.isVisible = isShimmering
         subjectLoader.isVisible = isShimmering
@@ -263,7 +271,7 @@ class NewMessageFragment : Fragment() {
 
     override fun onDestroyView() {
         // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
-        binding.editor.exportHtml { html ->
+        binding.editorWebView.exportHtml { html ->
             newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(html, BodyContentType.HTML_SANITIZED))
         }
 
@@ -338,7 +346,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() {
-        binding.editor.apply {
+        binding.editorWebView.apply {
             enableAlgorithmicDarkening(isEnabled = true)
             if (context.isNightModeEnabled()) addCss(context.readRawResource(R.raw.custom_dark_mode))
 
@@ -569,7 +577,7 @@ class NewMessageFragment : Fragment() {
 
     private fun observeBodyLoader() {
         newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { body ->
-            editorContentManager.setContent(binding.editor, body)
+            editorContentManager.setContent(binding.editorWebView, body)
         }
     }
 
@@ -603,7 +611,7 @@ class NewMessageFragment : Fragment() {
         // these values might not be accessible anymore by then. We store them right now before potentially loosing access to them
         // in case we need to save the Draft when they're inaccessible.
         val subject = binding.subjectTextField.text.toString()
-        binding.editor.exportHtml { html ->
+        binding.editorWebView.exportHtml { html ->
             newMessageViewModel.storeBodyAndSubject(subject, html)
         }
 

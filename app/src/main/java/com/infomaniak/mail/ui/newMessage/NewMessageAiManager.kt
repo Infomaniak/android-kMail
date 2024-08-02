@@ -93,7 +93,7 @@ class NewMessageAiManager @Inject constructor(
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
             subject?.let(subjectTextField::setText)
-            editorContentManager.setContent(editor, BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML))
+            editorContentManager.setContent(editorWebView, BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML))
         }
     }
 
@@ -225,7 +225,7 @@ class NewMessageAiManager @Inject constructor(
         fragment.safeNavigate(
             NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
                 isSubjectBlank = fragment.isSubjectBlank(),
-                isBodyBlank = binding.editor.isEmptyFlow.value ?: true,
+                isBodyBlank = binding.editorWebView.isEmptyFlow.value ?: true,
             ),
         )
     }
