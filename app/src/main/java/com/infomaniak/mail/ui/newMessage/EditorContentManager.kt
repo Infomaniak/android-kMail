@@ -20,8 +20,8 @@ package com.infomaniak.mail.ui.newMessage
 import android.text.Html
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.lib.richhtmleditor.RichHtmlEditorWebView
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import dagger.hilt.android.scopes.FragmentScoped
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
 
@@ -54,7 +54,7 @@ class EditorContentManager @Inject constructor() {
     private fun String.replaceNewLines(): String = replace(NEW_LINES_REGEX, "<br>")
 
     private fun String.sanitize(): String = HtmlSanitizer.getInstance()
-        .sanitize(Jsoup.parse(this))
+        .sanitize(jsoupParseWithLog(this))
         .apply { outputSettings().prettyPrint(false) }
         .getHtmlWithoutDocumentWrapping()
 
