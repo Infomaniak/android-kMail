@@ -86,7 +86,7 @@ class NewMessageActivity : BaseActivity() {
 
     private fun setupSnackbar() {
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
-            R.id.newMessageFragment -> findViewById(R.id.editor)
+            R.id.newMessageFragment -> findViewById(R.id.editorToolbar)
             R.id.aiPropositionFragment -> findViewById(R.id.aiPropositionBottomBar)
             else -> null
         }
