@@ -21,12 +21,13 @@ import android.content.Context
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.JsoupParserUtil.measureAndLogMemoryUsage
 import com.infomaniak.mail.utils.PrintHeaderUtils.createPrintHeader
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 object MessageBodyUtils {
@@ -67,7 +68,13 @@ object MessageBodyUtils {
             timeout = QUOTE_DETECTION_TIMEOUT,
             defaultValue = SplitBody(bodyContent),
             block = {
-                val (content, quotes) = splitContentAndQuotes(htmlDocument = Jsoup.parse(bodyContent))
+                // Do not nest jsoupParseWithLog and measureAndLogMemoryUsage so logs are independent from one another
+                val htmlDocument = jsoupParseWithLog(bodyContent)
+                val (content, quotes) = measureAndLogMemoryUsage(
+                    tag = "Split signature and quote memory usage",
+                    actionName = "splitting",
+                ) { splitContentAndQuotes(htmlDocument = htmlDocument) }
+
                 if (quotes.isEmpty() || quotes.all { it.isBlank() }) SplitBody(bodyContent) else SplitBody(content, bodyContent)
             },
             onTimeout = {

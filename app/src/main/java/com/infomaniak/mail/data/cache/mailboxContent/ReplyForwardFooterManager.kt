@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseBodyFragmentWithLog
 import com.infomaniak.mail.utils.MailDateFormatUtils.formatForHeader
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -159,7 +160,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
     }
 
     private fun parseAndWrapElementInNewDocument(elementHtml: String): Element {
-        val doc = Jsoup.parseBodyFragment(elementHtml)
+        val doc = jsoupParseBodyFragmentWithLog(elementHtml)
         return doc.body().firstElementChild()!!
     }
 

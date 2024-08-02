@@ -107,6 +107,7 @@ import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
 import io.realm.kotlin.MutableRealm
@@ -138,7 +139,7 @@ fun Activity.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
-fun String.removeLineBreaksFromHtml(): Document = Jsoup.parse(replace("\r", "").replace("\n", ""))
+fun String.removeLineBreaksFromHtml(): Document = jsoupParseWithLog(replace("\r", "").replace("\n", ""))
 
 fun String.htmlToText(): String = removeLineBreaksFromHtml().wholeText()
 
