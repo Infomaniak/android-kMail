@@ -67,6 +67,8 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
+import com.infomaniak.mail.utils.HtmlUtils.processCids
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
@@ -423,7 +425,30 @@ class NewMessageFragment : Fragment() {
         }
         removeQuote.setOnClickListener {
             trackNewMessageEvent("deleteQuote")
+            removeInlineAttachmentsUsedInQuote()
             newMessageViewModel.uiQuoteLiveData.value = null
+        }
+    }
+
+    private fun removeInlineAttachmentsUsedInQuote() {
+        newMessageViewModel.uiQuoteLiveData.value?.let { html ->
+            newMessageViewModel.attachmentsLiveData.value?.let { attachments ->
+                newMessageViewModel.attachmentsLiveData.value = attachments.filterOutHtmlCids(html)
+            }
+        }
+    }
+
+    private fun List<Attachment>.filterOutHtmlCids(html: String): List<Attachment> {
+        return buildList {
+            addAll(this@filterOutHtmlCids)
+
+            jsoupParseWithLog(html).processCids(
+                attachments = this@filterOutHtmlCids,
+                associateDataToCid = { it },
+                onCidImageFound = { attachment, _ ->
+                    remove(attachment)
+                }
+            )
         }
     }
 
