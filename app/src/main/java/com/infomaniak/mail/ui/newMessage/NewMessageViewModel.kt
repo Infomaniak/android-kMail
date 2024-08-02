@@ -72,6 +72,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldT
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
@@ -105,7 +106,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
 
@@ -350,7 +350,7 @@ class NewMessageViewModel @Inject constructor(
             return if (index == -1) Int.MAX_VALUE else index
         }
 
-        val doc = Jsoup.parse(draftBody).also { it.outputSettings().prettyPrint(false) }
+        val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
 
         val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
 
