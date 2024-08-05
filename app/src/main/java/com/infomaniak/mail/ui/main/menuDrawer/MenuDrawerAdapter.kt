@@ -31,20 +31,23 @@ import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxBinding
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxesHeaderBinding
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerItemType.DIVIDER_ITEM_VIEW_HOLDER
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerItemType.EMPTY_FOLDERS_ITEM
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerItemType.FOLDERS_HEADER_ITEM
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerItemType.FOLDER_ITEM
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerItemType.FOOTER_ITEM
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerItemType.INVALID_MAILBOX_ITEM
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerItemType.MAILBOXES_HEADER_ITEM
-import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerItemType.MAILBOX_ITEM
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ItemType.DIVIDER_ITEM
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ItemType.EMPTY_CUSTOM_FOLDERS_ITEM
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ItemType.FOLDERS_HEADER_ITEM
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ViewType.DIVIDER_VIEW
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ViewType.EMPTY_FOLDERS_VIEW
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ViewType.FOLDERS_HEADER_VIEW
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ViewType.FOLDER_VIEW
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ViewType.FOOTER_VIEW
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ViewType.INVALID_MAILBOX_VIEW
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ViewType.MAILBOXES_HEADER_VIEW
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.ViewType.MAILBOX_VIEW
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment.MediatorContainer
 import com.infomaniak.mail.ui.main.menuDrawer.items.DividerItemViewHolder
-import com.infomaniak.mail.ui.main.menuDrawer.items.EmptyFoldersItem
+import com.infomaniak.mail.ui.main.menuDrawer.items.EmptyFoldersViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder
-import com.infomaniak.mail.ui.main.menuDrawer.items.FoldersHeaderItem
+import com.infomaniak.mail.ui.main.menuDrawer.items.FoldersHeaderViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.FooterViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.FooterViewHolder.MenuDrawerFooter
 import com.infomaniak.mail.ui.main.menuDrawer.items.InvalidMailboxViewHolder
@@ -92,7 +95,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             if (areMailboxesExpanded) addAll(otherMailboxes)
 
             // Default Folders
-            add(ItemType.DIVIDER)
+            add(DIVIDER_ITEM)
             while (count < allFolders.count() && (allFolders[count].role != null || !allFolders[count].isRoot)) {
                 val defaultFolder = allFolders[count]
                 if (defaultFolder.canBeCollapsed) temporaryHasCollapsableDefaultFolder = true
@@ -101,11 +104,11 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             }
 
             // Custom Folders
-            add(ItemType.DIVIDER)
-            add(ItemType.CUSTOM_FOLDERS_HEADER)
+            add(DIVIDER_ITEM)
+            add(FOLDERS_HEADER_ITEM)
             if (areCustomFoldersExpanded) {
                 if (count == allFolders.count()) {
-                    add(ItemType.EMPTY_CUSTOM_FOLDERS)
+                    add(EMPTY_CUSTOM_FOLDERS_ITEM)
                 } else {
                     while (count < allFolders.count()) {
                         val customFolder = allFolders[count]
@@ -119,7 +122,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             hasCollapsableCustomFolder = temporaryHasCollapsableCustomFolder
 
             // Footer
-            add(ItemType.DIVIDER)
+            add(DIVIDER_ITEM)
             add(MenuDrawerFooter(permissions, quotas))
         }
     }
@@ -136,7 +139,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             var newIsFound = false
             for (index in currentList.indices) {
 
-                if (getItemViewType(index) != FOLDER_ITEM.ordinal) continue
+                if (getItemViewType(index) != FOLDER_VIEW.ordinal) continue
 
                 val itemId = (currentList[index] as Folder).id
                 if (itemId == oldId) {
@@ -156,13 +159,13 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return@runCatchingRealm when (val item = currentList[position]) {
-            is MailboxesHeader -> MAILBOXES_HEADER_ITEM.ordinal
-            is Mailbox -> if (item.isValid) MAILBOX_ITEM.ordinal else INVALID_MAILBOX_ITEM.ordinal
-            is Folder -> FOLDER_ITEM.ordinal
-            ItemType.CUSTOM_FOLDERS_HEADER -> FOLDERS_HEADER_ITEM.ordinal
-            ItemType.EMPTY_CUSTOM_FOLDERS -> EMPTY_FOLDERS_ITEM.ordinal
-            is MenuDrawerFooter -> FOOTER_ITEM.ordinal
-            ItemType.DIVIDER -> DIVIDER_ITEM_VIEW_HOLDER.ordinal
+            DIVIDER_ITEM -> DIVIDER_VIEW.ordinal
+            is MailboxesHeader -> MAILBOXES_HEADER_VIEW.ordinal
+            is Mailbox -> if (item.isValid) MAILBOX_VIEW.ordinal else INVALID_MAILBOX_VIEW.ordinal
+            FOLDERS_HEADER_ITEM -> FOLDERS_HEADER_VIEW.ordinal
+            is Folder -> FOLDER_VIEW.ordinal
+            EMPTY_CUSTOM_FOLDERS_ITEM -> EMPTY_FOLDERS_VIEW.ordinal
+            is MenuDrawerFooter -> FOOTER_VIEW.ordinal
             else -> error("Failed to find a viewType for MenuDrawer item")
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -171,14 +174,14 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         val inflater = LayoutInflater.from(parent.context)
 
         return when (viewType) {
-            MAILBOXES_HEADER_ITEM.ordinal -> MailboxesHeaderViewHolder(inflater, parent)
-            MAILBOX_ITEM.ordinal -> MailboxViewHolder(inflater, parent)
-            INVALID_MAILBOX_ITEM.ordinal -> InvalidMailboxViewHolder(inflater, parent)
-            FOLDER_ITEM.ordinal -> FolderViewHolder(inflater, parent)
-            FOLDERS_HEADER_ITEM.ordinal -> FoldersHeaderItem(inflater, parent)
-            EMPTY_FOLDERS_ITEM.ordinal -> EmptyFoldersItem(inflater, parent)
-            FOOTER_ITEM.ordinal -> FooterViewHolder(inflater, parent)
-            DIVIDER_ITEM_VIEW_HOLDER.ordinal -> DividerItemViewHolder(inflater, parent)
+            DIVIDER_VIEW.ordinal -> DividerItemViewHolder(inflater, parent)
+            MAILBOXES_HEADER_VIEW.ordinal -> MailboxesHeaderViewHolder(inflater, parent)
+            MAILBOX_VIEW.ordinal -> MailboxViewHolder(inflater, parent)
+            INVALID_MAILBOX_VIEW.ordinal -> InvalidMailboxViewHolder(inflater, parent)
+            FOLDERS_HEADER_VIEW.ordinal -> FoldersHeaderViewHolder(inflater, parent)
+            FOLDER_VIEW.ordinal -> FolderViewHolder(inflater, parent)
+            EMPTY_FOLDERS_VIEW.ordinal -> EmptyFoldersViewHolder(inflater, parent)
+            FOOTER_VIEW.ordinal -> FooterViewHolder(inflater, parent)
             else -> error("Failed to find a binding for MenuDrawer viewType")
         }
     }
@@ -214,6 +217,11 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 onLockedMailboxClicked = callbacks.onLockedMailboxClicked,
                 onInvalidPasswordMailboxClicked = callbacks.onInvalidPasswordMailboxClicked,
             )
+            is FoldersHeaderViewHolder -> holder.displayFoldersHeader(
+                binding = this as ItemMenuDrawerCustomFoldersHeaderBinding,
+                onFoldersHeaderClicked = callbacks.onFoldersHeaderClicked,
+                onCreateFolderClicked = callbacks.onCreateFolderClicked,
+            )
             is FolderViewHolder -> holder.displayFolder(
                 folder = item as Folder,
                 binding = this as ItemMenuDrawerFolderBinding,
@@ -221,11 +229,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 hasCollapsableFolder = if (item.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder,
                 onFolderClicked = callbacks.onFolderClicked,
                 onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
-            )
-            is FoldersHeaderItem -> holder.displayCustomFoldersHeader(
-                binding = this as ItemMenuDrawerCustomFoldersHeaderBinding,
-                onCustomFoldersHeaderClicked = callbacks.onCustomFoldersHeaderClicked,
-                onCreateFolderClicked = callbacks.onCreateFolderClicked,
             )
             is FooterViewHolder -> holder.displayFooter(
                 footer = item as MenuDrawerFooter,
@@ -243,48 +246,50 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     abstract class MenuDrawerViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 
     private enum class ItemType {
-        CUSTOM_FOLDERS_HEADER,
-        EMPTY_CUSTOM_FOLDERS,
-        DIVIDER,
+        DIVIDER_ITEM,
+        FOLDERS_HEADER_ITEM,
+        EMPTY_CUSTOM_FOLDERS_ITEM,
+    }
+
+    enum class ViewType {
+        DIVIDER_VIEW,
+        MAILBOXES_HEADER_VIEW,
+        MAILBOX_VIEW,
+        INVALID_MAILBOX_VIEW,
+        FOLDERS_HEADER_VIEW,
+        FOLDER_VIEW,
+        EMPTY_FOLDERS_VIEW,
+        FOOTER_VIEW,
     }
 
     private enum class NotifyType {
         MAILBOXES_HEADER_CLICKED,
     }
 
-    enum class MenuDrawerItemType {
-        MAILBOXES_HEADER_ITEM,
-        MAILBOX_ITEM,
-        INVALID_MAILBOX_ITEM,
-        FOLDER_ITEM,
-        FOLDERS_HEADER_ITEM,
-        EMPTY_FOLDERS_ITEM,
-        FOOTER_ITEM,
-        DIVIDER_ITEM_VIEW_HOLDER,
-    }
-
     private class FolderDiffCallback : DiffUtil.ItemCallback<Any>() {
 
         override fun areItemsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
             when (oldItem) {
+                DIVIDER_ITEM -> newItem == DIVIDER_ITEM
                 is MailboxesHeader -> newItem is MailboxesHeader && newItem.mailbox?.objectId == oldItem.mailbox?.objectId
                 is Mailbox -> newItem is Mailbox && newItem.objectId == oldItem.objectId
+                FOLDERS_HEADER_ITEM -> newItem == FOLDERS_HEADER_ITEM
                 is Folder -> newItem is Folder && newItem.id == oldItem.id
-                ItemType.CUSTOM_FOLDERS_HEADER -> newItem == ItemType.CUSTOM_FOLDERS_HEADER
-                ItemType.EMPTY_CUSTOM_FOLDERS -> newItem == ItemType.EMPTY_CUSTOM_FOLDERS
+                EMPTY_CUSTOM_FOLDERS_ITEM -> newItem == EMPTY_CUSTOM_FOLDERS_ITEM
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter
-                ItemType.DIVIDER -> newItem == ItemType.DIVIDER
                 else -> error("oldItem wasn't any known item type (in MenuDrawer `areItemsTheSame`)")
             }
         }.getOrDefault(false)
 
         override fun areContentsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
             when (oldItem) {
+                DIVIDER_ITEM -> true
                 is MailboxesHeader -> newItem is MailboxesHeader
                         && newItem.hasMoreThanOneMailbox == oldItem.hasMoreThanOneMailbox
                         && newItem.isExpanded == oldItem.isExpanded
                         && newItem.mailbox?.unreadCountDisplay?.count == oldItem.mailbox?.unreadCountDisplay?.count
                 is Mailbox -> newItem is Mailbox && newItem.unreadCountDisplay.count == oldItem.unreadCountDisplay.count
+                FOLDERS_HEADER_ITEM -> true
                 is Folder -> newItem is Folder &&
                         newItem.name == oldItem.name &&
                         newItem.isFavorite == oldItem.isFavorite &&
@@ -292,10 +297,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         newItem.unreadCountDisplay == oldItem.unreadCountDisplay &&
                         newItem.threads.count() == oldItem.threads.count() &&
                         newItem.canBeCollapsed == oldItem.canBeCollapsed
-                ItemType.CUSTOM_FOLDERS_HEADER -> true
-                ItemType.EMPTY_CUSTOM_FOLDERS -> true
+                EMPTY_CUSTOM_FOLDERS_ITEM -> true
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
-                ItemType.DIVIDER -> false
                 else -> error("oldItem wasn't any known item type (in MenuDrawer `areContentsTheSame`)")
             }
         }.getOrDefault(false)

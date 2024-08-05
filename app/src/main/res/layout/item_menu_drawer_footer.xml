@@ -23,7 +23,7 @@
     android:layout_marginBottom="@dimen/marginStandardSmall"
     android:orientation="vertical">
 
-    <!-- advanced actions dropdown -->
+    <!-- Advanced Actions dropdown -->
     <com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerDropdownView
         android:id="@+id/advancedActions"
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
         app:collapsedByDefault="true"
         app:title="@string/menuDrawerAdvancedActions" />
 
-    <!-- advanced actions -->
+    <!-- Advanced Actions -->
     <LinearLayout
         android:id="@+id/advancedActionsLayout"
         android:layout_width="match_parent"
@@ -64,13 +64,13 @@
 
     </LinearLayout>
 
-    <!-- divider -->
+    <!-- Divider -->
     <com.google.android.material.divider.MaterialDivider
         style="@style/MenuDrawerDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- feedback -->
+    <!-- Feedback -->
     <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView
         android:id="@+id/feedback"
         android:layout_width="match_parent"
@@ -78,7 +78,7 @@
         app:icon="@drawable/ic_feedback"
         app:text="@string/buttonFeedback" />
 
-    <!-- help -->
+    <!-- Help -->
     <com.infomaniak.mail.views.itemViews.SimpleMenuDrawerItemView
         android:id="@+id/help"
         android:layout_width="match_parent"
@@ -86,14 +86,14 @@
         app:icon="@drawable/ic_help"
         app:text="@string/buttonHelp" />
 
-    <!-- divider -->
+    <!-- Divider -->
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/storageDivider"
         style="@style/MenuDrawerDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- quotas -->
+    <!-- Quotas -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/storageLayout"
         android:layout_width="match_parent"
@@ -138,13 +138,13 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- divider -->
+    <!-- Divider -->
     <com.google.android.material.divider.MaterialDivider
         style="@style/MenuDrawerDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- app  version -->
+    <!-- App  version -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/appVersionName"
         style="@style/TextButton"
