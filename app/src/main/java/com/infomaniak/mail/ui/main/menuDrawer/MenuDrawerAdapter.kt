@@ -23,9 +23,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerActionBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerActionsHeaderBinding
 import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
@@ -33,6 +36,10 @@ import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxBinding
 import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxesHeaderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment.MediatorContainer
+import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder
+import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction
+import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType
+import com.infomaniak.mail.ui.main.menuDrawer.items.ActionsHeaderViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.DividerItemViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.EmptyFoldersViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder
@@ -68,6 +75,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 areMailboxesExpanded,
                 allFolders,
                 areCustomFoldersExpanded,
+                areActionsExpanded,
                 permissions,
                 quotas,
             ) = mediatorContainer
@@ -110,9 +118,40 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             hasCollapsableDefaultFolder = temporaryHasCollapsableDefaultFolder
             hasCollapsableCustomFolder = temporaryHasCollapsableCustomFolder
 
-            // Footer
+            // Actions
             add(ItemType.DIVIDER)
-            add(MenuDrawerFooter(permissions, quotas))
+            add(ItemType.ACTIONS_HEADER)
+            if (areActionsExpanded) {
+                add(
+                    MenuDrawerAction(
+                        type = ActionType.SYNC_AUTO_CONFIG,
+                        icon = R.drawable.ic_synchronize,
+                        text = R.string.syncCalendarsAndContactsTitle,
+                        maxLines = 2,
+                    ),
+                )
+                add(
+                    MenuDrawerAction(
+                        type = ActionType.IMPORT_MAILS,
+                        icon = R.drawable.ic_drawer_download,
+                        text = R.string.buttonImportEmails,
+                        maxLines = 1,
+                    ),
+                )
+                if (permissions?.canRestoreEmails == true) {
+                    add(
+                        MenuDrawerAction(
+                            type = ActionType.RESTORE_MAILS,
+                            icon = R.drawable.ic_restore_arrow,
+                            text = R.string.buttonRestoreEmails,
+                            maxLines = 1,
+                        ),
+                    )
+                }
+            }
+
+            // Footer
+            add(MenuDrawerFooter(quotas))
         }
     }
 
@@ -154,6 +193,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             ItemType.FOLDERS_HEADER -> ItemType.FOLDERS_HEADER.ordinal
             is Folder -> ItemType.FOLDER.ordinal
             ItemType.EMPTY_FOLDERS -> ItemType.EMPTY_FOLDERS.ordinal
+            ItemType.ACTIONS_HEADER -> ItemType.ACTIONS_HEADER.ordinal
+            is MenuDrawerAction -> ItemType.ACTION.ordinal
             is MenuDrawerFooter -> ItemType.FOOTER.ordinal
             else -> error("Failed to find a viewType for MenuDrawer item")
         }
@@ -170,6 +211,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             ItemType.FOLDERS_HEADER.ordinal -> FoldersHeaderViewHolder(inflater, parent)
             ItemType.FOLDER.ordinal -> FolderViewHolder(inflater, parent)
             ItemType.EMPTY_FOLDERS.ordinal -> EmptyFoldersViewHolder(inflater, parent)
+            ItemType.ACTIONS_HEADER.ordinal -> ActionsHeaderViewHolder(inflater, parent)
+            ItemType.ACTION.ordinal -> ActionViewHolder(inflater, parent)
             ItemType.FOOTER.ordinal -> FooterViewHolder(inflater, parent)
             else -> error("Failed to find a binding for MenuDrawer viewType")
         }
@@ -219,12 +262,18 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 onFolderClicked = callbacks.onFolderClicked,
                 onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
             )
+            is ActionsHeaderViewHolder -> holder.displayActionsHeader(
+                binding = this as ItemMenuDrawerActionsHeaderBinding,
+                onActionsHeaderClicked = callbacks.onActionsHeaderClicked,
+            )
+            is ActionViewHolder -> holder.displayAction(
+                action = item as MenuDrawerAction,
+                binding = this as ItemMenuDrawerActionBinding,
+                onActionClicked = callbacks.onActionClicked,
+            )
             is FooterViewHolder -> holder.displayFooter(
                 footer = item as MenuDrawerFooter,
                 binding = this as ItemMenuDrawerFooterBinding,
-                onSyncAutoConfigClicked = callbacks.onSyncAutoConfigClicked,
-                onImportMailsClicked = callbacks.onImportMailsClicked,
-                onRestoreMailsClicked = callbacks.onRestoreMailsClicked,
                 onFeedbackClicked = callbacks.onFeedbackClicked,
                 onHelpClicked = callbacks.onHelpClicked,
                 onAppVersionClicked = callbacks.onAppVersionClicked,
@@ -242,6 +291,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         FOLDERS_HEADER,
         FOLDER,
         EMPTY_FOLDERS,
+        ACTIONS_HEADER,
+        ACTION,
         FOOTER,
     }
 
@@ -259,6 +310,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 ItemType.FOLDERS_HEADER -> newItem == ItemType.FOLDERS_HEADER
                 is Folder -> newItem is Folder && newItem.id == oldItem.id
                 ItemType.EMPTY_FOLDERS -> newItem == ItemType.EMPTY_FOLDERS
+                ItemType.ACTIONS_HEADER -> newItem == ItemType.ACTIONS_HEADER
+                is MenuDrawerAction -> newItem is MenuDrawerAction && newItem.type == oldItem.type
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter
                 else -> error("oldItem wasn't any known item type (in MenuDrawer `areItemsTheSame`)")
             }
@@ -281,6 +334,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         newItem.threads.count() == oldItem.threads.count() &&
                         newItem.canBeCollapsed == oldItem.canBeCollapsed
                 ItemType.EMPTY_FOLDERS -> true
+                ItemType.ACTIONS_HEADER -> true
+                is MenuDrawerAction -> true
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
                 else -> error("oldItem wasn't any known item type (in MenuDrawer `areContentsTheSame`)")
             }

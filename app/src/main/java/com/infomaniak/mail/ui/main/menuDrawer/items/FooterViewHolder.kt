@@ -19,15 +19,11 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.toFloat
-import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.data.models.Quotas
-import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 
@@ -39,32 +35,11 @@ class FooterViewHolder(
     fun displayFooter(
         footer: MenuDrawerFooter,
         binding: ItemMenuDrawerFooterBinding,
-        onSyncAutoConfigClicked: () -> Unit,
-        onImportMailsClicked: () -> Unit,
-        onRestoreMailsClicked: () -> Unit,
         onFeedbackClicked: () -> Unit,
         onHelpClicked: () -> Unit,
         onAppVersionClicked: () -> Unit,
     ) = with(binding) {
         SentryLog.d("Bind", "Bind Footer")
-
-        // Actions header
-        advancedActions.setOnClickListener {
-            context.trackMenuDrawerEvent("advancedActions", value = (!advancedActions.isCollapsed).toFloat())
-            advancedActionsLayout.isGone = advancedActions.isCollapsed
-        }
-
-        // Calendar & contacts sync
-        syncAutoConfig.setOnClickListener { onSyncAutoConfigClicked() }
-
-        // Import mails
-        importMails.setOnClickListener { onImportMailsClicked() }
-
-        // Restore mails
-        restoreMails.apply {
-            isVisible = footer.permissions?.canRestoreEmails == true
-            setOnClickListener { onRestoreMailsClicked() }
-        }
 
         // Feedback
         feedback.setOnClickListener { onFeedbackClicked() }
@@ -88,5 +63,5 @@ class FooterViewHolder(
         }
     }
 
-    data class MenuDrawerFooter(val permissions: MailboxPermissions?, val quotas: Quotas?)
+    data class MenuDrawerFooter(val quotas: Quotas?)
 }

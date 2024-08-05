@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.menuDrawer
 
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType
 
 interface MenuDrawerAdapterCallbacks {
 
@@ -33,9 +34,9 @@ interface MenuDrawerAdapterCallbacks {
     var onFolderClicked: (folderId: String) -> Unit
     var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit
 
-    var onSyncAutoConfigClicked: () -> Unit
-    var onImportMailsClicked: () -> Unit
-    var onRestoreMailsClicked: () -> Unit
+    var onActionsHeaderClicked: () -> Unit
+    var onActionClicked: (ActionType) -> Unit
+
     var onFeedbackClicked: () -> Unit
     var onHelpClicked: () -> Unit
     var onAppVersionClicked: () -> Unit

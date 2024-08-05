@@ -36,6 +36,7 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
@@ -52,6 +53,7 @@ import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.InvalidPasswordFragmentArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
+import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ConfettiUtils
 import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType.INFOMANIAK
@@ -129,9 +131,8 @@ class MenuDrawerFragment : Fragment() {
                 override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
                 override var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
-                override var onSyncAutoConfigClicked: () -> Unit = ::onSyncAutoConfigClicked
-                override var onImportMailsClicked: () -> Unit = ::onImportMailsClicked
-                override var onRestoreMailsClicked: () -> Unit = ::onRestoreMailsClicked
+                override var onActionsHeaderClicked: () -> Unit = ::onActionsHeaderClicked
+                override var onActionClicked: (ActionType) -> Unit = ::onActionClicked
                 override var onFeedbackClicked: () -> Unit = ::onFeedbackClicked
                 override var onHelpClicked: () -> Unit = ::onHelpClicked
                 override var onAppVersionClicked: () -> Unit = ::onAppVersionClicked
@@ -197,6 +198,19 @@ class MenuDrawerFragment : Fragment() {
         menuDrawerViewModel.toggleFolderCollapsingState(folderId, shouldCollapse)
     }
 
+    private fun onActionsHeaderClicked() {
+        context?.trackMenuDrawerEvent("advancedActions", value = (!menuDrawerViewModel.areActionsExpanded.value!!).toFloat())
+        menuDrawerViewModel.toggleActionsCollapsingState()
+    }
+
+    private fun onActionClicked(type: ActionType) {
+        when (type) {
+            ActionType.SYNC_AUTO_CONFIG -> onSyncAutoConfigClicked()
+            ActionType.IMPORT_MAILS -> onImportMailsClicked()
+            ActionType.RESTORE_MAILS -> onRestoreMailsClicked()
+        }
+    }
+
     private fun onSyncAutoConfigClicked() {
         trackSyncAutoConfigEvent("openFromMenuDrawer")
         launchSyncAutoConfigActivityForResult()
@@ -258,6 +272,7 @@ class MenuDrawerFragment : Fragment() {
             menuDrawerViewModel.areMailboxesExpanded,
             currentFoldersLive,
             menuDrawerViewModel.areCustomFoldersExpanded,
+            menuDrawerViewModel.areActionsExpanded,
             currentPermissionsLive,
             currentQuotasLive,
             constructor = {
@@ -267,8 +282,9 @@ class MenuDrawerFragment : Fragment() {
                     it[1] as Boolean,
                     it[2] as List<Folder>,
                     it[3] as Boolean,
-                    it[4] as MailboxPermissions?,
-                    it[5] as Quotas?,
+                    it[4] as Boolean,
+                    it[5] as MailboxPermissions?,
+                    it[6] as Quotas?,
                 )
             }
         )
@@ -309,6 +325,7 @@ class MenuDrawerFragment : Fragment() {
         val areMailboxesExpanded: Boolean,
         val allFolders: List<Folder>,
         val areCustomFoldersExpanded: Boolean,
+        val areActionsExpanded: Boolean,
         val permissions: MailboxPermissions?,
         val quotas: Quotas?,
     )
