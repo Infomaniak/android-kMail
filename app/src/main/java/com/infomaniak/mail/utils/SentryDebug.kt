@@ -116,14 +116,6 @@ object SentryDebug {
             count++
         }
 
-        fun addStepData(value: String) {
-            addData(category = "step", value = value)
-        }
-
-        fun addEmailData(value: String) {
-            addData(category = "email", value = value)
-        }
-
         fun addDraftData(key: String, value: String) {
             addData(category = "draft", key = " - $key", value = value)
         }
@@ -136,8 +128,8 @@ object SentryDebug {
             addData(category = "attachment #${(index + 1).countPadding()}", value = value)
         }
 
-        addStepData(value = step)
-        addEmailData(value = AccountUtils.currentMailboxEmail.toString())
+        addData(category = "step", value = step)
+        addData(category = "email", value = AccountUtils.currentMailboxEmail.toString())
 
         addDraftData(key = "localUuid", value = localUuid)
         addDraftData(key = "remoteUuid", value = remoteUuid.toString())
