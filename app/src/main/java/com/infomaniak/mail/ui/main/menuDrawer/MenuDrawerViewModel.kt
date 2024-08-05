@@ -39,10 +39,15 @@ class MenuDrawerViewModel @Inject constructor(
 
     val areMailboxesExpanded = MutableLiveData(false)
     val areCustomFoldersExpanded = MutableLiveData(true)
+    val areActionsExpanded = MutableLiveData(false)
 
     fun toggleFolderCollapsingState(folderId: String, shouldCollapse: Boolean) = viewModelScope.launch(ioCoroutineContext) {
         FolderController.updateFolderAndChildren(folderId, mailboxContentRealm()) {
             if (it.isRoot) it.isCollapsed = shouldCollapse else it.isHidden = shouldCollapse
         }
+    }
+
+    fun toggleActionsCollapsingState() {
+        areActionsExpanded.value = !areActionsExpanded.value!!
     }
 }
