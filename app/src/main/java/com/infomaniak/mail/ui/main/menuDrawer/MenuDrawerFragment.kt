@@ -125,10 +125,10 @@ class MenuDrawerFragment : Fragment() {
                 override var onValidMailboxClicked: (Int) -> Unit = ::onValidMailboxClicked
                 override var onLockedMailboxClicked: (String) -> Unit = ::onLockedMailboxClicked
                 override var onInvalidPasswordMailboxClicked: (Mailbox) -> Unit = ::onInvalidPasswordMailboxClicked
+                override var onFoldersHeaderClicked: (Boolean) -> Unit = ::onFoldersHeaderClicked
+                override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
                 override var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
-                override var onCustomFoldersHeaderClicked: (Boolean) -> Unit = ::onCustomFoldersHeaderClicked
-                override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onSyncAutoConfigClicked: () -> Unit = ::onSyncAutoConfigClicked
                 override var onImportMailsClicked: () -> Unit = ::onImportMailsClicked
                 override var onRestoreMailsClicked: () -> Unit = ::onRestoreMailsClicked
@@ -178,7 +178,7 @@ class MenuDrawerFragment : Fragment() {
         )
     }
 
-    private fun onCustomFoldersHeaderClicked(isCollapsed: Boolean) {
+    private fun onFoldersHeaderClicked(isCollapsed: Boolean) {
         trackMenuDrawerEvent("customFolders", !isCollapsed)
         menuDrawerViewModel.areCustomFoldersExpanded.value = !isCollapsed
     }
