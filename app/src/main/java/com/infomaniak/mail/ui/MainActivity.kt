@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -198,7 +199,7 @@ class MainActivity : BaseActivity() {
 
         setupSnackbar()
         setupNavController()
-        setupMenuDrawerCallbacks()
+        setupMenuDrawer()
 
         mainViewModel.updateUserInfo()
 
@@ -210,6 +211,14 @@ class MainActivity : BaseActivity() {
 
         initAppUpdateManager()
         initAppReviewManager()
+    }
+
+    private fun setupMenuDrawer() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            binding.drawerLayout.defaultFocusHighlightEnabled = false
+        }
+
+        setupMenuDrawerCallbacks()
     }
 
     private fun initAppReviewManager() {
