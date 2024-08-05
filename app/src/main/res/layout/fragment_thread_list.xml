@@ -79,7 +79,7 @@
                                 android:layout_height="48dp"
                                 android:layout_gravity="center"
                                 android:layout_marginEnd="@dimen/marginStandardMedium"
-                                android:focusable="true"
+                                android:focusable="false"
                                 app:inset="@dimen/marginStandardSmall"
                                 tools:src="@tools:sample/avatars[12]" />
 

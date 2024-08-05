@@ -516,8 +516,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     private fun setupUserAvatar() {
-        binding.userAvatar.setFocusableTest()
-        binding.userAvatar.isFocusable = false
+        binding.userAvatar.isFocusable = true
         AccountUtils.currentUser?.let(binding.userAvatar::loadAvatar)
     }
 

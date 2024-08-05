@@ -416,6 +416,7 @@ class ThreadListAdapter @Inject constructor(
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
         val (recipient, bimi) = thread.computeAvatarRecipient()
         expeditorAvatar.loadAvatar(recipient, bimi)
+        expeditorAvatar.isFocusable = false
     }
 
     private fun CardviewThreadItemBinding.formatRecipientNames(recipients: List<Recipient>): String {
