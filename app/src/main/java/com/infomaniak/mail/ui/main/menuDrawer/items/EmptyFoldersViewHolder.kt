@@ -19,23 +19,10 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerEmptyCustomFoldersBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 
-class FoldersHeaderItem(
+class EmptyFoldersViewHolder(
     inflater: LayoutInflater,
     parent: ViewGroup,
-) : MenuDrawerViewHolder(ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)) {
-
-    fun displayCustomFoldersHeader(
-        binding: ItemMenuDrawerCustomFoldersHeaderBinding,
-        onCustomFoldersHeaderClicked: (Boolean) -> Unit,
-        onCreateFolderClicked: () -> Unit,
-    ) = with(binding.root) {
-        SentryLog.d("Bind", "Bind Custom Folders header")
-
-        setOnClickListener { onCustomFoldersHeaderClicked(isCollapsed) }
-        setOnActionClickListener { onCreateFolderClicked() }
-    }
-}
+) : MenuDrawerViewHolder(ItemMenuDrawerEmptyCustomFoldersBinding.inflate(inflater, parent, false))

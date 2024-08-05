@@ -24,15 +24,14 @@ interface MenuDrawerAdapterCallbacks {
     var onMailboxesHeaderClicked: () -> Unit
 
     var onValidMailboxClicked: (Int) -> Unit
-
     var onLockedMailboxClicked: (String) -> Unit
     var onInvalidPasswordMailboxClicked: (Mailbox) -> Unit
 
+    var onFoldersHeaderClicked: (Boolean) -> Unit
+    var onCreateFolderClicked: () -> Unit
+
     var onFolderClicked: (folderId: String) -> Unit
     var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit
-
-    var onCustomFoldersHeaderClicked: (Boolean) -> Unit
-    var onCreateFolderClicked: () -> Unit
 
     var onSyncAutoConfigClicked: () -> Unit
     var onImportMailsClicked: () -> Unit
