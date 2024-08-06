@@ -216,7 +216,7 @@ class SearchFragment : TwoPaneFragment() {
                 if (viewType == SearchFolderElement.FOLDER.itemId || viewType == SearchFolderElement.ALL_FOLDERS.itemId) {
 
                     val folder = folders[position] as? Folder
-                    val entryName: String = requireContext().getLocalizedNameOrAllFolders(folder)
+                    val entryName = requireContext().getLocalizedNameOrAllFolders(folder)
 
                     onFolderSelected(folder, entryName)
                     popupMenu.dismiss()
