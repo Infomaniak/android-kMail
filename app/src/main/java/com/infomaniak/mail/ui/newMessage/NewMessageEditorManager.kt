@@ -119,7 +119,8 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
         }
 
         editorActions.isGone = isEditorExpanded
-        textEditing.isVisible = isEditorExpanded
+        formatOptionsScrollView.isVisible = isEditorExpanded
+        formatOptionsDivider.isVisible = isEditorExpanded
     }
 
     fun observeEditorStatus(): Unit = with(binding) {
