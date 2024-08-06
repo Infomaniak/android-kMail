@@ -23,12 +23,10 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.ui.newMessage.BodyContentPayload
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -88,18 +86,6 @@ class Draft : RealmObject {
     var localUuid: String = UUID.randomUUID().toString()
     @Transient
     var messageUid: String? = null
-    //endregion
-
-    //region UI data (Transient & Ignore)
-    @Transient
-    @Ignore
-    var uiBody: BodyContentPayload = BodyContentPayload.emptyBody()
-    @Transient
-    @Ignore
-    var uiSignature: String? = null
-    @Transient
-    @Ignore
-    var uiQuote: String? = null
     //endregion
 
     var action
