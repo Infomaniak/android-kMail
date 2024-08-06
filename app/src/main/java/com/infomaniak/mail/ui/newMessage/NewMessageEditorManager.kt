@@ -59,7 +59,7 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
         _openFilePicker = openFilePicker
     }
 
-    fun observeEditorActions() = with(binding) {
+    fun observeEditorFormatActions() = with(binding) {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
                 EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
@@ -76,7 +76,7 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
         }
     }
 
-    fun setupEditorActions() = with(binding) {
+    fun setupEditorFormatActions() = with(binding) {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
                 context.trackEvent("editorActions", action.matomoValue)

@@ -186,7 +186,7 @@ class NewMessageFragment : Fragment() {
         observeShimmering()
 
         with(editorManager) {
-            observeEditorActions()
+            observeEditorFormatActions()
             observeEditorStatus()
         }
 
@@ -531,7 +531,7 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
             configureUiWithDraftData(draft)
             setupFromField(signatures)
-            editorManager.setupEditorActions()
+            editorManager.setupEditorFormatActions()
             editorManager.setupEditorFormatActionsToggle()
         }
     }
