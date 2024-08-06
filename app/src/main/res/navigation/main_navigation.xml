@@ -168,6 +168,16 @@
             app:argType="string" />
     </dialog>
 
+    <dialog
+        android:id="@+id/userToBlockBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.UserToBlockBottomSheetDialog"
+        android:label="UserToBlockBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_user_to_block">
+        <argument
+            android:name="threadUid"
+            app:argType="string" />
+    </dialog>
+
     <fragment
         android:id="@+id/switchUserFragment"
         android:name="com.infomaniak.mail.ui.main.user.SwitchUserFragment"
