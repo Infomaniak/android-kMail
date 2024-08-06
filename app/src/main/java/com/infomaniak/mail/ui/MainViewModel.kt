@@ -1002,6 +1002,20 @@ class MainViewModel @Inject constructor(
         emit(messageController.getMessage(messageUid)!!)
     }
 
+    fun hasOtherExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
+        val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } ?: false
+        emit(hasOtherExpeditors)
+    }
+
+    fun getMessagesFromUniqueExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
+        val messageToRecipient = threadController.getThread(threadUid)?.messages?.flatMap { message ->
+            message.from.filterNot { it.isMe() }
+                .distinct()
+                .map { from -> message to from }
+        }
+        emit(messageToRecipient)
+    }
+
     fun selectOrUnselectAll() {
         if (isEverythingSelected) {
             appContext.trackMultiSelectionEvent("none")

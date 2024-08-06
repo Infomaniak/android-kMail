@@ -104,6 +104,7 @@
     </plurals>
     <string name="attendeesListTitle">Elenco dei partecipanti (%d)</string>
     <string name="bccTitle">Bcc:</string>
+    <string name="blockAnExpeditorTitle">Bloccare un mittente</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Password bloccata</item>
         <item quantity="other">Password bloccate</item>
