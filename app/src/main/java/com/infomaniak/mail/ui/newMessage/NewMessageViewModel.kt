@@ -314,9 +314,8 @@ class NewMessageViewModel @Inject constructor(
         populateWithExternalMailDataIfNeeded(draft = this, intent)
     }
 
-    private fun initSignature(draft: Draft, signature: Signature) = with(draft) {
-
-        identityId = signature.id.toString()
+    private fun initSignature(draft: Draft, signature: Signature) {
+        draft.identityId = signature.id.toString()
 
         if (signature.content.isNotEmpty()) {
             initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
