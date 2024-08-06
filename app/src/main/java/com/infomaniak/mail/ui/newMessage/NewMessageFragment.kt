@@ -47,6 +47,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.lib.richhtmleditor.StatusCommand.*
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -184,6 +185,7 @@ class NewMessageFragment : Fragment() {
         observeShimmering()
 
         editorManager.observeEditorActions()
+        editorManager.observeEditorStatus()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
 
         with(aiManager) {
@@ -343,6 +345,8 @@ class NewMessageFragment : Fragment() {
 
     private fun initEditorUi() {
         binding.editorWebView.apply {
+            subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST))
+
             enableAlgorithmicDarkening(isEnabled = true)
             if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
 

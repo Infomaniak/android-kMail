@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.content.res.ColorStateList
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -28,6 +29,7 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.notYetImplemented
 import dagger.hilt.android.scopes.FragmentScoped
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
@@ -57,7 +59,7 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
         _openFilePicker = openFilePicker
     }
 
-    fun observeEditorActions() {
+    fun observeEditorActions() = with(binding) {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
                 EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
@@ -65,11 +67,11 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
                 EditorAction.LINK -> fragment.notYetImplemented()
                 EditorAction.CLOCK -> fragment.notYetImplemented()
                 EditorAction.AI -> aiManager.openAiPrompt()
-                EditorAction.BOLD -> {}
-                EditorAction.ITALIC -> {}
-                EditorAction.UNDERLINE -> {}
-                EditorAction.STRIKE_THROUGH -> {}
-                EditorAction.UNORDERED_LIST -> {}
+                EditorAction.BOLD -> editorWebView.toggleBold()
+                EditorAction.ITALIC -> editorWebView.toggleItalic()
+                EditorAction.UNDERLINE -> editorWebView.toggleUnderline()
+                EditorAction.STRIKE_THROUGH -> editorWebView.toggleStrikeThrough()
+                EditorAction.UNORDERED_LIST -> editorWebView.toggleUnorderedList()
             }
         }
     }
@@ -118,6 +120,18 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
 
         editorActions.isGone = isEditorExpanded
         textEditing.isVisible = isEditorExpanded
+    }
+
+    fun observeEditorStatus(): Unit = with(binding) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            editorWebView.editorStatusesFlow.collect {
+                buttonBold.isActivated = it.isBold
+                buttonItalic.isActivated = it.isItalic
+                buttonUnderline.isActivated = it.isUnderlined
+                buttonStrikeThrough.isActivated = it.isStrikeThrough
+                buttonList.isActivated = it.isUnorderedListSelected
+            }
+        }
     }
 
     enum class EditorAction(val matomoValue: String) {
