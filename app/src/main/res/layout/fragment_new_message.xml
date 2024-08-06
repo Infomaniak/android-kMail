@@ -30,10 +30,10 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
-            android:touchscreenBlocksFocus="false"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/newMessageBackgroundColor"
+            android:touchscreenBlocksFocus="false"
             app:contentInsetEnd="@dimen/marginStandardSmall"
             app:layout_constraintBottom_toTopOf="@+id/compositionNestedScrollView"
             app:layout_constraintTop_toTopOf="parent"
