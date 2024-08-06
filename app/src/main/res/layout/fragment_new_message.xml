@@ -548,7 +548,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/formatOptionsDivider"
+                    app:layout_constraintEnd_toStartOf="@id/sendButton"
                     app:layout_constraintStart_toEndOf="@id/editorTextOptions"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -661,18 +661,6 @@
                         </LinearLayout>
                     </HorizontalScrollView>
                 </FrameLayout>
-
-                <com.google.android.material.divider.MaterialDivider
-                    android:id="@+id/formatOptionsDivider"
-                    android:layout_width="1dp"
-                    android:layout_height="0dp"
-                    android:layout_marginVertical="@dimen/marginStandardSmall"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/sendButton"
-                    app:layout_constraintStart_toEndOf="@id/dynamicEditorActionsLayout"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/sendButton"
