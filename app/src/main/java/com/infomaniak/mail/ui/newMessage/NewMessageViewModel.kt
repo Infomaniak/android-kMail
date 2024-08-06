@@ -888,9 +888,7 @@ class NewMessageViewModel @Inject constructor(
 
         subject = subjectValue
 
-        val signature = uiSignatureLiveData.value
-        val quote = uiQuoteLiveData.value
-        body = uiBodyValue + (signature ?: "") + (quote ?: "")
+        body = uiBodyValue + (uiSignatureLiveData.value ?: "") + (uiQuoteLiveData.value ?: "")
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -906,12 +904,7 @@ class NewMessageViewModel @Inject constructor(
 
         // Only if `!isFinishing`, because if we are finishing, well… We're out of here so we don't care about all of that.
         if (!isFinishing) {
-            copyFromRealm()
-                .apply {
-                    uiSignature = signature
-                    uiQuote = quote
-                }
-                .saveSnapshot(uiBodyValue)
+            copyFromRealm().saveSnapshot(uiBodyValue)
             isNewMessage = false
         }
     }
