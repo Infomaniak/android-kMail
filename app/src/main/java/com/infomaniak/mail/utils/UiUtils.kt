@@ -37,6 +37,7 @@ import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 object UiUtils {
 
     const val FULLY_SLID = 1.0f
+    const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
 
     @ColorInt
     fun pointBetweenColors(@ColorInt from: Int, @ColorInt to: Int, percent: Float): Int {

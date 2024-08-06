@@ -19,14 +19,14 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.extensions.readRawResource
+import com.infomaniak.mail.utils.extensions.loadCss
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SignatureUtils @Inject constructor(appContext: Context) {
 
-    private val signatureMargins by lazy { appContext.readRawResource(R.raw.signature_margins) }
+    private val signatureMargins by lazy { appContext.loadCss(R.raw.signature_margins) }
 
     fun encapsulateSignatureContentWithInfomaniakClass(signatureContent: String): String {
         val verticalMarginsCss = signatureMargins

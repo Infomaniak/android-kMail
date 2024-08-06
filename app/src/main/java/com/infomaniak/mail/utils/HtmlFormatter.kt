@@ -23,7 +23,9 @@ import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.extensions.getAttributeColor
+import com.infomaniak.mail.utils.extensions.loadCss
 import com.infomaniak.mail.utils.extensions.readRawResource
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -178,7 +180,6 @@ class HtmlFormatter(private val html: String) {
     data class PrintData(val context: Context, val message: Message)
 
     companion object {
-        private const val PRIMARY_COLOR_CODE = "--kmail-primary-color"
         private const val KMAIL_MESSAGE_ID = "kmail-message-content"
 
         private const val WBR = "wbr"
@@ -188,22 +189,6 @@ class HtmlFormatter(private val html: String) {
         private const val OPTIMAL_STRING_LENGTH = 120
         private val DETECT_BUT_DO_NOT_BREAK = setOf(' ')
         private val BREAK_CHARACTERS = setOf(':', '/', '~', '.', ',', '-', '_', '?', '#', '%', '=', '&')
-
-        private fun Context.loadCss(@RawRes cssResId: Int, customColors: List<Pair<String, Int>> = emptyList()): String {
-            var css = readRawResource(cssResId)
-
-            if (customColors.isNotEmpty()) {
-                var header = ":root {\n"
-                customColors.forEach { (variableName, color) ->
-                    header += formatCssVariable(variableName, color)
-                }
-                header += "}\n\n"
-
-                css = header + css
-            }
-
-            return css
-        }
 
         private fun Context.loadScript(
             @RawRes scriptResId: Int,
@@ -223,11 +208,6 @@ class HtmlFormatter(private val html: String) {
                 is Int -> value.toString()
                 else -> throw NotImplementedError()
             }
-        }
-
-        private fun formatCssVariable(variableName: String, color: Int): String {
-            val formattedColor = Utils.colorToHexRepresentation(color)
-            return "$variableName: $formattedColor;\n"
         }
 
         fun Context.getCustomDarkMode(): String = loadCss(R.raw.custom_dark_mode)

@@ -1,3 +1,7 @@
+html {
+    caret-color: var(--kmail-primary-color);
+}
+
 body {
     margin-top: 0px;
     margin-bottom: 0px;
