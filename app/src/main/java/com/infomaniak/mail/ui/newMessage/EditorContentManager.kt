@@ -58,6 +58,12 @@ class EditorContentManager @Inject constructor() {
         .apply { outputSettings().prettyPrint(false) }
         .getHtmlWithoutDocumentWrapping()
 
+    // Jsoup wraps parsed html inside an <html> and <body> tag. This gives us a wrapped form of the html content. While the editor
+    // can handle this wrapped HTML without issues, it will also output the HTML in this wrapped form if given one as input.
+    // If the HTML received from the API is unwrapped, the sanitization process will wrap it, leading to failed comparisons due to
+    // this wrapping, during draft snapshot comparisons, even when the actual content hasn't changed.
+    // This method checks if the HTML is wrapped with an <html> tag containing exactly one empty <head> and one <body> tag.
+    // If this wrapping is detected, the method unwraps the HTML and returns only the content within the <body> tag.
     private fun Document.getHtmlWithoutDocumentWrapping(): String {
         val html = root().firstElementChild() ?: return html()
         val nodeSize = html.childNodeSize()
