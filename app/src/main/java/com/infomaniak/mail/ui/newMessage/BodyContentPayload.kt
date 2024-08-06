@@ -24,7 +24,7 @@ package com.infomaniak.mail.ui.newMessage
 data class BodyContentPayload(val content: String, val type: BodyContentType) {
 
     companion object {
-        fun emptyBody() = BodyContentPayload("", BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
+        fun emptyBody() = BodyContentPayload(content = "", type = BodyContentType.TEXT_PLAIN_WITHOUT_HTML)
     }
 }
 
