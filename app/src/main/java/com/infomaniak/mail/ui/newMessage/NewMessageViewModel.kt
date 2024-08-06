@@ -57,6 +57,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
+import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FocusableElement
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
@@ -140,7 +141,10 @@ class NewMessageViewModel @Inject constructor(
 
     private var snapshot: DraftSnapshot? = null
 
-    var otherRecipientsFieldsAreEmpty = MutableLiveData(true)
+    val otherRecipientsFieldsAreEmpty = MutableLiveData(true)
+    val focusedElementLiveData = MutableLiveData<FocusableElement>()
+    val isEditorWebViewFocusedLiveData = focusedElementLiveData.map { it == FocusableElement.BODY }
+
     var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
     val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()

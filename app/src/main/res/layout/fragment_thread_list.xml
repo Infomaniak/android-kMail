@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content">
 
                 <FrameLayout
-                    android:id="@+id/formatOptionsLayout"
+                    android:id="@+id/formatOptionsScrollView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +135,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/unreadCountChip"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/formatOptionsLayout">
+                    app:layout_constraintTop_toBottomOf="@id/formatOptionsScrollView">
 
                     <TextView
                         android:id="@+id/noNetwork"

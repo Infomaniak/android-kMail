@@ -604,13 +604,13 @@
                     app:icon="@drawable/ic_ai_magic_wand"
                     app:iconTint="@color/aiColor"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/formatOptionsLayout"
+                    app:layout_constraintEnd_toStartOf="@id/formatOptionsScrollView"
                     app:layout_constraintStart_toEndOf="@+id/editorClock"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
                 <HorizontalScrollView
-                    android:id="@+id/formatOptionsLayout"
+                    android:id="@+id/formatOptionsScrollView"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -619,6 +619,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <LinearLayout
+                        android:id="@+id/formatOptionsLayout"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:orientation="horizontal">
@@ -668,7 +669,7 @@
                     android:layout_marginVertical="@dimen/marginStandardSmall"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/sendButton"
-                    app:layout_constraintStart_toEndOf="@id/formatOptionsLayout"
+                    app:layout_constraintStart_toEndOf="@id/formatOptionsScrollView"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
@@ -688,7 +689,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
-                    app:constraint_referenced_ids="formatOptionsLayout,formatOptionsDivider"
+                    app:constraint_referenced_ids="formatOptionsScrollView,formatOptionsDivider"
                     tools:visibility="visible" />
 
                 <androidx.constraintlayout.widget.Group

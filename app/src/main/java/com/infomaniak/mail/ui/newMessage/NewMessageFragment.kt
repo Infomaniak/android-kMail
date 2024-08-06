@@ -36,6 +36,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
+import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -184,8 +185,11 @@ class NewMessageFragment : Fragment() {
         observeUiQuote()
         observeShimmering()
 
-        editorManager.observeEditorActions()
-        editorManager.observeEditorStatus()
+        with(editorManager) {
+            observeEditorActions()
+            observeEditorStatus()
+        }
+
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
 
         with(aiManager) {
@@ -198,6 +202,7 @@ class NewMessageFragment : Fragment() {
             setOnFocusChangedListeners()
             observeContacts()
             observeCcAndBccVisibility()
+            observeFocusedElement()
         }
     }
 
@@ -344,25 +349,42 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() {
-        binding.editorWebView.apply {
-            subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST))
+        binding.editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST))
+        setEditorStyle()
+        handleEditorPlaceholderVisibility()
 
-            enableAlgorithmicDarkening(isEnabled = true)
-            if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
+        setToolbarEnabledStatus(false)
+        disableButtonsWhenFocusIsLost()
+    }
 
-            val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaterial.attr.colorPrimary))
-            addCss(context.loadCss(R.raw.style, customColors))
-            addCss(context.loadCss(R.raw.editor_style, customColors))
+    private fun setEditorStyle() = with(binding.editorWebView) {
+        enableAlgorithmicDarkening(isEnabled = true)
+        if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
 
-            val isPlaceholderVisible = combine(
-                isEmptyFlow.filterNotNull(),
-                newMessageViewModel.isShimmering,
-            ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
+        val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaterial.attr.colorPrimary))
+        addCss(context.loadCss(R.raw.style, customColors))
+        addCss(context.loadCss(R.raw.editor_style, customColors))
+    }
 
-            isPlaceholderVisible
-                .onEach { isVisible -> binding.newMessagePlaceholder.isVisible = isVisible }
-                .launchIn(lifecycleScope)
+    private fun handleEditorPlaceholderVisibility() {
+        val isPlaceholderVisible = combine(
+            binding.editorWebView.isEmptyFlow.filterNotNull(),
+            newMessageViewModel.isShimmering,
+        ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
+
+        isPlaceholderVisible
+            .onEach { isVisible -> binding.newMessagePlaceholder.isVisible = isVisible }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun disableButtonsWhenFocusIsLost() {
+        newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { hasFocus ->
+            setToolbarEnabledStatus(hasFocus)
         }
+    }
+
+    private fun setToolbarEnabledStatus(isEnabled: Boolean) {
+        binding.formatOptionsLayout.forEach { view -> view.isEnabled = isEnabled }
     }
 
     private fun initializeDraft() = with(newMessageViewModel) {

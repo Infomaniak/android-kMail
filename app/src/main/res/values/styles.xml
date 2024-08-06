@@ -244,7 +244,7 @@
     <style name="EditorFormatButton" parent="Widget.Material3.Button.IconButton">
         <item name="android:minWidth">48dp</item>
         <item name="backgroundTint">@color/editor_button_background</item>
-        <item name="iconTint">@color/iconColor</item>
+        <item name="iconTint">@color/icon_button_disabled</item>
     </style>
 
     <style name="QuickBottomActionBarButton" parent="Widget.Material3.Button.TextButton">
