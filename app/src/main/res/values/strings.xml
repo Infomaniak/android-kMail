@@ -169,6 +169,7 @@
     <string name="buttonTextOptionsOpen">Open text formatting</string>
     <string name="buttonTry">Try</string>
     <string name="buttonUnderline">Underline</string>
+    <string name="buttonUnorderedList">Unordered list</string>
     <string name="buttonUnselectAll">None</string>
     <string name="buttonValid">Validate</string>
     <string name="buttonYes">Yes</string>

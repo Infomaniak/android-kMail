@@ -623,6 +623,7 @@
                                 style="@style/EditorFormatButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:contentDescription="@string/buttonUnorderedList"
                                 app:icon="@drawable/ic_editor_list" />
 
                             <com.google.android.material.button.MaterialButton
@@ -630,6 +631,7 @@
                                 style="@style/EditorFormatButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:contentDescription="@string/buttonBold"
                                 app:icon="@drawable/ic_editor_bold" />
 
                             <com.google.android.material.button.MaterialButton
@@ -637,6 +639,7 @@
                                 style="@style/EditorFormatButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:contentDescription="@string/buttonItalic"
                                 app:icon="@drawable/ic_editor_italic" />
 
                             <com.google.android.material.button.MaterialButton
@@ -644,6 +647,7 @@
                                 style="@style/EditorFormatButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:contentDescription="@string/buttonUnderline"
                                 app:icon="@drawable/ic_editor_underline" />
 
                             <com.google.android.material.button.MaterialButton
@@ -651,6 +655,7 @@
                                 style="@style/EditorFormatButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:contentDescription="@string/buttonStrikeThrough"
                                 app:icon="@drawable/ic_editor_strikethrough" />
 
                         </LinearLayout>

@@ -165,6 +165,7 @@
     <string name="buttonTextOptionsOpen">Ouvrir le formatage de texte</string>
     <string name="buttonTry">Essayer</string>
     <string name="buttonUnderline">Souligner</string>
+    <string name="buttonUnorderedList">Liste non ordonnée</string>
     <string name="buttonUnselectAll">Aucun</string>
     <string name="buttonValid">Valider</string>
     <string name="buttonYes">Oui</string>
