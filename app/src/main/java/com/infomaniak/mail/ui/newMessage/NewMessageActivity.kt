@@ -86,7 +86,7 @@ class NewMessageActivity : BaseActivity() {
 
     private fun setupSnackbar() {
         fun getAnchor(): View? = when (navController.currentDestination?.id) {
-            R.id.newMessageFragment -> findViewById(R.id.editor)
+            R.id.newMessageFragment -> findViewById(R.id.editorToolbar)
             R.id.aiPropositionFragment -> findViewById(R.id.aiPropositionBottomBar)
             else -> null
         }
@@ -124,26 +124,34 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun saveDraft() {
-
-        val fragment = getCurrentFragment(R.id.newMessageHostFragment)
-
-        val (subjectValue, uiBodyValue) = if (fragment is NewMessageFragment) {
-            fragment.getSubjectAndBodyValues()
-        } else with(newMessageViewModel) {
-            lastOnStopSubjectValue to lastOnStopBodyValue
-        }
-
-        newMessageViewModel.executeDraftActionWhenStopping(
+        val draftSaveConfiguration = DraftSaveConfiguration(
             action = if (newMessageViewModel.shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
             isFinishing = isFinishing,
             isTaskRoot = isTaskRoot,
-            subjectValue = subjectValue,
-            uiBodyValue = uiBodyValue,
             startWorkerCallback = ::startWorker,
         )
+
+        newMessageViewModel.waitForBodyAndSubjectToExecuteDraftAction(draftSaveConfiguration)
     }
 
     private fun startWorker() {
         draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
+    }
+
+    data class DraftSaveConfiguration(
+        val action: DraftAction,
+        val isFinishing: Boolean,
+        val isTaskRoot: Boolean,
+        val startWorkerCallback: () -> Unit,
+    ) {
+        var subjectValue: String = ""
+            private set
+        var uiBodyValue: String = ""
+            private set
+
+        fun addSubjectAndBody(subject: String, body: String) {
+            subjectValue = subject
+            uiBodyValue = body
+        }
     }
 }

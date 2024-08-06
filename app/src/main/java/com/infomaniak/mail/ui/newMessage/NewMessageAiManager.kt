@@ -53,6 +53,7 @@ import com.infomaniak.lib.core.R as RCore
 @FragmentScoped
 class NewMessageAiManager @Inject constructor(
     @ActivityContext private val activityContext: Context,
+    private val editorContentManager: EditorContentManager,
     private val localSettings: LocalSettings,
 ) : NewMessageManager() {
 
@@ -92,7 +93,7 @@ class NewMessageAiManager @Inject constructor(
     fun observeAiOutput() = with(binding) {
         aiViewModel.aiOutputToInsert.observe(viewLifecycleOwner) { (subject, content) ->
             subject?.let(subjectTextField::setText)
-            bodyTextField.setText(content)
+            editorContentManager.setContent(editorWebView, BodyContentPayload(content, BodyContentType.TEXT_PLAIN_WITH_HTML))
         }
     }
 
@@ -224,7 +225,7 @@ class NewMessageAiManager @Inject constructor(
         fragment.safeNavigate(
             NewMessageFragmentDirections.actionNewMessageFragmentToAiPropositionFragment(
                 isSubjectBlank = fragment.isSubjectBlank(),
-                isBodyBlank = binding.bodyTextField.text?.isBlank() == true,
+                isBodyBlank = binding.editorWebView.isEmptyFlow.value ?: true,
             ),
         )
     }

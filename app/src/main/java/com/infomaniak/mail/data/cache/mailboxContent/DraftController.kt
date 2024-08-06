@@ -17,22 +17,14 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.lib.core.utils.contains
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Attachment.UploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
@@ -40,8 +32,6 @@ import javax.inject.Inject
 
 class DraftController @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    private val mailboxController: MailboxController,
-    private val replyForwardFooterManager: ReplyForwardFooterManager,
 ) {
 
     //region Get data
@@ -74,42 +64,6 @@ class DraftController @Inject constructor(
     //endregion
 
     //region Open Draft
-    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
-        draft.inReplyTo = previousMessage.messageId
-
-        val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
-        draft.references = "${previousReferences}${previousMessage.messageId}"
-
-        draft.subject = formatSubject(draftMode, previousMessage.subject ?: "")
-
-        when (draftMode) {
-            DraftMode.REPLY, DraftMode.REPLY_ALL -> {
-                draft.inReplyToUid = previousMessage.uid
-
-                val (toList, ccList) = previousMessage.getRecipientsForReplyTo(replyAll = draftMode == DraftMode.REPLY_ALL)
-                draft.to = toList.toRealmList()
-                draft.cc = ccList.toRealmList()
-
-                draft.uiQuote = replyForwardFooterManager.createReplyFooter(previousMessage)
-            }
-            DraftMode.FORWARD -> {
-                draft.forwardedUid = previousMessage.uid
-
-                val mailboxUuid = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
-                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
-                    draft.attachments += attachment.apply {
-                        resource = previousMessage.attachments.find { it.name == name }?.resource
-                        setUploadStatus(UploadStatus.FINISHED)
-                    }
-                    SentryDebug.addAttachmentsBreadcrumb(draft, step = "set previousMessage when reply/replyAll/Forward")
-                }
-
-                draft.uiQuote = replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)
-            }
-            DraftMode.NEW_MAIL -> Unit
-        }
-    }
-
     fun fetchHeavyDataIfNeeded(message: Message, realm: Realm): Pair<Message, Boolean> {
         if (message.isFullyDownloaded()) return message to false
 
@@ -117,29 +71,9 @@ class DraftController @Inject constructor(
         val hasFailedFetching = deleted.isNotEmpty() || failed.isNotEmpty()
         return MessageController.getMessage(message.uid, realm)!! to hasFailedFetching
     }
-
-    private fun formatSubject(draftMode: DraftMode, subject: String): String {
-
-        fun String.isReply(): Boolean = this in Regex(REGEX_REPLY, RegexOption.IGNORE_CASE)
-        fun String.isForward(): Boolean = this in Regex(REGEX_FORWARD, RegexOption.IGNORE_CASE)
-
-        val prefix = when (draftMode) {
-            DraftMode.REPLY, DraftMode.REPLY_ALL -> if (subject.isReply()) "" else PREFIX_REPLY
-            DraftMode.FORWARD -> if (subject.isForward()) "" else PREFIX_FORWARD
-            DraftMode.NEW_MAIL -> {
-                throw IllegalStateException("`${DraftMode::class.simpleName}` cannot be `${DraftMode.NEW_MAIL.name}` here.")
-            }
-        }
-
-        return prefix + subject
-    }
     //endregion
 
     companion object {
-        private const val PREFIX_REPLY = "Re: "
-        private const val PREFIX_FORWARD = "Fw: "
-        private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
-        private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
 
         //region Queries
         private fun getDraftsQuery(query: String? = null, realm: TypedRealm): RealmQuery<Draft> = with(realm) {

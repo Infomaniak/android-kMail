@@ -40,6 +40,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -79,11 +80,17 @@ import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
+import com.infomaniak.mail.utils.extensions.readRawResource
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -113,6 +120,9 @@ class NewMessageFragment : Fragment() {
 
     private val newMessageActivity by lazy { requireActivity() as NewMessageActivity }
     private val webViewUtils by lazy { WebViewUtils(requireContext()) }
+
+    @Inject
+    lateinit var editorContentManager: EditorContentManager
 
     @Inject
     lateinit var aiManager: NewMessageAiManager
@@ -172,8 +182,10 @@ class NewMessageFragment : Fragment() {
         observeAttachments()
         observeImportAttachmentsResult()
         observeOpenAttachment()
+        observeBodyLoader()
         observeUiSignature()
         observeUiQuote()
+        observeShimmering()
 
         editorManager.observeEditorActions()
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
@@ -191,8 +203,27 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun initManagers() {
+    private fun observeShimmering() {
+        lifecycleScope.launch {
+            newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
+        }
+    }
 
+    private fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {
+        fromMailAddress.isGone = isShimmering
+        subjectTextField.isGone = isShimmering
+        editorWebView.isGone = isShimmering
+
+        fromLoader.isVisible = isShimmering
+        subjectLoader.isVisible = isShimmering
+        bodyLoader.isVisible = isShimmering
+
+        toField.setShimmerVisibility(isShimmering)
+        ccField.setShimmerVisibility(isShimmering)
+        bccField.setShimmerVisibility(isShimmering)
+    }
+
+    private fun initManagers() {
         aiManager.initValues(
             newMessageViewModel = newMessageViewModel,
             binding = binding,
@@ -239,6 +270,11 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        // This block of code is needed in order to keep and reload the content of the editor across configuration changes.
+        binding.editorWebView.exportHtml { html ->
+            newMessageViewModel.editorBodyInitializer.postValue(BodyContentPayload(html, BodyContentType.HTML_SANITIZED))
+        }
+
         addressListPopupWindow = null
         quoteWebView?.destroyAndClearHistory()
         quoteWebView = null
@@ -298,6 +334,8 @@ class NewMessageFragment : Fragment() {
             }
         })
 
+        initEditorUi()
+
         setupSendButton()
         externalsManager.setupExternalBanner()
 
@@ -307,13 +345,31 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun initEditorUi() {
+        binding.editorWebView.apply {
+            enableAlgorithmicDarkening(isEnabled = true)
+            if (context.isNightModeEnabled()) addCss(context.readRawResource(R.raw.custom_dark_mode))
+
+            addCss(context.readRawResource(R.raw.style))
+            addCss(context.readRawResource(R.raw.editor_style))
+
+            val isPlaceholderVisible = combine(
+                isEmptyFlow.filterNotNull(),
+                newMessageViewModel.isShimmering,
+            ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
+
+            isPlaceholderVisible
+                .onEach { isVisible -> binding.newMessagePlaceholder.isVisible = isVisible }
+                .launchIn(lifecycleScope)
+        }
+    }
+
     private fun initializeDraft() = with(newMessageViewModel) {
         if (initResult.value == null) {
             initDraftAndViewModel(intent = requireActivity().intent).observe(viewLifecycleOwner) { draft ->
                 if (draft != null) {
                     showKeyboardInCorrectView(isToFieldEmpty = draft.to.isEmpty())
                     binding.subjectTextField.setText(draft.subject)
-                    binding.bodyTextField.setText(draft.uiBody)
                 } else {
                     requireActivity().apply {
                         showToast(R.string.failToOpenDraft)
@@ -322,21 +378,6 @@ class NewMessageFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun hideLoader() = with(binding) {
-
-        fromMailAddress.isVisible = true
-        subjectTextField.isVisible = true
-        bodyTextField.isVisible = true
-
-        fromLoader.isGone = true
-        subjectLoader.isGone = true
-        bodyLoader.isGone = true
-
-        toField.hideLoader()
-        ccField.hideLoader()
-        bccField.hideLoader()
     }
 
     private fun showKeyboardInCorrectView(isToFieldEmpty: Boolean) = with(recipientFieldsManager) {
@@ -442,7 +483,6 @@ class NewMessageFragment : Fragment() {
 
     private fun observeInitResult() {
         newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
-            hideLoader()
             configureUiWithDraftData(draft)
             setupFromField(signatures)
             editorManager.setupEditorActions()
@@ -535,6 +575,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun observeBodyLoader() {
+        newMessageViewModel.editorBodyInitializer.observe(viewLifecycleOwner) { body ->
+            editorContentManager.setContent(binding.editorWebView, body)
+        }
+    }
+
     private fun observeUiSignature() = with(binding) {
         newMessageViewModel.uiSignatureLiveData.observe(viewLifecycleOwner) { signature ->
             if (signature == null) {
@@ -555,17 +601,19 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    override fun onStop() = with(newMessageViewModel) {
+    override fun onStart() {
+        super.onStart()
+        newMessageViewModel.discardOldBodyAndSubjectChannelMessages()
+    }
 
-        /**
-         * When the Activity is being stopped, we save the Draft.
-         * We then need the up-to-date subject & body values.
-         * If we are in the NewMessageFragment when stopping, it's easy, we just get them from the binding.
-         * If we are not (ex: AI fragments), we get them from the ViewModel.
-         * Hence, here, we save them to the ViewModel when stopping the NewMessageFragment.
-         */
-        lastOnStopSubjectValue = binding.subjectTextField.text.toString()
-        lastOnStopBodyValue = binding.bodyTextField.text.toString()
+    override fun onStop() {
+        // When the Activity is being stopped, we save the Draft. To do this, we need to know the subject and body values but
+        // these values might not be accessible anymore by then. We store them right now before potentially loosing access to them
+        // in case we need to save the Draft when they're inaccessible.
+        val subject = binding.subjectTextField.text.toString()
+        binding.editorWebView.exportHtml { html ->
+            newMessageViewModel.storeBodyAndSubject(subject, html)
+        }
 
         super.onStop()
     }
@@ -623,8 +671,4 @@ class NewMessageFragment : Fragment() {
     fun closeAiPrompt() = aiManager.closeAiPrompt()
 
     fun isSubjectBlank() = binding.subjectTextField.text?.isBlank() == true
-
-    fun getSubjectAndBodyValues(): Pair<String, String> = with(binding) {
-        return subjectTextField.text.toString() to bodyTextField.text.toString()
-    }
 }

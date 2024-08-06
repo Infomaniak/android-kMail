@@ -143,8 +143,6 @@ fun String.removeLineBreaksFromHtml(): Document = jsoupParseWithLog(replace("\r"
 
 fun String.htmlToText(): String = removeLineBreaksFromHtml().wholeText()
 
-fun String.textToHtml(): String = replace("\n", "<br>")
-
 //region Date
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
 

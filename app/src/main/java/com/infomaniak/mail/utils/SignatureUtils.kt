@@ -19,8 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.extensions.readRawResource
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,10 +36,5 @@ class SignatureUtils @Inject constructor(appContext: Context) {
 
     private fun extractAttributesFromMarginCss(verticalMarginsCss: String): String {
         return Regex("""\{(.*)\}""").find(verticalMarginsCss)!!.groupValues[1]
-    }
-
-    fun initSignature(draft: Draft, signature: Signature) = with(draft) {
-        identityId = signature.id.toString()
-        if (signature.content.isNotEmpty()) uiSignature = encapsulateSignatureContentWithInfomaniakClass(signature.content)
     }
 }

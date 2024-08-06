@@ -27,7 +27,6 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -87,18 +86,6 @@ class Draft : RealmObject {
     var localUuid: String = UUID.randomUUID().toString()
     @Transient
     var messageUid: String? = null
-    //endregion
-
-    //region UI data (Transient & Ignore)
-    @Transient
-    @Ignore
-    var uiBody: String = ""
-    @Transient
-    @Ignore
-    var uiSignature: String? = null
-    @Transient
-    @Ignore
-    var uiQuote: String? = null
     //endregion
 
     var action

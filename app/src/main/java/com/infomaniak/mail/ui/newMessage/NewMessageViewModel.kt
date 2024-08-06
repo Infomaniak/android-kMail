@@ -35,6 +35,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.lib.core.utils.getFileNameAndSize
 import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.lib.core.utils.parcelableArrayListExtra
@@ -49,6 +50,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ReplyForwardFooterManager
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -66,6 +68,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.*
@@ -83,7 +86,6 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions.findSpecificAtt
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.isEmail
-import com.infomaniak.mail.utils.extensions.textToHtml
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.uploadAttachmentsWithMutex
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -97,6 +99,12 @@ import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -114,6 +122,7 @@ class NewMessageViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val replyForwardFooterManager: ReplyForwardFooterManager,
     private val sharedUtils: SharedUtils,
     private val signatureUtils: SignatureUtils,
     private val snackbarManager: SnackbarManager,
@@ -122,6 +131,12 @@ class NewMessageViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
+
+    //region Initial data
+    private var initialBody: BodyContentPayload = BodyContentPayload.emptyBody()
+    private var initialSignature: String? = null
+    private var initialQuote: String? = null
+    //endregion
 
     //region UI data
     val fromLiveData = MutableLiveData<UiFrom>()
@@ -133,8 +148,16 @@ class NewMessageViewModel @Inject constructor(
     val uiQuoteLiveData = MutableLiveData<String?>()
     //endregion
 
-    var lastOnStopSubjectValue = ""
-    var lastOnStopBodyValue = ""
+    val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
+
+    // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
+    // 2. Inserting the AI proposition navigates back to NewMessageFragment.
+    // 3. When saving or sending the draft now, the channel still holds the previous body as it wasn't consumed.
+    // channelExpirationIdTarget lets us identify and discard outdated messages, ensuring the correct message is processed.
+    private var channelExpirationIdTarget = 0
+    private val _subjectAndBodyChannel: Channel<SubjectAndBodyData> = Channel(capacity = CONFLATED)
+    private val subjectAndBodyChannel: ReceiveChannel<SubjectAndBodyData> = _subjectAndBodyChannel
+    private var subjectAndBodyJob: Job? = null
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -155,6 +178,9 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<InitResult>()
+
+    private val _isShimmering = MutableStateFlow(true)
+    val isShimmering: StateFlow<Boolean> = _isShimmering
 
     val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -226,8 +252,9 @@ class NewMessageViewModel @Inject constructor(
             markAsRead(currentMailbox, realm)
 
             realm.writeBlocking { draftController.upsertDraft(it, realm = this) }
-            it.saveSnapshot()
+            it.saveSnapshot(initialBody.content)
             it.initLiveData(signatures)
+            _isShimmering.emit(false)
 
             initResult.postValue(InitResult(it, signatures))
         }
@@ -241,7 +268,7 @@ class NewMessageViewModel @Inject constructor(
             if (draft.identityId.isNullOrBlank()) {
                 draft.identityId = SignatureController.getDefaultSignatureWithFallback(realm, draftMode)?.id?.toString()
             }
-            if (draft.body.isNotEmpty()) splitSignatureAndQuoteFromBody(draft)
+            splitSignatureAndQuoteFromBody(draft)
         }
     }
 
@@ -261,7 +288,7 @@ class NewMessageViewModel @Inject constructor(
                         val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(message, realm)
                         if (hasFailedFetching) return null
 
-                        draftController.setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
+                        setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
 
                         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
                         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!, fullMessage.uid)
@@ -279,14 +306,72 @@ class NewMessageViewModel @Inject constructor(
             defaultSignature
         }
 
-        signatureUtils.initSignature(
+        initSignature(
             draft = this,
             signature = signature ?: Signature.getDummySignature(appContext, email = currentMailbox.email, isDefault = true),
         )
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
+    }
 
-        body = getWholeBody()
+    private fun initSignature(draft: Draft, signature: Signature) {
+        draft.identityId = signature.id.toString()
+
+        if (signature.content.isNotEmpty()) {
+            initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+        }
+    }
+
+    private fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
+        draft.inReplyTo = previousMessage.messageId
+
+        val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
+        draft.references = "${previousReferences}${previousMessage.messageId}"
+
+        draft.subject = formatSubject(draftMode, previousMessage.subject ?: "")
+
+        when (draftMode) {
+            DraftMode.REPLY, DraftMode.REPLY_ALL -> {
+                draft.inReplyToUid = previousMessage.uid
+
+                val (toList, ccList) = previousMessage.getRecipientsForReplyTo(replyAll = draftMode == DraftMode.REPLY_ALL)
+                draft.to = toList.toRealmList()
+                draft.cc = ccList.toRealmList()
+
+                initialQuote = replyForwardFooterManager.createReplyFooter(previousMessage)
+            }
+            DraftMode.FORWARD -> {
+                draft.forwardedUid = previousMessage.uid
+
+                val mailboxUuid = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
+                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
+                    draft.attachments += attachment.apply {
+                        resource = previousMessage.attachments.find { it.name == name }?.resource
+                        setUploadStatus(UploadStatus.FINISHED)
+                    }
+                    SentryDebug.addAttachmentsBreadcrumb(draft, step = "set previousMessage when reply/replyAll/Forward")
+                }
+
+                initialQuote = replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)
+            }
+            DraftMode.NEW_MAIL -> Unit
+        }
+    }
+
+    private fun formatSubject(draftMode: DraftMode, subject: String): String {
+
+        fun String.isReply(): Boolean = this in Regex(REGEX_REPLY, RegexOption.IGNORE_CASE)
+        fun String.isForward(): Boolean = this in Regex(REGEX_FORWARD, RegexOption.IGNORE_CASE)
+
+        val prefix = when (draftMode) {
+            DraftMode.REPLY, DraftMode.REPLY_ALL -> if (subject.isReply()) "" else PREFIX_REPLY
+            DraftMode.FORWARD -> if (subject.isForward()) "" else PREFIX_FORWARD
+            DraftMode.NEW_MAIL -> {
+                throw IllegalStateException("`${DraftMode::class.simpleName}` cannot be `${DraftMode.NEW_MAIL.name}` here.")
+            }
+        }
+
+        return prefix + subject
     }
 
     private fun saveNavArgsToSavedState(localUuid: String) {
@@ -298,6 +383,25 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun splitSignatureAndQuoteFromBody(draft: Draft) {
+        val remoteBody = draft.body
+        if (remoteBody.isEmpty()) return
+
+        val (body, signature, quote) = when (draft.mimeType) {
+            Utils.TEXT_PLAIN -> BodyData(
+                body = BodyContentPayload(remoteBody, BodyContentType.TEXT_PLAIN_WITHOUT_HTML),
+                signature = null,
+                quote = null
+            )
+            Utils.TEXT_HTML -> splitSignatureAndQuoteFromHtml(remoteBody)
+            else -> error("Cannot load an email which is not of type text/plain or text/html")
+        }
+
+        initialBody = body
+        initialSignature = signature
+        initialQuote = quote
+    }
+
+    private fun splitSignatureAndQuoteFromHtml(draftBody: String): BodyData {
 
         fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
             return getElementsByClass(divClassName).firstOrNull()?.let {
@@ -313,23 +417,19 @@ class NewMessageViewModel @Inject constructor(
             return if (index == -1) Int.MAX_VALUE else index
         }
 
-        val doc = jsoupParseWithLog(draft.body).also { it.outputSettings().prettyPrint(false) }
+        val doc = jsoupParseWithLog(draftBody).also { it.outputSettings().prettyPrint(false) }
 
-        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
+        val (bodyWithQuote, signature) = doc.split(MessageBodyUtils.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draftBody)
 
-        val replyPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
-        val forwardPosition = draft.body.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
+        val replyPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME)
+        val forwardPosition = draftBody.lastIndexOfOrMax(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME)
         val (body, quote) = if (replyPosition < forwardPosition) {
             doc.split(MessageBodyUtils.INFOMANIAK_REPLY_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         } else {
             doc.split(MessageBodyUtils.INFOMANIAK_FORWARD_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
         }
 
-        draft.apply {
-            uiBody = body.htmlToText()
-            uiSignature = signature
-            uiQuote = quote
-        }
+        return BodyData(BodyContentPayload(body, BodyContentType.HTML_UNSANITIZED), signature, quote)
     }
 
     private fun populateWithExternalMailDataIfNeeded(draft: Draft, intent: Intent) {
@@ -374,14 +474,14 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.saveSnapshot() {
+    private fun Draft.saveSnapshot(uiBodyValue: String) {
         snapshot = DraftSnapshot(
             identityId = identityId,
             to = to.toSet(),
             cc = cc.toSet(),
             bcc = bcc.toSet(),
             subject = subject,
-            uiBody = uiBody,
+            uiBody = uiBodyValue,
             attachmentsLocalUuids = attachments.map { it.localUuid }.toSet(),
         )
     }
@@ -401,8 +501,10 @@ class NewMessageViewModel @Inject constructor(
 
         attachmentsLiveData.postValue(attachments)
 
-        uiSignatureLiveData.postValue(uiSignature)
-        uiQuoteLiveData.postValue(uiQuote)
+        editorBodyInitializer.postValue(initialBody)
+
+        uiSignatureLiveData.postValue(initialSignature)
+        uiQuoteLiveData.postValue(initialQuote)
 
         if (cc.isNotEmpty() || bcc.isNotEmpty()) {
             otherRecipientsFieldsAreEmpty.postValue(false)
@@ -533,7 +635,7 @@ class NewMessageViewModel @Inject constructor(
             handleMailTo(draft, intent.data, intent)
         } else if (hasExtra(Intent.EXTRA_TEXT)) {
             getStringExtra(Intent.EXTRA_SUBJECT)?.let { draft.subject = it }
-            getStringExtra(Intent.EXTRA_TEXT)?.let { draft.uiBody = it }
+            getStringExtra(Intent.EXTRA_TEXT)?.let { initialBody = BodyContentPayload(it, BodyContentType.TEXT_PLAIN_WITH_HTML) }
         }
 
         if (hasExtra(Intent.EXTRA_STREAM)) {
@@ -601,7 +703,10 @@ class NewMessageViewModel @Inject constructor(
             bcc.addAll(splitBcc)
 
             subject = mailToIntent?.subject?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_SUBJECT)
-            uiBody = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+
+            val bodyContent = mailToIntent?.body?.takeIf(String::isNotEmpty) ?: intent?.getStringExtra(Intent.EXTRA_TEXT)
+            val mailToPayload = bodyContent?.let { BodyContentPayload(it, BodyContentType.TEXT_PLAIN_WITH_HTML) }
+            initialBody = mailToPayload ?: BodyContentPayload.emptyBody()
         }
     }
 
@@ -763,31 +868,53 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
-    fun executeDraftActionWhenStopping(
-        action: DraftAction,
-        isFinishing: Boolean,
-        isTaskRoot: Boolean,
-        subjectValue: String,
-        uiBodyValue: String,
-        startWorkerCallback: () -> Unit,
-    ) = globalCoroutineScope.launch(ioDispatcher) {
+    fun storeBodyAndSubject(subject: String, html: String) {
+        globalCoroutineScope.launch(ioDispatcher) {
+            _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
+        }
+    }
 
-        val localUuid = draftLocalUuid ?: return@launch
+    fun discardOldBodyAndSubjectChannelMessages() {
+        channelExpirationIdTarget++
+    }
+
+    fun waitForBodyAndSubjectToExecuteDraftAction(draftSaveConfiguration: DraftSaveConfiguration) {
+        subjectAndBodyJob?.cancel()
+        subjectAndBodyJob = globalCoroutineScope.launch(ioDispatcher) {
+            val subject: String
+            val body: String
+            while (true) {
+                // receive() is a blocking call as long as it has no data
+                val (receivedSubject, receivedBody, expirationId) = subjectAndBodyChannel.receive()
+                if (expirationId == channelExpirationIdTarget) {
+                    subject = receivedSubject
+                    body = receivedBody
+                    break
+                }
+            }
+
+            draftSaveConfiguration.addSubjectAndBody(subject, body)
+            executeDraftAction(draftSaveConfiguration)
+        }
+    }
+
+    private suspend fun executeDraftAction(draftSaveConfiguration: DraftSaveConfiguration) = with(draftSaveConfiguration) {
+        val localUuid = draftLocalUuid ?: return@with
         val subject = subjectValue.ifBlank { null }?.take(SUBJECT_MAX_LENGTH)
 
         if (action == DraftAction.SAVE && isSnapshotTheSame(subject, uiBodyValue)) {
             if (isFinishing && isNewMessage) removeDraftFromRealm(localUuid)
-            return@launch
+            return@with
         }
 
         val hasFailed = mailboxContentRealm().writeBlocking {
             DraftController.getDraft(localUuid, realm = this)
-                ?.updateDraftFromLiveData(action, isFinishing, subject, uiBodyValue, realm = this@writeBlocking)
+                ?.updateDraftBeforeSavingRemotely(action, isFinishing, subject, uiBodyValue, realm = this@writeBlocking)
                 ?: return@writeBlocking true
             return@writeBlocking false
         }
 
-        if (hasFailed) return@launch
+        if (hasFailed) return@with
 
         showDraftToastToUser(action, isFinishing, isTaskRoot)
         startWorkerCallback()
@@ -806,7 +933,7 @@ class NewMessageViewModel @Inject constructor(
         super.onCleared()
     }
 
-    private fun Draft.updateDraftFromLiveData(
+    private fun Draft.updateDraftBeforeSavingRemotely(
         draftAction: DraftAction,
         isFinishing: Boolean,
         subjectValue: String?,
@@ -828,11 +955,7 @@ class NewMessageViewModel @Inject constructor(
 
         subject = subjectValue
 
-        uiBody = uiBodyValue
-        uiSignature = uiSignatureLiveData.value
-        uiQuote = uiQuoteLiveData.value
-
-        body = getWholeBody()
+        body = uiBodyValue + (uiSignatureLiveData.value ?: "") + (uiQuoteLiveData.value ?: "")
 
         /**
          * If we are opening for the 1st time an existing Draft created somewhere else
@@ -848,13 +971,7 @@ class NewMessageViewModel @Inject constructor(
 
         // Only if `!isFinishing`, because if we are finishing, well… We're out of here so we don't care about all of that.
         if (!isFinishing) {
-            copyFromRealm()
-                .apply {
-                    uiBody = this@updateDraftFromLiveData.uiBody
-                    uiSignature = this@updateDraftFromLiveData.uiSignature
-                    uiQuote = this@updateDraftFromLiveData.uiQuote
-                }
-                .saveSnapshot()
+            copyFromRealm().saveSnapshot(uiBodyValue)
             isNewMessage = false
         }
     }
@@ -896,8 +1013,6 @@ class NewMessageViewModel @Inject constructor(
 
         SentryDebug.addAttachmentsBreadcrumb(draft = this, step)
     }
-
-    private fun Draft.getWholeBody(): String = uiBody.textToHtml() + (uiSignature ?: "") + (uiQuote ?: "")
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {
         return snapshot?.let { draftSnapshot ->
@@ -991,9 +1106,19 @@ class NewMessageViewModel @Inject constructor(
         val attachmentsLocalUuids: Set<String>,
     )
 
+    private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
+
+    private data class BodyData(val body: BodyContentPayload, val signature: String?, val quote: String?)
+
     companion object {
         private val TAG = NewMessageViewModel::class.java.simpleName
+
         private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998
+
+        private const val PREFIX_REPLY = "Re: "
+        private const val PREFIX_FORWARD = "Fw: "
+        private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
+        private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
     }
 }
