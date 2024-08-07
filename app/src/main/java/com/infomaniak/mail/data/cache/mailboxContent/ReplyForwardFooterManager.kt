@@ -22,7 +22,9 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
+import com.infomaniak.mail.utils.HtmlUtils.CID_PROTOCOL
+import com.infomaniak.mail.utils.HtmlUtils.SRC_ATTRIBUTE
+import com.infomaniak.mail.utils.HtmlUtils.processCids
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseBodyFragmentWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.MailDateFormatUtils.formatForHeader
@@ -42,12 +44,12 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
     fun createForwardFooter(message: Message, attachmentsToForward: List<Attachment>): String {
         val previousBody = getHtmlDocument(message)?.let { document ->
             document.processCids(
-                message = message,
+                attachments = message.attachments,
                 associateDataToCid = { oldAttachment ->
                     val newAttachment = attachmentsToForward.find { it.originalContentId == oldAttachment.contentId }
                     newAttachment?.contentId
                 },
-                applyAssociatedDataToImage = { newContentId, imageElement ->
+                onCidImageFound = { newContentId, imageElement ->
                     imageElement.attr(SRC_ATTRIBUTE, "${CID_PROTOCOL}$newContentId")
                 },
             )
@@ -66,9 +68,9 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
 
         val previousBody = getHtmlDocument(message)?.let { document ->
             document.processCids(
-                message = message,
+                attachments = message.attachments,
                 associateDataToCid = Attachment::name,
-                applyAssociatedDataToImage = { name, imageElement ->
+                onCidImageFound = { name, imageElement ->
                     imageElement.replaceWith(TextNode("<$name>"))
                 },
             )
@@ -78,22 +80,6 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
 
         val previousFullBody = computePreviousFullBody(previousBody, message)
         return assembleReplyHtmlFooter(messageReplyHeader, previousFullBody)
-    }
-
-    private fun Document.processCids(
-        message: Message,
-        associateDataToCid: (Attachment) -> String?,
-        applyAssociatedDataToImage: (String, Element) -> Unit
-    ) {
-        val attachmentsMap = message.attachments.associate {
-            it.contentId to associateDataToCid(it)
-        }
-
-        doOnHtmlImage { imageElement ->
-            attachmentsMap[getCid(imageElement)]?.let { associatedData ->
-                applyAssociatedDataToImage(associatedData, imageElement)
-            }
-        }
     }
 
     private fun Message.fromName(): String = sender?.quotedDisplayName() ?: appContext.getString(R.string.unknownRecipientTitle)
@@ -109,11 +95,6 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         return html?.let(::jsoupParseWithLog)
     }
 
-    private fun Document.doOnHtmlImage(actionOnImage: (Element) -> Unit) {
-        select(CID_IMAGE_CSS_QUERY).forEach { imageElement -> actionOnImage(imageElement) }
-    }
-
-    private fun getCid(imageElement: Element) = imageElement.attr(SRC_ATTRIBUTE).removePrefix(CID_PROTOCOL)
 
     private fun computePreviousFullBody(previousBody: String, message: Message): String {
         return message.body?.let { body ->
@@ -186,11 +167,5 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
 
     private fun formatRecipientList(recipientList: List<Recipient>): String? {
         return if (recipientList.isNotEmpty()) recipientList.joinToString { it.quotedDisplayName() } else null
-    }
-
-    companion object {
-        private const val CID_PROTOCOL = "${MessageWebViewClient.CID_SCHEME}:"
-        private const val SRC_ATTRIBUTE = "src"
-        private const val CID_IMAGE_CSS_QUERY = "img[${SRC_ATTRIBUTE}^='${CID_PROTOCOL}']"
     }
 }
