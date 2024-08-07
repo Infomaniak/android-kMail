@@ -114,32 +114,9 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             add(ItemType.DIVIDER)
             add(ItemType.ACTIONS_HEADER)
             if (areActionsExpanded) {
-                add(
-                    MenuDrawerAction(
-                        type = ActionType.SYNC_AUTO_CONFIG,
-                        icon = R.drawable.ic_synchronize,
-                        text = R.string.syncCalendarsAndContactsTitle,
-                        maxLines = 2,
-                    ),
-                )
-                add(
-                    MenuDrawerAction(
-                        type = ActionType.IMPORT_MAILS,
-                        icon = R.drawable.ic_drawer_download,
-                        text = R.string.buttonImportEmails,
-                        maxLines = 1,
-                    ),
-                )
-                if (permissions?.canRestoreEmails == true) {
-                    add(
-                        MenuDrawerAction(
-                            type = ActionType.RESTORE_MAILS,
-                            icon = R.drawable.ic_restore_arrow,
-                            text = R.string.buttonRestoreEmails,
-                            maxLines = 1,
-                        ),
-                    )
-                }
+                add(syncAutoConfigAction)
+                add(importMailsAction)
+                if (permissions?.canRestoreEmails == true) add(restoreMailsAction)
             }
 
             // Footer
@@ -329,5 +306,26 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 null
             }
         }
+    }
+
+    companion object {
+        private val syncAutoConfigAction = MenuDrawerAction(
+            type = ActionType.SYNC_AUTO_CONFIG,
+            icon = R.drawable.ic_synchronize,
+            text = R.string.syncCalendarsAndContactsTitle,
+            maxLines = 2,
+        )
+        private val importMailsAction = MenuDrawerAction(
+            type = ActionType.IMPORT_MAILS,
+            icon = R.drawable.ic_drawer_download,
+            text = R.string.buttonImportEmails,
+            maxLines = 1,
+        )
+        private val restoreMailsAction = MenuDrawerAction(
+            type = ActionType.RESTORE_MAILS,
+            icon = R.drawable.ic_restore_arrow,
+            text = R.string.buttonRestoreEmails,
+            maxLines = 1,
+        )
     }
 }
