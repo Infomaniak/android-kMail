@@ -26,14 +26,6 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
-import com.infomaniak.mail.databinding.ItemMenuDrawerActionBinding
-import com.infomaniak.mail.databinding.ItemMenuDrawerActionsHeaderBinding
-import com.infomaniak.mail.databinding.ItemMenuDrawerCustomFoldersHeaderBinding
-import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
-import com.infomaniak.mail.databinding.ItemMenuDrawerFooterBinding
-import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxBinding
-import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxesHeaderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment.MediatorContainer
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder
@@ -220,60 +212,49 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() == NotifyType.MAILBOXES_HEADER_CLICKED) {
-            (holder as MailboxesHeaderViewHolder).updateCollapseState(
-                header = currentList[position] as MailboxesHeader,
-                binding = holder.binding as ItemMenuDrawerMailboxesHeaderBinding,
-            )
+            (holder as MailboxesHeaderViewHolder).updateCollapseState(header = currentList[position] as MailboxesHeader)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
     }
 
-    override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: MenuDrawerViewHolder, position: Int) {
         val item = currentList[position]
 
         when (holder) {
             is MailboxesHeaderViewHolder -> holder.displayMailboxesHeader(
                 header = item as MailboxesHeader,
-                binding = this as ItemMenuDrawerMailboxesHeaderBinding,
                 onMailboxesHeaderClicked = callbacks.onMailboxesHeaderClicked,
             )
             is MailboxViewHolder -> holder.displayMailbox(
                 mailbox = item as Mailbox,
-                binding = this as ItemMenuDrawerMailboxBinding,
                 onValidMailboxClicked = callbacks.onValidMailboxClicked,
             )
             is InvalidMailboxViewHolder -> holder.displayInvalidMailbox(
                 mailbox = item as Mailbox,
-                binding = this as ItemInvalidMailboxBinding,
                 onLockedMailboxClicked = callbacks.onLockedMailboxClicked,
                 onInvalidPasswordMailboxClicked = callbacks.onInvalidPasswordMailboxClicked,
             )
             is FoldersHeaderViewHolder -> holder.displayFoldersHeader(
-                binding = this as ItemMenuDrawerCustomFoldersHeaderBinding,
                 onFoldersHeaderClicked = callbacks.onFoldersHeaderClicked,
                 onCreateFolderClicked = callbacks.onCreateFolderClicked,
             )
             is FolderViewHolder -> holder.displayFolder(
                 folder = item as Folder,
-                binding = this as ItemMenuDrawerFolderBinding,
                 currentFolderId = currentFolderId,
                 hasCollapsableFolder = if (item.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder,
                 onFolderClicked = callbacks.onFolderClicked,
                 onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
             )
             is ActionsHeaderViewHolder -> holder.displayActionsHeader(
-                binding = this as ItemMenuDrawerActionsHeaderBinding,
                 onActionsHeaderClicked = callbacks.onActionsHeaderClicked,
             )
             is ActionViewHolder -> holder.displayAction(
                 action = item as MenuDrawerAction,
-                binding = this as ItemMenuDrawerActionBinding,
                 onActionClicked = callbacks.onActionClicked,
             )
             is FooterViewHolder -> holder.displayFooter(
                 footer = item as MenuDrawerFooter,
-                binding = this as ItemMenuDrawerFooterBinding,
                 onFeedbackClicked = callbacks.onFeedbackClicked,
                 onHelpClicked = callbacks.onHelpClicked,
                 onAppVersionClicked = callbacks.onAppVersionClicked,

@@ -34,11 +34,10 @@ class FooterViewHolder(
 
     fun displayFooter(
         footer: MenuDrawerFooter,
-        binding: ItemMenuDrawerFooterBinding,
         onFeedbackClicked: () -> Unit,
         onHelpClicked: () -> Unit,
         onAppVersionClicked: () -> Unit,
-    ) = with(binding) {
+    ) = with(binding as ItemMenuDrawerFooterBinding) {
         SentryLog.d("Bind", "Bind Footer")
 
         // Feedback

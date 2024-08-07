@@ -34,9 +34,8 @@ class MailboxesHeaderViewHolder(
 
     fun displayMailboxesHeader(
         header: MailboxesHeader,
-        binding: ItemMenuDrawerMailboxesHeaderBinding,
         onMailboxesHeaderClicked: () -> Unit,
-    ) = with(binding) {
+    ) = with(binding as ItemMenuDrawerMailboxesHeaderBinding) {
         SentryLog.d("Bind", "Bind Mailboxes header")
 
         val (mailbox, hasMoreThanOneMailbox, isExpanded) = header
@@ -55,8 +54,7 @@ class MailboxesHeaderViewHolder(
 
     fun updateCollapseState(
         header: MailboxesHeader,
-        binding: ItemMenuDrawerMailboxesHeaderBinding,
-    ) = with(binding) {
+    ) = with(binding as ItemMenuDrawerMailboxesHeaderBinding) {
         SentryLog.d("Bind", "Bind Mailboxes header because of collapse change")
 
         mailboxExpandButton.toggleChevron(!header.isExpanded)
