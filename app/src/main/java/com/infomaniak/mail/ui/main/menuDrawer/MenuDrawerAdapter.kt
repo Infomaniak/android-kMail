@@ -114,6 +114,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     private fun MutableList<Any>.addCustomFoldersFrom(allFolders: List<Folder>, areCustomFoldersExpanded: Boolean): Boolean {
+        var isFirstCustomFolderEncountered = false
         var atLeastOneFolderIsIndented = false
         var areCustomFoldersEmpty = true
 
@@ -121,7 +122,9 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         if (!areCustomFoldersExpanded) return false
 
         for (folder in allFolders) {
-            if (!folder.isDefaultFolder()) {
+            if (!isFirstCustomFolderEncountered && !folder.isDefaultFolder()) isFirstCustomFolderEncountered = true
+
+            if (isFirstCustomFolderEncountered) {
                 areCustomFoldersEmpty = false
                 if (folder.canBeCollapsed) atLeastOneFolderIsIndented = true
                 add(folder)
