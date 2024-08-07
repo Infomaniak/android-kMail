@@ -73,8 +73,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             ) = mediatorContainer
 
             var count = 0
-            var temporaryHasCollapsableDefaultFolder = false
-            var temporaryHasCollapsableCustomFolder = false
+            hasCollapsableDefaultFolder = false
+            hasCollapsableCustomFolder = false
 
             // Mailboxes
             val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
@@ -87,7 +87,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             add(ItemType.DIVIDER)
             while (count < allFolders.count() && (allFolders[count].role != null || !allFolders[count].isRoot)) {
                 val defaultFolder = allFolders[count]
-                if (defaultFolder.canBeCollapsed) temporaryHasCollapsableDefaultFolder = true
+                if (defaultFolder.canBeCollapsed) hasCollapsableDefaultFolder = true
                 add(defaultFolder)
                 count++
             }
@@ -101,14 +101,12 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 } else {
                     while (count < allFolders.count()) {
                         val customFolder = allFolders[count]
-                        if (customFolder.canBeCollapsed) temporaryHasCollapsableCustomFolder = true
+                        if (customFolder.canBeCollapsed) hasCollapsableCustomFolder = true
                         add(customFolder)
                         count++
                     }
                 }
             }
-            hasCollapsableDefaultFolder = temporaryHasCollapsableDefaultFolder
-            hasCollapsableCustomFolder = temporaryHasCollapsableCustomFolder
 
             // Actions
             add(ItemType.DIVIDER)
