@@ -32,13 +32,15 @@ class ActionViewHolder(
     parent: ViewGroup,
 ) : MenuDrawerViewHolder(ItemMenuDrawerActionBinding.inflate(inflater, parent, false)) {
 
+    override val binding = super.binding as ItemMenuDrawerActionBinding
+
     fun displayAction(
         action: MenuDrawerAction,
         onActionClicked: (ActionType) -> Unit,
     ) {
         SentryLog.d("Bind", "Bind Action : ${action.type.name}")
 
-        (binding as ItemMenuDrawerActionBinding).root.apply {
+        binding.root.apply {
             icon = AppCompatResources.getDrawable(context, action.icon)
             text = context.getString(action.text)
             maxLines = action.maxLines

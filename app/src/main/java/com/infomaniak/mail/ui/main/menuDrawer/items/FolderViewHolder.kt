@@ -37,6 +37,8 @@ class FolderViewHolder(
     parent: ViewGroup,
 ) : MenuDrawerViewHolder(ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)) {
 
+    override val binding = super.binding as ItemMenuDrawerFolderBinding
+
     fun displayFolder(
         folder: Folder,
         currentFolderId: String?,
@@ -69,7 +71,7 @@ class FolderViewHolder(
             else -> folder.unreadCountDisplay
         }
 
-        (binding as ItemMenuDrawerFolderBinding).root.setFolderUi(
+        binding.root.setFolderUi(
             folder,
             roleDependantParameters,
             unread,

@@ -32,12 +32,14 @@ class FooterViewHolder(
     parent: ViewGroup,
 ) : MenuDrawerViewHolder(ItemMenuDrawerFooterBinding.inflate(inflater, parent, false)) {
 
+    override val binding = super.binding as ItemMenuDrawerFooterBinding
+
     fun displayFooter(
         footer: MenuDrawerFooter,
         onFeedbackClicked: () -> Unit,
         onHelpClicked: () -> Unit,
         onAppVersionClicked: () -> Unit,
-    ) = with(binding as ItemMenuDrawerFooterBinding) {
+    ) = with(binding) {
         SentryLog.d("Bind", "Bind Footer")
 
         // Feedback
