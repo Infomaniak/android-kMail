@@ -80,6 +80,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -103,11 +104,11 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ApiErrorException
+import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
-import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
 import io.realm.kotlin.MutableRealm
@@ -116,11 +117,11 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.encodeToString
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
@@ -322,29 +323,6 @@ fun LiveData<UiRecipients>.valueOrEmpty(): List<Recipient> = value?.recipients ?
 //endregion
 
 //region Folders
-fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
-    return toMutableList().let { list ->
-
-        val defaultFolders = list
-            .filter { it.role != null }
-            .sortedBy { it.role?.order }
-            .flattenFolderChildren()
-            .also(list::removeAll)
-
-        val customFolders = list.flattenFolderChildren()
-
-        defaultFolders to customFolders
-    }
-}
-
-fun List<Folder>.getDefaultMenuFolders(): List<Folder> {
-    return sortedBy { it.role?.order }.flattenFolderChildren()
-}
-
-fun List<Folder>.getCustomMenuFolders(dismissHiddenChildren: Boolean = false): List<Folder> {
-    return flattenFolderChildren(dismissHiddenChildren)
-}
-
 fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
 
     if (isEmpty()) return this
@@ -356,24 +334,53 @@ fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): 
 
         val folder = inputList.removeFirst()
 
-        if (folder.isManaged()) {
+        val children = if (folder.isManaged()) {
             outputList.add(folder.copyFromRealm(1u))
-            val children = with(folder.children) {
+            with(folder.children) {
                 (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
-                    .sort(Folder::name.name, Sort.ASCENDING)
+                    .sortFolders()
                     .find()
             }
-            inputList.addAll(0, children)
         } else {
             outputList.add(folder)
-            val children = with(folder.children) { if (dismissHiddenChildren) filter { !it.isHidden } else this }
-            inputList.addAll(children)
+            (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children)
+                .sortFolders()
         }
+
+        inputList.addAll(index = 0, children)
 
         return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
     }
 
     return formatFolderWithAllChildren(toMutableList())
+}
+
+/**
+ * These 2 `sortFolders()` functions should always implement the same sort logic.
+ */
+fun RealmQuery<Folder>.sortFolders() = sort(Folder::sortedName.name, Sort.ASCENDING)
+    .sort(Folder::isFavorite.name, Sort.DESCENDING)
+    .sort(Folder::roleOrder.name, Sort.DESCENDING)
+
+/**
+ * These 2 `sortFolders()` functions should always implement the same sort logic.
+ */
+fun List<Folder>.sortFolders() = sortedBy { it.sortedName }
+    .sortedByDescending { it.isFavorite }
+    .sortedByDescending { it.roleOrder }
+
+fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> {
+    val folders = this
+    var needsToAddDivider = true
+    return buildList {
+        folders.forEach { folder ->
+            if (needsToAddDivider && folder.isRootAndCustom) {
+                needsToAddDivider = false
+                add(dividerType)
+            }
+            add(folder)
+        }
+    }
 }
 //endregion
 
@@ -629,6 +636,20 @@ private fun Spannable.setClickableSpan(startIndex: Int, endIndex: Int, onClick: 
 
 fun Fragment.bindAlertToViewLifecycle(alertDialog: BaseAlertDialog) {
     alertDialog.bindAlertToLifecycle(viewLifecycleOwner)
+}
+
+/**
+ * Asynchronously validate folder name locally
+ * @return error string, otherwise null
+ */
+private val invalidCharactersRegex by lazy { Regex("[/'\"]") }
+fun Context.getFolderCreationError(folderName: CharSequence, folderController: FolderController): String? {
+    return when {
+        folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
+        folderName.contains(invalidCharactersRegex) -> getString(R.string.errorNewFolderInvalidCharacter)
+        folderController.getRootFolder(folderName.toString()) != null -> getString(R.string.errorNewFolderAlreadyExists)
+        else -> null
+    }
 }
 
 fun Context.getTransparentColor() = getColor(android.R.color.transparent)

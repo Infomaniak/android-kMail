@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.move
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -29,8 +28,9 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
+import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.getCustomMenuFolders
+import com.infomaniak.mail.utils.extensions.flattenFolderChildren
 import com.infomaniak.mail.utils.extensions.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -52,41 +52,67 @@ class MoveViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private var filterJob: Job? = null
+    private var searchJob: Job? = null
 
     private val messageUid inline get() = savedStateHandle.get<String?>(MoveFragmentArgs::messageUid.name)
     private val threadsUids inline get() = savedStateHandle.get<Array<String>>(MoveFragmentArgs::threadsUids.name)!!
 
-    var filterResults: MutableLiveData<List<Folder>> = MutableLiveData()
+    private var allFolders = emptyList<Any>()
+    val sourceFolderIdLiveData = MutableLiveData<String>()
+    val filterResults = MutableLiveData<List<Any>>()
+    var hasAlreadyTrackedSearch = false
 
-    fun cancelSearch() {
-        filterJob?.cancel()
+    init {
+        viewModelScope.launch(ioCoroutineContext) {
+
+            val sourceFolderId = messageUid?.let(messageController::getMessage)?.folderId
+                ?: threadController.getThread(threadsUids.first())!!.folderId
+
+            sourceFolderIdLiveData.postValue(sourceFolderId)
+
+            allFolders = folderController.getMoveFolders()
+                .flattenFolderChildren()
+                .addDividerBeforeFirstCustomFolder(dividerType = Unit)
+                .also(filterResults::postValue)
+        }
     }
 
-    fun getFolderIdAndCustomFolders() = liveData(ioCoroutineContext) {
-
-        val folderId = messageUid?.let { messageController.getMessage(it)!!.folderId }
-            ?: threadController.getThread(threadsUids.first())!!.folderId
-
-        val customFolders = folderController.getCustomFolders().getCustomMenuFolders()
-
-        emit(folderId to customFolders)
+    fun filterFolders(query: CharSequence?, shouldDebounce: Boolean) {
+        if (query?.isNotBlank() == true) {
+            searchFolders(query, shouldDebounce)
+        } else {
+            cancelSearch()
+            filterResults.value = allFolders
+        }
     }
 
-    fun filterFolders(query: String, folders: List<Folder>, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
-        filterJob?.cancel()
-        filterJob = launch {
+    private fun searchFolders(query: CharSequence, shouldDebounce: Boolean) = viewModelScope.launch(ioCoroutineContext) {
+
+        cancelSearch()
+
+        searchJob = launch {
+
             if (shouldDebounce) {
                 delay(FILTER_DEBOUNCE_DURATION)
                 ensureActive()
             }
-            val filteredFolders = folders.filter { folder ->
-                val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
-                folderName.standardize().contains(query.standardize())
+
+            val filteredFolders = mutableListOf<Any>().apply {
+                allFolders.forEach { folder ->
+                    ensureActive()
+                    if (folder !is Folder) return@forEach
+                    val folderName = folder.role?.folderNameRes?.let(appContext::getString) ?: folder.name
+                    val isFound = folderName.standardize().contains(query.standardize())
+                    if (isFound) add(folder)
+                }
             }
 
             filterResults.postValue(filteredFolders)
         }
+    }
+
+    fun cancelSearch() {
+        searchJob?.cancel()
     }
 
     override fun onCleared() {

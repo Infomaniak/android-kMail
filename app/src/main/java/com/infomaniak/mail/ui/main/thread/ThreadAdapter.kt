@@ -60,6 +60,7 @@ import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
+import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -90,7 +91,7 @@ class ThreadAdapter(
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
 
-    inline val items: MutableList<Any> get() = currentList
+    inline val items: List<Any> get() = currentList
 
     //region Auto-scroll at Thread opening
     private val currentSetOfLoadedExpandedMessagesUids = mutableSetOf<String>()
@@ -183,7 +184,7 @@ class ThreadAdapter(
         val item = items[position]
 
         holder.binding.root.tag = if (item is SuperCollapsedBlock || (item is Message && item.shouldHideDivider)) {
-            IGNORE_DIVIDER_TAG
+            UiUtils.IGNORE_DIVIDER_TAG
         } else {
             null
         }
@@ -851,9 +852,6 @@ class ThreadAdapter(
     }
 
     companion object {
-
-        const val IGNORE_DIVIDER_TAG = "ignoreDividerTag"
-
         private val contextMenuTypeForHitTestResultType = mapOf(
             HitTestResult.PHONE_TYPE to ContextMenuType.PHONE,
             HitTestResult.EMAIL_TYPE to ContextMenuType.EMAIL,

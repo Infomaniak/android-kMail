@@ -51,12 +51,13 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
-import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallback
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapterCallbacks
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElement
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
+import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
@@ -153,7 +154,7 @@ class SearchFragment : TwoPaneFragment() {
         threadListAdapter(
             folderRole = null,
             isFolderNameVisible = true,
-            threadListAdapterCallback = object : ThreadListAdapterCallback {
+            callbacks = object : ThreadListAdapterCallbacks {
 
                 override var onSwipeFinished: (() -> Unit)? = null
 
@@ -202,13 +203,13 @@ class SearchFragment : TwoPaneFragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
-        searchViewModel.foldersLive.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
+        searchViewModel.foldersLive.observe(viewLifecycleOwner) { allFolders ->
 
-            val folders = defaultFolders.toMutableList<Any>().apply {
-                add(0, SearchFolderElement.ALL_FOLDERS)
-                add(SearchFolderElement.DIVIDER)
-                addAll(customFolders)
-            }.toList()
+            val folders = allFolders
+                .addDividerBeforeFirstCustomFolder(dividerType = SearchFolderElement.DIVIDER)
+                .toMutableList()
+                .apply { add(0, SearchFolderElement.ALL_FOLDERS) }
+                .toList()
 
             searchAdapter = SearchFolderAdapter(folders) { folder, title ->
                 onFolderSelected(folder, title)

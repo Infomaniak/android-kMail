@@ -69,8 +69,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.getCustomMenuFolders
-import com.infomaniak.mail.utils.extensions.getDefaultMenuFolders
+import com.infomaniak.mail.utils.extensions.flattenFolderChildren
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
@@ -85,6 +84,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -119,7 +119,6 @@ class MainViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var refreshEverythingJob: Job? = null
 
-    // First boolean is the download status, second boolean is if the LoadMore button should be displayed
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isInternetAvailable = MutableLiveData<Boolean>()
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
@@ -158,14 +157,12 @@ class MainViewModel @Inject constructor(
         it?.let(mailboxController::getMailbox)
     }.asLiveData(ioCoroutineContext)
 
-    val currentDefaultFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
-        objectId?.let { folderController.getDefaultFoldersAsync().map { it.list.getDefaultMenuFolders() } } ?: emptyFlow()
+    val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
+        folderController.getMenuDrawerDefaultFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) }
     }.asLiveData(ioCoroutineContext)
 
-    val currentCustomFoldersLive = _currentMailboxObjectId.flatMapLatest { objectId ->
-        objectId
-            ?.let { folderController.getCustomFoldersAsync().map { it.list.getCustomMenuFolders(dismissHiddenChildren = true) } }
-            ?: emptyFlow()
+    val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
+        folderController.getMenuDrawerCustomFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) }
     }.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {

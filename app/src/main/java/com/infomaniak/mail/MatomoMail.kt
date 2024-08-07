@@ -168,6 +168,10 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackCreateFolderEvent(name: String) {
+        context?.trackCreateFolderEvent(name)
+    }
+
+    fun Context.trackCreateFolderEvent(name: String) {
         trackEvent("createFolder", name)
     }
 
@@ -207,10 +211,6 @@ object MatomoMail : MatomoCore {
 
     fun Fragment.trackInvalidPasswordMailboxEvent(name: String) {
         trackEvent("invalidPasswordMailbox", name)
-    }
-
-    fun Fragment.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
-        context?.trackExternalEvent(name, action, value)
     }
 
     fun Context.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {

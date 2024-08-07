@@ -32,7 +32,7 @@ import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
 import com.infomaniak.mail.ui.main.MailboxListFragment
-import com.infomaniak.mail.ui.main.menu.MailboxesAdapter
+import com.infomaniak.mail.ui.main.menuDrawer.MailboxesAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -55,7 +55,7 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         return FragmentNoValidMailboxesBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()

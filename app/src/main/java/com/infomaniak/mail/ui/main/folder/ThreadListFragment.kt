@@ -304,7 +304,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private fun setupAdapter() {
         threadListAdapter(
             folderRole = mainViewModel.currentFolder.value?.role,
-            threadListAdapterCallback = object : ThreadListAdapterCallback {
+            callbacks = object : ThreadListAdapterCallbacks {
 
                 override var onSwipeFinished: (() -> Unit)? = { threadListViewModel.isRecoveringFinished.value = true }
 
@@ -506,7 +506,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
                 notYetImplemented()
                 true
             }
-            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
+            SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
         }
 
         val shouldKeepItemBecauseOfNoConnection = isInternetAvailable.value == false

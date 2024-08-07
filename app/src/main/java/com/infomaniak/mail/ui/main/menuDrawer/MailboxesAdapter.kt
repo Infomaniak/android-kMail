@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.menuDrawer
 
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
@@ -29,9 +29,9 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.databinding.ItemInvalidMailboxBinding
-import com.infomaniak.mail.databinding.ItemMailboxMenuDrawerBinding
+import com.infomaniak.mail.databinding.ItemMenuDrawerMailboxBinding
 import com.infomaniak.mail.databinding.ItemSelectableMailboxBinding
-import com.infomaniak.mail.ui.main.menu.MailboxesAdapter.MailboxesViewHolder
+import com.infomaniak.mail.ui.main.menuDrawer.MailboxesAdapter.MailboxesViewHolder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.DecoratedItemView.SelectionStyle
@@ -50,7 +50,7 @@ class MailboxesAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
             DisplayType.SIMPLE_MAILBOX.layout -> ItemSelectableMailboxBinding.inflate(layoutInflater, parent, false)
-            DisplayType.MENU_DRAWER_MAILBOX.layout -> ItemMailboxMenuDrawerBinding.inflate(layoutInflater, parent, false)
+            DisplayType.MENU_DRAWER_MAILBOX.layout -> ItemMenuDrawerMailboxBinding.inflate(layoutInflater, parent, false)
             else -> ItemInvalidMailboxBinding.inflate(layoutInflater, parent, false)
         }
 
@@ -67,7 +67,7 @@ class MailboxesAdapter(
                     (this as ItemSelectableMailboxBinding).displaySimpleMailbox(mailbox, isCurrentMailbox)
                 }
                 DisplayType.MENU_DRAWER_MAILBOX.layout -> {
-                    (this as ItemMailboxMenuDrawerBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
+                    (this as ItemMenuDrawerMailboxBinding).displayMenuDrawerMailbox(mailbox, isCurrentMailbox)
                 }
                 DisplayType.INVALID_MAILBOX.layout -> (this as ItemInvalidMailboxBinding).displayInvalidMailbox(mailbox)
             }
@@ -94,7 +94,7 @@ class MailboxesAdapter(
         setSelectedState(isCurrentMailbox)
     }
 
-    private fun ItemMailboxMenuDrawerBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
+    private fun ItemMenuDrawerMailboxBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
         displayValidMailbox(mailbox, isCurrentMailbox) { context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME) }
 
         unreadCount = mailbox.unreadCountDisplay.count
@@ -141,7 +141,7 @@ class MailboxesAdapter(
 
     private enum class DisplayType(val layout: Int) {
         INVALID_MAILBOX(R.layout.item_invalid_mailbox),
-        MENU_DRAWER_MAILBOX(R.layout.item_mailbox_menu_drawer),
+        MENU_DRAWER_MAILBOX(R.layout.item_menu_drawer_mailbox),
         SIMPLE_MAILBOX(R.layout.item_selectable_mailbox),
     }
 

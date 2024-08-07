@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.extensions.copyListToRealm
 import com.infomaniak.mail.utils.extensions.flattenFolderChildren
+import com.infomaniak.mail.utils.extensions.sortFolders
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -34,7 +35,6 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
@@ -45,20 +45,20 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
-    fun getCustomFolders(): RealmResults<Folder> {
-        return getCustomFoldersQuery(mailboxContentRealm()).find()
+    fun getMenuDrawerDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.CUSTOM, withoutChildren = true).asFlow()
     }
 
-    fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), onlyRoots = true).asFlow()
+    fun getMenuDrawerCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.DEFAULT, withoutChildren = true).asFlow()
     }
 
-    fun getDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getDefaultFoldersQuery(mailboxContentRealm()).asFlow()
+    fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
     }
 
-    fun getCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getCustomFoldersQuery(mailboxContentRealm()).asFlow()
+    fun getMoveFolders(): RealmResults<Folder> {
+        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.DRAFT, withoutChildren = true).find()
     }
 
     fun getFolder(id: String): Folder? {
@@ -131,31 +131,31 @@ class FolderController @Inject constructor(
     }
     //endregion
 
+    enum class FoldersType {
+        DEFAULT,
+        CUSTOM,
+        DRAFT,
+    }
+
     companion object {
         const val SEARCH_FOLDER_ID = "search_folder_id"
         private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
         private val isRootFolder = "${Folder.parentsPropertyName}.@count == 0"
 
         //region Queries
-        private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = false): RealmQuery<Folder> {
-            val rootsQuery = if (onlyRoots) " AND $isRootFolder" else ""
-            return realm
-                .query<Folder>(isNotSearch + rootsQuery)
-                .sort(Folder::name.name, Sort.ASCENDING)
-                .sort(Folder::isFavorite.name, Sort.DESCENDING)
-        }
-
-        private fun getDefaultFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-            val hasRole = "${Folder.rolePropertyName} != nil"
-            return realm.query("$isNotSearch AND $hasRole")
-        }
-
-        private fun getCustomFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-            val hasNoRole = "${Folder.rolePropertyName} == nil"
-            return realm
-                .query<Folder>("$isNotSearch AND $isRootFolder AND $hasNoRole")
-                .sort(Folder::name.name, Sort.ASCENDING)
-                .sort(Folder::isFavorite.name, Sort.DESCENDING)
+        private fun getFoldersQuery(
+            realm: TypedRealm,
+            withoutType: FoldersType? = null,
+            withoutChildren: Boolean = false,
+        ): RealmQuery<Folder> {
+            val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
+            val typeQuery = when (withoutType) {
+                FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
+                FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != nil"
+                FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
+                null -> ""
+            }
+            return realm.query<Folder>("$isNotSearch${rootsQuery}${typeQuery}").sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {

@@ -15,15 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.folder
+package com.infomaniak.mail.ui.main.menuDrawer.items
 
-import com.infomaniak.mail.data.models.thread.Thread
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.mail.databinding.ItemMenuDrawerActionsHeaderBinding
+import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 
-interface ThreadListAdapterCallback {
-    var onSwipeFinished: (() -> Unit)?
-    var onThreadClicked: (thread: Thread) -> Unit
-    var onFlushClicked: ((dialogTitle: String) -> Unit)?
-    var onLoadMoreClicked: () -> Unit
-    var onPositionClickedChanged: (position: Int, previousPosition: Int) -> Unit
-    var deleteThreadInRealm: (threadUid: String) -> Unit
+class ActionsHeaderViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup,
+) : MenuDrawerViewHolder(ItemMenuDrawerActionsHeaderBinding.inflate(inflater, parent, false)) {
+
+    fun displayActionsHeader(onActionsHeaderClicked: () -> Unit) {
+        SentryLog.d("Bind", "Bind Actions header")
+        binding.root.setOnClickListener { onActionsHeaderClicked() }
+    }
 }

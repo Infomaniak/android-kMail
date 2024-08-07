@@ -1,2 +1,2 @@
-- Bloquage de l'importation de pièces jointes lorsque la limite de taille est atteinte
+- Blocage de l'importation de pièces jointes lorsque la limite de taille est atteinte
 - Correction de la barre d'outils de l'éditeur affichée sous le clavier
