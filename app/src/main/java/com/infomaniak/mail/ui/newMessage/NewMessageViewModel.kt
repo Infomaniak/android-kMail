@@ -549,13 +549,16 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun Body.asPlainText(messageUid: String): String = when (type) {
-        Utils.TEXT_HTML -> {
-            val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
-            val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies, messageUid)
-            fullBody.htmlToText()
-        }
-        else -> value
+    private suspend fun Body.asPlainText(messageUid: String): String? {
+        //TODO: When the API handles blank characters, remove ifBlank
+        return when (type) {
+            Utils.TEXT_HTML -> {
+                val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
+                val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies, messageUid)
+                fullBody.htmlToText()
+            }
+            else -> value
+        }.ifBlank { null }
     }
 
     private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature? {
