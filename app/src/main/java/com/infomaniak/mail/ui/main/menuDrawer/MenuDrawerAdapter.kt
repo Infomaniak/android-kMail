@@ -114,9 +114,9 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             add(ItemType.DIVIDER)
             add(ItemType.ACTIONS_HEADER)
             if (areActionsExpanded) {
-                add(syncAutoConfigAction)
-                add(importMailsAction)
-                if (permissions?.canRestoreEmails == true) add(restoreMailsAction)
+                add(SYNC_AUTO_CONFIG_ACTION)
+                add(IMPORT_MAILS_ACTION)
+                if (permissions?.canRestoreEmails == true) add(RESTORE_MAILS_ACTION)
             }
 
             // Footer
@@ -309,19 +309,19 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     companion object {
-        private val syncAutoConfigAction = MenuDrawerAction(
+        private val SYNC_AUTO_CONFIG_ACTION = MenuDrawerAction(
             type = ActionType.SYNC_AUTO_CONFIG,
             icon = R.drawable.ic_synchronize,
             text = R.string.syncCalendarsAndContactsTitle,
             maxLines = 2,
         )
-        private val importMailsAction = MenuDrawerAction(
+        private val IMPORT_MAILS_ACTION = MenuDrawerAction(
             type = ActionType.IMPORT_MAILS,
             icon = R.drawable.ic_drawer_download,
             text = R.string.buttonImportEmails,
             maxLines = 1,
         )
-        private val restoreMailsAction = MenuDrawerAction(
+        private val RESTORE_MAILS_ACTION = MenuDrawerAction(
             type = ActionType.RESTORE_MAILS,
             icon = R.drawable.ic_restore_arrow,
             text = R.string.buttonRestoreEmails,
