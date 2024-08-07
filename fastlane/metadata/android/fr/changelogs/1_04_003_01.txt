@@ -1,0 +1,2 @@
+- Ajout de la possibilité de bloquer un contact spécifique dans un fil de discussion
+- Remplacement de l'éditeur actuel par un éditeur html riche

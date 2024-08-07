@@ -1,0 +1,2 @@
+- Add possibility to block a specific contact in a thread
+- Replace current editor with rich html editor
