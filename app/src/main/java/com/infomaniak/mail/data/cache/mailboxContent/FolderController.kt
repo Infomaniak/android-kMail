@@ -36,6 +36,7 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
@@ -47,6 +48,15 @@ class FolderController @Inject constructor(
     //region Get data
     fun getRootFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
+    }
+
+    fun getMenuDrawerFolders(): Flow<Pair<ResultsChange<Folder>, ResultsChange<Folder>>> {
+        val defaultFoldersFlow = getDefaultFoldersQuery(mailboxContentRealm()).asFlow()
+        val customFoldersFlow = getCustomFoldersQuery(mailboxContentRealm()).asFlow()
+        return defaultFoldersFlow.combine(
+            flow = customFoldersFlow,
+            transform = { defaultFolders, customFolders -> defaultFolders to customFolders }
+        )
     }
 
     fun getMoveFolders(): RealmResults<Folder> {
@@ -137,6 +147,16 @@ class FolderController @Inject constructor(
             val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
             val draftsQuery = if (withoutDrafts) " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'" else ""
             return realm.query<Folder>("$isNotSearch${rootsQuery}${draftsQuery}").sortFolders()
+        }
+
+        private fun getDefaultFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+            val isDefaultRoot = "AND ${Folder.rolePropertyName} != null AND $isRootFolder"
+            return realm.query<Folder>("$isNotSearch$isDefaultRoot").sortFolders()
+        }
+
+        private fun getCustomFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+            val isCustomRoot = "AND ${Folder.rolePropertyName} == null AND $isRootFolder"
+            return realm.query<Folder>("$isNotSearch$isCustomRoot").sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
