@@ -31,7 +31,7 @@ object HtmlUtils {
     fun <T> Document.processCids(
         attachments: List<Attachment>,
         associateDataToCid: (Attachment) -> T?,
-        onCidImageFound: (T, Element) -> Unit
+        onCidImageFound: (T, Element) -> Unit,
     ) {
         val attachmentsMap = attachments.associate {
             it.contentId to associateDataToCid(it)
