@@ -65,7 +65,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             val (
                 mailboxes,
                 areMailboxesExpanded,
-                allFolders,
+                defaultFolders,
+                customFolders,
                 areCustomFoldersExpanded,
                 areActionsExpanded,
                 permissions,
@@ -75,10 +76,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             addMailboxes(mailboxes, areMailboxesExpanded)
 
             add(ItemType.DIVIDER)
-            hasCollapsableDefaultFolder = addDefaultFolders(allFolders)
+            hasCollapsableDefaultFolder = addDefaultFolders(defaultFolders)
 
             add(ItemType.DIVIDER)
-            hasCollapsableCustomFolder = addCustomFoldersFrom(allFolders, areCustomFoldersExpanded)
+            hasCollapsableCustomFolder = addCustomFoldersFrom(customFolders, areCustomFoldersExpanded)
 
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)
@@ -98,45 +99,34 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         if (areMailboxesExpanded) addAll(otherMailboxes)
     }
 
-    private fun MutableList<Any>.addDefaultFolders(allFolders: List<Folder>): Boolean {
+    private fun MutableList<Any>.addDefaultFolders(defaultFolders: List<Folder>): Boolean {
         var atLeastOneFolderIsIndented = false
 
-        for (folder in allFolders) {
-            if (folder.isDefaultFolder()) {
-                if (folder.canBeCollapsed) atLeastOneFolderIsIndented = true
-                add(folder)
-            } else {
-                break
-            }
+        defaultFolders.forEach { defaultFolder ->
+            if (defaultFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
+            add(defaultFolder)
         }
 
         return atLeastOneFolderIsIndented
     }
 
-    private fun MutableList<Any>.addCustomFoldersFrom(allFolders: List<Folder>, areCustomFoldersExpanded: Boolean): Boolean {
-        var isFirstCustomFolderEncountered = false
+    private fun MutableList<Any>.addCustomFoldersFrom(customFolders: List<Folder>, areCustomFoldersExpanded: Boolean): Boolean {
         var atLeastOneFolderIsIndented = false
-        var areCustomFoldersEmpty = true
 
         add(ItemType.FOLDERS_HEADER)
         if (!areCustomFoldersExpanded) return false
 
-        for (folder in allFolders) {
-            if (!isFirstCustomFolderEncountered && !folder.isDefaultFolder()) isFirstCustomFolderEncountered = true
-
-            if (isFirstCustomFolderEncountered) {
-                areCustomFoldersEmpty = false
-                if (folder.canBeCollapsed) atLeastOneFolderIsIndented = true
-                add(folder)
+        if (customFolders.isEmpty()) {
+            add(ItemType.EMPTY_FOLDERS)
+        } else {
+            customFolders.forEach { customFolder ->
+                if (customFolder.canBeCollapsed) atLeastOneFolderIsIndented = true
+                add(customFolder)
             }
         }
 
-        if (areCustomFoldersEmpty) add(ItemType.EMPTY_FOLDERS)
-
         return atLeastOneFolderIsIndented
     }
-
-    private fun Folder.isDefaultFolder() = role != null || !isRoot
 
     private fun MutableList<Any>.addAdvancedActions(
         areActionsExpanded: Boolean,

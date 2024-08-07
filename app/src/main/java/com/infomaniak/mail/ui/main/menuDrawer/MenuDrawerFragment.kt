@@ -276,11 +276,13 @@ class MenuDrawerFragment : Fragment() {
             currentPermissionsLive,
             currentQuotasLive,
             constructor = {
+                val (defaultFolders, customFolders) = it[2] as Pair<List<Folder>, List<Folder>>
                 @Suppress("UNCHECKED_CAST")
                 MediatorContainer(
                     it[0] as List<Mailbox>,
                     it[1] as Boolean,
-                    it[2] as List<Folder>,
+                    defaultFolders,
+                    customFolders,
                     it[3] as Boolean,
                     it[4] as Boolean,
                     it[5] as MailboxPermissions?,
@@ -323,7 +325,8 @@ class MenuDrawerFragment : Fragment() {
     data class MediatorContainer(
         val mailboxes: List<Mailbox>,
         val areMailboxesExpanded: Boolean,
-        val allFolders: List<Folder>,
+        val defaultFolders: List<Folder>,
+        val customFolders: List<Folder>,
         val areCustomFoldersExpanded: Boolean,
         val areActionsExpanded: Boolean,
         val permissions: MailboxPermissions?,
