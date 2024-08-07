@@ -26,6 +26,7 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment.MediatorContainer
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder
@@ -61,7 +62,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     fun formatList(mediatorContainer: MediatorContainer) = buildList {
         runCatchingRealm {
-
             val (
                 mailboxes,
                 areMailboxesExpanded,
@@ -72,53 +72,78 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 quotas,
             ) = mediatorContainer
 
-            var count = 0
-            hasCollapsableDefaultFolder = false
-            hasCollapsableCustomFolder = false
+            addMailboxes(mailboxes, areMailboxesExpanded)
 
-            // Mailboxes
-            val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
-            val otherMailboxes = mailboxes.toMutableList()
-            val currentMailbox = otherMailboxes.removeAt(currentMailboxIndex)
-            add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
-            if (areMailboxesExpanded) addAll(otherMailboxes)
-
-            // Default Folders
             add(ItemType.DIVIDER)
-            while (count < allFolders.count() && (allFolders[count].role != null || !allFolders[count].isRoot)) {
-                val defaultFolder = allFolders[count]
-                if (defaultFolder.canBeCollapsed) hasCollapsableDefaultFolder = true
-                add(defaultFolder)
-                count++
-            }
+            hasCollapsableDefaultFolder = addDefaultFolders(allFolders)
 
-            // Custom Folders
             add(ItemType.DIVIDER)
-            add(ItemType.FOLDERS_HEADER)
-            if (areCustomFoldersExpanded) {
-                if (count == allFolders.count()) {
-                    add(ItemType.EMPTY_FOLDERS)
-                } else {
-                    while (count < allFolders.count()) {
-                        val customFolder = allFolders[count]
-                        if (customFolder.canBeCollapsed) hasCollapsableCustomFolder = true
-                        add(customFolder)
-                        count++
-                    }
-                }
-            }
+            hasCollapsableCustomFolder = addCustomFoldersFrom(allFolders, areCustomFoldersExpanded)
 
-            // Actions
             add(ItemType.DIVIDER)
-            add(ItemType.ACTIONS_HEADER)
-            if (areActionsExpanded) {
-                add(SYNC_AUTO_CONFIG_ACTION)
-                add(IMPORT_MAILS_ACTION)
-                if (permissions?.canRestoreEmails == true) add(RESTORE_MAILS_ACTION)
-            }
+            addAdvancedActions(areActionsExpanded, permissions)
 
-            // Footer
             add(MenuDrawerFooter(quotas))
+        }
+    }
+
+    private fun MutableList<Any>.addMailboxes(
+        mailboxes: List<Mailbox>,
+        areMailboxesExpanded: Boolean
+    ) {
+        val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
+        val otherMailboxes = mailboxes.toMutableList()
+        val currentMailbox = otherMailboxes.removeAt(currentMailboxIndex)
+        add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
+        if (areMailboxesExpanded) addAll(otherMailboxes)
+    }
+
+    private fun MutableList<Any>.addDefaultFolders(allFolders: List<Folder>): Boolean {
+        var atLeastOneFolderIsIndented = false
+
+        for (folder in allFolders) {
+            if (folder.isDefaultFolder()) {
+                if (folder.canBeCollapsed) atLeastOneFolderIsIndented = true
+                add(folder)
+            } else {
+                break
+            }
+        }
+
+        return atLeastOneFolderIsIndented
+    }
+
+    private fun MutableList<Any>.addCustomFoldersFrom(allFolders: List<Folder>, areCustomFoldersExpanded: Boolean): Boolean {
+        var atLeastOneFolderIsIndented = false
+        var areCustomFoldersEmpty = true
+
+        add(ItemType.FOLDERS_HEADER)
+        if (!areCustomFoldersExpanded) return false
+
+        for (folder in allFolders) {
+            if (!folder.isDefaultFolder()) {
+                areCustomFoldersEmpty = false
+                if (folder.canBeCollapsed) atLeastOneFolderIsIndented = true
+                add(folder)
+            }
+        }
+
+        if (areCustomFoldersEmpty) add(ItemType.EMPTY_FOLDERS)
+
+        return atLeastOneFolderIsIndented
+    }
+
+    private fun Folder.isDefaultFolder() = role != null || !isRoot
+
+    private fun MutableList<Any>.addAdvancedActions(
+        areActionsExpanded: Boolean,
+        permissions: MailboxPermissions?
+    ) {
+        add(ItemType.ACTIONS_HEADER)
+        if (areActionsExpanded) {
+            add(SYNC_AUTO_CONFIG_ACTION)
+            add(IMPORT_MAILS_ACTION)
+            if (permissions?.canRestoreEmails == true) add(RESTORE_MAILS_ACTION)
         }
     }
 
