@@ -28,10 +28,12 @@ class FoldersHeaderViewHolder(
     parent: ViewGroup,
 ) : MenuDrawerViewHolder(ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)) {
 
+    override val binding = super.binding as ItemMenuDrawerCustomFoldersHeaderBinding
+
     fun displayFoldersHeader(
         onFoldersHeaderClicked: (Boolean) -> Unit,
         onCreateFolderClicked: () -> Unit,
-    ) = with((binding as ItemMenuDrawerCustomFoldersHeaderBinding).root) {
+    ) = with(binding.root) {
         SentryLog.d("Bind", "Bind Custom Folders header")
 
         setOnClickListener { onFoldersHeaderClicked(isCollapsed) }

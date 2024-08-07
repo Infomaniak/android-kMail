@@ -31,10 +31,12 @@ class MailboxViewHolder(
     parent: ViewGroup,
 ) : MenuDrawerViewHolder(ItemMenuDrawerMailboxBinding.inflate(inflater, parent, false)) {
 
+    override val binding = super.binding as ItemMenuDrawerMailboxBinding
+
     fun displayMailbox(
         mailbox: Mailbox,
         onValidMailboxClicked: (Int) -> Unit,
-    ) = with((binding as ItemMenuDrawerMailboxBinding).root) {
+    ) = with(binding.root) {
         SentryLog.d("Bind", "Bind Mailbox (${mailbox.email})")
 
         text = mailbox.email

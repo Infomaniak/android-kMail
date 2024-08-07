@@ -239,7 +239,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
     }
 
-    abstract class MenuDrawerViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
+    abstract class MenuDrawerViewHolder(open val binding: ViewBinding) : ViewHolder(binding.root)
 
     enum class ItemType {
         DIVIDER,

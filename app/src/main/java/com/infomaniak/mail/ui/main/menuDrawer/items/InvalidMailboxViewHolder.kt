@@ -30,11 +30,13 @@ class InvalidMailboxViewHolder(
     parent: ViewGroup,
 ) : MenuDrawerViewHolder(ItemInvalidMailboxBinding.inflate(inflater, parent, false)) {
 
+    override val binding = super.binding as ItemInvalidMailboxBinding
+
     fun displayInvalidMailbox(
         mailbox: Mailbox,
         onLockedMailboxClicked: (String) -> Unit,
         onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
-    ) = with((binding as ItemInvalidMailboxBinding).root) {
+    ) = with(binding.root) {
         SentryLog.d("Bind", "Bind Invalid Mailbox (${mailbox.email})")
 
         text = mailbox.email
