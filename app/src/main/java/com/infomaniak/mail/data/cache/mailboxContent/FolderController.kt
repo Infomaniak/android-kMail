@@ -36,7 +36,6 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
@@ -50,13 +49,12 @@ class FolderController @Inject constructor(
         return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
     }
 
-    fun getMenuDrawerFolders(): Flow<Pair<ResultsChange<Folder>, ResultsChange<Folder>>> {
-        val defaultFoldersFlow = getDefaultFoldersQuery(mailboxContentRealm()).asFlow()
-        val customFoldersFlow = getCustomFoldersQuery(mailboxContentRealm()).asFlow()
-        return defaultFoldersFlow.combine(
-            flow = customFoldersFlow,
-            transform = { defaultFolders, customFolders -> defaultFolders to customFolders }
-        )
+    fun getMenuDrawerDefaultFolders(): Flow<ResultsChange<Folder>> {
+        return getDefaultFoldersQuery(mailboxContentRealm()).asFlow()
+    }
+
+    fun getMenuDrawerCustomFolders(): Flow<ResultsChange<Folder>> {
+        return getCustomFoldersQuery(mailboxContentRealm()).asFlow()
     }
 
     fun getMoveFolders(): RealmResults<Folder> {
