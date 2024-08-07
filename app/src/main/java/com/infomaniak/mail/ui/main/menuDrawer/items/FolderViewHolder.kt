@@ -39,7 +39,6 @@ class FolderViewHolder(
 
     fun displayFolder(
         folder: Folder,
-        binding: ItemMenuDrawerFolderBinding,
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
@@ -70,7 +69,7 @@ class FolderViewHolder(
             else -> folder.unreadCountDisplay
         }
 
-        binding.root.setFolderUi(
+        (binding as ItemMenuDrawerFolderBinding).root.setFolderUi(
             folder,
             roleDependantParameters,
             unread,

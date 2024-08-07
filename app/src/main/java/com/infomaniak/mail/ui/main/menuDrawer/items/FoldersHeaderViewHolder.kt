@@ -29,10 +29,9 @@ class FoldersHeaderViewHolder(
 ) : MenuDrawerViewHolder(ItemMenuDrawerCustomFoldersHeaderBinding.inflate(inflater, parent, false)) {
 
     fun displayFoldersHeader(
-        binding: ItemMenuDrawerCustomFoldersHeaderBinding,
         onFoldersHeaderClicked: (Boolean) -> Unit,
         onCreateFolderClicked: () -> Unit,
-    ) = with(binding.root) {
+    ) = with((binding as ItemMenuDrawerCustomFoldersHeaderBinding).root) {
         SentryLog.d("Bind", "Bind Custom Folders header")
 
         setOnClickListener { onFoldersHeaderClicked(isCollapsed) }

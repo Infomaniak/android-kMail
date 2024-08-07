@@ -33,9 +33,8 @@ class MailboxViewHolder(
 
     fun displayMailbox(
         mailbox: Mailbox,
-        binding: ItemMenuDrawerMailboxBinding,
         onValidMailboxClicked: (Int) -> Unit,
-    ) = with(binding.root) {
+    ) = with((binding as ItemMenuDrawerMailboxBinding).root) {
         SentryLog.d("Bind", "Bind Mailbox (${mailbox.email})")
 
         text = mailbox.email

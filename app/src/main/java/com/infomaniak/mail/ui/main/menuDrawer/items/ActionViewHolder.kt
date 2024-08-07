@@ -34,12 +34,11 @@ class ActionViewHolder(
 
     fun displayAction(
         action: MenuDrawerAction,
-        binding: ItemMenuDrawerActionBinding,
         onActionClicked: (ActionType) -> Unit,
     ) {
         SentryLog.d("Bind", "Bind Action : ${action.type.name}")
 
-        binding.root.apply {
+        (binding as ItemMenuDrawerActionBinding).root.apply {
             icon = AppCompatResources.getDrawable(context, action.icon)
             text = context.getString(action.text)
             maxLines = action.maxLines

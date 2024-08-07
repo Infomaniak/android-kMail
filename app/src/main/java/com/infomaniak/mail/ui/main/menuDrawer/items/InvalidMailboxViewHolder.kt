@@ -32,10 +32,9 @@ class InvalidMailboxViewHolder(
 
     fun displayInvalidMailbox(
         mailbox: Mailbox,
-        binding: ItemInvalidMailboxBinding,
         onLockedMailboxClicked: (String) -> Unit,
         onInvalidPasswordMailboxClicked: (Mailbox) -> Unit,
-    ) = with(binding.root) {
+    ) = with((binding as ItemInvalidMailboxBinding).root) {
         SentryLog.d("Bind", "Bind Invalid Mailbox (${mailbox.email})")
 
         text = mailbox.email

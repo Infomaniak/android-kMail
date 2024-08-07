@@ -28,7 +28,7 @@ class ActionsHeaderViewHolder(
     parent: ViewGroup,
 ) : MenuDrawerViewHolder(ItemMenuDrawerActionsHeaderBinding.inflate(inflater, parent, false)) {
 
-    fun displayActionsHeader(binding: ItemMenuDrawerActionsHeaderBinding, onActionsHeaderClicked: () -> Unit) {
+    fun displayActionsHeader(onActionsHeaderClicked: () -> Unit) {
         SentryLog.d("Bind", "Bind Actions header")
         binding.root.setOnClickListener { onActionsHeaderClicked() }
     }
