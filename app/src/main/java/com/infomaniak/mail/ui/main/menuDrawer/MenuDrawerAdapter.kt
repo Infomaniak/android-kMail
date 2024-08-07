@@ -319,13 +319,11 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
         override fun areContentsTheSame(oldItem: Any, newItem: Any) = runCatchingRealm {
             when (oldItem) {
-                ItemType.DIVIDER -> true
                 is MailboxesHeader -> newItem is MailboxesHeader
                         && newItem.hasMoreThanOneMailbox == oldItem.hasMoreThanOneMailbox
                         && newItem.isExpanded == oldItem.isExpanded
                         && newItem.mailbox?.unreadCountDisplay?.count == oldItem.mailbox?.unreadCountDisplay?.count
                 is Mailbox -> newItem is Mailbox && newItem.unreadCountDisplay.count == oldItem.unreadCountDisplay.count
-                ItemType.FOLDERS_HEADER -> true
                 is Folder -> newItem is Folder &&
                         newItem.name == oldItem.name &&
                         newItem.isFavorite == oldItem.isFavorite &&
@@ -333,10 +331,12 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                         newItem.unreadCountDisplay == oldItem.unreadCountDisplay &&
                         newItem.threads.count() == oldItem.threads.count() &&
                         newItem.canBeCollapsed == oldItem.canBeCollapsed
-                ItemType.EMPTY_FOLDERS -> true
-                ItemType.ACTIONS_HEADER -> true
-                is MenuDrawerAction -> true
                 is MenuDrawerFooter -> newItem is MenuDrawerFooter && newItem.quotas?.size == oldItem.quotas?.size
+                ItemType.DIVIDER,
+                ItemType.FOLDERS_HEADER,
+                ItemType.EMPTY_FOLDERS,
+                ItemType.ACTIONS_HEADER,
+                is MenuDrawerAction -> true
                 else -> error("oldItem wasn't any known item type (in MenuDrawer `areContentsTheSame`)")
             }
         }.getOrDefault(false)
