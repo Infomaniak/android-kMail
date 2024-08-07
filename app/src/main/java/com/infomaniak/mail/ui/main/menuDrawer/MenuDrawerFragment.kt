@@ -270,23 +270,23 @@ class MenuDrawerFragment : Fragment() {
         Utils.waitInitMediator(
             mailboxesLive,
             menuDrawerViewModel.areMailboxesExpanded,
-            currentFoldersLive,
+            defaultFoldersLive,
+            customFoldersLive,
             menuDrawerViewModel.areCustomFoldersExpanded,
             menuDrawerViewModel.areActionsExpanded,
             currentPermissionsLive,
             currentQuotasLive,
             constructor = {
-                val (defaultFolders, customFolders) = it[2] as Pair<List<Folder>, List<Folder>>
                 @Suppress("UNCHECKED_CAST")
                 MediatorContainer(
                     it[0] as List<Mailbox>,
                     it[1] as Boolean,
-                    defaultFolders,
-                    customFolders,
-                    it[3] as Boolean,
+                    it[2] as List<Folder>,
+                    it[3] as List<Folder>,
                     it[4] as Boolean,
-                    it[5] as MailboxPermissions?,
-                    it[6] as Quotas?,
+                    it[5] as Boolean,
+                    it[6] as MailboxPermissions?,
+                    it[7] as Quotas?,
                 )
             }
         )

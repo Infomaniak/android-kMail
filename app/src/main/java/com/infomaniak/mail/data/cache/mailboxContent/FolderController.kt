@@ -45,20 +45,20 @@ class FolderController @Inject constructor(
 ) {
 
     //region Get data
-    fun getRootFoldersAsync(): Flow<ResultsChange<Folder>> {
+    fun getMenuDrawerDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.CUSTOM, withoutChildren = true).asFlow()
+    }
+
+    fun getMenuDrawerCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.DEFAULT, withoutChildren = true).asFlow()
+    }
+
+    fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
     }
 
-    fun getMenuDrawerDefaultFolders(): Flow<ResultsChange<Folder>> {
-        return getDefaultFoldersQuery(mailboxContentRealm()).asFlow()
-    }
-
-    fun getMenuDrawerCustomFolders(): Flow<ResultsChange<Folder>> {
-        return getCustomFoldersQuery(mailboxContentRealm()).asFlow()
-    }
-
     fun getMoveFolders(): RealmResults<Folder> {
-        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true, withoutDrafts = true).find()
+        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.DRAFT, withoutChildren = true).find()
     }
 
     fun getFolder(id: String): Folder? {
@@ -131,6 +131,12 @@ class FolderController @Inject constructor(
     }
     //endregion
 
+    enum class FoldersType {
+        DEFAULT,
+        CUSTOM,
+        DRAFT,
+    }
+
     companion object {
         const val SEARCH_FOLDER_ID = "search_folder_id"
         private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
@@ -139,22 +145,17 @@ class FolderController @Inject constructor(
         //region Queries
         private fun getFoldersQuery(
             realm: TypedRealm,
+            withoutType: FoldersType? = null,
             withoutChildren: Boolean = false,
-            withoutDrafts: Boolean = false,
         ): RealmQuery<Folder> {
             val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
-            val draftsQuery = if (withoutDrafts) " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'" else ""
-            return realm.query<Folder>("$isNotSearch${rootsQuery}${draftsQuery}").sortFolders()
-        }
-
-        private fun getDefaultFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-            val isDefaultRoot = "AND ${Folder.rolePropertyName} != null AND $isRootFolder"
-            return realm.query<Folder>("$isNotSearch$isDefaultRoot").sortFolders()
-        }
-
-        private fun getCustomFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-            val isCustomRoot = "AND ${Folder.rolePropertyName} == null AND $isRootFolder"
-            return realm.query<Folder>("$isNotSearch$isCustomRoot").sortFolders()
+            val typeQuery = when (withoutType) {
+                FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
+                FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != nil"
+                FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
+                null -> ""
+            }
+            return realm.query<Folder>("$isNotSearch${rootsQuery}${typeQuery}").sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {

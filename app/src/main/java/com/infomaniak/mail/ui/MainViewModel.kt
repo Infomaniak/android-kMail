@@ -83,7 +83,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -158,16 +157,12 @@ class MainViewModel @Inject constructor(
         it?.let(mailboxController::getMailbox)
     }.asLiveData(ioCoroutineContext)
 
-    private val currentDefaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerDefaultFolders().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) }
-    }
+    val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
+        folderController.getMenuDrawerDefaultFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) }
+    }.asLiveData(ioCoroutineContext)
 
-    private val currentCustomFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerCustomFolders().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) }
-    }
-
-    val currentFoldersLive = currentDefaultFoldersLive.combine(currentCustomFoldersLive) { defaultFolders, customFolders ->
-        defaultFolders to customFolders
+    val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
+        folderController.getMenuDrawerCustomFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) }
     }.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {

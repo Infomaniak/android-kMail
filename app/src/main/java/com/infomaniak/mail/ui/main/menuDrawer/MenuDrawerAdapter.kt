@@ -62,6 +62,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     fun formatList(mediatorContainer: MediatorContainer) = buildList {
         runCatchingRealm {
+
             val (
                 mailboxes,
                 areMailboxesExpanded,
@@ -79,7 +80,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             hasCollapsableDefaultFolder = addDefaultFolders(defaultFolders)
 
             add(ItemType.DIVIDER)
-            hasCollapsableCustomFolder = addCustomFoldersFrom(customFolders, areCustomFoldersExpanded)
+            hasCollapsableCustomFolder = addCustomFolders(customFolders, areCustomFoldersExpanded)
 
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)
@@ -88,13 +89,11 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         }
     }
 
-    private fun MutableList<Any>.addMailboxes(
-        mailboxes: List<Mailbox>,
-        areMailboxesExpanded: Boolean
-    ) {
+    private fun MutableList<Any>.addMailboxes(mailboxes: List<Mailbox>, areMailboxesExpanded: Boolean) {
         val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
         val otherMailboxes = mailboxes.toMutableList()
         val currentMailbox = otherMailboxes.removeAt(currentMailboxIndex)
+
         add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
         if (areMailboxesExpanded) addAll(otherMailboxes)
     }
@@ -110,7 +109,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         return atLeastOneFolderIsIndented
     }
 
-    private fun MutableList<Any>.addCustomFoldersFrom(customFolders: List<Folder>, areCustomFoldersExpanded: Boolean): Boolean {
+    private fun MutableList<Any>.addCustomFolders(customFolders: List<Folder>, areCustomFoldersExpanded: Boolean): Boolean {
         var atLeastOneFolderIsIndented = false
 
         add(ItemType.FOLDERS_HEADER)
@@ -128,11 +127,10 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         return atLeastOneFolderIsIndented
     }
 
-    private fun MutableList<Any>.addAdvancedActions(
-        areActionsExpanded: Boolean,
-        permissions: MailboxPermissions?
-    ) {
+    private fun MutableList<Any>.addAdvancedActions(areActionsExpanded: Boolean, permissions: MailboxPermissions?) {
+
         add(ItemType.ACTIONS_HEADER)
+
         if (areActionsExpanded) {
             add(SYNC_AUTO_CONFIG_ACTION)
             add(IMPORT_MAILS_ACTION)
