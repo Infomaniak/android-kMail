@@ -43,6 +43,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.getColorOrNull
 import com.infomaniak.mail.utils.extensions.getTransparentColor
@@ -71,11 +72,13 @@ class AvatarView @JvmOverloads constructor(
         }
 
     private val avatarUpdateObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
-        val (correspondent, bimi) = state
-        val displayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
+        runCatchingRealm {
+            val (correspondent, bimi) = state
+            val displayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
 
-        if (displayType == AvatarDisplayType.UNKNOWN_CORRESPONDENT) return@Observer
-        loadAvatarByDisplayType(displayType, correspondent, bimi, contacts)
+            if (displayType == AvatarDisplayType.UNKNOWN_CORRESPONDENT) return@Observer
+            loadAvatarByDisplayType(displayType, correspondent, bimi, contacts)
+        }
     }
 
     @Inject
