@@ -280,6 +280,10 @@ inline fun <reified T> ApiResponse<T>.getApiException(): Exception {
     return error?.exception ?: ApiErrorException(ApiController.json.encodeToString(this))
 }
 
+fun List<ApiResponse<*>>.atLeastOneSucceeded(): Boolean = any { it.isSuccess() }
+
+fun List<ApiResponse<*>>.allFailed(): Boolean = none { it.isSuccess() }
+
 fun String.toLongUid(folderId: String) = "${this}@${folderId}"
 
 fun String.toShortUid(): Int = substringBefore('@').toInt()
