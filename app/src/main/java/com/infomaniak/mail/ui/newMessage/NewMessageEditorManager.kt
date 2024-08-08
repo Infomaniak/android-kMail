@@ -67,7 +67,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                 EditorAction.LINK -> if (buttonLink.isActivated) {
                     editorWebView.unlink()
                 } else {
-                    insertLinkDialog.show("", "") { displayText, url ->
+                    insertLinkDialog.show { displayText, url ->
                         editorWebView.createLink(displayText, url)
                     }
                 }

@@ -56,11 +56,8 @@ class InsertLinkDialog @Inject constructor(
         addLink = null
     }
 
-    fun show(displayNameDefaultValue: String, urlDefaultValue: String, addLinkCallback: (String, String) -> Unit) {
-        binding.apply {
-            displayNameEditText.setText(displayNameDefaultValue)
-            urlEditText.setText(urlDefaultValue)
-        }
+    // TODO: Add a default display name value with the selection's text when the user selects some text before inserting a link
+    fun show(addLinkCallback: (String, String) -> Unit) {
         addLink = addLinkCallback
         alertDialog.show()
     }
