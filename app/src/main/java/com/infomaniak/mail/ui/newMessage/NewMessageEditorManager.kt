@@ -64,8 +64,12 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
             when (editorAction) {
                 EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
                 EditorAction.CAMERA -> fragment.notYetImplemented()
-                EditorAction.LINK -> insertLinkDialog.show("", "") { displayText, url ->
-                    editorWebView.createLink(displayText, url)
+                EditorAction.LINK -> if (buttonLink.isActivated) {
+                    editorWebView.unlink()
+                } else {
+                    insertLinkDialog.show("", "") { displayText, url ->
+                        editorWebView.createLink(displayText, url)
+                    }
                 }
                 EditorAction.CLOCK -> fragment.notYetImplemented()
                 EditorAction.AI -> aiManager.openAiPrompt()
@@ -88,7 +92,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
-        linkEditor(editorLink, EditorAction.LINK)
         linkEditor(editorClock, EditorAction.CLOCK)
         linkEditor(editorAi, EditorAction.AI)
 
@@ -97,6 +100,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         linkEditor(buttonUnderline, EditorAction.UNDERLINE)
         linkEditor(buttonStrikeThrough, EditorAction.STRIKE_THROUGH)
         linkEditor(buttonList, EditorAction.UNORDERED_LIST)
+        linkEditor(buttonLink, EditorAction.LINK)
     }
 
     fun setupEditorFormatActionsToggle() = with(binding) {
@@ -133,6 +137,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                 buttonUnderline.isActivated = it.isUnderlined
                 buttonStrikeThrough.isActivated = it.isStrikeThrough
                 buttonList.isActivated = it.isUnorderedListSelected
+                buttonLink.isActivated = it.isLinkSelected
             }
         }
     }

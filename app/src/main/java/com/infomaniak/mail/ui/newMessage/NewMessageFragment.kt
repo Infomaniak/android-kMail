@@ -349,7 +349,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() {
-        binding.editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST))
+        binding.editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
         setEditorStyle()
         handleEditorPlaceholderVisibility()
 

@@ -576,14 +576,6 @@
                             app:icon="@drawable/ic_editor_camera" />
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/editorLink"
-                            style="@style/EditorIconButton"
-                            android:layout_width="@dimen/newMessageToolbarItemWidth"
-                            android:layout_height="match_parent"
-                            android:contentDescription="@string/buttonHyperlink"
-                            app:icon="@drawable/ic_editor_link" />
-
-                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/editorClock"
                             style="@style/EditorIconButton"
                             android:layout_width="@dimen/newMessageToolbarItemWidth"
@@ -617,6 +609,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:orientation="horizontal">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/buttonLink"
+                                style="@style/EditorFormatButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:contentDescription="@string/buttonStrikeThrough"
+                                app:icon="@drawable/ic_editor_link" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/buttonList"
