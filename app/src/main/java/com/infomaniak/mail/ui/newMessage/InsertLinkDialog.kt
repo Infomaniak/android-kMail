@@ -18,14 +18,18 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.content.Context
+import android.content.DialogInterface
+import android.util.Patterns
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogInsertLinkBinding
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
+import com.infomaniak.mail.utils.extensions.trimmedText
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -38,26 +42,52 @@ class InsertLinkDialog @Inject constructor(
     val binding: DialogInsertLinkBinding by lazy { DialogInsertLinkBinding.inflate(activity.layoutInflater) }
     private var addLink: ((String, String) -> Unit)? = null
 
-    private val defaultDisplayName by lazy { activityContext.getString(R.string.addLinkTextPlaceholder) }
+    private val defaultDisplayNameLabel by lazy { activityContext.getString(R.string.addLinkTextPlaceholder) }
 
     override val alertDialog: AlertDialog = with(binding) {
         showDisplayNamePreview()
 
         MaterialAlertDialogBuilder(context)
             .setView(root)
-            .setPositiveButton(R.string.buttonConfirm) { _, _ ->
-                addLink?.invoke(displayNameEditText.text.toString(), urlEditText.text.toString())
-            }
+            .setPositiveButton(R.string.buttonConfirm, null)
             .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
             .create()
+            .also {
+                it.setOnShowListener { dialog ->
+                    displayNameEditText.showKeyboard()
+                    urlLayout.setError(null)
+                    setConfirmButtonListener(dialog)
+                }
+            }
+    }
+
+    private fun setConfirmButtonListener(dialog: DialogInterface) = with(binding) {
+        (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val url = addMissingHttpsProtocol(urlEditText.trimmedText)
+            if (validate(url)) {
+                val displayName = (displayNameEditText.text?.takeIf { it.isNotBlank() } ?: urlEditText.text).toString()
+                addLink?.invoke(displayName, url)
+                dialog.dismiss()
+            } else {
+                urlLayout.setError(activityContext.getString(R.string.snackbarInvalidUrl))
+            }
+        }
+
+        urlEditText.doOnTextChanged { _, _, _, _ ->
+            urlLayout.setError(null)
+        }
     }
 
     override fun resetCallbacks() {
         addLink = null
     }
 
-    // TODO: Add a default display name value with the selection's text when the user selects some text before inserting a link
-    fun show(addLinkCallback: (String, String) -> Unit) {
+    fun show(defaultDisplayNameValue: String = "", defaultUrlValue: String = "", addLinkCallback: (String, String) -> Unit) {
+        binding.apply {
+            displayNameEditText.setText(defaultDisplayNameValue)
+            urlEditText.setText(defaultUrlValue)
+        }
+
         addLink = addLinkCallback
         alertDialog.show()
     }
@@ -88,14 +118,14 @@ class InsertLinkDialog @Inject constructor(
         }
 
         displayNameEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            displayNameLayout.hint = if (hasFocus) defaultDisplayName else computeDisplayNamePreview()
+            displayNameLayout.hint = if (hasFocus) defaultDisplayNameLabel else computeDisplayNamePreview()
             if (thereIsNoPreviewToDisplay()) hidePlaceholder()
         }
     }
 
     private fun computeDisplayNamePreview(): String {
-        if (!displayNameIsEmpty()) return defaultDisplayName
-        if (thereIsNoPreviewToDisplay()) return defaultDisplayName
+        if (!displayNameIsEmpty()) return defaultDisplayNameLabel
+        if (thereIsNoPreviewToDisplay()) return defaultDisplayNameLabel
 
         return binding.urlEditText.text.toString()
     }
@@ -107,4 +137,19 @@ class InsertLinkDialog @Inject constructor(
     private fun displayNameIsEmpty() = binding.displayNameEditText.text.isNullOrEmpty()
 
     private fun thereIsNoPreviewToDisplay() = binding.urlEditText.text.isNullOrBlank()
+
+    private fun addMissingHttpsProtocol(link: String): String {
+        val protocolEndIndex = link.indexOf("://")
+        val isProtocolSpecified = protocolEndIndex > 0 // If there is indeed a specified protocol of at least 1 char long
+
+        if (isProtocolSpecified) return link
+
+        val strippedUserInput = if (protocolEndIndex != -1) link.substring(protocolEndIndex + 3) else link
+
+        return "https://$strippedUserInput"
+    }
+
+    private fun validate(userUrlInput: String): Boolean {
+        return Patterns.WEB_URL.matcher(userUrlInput).matches()
+    }
 }
