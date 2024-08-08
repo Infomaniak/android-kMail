@@ -22,11 +22,19 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <TextView
+        android:id="@+id/dialogTitle"
+        style="@style/BottomSheetTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginStandard"
+        android:text="@string/urlEntryTitle" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/displayNameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/marginStandardMedium"
+        android:layout_marginVertical="@dimen/marginStandardMedium"
         app:placeholderTextColor="@color/tertiaryTextColor">
 
         <com.google.android.material.textfield.TextInputEditText

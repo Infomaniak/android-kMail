@@ -45,7 +45,6 @@ class InsertLinkDialog @Inject constructor(
 
         MaterialAlertDialogBuilder(context)
             .setView(root)
-            .setTitle(R.string.urlEntryTitle)
             .setPositiveButton(R.string.buttonConfirm) { _, _ ->
                 addLink?.invoke(displayNameEditText.text.toString(), urlEditText.text.toString())
             }
