@@ -47,6 +47,7 @@ import com.infomaniak.mail.utils.ConfettiUtils
 import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType
 import com.infomaniak.mail.utils.LogoutUser
 import com.infomaniak.mail.utils.PlayServicesUtils
+import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -82,6 +83,11 @@ class AccountFragment : Fragment(), MailboxListFragment {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        saveFocusWhenNavigatingBack(getLayout = { binding.constraintLayoutContainer }, lifecycle)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccountBinding.inflate(inflater, container, false).also { binding = it }.root

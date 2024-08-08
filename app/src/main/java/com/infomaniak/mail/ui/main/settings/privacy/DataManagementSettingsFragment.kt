@@ -28,6 +28,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.databinding.FragmentDataManagementSettingsBinding
+import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +37,11 @@ import dagger.hilt.android.AndroidEntryPoint
 class DataManagementSettingsFragment : Fragment() {
 
     private var binding: FragmentDataManagementSettingsBinding by safeBinding()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        saveFocusWhenNavigatingBack(getLayout = { binding.linearLayoutContainer }, lifecycle)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentDataManagementSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
