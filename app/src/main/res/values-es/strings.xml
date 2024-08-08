@@ -46,6 +46,7 @@
     <string name="actionUnstar">Borrar de favoritos</string>
     <string name="actionViewInDark">Ver en tema oscuro</string>
     <string name="actionViewInLight">Ver en tema claro</string>
+    <string name="addLinkTextPlaceholder">Texto a mostrar</string>
     <string name="addUnknownRecipientAlreadyUsed">El correo electrónico ya está utilizado</string>
     <string name="addUnknownRecipientInvalidEmail">El correo electrónico no es válido</string>
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>

@@ -52,6 +52,7 @@
     <string name="actionUnstar">Delete from favorites</string>
     <string name="actionViewInDark">View in dark theme</string>
     <string name="actionViewInLight">View in light theme</string>
+    <string name="addLinkTextPlaceholder">Text to display</string>
     <string name="addUnknownRecipientAlreadyUsed">The email is already used</string>
     <string name="addUnknownRecipientInvalidEmail">The email is invalid</string>
     <string name="addUnknownRecipientTitle">Add a recipient</string>

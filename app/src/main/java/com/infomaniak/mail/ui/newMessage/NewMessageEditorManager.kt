@@ -34,7 +34,7 @@ import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
 @FragmentScoped
-class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
+class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: InsertLinkDialog) : NewMessageManager() {
 
     private var _aiManager: NewMessageAiManager? = null
     private inline val aiManager: NewMessageAiManager get() = _aiManager!!
@@ -64,7 +64,9 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
             when (editorAction) {
                 EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
                 EditorAction.CAMERA -> fragment.notYetImplemented()
-                EditorAction.LINK -> fragment.notYetImplemented()
+                EditorAction.LINK -> insertLinkDialog.show("", "") { displayText, url ->
+                    editorWebView.createLink(displayText, url)
+                }
                 EditorAction.CLOCK -> fragment.notYetImplemented()
                 EditorAction.AI -> aiManager.openAiPrompt()
                 EditorAction.BOLD -> editorWebView.toggleBold()
