@@ -153,6 +153,12 @@ class ThreadFragment : Fragment() {
 
         observeThreadOpening()
         observeAutoAdvance()
+
+        observeReportDisplayProblemResult()
+    }
+
+    private fun observeReportDisplayProblemResult() {
+        mainViewModel.reportDisplayProblemTrigger.observe(viewLifecycleOwner) { descriptionDialog.resetLoadingAndDismiss() }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
