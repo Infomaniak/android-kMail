@@ -19,7 +19,6 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.lib.core.BuildConfig.INFOMANIAK_API_V1
 import com.infomaniak.mail.BuildConfig.MAIL_API
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.utils.Utils
 
 object ApiRoutes {
@@ -175,21 +174,9 @@ object ApiRoutes {
         return "${getMessages(mailboxUuid, folderId)}/activities?signature=$cursor"
     }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String, shouldGetAll: Boolean, info: PaginationInfo?): String {
-
-        val endpoint = "${getMessages(mailboxUuid, folderId)}/messages-uids?"
-
-        val parameters = if (shouldGetAll) {
-            "messages=${Utils.NUMBER_OF_OLD_UIDS_TO_FETCH}&order_by=date_desc"
-        } else {
-            val quantity = "messages=${Utils.PAGE_SIZE}"
-            val offset = info?.offsetUid?.let { "&uid_offset=$it" } ?: ""
-            val direction = info?.direction?.let { "&direction=$it" } ?: ""
-
-            "${quantity}${offset}${direction}"
-        }
-
-        return "${endpoint}${parameters}"
+    fun getDateOrderedMessagesUids(mailboxUuid: String, folderId: String): String {
+        val parameters = "?messages=${Utils.NUMBER_OF_OLD_UIDS_TO_FETCH}&direction=desc"
+        return "${getMessages(mailboxUuid, folderId)}/date-ordered-messages-uids${parameters}"
     }
 
     fun getMessagesByUids(mailboxUuid: String, folderId: String, uids: List<Int>): String {

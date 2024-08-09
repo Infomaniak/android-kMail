@@ -80,6 +80,8 @@ class Folder : RealmObject, Cloneable {
     @Transient
     var oldMessagesUidsToFetch = realmListOf<Int>()
     @Transient
+    var newMessagesUidsToFetch = realmListOf<Int>()
+    @Transient
     var remainingOldMessagesToFetch: Int = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
 
     @Transient
@@ -120,6 +122,7 @@ class Folder : RealmObject, Cloneable {
         threads: RealmList<Thread>,
         messages: RealmList<Message>,
         oldMessagesUidsToFetch: RealmList<Int>,
+        newMessagesUidsToFetch: RealmList<Int>,
         remainingOldMessagesToFetch: Int,
         isHidden: Boolean,
         isCollapsed: Boolean,
@@ -130,24 +133,13 @@ class Folder : RealmObject, Cloneable {
         this.unreadCountLocal = unreadCount
         this.threads.addAll(threads)
         this.messages.addAll(messages)
-        this.oldMessagesUidsToFetch = oldMessagesUidsToFetch
+        this.oldMessagesUidsToFetch.addAll(oldMessagesUidsToFetch)
+        this.newMessagesUidsToFetch.addAll(newMessagesUidsToFetch)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
         this.isHidden = isHidden
         this.isCollapsed = isCollapsed
 
         this.sortedName = this.name.lowercase().removeAccents()
-    }
-
-    fun resetLocalValues() {
-        lastUpdatedAt = null
-        cursor = null
-        unreadCountLocal = 0
-        threads = realmListOf()
-        messages = realmListOf()
-        oldMessagesUidsToFetch = realmListOf()
-        remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
-        isHidden = false
-        isCollapsed = false
     }
 
     fun getLocalizedName(context: Context): String {

@@ -26,6 +26,8 @@ data class ActivitiesResult(
     val deletedShortUids: List<String>,
     @SerialName("updated")
     val updatedMessages: List<MessageFlags>,
+    @SerialName("added")
+    val addedShortUids: List<Int>,
     @SerialName("unread_count")
     val unreadCountRemote: Int,
     @SerialName("signature")

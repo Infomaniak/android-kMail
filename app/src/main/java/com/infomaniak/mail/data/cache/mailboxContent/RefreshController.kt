@@ -23,7 +23,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.*
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RetryStrategy.Iteration
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -47,9 +46,9 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
-import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmSet
 import io.sentry.Sentry
 import kotlinx.coroutines.*
@@ -143,129 +142,20 @@ class RefreshController @Inject constructor(
             realm.handleRefreshMode(scope = this) to null
         }
     }.getOrElse {
-        handleRefreshFailure(job, throwable = it)
+        handleRefreshFailure(throwable = it)
     }
 
-    private suspend fun retryWithRunCatching(
-        job: Job,
-        failedFolder: Folder,
-        retryStrategy: RetryStrategy,
-        returnThreads: Set<Thread>?,
-    ): Pair<Set<Thread>?, Throwable?> = runCatching {
-        withContext(Dispatchers.IO + job) {
+    private fun handleRefreshFailure(throwable: Throwable): Pair<Set<Thread>?, Throwable?> {
 
-            // If fetching the Activities failed because of a not found Message, we should pause briefly
-            // before trying again to retrieve new Messages, to ensure that the API is up-to-date.
-            delay(Utils.DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN)
-            ensureActive()
-
-            val threads = if (retryStrategy.iteration == Iteration.ABORT_MISSION) {
-                realm.refresh(scope = this, failedFolder)
-            } else {
-                realm.fetchOneNewPage(scope = this, failedFolder, retryStrategy.fibonacci).second
-            }
-
-            val isSameFolder = failedFolder.id == initialFolder.id
-            val impactedThreads = if (isSameFolder) threads else returnThreads
-
-            impactedThreads to null
-        }
-    }.getOrElse {
-        handleRefreshFailure(job, throwable = it, retryStrategy, returnThreads)
-    }
-
-    private suspend fun handleRefreshFailure(
-        job: Job,
-        throwable: Throwable,
-        retryStrategy: RetryStrategy = RetryStrategy(),
-        returnThreadsFromParameters: Set<Thread>? = null,
-    ): Pair<Set<Thread>?, Throwable?> {
-
-        val (returnThreadsFromException, exception) = if (throwable is ReturnThreadsException) {
+        val (returnThreads, exception) = if (throwable is ReturnThreadsException) {
             throwable.threads to throwable.exception
         } else {
             null to throwable
         }
 
-        val returnThreads = returnThreadsFromParameters ?: returnThreadsFromException
+        handleAllExceptions(exception)
 
-        return if (exception is MessageNotFoundException) {
-            handleMessageNotFound(job, exception, retryStrategy, returnThreads)
-        } else {
-            handleAllExceptions(exception)
-            returnThreads to exception
-        }
-    }
-
-    private suspend fun handleMessageNotFound(
-        job: Job,
-        exception: MessageNotFoundException,
-        strategy: RetryStrategy,
-        returnThreads: Set<Thread>?,
-    ): Pair<Set<Thread>?, Throwable?> {
-
-        fun sendMessageNotFoundSentry(failedFolder: Folder) {
-            val fibonacci = if (strategy.iteration == Iteration.ABORT_MISSION) -1 else strategy.fibonacci
-
-            // Only log if we are at the last Fibonacci or at ABORT_MISSION.
-            if (fibonacci in 1..<FIBONACCI_SEQUENCE.last()) return
-
-            Sentry.withScope { scope ->
-                scope.setTag("iteration", strategy.iteration.name)
-                scope.setTag("fibonacci", "$fibonacci")
-                scope.setTag("direction", exception.direction.name)
-                scope.setExtra("iteration", strategy.iteration.name)
-                scope.setExtra("fibonacci", "$fibonacci")
-                scope.setExtra("folderCursor", "${failedFolder.cursor}")
-                scope.setExtra("folder", failedFolder.displayForSentry())
-                Sentry.captureException(exception)
-            }
-        }
-
-        fun computeFibonacci(folderId: String) {
-            val nextFibonacci = FIBONACCI_SEQUENCE.firstOrNull { it > strategy.fibonacci }
-            if (nextFibonacci == null || endOfMessagesReached) {
-                realm.writeBlocking {
-                    getUpToDateFolder(folderId).apply {
-                        delete(messages)
-                        delete(threads)
-                        resetLocalValues()
-                    }
-                }
-                strategy.iteration = Iteration.ABORT_MISSION
-            } else {
-                strategy.fibonacci = nextFibonacci
-            }
-        }
-
-        suspend fun retry(failedFolder: Folder, retryStrategy: RetryStrategy): Pair<Set<Thread>?, Throwable?> {
-            return retryWithRunCatching(job, failedFolder, retryStrategy, returnThreads)
-        }
-
-        val failedFolder = exception.folder
-
-        sendMessageNotFoundSentry(failedFolder)
-
-        when (strategy.iteration) {
-            Iteration.FIRST_TIME -> {
-                strategy.iteration = Iteration.SECOND_TIME
-            }
-            Iteration.SECOND_TIME -> {
-                strategy.apply {
-                    iteration = Iteration.FIBONACCI_TIME
-                    fibonacci = FIBONACCI_SEQUENCE.first()
-                }
-            }
-            Iteration.FIBONACCI_TIME -> {
-                computeFibonacci(failedFolder.id)
-            }
-            Iteration.ABORT_MISSION -> {
-                handleAllExceptions(exception)
-                return returnThreads to exception
-            }
-        }
-
-        return retry(failedFolder, strategy)
+        return returnThreads to exception
     }
 
     private suspend fun Realm.handleRefreshMode(scope: CoroutineScope): Set<Thread> {
@@ -284,7 +174,7 @@ class RefreshController @Inject constructor(
                 }
             }
             ONE_PAGE_OF_OLD_MESSAGES -> {
-                fetchOneOldPage(scope, initialFolder)
+                fetchOnePage(scope, initialFolder, Direction.IN_THE_PAST)
                 emptySet()
             }
         }
@@ -318,165 +208,40 @@ class RefreshController @Inject constructor(
 
     private suspend fun Realm.refresh(scope: CoroutineScope, folder: Folder): Set<Thread> {
 
-        var upToDateFolder = folder
-        val previousCursor = upToDateFolder.cursor
+        val previousCursor = folder.cursor
+        val impactedThreads = mutableSetOf<Thread>()
 
-        suspend fun fetchFirstPage(): Set<Thread> {
-            fetchOldMessagesUids(scope, upToDateFolder)
-            upToDateFolder = getUpToDateFolder(upToDateFolder.id)
-            val threads = fetchOneOldPage(scope, upToDateFolder).second
-            FolderController.updateFolder(upToDateFolder.id, realm = this) { it.lastUpdatedAt = Date().toRealmInstant() }
-            return threads
+        if (previousCursor == null) {
+            fetchOldMessagesUids(scope, folder)
+        } else {
+            fetchActivities(scope, folder, previousCursor)
         }
 
-        val impactedThreads = when {
-            previousCursor == null -> {
-                fetchFirstPage()
-            }
-            upToDateFolder.messages.isEmpty() -> {
-                // If the Folder has been emptied, we need to reset the whole history, and start over.
-                FolderController.updateFolder(upToDateFolder.id, realm = this) {
-                    it.oldMessagesUidsToFetch = realmListOf()
-                    it.remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
-                }
-                fetchFirstPage()
-            }
-            else -> {
-                fetchActivities(scope, upToDateFolder, previousCursor)
-            }
-        }
-
-        if (upToDateFolder.remainingOldMessagesToFetch > 0) fetchAllOldPages(scope, upToDateFolder.id)
+        impactedThreads += fetchAllNewPages(scope, folder.id)
+        fetchAllOldPages(scope, folder.id)
 
         return impactedThreads
     }
 
     private fun Realm.fetchOldMessagesUids(scope: CoroutineScope, folder: Folder) {
 
-        val result = getMessagesUids(folder.id, shouldGetAll = true)!!
+        val result = getDateOrderedMessagesUids(folder.id)!!
         scope.ensureActive()
 
         FolderController.updateFolder(folder.id, realm = this) {
-            it.oldMessagesUidsToFetch = result.addedShortUids.toRealmList()
+            it.oldMessagesUidsToFetch.replaceContent(result.addedShortUids)
+            it.lastUpdatedAt = Date().toRealmInstant()
             it.cursor = result.cursor
         }
     }
 
-    private suspend fun Realm.fetchAllOldPages(scope: CoroutineScope, folderId: String) {
+    private fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String) {
 
-        var folder = getUpToDateFolder(folderId)
-
-        while (folder.remainingOldMessagesToFetch > 0) {
-            scope.ensureActive()
-
-            fetchOneOldPage(scope, folder)
-            folder = getUpToDateFolder(folderId)
-        }
-    }
-
-    private suspend fun Realm.fetchOneOldPage(scope: CoroutineScope, folder: Folder): Pair<Int, Set<Thread>> {
-
-        val allUids = folder.oldMessagesUidsToFetch
-        val (uidsToFetch, remainingUids) = if (allUids.count() > Utils.PAGE_SIZE) {
-            allUids.subList(0, Utils.PAGE_SIZE) to allUids.subList(Utils.PAGE_SIZE, allUids.count())
-        } else {
-            allUids to emptyList<Int>()
-        }
-        val uidsCount = uidsToFetch.count()
-
-        val impactedThreads = handleAddedUids(scope, folder, uidsToFetch, folder.cursor!!)
-        updateFolder(folder.id, Direction.IN_THE_PAST, uidsCount, remainingUids)
-        sendSentryOrphans(folder)
-
-        return uidsCount to impactedThreads
-    }
-
-    private suspend fun Realm.fetchAllNewPages(scope: CoroutineScope, folder: Folder): Set<Thread> {
-
-        val impactedThreads = mutableSetOf<Thread>()
-        var futureIsStillAhead = true
-
-        while (futureIsStillAhead) {
-            scope.ensureActive()
-
-            val (uidsCount, threads) = fetchOneNewPage(scope, folder)
-            futureIsStillAhead = uidsCount >= Utils.PAGE_SIZE
-            impactedThreads += threads
-        }
-
-        return impactedThreads
-    }
-
-    private suspend fun Realm.fetchOneNewPage(scope: CoroutineScope, folder: Folder, fibonacci: Int = 1): Pair<Int, Set<Thread>> {
-
-        val direction = Direction.TO_THE_FUTURE
-
-        fun Realm.getPaginationInfo(): PaginationInfo? {
-            return MessageController.getNewestMessage(
-                folderId = folder.id,
-                fibonacci = fibonacci,
-                realm = this,
-                endOfMessagesReached = { endOfMessagesReached = true },
-            )?.shortUid?.let { offsetUid ->
-                PaginationInfo(offsetUid, direction.apiCallValue)
-            }
-        }
-
-        fun getNewMessages(paginationInfo: PaginationInfo?): NewMessagesResult {
-            return runCatching {
-                getMessagesUids(folder.id, paginationInfo)!!
-            }.getOrElse {
-                throw if (it is ApiErrorException && it.errorCode == ErrorCode.MESSAGE_NOT_FOUND) {
-                    MessageNotFoundException(it.message, folder, direction)
-                } else {
-                    it
-                }
-            }
-        }
-
-        val paginationInfo = getPaginationInfo().also(::addSentryBreadcrumbAboutPaginationInfo)
-
-        val newMessages = getNewMessages(paginationInfo)
-        val uidsCount = newMessages.addedShortUids.count()
+        val activities = getMessagesUidsDelta(folder.id, previousCursor) ?: return
         scope.ensureActive()
 
-        val oldMessagesUidsToFetch = getUpToDateFolder(folder.id).oldMessagesUidsToFetch
-        val remainingUids = oldMessagesUidsToFetch.subtract(newMessages.addedShortUids.toSet()).toList()
-
-        val impactedThreads = handleAddedUids(scope, folder, newMessages.addedShortUids, newMessages.cursor)
-        updateFolder(folder.id, direction, uidsCount, remainingUids)
-        sendSentryOrphans(folder)
-
-        return uidsCount to impactedThreads
-    }
-
-    private fun Realm.updateFolder(folderId: String, direction: Direction, uidsCount: Int, remainingUids: List<Int>) {
-
-        FolderController.updateFolder(folderId, realm = this) {
-
-            it.oldMessagesUidsToFetch = remainingUids.toRealmList()
-
-            when (direction) {
-                Direction.IN_THE_PAST -> {
-                    it.remainingOldMessagesToFetch = if (it.oldMessagesUidsToFetch.isEmpty()) {
-                        0
-                    } else {
-                        max(it.remainingOldMessagesToFetch - uidsCount, 0)
-                    }
-                }
-                Direction.TO_THE_FUTURE -> {
-                    it.lastUpdatedAt = Date().toRealmInstant()
-                }
-            }
-        }
-    }
-
-    private suspend fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String): Set<Thread> {
-
-        val activities = getMessagesUidsDelta(folder.id, previousCursor) ?: return emptySet()
-        scope.ensureActive()
-
-        val logMessage = "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()}"
+        val logMessage =
+            "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()} | Added: ${activities.addedShortUids.count()}"
         SentryLog.d("API", "$logMessage | ${folder.displayForSentry()}")
 
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
@@ -492,22 +257,72 @@ class RefreshController @Inject constructor(
             }
 
             getUpToDateFolder(folder.id).let {
-                it.lastUpdatedAt = Date().toRealmInstant()
+                it.newMessagesUidsToFetch.addAll(activities.addedShortUids)
                 it.unreadCountRemote = activities.unreadCountRemote
-                SentryDebug.addCursorBreadcrumb("fetchActivities", it, activities.cursor)
+                it.lastUpdatedAt = Date().toRealmInstant()
                 it.cursor = activities.cursor
+                SentryDebug.addCursorBreadcrumb("fetchActivities", it, activities.cursor)
             }
         }
 
         sendSentryOrphans(folder, previousCursor)
+    }
 
-        val upToDateFolder = getUpToDateFolder(folder.id)
-        // If the Folder has been emptied, we need to reset the whole history, and start over.
-        return if (upToDateFolder.messages.isEmpty()) {
-            refresh(scope, upToDateFolder)
-        } else {
-            fetchAllNewPages(scope, upToDateFolder)
+    private suspend fun Realm.fetchAllNewPages(scope: CoroutineScope, folderId: String): Set<Thread> {
+
+        val impactedThreads = mutableSetOf<Thread>()
+        var folder = getUpToDateFolder(folderId)
+
+        while (folder.newMessagesUidsToFetch.isNotEmpty()) {
+            scope.ensureActive()
+
+            impactedThreads += fetchOnePage(scope, folder, Direction.TO_THE_FUTURE)
+            folder = getUpToDateFolder(folderId)
         }
+
+        return impactedThreads
+    }
+
+    private suspend fun Realm.fetchAllOldPages(scope: CoroutineScope, folderId: String) {
+
+        var folder = getUpToDateFolder(folderId)
+
+        while (folder.remainingOldMessagesToFetch > 0) {
+            scope.ensureActive()
+
+            fetchOnePage(scope, folder, Direction.IN_THE_PAST)
+            folder = getUpToDateFolder(folderId)
+        }
+    }
+
+    private suspend fun Realm.fetchOnePage(scope: CoroutineScope, folder: Folder, direction: Direction): Set<Thread> {
+
+        val allUids = if (direction == Direction.TO_THE_FUTURE) folder.newMessagesUidsToFetch else folder.oldMessagesUidsToFetch
+        val (uidsToFetch, uidsRemaining) = if (allUids.count() > Utils.PAGE_SIZE) {
+            allUids.subList(0, Utils.PAGE_SIZE) to allUids.subList(Utils.PAGE_SIZE, allUids.count())
+        } else {
+            allUids to emptyList<Int>().toRealmList()
+        }
+
+        val impactedThreads = handleAddedUids(scope, folder, uidsToFetch)
+
+        FolderController.updateFolder(folder.id, realm = this) {
+            if (direction == Direction.TO_THE_FUTURE) {
+                it.newMessagesUidsToFetch.replaceContent(uidsRemaining)
+                it.lastUpdatedAt = Date().toRealmInstant()
+            } else {
+                it.oldMessagesUidsToFetch.replaceContent(uidsRemaining)
+                it.remainingOldMessagesToFetch = if (it.oldMessagesUidsToFetch.isEmpty()) {
+                    0
+                } else {
+                    max(it.remainingOldMessagesToFetch - uidsToFetch.count(), 0)
+                }
+            }
+        }
+
+        sendSentryOrphans(folder)
+
+        return impactedThreads
     }
 
     private fun refreshUnreadCount(id: String, realm: MutableRealm) {
@@ -525,6 +340,11 @@ class RefreshController @Inject constructor(
     }
 
     private fun TypedRealm.getUpToDateFolder(id: String) = FolderController.getFolder(id, realm = this)!!
+
+    private inline fun <reified T> RealmList<T>.replaceContent(list: List<T>) {
+        clear()
+        addAll(list.toRealmList())
+    }
     //endregion
 
     //region Added Messages
@@ -532,7 +352,6 @@ class RefreshController @Inject constructor(
         scope: CoroutineScope,
         folder: Folder,
         uids: List<Int>,
-        cursor: String,
     ): Set<Thread> {
 
         val logMessage = "Added: ${uids.count()}"
@@ -547,13 +366,6 @@ class RefreshController @Inject constructor(
         val apiResponse = delayApiCallManager.getMessagesByUids(scope, mailbox.uuid, folder.id, uids, okHttpClient)
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         scope.ensureActive()
-
-        SentryDebug.sendMissingMessages(
-            sentUids = uids,
-            receivedMessages = apiResponse.data?.messages ?: emptyList(),
-            folder = folder,
-            newCursor = cursor,
-        )
 
         apiResponse.data?.messages?.let { messages ->
 
@@ -736,14 +548,8 @@ class RefreshController @Inject constructor(
         val existingMessage = folderMessages[remoteMessage.uid]?.let {
             if (it.isManaged()) it else MessageController.getMessage(it.uid, realm = this)
         }
-        // Add Sentry log and leave if the message already exists
+        // Add Sentry log and leave if the Message already exists
         if (existingMessage != null && !existingMessage.isOrphan()) {
-            SentryDebug.addThreadsAlgoBreadcrumb(
-                message = "LastUids",
-                data = mapOf(
-                    "lastUids" to MessageController.getNewestMessages(folder.id, limit = 50, realm = this).map { it.shortUid },
-                ),
-            )
             SentryLog.i(
                 TAG,
                 "Already existing message in folder ${folder.displayForSentry()} | threadMode = ${localSettings.threadMode}",
@@ -866,12 +672,8 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region API calls
-    private fun getMessagesUids(
-        folderId: String,
-        info: PaginationInfo? = null,
-        shouldGetAll: Boolean = false,
-    ): NewMessagesResult? {
-        return with(ApiRepository.getMessagesUids(mailbox.uuid, folderId, okHttpClient, shouldGetAll, info)) {
+    private fun getDateOrderedMessagesUids(folderId: String): NewMessagesResult? {
+        return with(ApiRepository.getDateOrderedMessagesUids(mailbox.uuid, folderId, okHttpClient)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
         }
@@ -933,20 +735,9 @@ class RefreshController @Inject constructor(
                 "3_folderId" to folder.id,
                 "5_deleted" to activities.deletedShortUids.map { it },
                 "6_updated" to activities.updatedMessages.map { it.shortUid },
+                "7_updated" to activities.addedShortUids.map { it },
             ),
         )
-    }
-
-    private fun addSentryBreadcrumbAboutPaginationInfo(info: PaginationInfo?) {
-        info?.let {
-            SentryDebug.addThreadsAlgoBreadcrumb(
-                message = "PaginationInfo",
-                data = mapOf(
-                    "direction" to it.direction,
-                    "offsetUid" to it.offsetUid,
-                ),
-            )
-        }
     }
 
     private fun addSentryBreadcrumbForAddedUids(
@@ -982,37 +773,14 @@ class RefreshController @Inject constructor(
         ONE_PAGE_OF_OLD_MESSAGES, /* Get 1 page of old Messages */
     }
 
-    private enum class Direction(val apiCallValue: String) {
-        IN_THE_PAST("previous"), /* To get more pages of old Messages */
-        TO_THE_FUTURE("following"), /* To get more pages of new Messages */
+    private enum class Direction {
+        IN_THE_PAST, /* To get more pages of old Messages */
+        TO_THE_FUTURE, /* To get more pages of new Messages */
     }
-
-    data class PaginationInfo(
-        val offsetUid: Int,
-        val direction: String,
-    )
 
     private class ReturnThreadsException(val threads: Set<Thread>, val exception: Throwable) : Exception()
 
     private class ForcedCancellationException : CancellationException()
-
-    private class MessageNotFoundException(
-        override val message: String?,
-        val folder: Folder,
-        val direction: Direction,
-    ) : ApiErrorException(message)
-
-    private data class RetryStrategy(
-        var iteration: Iteration = Iteration.FIRST_TIME,
-        var fibonacci: Int = 1,
-    ) {
-        enum class Iteration {
-            FIRST_TIME,
-            SECOND_TIME,
-            FIBONACCI_TIME,
-            ABORT_MISSION,
-        }
-    }
 
     data class RefreshCallbacks(
         val onStart: (() -> Unit),
@@ -1021,6 +789,5 @@ class RefreshController @Inject constructor(
 
     companion object {
         private val TAG = RefreshController::class.java.simpleName
-        private val FIBONACCI_SEQUENCE = arrayOf(2, 8, 34, 144)
     }
 }

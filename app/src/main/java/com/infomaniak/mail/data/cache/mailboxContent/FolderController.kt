@@ -120,6 +120,7 @@ class FolderController @Inject constructor(
                     localFolder.threads,
                     localFolder.messages,
                     localFolder.oldMessagesUidsToFetch,
+                    localFolder.newMessagesUidsToFetch,
                     localFolder.remainingOldMessagesToFetch,
                     localFolder.isHidden,
                     isCollapsed,

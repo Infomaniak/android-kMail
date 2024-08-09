@@ -29,7 +29,6 @@ import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.LocalSettings.AiEngine
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
@@ -255,15 +254,13 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
-    fun getMessagesUids(
+    fun getDateOrderedMessagesUids(
         mailboxUuid: String,
         folderId: String,
         okHttpClient: OkHttpClient?,
-        shouldGetAll: Boolean,
-        info: PaginationInfo?,
     ): ApiResponse<NewMessagesResult> {
         return callApi(
-            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, shouldGetAll, info),
+            url = ApiRoutes.getDateOrderedMessagesUids(mailboxUuid, folderId),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )

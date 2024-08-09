@@ -156,16 +156,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         private val isNotScheduled = "${Message::isScheduled.name} == false"
 
         //region Queries
-        private fun getNewestMessagesQuery(folderId: String, realm: TypedRealm, limit: Int = 1): RealmQuery<Message> {
-
-            val byFolderId = "${Message::folderId.name} == $0"
-            val isNotFromSearch = "${Message::isFromSearch.name} == false"
-
-            return realm.query<Message>("$byFolderId AND $isNotFromSearch", folderId)
-                .sort(Message::shortUid.name, Sort.DESCENDING)
-                .limit(limit)
-        }
-
         private fun getMessagesQuery(messageUid: String, realm: TypedRealm): RealmQuery<Message> {
             return realm.query<Message>("${Message::uid.name} == $0", messageUid)
         }
@@ -187,17 +177,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
             return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
-        }
-
-        fun getNewestMessage(folderId: String, fibonacci: Int, realm: TypedRealm, endOfMessagesReached: () -> Unit): Message? {
-            return getNewestMessagesQuery(folderId, realm, fibonacci)
-                .find()
-                .also { if (it.count() < fibonacci) endOfMessagesReached() }
-                .lastOrNull()
-        }
-
-        fun getNewestMessages(folderId: String, limit: Int, realm: MutableRealm): List<Message> {
-            return getNewestMessagesQuery(folderId, realm, limit).find()
         }
         //endregion
 

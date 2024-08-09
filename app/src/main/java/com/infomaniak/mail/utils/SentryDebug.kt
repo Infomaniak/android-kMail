@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.extensions.toLongUid
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 import io.realm.kotlin.query.RealmResults
@@ -210,33 +209,6 @@ object SentryDebug {
             scope.setExtra("messageUid", "$messageUid")
             throwable?.let { scope.setExtra("throwable", it.stackTraceToString()) }
             Sentry.captureMessage("Failed Notif : $reason")
-        }
-    }
-
-    fun sendMissingMessages(
-        sentUids: List<Int>,
-        receivedMessages: List<Message>,
-        folder: Folder,
-        newCursor: String,
-    ) {
-        if (receivedMessages.count() != sentUids.count()) {
-            val receivedUids = mutableSetOf<Int>().apply {
-                receivedMessages.forEach { add(it.shortUid) }
-            }
-            val missingUids = sentUids.filterNot(receivedUids::contains)
-            if (missingUids.isNotEmpty()) {
-                Sentry.withScope { scope ->
-                    scope.setExtra("1. newCursor", newCursor)
-                    scope.setExtra("2. previousCursor", "${folder.cursor}")
-                    scope.setExtra("3. input", "${sentUids.map { it }}")
-                    scope.setExtra("4. output", "${receivedMessages.map { it.shortUid }}")
-                    scope.setExtra("5. missing", "${missingUids.map { it.toString().toLongUid(folder.id) }}")
-                    Sentry.captureMessage(
-                        "We tried to download some Messages, but they were nowhere to be found.",
-                        SentryLevel.ERROR,
-                    )
-                }
-            }
         }
     }
 
