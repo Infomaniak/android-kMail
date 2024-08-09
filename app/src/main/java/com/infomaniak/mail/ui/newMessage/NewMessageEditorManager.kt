@@ -111,6 +111,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     }
 
     private fun updateEditorVisibility(isEditorExpanded: Boolean) = with(binding) {
+        if (isEditorExpanded) editorWebView.requestFocus()
 
         val color = if (isEditorExpanded) {
             context.getAttributeColor(RMaterial.attr.colorPrimary)
