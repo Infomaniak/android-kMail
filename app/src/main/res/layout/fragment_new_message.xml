@@ -291,7 +291,8 @@
                         android:layout_marginTop="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView" />
+                        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
+                        tools:layout_height="100dp" />
 
                     <TextView
                         android:id="@+id/newMessagePlaceholder"
@@ -363,7 +364,8 @@
                         android:layout_marginBottom="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/editorWebView" />
+                        app:layout_constraintTop_toBottomOf="@id/editorWebView"
+                        tools:layout_height="50dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/removeSignature"
