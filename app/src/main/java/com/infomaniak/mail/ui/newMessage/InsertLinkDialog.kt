@@ -55,10 +55,15 @@ class InsertLinkDialog @Inject constructor(
             .also {
                 it.setOnShowListener { dialog ->
                     displayNameEditText.showKeyboard()
-                    urlLayout.setError(null)
+                    resetDialogState()
                     setConfirmButtonListener(dialog)
                 }
             }
+    }
+
+    private fun resetDialogState() {
+        binding.urlLayout.setError(null)
+        hidePlaceholder()
     }
 
     private fun setConfirmButtonListener(dialog: DialogInterface) = with(binding) {
