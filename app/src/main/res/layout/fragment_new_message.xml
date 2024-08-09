@@ -291,7 +291,8 @@
                         android:layout_marginTop="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView" />
+                        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
+                        tools:layout_height="100dp" />
 
                     <TextView
                         android:id="@+id/newMessagePlaceholder"
@@ -299,6 +300,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="@dimen/marginStandardMedium"
+                        android:paddingBottom="@dimen/marginStandardMedium"
                         android:text="@string/newMessagePlaceholderTitle"
                         android:textColor="@color/tertiaryTextColor"
                         android:visibility="gone"
@@ -356,14 +358,20 @@
                             android:maxWidth="200dp" />
                     </LinearLayout>
 
+                    <!--This view is has exactly one line of text worth of negative top margin because the editor has the same
+                    amount of extra space as "bottom margin". This way the editor and the signature continue being aligned exactly
+                    how they will look like when the email is sent. The editor extra bottom margin is needed to display selection
+                    handles correctly-->
                     <WebView
                         android:id="@+id/signatureWebView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="-16dp"
                         android:layout_marginBottom="@dimen/marginStandardMedium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/editorWebView" />
+                        app:layout_constraintTop_toBottomOf="@id/editorWebView"
+                        tools:layout_height="50dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/removeSignature"
