@@ -24,7 +24,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.extensions.copyListToRealm
-import com.infomaniak.mail.utils.extensions.flattenFolderChildren
+import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.sortFolders
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -80,7 +80,7 @@ class FolderController @Inject constructor(
 
     //region Edit data
     fun update(mailbox: Mailbox, remoteFolders: List<Folder>, realm: Realm) {
-        val remoteFoldersWithChildren = remoteFolders.flattenFolderChildren()
+        val remoteFoldersWithChildren = remoteFolders.flattenFolderChildrenAndRemoveMessages()
 
         realm.writeBlocking {
 

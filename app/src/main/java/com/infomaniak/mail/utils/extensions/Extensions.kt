@@ -323,7 +323,7 @@ fun LiveData<UiRecipients>.valueOrEmpty(): List<Recipient> = value?.recipients ?
 //endregion
 
 //region Folders
-fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
+fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: Boolean = false): List<Folder> {
 
     if (isEmpty()) return this
 
