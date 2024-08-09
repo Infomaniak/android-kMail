@@ -54,7 +54,7 @@ class InsertLinkDialog @Inject constructor(
             .create()
             .also {
                 it.setOnShowListener { dialog ->
-                    displayNameEditText.showKeyboard()
+                    urlEditText.showKeyboard()
                     resetDialogState()
                     setConfirmButtonListener(dialog)
                 }
