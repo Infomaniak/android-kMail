@@ -59,29 +59,6 @@ class InsertLinkDialog @Inject constructor(
             }
     }
 
-    private fun resetDialogState() {
-        binding.urlLayout.setError(null)
-
-        binding.displayNameLayout.placeholderText = null
-    }
-
-    private fun setConfirmButtonListener(dialog: DialogInterface) = with(binding) {
-        (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            val url = addMissingHttpsProtocol(urlEditText.trimmedText)
-            if (validate(url)) {
-                val displayName = (displayNameEditText.text?.takeIf { it.isNotBlank() } ?: urlEditText.text).toString().trim()
-                addLink?.invoke(displayName, url)
-                dialog.dismiss()
-            } else {
-                urlLayout.setError(activityContext.getString(R.string.snackbarInvalidUrl))
-            }
-        }
-
-        urlEditText.doOnTextChanged { _, _, _, _ ->
-            urlLayout.setError(null)
-        }
-    }
-
     override fun resetCallbacks() {
         addLink = null
     }
@@ -116,9 +93,33 @@ class InsertLinkDialog @Inject constructor(
         }
     }
 
+    private fun resetDialogState() = with(binding) {
+        urlLayout.setError(null)
+        displayNameLayout.placeholderText = null
+    }
+
+    private fun setConfirmButtonListener(dialog: DialogInterface) = with(binding) {
+        (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val url = addMissingHttpsProtocol(urlEditText.trimmedText)
+
+            if (validate(url)) {
+                val displayName = (displayNameEditText.text?.takeIf { it.isNotBlank() } ?: urlEditText.text).toString().trim()
+                addLink?.invoke(displayName, url)
+
+                dialog.dismiss()
+            } else {
+                urlLayout.setError(activityContext.getString(R.string.snackbarInvalidUrl))
+            }
+        }
+
+        urlEditText.doOnTextChanged { _, _, _, _ ->
+            urlLayout.setError(null)
+        }
+    }
+
     private fun addMissingHttpsProtocol(link: String): String {
         val protocolEndIndex = link.indexOf("://")
-        val isProtocolSpecified = protocolEndIndex > 0 // If there is indeed a specified protocol of at least 1 char long
+        val isProtocolSpecified = protocolEndIndex > 0 // If there is a specified protocol and it is at least 1 char long
 
         if (isProtocolSpecified) return link
 
