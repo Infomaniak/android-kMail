@@ -20,8 +20,8 @@ package com.infomaniak.mail.ui.newMessage
 import android.content.Context
 import android.content.DialogInterface
 import android.util.Patterns
-import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
@@ -42,8 +42,6 @@ class InsertLinkDialog @Inject constructor(
     val binding: DialogInsertLinkBinding by lazy { DialogInsertLinkBinding.inflate(activity.layoutInflater) }
     private var addLink: ((String, String) -> Unit)? = null
 
-    private val defaultDisplayNameLabel by lazy { activityContext.getString(R.string.addLinkTextPlaceholder) }
-
     override val alertDialog: AlertDialog = with(binding) {
         showDisplayNamePreview()
 
@@ -63,14 +61,15 @@ class InsertLinkDialog @Inject constructor(
 
     private fun resetDialogState() {
         binding.urlLayout.setError(null)
-        hidePlaceholder()
+
+        binding.displayNameLayout.placeholderText = null
     }
 
     private fun setConfirmButtonListener(dialog: DialogInterface) = with(binding) {
         (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val url = addMissingHttpsProtocol(urlEditText.trimmedText)
             if (validate(url)) {
-                val displayName = (displayNameEditText.text?.takeIf { it.isNotBlank() } ?: urlEditText.text).toString()
+                val displayName = (displayNameEditText.text?.takeIf { it.isNotBlank() } ?: urlEditText.text).toString().trim()
                 addLink?.invoke(displayName, url)
                 dialog.dismiss()
             } else {
@@ -97,51 +96,25 @@ class InsertLinkDialog @Inject constructor(
         alertDialog.show()
     }
 
-    // We need to play with the display text's hint and placeholder to only show the correct one in each situation. Placeholder is
-    // only visible when the EditText is focused and hint takes the place of the placeholder when the EditText is not focused.
+    // Pre fills the display name with the url's content if the fields contain the same value.
     private fun showDisplayNamePreview() = with(binding) {
-        urlEditText.doOnTextChanged { _, _, _, _ ->
-            if (displayNameIsEmpty()) {
-                displayNameLayout.apply {
-                    val preview = computeDisplayNamePreview()
+        displayNameEditText.setTextColor(activityContext.getColor(R.color.tertiaryTextColor))
 
-                    placeholderText = preview
-                    hint = preview
-                    invalidate() // Required to update the hint, else it never updates visually
-                }
+        var areInputsSynced = false
+        urlEditText.addTextChangedListener(
+            beforeTextChanged = { text, _, _, _ ->
+                areInputsSynced = text.toString() == displayNameEditText.text.toString()
+            },
+            onTextChanged = { text, _, _, _ ->
+                if (areInputsSynced || displayNameEditText.text.isNullOrBlank()) displayNameEditText.setText(text)
             }
-        }
+        )
 
-        displayNameEditText.doOnTextChanged { _, _, _, _ ->
-            if (displayNameIsEmpty()) {
-                if (thereIsNoPreviewToDisplay()) {
-                    hidePlaceholder()
-                } else {
-                    displayNameLayout.placeholderText = computeDisplayNamePreview()
-                }
-            }
-        }
-
-        displayNameEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            displayNameLayout.hint = if (hasFocus) defaultDisplayNameLabel else computeDisplayNamePreview()
-            if (thereIsNoPreviewToDisplay()) hidePlaceholder()
+        displayNameEditText.setOnFocusChangeListener { _, hasFocus ->
+            val textColor = activityContext.getColor(if (hasFocus) R.color.primaryTextColor else R.color.tertiaryTextColor)
+            displayNameEditText.setTextColor(textColor)
         }
     }
-
-    private fun computeDisplayNamePreview(): String {
-        if (!displayNameIsEmpty()) return defaultDisplayNameLabel
-        if (thereIsNoPreviewToDisplay()) return defaultDisplayNameLabel
-
-        return binding.urlEditText.text.toString()
-    }
-
-    private fun hidePlaceholder() {
-        binding.displayNameLayout.placeholderText = null
-    }
-
-    private fun displayNameIsEmpty() = binding.displayNameEditText.text.isNullOrEmpty()
-
-    private fun thereIsNoPreviewToDisplay() = binding.urlEditText.text.isNullOrBlank()
 
     private fun addMissingHttpsProtocol(link: String): String {
         val protocolEndIndex = link.indexOf("://")

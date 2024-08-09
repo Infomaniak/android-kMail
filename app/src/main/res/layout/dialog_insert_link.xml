@@ -30,21 +30,21 @@
         android:layout_marginTop="@dimen/marginStandard"
         android:text="@string/urlEntryTitle" />
 
-    <com.google.android.material.textfield.TextInputLayout
+    <com.infomaniak.lib.core.views.EndIconTextInputLayout
         android:id="@+id/displayNameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
-        app:placeholderTextColor="@color/tertiaryTextColor">
+        android:layout_marginVertical="@dimen/marginStandardMedium">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/displayNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/addLinkTextPlaceholder"
-            android:inputType="text" />
+            android:inputType="text"
+            android:selectAllOnFocus="true" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
 
     <com.infomaniak.lib.core.views.EndIconTextInputLayout
         android:id="@+id/urlLayout"
