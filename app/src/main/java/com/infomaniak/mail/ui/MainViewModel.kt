@@ -69,7 +69,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.flattenFolderChildren
+import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
@@ -158,11 +158,11 @@ class MainViewModel @Inject constructor(
     }.asLiveData(ioCoroutineContext)
 
     val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerDefaultFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) }
+        folderController.getMenuDrawerDefaultFoldersAsync().map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
     }.asLiveData(ioCoroutineContext)
 
     val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerCustomFoldersAsync().map { it.list.flattenFolderChildren(dismissHiddenChildren = true) }
+        folderController.getMenuDrawerCustomFoldersAsync().map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
     }.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {

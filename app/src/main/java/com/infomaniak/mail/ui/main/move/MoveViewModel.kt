@@ -30,7 +30,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.flattenFolderChildren
+import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -71,7 +71,7 @@ class MoveViewModel @Inject constructor(
             sourceFolderIdLiveData.postValue(sourceFolderId)
 
             allFolders = folderController.getMoveFolders()
-                .flattenFolderChildren()
+                .flattenFolderChildrenAndRemoveMessages()
                 .addDividerBeforeFirstCustomFolder(dividerType = Unit)
                 .also(filterResults::postValue)
         }

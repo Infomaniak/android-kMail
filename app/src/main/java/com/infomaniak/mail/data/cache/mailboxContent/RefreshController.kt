@@ -701,7 +701,7 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             it.recomputeThread(realm = this)
-            impactedThreadsUnmanaged.add(it.copyFromRealm(1u))
+            impactedThreadsUnmanaged.add(it.copyFromRealm(0u))
         }
 
         return impactedThreadsUnmanaged

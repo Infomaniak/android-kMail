@@ -323,7 +323,7 @@ fun LiveData<UiRecipients>.valueOrEmpty(): List<Recipient> = value?.recipients ?
 //endregion
 
 //region Folders
-fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): List<Folder> {
+fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: Boolean = false): List<Folder> {
 
     if (isEmpty()) return this
 
@@ -335,7 +335,8 @@ fun List<Folder>.flattenFolderChildren(dismissHiddenChildren: Boolean = false): 
         val folder = inputList.removeFirst()
 
         val children = if (folder.isManaged()) {
-            outputList.add(folder.copyFromRealm(1u))
+            // We remove the Messages because we don't need them here. And it can be a pretty big list.
+            outputList.add(folder.copyFromRealm(1u).apply { messages.clear() })
             with(folder.children) {
                 (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
                     .sortFolders()
