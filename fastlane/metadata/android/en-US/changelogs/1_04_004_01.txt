@@ -1,0 +1,2 @@
+- Remove associated inline Attachements when removing previous email quote
+- Fix missing selection indicator handles when the selected line is on the last line of the Rich HTML Editor

@@ -1,0 +1,2 @@
+- Suppression des pièces jointes lors de la suppression de la citation du précédent email
+- Correction des poignées manquantes d'indicateur de sélection lorsque la ligne sélectionnée se trouve sur la dernière ligne de l'Éditeur HTML Riche
