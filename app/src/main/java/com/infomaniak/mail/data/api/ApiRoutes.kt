@@ -206,8 +206,12 @@ object ApiRoutes {
         return "${messages(mailboxUuid)}/unseen"
     }
 
-    fun starMessages(mailboxUuid: String, star: Boolean): String {
-        return "${messages(mailboxUuid)}/${if (star) "star" else "unstar"}"
+    fun starMessages(mailboxUuid: String): String {
+        return "${messages(mailboxUuid)}/star"
+    }
+
+    fun unstarMessages(mailboxUuid: String): String {
+        return "${messages(mailboxUuid)}/unstar"
     }
     //endregion
 

@@ -246,15 +246,11 @@ object ApiRepository : ApiRepositoryCore() {
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
     fun addToFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
-        return starMessages(mailboxUuid, messageUids, star = true)
+        return callApi(ApiRoutes.starMessages(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
     fun removeFromFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
-        return starMessages(mailboxUuid, messageUids, star = false)
-    }
-
-    private fun starMessages(mailboxUuid: String, messageIds: List<String>, star: Boolean): ApiResponse<Unit> {
-        return callApi(ApiRoutes.starMessages(mailboxUuid, star), POST, mapOf("uids" to messageIds))
+        return callApi(ApiRoutes.unstarMessages(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
     fun getMessagesUids(
