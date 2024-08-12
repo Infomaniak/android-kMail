@@ -25,15 +25,7 @@ import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
-import com.infomaniak.lib.core.utils.FORMAT_DATE_HOUR_MINUTE
-import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE
-import com.infomaniak.lib.core.utils.FormatData
-import com.infomaniak.lib.core.utils.addDays
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.format
-import com.infomaniak.lib.core.utils.formatWithLocal
-import com.infomaniak.lib.core.utils.isSameDayAs
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.trackCalendarEventEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment

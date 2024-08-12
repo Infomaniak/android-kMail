@@ -34,11 +34,7 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.chip.Chip
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.hideKeyboard
-import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R

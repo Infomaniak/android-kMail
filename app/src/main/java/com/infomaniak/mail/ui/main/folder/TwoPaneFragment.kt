@@ -41,12 +41,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions
-import com.infomaniak.mail.utils.extensions.isPhone
-import com.infomaniak.mail.utils.extensions.isTabletInLandscape
-import com.infomaniak.mail.utils.extensions.isTabletInPortrait
-import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment() {

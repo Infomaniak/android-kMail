@@ -31,9 +31,7 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
-import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
-import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
-import com.infomaniak.mail.data.LocalSettings.AccentColor.SYSTEM
+import com.infomaniak.mail.data.LocalSettings.AccentColor.*
 import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint

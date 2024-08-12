@@ -42,11 +42,7 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
-import io.realm.kotlin.query.RealmQuery
-import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.query.RealmScalarQuery
-import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.query.Sort
+import io.realm.kotlin.query.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow

@@ -20,11 +20,7 @@ package com.infomaniak.mail.data.api
 import com.infomaniak.mail.data.models.message.SubBody
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonTransformingSerializer
-import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.*
 
 // Documentation: https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-json/kotlinx.serialization.json/-json-transforming-serializer/
 object FlatteningSubBodiesSerializer : JsonTransformingSerializer<RealmList<SubBody>>(
