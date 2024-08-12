@@ -18,12 +18,8 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.os.Bundle
-import android.transition.AutoTransition
-import android.transition.ChangeBounds
-import android.transition.Fade
+import android.transition.*
 import android.transition.Fade.IN
-import android.transition.TransitionManager
-import android.transition.TransitionSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

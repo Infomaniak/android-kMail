@@ -22,9 +22,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.ONE_PAGE_OF_OLD_MESSAGES
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.REFRESH_FOLDER
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.REFRESH_FOLDER_WITH_ROLE
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.*
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RetryStrategy.Iteration
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
@@ -52,13 +50,7 @@ import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.RealmSet
 import io.sentry.Sentry
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.util.Date
 import javax.inject.Inject

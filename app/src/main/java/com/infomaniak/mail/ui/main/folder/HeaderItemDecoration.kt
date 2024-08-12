@@ -25,15 +25,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.forEachIndexed
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
-import androidx.recyclerview.widget.RecyclerView.NO_POSITION
-import androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener
-import androidx.recyclerview.widget.RecyclerView.State
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration.Intersection.CENTER
-import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration.Intersection.INSET_BOTTOM
-import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration.Intersection.INSET_TOP
+import androidx.recyclerview.widget.RecyclerView.*
+import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration.Intersection.*
 
 class HeaderItemDecoration(
     parent: RecyclerView,
