@@ -174,7 +174,7 @@ class RefreshController @Inject constructor(
                 }
             }
             ONE_PAGE_OF_OLD_MESSAGES -> {
-                fetchOnePage(scope, initialFolder, Direction.IN_THE_PAST)
+                fetchOnePageOfOldMessages(scope, initialFolder.id)
                 emptySet()
             }
         }
@@ -221,6 +221,23 @@ class RefreshController @Inject constructor(
         fetchAllOldPages(scope, folder.id)
 
         return impactedThreads
+    }
+
+    private suspend fun Realm.fetchOnePageOfOldMessages(scope: CoroutineScope, folderId: String) {
+
+        var totalNewThreads = 0
+        var upToDateFolder = getUpToDateFolder(folderId)
+        var maxPagesToFetch = Utils.MAX_OLD_PAGES_TO_FETCH_TO_GET_ENOUGH_NEW_THREADS
+
+        while (
+            totalNewThreads < Utils.PAGE_SIZE / 2 &&
+            upToDateFolder.oldMessagesUidsToFetch.isNotEmpty() &&
+            maxPagesToFetch > 0
+        ) {
+            totalNewThreads += fetchOnePage(scope, upToDateFolder, Direction.IN_THE_PAST).count()
+            upToDateFolder = getUpToDateFolder(folderId)
+            maxPagesToFetch--
+        }
     }
 
     private fun Realm.fetchOldMessagesUids(scope: CoroutineScope, folder: Folder) {
