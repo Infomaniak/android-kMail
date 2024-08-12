@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -39,6 +38,7 @@ import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import javax.inject.Inject
 
@@ -156,12 +156,9 @@ class SharedUtils @Inject constructor(
             return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
                 return@with if (isSuccess()) {
                     customRealm.writeBlocking {
-                        SignatureController.update(
-                            signatures = data!!.signatures,
-                            defaultSignatureId = data!!.defaultSignatureId,
-                            defaultReplySignatureId = data!!.defaultReplySignatureId,
-                            realm = this,
-                        )
+                        MailboxController.getMailbox(mailbox.objectId, realm = this)?.let {
+                            it.signatures = data!!.signatures.toRealmList()
+                        }
                     }
                     null
                 } else {

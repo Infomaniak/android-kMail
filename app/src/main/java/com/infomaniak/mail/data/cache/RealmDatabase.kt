@@ -63,7 +63,6 @@ object RealmDatabase {
     //region Realms' mutexes
     private val appSettingsMutex = Mutex()
     private val userInfoMutex = Mutex()
-    private val mailboxInfoMutex = Mutex()
     private val mailboxContentMutex = Mutex()
     //endregion
 
@@ -161,7 +160,7 @@ object RealmDatabase {
 
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 1L
-        const val MAILBOX_INFO_SCHEMA_VERSION = 5L
+        const val MAILBOX_INFO_SCHEMA_VERSION = 6L
         const val MAILBOX_CONTENT_SCHEMA_VERSION = 16L
         //endregion
 
@@ -185,6 +184,7 @@ object RealmDatabase {
             Mailbox::class,
             MailboxPermissions::class,
             Quotas::class,
+            Signature::class,
         )
         val mailboxContentSet = setOf(
             Folder::class,
@@ -200,7 +200,6 @@ object RealmDatabase {
             SwissTransferContainer::class,
             SwissTransferFile::class,
             Attendee::class,
-            Signature::class,
             Bimi::class,
         )
         //endregion

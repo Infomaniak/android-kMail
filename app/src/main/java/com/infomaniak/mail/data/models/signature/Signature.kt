@@ -21,18 +21,16 @@ import android.content.Context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.utils.AccountUtils
-import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
-import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
-class Signature : RealmObject {
+class Signature : EmbeddedRealmObject {
 
     //region Remote data
-    @PrimaryKey
     var id: Int = 0
     var name: String = ""
     @SerialName("full_name")
