@@ -27,6 +27,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.ui.main.settings.ItemSettingView
+import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.notYetImplemented
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -35,6 +36,11 @@ class MailboxSettingsFragment : Fragment() {
 
     private var binding: FragmentMailboxSettingsBinding by safeBinding()
     private val navigationArgs: MailboxSettingsFragmentArgs by navArgs()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        saveFocusWhenNavigatingBack(getLayout = { binding.linearLayoutContainer }, lifecycle)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMailboxSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
