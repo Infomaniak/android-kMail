@@ -30,7 +30,6 @@
         android:layout_marginVertical="2dp"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
         android:nextFocusRight="@+id/newMessageFab"
-        android:nextFocusUp="@id/userAvatar"
         app:cardCornerRadius="@null"
         app:cardPreventCornerOverlap="false"
         app:shapeAppearanceOverlay="@style/RoundedDecoratedTextItemShapeAppearance">

@@ -34,6 +34,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="@dimen/material_bottom_sheet_max_width"
+        android:focusable="false"
         app:rippleColor="@android:color/transparent"
         tools:ignore="KeyboardInaccessibleWidget">
 

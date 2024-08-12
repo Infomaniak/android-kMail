@@ -211,9 +211,7 @@ class SearchFragment : TwoPaneFragment() {
             popupMenu.setAdapter(searchAdapter)
 
             popupMenu.setOnItemClickListener { _, _, position, _ ->
-                val viewType = searchAdapter.getItemViewType(position)
-
-                if (viewType == SearchFolderElement.FOLDER.itemId || viewType == SearchFolderElement.ALL_FOLDERS.itemId) {
+                if (searchAdapter.getItemViewType(position) != SearchFolderElement.DIVIDER.itemId) {
 
                     val folder = folders[position] as? Folder
                     val entryName = requireContext().getLocalizedNameOrAllFolders(folder)

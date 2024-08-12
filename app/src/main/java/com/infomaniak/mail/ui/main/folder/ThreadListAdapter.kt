@@ -43,7 +43,17 @@ import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.capitalizeFirstChar
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.isInTheFuture
+import com.infomaniak.lib.core.utils.isThisMonth
+import com.infomaniak.lib.core.utils.isThisWeek
+import com.infomaniak.lib.core.utils.isThisYear
+import com.infomaniak.lib.core.utils.isToday
+import com.infomaniak.lib.core.utils.isYesterday
+import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -62,9 +72,19 @@ import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.formatSubject
+import com.infomaniak.mail.utils.extensions.getAttributeColor
+import com.infomaniak.mail.utils.extensions.isEmail
+import com.infomaniak.mail.utils.extensions.isLastWeek
+import com.infomaniak.mail.utils.extensions.postfixWithTag
+import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
@@ -417,6 +437,8 @@ class ThreadListAdapter @Inject constructor(
         val (recipient, bimi) = thread.computeAvatarRecipient()
         expeditorAvatar.apply {
             loadAvatar(recipient, bimi)
+
+            // Set isFocusable here instead of in XML file because set XML don't trigger the overridden setFocusable(boolean) in avatar view.
             isFocusable = false
         }
     }

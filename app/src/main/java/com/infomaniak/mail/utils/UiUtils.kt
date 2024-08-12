@@ -169,11 +169,6 @@ object UiUtils {
             @IdRes
             private var lastFocusViewId: Int? = null
 
-            override fun onDestroy(owner: LifecycleOwner) {
-                lifecycle.removeObserver(this)
-                super.onDestroy(owner)
-            }
-
             override fun onStart(owner: LifecycleOwner) {
                 super.onStart(owner)
                 lastFocusViewId?.let { viewId ->
@@ -186,6 +181,11 @@ object UiUtils {
                     lastFocusViewId = it.id
                 }
                 super.onStop(owner)
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                lifecycle.removeObserver(this)
+                super.onDestroy(owner)
             }
         }
 
