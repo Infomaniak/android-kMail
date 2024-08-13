@@ -202,7 +202,6 @@ class NewMessageFragment : Fragment() {
             setOnFocusChangedListeners()
             observeContacts()
             observeCcAndBccVisibility()
-            observeFocusedElement()
         }
     }
 

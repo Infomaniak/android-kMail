@@ -33,7 +33,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     private var _externalsManager: NewMessageExternalsManager? = null
     private inline val externalsManager: NewMessageExternalsManager get() = _externalsManager!!
 
-    private var lastFieldToTakeFocus: FocusableElement? = FocusableElement.TO
+    private var lastFieldToTakeFocus: FieldType? = TO
 
     fun initValues(
         newMessageViewModel: NewMessageViewModel,
@@ -58,7 +58,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(recipient = it, type = TO) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(TO) },
             onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
-            gotFocusCallback = { elementGotFocus(FocusableElement.TO) },
+            gotFocusCallback = { fieldGotFocus(TO) },
             onToggleEverythingCallback = ::openAdvancedFields,
         )
 
@@ -68,7 +68,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(recipient = it, type = CC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(CC) },
             onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
-            gotFocusCallback = { elementGotFocus(FocusableElement.CC) },
+            gotFocusCallback = { fieldGotFocus(CC) },
         )
 
         bccField.initRecipientField(
@@ -77,7 +77,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(recipient = it, type = BCC) },
             onContactRemovedCallback = { recipient -> recipient.removeInViewModelAndUpdateBannerVisibility(BCC) },
             onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
-            gotFocusCallback = { elementGotFocus(FocusableElement.BCC) },
+            gotFocusCallback = { fieldGotFocus(BCC) },
         )
     }
 
@@ -96,24 +96,18 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         externalsManager.updateBannerVisibility()
     }
 
-    private fun elementGotFocus(element: FocusableElement?) {
-        newMessageViewModel.focusedElementLiveData.value = element
-    }
+    private fun fieldGotFocus(field: FieldType?) = with(binding) {
+        if (lastFieldToTakeFocus == field) return
 
-    fun observeFocusedElement() = with(binding) {
-        newMessageViewModel.focusedElementLiveData.observe(viewLifecycleOwner) { field ->
-            if (lastFieldToTakeFocus == field) return@observe
-
-            if (field == null && newMessageViewModel.otherRecipientsFieldsAreEmpty.value == true) {
-                toField.collapseEverything()
-            } else {
-                if (field != FocusableElement.TO) toField.collapse()
-                if (field != FocusableElement.CC) ccField.collapse()
-                if (field != FocusableElement.BCC) bccField.collapse()
-            }
-
-            lastFieldToTakeFocus = field
+        if (field == null && newMessageViewModel.otherRecipientsFieldsAreEmpty.value == true) {
+            toField.collapseEverything()
+        } else {
+            if (field != TO) toField.collapse()
+            if (field != CC) ccField.collapse()
+            if (field != BCC) bccField.collapse()
         }
+
+        lastFieldToTakeFocus = field
     }
 
     private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
@@ -126,9 +120,11 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(isCollapsed = !it) }
     }
 
-    fun setOnFocusChangedListeners() = with(binding) {
-        subjectTextField.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) elementGotFocus(FocusableElement.OTHER) }
-        editorWebView.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) elementGotFocus(FocusableElement.BODY) }
+    fun setOnFocusChangedListeners() = with(newMessageViewModel) {
+        binding.subjectTextField.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
+        binding.editorWebView.setOnFocusChangeListener { _, hasFocus -> isEditorWebViewFocusedLiveData.value = hasFocus }
+
+        isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { hasFocus -> if (hasFocus) fieldGotFocus(null) }
     }
 
     fun focusBodyField() {
@@ -158,13 +154,5 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         TO,
         CC,
         BCC,
-    }
-
-    enum class FocusableElement {
-        TO,
-        CC,
-        BCC,
-        BODY,
-        OTHER,
     }
 }
