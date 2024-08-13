@@ -155,9 +155,13 @@ class SharedUtils @Inject constructor(
         fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
             return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
                 return@with if (isSuccess()) {
+                    val signaturesResult = data!!
                     customRealm.writeBlocking {
-                        MailboxController.getMailbox(mailbox.objectId, realm = this)?.let {
-                            it.signatures = data!!.signatures.toRealmList()
+                        MailboxController.getMailbox(mailbox.objectId, realm = this)?.let { mailbox ->
+                            mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
+                                firstOrNull { it.id == signaturesResult.defaultSignatureId }?.isDefault = true
+                                firstOrNull { it.id == signaturesResult.defaultReplySignatureId }?.isDefaultReply = true
+                            }.toRealmList()
                         }
                     }
                     null
