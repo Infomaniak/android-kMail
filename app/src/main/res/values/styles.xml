@@ -240,7 +240,6 @@
         <item name="rippleColor">?android:attr/colorControlHighlight</item>
     </style>
 
-
     <style name="EditorFormatButton" parent="Widget.Material3.Button.IconButton">
         <item name="android:minWidth">48dp</item>
         <item name="backgroundTint">@color/editor_button_background</item>
