@@ -141,7 +141,7 @@ class ThreadListMultiSelection {
     private fun displaySelectionToolbar(isMultiSelectOn: Boolean) = with(threadListFragment.binding) {
         val autoTransition = AutoTransition()
         autoTransition.duration = TOOLBAR_FADE_DURATION
-        TransitionManager.beginDelayedTransition(formatOptionsScrollView, autoTransition)
+        TransitionManager.beginDelayedTransition(toolbarLayout, autoTransition)
 
         toolbar.isGone = isMultiSelectOn
         toolbarSelection.isVisible = isMultiSelectOn
