@@ -121,10 +121,10 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     }
 
     fun setOnFocusChangedListeners() = with(newMessageViewModel) {
-        binding.subjectTextField.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
+        binding.subjectTextField.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(field = null) }
         binding.editorWebView.setOnFocusChangeListener { _, hasFocus -> isEditorWebViewFocusedLiveData.value = hasFocus }
 
-        isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { hasFocus -> if (hasFocus) fieldGotFocus(null) }
+        isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { hasFocus -> if (hasFocus) fieldGotFocus(field = null) }
     }
 
     fun focusBodyField() {

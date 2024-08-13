@@ -377,9 +377,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun disableButtonsWhenFocusIsLost() {
-        newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { hasFocus ->
-            setToolbarEnabledStatus(hasFocus)
-        }
+        newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner, ::setToolbarEnabledStatus)
     }
 
     private fun setToolbarEnabledStatus(isEnabled: Boolean) {
