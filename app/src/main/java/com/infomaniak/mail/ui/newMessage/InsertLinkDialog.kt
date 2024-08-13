@@ -77,7 +77,7 @@ class InsertLinkDialog @Inject constructor(
         alertDialog.show()
     }
 
-    // Pre fills the display name with the url's content if the fields contain the same value.
+    // Pre-fills the display name with the url's content if the fields contain the same value.
     private fun showDisplayNamePreview() = with(binding) {
         displayNameEditText.setTextColor(activityContext.getColor(R.color.tertiaryTextColor))
 
