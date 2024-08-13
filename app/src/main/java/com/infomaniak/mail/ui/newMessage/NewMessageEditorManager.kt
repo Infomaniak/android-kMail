@@ -106,28 +106,28 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     fun setupEditorFormatActionsToggle() = with(binding) {
         editorTextOptions.setOnClickListener {
             newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
-            updateEditorVisibility(newMessageViewModel.isEditorExpanded)
+            updateEditorFormatActionsVisibility(newMessageViewModel.isEditorExpanded)
         }
     }
 
-    private fun updateEditorVisibility(isEditorExpanded: Boolean) = with(binding) {
-        if (isEditorExpanded) editorWebView.requestFocus()
+    private fun updateEditorFormatActionsVisibility(isExpanded: Boolean) = with(binding) {
+        if (isExpanded) editorWebView.requestFocus()
 
-        val color = if (isEditorExpanded) {
+        val color = if (isExpanded) {
             context.getAttributeColor(RMaterial.attr.colorPrimary)
         } else {
             context.getColor(R.color.iconColor)
         }
-        val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
+        val resId = if (isExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
 
         editorTextOptions.apply {
             iconTint = ColorStateList.valueOf(color)
             contentDescription = context.getString(resId)
         }
 
-        editorActions.isGone = isEditorExpanded
-        sendButton.isGone = isEditorExpanded
-        formatOptionsScrollView.isVisible = isEditorExpanded
+        editorActions.isGone = isExpanded
+        sendButton.isGone = isExpanded
+        formatOptionsScrollView.isVisible = isExpanded
     }
 
     fun observeEditorStatus(): Unit = with(binding) {
