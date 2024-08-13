@@ -57,6 +57,9 @@ class InsertLinkDialog @Inject constructor(
                     resetDialogState()
                     setConfirmButtonListener(dialog)
                 }
+                urlEditText.doOnTextChanged { _, _, _, _ ->
+                    urlLayout.setError(null)
+                }
             }
     }
 
@@ -111,10 +114,6 @@ class InsertLinkDialog @Inject constructor(
             } else {
                 urlLayout.setError(activityContext.getString(R.string.snackbarInvalidUrl))
             }
-        }
-
-        urlEditText.doOnTextChanged { _, _, _, _ ->
-            urlLayout.setError(null)
         }
     }
 
