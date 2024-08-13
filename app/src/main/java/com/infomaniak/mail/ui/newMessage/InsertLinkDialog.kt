@@ -118,17 +118,21 @@ class InsertLinkDialog @Inject constructor(
     }
 
     private fun addMissingHttpsProtocol(link: String): String {
-        val protocolEndIndex = link.indexOf("://")
+        val protocolEndIndex = link.indexOf(PROTOCOL_SEPARATOR)
         val isProtocolSpecified = protocolEndIndex > 0 // If there is a specified protocol and it is at least 1 char long
 
         if (isProtocolSpecified) return link
 
-        val strippedUserInput = if (protocolEndIndex != -1) link.substring(protocolEndIndex + 3) else link
+        val strippedUserInput = if (protocolEndIndex == -1) link else link.substring(PROTOCOL_SEPARATOR.length)
 
         return "https://$strippedUserInput"
     }
 
     private fun validate(userUrlInput: String): Boolean {
         return Patterns.WEB_URL.matcher(userUrlInput).matches()
+    }
+
+    companion object {
+        private const val PROTOCOL_SEPARATOR = "://"
     }
 }
