@@ -33,6 +33,7 @@ import com.infomaniak.mail.utils.extensions.trimmedText
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @ActivityScoped
 class InsertLinkDialog @Inject constructor(
@@ -48,7 +49,7 @@ class InsertLinkDialog @Inject constructor(
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm, null)
-            .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
+            .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
             .also {
                 it.setOnShowListener { dialog ->

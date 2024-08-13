@@ -48,6 +48,7 @@ import io.sentry.Sentry
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
+import com.infomaniak.lib.core.R as RCore
 
 object AttachmentExtensions {
 
@@ -122,7 +123,7 @@ object AttachmentExtensions {
         if (openWithIntent(context).hasSupportedApplications(context)) {
             executeIntent(context, OPEN_WITH, navigateToDownloadProgressDialog)
         } else {
-            snackbarManager.setValue(context.getString(com.infomaniak.lib.core.R.string.errorNoSupportingAppFound))
+            snackbarManager.setValue(context.getString(RCore.string.errorNoSupportingAppFound))
         }
     }
 
