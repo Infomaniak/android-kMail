@@ -1104,6 +1104,5 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
-        private const val TIMEOUT_MS_NETWORK_AVAILABILITY_MS = 500L
     }
 }
