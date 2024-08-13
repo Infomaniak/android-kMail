@@ -49,6 +49,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.AccountUtils
@@ -64,6 +65,7 @@ import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
@@ -93,6 +95,7 @@ class MainViewModel @Inject constructor(
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
     private val snackbarManager: SnackbarManager,
+    @MailboxInfoRealm private val mailboxInfoRealm: Realm,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -350,7 +353,7 @@ class MainViewModel @Inject constructor(
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Signatures")
-        updateSignatures(mailbox, mailboxContentRealm())
+        updateSignatures(mailbox, mailboxInfoRealm)
     }
 
     private fun updateFeatureFlag(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {

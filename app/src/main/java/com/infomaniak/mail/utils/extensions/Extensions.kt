@@ -78,7 +78,9 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
@@ -308,6 +310,14 @@ fun <T> LiveData<List<T>>.valueOrEmpty(): List<T> = value ?: emptyList()
 
 @JvmName("valueOrEmptyForUiRecipients")
 fun LiveData<UiRecipients>.valueOrEmpty(): List<Recipient> = value?.recipients ?: emptyList()
+//endregion
+
+//region Mailboxes
+fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
+    return firstOrNull {
+        if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) it.isDefaultReply else it.isDefault
+    }
+}
 //endregion
 
 //region Folders

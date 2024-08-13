@@ -38,7 +38,6 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ReplyForwardFooterManager
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
@@ -63,11 +62,8 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.findSpecificAttachment
-import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.htmlToText
-import com.infomaniak.mail.utils.extensions.isEmail
-import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -206,7 +202,7 @@ class NewMessageViewModel @Inject constructor(
 
         runCatching {
 
-            signatures = SignatureController.getAllSignatures(realm)
+            signatures = currentMailbox.signatures
                 .also { signaturesCount = it.count() }
                 .toMutableList()
                 .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox.email)) }
@@ -216,7 +212,7 @@ class NewMessageViewModel @Inject constructor(
             draft = if (isNewMessage) {
                 getNewDraft(signatures, intent, realm) ?: return@runCatching
             } else {
-                getExistingDraft(draftLocalUuid, realm) ?: return@runCatching
+                getExistingDraft(draftLocalUuid) ?: return@runCatching
             }
         }.onFailure(Sentry::captureException)
 
@@ -238,11 +234,11 @@ class NewMessageViewModel @Inject constructor(
         emit(draft)
     }
 
-    private fun getExistingDraft(localUuid: String?, realm: Realm): Draft? {
+    private fun getExistingDraft(localUuid: String?): Draft? {
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
             if (draft.identityId.isNullOrBlank()) {
-                draft.identityId = SignatureController.getDefaultSignatureWithFallback(realm, draftMode)?.id?.toString()
+                draft.identityId = currentMailbox.getDefaultSignatureWithFallback().id.toString()
             }
             splitSignatureAndQuoteFromBody(draft)
         }
@@ -274,7 +270,7 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        val defaultSignature = SignatureController.getDefaultSignature(realm, draftMode)
+        val defaultSignature = signatures.getDefault(draftMode)
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
         val signature = if (shouldPreselectSignature) {
             defaultSignature ?: guessMostFittingSignature(previousMessage!!, signatures)

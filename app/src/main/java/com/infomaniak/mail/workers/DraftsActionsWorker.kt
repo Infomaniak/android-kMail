@@ -32,7 +32,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment.UploadStatus
@@ -374,9 +373,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         updateSignatures(mailbox, mailboxContentRealm)
 
-        val signature = SignatureController.getDefaultSignatureWithFallback(realm = mailboxContentRealm)
+        val signature = mailbox.getDefaultSignatureWithFallback()
+
         mailboxContentRealm.writeBlocking {
-            draftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature?.id?.toString() }
+            draftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
         }
 
         return executeDraftAction(

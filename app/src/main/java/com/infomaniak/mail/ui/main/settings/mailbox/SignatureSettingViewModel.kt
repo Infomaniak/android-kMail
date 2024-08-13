@@ -23,14 +23,14 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.cache.mailboxInfo.SignatureController
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,7 +39,9 @@ import com.infomaniak.lib.core.R as RCore
 @HiltViewModel
 class SignatureSettingViewModel @Inject constructor(
     mailboxController: MailboxController,
+    signatureController: SignatureController,
     private val savedStateHandle: SavedStateHandle,
+    @MailboxInfoRealm private val mailboxInfoRealm: Realm,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -47,9 +49,8 @@ class SignatureSettingViewModel @Inject constructor(
 
     private val mailboxObjectId inline get() = savedStateHandle.get<String>(SignatureSettingFragmentArgs::mailboxObjectId.name)!!
     val mailbox = mailboxController.getMailbox(mailboxObjectId)!!
-    private val customRealm = RealmDatabase.newMailboxContentInstance(AccountUtils.currentUserId, mailbox.mailboxId)
 
-    val signaturesLive = SignatureController.getSignaturesAsync(customRealm).asLiveData(coroutineContext)
+    val signaturesLive = signatureController.getSignaturesAsync(mailboxObjectId).asLiveData(coroutineContext)
     val showError = SingleLiveEvent<Int>() // StringRes
 
     fun setDefaultSignature(signature: Signature?) = viewModelScope.launch(ioDispatcher) {
@@ -63,14 +64,9 @@ class SignatureSettingViewModel @Inject constructor(
     }
 
     fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
-        updateSignatures(mailbox, customRealm)?.also { translatedError ->
+        updateSignatures(mailbox, mailboxInfoRealm)?.also { translatedError ->
             val title = if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
             showError.postValue(title)
         }
-    }
-
-    override fun onCleared() {
-        customRealm.close()
-        super.onCleared()
     }
 }

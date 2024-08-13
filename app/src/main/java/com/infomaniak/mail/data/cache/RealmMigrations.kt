@@ -36,6 +36,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.deleteRealmFromFirstMigration()
 }
 
+// Migrate to version #1
 private fun MigrationContext.deleteRealmFromFirstMigration() {
-    if (oldRealm.schemaVersion() == 0L) newRealm.deleteAll()
+    if (oldRealm.schemaVersion() < 1L) newRealm.deleteAll()
 }

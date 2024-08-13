@@ -23,13 +23,14 @@ import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.UnreadDisplay
+import com.infomaniak.mail.utils.extensions.getDefault
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -61,7 +62,7 @@ class Mailbox : RealmObject {
     var isLocked: Boolean = false
     @SerialName("unseen_messages")
     var unreadCountRemote: Int = 0
-    var aliases: RealmList<String> = realmListOf()
+    var aliases = realmListOf<String>()
     //endregion
 
     //region Local data (Transient)
@@ -77,11 +78,13 @@ class Mailbox : RealmObject {
     @Transient
     var permissions: MailboxPermissions? = null
     @Transient
-    private var _featureFlags: RealmSet<String> = realmSetOf()
+    var signatures = realmListOf<Signature>()
+    @Transient
+    private var _featureFlags = realmSetOf<String>()
     @Transient
     var externalMailFlagEnabled: Boolean = false
     @Transient
-    var trustedDomains: RealmList<String> = realmListOf()
+    var trustedDomains = realmListOf<String>()
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -111,6 +114,10 @@ class Mailbox : RealmObject {
         this.quotas = quotas
         this.unreadCountLocal = inboxUnreadCount
         this.permissions = permissions
+    }
+
+    fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature {
+        return signatures.getDefault(draftMode) ?: signatures.first()
     }
 
     fun notificationsIsDisabled(notificationManagerCompat: NotificationManagerCompat): Boolean = with(notificationManagerCompat) {
