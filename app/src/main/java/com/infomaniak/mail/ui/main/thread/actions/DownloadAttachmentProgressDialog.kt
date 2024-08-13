@@ -81,7 +81,7 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     private fun popBackStackWithError() {
         // We have to use the Flow instead of the LiveData here since the mainViewModel is not the same instance as the one in the
         // MainActivity. So, instead of observing the LiveData in order to make it "active", we use the Flow.
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.isNetworkAvailable.first { it != null }?.let { isNetworkAvailable ->
                 val title = if (isNetworkAvailable) R.string.anErrorHasOccurred else R.string.noConnection
                 showSnackbar(title)
