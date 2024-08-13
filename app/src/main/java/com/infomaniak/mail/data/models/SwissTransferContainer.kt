@@ -21,7 +21,6 @@ package com.infomaniak.mail.data.models
 
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -38,6 +37,6 @@ class SwissTransferContainer : RealmObject {
     var size: Long = 0L
     var expiredDate: String = ""
     @SerialName("files")
-    var swissTransferFiles: RealmList<SwissTransferFile> = realmListOf()
+    var swissTransferFiles = realmListOf<SwissTransferFile>()
     //endregion
 }
