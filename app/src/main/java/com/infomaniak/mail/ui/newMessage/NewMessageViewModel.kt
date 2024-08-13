@@ -145,7 +145,7 @@ class NewMessageViewModel @Inject constructor(
     val focusedElementLiveData = MutableLiveData<FocusableElement>()
     val isEditorWebViewFocusedLiveData = focusedElementLiveData.map { it == FocusableElement.BODY }
 
-    var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
+    val initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
     val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
     val isSendingAllowed = SingleLiveEvent(false)
