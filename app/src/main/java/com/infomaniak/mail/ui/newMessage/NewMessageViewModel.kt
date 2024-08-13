@@ -62,13 +62,8 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.findSpecificAttachment
-import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.getDefault
-import com.infomaniak.mail.utils.extensions.getDefaultSignatureWithFallback
-import com.infomaniak.mail.utils.extensions.htmlToText
-import com.infomaniak.mail.utils.extensions.isEmail
-import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm

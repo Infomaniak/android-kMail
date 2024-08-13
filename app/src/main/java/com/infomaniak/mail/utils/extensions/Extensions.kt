@@ -79,7 +79,6 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
@@ -318,10 +317,6 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
     return firstOrNull {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) it.isDefaultReply else it.isDefault
     }
-}
-
-fun Mailbox.getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature {
-    return signatures.getDefault(draftMode) ?: signatures.first()
 }
 //endregion
 

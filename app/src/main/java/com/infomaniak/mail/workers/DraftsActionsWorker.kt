@@ -43,7 +43,6 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
-import com.infomaniak.mail.utils.extensions.getDefaultSignatureWithFallback
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
