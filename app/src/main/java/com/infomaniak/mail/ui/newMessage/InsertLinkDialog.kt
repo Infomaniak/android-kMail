@@ -37,7 +37,7 @@ import com.infomaniak.lib.core.R as RCore
 
 @ActivityScoped
 class InsertLinkDialog @Inject constructor(
-    @ActivityContext private val activityContext: Context
+    @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
 
     val binding: DialogInsertLinkBinding by lazy { DialogInsertLinkBinding.inflate(activity.layoutInflater) }
