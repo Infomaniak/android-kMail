@@ -128,9 +128,7 @@ class InsertLinkDialog @Inject constructor(
         return "https://$strippedUserInput"
     }
 
-    private fun validate(userUrlInput: String): Boolean {
-        return Patterns.WEB_URL.matcher(userUrlInput).matches()
-    }
+    private fun validate(userUrlInput: String): Boolean = Patterns.WEB_URL.matcher(userUrlInput).matches()
 
     companion object {
         private const val PROTOCOL_SEPARATOR = "://"
