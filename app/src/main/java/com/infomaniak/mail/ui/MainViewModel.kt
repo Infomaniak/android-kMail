@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.networking.NetworkAvailability
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
@@ -99,7 +100,6 @@ class MainViewModel @Inject constructor(
     private var refreshEverythingJob: Job? = null
 
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isInternetAvailable = MutableLiveData<Boolean>()
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
@@ -137,11 +137,13 @@ class MainViewModel @Inject constructor(
     }.asLiveData(ioCoroutineContext)
 
     val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerDefaultFoldersAsync().map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
+        folderController.getMenuDrawerDefaultFoldersAsync()
+            .map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
     }.asLiveData(ioCoroutineContext)
 
     val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
-        folderController.getMenuDrawerCustomFoldersAsync().map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
+        folderController.getMenuDrawerCustomFoldersAsync()
+            .map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
     }.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
@@ -168,6 +170,17 @@ class MainViewModel @Inject constructor(
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
+
+    val isNetworkAvailable = NetworkAvailability(appContext).isNetworkAvailable
+        .mapLatest {
+            SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
+            it
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = null,
+        )
 
     private var currentThreadsLiveJob: Job? = null
 

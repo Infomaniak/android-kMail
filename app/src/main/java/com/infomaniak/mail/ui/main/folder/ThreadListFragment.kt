@@ -34,6 +34,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -81,6 +82,7 @@ import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
@@ -495,8 +497,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
         }
 
-        val shouldKeepItemBecauseOfNoConnection = isInternetAvailable.value == false
-
+        val shouldKeepItemBecauseOfNoConnection = isNetworkAvailable.value == false
         return shouldKeepItemBecauseOfAction || shouldKeepItemBecauseOfNoConnection
     }
 
@@ -529,10 +530,14 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     }
 
     private fun observeNetworkStatus() {
-        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
-            TransitionManager.beginDelayedTransition(binding.root)
-            binding.noNetwork.isGone = isAvailable
-            if (!isAvailable) updateThreadsVisibility()
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.isNetworkAvailable.collect { isNetworkAvailable ->
+                if (isNetworkAvailable != null) {
+                    TransitionManager.beginDelayedTransition(binding.root)
+                    binding.noNetwork.isGone = isNetworkAvailable
+                    if (!isNetworkAvailable) updateThreadsVisibility()
+                }
+            }
         }
     }
 
@@ -731,7 +736,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         val areThereThreads = (currentThreadsCount ?: 0) > 0
         val isFilterEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
         val isCursorNull = currentFolderCursor == null
-        val isNetworkConnected = mainViewModel.isInternetAvailable.value == true
+        val isNetworkConnected = mainViewModel.isNetworkAvailable.value == true
         val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
         val isWaitingFirstThreads = isCursorNull && isNetworkConnected
         val shouldDisplayThreadsView = isBooting || isWaitingFirstThreads || areThereThreads || isFilterEnabled
