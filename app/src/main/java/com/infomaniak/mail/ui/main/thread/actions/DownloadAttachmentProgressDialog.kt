@@ -81,7 +81,7 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     private fun popBackStackWithError() {
         viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.isNetworkAvailable.first { it != null }?.let { isNetworkAvailable ->
-                showSnackbar(if (isNetworkAvailable) R.string.anErrorHasOccurred else R.string.noConnection)
+                showSnackbar(title = if (isNetworkAvailable) R.string.anErrorHasOccurred else R.string.noConnection)
                 findNavController().popBackStack()
             }
         }
