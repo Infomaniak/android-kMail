@@ -179,7 +179,7 @@ class MainViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = null
+            initialValue = null,
         )
 
     private var currentThreadsLiveJob: Job? = null
