@@ -81,7 +81,7 @@ class RefreshController @Inject constructor(
         refreshThreadsJob?.cancel(ForcedCancellationException())
     }
 
-    fun clearCallbacks() {
+    private fun clearCallbacks() {
         onStart = null
         onStop = null
     }
