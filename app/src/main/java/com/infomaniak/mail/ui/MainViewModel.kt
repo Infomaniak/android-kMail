@@ -184,6 +184,8 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.Eagerly,
             initialValue = null,
         )
+    
+    inline val hasNetwork get() = isNetworkAvailable.value != false
 
     private var currentThreadsLiveJob: Job? = null
 
