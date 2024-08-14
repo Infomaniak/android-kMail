@@ -497,7 +497,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
         }
 
-        val shouldKeepItemBecauseOfNoConnection = isNetworkAvailable.value == false
+        val shouldKeepItemBecauseOfNoConnection = !hasNetwork
         return shouldKeepItemBecauseOfAction || shouldKeepItemBecauseOfNoConnection
     }
 
@@ -532,6 +532,8 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
     private fun observeNetworkStatus() {
         viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.isNetworkAvailable.collect { isNetworkAvailable ->
+                if (_binding == null) return@collect
+
                 if (isNetworkAvailable != null) {
                     TransitionManager.beginDelayedTransition(binding.root)
                     binding.noNetwork.isGone = isNetworkAvailable
@@ -736,7 +738,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         val areThereThreads = (currentThreadsCount ?: 0) > 0
         val isFilterEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
         val isCursorNull = currentFolderCursor == null
-        val isNetworkConnected = mainViewModel.isNetworkAvailable.value == true
+        val isNetworkConnected = mainViewModel.hasNetwork
         val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
         val isWaitingFirstThreads = isCursorNull && isNetworkConnected
         val shouldDisplayThreadsView = isBooting || isWaitingFirstThreads || areThereThreads || isFilterEnabled
