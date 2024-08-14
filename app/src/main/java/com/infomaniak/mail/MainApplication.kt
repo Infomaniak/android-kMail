@@ -56,6 +56,8 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
+import io.realm.kotlin.log.LogLevel
+import io.realm.kotlin.log.RealmLog
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -133,6 +135,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         configureInfomaniakCore()
         notificationUtils.initNotificationChannel()
         configureHttpClient()
+        configureRealmLog()
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -192,6 +195,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                     enableAutoFragmentLifecycleTracing = true,
                 )
             )
+            options.isReportHistoricalAnrs = true
+            options.isAttachAnrThreadDump = true
         }
     }
 
@@ -234,6 +239,14 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             ),
         )
         HttpClient.init(tokenInterceptorListener)
+    }
+
+    private fun configureRealmLog() {
+        RealmLog.level = LogLevel.DEBUG
+        // Removing Realm system logs to avoid spamming the logcat
+        RealmLog.removeAll()
+        // Adding our own Realm logger to log to Sentry
+        RealmLog.add(SentryRealmLogger())
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
