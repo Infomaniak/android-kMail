@@ -207,9 +207,8 @@ class MainViewModel @Inject constructor(
     }.asFlow()
 
     override fun onCleared() {
-        refreshController.clearCallbacks()
-        super.onCleared()
         RealmDatabase.closeOldRealms()
+        super.onCleared()
     }
 
     /**
