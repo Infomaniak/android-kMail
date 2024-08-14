@@ -210,8 +210,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.attachmentToForward(mailboxUuid), POST, body)
     }
 
-    fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
-        return callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to messageUids))
+    fun deleteMessages(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
+        return callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
     fun moveMessages(
@@ -234,12 +234,12 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
-    fun addToFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
-        return callApi(ApiRoutes.starMessages(mailboxUuid), POST, mapOf("uids" to messageUids))
+    fun addToFavorites(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
+        return callApi(ApiRoutes.starMessages(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
-    fun removeFromFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<Unit> {
-        return callApi(ApiRoutes.unstarMessages(mailboxUuid), POST, mapOf("uids" to messageUids))
+    fun removeFromFavorites(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
+        return callApi(ApiRoutes.unstarMessages(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
     fun getMessagesUids(

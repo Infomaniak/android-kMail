@@ -41,9 +41,8 @@ object Utils {
     /** The MIME type for data whose type is otherwise unknown. */
     const val MIMETYPE_UNKNOWN = "application/octet-stream"
 
-    const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500 // Number of Messages we want to fetch when 1st opening a Folder
-    /** Beware: the API refuses a PAGE_SIZE bigger than 200. */
-    const val PAGE_SIZE = 50
+    const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500 // Number of Messages we want to fetch when 1st opening a Folder.
+    const val PAGE_SIZE = 50 // Beware: the API refuses a PAGE_SIZE bigger than 200.
     const val DELAY_BEFORE_FETCHING_ACTIVITIES_AGAIN = 500L
 
     const val TAG_SEPARATOR = " "

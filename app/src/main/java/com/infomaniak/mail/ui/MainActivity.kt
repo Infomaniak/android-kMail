@@ -95,7 +95,7 @@ class MainActivity : BaseActivity() {
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
-    private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let { MainActivityArgs.fromBundle(it) } }
+    private val navigationArgs: MainActivityArgs? by lazy { intent?.extras?.let(MainActivityArgs::fromBundle) }
 
     private var previousDestinationId: Int? = null
 

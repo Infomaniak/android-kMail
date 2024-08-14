@@ -88,7 +88,7 @@ class ThreadAdapter(
     private var hasNotScrolledYet = true
     //endregion
 
-    private val manuallyAllowedMessageUids = mutableSetOf<String>()
+    private val manuallyAllowedMessagesUids = mutableSetOf<String>()
 
     private lateinit var recyclerView: RecyclerView
     private val webViewUtils by lazy { WebViewUtils(recyclerView.context) }
@@ -444,7 +444,7 @@ class ThreadAdapter(
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
 
-            manuallyAllowedMessageUids.add(messageUid)
+            manuallyAllowedMessagesUids.add(messageUid)
 
             reloadVisibleWebView()
 
@@ -639,7 +639,7 @@ class ThreadAdapter(
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
     }
 
-    fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessageUids.contains(messageUid)
+    fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessagesUids.contains(messageUid)
 
     fun toggleLightMode(message: Message) {
         val index = items.indexOf(message)
