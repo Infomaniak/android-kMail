@@ -36,6 +36,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.Group
+import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -47,6 +48,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.lib.richhtmleditor.StatusCommand.*
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -183,7 +185,11 @@ class NewMessageFragment : Fragment() {
         observeUiQuote()
         observeShimmering()
 
-        editorManager.observeEditorActions()
+        with(editorManager) {
+            observeEditorFormatActions()
+            observeEditorStatus()
+        }
+
         externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
 
         with(aiManager) {
@@ -342,23 +348,40 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initEditorUi() {
-        binding.editorWebView.apply {
-            enableAlgorithmicDarkening(isEnabled = true)
-            if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
+        binding.editorWebView.subscribeToStates(setOf(BOLD, ITALIC, UNDERLINE, STRIKE_THROUGH, UNORDERED_LIST, CREATE_LINK))
+        setEditorStyle()
+        handleEditorPlaceholderVisibility()
 
-            val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaterial.attr.colorPrimary))
-            addCss(context.loadCss(R.raw.style, customColors))
-            addCss(context.loadCss(R.raw.editor_style, customColors))
+        setToolbarEnabledStatus(false)
+        disableButtonsWhenFocusIsLost()
+    }
 
-            val isPlaceholderVisible = combine(
-                isEmptyFlow.filterNotNull(),
-                newMessageViewModel.isShimmering,
-            ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
+    private fun setEditorStyle() = with(binding.editorWebView) {
+        enableAlgorithmicDarkening(isEnabled = true)
+        if (context.isNightModeEnabled()) addCss(context.loadCss(R.raw.custom_dark_mode))
 
-            isPlaceholderVisible
-                .onEach { isVisible -> binding.newMessagePlaceholder.isVisible = isVisible }
-                .launchIn(lifecycleScope)
-        }
+        val customColors = listOf(PRIMARY_COLOR_CODE to context.getAttributeColor(RMaterial.attr.colorPrimary))
+        addCss(context.loadCss(R.raw.style, customColors))
+        addCss(context.loadCss(R.raw.editor_style, customColors))
+    }
+
+    private fun handleEditorPlaceholderVisibility() {
+        val isPlaceholderVisible = combine(
+            binding.editorWebView.isEmptyFlow.filterNotNull(),
+            newMessageViewModel.isShimmering,
+        ) { isEditorEmpty, isShimmering -> isEditorEmpty && !isShimmering }
+
+        isPlaceholderVisible
+            .onEach { isVisible -> binding.newMessagePlaceholder.isVisible = isVisible }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun disableButtonsWhenFocusIsLost() {
+        newMessageViewModel.isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner, ::setToolbarEnabledStatus)
+    }
+
+    private fun setToolbarEnabledStatus(isEnabled: Boolean) {
+        binding.formatOptionsLayout.forEach { view -> view.isEnabled = isEnabled }
     }
 
     private fun initializeDraft() = with(newMessageViewModel) {
@@ -505,7 +528,7 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.initResult.observe(viewLifecycleOwner) { (draft, signatures) ->
             configureUiWithDraftData(draft)
             setupFromField(signatures)
-            editorManager.setupEditorActions()
+            editorManager.setupEditorFormatActions()
             editorManager.setupEditorFormatActionsToggle()
         }
     }

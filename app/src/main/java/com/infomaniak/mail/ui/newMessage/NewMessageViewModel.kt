@@ -140,8 +140,10 @@ class NewMessageViewModel @Inject constructor(
 
     private var snapshot: DraftSnapshot? = null
 
-    var otherRecipientsFieldsAreEmpty = MutableLiveData(true)
-    var initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
+    val otherRecipientsFieldsAreEmpty = MutableLiveData(true)
+    val isEditorWebViewFocusedLiveData = MutableLiveData<Boolean>()
+
+    val initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
     val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
     val isSendingAllowed = SingleLiveEvent(false)

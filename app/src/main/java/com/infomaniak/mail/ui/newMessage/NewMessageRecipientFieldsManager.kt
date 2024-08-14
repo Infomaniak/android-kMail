@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -121,10 +120,11 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         initializeFieldsAsOpen.observe(viewLifecycleOwner) { openAdvancedFields(isCollapsed = !it) }
     }
 
-    fun setOnFocusChangedListeners() = with(binding) {
-        val listener = View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(null) }
-        subjectTextField.onFocusChangeListener = listener
-        editorWebView.onFocusChangeListener = listener
+    fun setOnFocusChangedListeners() = with(newMessageViewModel) {
+        binding.subjectTextField.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) fieldGotFocus(field = null) }
+        binding.editorWebView.setOnFocusChangeListener { _, hasFocus -> isEditorWebViewFocusedLiveData.value = hasFocus }
+
+        isEditorWebViewFocusedLiveData.observe(viewLifecycleOwner) { hasFocus -> if (hasFocus) fieldGotFocus(field = null) }
     }
 
     fun focusBodyField() {

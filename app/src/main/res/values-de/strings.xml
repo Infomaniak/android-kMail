@@ -46,6 +46,7 @@
     <string name="actionUnstar">Aus Favoriten löschen</string>
     <string name="actionViewInDark">Ansicht im dunklen Thema</string>
     <string name="actionViewInLight">Ansicht im hellen Thema</string>
+    <string name="addLinkTextPlaceholder">Anzuzeigender Text</string>
     <string name="addUnknownRecipientAlreadyUsed">Die E-Mail wird bereits verwendet</string>
     <string name="addUnknownRecipientInvalidEmail">Die E-Mail ist ungültig</string>
     <string name="addUnknownRecipientTitle">Einen Empfänger hinzufügen</string>
@@ -163,6 +164,7 @@
     <string name="buttonTextOptionsOpen">Offene Textformatierung</string>
     <string name="buttonTry">Probieren</string>
     <string name="buttonUnderline">Unterstreichen Sie</string>
+    <string name="buttonUnorderedList">Unsortierte Liste</string>
     <string name="buttonUnselectAll">Keine</string>
     <string name="buttonValid">Validieren Sie</string>
     <string name="buttonYes">Ja</string>

@@ -46,6 +46,7 @@
     <string name="actionUnstar">Retirer des favoris</string>
     <string name="actionViewInDark">Voir en thème sombre</string>
     <string name="actionViewInLight">Voir en thème clair</string>
+    <string name="addLinkTextPlaceholder">Texte à afficher</string>
     <string name="addUnknownRecipientAlreadyUsed">L’adresse mail est déjà utilisée</string>
     <string name="addUnknownRecipientInvalidEmail">L’adresse mail n’est pas valide</string>
     <string name="addUnknownRecipientTitle">Ajouter un destinataire</string>
@@ -165,6 +166,7 @@
     <string name="buttonTextOptionsOpen">Ouvrir le formatage de texte</string>
     <string name="buttonTry">Essayer</string>
     <string name="buttonUnderline">Souligner</string>
+    <string name="buttonUnorderedList">Liste non ordonnée</string>
     <string name="buttonUnselectAll">Aucun</string>
     <string name="buttonValid">Valider</string>
     <string name="buttonYes">Oui</string>

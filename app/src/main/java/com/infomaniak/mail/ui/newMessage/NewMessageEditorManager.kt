@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.content.res.ColorStateList
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -28,11 +29,12 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.notYetImplemented
 import dagger.hilt.android.scopes.FragmentScoped
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
 @FragmentScoped
-class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
+class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: InsertLinkDialog) : NewMessageManager() {
 
     private var _aiManager: NewMessageAiManager? = null
     private inline val aiManager: NewMessageAiManager get() = _aiManager!!
@@ -57,19 +59,30 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
         _openFilePicker = openFilePicker
     }
 
-    fun observeEditorActions() {
+    fun observeEditorFormatActions() = with(binding) {
         newMessageViewModel.editorAction.observe(viewLifecycleOwner) { (editorAction, _) ->
             when (editorAction) {
                 EditorAction.ATTACHMENT -> _openFilePicker?.invoke()
                 EditorAction.CAMERA -> fragment.notYetImplemented()
-                EditorAction.LINK -> fragment.notYetImplemented()
+                EditorAction.LINK -> if (buttonLink.isActivated) {
+                    editorWebView.unlink()
+                } else {
+                    insertLinkDialog.show { displayText, url ->
+                        editorWebView.createLink(displayText, url)
+                    }
+                }
                 EditorAction.CLOCK -> fragment.notYetImplemented()
                 EditorAction.AI -> aiManager.openAiPrompt()
+                EditorAction.BOLD -> editorWebView.toggleBold()
+                EditorAction.ITALIC -> editorWebView.toggleItalic()
+                EditorAction.UNDERLINE -> editorWebView.toggleUnderline()
+                EditorAction.STRIKE_THROUGH -> editorWebView.toggleStrikeThrough()
+                EditorAction.UNORDERED_LIST -> editorWebView.toggleUnorderedList()
             }
         }
     }
 
-    fun setupEditorActions() = with(binding) {
+    fun setupEditorFormatActions() = with(binding) {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
                 context.trackEvent("editorActions", action.matomoValue)
@@ -79,34 +92,55 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
-        linkEditor(editorLink, EditorAction.LINK)
         linkEditor(editorClock, EditorAction.CLOCK)
         linkEditor(editorAi, EditorAction.AI)
+
+        linkEditor(buttonBold, EditorAction.BOLD)
+        linkEditor(buttonItalic, EditorAction.ITALIC)
+        linkEditor(buttonUnderline, EditorAction.UNDERLINE)
+        linkEditor(buttonStrikeThrough, EditorAction.STRIKE_THROUGH)
+        linkEditor(buttonList, EditorAction.UNORDERED_LIST)
+        linkEditor(buttonLink, EditorAction.LINK)
     }
 
     fun setupEditorFormatActionsToggle() = with(binding) {
         editorTextOptions.setOnClickListener {
             newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
-            updateEditorVisibility(newMessageViewModel.isEditorExpanded)
+            updateEditorFormatActionsVisibility(newMessageViewModel.isEditorExpanded)
         }
     }
 
-    private fun updateEditorVisibility(isEditorExpanded: Boolean) = with(binding) {
+    private fun updateEditorFormatActionsVisibility(isExpanded: Boolean) = with(binding) {
+        if (isExpanded) editorWebView.requestFocus()
 
-        val color = if (isEditorExpanded) {
+        val color = if (isExpanded) {
             context.getAttributeColor(RMaterial.attr.colorPrimary)
         } else {
             context.getColor(R.color.iconColor)
         }
-        val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
+        val resId = if (isExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
 
         editorTextOptions.apply {
             iconTint = ColorStateList.valueOf(color)
             contentDescription = context.getString(resId)
         }
 
-        editorActions.isGone = isEditorExpanded
-        textEditing.isVisible = isEditorExpanded
+        editorActions.isGone = isExpanded
+        sendButton.isGone = isExpanded
+        formatOptionsScrollView.isVisible = isExpanded
+    }
+
+    fun observeEditorStatus(): Unit = with(binding) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            editorWebView.editorStatusesFlow.collect {
+                buttonBold.isActivated = it.isBold
+                buttonItalic.isActivated = it.isItalic
+                buttonUnderline.isActivated = it.isUnderlined
+                buttonStrikeThrough.isActivated = it.isStrikeThrough
+                buttonList.isActivated = it.isUnorderedListSelected
+                buttonLink.isActivated = it.isLinkSelected
+            }
+        }
     }
 
     enum class EditorAction(val matomoValue: String) {
@@ -115,10 +149,10 @@ class NewMessageEditorManager @Inject constructor() : NewMessageManager() {
         LINK("addLink"),
         CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
         AI("aiWriter"),
-        // BOLD("bold"),
-        // ITALIC("italic"),
-        // UNDERLINE("underline"),
-        // STRIKE_THROUGH("strikeThrough"),
-        // UNORDERED_LIST("unorderedList"),
+        BOLD("bold"),
+        ITALIC("italic"),
+        UNDERLINE("underline"),
+        STRIKE_THROUGH("strikeThrough"),
+        UNORDERED_LIST("unorderedList"),
     }
 }
