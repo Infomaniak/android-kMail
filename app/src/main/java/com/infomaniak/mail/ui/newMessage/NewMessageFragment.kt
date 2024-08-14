@@ -303,7 +303,10 @@ class NewMessageFragment : Fragment() {
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
-        signatureWebView.enableAlgorithmicDarkening(true)
+        signatureWebView.apply {
+            isFocusable = false
+            enableAlgorithmicDarkening(true)
+        }
         quoteWebView.enableAlgorithmicDarkening(true)
 
         attachmentsRecyclerView.adapter = AttachmentAdapter(
