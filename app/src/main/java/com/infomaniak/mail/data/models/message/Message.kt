@@ -60,12 +60,12 @@ class Message : RealmObject {
     // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
     var date: RealmInstant = Date().toRealmInstant()
     var subject: String? = null
-    var from: RealmList<Recipient> = realmListOf()
-    var to: RealmList<Recipient> = realmListOf()
-    var cc: RealmList<Recipient> = realmListOf()
-    var bcc: RealmList<Recipient> = realmListOf()
+    var from = realmListOf<Recipient>()
+    var to = realmListOf<Recipient>()
+    var cc = realmListOf<Recipient>()
+    var bcc = realmListOf<Recipient>()
     @SerialName("reply_to")
-    var replyTo: RealmList<Recipient> = realmListOf()
+    var replyTo = realmListOf<Recipient>()
     @SerialName("in_reply_to")
     @Serializable(with = UnwrappingJsonListSerializer::class)
     var inReplyTo: String? = null
@@ -84,7 +84,7 @@ class Message : RealmObject {
     var body: Body? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
-    var attachments: RealmList<Attachment> = realmListOf()
+    var attachments = realmListOf<Attachment>()
     @SerialName("seen")
     var isSeen: Boolean = false
     @SerialName("forwarded")
@@ -122,7 +122,7 @@ class Message : RealmObject {
     @Transient
     var isTrashed: Boolean = false
     @Transient
-    var messageIds: RealmSet<String> = realmSetOf()
+    var messageIds = realmSetOf<String>()
     @Transient
     var draftLocalUuid: String? = null
     @Transient
@@ -134,7 +134,7 @@ class Message : RealmObject {
     @Transient
     var latestCalendarEventResponse: CalendarEventResponse? = null
     @Transient
-    var swissTransferFiles: RealmList<SwissTransferFile> = realmListOf()
+    var swissTransferFiles = realmListOf<SwissTransferFile>()
     @Transient
     var hasAttachable: Boolean = false
     //endregion

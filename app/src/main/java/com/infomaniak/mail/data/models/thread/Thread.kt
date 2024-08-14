@@ -44,7 +44,6 @@ import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -61,13 +60,13 @@ class Thread : RealmObject {
     //region Remote data
     @PrimaryKey
     var uid: String = ""
-    var messages: RealmList<Message> = realmListOf()
+    var messages = realmListOf<Message>()
     // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
     var date: RealmInstant = Date().toRealmInstant()
     @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
-    var from: RealmList<Recipient> = realmListOf()
-    var to: RealmList<Recipient> = realmListOf()
+    var from = realmListOf<Recipient>()
+    var to = realmListOf<Recipient>()
     var subject: String? = null
     @SerialName("has_drafts")
     var hasDrafts: Boolean = false
@@ -85,9 +84,9 @@ class Thread : RealmObject {
     @Transient
     var folderName: String = ""
     @Transient
-    var duplicates: RealmList<Message> = realmListOf()
+    var duplicates = realmListOf<Message>()
     @Transient
-    var messagesIds: RealmSet<String> = realmSetOf()
+    var messagesIds = realmSetOf<String>()
     @Transient
     var isFromSearch: Boolean = false
     @Transient

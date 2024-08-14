@@ -26,7 +26,6 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -41,8 +40,8 @@ class SubBody : EmbeddedRealmObject {
     // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
     var date: RealmInstant = Date().toRealmInstant()
     var subject: String? = null
-    var from: RealmList<Recipient> = realmListOf()
-    var to: RealmList<Recipient> = realmListOf()
+    var from = realmListOf<Recipient>()
+    var to = realmListOf<Recipient>()
     @SerialName("part_id")
     var partId: String? = null
     @SerialName("body_value")

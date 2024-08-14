@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.mail.data.api.FlatteningSubBodiesSerializer
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.EmbeddedRealmObject
-import io.realm.kotlin.types.RealmList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -33,6 +32,6 @@ class Body : EmbeddedRealmObject {
 
     @Serializable(FlatteningSubBodiesSerializer::class)
     @SerialName("subBody")
-    var subBodies: RealmList<SubBody> = realmListOf()
+    var subBodies = realmListOf<SubBody>()
     //endregion
 }

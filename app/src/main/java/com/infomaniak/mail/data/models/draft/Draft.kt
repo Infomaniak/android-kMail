@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -42,13 +41,13 @@ class Draft : RealmObject {
     @SerialName("uuid")
     var remoteUuid: String? = null
 
-    var to: RealmList<Recipient> = realmListOf()
-    var cc: RealmList<Recipient> = realmListOf()
-    var bcc: RealmList<Recipient> = realmListOf()
+    var to = realmListOf<Recipient>()
+    var cc = realmListOf<Recipient>()
+    var bcc = realmListOf<Recipient>()
 
     var subject: String? = null
     var body: String = ""
-    var attachments: RealmList<Attachment> = realmListOf()
+    var attachments = realmListOf<Attachment>()
 
     @SerialName("mime_type")
     var mimeType: String = ""

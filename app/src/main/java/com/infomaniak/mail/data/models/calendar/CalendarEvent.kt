@@ -46,7 +46,7 @@ class CalendarEvent() : EmbeddedRealmObject {
     var isFullDay: Boolean = false
     var start: RealmInstant = Date(0).toRealmInstant()
     var end: RealmInstant = Date(0).toRealmInstant()
-    var attendees: RealmList<Attendee> = realmListOf()
+    var attendees = realmListOf<Attendee>()
     @SerialName("status")
     private var _status: String? = null
     //endregion

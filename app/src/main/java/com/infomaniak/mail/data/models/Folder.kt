@@ -58,7 +58,7 @@ class Folder : RealmObject, Cloneable {
     @SerialName("unread_count")
     var unreadCountRemote: Int = 0
     var separator: String = ""
-    var children: RealmList<Folder> = realmListOf()
+    var children = realmListOf<Folder>()
     //endregion
 
     //region Local data (Transient)
@@ -69,9 +69,9 @@ class Folder : RealmObject, Cloneable {
     @Transient
     var unreadCountLocal: Int = 0
     @Transient
-    var threads: RealmList<Thread> = realmListOf()
+    var threads = realmListOf<Thread>()
     @Transient
-    var messages: RealmList<Message> = realmListOf()
+    var messages = realmListOf<Message>()
     @Transient
     var remainingOldMessagesToFetch: Int = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
     @Transient
