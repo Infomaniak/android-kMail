@@ -474,7 +474,7 @@ class MainViewModel @Inject constructor(
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         val mailbox = currentMailbox.value!!
-        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
+        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         var trashId: String? = null
         var undoResource: String? = null
         val shouldPermanentlyDelete = isPermanentDeleteFolder(getActionFolderRole(threads, message))
@@ -581,7 +581,7 @@ class MainViewModel @Inject constructor(
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
         val destinationFolder = folderController.getFolder(destinationFolderId)!!
-        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
+        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
@@ -643,7 +643,7 @@ class MainViewModel @Inject constructor(
         message: Message? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
-        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
+        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
         val role = getActionFolderRole(threads, message)
         val isFromArchive = role == FolderRole.ARCHIVE
@@ -690,7 +690,7 @@ class MainViewModel @Inject constructor(
         shouldRead: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
-        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
+        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
         val isSeen = when {
             message != null -> message.isSeen
@@ -752,7 +752,7 @@ class MainViewModel @Inject constructor(
         shouldFavorite: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
-        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
+        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
         val isFavorite = when {
             message != null -> message.isFavorite
@@ -812,7 +812,7 @@ class MainViewModel @Inject constructor(
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
-        val threads = getActionThreads(threadsUids).ifEmpty { return@launch }
+        val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
         val destinationFolderRole = if (getActionFolderRole(threads, message) == FolderRole.SPAM) {
             FolderRole.INBOX
@@ -944,8 +944,6 @@ class MainViewModel @Inject constructor(
     private fun onDownloadStop() {
         isDownloadingChanges.postValue(false)
     }
-
-    private fun getActionThreads(threadsUids: List<String>): List<Thread> = threadsUids.mapNotNull(threadController::getThread)
 
     fun getActionFolderRole(thread: Thread?): FolderRole? {
         return getActionFolderRole(thread?.let(::listOf))

@@ -69,6 +69,10 @@ class ThreadController @Inject constructor(
         return getSearchThreadsQuery(mailboxContentRealm()).count().find()
     }
 
+    fun getThreads(threadsUids: List<String>): RealmResults<Thread> {
+        return getThreadsByUids(threadsUids, mailboxContentRealm())
+    }
+
     fun getThread(uid: String): Thread? {
         return getThread(uid, mailboxContentRealm())
     }
@@ -181,6 +185,10 @@ class ThreadController @Inject constructor(
     companion object {
 
         //region Queries
+        private fun getThreadsByUidsQuery(threadsUids: List<String>, realm: TypedRealm): RealmQuery<Thread> {
+            return realm.query("${Thread::uid.name} IN $0", threadsUids)
+        }
+
         private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
             return realm.query("ANY ${Thread::messagesIds.name} IN $0", messageIds)
         }
@@ -236,6 +244,10 @@ class ThreadController @Inject constructor(
         //region Get data
         fun getThread(uid: String, realm: TypedRealm): Thread? {
             return getThreadQuery(uid, realm).find()
+        }
+
+        private fun getThreadsByUids(threadsUids: List<String>, realm: TypedRealm): RealmResults<Thread> {
+            return getThreadsByUidsQuery(threadsUids, realm).find()
         }
 
         fun getThreads(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
