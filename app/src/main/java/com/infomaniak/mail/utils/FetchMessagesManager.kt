@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.html.cleaner.HtmlSanitizer
+import com.infomaniak.lib.core.api.ApiController.NetworkException
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -95,7 +96,7 @@ class FetchMessagesManager @Inject constructor(
         ).let { (threads, throwable) ->
 
             if (threads == null) {
-                if (throwable !is CancellationException) {
+                if (throwable !is CancellationException && throwable !is NetworkException) {
                     SentryDebug.sendFailedNotification(
                         reason = "RefreshThreads failed",
                         sentryLevel = SentryLevel.ERROR,
