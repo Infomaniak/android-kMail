@@ -439,11 +439,10 @@ object ApiRepository : ApiRepositoryCore() {
 
     /**
      * Create batches of the given values to perform the given request
-     * - Parameters:
-     *   - values: Data to batch
-     *   - limit: Chunk size
-     *   - perform: Request to perform
-     * - Returns: Array of the perform return type
+     * @param values Data to batch
+     * @param limit Chunk size
+     * @param perform Request to perform
+     * @return Array of the perform return type
      */
     private fun <T, R> batchOver(
         values: List<T>,
