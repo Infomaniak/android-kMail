@@ -63,6 +63,10 @@
         tools:targetApi="UPSIDE_DOWN_CAKE">
 
         <meta-data
+            android:name="io.sentry.anr.enable"
+            android:value="true" />
+
+        <meta-data
             android:name="io.sentry.auto-init"
             android:value="false" />
 
