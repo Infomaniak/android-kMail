@@ -165,26 +165,24 @@ object UiUtils {
     fun dividerDrawable(context: Context) = AppCompatResources.getDrawable(context, R.drawable.divider)
 
     fun saveFocusWhenNavigatingBack(getLayout: () -> ViewGroup, lifecycle: Lifecycle) {
+
         val lifecycleObserver = object : DefaultLifecycleObserver {
+
             @IdRes
             private var lastFocusViewId: Int? = null
 
             override fun onStart(owner: LifecycleOwner) {
                 super.onStart(owner)
-                lastFocusViewId?.let { viewId ->
-                    getLayout().findViewById<View>(viewId).requestFocus()
-                }
+                lastFocusViewId?.let { viewId -> getLayout().findViewById<View>(viewId).requestFocus() }
             }
 
             override fun onStop(owner: LifecycleOwner) {
-                getLayout().focusedChild?.let {
-                    lastFocusViewId = it.id
-                }
+                getLayout().focusedChild?.let { lastFocusViewId = it.id }
                 super.onStop(owner)
             }
 
             override fun onDestroy(owner: LifecycleOwner) {
-                lifecycle.removeObserver(this)
+                lifecycle.removeObserver(observer = this)
                 super.onDestroy(owner)
             }
         }
