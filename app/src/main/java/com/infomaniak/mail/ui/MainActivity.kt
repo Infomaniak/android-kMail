@@ -198,7 +198,7 @@ class MainActivity : BaseActivity() {
 
         setupSnackbar()
         setupNavController()
-        setupMenuDrawerCallbacks()
+        setupMenuDrawer()
 
         mainViewModel.updateUserInfo()
 
@@ -210,6 +210,11 @@ class MainActivity : BaseActivity() {
 
         initAppUpdateManager()
         initAppReviewManager()
+    }
+
+    private fun setupMenuDrawer() {
+        binding.drawerLayout.isFocusable = false // Set here because not working in XML
+        setupMenuDrawerCallbacks()
     }
 
     private fun initAppReviewManager() {

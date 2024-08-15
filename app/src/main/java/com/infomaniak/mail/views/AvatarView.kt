@@ -143,6 +143,10 @@ class AvatarView @JvmOverloads constructor(
         binding.root.setOnLongClickListener(onLongClickListener)
     }
 
+    override fun setFocusable(focusable: Boolean) {
+        binding.root.isFocusable = focusable
+    }
+
     fun loadAvatar(user: User) = with(binding.avatarImage) {
         contentDescription = user.email
         loadAvatar(

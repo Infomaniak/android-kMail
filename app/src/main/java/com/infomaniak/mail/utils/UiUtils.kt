@@ -22,14 +22,20 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
+import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
+import androidx.annotation.IdRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
@@ -157,4 +163,30 @@ object UiUtils {
     }
 
     fun dividerDrawable(context: Context) = AppCompatResources.getDrawable(context, R.drawable.divider)
+
+    fun saveFocusWhenNavigatingBack(getLayout: () -> ViewGroup, lifecycle: Lifecycle) {
+
+        val lifecycleObserver = object : DefaultLifecycleObserver {
+
+            @IdRes
+            private var lastFocusViewId: Int? = null
+
+            override fun onStart(owner: LifecycleOwner) {
+                super.onStart(owner)
+                lastFocusViewId?.let { viewId -> getLayout().findViewById<View>(viewId).requestFocus() }
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                getLayout().focusedChild?.let { lastFocusViewId = it.id }
+                super.onStop(owner)
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                lifecycle.removeObserver(observer = this)
+                super.onDestroy(owner)
+            }
+        }
+
+        lifecycle.addObserver(lifecycleObserver)
+    }
 }

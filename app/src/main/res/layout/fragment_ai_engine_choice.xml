@@ -26,6 +26,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:touchscreenBlocksFocus="false"
         app:navigationIconTint="@color/iconColor" />
 
     <TextView

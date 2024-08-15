@@ -415,7 +415,13 @@ class ThreadListAdapter @Inject constructor(
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
         val (recipient, bimi) = thread.computeAvatarRecipient()
-        expeditorAvatar.loadAvatar(recipient, bimi)
+        expeditorAvatar.apply {
+            loadAvatar(recipient, bimi)
+
+            // Set `isFocusable` here instead of in XML file because setting it in the
+            // XML doesn't trigger the overridden `setFocusable(boolean)` in AvatarView.
+            isFocusable = false
+        }
     }
 
     private fun CardviewThreadItemBinding.formatRecipientNames(recipients: List<Recipient>): String {

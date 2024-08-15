@@ -20,12 +20,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="false"
     tools:context=".ui.main.thread.ThreadFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/threadView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusable="false"
         android:visibility="gone"
         tools:visibility="visible">
 
@@ -33,6 +35,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:touchscreenBlocksFocus="false"
             app:contentInsetEnd="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

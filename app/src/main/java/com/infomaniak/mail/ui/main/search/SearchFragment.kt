@@ -206,12 +206,20 @@ class SearchFragment : TwoPaneFragment() {
                 .apply { add(0, SearchFolderElement.ALL_FOLDERS) }
                 .toList()
 
-            searchAdapter = SearchFolderAdapter(folders) { folder, title ->
-                onFolderSelected(folder, title)
-                popupMenu.dismiss()
-            }
+            searchAdapter = SearchFolderAdapter(folders)
 
             popupMenu.setAdapter(searchAdapter)
+
+            popupMenu.setOnItemClickListener { _, _, position, _ ->
+                if (searchAdapter.getItemViewType(position) != SearchFolderElement.DIVIDER.itemId) {
+
+                    val folder = folders[position] as? Folder
+                    val entryName = requireContext().getLocalizedNameOrAllFolders(folder)
+
+                    onFolderSelected(folder, entryName)
+                    popupMenu.dismiss()
+                }
+            }
 
             updateFolderDropDownUi(
                 folder = searchViewModel.filterFolder,

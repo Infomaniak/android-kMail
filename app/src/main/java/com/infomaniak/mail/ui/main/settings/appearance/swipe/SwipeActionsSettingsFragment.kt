@@ -30,6 +30,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
+import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +43,11 @@ class SwipeActionsSettingsFragment : Fragment() {
 
     @Inject
     lateinit var localSettings: LocalSettings
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        saveFocusWhenNavigatingBack(getLayout = { binding.linearLayoutContainer }, lifecycle)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSwipeActionsSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
