@@ -48,12 +48,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
-import com.infomaniak.lib.richhtmleditor.StatusCommand.CREATE_LINK
-import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
-import com.infomaniak.lib.richhtmleditor.StatusCommand.STRIKE_THROUGH
-import com.infomaniak.lib.richhtmleditor.StatusCommand.UNDERLINE
-import com.infomaniak.lib.richhtmleditor.StatusCommand.UNORDERED_LIST
+import com.infomaniak.lib.richhtmleditor.StatusCommand.*
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -83,17 +78,8 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions
+import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
-import com.infomaniak.mail.utils.extensions.getAttributeColor
-import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
-import com.infomaniak.mail.utils.extensions.loadCss
-import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
-import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -317,10 +303,7 @@ class NewMessageFragment : Fragment() {
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
 
-        signatureWebView.apply {
-            isFocusable = false
-            enableAlgorithmicDarkening(true)
-        }
+        signatureWebView.enableAlgorithmicDarkening(true)
         quoteWebView.enableAlgorithmicDarkening(true)
 
         attachmentsRecyclerView.adapter = AttachmentAdapter(
