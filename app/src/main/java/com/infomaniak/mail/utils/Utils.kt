@@ -45,6 +45,7 @@ object Utils {
     const val NUMBER_OF_OLD_MESSAGES_TO_FETCH = 500 // Number of Messages we want to fetch when 1st opening a Folder
     const val PAGE_SIZE = 50 // Beware: the API refuses a PAGE_SIZE bigger than 200
     const val MAX_OLD_PAGES_TO_FETCH_TO_GET_ENOUGH_NEW_THREADS = 5 // We don't want to spam the API, so we just get a few pages
+
     const val MAX_UIDS_PER_CALL = 1_000 // Beware: the API refuses a MAX_UIDS_PER_CALL bigger than 1000
 
     const val TAG_SEPARATOR = " "
