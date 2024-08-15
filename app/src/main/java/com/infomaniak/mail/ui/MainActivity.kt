@@ -213,7 +213,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupMenuDrawer() {
-        binding.drawerLayout.isFocusable = false
+        binding.drawerLayout.isFocusable = false // Set here because not working in XML
         setupMenuDrawerCallbacks()
     }
 
