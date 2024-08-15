@@ -30,17 +30,16 @@ class SentryRealmLogger : RealmLogger {
     override val tag: String = "Realm"
 
     override fun log(level: LogLevel, throwable: Throwable?, message: String?, vararg args: Any?) {
-        val throwableMsg = throwable?.message
-        val breadCrumb = when {
-            throwableMsg != null -> Breadcrumb.error(throwableMsg).apply {
-                category = "exception"
-            }
-            else -> Breadcrumb().apply {
+        val throwableMessage = throwable?.message
+        val breadcrumb = if (throwableMessage == null) {
+            Breadcrumb().apply {
                 this.level = SentryLevel.INFO
-                category = tag
+                this.category = tag
                 this.message = "($tag): $message"
             }
+        } else {
+            Breadcrumb.error(throwableMessage).apply { category = "exception" }
         }
-        Sentry.addBreadcrumb(breadCrumb)
+        Sentry.addBreadcrumb(breadcrumb)
     }
 }
