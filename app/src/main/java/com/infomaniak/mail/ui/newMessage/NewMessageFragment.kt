@@ -505,8 +505,8 @@ class NewMessageFragment : Fragment() {
                 icon = AppCompatResources.getDrawable(context, R.drawable.ic_chevron_down)
                 setOnClickListener { _ -> addressListPopupWindow?.show() }
 
-                // Set isFocusable here instead of in XML file because set XML don't trigger the overridden setFocusable(boolean)
-                // in avatar view.
+                // Set `isFocusable` here instead of in XML file because setting it in the
+                // XML doesn't trigger the overridden `setFocusable(boolean)` in AvatarView.
                 isFocusable = true
             }
         }

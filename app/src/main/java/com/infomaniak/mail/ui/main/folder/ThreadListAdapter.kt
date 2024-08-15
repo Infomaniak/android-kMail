@@ -418,8 +418,8 @@ class ThreadListAdapter @Inject constructor(
         expeditorAvatar.apply {
             loadAvatar(recipient, bimi)
 
-            // Set isFocusable here instead of in XML file because set XML don't trigger the overridden setFocusable(boolean)
-            // in avatar view.
+            // Set `isFocusable` here instead of in XML file because setting it in the
+            // XML doesn't trigger the overridden `setFocusable(boolean)` in AvatarView.
             isFocusable = false
         }
     }
