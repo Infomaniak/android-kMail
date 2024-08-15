@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
@@ -76,9 +77,9 @@ class SharedUtils @Inject constructor(
             else -> messageController.getMessageAndDuplicates(threads.first(), message)
         }
 
-        val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids()).isSuccess()
+        val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
 
-        if (isSuccess && shouldRefreshThreads) {
+        if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
             refreshFolders(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),

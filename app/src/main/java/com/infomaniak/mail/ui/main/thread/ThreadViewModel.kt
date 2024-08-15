@@ -38,6 +38,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.appContext
+import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -335,8 +336,10 @@ class ThreadViewModel @Inject constructor(
         val realm = mailboxContentRealm()
         val thread = threadLive.value ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
-        val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) {
+
+        val apiResponses = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids())
+
+        if (apiResponses.atLeastOneSucceeded()) {
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = mailbox,

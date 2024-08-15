@@ -476,23 +476,24 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         var trashId: String? = null
-        var undoResource: String? = null
+        var undoResources = emptyList<String>()
         val shouldPermanentlyDelete = isPermanentDeleteFolder(getActionFolderRole(threads, message))
 
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
 
-        val apiResponse = if (shouldPermanentlyDelete) {
+        val apiResponses = if (shouldPermanentlyDelete) {
             ApiRepository.deleteMessages(mailbox.uuid, uids)
         } else {
             trashId = folderController.getFolder(FolderRole.TRASH)!!.id
             ApiRepository.moveMessages(mailbox.uuid, uids, trashId).also {
-                undoResource = it.data?.undoResource
+                undoResources = it.mapNotNull { apiResponse -> apiResponse.data?.undoResource }
             }
         }
 
         deleteThreadOrMessageTrigger.postValue(Unit)
-        if (apiResponse.isSuccess()) {
+
+        if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
             refreshFoldersAsync(
@@ -509,10 +510,10 @@ class MainViewModel @Inject constructor(
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
         showDeleteSnackbar(
-            apiResponse,
+            apiResponses,
             shouldPermanentlyDelete,
             message,
-            undoResource,
+            undoResources,
             undoFoldersIds,
             undoDestinationId,
             threads.count(),
@@ -520,16 +521,16 @@ class MainViewModel @Inject constructor(
     }
 
     private fun showDeleteSnackbar(
-        apiResponse: ApiResponse<*>,
+        apiResponses: List<ApiResponse<*>>,
         shouldPermanentlyDelete: Boolean,
         message: Message?,
-        undoResource: String?,
+        undoResources: List<String>,
         undoFoldersIds: List<String>,
         undoDestinationId: String?,
         numberOfImpactedThreads: Int,
     ) {
 
-        val snackbarTitle = if (apiResponse.isSuccess()) {
+        val snackbarTitle = if (apiResponses.atLeastOneSucceeded()) {
             val destination = appContext.getString(FolderRole.TRASH.folderNameRes)
             when {
                 shouldPermanentlyDelete && message == null -> {
@@ -544,10 +545,12 @@ class MainViewModel @Inject constructor(
                 else -> appContext.getString(R.string.snackbarMessageMoved, destination)
             }
         } else {
-            appContext.getString(apiResponse.translatedError)
+            appContext.getString(apiResponses.first().translatedError)
         }
 
-        snackbarManager.postValue(snackbarTitle, undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
+        val undoData = if (undoResources.isEmpty()) null else UndoData(undoResources, undoFoldersIds, undoDestinationId)
+
+        snackbarManager.postValue(snackbarTitle, undoData)
     }
 
     private fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
@@ -586,9 +589,9 @@ class MainViewModel @Inject constructor(
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
-        if (apiResponse.isSuccess()) {
+        if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
             refreshFoldersAsync(
@@ -599,28 +602,37 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
+        showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
     }
 
     private fun showMoveSnackbar(
         threads: List<Thread>,
         message: Message?,
         messages: List<Message>,
-        apiResponse: ApiResponse<MoveResult>,
+        apiResponses: List<ApiResponse<MoveResult>>,
         destinationFolder: Folder,
     ) {
-        val undoDestinationId = message?.folderId ?: threads.first().folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolder.id
 
         val destination = destinationFolder.getLocalizedName(appContext)
 
         val snackbarTitle = when {
-            !apiResponse.isSuccess() -> appContext.getString(apiResponse.translatedError)
+            apiResponses.allFailed() -> appContext.getString(apiResponses.first().translatedError)
             message == null -> appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
+        val undoResources = apiResponses.mapNotNull { it.data?.undoResource }
+        val undoData = if (undoResources.isEmpty()) {
+            null
+        } else {
+            val undoDestinationId = message?.folderId ?: threads.first().folderId
+            UndoData(
+                resources = apiResponses.mapNotNull { it.data?.undoResource },
+                foldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolder.id,
+                destinationFolderId = undoDestinationId,
+            )
+        }
+
         snackbarManager.postValue(snackbarTitle, undoData)
     }
     //endregion
@@ -653,9 +665,9 @@ class MainViewModel @Inject constructor(
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
-        if (apiResponse.isSuccess()) {
+        if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
@@ -667,7 +679,7 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
+        showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
     }
     //endregion
 
@@ -716,9 +728,11 @@ class MainViewModel @Inject constructor(
         threads: List<Thread>,
         message: Message? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
+
         val messages = getMessagesToMarkAsUnseen(threads, message)
-        val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) {
+        val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids())
+
+        if (apiResponses.atLeastOneSucceeded()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
@@ -767,13 +781,13 @@ class MainViewModel @Inject constructor(
         }
         val uids = messages.getUids()
 
-        val isSuccess = if (isFavorite) {
-            ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()
+        val apiResponses = if (isFavorite) {
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
         } else {
-            ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
+            ApiRepository.addToFavorites(mailbox.uuid, uids)
         }
 
-        if (isSuccess) {
+        if (apiResponses.atLeastOneSucceeded()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(),
@@ -823,9 +837,9 @@ class MainViewModel @Inject constructor(
 
         val messages = getMessagesToSpamOrHam(threads, message)
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
-        if (apiResponse.isSuccess()) {
+        if (apiResponses.atLeastOneSucceeded()) {
             refreshFoldersAsync(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
@@ -834,7 +848,7 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponse, destinationFolder)
+        if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
     }
 
     private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
@@ -877,25 +891,32 @@ class MainViewModel @Inject constructor(
 
     //region Undo action
     fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
+
+        fun List<ApiResponse<*>>.getFailedCall() = firstOrNull { it.data != true }
+
         val mailbox = currentMailbox.value!!
-        val (resource, foldersIds, destinationFolderId) = undoData
+        val (resources, foldersIds, destinationFolderId) = undoData
 
-        with(ApiRepository.undoAction(resource)) {
+        val apiResponses = resources.map(ApiRepository::undoAction)
 
-            val snackbarTitle = if (data == true) {
-                // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
-                sharedUtils.refreshFolders(
-                    mailbox = mailbox,
-                    messagesFoldersIds = foldersIds,
-                    destinationFolderId = destinationFolderId,
-                )
-                R.string.snackbarMoveCancelled
-            } else {
-                if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
-            }
-
-            snackbarManager.postValue(appContext.getString(snackbarTitle))
+        if (apiResponses.atLeastOneSucceeded()) {
+            // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.
+            sharedUtils.refreshFolders(
+                mailbox = mailbox,
+                messagesFoldersIds = foldersIds,
+                destinationFolderId = destinationFolderId,
+            )
         }
+
+        val failedCall = apiResponses.getFailedCall()
+
+        val snackbarTitle = when {
+            failedCall == null -> R.string.snackbarMoveCancelled
+            failedCall.translatedError == 0 -> RCore.string.anErrorHasOccurred
+            else -> failedCall.translatedError
+        }
+
+        snackbarManager.postValue(appContext.getString(snackbarTitle))
     }
     //endregion
 
@@ -910,7 +931,7 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
             apiResponse.data?.id
         } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()), undoData = null)
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
             null
         }
     }

@@ -43,6 +43,7 @@ import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
 import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.AndroidEntryPoint
@@ -161,7 +162,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             context.trackNotificationActionEvent(matomoValue)
 
             with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id, okHttpClient)) {
-                if (isSuccess()) {
+                if (atLeastOneSucceeded()) {
                     dismissNotification(context, mailbox, notificationId)
                     updateFolders(folders = listOf(message.folder, destinationFolder), mailbox, realm)
                 } else {
@@ -169,7 +170,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
                     Sentry.withScope { scope ->
                         scope.setTag("reason", "Notif action fail because of API call")
                         scope.setExtra("destination folder role", folderRole.name)
-                        Sentry.captureException(getApiException())
+                        Sentry.captureException(first().getApiException())
                     }
                 }
             }

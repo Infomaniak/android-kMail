@@ -90,7 +90,7 @@ class SnackbarManager @Inject constructor() {
     )
 
     data class UndoData(
-        val resource: String,
+        val resources: List<String>,
         val foldersIds: List<String>,
         val destinationFolderId: String?,
     )

@@ -57,6 +57,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
+import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -157,12 +158,16 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.externalMailInfo(mailboxHostingId, mailboxName), GET)
     }
 
-    fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
-        return callApi(ApiRoutes.messagesSeen(mailboxUuid), POST, mapOf("uids" to messagesUids))
+    fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+        return batchOver(messagesUids) {
+            callApi(ApiRoutes.messagesSeen(mailboxUuid), POST, mapOf("uids" to it))
+        }
     }
 
-    fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
-        return callApi(ApiRoutes.messagesUnseen(mailboxUuid), POST, mapOf("uids" to messagesUids))
+    fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+        return batchOver(messagesUids) {
+            callApi(ApiRoutes.messagesUnseen(mailboxUuid), POST, mapOf("uids" to it))
+        }
     }
 
     fun saveDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SaveDraftResult> {
@@ -210,8 +215,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.attachmentToForward(mailboxUuid), POST, body)
     }
 
-    fun deleteMessages(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
-        return callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to messagesUids))
+    fun deleteMessages(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+        return batchOver(messagesUids) {
+            callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to it))
+        }
     }
 
     fun moveMessages(
@@ -219,13 +226,15 @@ object ApiRepository : ApiRepositoryCore() {
         messagesUids: List<String>,
         destinationId: String,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
-    ): ApiResponse<MoveResult> {
-        return callApi(
-            url = ApiRoutes.moveMessages(mailboxUuid),
-            method = POST,
-            body = mapOf("uids" to messagesUids, "to" to destinationId),
-            okHttpClient = okHttpClient,
-        )
+    ): List<ApiResponse<MoveResult>> {
+        return batchOver(messagesUids) {
+            callApi(
+                url = ApiRoutes.moveMessages(mailboxUuid),
+                method = POST,
+                body = mapOf("uids" to it, "to" to destinationId),
+                okHttpClient = okHttpClient,
+            )
+        }
     }
 
     fun deleteDraft(mailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {
@@ -234,12 +243,16 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
-    fun addToFavorites(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
-        return callApi(ApiRoutes.starMessages(mailboxUuid), POST, mapOf("uids" to messagesUids))
+    fun addToFavorites(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+        return batchOver(messagesUids) {
+            callApi(ApiRoutes.starMessages(mailboxUuid), POST, mapOf("uids" to it))
+        }
     }
 
-    fun removeFromFavorites(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Unit> {
-        return callApi(ApiRoutes.unstarMessages(mailboxUuid), POST, mapOf("uids" to messagesUids))
+    fun removeFromFavorites(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+        return batchOver(messagesUids) {
+            callApi(ApiRoutes.unstarMessages(mailboxUuid), POST, mapOf("uids" to it))
+        }
     }
 
     fun getMessagesUids(
@@ -422,6 +435,21 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getShareLink(mailboxUuid: String, folderId: String, mailId: Int): ApiResponse<ShareThread> {
         return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
+    }
+
+    /**
+     * Create batches of the given values to perform the given request
+     * @param values Data to batch
+     * @param limit Chunk size
+     * @param perform Request to perform
+     * @return Array of the perform return type
+     */
+    private fun <T, R> batchOver(
+        values: List<T>,
+        limit: Int = Utils.MESSAGES_UIDS_SIZE,
+        perform: (List<T>) -> ApiResponse<R>,
+    ): List<ApiResponse<R>> {
+        return values.chunked(limit).map(perform)
     }
 
     /**
