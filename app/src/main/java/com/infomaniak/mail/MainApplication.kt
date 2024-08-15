@@ -241,12 +241,10 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         HttpClient.init(tokenInterceptorListener)
     }
 
-    private fun configureRealmLog() {
-        RealmLog.level = LogLevel.DEBUG
-        // Removing Realm system logs to avoid spamming the logcat
-        RealmLog.removeAll()
-        // Adding our own Realm logger to log to Sentry
-        RealmLog.add(SentryRealmLogger())
+    private fun configureRealmLog() = with(RealmLog) {
+        level = LogLevel.DEBUG
+        removeAll() // Removing Realm system logs to avoid spamming the logcat
+        add(SentryRealmLogger()) // Adding our own Realm logger to log to Sentry
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
