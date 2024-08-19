@@ -148,6 +148,26 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
     //endregion
 
+    //region Edit
+
+    fun updateIsFavoriteStatus(messageUids: List<String>, isFavorite: Boolean) = with(mailboxContentRealm()) {
+        writeBlocking {
+            getMessagesByUids(messageUids, this).forEach {
+                it.isFavorite = isFavorite
+            }
+        }
+    }
+
+    fun updateReadStatus(messageUids: List<String>, isSeen: Boolean) = with(mailboxContentRealm()) {
+        writeBlocking {
+            getMessagesByUids(messageUids, this).forEach {
+                it.isSeen = isSeen
+            }
+        }
+    }
+
+    //endregion
+
     companion object {
         private val isNotDraft = "${Message::isDraft.name} == false"
         private val isNotScheduled = "${Message::isScheduled.name} == false"

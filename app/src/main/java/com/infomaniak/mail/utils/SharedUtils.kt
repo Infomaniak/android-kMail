@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -45,6 +46,7 @@ import javax.inject.Inject
 class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
+    private val threadController: ThreadController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
 ) {
@@ -75,7 +77,14 @@ class SharedUtils @Inject constructor(
             else -> messageController.getMessageAndDuplicates(threads.first(), message)
         }
 
+        val messagesUids = messages.map { it.uid }
+        val threadsUids = threads.map { it.uid }
+
+        updateThreadsAndMessagesSeenStatus(threadsUids, messagesUids, true)
+
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
+
+        if (!apiResponses.atLeastOneSucceeded()) updateThreadsAndMessagesSeenStatus(threadsUids, messagesUids, false)
 
         if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
             refreshFolders(
@@ -85,6 +94,11 @@ class SharedUtils @Inject constructor(
                 callbacks = callbacks,
             )
         }
+    }
+
+    private fun updateThreadsAndMessagesSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
+        messageController.updateReadStatus(messagesUids, isSeen = isSeen)
+        threadController.updateReadStatus(threadsUids)
     }
 
     fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {

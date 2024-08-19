@@ -490,6 +490,8 @@ class MainViewModel @Inject constructor(
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
 
+        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = true)
+
         val apiResponses = if (shouldPermanentlyDelete) {
             ApiRepository.deleteMessages(mailbox.uuid, uids)
         } else {
@@ -510,6 +512,8 @@ class MainViewModel @Inject constructor(
                 destinationFolderId = trashId,
                 callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
+        } else if (!apiResponses.atLeastOneSucceeded()) {
+            threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
         } else if (isSwipe) {
             // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
             reassignCurrentThreadsLive()
@@ -597,6 +601,8 @@ class MainViewModel @Inject constructor(
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
+        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = true)
+
         val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponses.atLeastOneSucceeded()) {
@@ -606,8 +612,10 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
+                callbacks = RefreshCallbacks(onStart = { onDownloadStart() }, onStop = { onDownloadStop(threadsUids) }),
             )
+        } else {
+            threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
         }
 
         showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
@@ -738,7 +746,13 @@ class MainViewModel @Inject constructor(
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         val messages = getMessagesToMarkAsUnseen(threads, message)
-        val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids())
+        val messagesUids = messages.map { it.uid }
+        val threadsUids = threads.map { it.uid }
+
+        messageController.updateReadStatus(messagesUids, isSeen = false)
+        threadController.updateReadStatus(threadsUids)
+
+        val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
         if (apiResponses.atLeastOneSucceeded()) {
             refreshFoldersAsync(
@@ -746,6 +760,9 @@ class MainViewModel @Inject constructor(
                 messagesFoldersIds = messages.getFoldersIds(),
                 callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
+        } else {
+            messageController.updateReadStatus(messagesUids, isSeen = true)
+            threadController.updateReadStatus(threadsUids)
         }
     }
 
@@ -789,6 +806,11 @@ class MainViewModel @Inject constructor(
         }
         val uids = messages.getUids()
 
+        /*threadController.updateFavoriteStatus(threadsUids, !isFavorite)
+        messageController.updateIsFavoriteStatus(uids, !isFavorite)
+
+        val isSuccess = if (isFavorite) {
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()*/
         val apiResponses = if (isFavorite) {
             ApiRepository.removeFromFavorites(mailbox.uuid, uids)
         } else {
@@ -801,6 +823,9 @@ class MainViewModel @Inject constructor(
                 messagesFoldersIds = messages.getFoldersIds(),
                 callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
+        } else {
+            threadController.updateFavoriteStatus(threadsUids, isFavorite)
+            messageController.updateIsFavoriteStatus(uids, isFavorite)
         }
     }
 
@@ -1006,7 +1031,8 @@ class MainViewModel @Inject constructor(
         isDownloadingChanges.postValue(true)
     }
 
-    private fun onDownloadStop() {
+    private fun onDownloadStop(threadsUids: List<String>) {
+        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
         isDownloadingChanges.postValue(false)
     }
 

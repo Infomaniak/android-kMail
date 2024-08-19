@@ -91,6 +91,9 @@ class Thread : RealmObject {
     var isFromSearch: Boolean = false
     @Transient
     var hasAttachable: Boolean = false
+    //Has been  moved (deleted, moved) but API called has not been done yet. Used to filter locally the list of threads
+    @Transient
+    var isMovedOutLocally: Boolean = false
     //endregion
 
     private val _folders by backlinks(Folder::threads)
