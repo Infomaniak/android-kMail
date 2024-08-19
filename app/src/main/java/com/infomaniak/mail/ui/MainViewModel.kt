@@ -503,20 +503,24 @@ class MainViewModel @Inject constructor(
 
         deleteThreadOrMessageTrigger.postValue(Unit)
 
-        if (apiResponses.atLeastOneSucceeded()) {
-            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
+        when {
+            apiResponses.atLeastOneSucceeded() -> {
+                if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = trashId),
-                destinationFolderId = trashId,
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-            )
-        } else if (!apiResponses.atLeastOneSucceeded()) {
-            threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
-        } else if (isSwipe) {
-            // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
-            reassignCurrentThreadsLive()
+                refreshFoldersAsync(
+                    mailbox = mailbox,
+                    messagesFoldersIds = messages.getFoldersIds(exception = trashId),
+                    destinationFolderId = trashId,
+                    callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
+                )
+            }
+            !apiResponses.atLeastOneSucceeded() -> {
+                threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
+            }
+            isSwipe -> {
+                // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
+                reassignCurrentThreadsLive()
+            }
         }
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
