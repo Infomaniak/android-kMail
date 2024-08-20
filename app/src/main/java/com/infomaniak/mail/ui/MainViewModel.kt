@@ -904,7 +904,7 @@ class MainViewModel @Inject constructor(
 
         if (!response.isSuccessful || response.body == null) {
             reportDisplayProblemTrigger.postValue(Unit)
-            snackbarManager.postValue(appContext.getString(com.infomaniak.lib.core.R.string.anErrorHasOccurred))
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
 
             return@launch
         }
