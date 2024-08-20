@@ -345,55 +345,54 @@ class ThreadController @Inject constructor(
                 }
             }
 
+            var hasAttachableInThread = false
 
-                var hasAttachableInThread = false
+            messages.forEach { localMessage ->
 
-                messages.forEach { localMessage ->
+                if (localMessage.isFullyDownloaded()) return@forEach
 
-                    if (localMessage.isFullyDownloaded()) return@forEach
+                runCatching {
+                    val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
 
-                    runCatching {
-                        val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
+                    realm.writeBlocking {
+                        if (apiResponse.isSuccess()) {
+                            apiResponse.data?.also { remoteMessage ->
+                                val swissTransferFiles = remoteMessage.swissTransferUuid?.let { uuid ->
+                                    fetchSwissTransferContainer(uuid)?.let { container ->
+                                        SwissTransferContainerController.upsertSwissTransferContainer(container, realm = this)
+                                        container.swissTransferFiles
+                                    }
+                                } ?: realmListOf()
 
-                        realm.writeBlocking {
-                            if (apiResponse.isSuccess()) {
-                                apiResponse.data?.also { remoteMessage ->
-                                    val swissTransferFiles = remoteMessage.swissTransferUuid?.let { uuid ->
-                                        fetchSwissTransferContainer(uuid)?.let { container ->
-                                            SwissTransferContainerController.upsertSwissTransferContainer(container, realm = this)
-                                            container.swissTransferFiles
-                                        }
-                                    } ?: realmListOf()
+                                remoteMessage.initLocalValues(
+                                    MessageInitialState(
+                                        date = localMessage.date,
+                                        isFullyDownloaded = true,
+                                        isTrashed = localMessage.isTrashed,
+                                        isFromSearch = localMessage.isFromSearch,
+                                        draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                    ),
+                                    latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
+                                    messageIds = localMessage.messageIds,
+                                    swissTransferFiles = swissTransferFiles,
+                                )
 
-                                    remoteMessage.initLocalValues(
-                                        MessageInitialState(
-                                            date = localMessage.date,
-                                            isFullyDownloaded = true,
-                                            isTrashed = localMessage.isTrashed,
-                                            isFromSearch = localMessage.isFromSearch,
-                                            draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
-                                        ),
-                                        latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
-                                        messageIds = localMessage.messageIds,
-                                        swissTransferFiles = swissTransferFiles,
-                                    )
+                                if (remoteMessage.hasAttachable) hasAttachableInThread = true
 
-                                    if (remoteMessage.hasAttachable) hasAttachableInThread = true
-
-                                    MessageController.upsertMessage(remoteMessage, realm = this)
-                                }
-                            } else {
-                                handleFailure(localMessage.uid, apiResponse.error?.code)
+                                MessageController.upsertMessage(remoteMessage, realm = this)
                             }
-
-                            // TODO: Remove this when the API returns the good value for `has_attachments`.
-                            verifyAttachmentsValues(hasAttachableInThread, messages, this@writeBlocking)
+                        } else {
+                            handleFailure(localMessage.uid, apiResponse.error?.code)
                         }
-                    }.onFailure {
-                        // This `onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
-                        handleFailure(localMessage.uid)
+
+                        // TODO: Remove this when the API returns the good value for `has_attachments`.
+                        verifyAttachmentsValues(hasAttachableInThread, messages, this@writeBlocking)
                     }
+                }.onFailure {
+                    // This `onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
+                    handleFailure(localMessage.uid)
                 }
+            }
 
             return deletedMessagesUids to failedMessagesUids
         }
