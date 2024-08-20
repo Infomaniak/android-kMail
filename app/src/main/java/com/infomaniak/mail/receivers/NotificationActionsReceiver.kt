@@ -112,7 +112,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             else -> null
         } ?: return
 
-        return executeAction(context, folderRole, undoNotificationTitle, matomoValue, payload)
+        executeAction(context, folderRole, undoNotificationTitle, matomoValue, payload)
     }
 
     private fun executeUndoAction(payload: NotificationPayload) {
