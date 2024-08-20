@@ -257,8 +257,9 @@ class RefreshController @Inject constructor(
         val activities = getMessagesUidsDelta(folder.id, previousCursor) ?: return
         scope.ensureActive()
 
-        val logMessage =
-            "Deleted: ${activities.deletedShortUids.count()} | Updated: ${activities.updatedMessages.count()} | Added: ${activities.addedShortUids.count()}"
+        val logMessage = "Deleted: ${activities.deletedShortUids.count()} | " +
+                "Updated: ${activities.updatedMessages.count()} | " +
+                "Added: ${activities.addedShortUids.count()}"
         SentryLog.d("API", "$logMessage | ${folder.displayForSentry()}")
 
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
