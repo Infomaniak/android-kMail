@@ -160,6 +160,10 @@ object ApiRoutes {
     fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${message(mailboxUuid, folderId, shortUid)}/report"
     }
+
+    fun downloadMessage(mailboxUuid: String, folderId: String, shortUid: Int): String {
+        return "${message(mailboxUuid, folderId, shortUid)}/download"
+    }
     //endregion
 
     //region Messages from Folder/Mobile

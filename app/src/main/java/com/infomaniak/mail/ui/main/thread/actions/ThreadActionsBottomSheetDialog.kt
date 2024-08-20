@@ -196,7 +196,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onReportDisplayProblem() {
-                    notYetImplemented()
+                    descriptionDialog.show(
+                        title = getString(R.string.reportDisplayProblemTitle),
+                        description = getString(R.string.reportDisplayProblemDescription),
+                        onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(messageUidToReply) },
+                    )
                 }
                 //endregion
             },

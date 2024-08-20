@@ -21,12 +21,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
+import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.runBlocking
 
 abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
@@ -65,6 +68,8 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        computeReportDisplayProblemVisibility()
+
         archive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReadUnread() }
         move.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onMove() }
@@ -87,6 +92,11 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     fun initOnClickListener(listener: OnActionClick) {
         onClickListener = listener
+    }
+
+    private fun computeReportDisplayProblemVisibility() = runBlocking {
+        binding.reportDisplayProblem.isVisible =
+            mainViewModel.currentMailbox.value?.let { AccountUtils.getUserById(it.userId)?.isStaff } ?: false
     }
 
     private fun computeUnreadStyle(isSeen: Boolean) = if (isSeen) {
