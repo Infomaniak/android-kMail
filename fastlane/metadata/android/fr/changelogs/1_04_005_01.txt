@@ -1,0 +1,5 @@
+- Amélioration de la vérification de la disponibilité du réseau
+- Ajout d'options de formatage dans la barre d'outils du nouvel éditeur HTML riche
+- Affichage correct des signatures qui n'ont pas de nom d'expéditeur
+- Correction du rafraîchissement infini des fils de discussion lors du changement de compte/boîte aux lettres
+- Permettre la navigation au clavier

@@ -1,0 +1,5 @@
+- Improve the way we check for network availability
+- Add toolbar formatting options to the new rich html editor
+- Correctly display Signatures that don't have a sender name
+- Fix infinite refresh loading of Threads when switching Account/Mailbox
+- Allow keyboard navigation
