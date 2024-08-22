@@ -29,7 +29,6 @@ import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.LocalSettings.AiEngine
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.PaginationInfo
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
@@ -255,14 +254,13 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
-    fun getMessagesUids(
+    fun getDateOrderedMessagesUids(
         mailboxUuid: String,
         folderId: String,
         okHttpClient: OkHttpClient?,
-        info: PaginationInfo?,
     ): ApiResponse<NewMessagesResult> {
         return callApi(
-            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, info),
+            url = ApiRoutes.getDateOrderedMessagesUids(mailboxUuid, folderId),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )
@@ -446,7 +444,7 @@ object ApiRepository : ApiRepositoryCore() {
      */
     private fun <T, R> batchOver(
         values: List<T>,
-        limit: Int = Utils.MESSAGES_UIDS_SIZE,
+        limit: Int = Utils.MAX_UIDS_PER_CALL,
         perform: (List<T>) -> ApiResponse<R>,
     ): List<ApiResponse<R>> {
         return values.chunked(limit).map(perform)

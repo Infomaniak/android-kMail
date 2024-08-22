@@ -41,7 +41,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
-import kotlin.math.max
 
 @Serializable
 class Folder : RealmObject, Cloneable {
@@ -72,10 +71,19 @@ class Folder : RealmObject, Cloneable {
     var threads = realmListOf<Thread>()
     @Transient
     var messages = realmListOf<Message>()
+
+    /**
+     * List of old Messages UIDs of this Folder that we need to fetch.
+     * When first opening the Folder, we get the full list of UIDs, and we store it.
+     * Then, we'll be able to go through it as we want to fetch the old Messages.
+     */
     @Transient
-    var remainingOldMessagesToFetch: Int = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
+    var oldMessagesUidsToFetch = realmListOf<Int>()
     @Transient
-    var isHistoryComplete: Boolean = DEFAULT_IS_HISTORY_COMPLETE
+    var newMessagesUidsToFetch = realmListOf<Int>()
+    @Transient
+    var remainingOldMessagesToFetch: Int = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
+
     @Transient
     var isHidden: Boolean = false // For children only (a children Folder is hidden if its parent is collapsed)
     @Transient
@@ -113,8 +121,9 @@ class Folder : RealmObject, Cloneable {
         unreadCount: Int,
         threads: RealmList<Thread>,
         messages: RealmList<Message>,
+        oldMessagesUidsToFetch: RealmList<Int>,
+        newMessagesUidsToFetch: RealmList<Int>,
         remainingOldMessagesToFetch: Int,
-        isHistoryComplete: Boolean,
         isHidden: Boolean,
         isCollapsed: Boolean,
     ) {
@@ -124,24 +133,13 @@ class Folder : RealmObject, Cloneable {
         this.unreadCountLocal = unreadCount
         this.threads.addAll(threads)
         this.messages.addAll(messages)
+        this.oldMessagesUidsToFetch.addAll(oldMessagesUidsToFetch)
+        this.newMessagesUidsToFetch.addAll(newMessagesUidsToFetch)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
-        this.isHistoryComplete = isHistoryComplete
         this.isHidden = isHidden
         this.isCollapsed = isCollapsed
 
         this.sortedName = this.name.lowercase().removeAccents()
-    }
-
-    fun resetLocalValues() {
-        lastUpdatedAt = null
-        cursor = null
-        unreadCountLocal = 0
-        threads = realmListOf()
-        messages = realmListOf()
-        remainingOldMessagesToFetch = DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH
-        isHistoryComplete = DEFAULT_IS_HISTORY_COMPLETE
-        isHidden = false
-        isCollapsed = false
     }
 
     fun getLocalizedName(context: Context): String {
@@ -176,11 +174,6 @@ class Folder : RealmObject, Cloneable {
     companion object {
         val rolePropertyName = Folder::_role.name
         val parentsPropertyName = Folder::_parents.name
-
-        // We start by downloading 1 page when 1st opening a Folder, before trying to download old Messages.
-        // So when trying to get old Messages, we need to fetch 1 less page. Hence this computation.
-        val DEFAULT_REMAINING_OLD_MESSAGES_TO_FETCH = max(Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH - Utils.PAGE_SIZE, 0)
-        const val DEFAULT_IS_HISTORY_COMPLETE = false
 
         const val INBOX_FOLDER_ID = "eJzz9HPyjwAABGYBgQ--"
         private const val CUSTOM_FOLDER_ROLE_ORDER = 0

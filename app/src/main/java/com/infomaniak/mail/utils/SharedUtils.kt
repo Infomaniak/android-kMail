@@ -23,7 +23,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
@@ -44,7 +43,6 @@ import io.sentry.Sentry
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
-    private val folderController: FolderController,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
     private val messageController: MessageController,
@@ -107,15 +105,13 @@ class SharedUtils @Inject constructor(
         destinationFolderId?.let(foldersIds::add)
 
         foldersIds.forEach { folderId ->
-            folderController.getFolder(folderId)?.let { folder ->
-                refreshController.refreshThreads(
-                    refreshMode = RefreshMode.REFRESH_FOLDER,
-                    mailbox = mailbox,
-                    folder = folder,
-                    realm = mailboxContentRealm(),
-                    callbacks = if (folderId == currentFolderId) callbacks else null,
-                )
-            }
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER,
+                mailbox = mailbox,
+                folderId = folderId,
+                realm = mailboxContentRealm(),
+                callbacks = if (folderId == currentFolderId) callbacks else null,
+            )
         }
     }
 

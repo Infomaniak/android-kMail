@@ -53,7 +53,7 @@ class FetchMessagesManager @Inject constructor(
 
     private lateinit var coroutineScope: CoroutineScope
 
-    // We can arrive here for mailboxes we did not opened yet. That's why we check before doing anything.
+    // We can arrive here for Mailboxes we did not open yet. That's why we check before doing anything.
     suspend fun execute(
         scope: CoroutineScope,
         userId: Int,
@@ -90,7 +90,7 @@ class FetchMessagesManager @Inject constructor(
         val threadsWithNewMessages = refreshController.refreshThreads(
             refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
             mailbox = mailbox,
-            folder = folder,
+            folderId = folder.id,
             okHttpClient = okHttpClient,
             realm = realm,
         ).let { (threads, throwable) ->
