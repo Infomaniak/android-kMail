@@ -34,9 +34,19 @@ val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmAt1stMigration()
+    migrationContext.resetFoldersCursor()
 }
 
 // Migrate to version #1
 private fun MigrationContext.deleteRealmAt1stMigration() {
     if (oldRealm.schemaVersion() < 1L) newRealm.deleteAll()
+}
+
+// Migrate to version #17
+private fun MigrationContext.resetFoldersCursor() {
+    if (oldRealm.schemaVersion() < 17L && newRealm.schemaVersion() >= 17L) {
+        oldRealm.query(className = "Folder").find().forEach {
+            newRealm.findLatest(it)?.set(propertyName = "cursor", value = null)
+        }
+    }
 }
