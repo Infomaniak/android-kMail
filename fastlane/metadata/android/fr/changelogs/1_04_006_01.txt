@@ -1,0 +1,1 @@
+- Amélioration de l'obtention et affichage des anciens courriels quand on remonte dans l'historique d'un dossier

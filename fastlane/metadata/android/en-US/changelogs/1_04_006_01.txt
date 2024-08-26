@@ -1,0 +1,1 @@
+- Improved retrieval and display of old emails when going back in the history of a folder
