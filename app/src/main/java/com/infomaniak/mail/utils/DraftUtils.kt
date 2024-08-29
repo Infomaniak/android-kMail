@@ -47,7 +47,7 @@ suspend fun uploadAttachmentsWithMutex(
 
 private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: DraftController, realm: Realm) {
 
-    fun getAwaitingAttachments(): List<Attachment> = attachments.filter { it.uploadStatus == UploadStatus.AWAITING }
+    fun getUnfinishedAttachments(): List<Attachment> = attachments.filterNot { it.uploadStatus == UploadStatus.FINISHED }
 
     fun setUploadStatus(attachment: Attachment, uploadStatus: UploadStatus, step: String) {
         realm.writeBlocking {
@@ -57,7 +57,7 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
         }
     }
 
-    val attachmentsToUpload = getAwaitingAttachments()
+    val attachmentsToUpload = getUnfinishedAttachments()
     val attachmentsToUploadCount = attachmentsToUpload.count()
     if (attachmentsToUploadCount > 0) {
         SentryLog.d(ATTACHMENT_TAG, "Uploading $attachmentsToUploadCount attachments")
