@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.api.ApiController.NetworkException
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -74,7 +74,7 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
         }.onFailure { exception ->
             setUploadStatus(attachment, UploadStatus.AWAITING, step = "after failing upload")
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
-            if ((exception as Exception).isNetworkException()) throw ApiController.NetworkException()
+            if ((exception as Exception).isNetworkException()) throw NetworkException()
             throw exception
         }
     }
