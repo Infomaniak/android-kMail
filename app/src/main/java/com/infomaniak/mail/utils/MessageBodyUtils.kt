@@ -78,10 +78,12 @@ object MessageBodyUtils {
                 if (quotes.isEmpty() || quotes.all { it.isBlank() }) SplitBody(bodyContent) else SplitBody(content, bodyContent)
             },
             onTimeout = {
-                Sentry.withScope { scope ->
+                Sentry.captureMessage(
+                    "Timeout reached while displaying a Message's body",
+                    SentryLevel.WARNING,
+                ) { scope ->
                     scope.setExtra("body size", "${bodyContent.toByteArray().size} bytes")
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    Sentry.captureMessage("Timeout reached while displaying a Message's body", SentryLevel.WARNING)
                 }
             },
         )

@@ -27,9 +27,8 @@ object UnwrappingJsonListSerializer : JsonTransformingSerializer<String>(String.
 
     override fun transformDeserialize(element: JsonElement): JsonElement {
         return if (element is JsonArray) {
-            Sentry.withScope { scope ->
+            Sentry.captureMessage("Found an array of inReplyTo") { scope ->
                 scope.setExtra("inReplyToList", "ids: ${element.map { it }}")
-                Sentry.captureMessage("Found an array of inReplyTo")
             }
             element.first()
         } else {

@@ -99,7 +99,10 @@ class Thread : RealmObject {
             runCatching {
                 _folders.single()
             }.getOrElse { exception ->
-                Sentry.withScope { scope ->
+                Sentry.captureMessage(
+                    "Thread has several or 0 parent folders, it should not be possible",
+                    SentryLevel.ERROR,
+                ) { scope ->
                     scope.setTag("foldersId", _folders.joinToString { it.id })
                     scope.setTag("foldersCount", "${_folders.count()}")
                     scope.setExtra("foldersCount", "${_folders.count()}")
@@ -107,7 +110,6 @@ class Thread : RealmObject {
                     scope.setExtra("threadUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     scope.setExtra("exception message", exception.message.toString())
-                    Sentry.captureMessage("Thread has several or 0 parent folders, it should not be possible", SentryLevel.ERROR)
                 }
                 _folders.first()
             }
@@ -233,7 +235,7 @@ class Thread : RealmObject {
         recipients.firstOrNull() to message.bimi
 
     }.getOrElse { throwable ->
-        Sentry.withScope { scope ->
+        Sentry.captureException(throwable) { scope ->
             scope.setExtra("thread.folder.role", folder.role?.name.toString())
             scope.setExtra("thread.folder.id", folder.id)
             scope.setExtra("thread.folderId", folderId)
@@ -242,7 +244,6 @@ class Thread : RealmObject {
             scope.setExtra("thread.duplicates.count", "${duplicates.count()}")
             scope.setExtra("thread.isFromSearch", "$isFromSearch")
             scope.setExtra("thread.hasDrafts", "$hasDrafts")
-            Sentry.captureException(throwable)
         }
 
         null to null

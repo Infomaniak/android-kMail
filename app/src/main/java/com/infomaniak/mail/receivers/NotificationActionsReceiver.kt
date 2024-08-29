@@ -167,10 +167,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
                     updateFolders(folders = listOf(message.folder, destinationFolder), mailbox, realm)
                 } else {
                     executeUndoAction(payload)
-                    Sentry.withScope { scope ->
+                    Sentry.captureException(first().getApiException()) { scope ->
                         scope.setTag("reason", "Notif action fail because of API call")
                         scope.setExtra("destination folder role", folderRole.name)
-                        Sentry.captureException(first().getApiException())
                     }
                 }
             }

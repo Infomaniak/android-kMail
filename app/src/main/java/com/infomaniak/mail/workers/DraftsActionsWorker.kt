@@ -184,9 +184,8 @@ class DraftsActionsWorker @AssistedInject constructor(
                 exception.printStackTrace()
 
                 if ((exception as? ApiErrorException)?.errorCode != ErrorCode.DRAFT_HAS_TOO_MANY_RECIPIENTS) {
-                    Sentry.withScope { scope ->
+                    Sentry.captureException(exception) { scope ->
                         if (exception is ApiErrorException) scope.setTag("Api error code", exception.errorCode ?: "")
-                        Sentry.captureException(exception)
                     }
                 }
 
@@ -329,11 +328,13 @@ class DraftsActionsWorker @AssistedInject constructor(
                 }
                 error?.exception is SerializationException -> {
                     realmActionOnDraft = deleteDraftCallback(draft)
-                    Sentry.withScope { scope ->
+                    Sentry.captureMessage(
+                        "Return JSON for SendDraft API call was modified",
+                        SentryLevel.ERROR,
+                    ) { scope ->
                         scope.setExtra("Is data null ?", "${data == null}")
                         scope.setExtra("Error code", error?.code.toString())
                         scope.setExtra("Error description", error?.description.toString())
-                        Sentry.captureMessage("Return JSON for SendDraft API call was modified", SentryLevel.ERROR)
                     }
                 }
                 else -> {

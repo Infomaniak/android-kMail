@@ -53,7 +53,6 @@ import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -144,7 +143,7 @@ class AccountFragment : Fragment(), MailboxListFragment {
 
         if ((month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)) {
             binding.easterEggHalloween.isVisible = true
-            Sentry.captureMessage("Easter egg Halloween has been triggered! Woohoo!", SentryLevel.INFO)
+            Sentry.captureMessage("Easter egg Halloween has been triggered! Woohoo!")
             trackEasterEggEvent("halloween${Date().year()}")
         }
     }

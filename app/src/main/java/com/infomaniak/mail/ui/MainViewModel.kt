@@ -910,7 +910,10 @@ class MainViewModel @Inject constructor(
 
         val filename = UUID.randomUUID().toString()
         val emlAttachment = Attachment(response.body?.bytes(), filename, EML_CONTENT_TYPE)
-        Sentry.captureMessage("Message display problem reported", SentryLevel.ERROR) { scope ->
+        Sentry.captureMessage(
+            "Message display problem reported",
+            SentryLevel.ERROR,
+        ) { scope ->
             scope.addAttachment(emlAttachment)
         }
 

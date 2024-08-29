@@ -219,11 +219,10 @@ class CalendarEventBannerView @JvmOverloads constructor(
     private fun displayOrganizer(attendees: List<Attendee>) = with(binding) {
         val organizers = attendees.filter(Attendee::isOrganizer)
         if (organizers.count() > 1) {
-            Sentry.withScope { scope ->
+            Sentry.captureMessage("Found more than one organizer for an event") { scope ->
                 scope.setExtra("amount of organizer", organizers.count().toString())
                 scope.setExtra("have same email", organizers.all { it.email == organizers[0].email }.toString())
                 scope.setExtra("have same name", organizers.all { it.name == organizers[0].name }.toString())
-                Sentry.captureMessage("Found more than one organizer for an event")
             }
         }
 
