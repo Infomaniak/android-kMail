@@ -32,6 +32,10 @@ jobs:
       # Setup Gradle and run Build
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Clean gradle cache
+        run: ./gradlew clean
+
       - name: Build with Gradle
         run: ./gradlew build
 
