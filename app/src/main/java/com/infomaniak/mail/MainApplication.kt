@@ -170,6 +170,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureSentry() {
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
+
+            options.maxBreadcrumbs = 1_000
+
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
                 val isNetworkException = event.exceptions?.any { it.type == "ApiController\$NetworkException" } ?: false
