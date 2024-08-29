@@ -21,7 +21,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.api.ApiController.NetworkException
 import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 
@@ -39,7 +39,7 @@ abstract class BaseCoroutineWorker(appContext: Context, params: WorkerParameters
             exception.printStackTrace()
             when (exception) {
                 is CancellationException -> Result.failure()
-                is ApiController.NetworkException -> Result.retry()
+                is NetworkException -> Result.retry()
                 else -> {
                     Sentry.captureException(exception)
                     Result.failure()

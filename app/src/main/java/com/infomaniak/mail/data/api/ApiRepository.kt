@@ -73,7 +73,7 @@ object ApiRepository : ApiRepositoryCore() {
         method: ApiController.ApiMethod,
         body: Any? = null,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
-    ): T = ApiController.callApi(url, method, body, okHttpClient, true)
+    ): T = ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
 
     fun ping(): ApiResponse<String> = callApi(ApiRoutes.ping(), GET)
 

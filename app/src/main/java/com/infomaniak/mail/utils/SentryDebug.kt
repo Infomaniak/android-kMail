@@ -223,7 +223,7 @@ object SentryDebug {
             scope.setExtra("folderRole", "${folder.role?.name}")
             scope.setExtra("folderId", folder.id)
             Sentry.captureMessage(
-                "Message is in wrong Folder (related to 'Message has multiple parent folders'",
+                "Message is in wrong Folder (related to 'Message has multiple parent folders')",
                 SentryLevel.ERROR,
             )
         }
