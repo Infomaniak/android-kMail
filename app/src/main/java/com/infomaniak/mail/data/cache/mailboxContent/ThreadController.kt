@@ -384,7 +384,7 @@ class ThreadController @Inject constructor(
                 //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
                 if (emptyThreads.isNotEmpty()) {
                     emptyThreads.forEach {
-                        SentryDebug.sendEmptyThread(it, "No Message in a Thread when refreshing a Folder")
+                        SentryDebug.sendEmptyThread(it, "No Message in a Thread when refreshing a Folder", realm = this)
                     }
                     delete(emptyThreadsQuery)
                 }
