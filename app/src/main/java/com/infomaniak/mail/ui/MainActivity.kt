@@ -75,7 +75,6 @@ import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -497,7 +496,7 @@ class MainActivity : BaseActivity() {
                 isVisible = true
                 playAnimation()
             }
-            Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!", SentryLevel.INFO)
+            Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
             trackEasterEggEvent("xmas${Date().year()}")
         }
     }

@@ -36,11 +36,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.extensions.MergedContactDictionary
-import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.getUids
-import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.query.RealmResults
@@ -381,11 +377,10 @@ class ThreadViewModel @Inject constructor(
         if (apiResponse.isSuccess()) {
             updateCalendarEvent(message, apiResponse.data!!)
         } else {
-            Sentry.withScope { scope ->
+            Sentry.captureMessage("Failed loading calendar event") { scope ->
                 scope.setExtra("ics attachment mimeType", icsAttachment.mimeType)
                 scope.setExtra("ics attachment size", icsAttachment.size.toString())
                 scope.setExtra("error code", apiResponse.error?.code.toString())
-                Sentry.captureMessage("Failed loading calendar event")
             }
         }
     }
@@ -395,13 +390,15 @@ class ThreadViewModel @Inject constructor(
             localMessage?.let {
                 it.latestCalendarEventResponse = calendarEventResponse
             } ?: run {
-                Sentry.withScope { scope ->
+                Sentry.captureMessage(
+                    "Cannot find message by uid for fetched calendar event inside Realm",
+                    SentryLevel.ERROR,
+                ) { scope ->
                     scope.setExtra("message.uid", message.uid)
                     val hasUserStoredEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent()
                     scope.setExtra("event has userStoredEvent", hasUserStoredEvent.toString())
                     scope.setExtra("event is canceled", calendarEventResponse.isCanceled.toString())
                     scope.setExtra("event has attachmentEvent", calendarEventResponse.hasAttachmentEvent().toString())
-                    Sentry.captureMessage("Cannot find message by uid for fetched calendar event inside Realm", SentryLevel.ERROR)
                 }
             }
         }

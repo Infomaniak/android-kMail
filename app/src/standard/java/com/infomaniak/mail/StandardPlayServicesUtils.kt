@@ -73,9 +73,8 @@ class StandardPlayServicesUtils @Inject constructor(
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 if (task.exception?.message?.contains(SERVICE_NOT_AVAILABLE_EXCEPTION) != true) {
-                    Sentry.withScope { scope ->
+                    Sentry.captureMessage("Fetching FCM registration token failed", SentryLevel.ERROR) { scope ->
                         scope.setExtra("task.exception", task.exception.toString())
-                        Sentry.captureMessage("Fetching FCM registration token failed", SentryLevel.ERROR)
                     }
                 }
                 SentryLog.w("firebase", "Fetching FCM registration token failed", task.exception)

@@ -41,9 +41,8 @@ open class BaseActivity : AppCompatActivity() {
         if (AccountUtils.currentUser == null) runBlocking {
             AccountUtils.requestCurrentUser()
             if (AccountUtils.currentUser == null) {
-                Sentry.withScope { scope ->
+                Sentry.captureMessage("BaseActivity> the current user is null") { scope ->
                     scope.setExtra("has been fixed", "false")
-                    Sentry.captureMessage("BaseActivity> the current user is null")
                 }
             }
         }

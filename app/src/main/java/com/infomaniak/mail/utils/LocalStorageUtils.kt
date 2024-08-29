@@ -121,11 +121,10 @@ object LocalStorageUtils {
 
             return@use getFileToUpload(context, uri, snackbarManager, attachmentsUploadDir, hashedFileName, inputStream)
         } ?: run {
-            Sentry.withScope { scope ->
+            Sentry.captureMessage("failed to access uri") { scope ->
                 scope.setExtra("uri is absolute", uri.isAbsolute.toString())
                 scope.setExtra("uri is relative", uri.isRelative.toString())
                 scope.setExtra("uri is opaque", uri.isOpaque.toString())
-                Sentry.captureMessage("failed to access uri")
             }
             null
         }
@@ -144,20 +143,21 @@ object LocalStorageUtils {
             FileOutputStream(file).use(inputStream::copyTo)
             true
         }.getOrElse {
-            Sentry.withScope { scope ->
+
+            val exception = it.message
+                ?.let { message -> AttachmentMissingFileException(message.replace(file.path, HIDDEN_FILE_NAME)) }
+                ?: it
+            exception.stackTrace = it.stackTrace
+
+            Sentry.captureException(exception) { scope ->
                 scope.setExtra("uri", uri.toString().replace(file.path, HIDDEN_FILE_NAME))
-                val exception = it.message
-                    ?.let { message -> AttachmentMissingFileException(message.replace(file.path, HIDDEN_FILE_NAME)) }
-                    ?: it
-
-                exception.stackTrace = it.stackTrace
-                Sentry.captureException(exception)
-
-                val isNameLong = exception.message?.contains(NAME_TOO_LONG_EXCEPTION) == true
-                val snackbarMessageId = if (isNameLong) R.string.errorFileNameTooLong else RCore.string.errorFileNotFound
-
-                snackbarManager.postValue(context.getString(snackbarMessageId))
             }
+
+            val isNameLong = exception.message?.contains(NAME_TOO_LONG_EXCEPTION) == true
+            val snackbarMessageId = if (isNameLong) R.string.errorFileNameTooLong else RCore.string.errorFileNotFound
+
+            snackbarManager.postValue(context.getString(snackbarMessageId))
+
             false
         }
 

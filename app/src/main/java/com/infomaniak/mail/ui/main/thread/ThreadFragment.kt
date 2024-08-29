@@ -630,15 +630,14 @@ class ThreadFragment : Fragment() {
             } else {
                 val targetChild = binding.messagesList.getChildAt(indexToScroll)
                 if (targetChild == null) {
-                    Sentry.withScope { scope ->
+                    Sentry.captureMessage(
+                        "Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom",
+                        SentryLevel.ERROR,
+                    ) { scope ->
                         scope.setExtra("indexToScroll", indexToScroll.toString())
                         scope.setExtra("messageCount", threadAdapter.items.count().toString())
                         scope.setExtra("isExpandedMap", threadState.isExpandedMap.toString())
                         scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
-                        Sentry.captureMessage(
-                            "Target child for scroll in ThreadFragment is null. Fallback to scrolling to bottom",
-                            SentryLevel.ERROR,
-                        )
                     }
                     getBottomY()
                 } else {
