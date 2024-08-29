@@ -304,10 +304,7 @@ class ThreadAdapter(
 
     private fun isThemeTheSameForMessageUid(messageUid: String) = threadAdapterState.isThemeTheSameMap[messageUid] ?: run {
         // TODO: Find the cause. The bug probably affects other parts of the code that do not crash
-        Sentry.captureMessage(
-            "Missing message uid inside isThemeTheSameMap",
-            SentryLevel.ERROR,
-        ) { scope ->
+        Sentry.captureMessage("Missing message uid inside isThemeTheSameMap", SentryLevel.ERROR) { scope ->
             val mapStringRepresentation = threadAdapterState.isThemeTheSameMap
                 .map { (key, value) -> "($key -> $value)" }
                 .joinToString(prefix = "[", postfix = "]")

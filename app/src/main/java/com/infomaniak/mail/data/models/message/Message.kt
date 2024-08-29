@@ -182,10 +182,7 @@ class Message : RealmObject {
                         }
                     }
                 }
-                Sentry.captureMessage(
-                    sentryMessage,
-                    SentryLevel.ERROR,
-                ) { scope ->
+                Sentry.captureMessage(sentryMessage, SentryLevel.ERROR) { scope ->
                     scope.setExtra("messageUid", uid)
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                     scope.setExtra("folders", "${_folders.map { "role:[${it.role?.name}] (id:[${it.id}])" }}")

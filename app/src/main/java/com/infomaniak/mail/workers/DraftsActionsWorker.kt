@@ -328,10 +328,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                 }
                 error?.exception is SerializationException -> {
                     realmActionOnDraft = deleteDraftCallback(draft)
-                    Sentry.captureMessage(
-                        "Return JSON for SendDraft API call was modified",
-                        SentryLevel.ERROR,
-                    ) { scope ->
+                    Sentry.captureMessage("Return JSON for SendDraft API call was modified", SentryLevel.ERROR) { scope ->
                         scope.setExtra("Is data null ?", "${data == null}")
                         scope.setExtra("Error code", error?.code.toString())
                         scope.setExtra("Error description", error?.description.toString())

@@ -173,10 +173,7 @@ object SentryDebug {
     //
     //  Also added in ThreadListAdapter & ThreadController the 04/06/24.
     fun sendEmptyThread(thread: Thread, message: String) = with(thread) {
-        Sentry.captureMessage(
-            message,
-            SentryLevel.ERROR,
-        ) { scope ->
+        Sentry.captureMessage(message, SentryLevel.ERROR) { scope ->
             scope.setExtra("currentUserId", "${AccountUtils.currentUserId}")
             scope.setExtra("currentMailboxEmail", AccountUtils.currentMailboxEmail.toString())
             scope.setExtra("folderId", folderId)
@@ -199,10 +196,7 @@ object SentryDebug {
         mailbox: Mailbox? = null,
         throwable: Throwable? = null,
     ) {
-        Sentry.captureMessage(
-            "Failed Notif : $reason",
-            sentryLevel,
-        ) { scope ->
+        Sentry.captureMessage("Failed Notif : $reason", sentryLevel) { scope ->
             scope.setExtra("userId", "${userId?.toString()}")
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("mailboxId", "${mailboxId?.toString()}")
@@ -232,10 +226,7 @@ object SentryDebug {
     fun sendOrphanMessages(previousCursor: String?, folder: Folder): List<Message> {
         val orphanMessages = folder.messages.filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
-            Sentry.captureMessage(
-                "We found some orphan Messages.",
-                SentryLevel.ERROR,
-            ) { scope ->
+            Sentry.captureMessage("We found some orphan Messages.", SentryLevel.ERROR) { scope ->
                 scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
                 scope.setExtra("number of Messages", "${orphanMessages.count()}")
                 scope.setExtra("previousCursor", "$previousCursor")
@@ -249,10 +240,7 @@ object SentryDebug {
     fun sendOrphanThreads(previousCursor: String?, folder: Folder, realm: TypedRealm): RealmResults<Thread> {
         val orphanThreads = ThreadController.getOrphanThreads(realm)
         if (orphanThreads.isNotEmpty()) {
-            Sentry.captureMessage(
-                "We found some orphan Threads.",
-                SentryLevel.ERROR,
-            ) { scope ->
+            Sentry.captureMessage("We found some orphan Threads.", SentryLevel.ERROR) { scope ->
                 scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
                 scope.setExtra("number of Threads", "${orphanThreads.count()}")
                 scope.setExtra("number of Messages", "${orphanThreads.map { it.messages.count() }}")
@@ -266,10 +254,7 @@ object SentryDebug {
 
     fun sendOrphanDrafts(orphans: List<Draft>) {
         if (orphans.isNotEmpty()) {
-            Sentry.captureMessage(
-                "We found some orphan Drafts.",
-                SentryLevel.ERROR,
-            ) { scope ->
+            Sentry.captureMessage("We found some orphan Drafts.", SentryLevel.ERROR) { scope ->
                 scope.setExtra(
                     "orphanDrafts",
                     orphans.joinToString {
@@ -285,10 +270,7 @@ object SentryDebug {
     }
 
     fun sendOverScrolledMessage(clientWidth: Int, scrollWidth: Int, messageUid: String) {
-        Sentry.captureMessage(
-            "When resizing the mail with js, after zooming, it can still scroll.",
-            SentryLevel.ERROR,
-        ) { scope ->
+        Sentry.captureMessage("When resizing the mail with js, after zooming, it can still scroll.", SentryLevel.ERROR) { scope ->
             scope.setTag("messageUid", messageUid)
             scope.setExtra("clientWidth", "$clientWidth")
             scope.setExtra("scrollWidth", "$scrollWidth")
@@ -296,10 +278,7 @@ object SentryDebug {
     }
 
     fun sendJavaScriptError(errorName: String, errorMessage: String, errorStack: String, messageUid: String) {
-        Sentry.captureMessage(
-            "JavaScript returned an error when displaying an email.",
-            SentryLevel.ERROR,
-        ) { scope ->
+        Sentry.captureMessage("JavaScript returned an error when displaying an email.", SentryLevel.ERROR) { scope ->
             scope.setTag("messageUid", messageUid)
             scope.setExtra("errorName", errorName)
             scope.setExtra("errorMessage", errorMessage)
@@ -315,10 +294,7 @@ object SentryDebug {
     }
 
     fun sendCredentialsIssue(infomaniakLogin: String?, infomaniakPassword: String) {
-        Sentry.captureMessage(
-            "Credentials issue when trying to auto-sync user",
-            SentryLevel.ERROR,
-        ) { scope ->
+        Sentry.captureMessage("Credentials issue when trying to auto-sync user", SentryLevel.ERROR) { scope ->
             scope.setExtra("email", "${AccountUtils.currentUser?.email}")
             val loginStatus = when {
                 infomaniakLogin == null -> "is null"
@@ -337,7 +313,9 @@ object SentryDebug {
     }
 
     fun sendWebViewVersionName(webViewPackageName: String?, webViewVersionName: String?, majorVersion: Int) {
-        Sentry.captureMessage("WebView version name might be null on some devices. Checking that the version name is ok.") { scope ->
+        Sentry.captureMessage(
+            "WebView version name might be null on some devices. Checking that the version name is ok.",
+        ) { scope ->
             scope.setTag("webViewPackageName", "$webViewPackageName")
             scope.setTag("webViewVersionName", "$webViewVersionName")
             scope.setTag("majorVersion", "$majorVersion")
