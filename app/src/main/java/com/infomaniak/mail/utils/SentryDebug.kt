@@ -103,7 +103,11 @@ object SentryDebug {
         )
     }
 
-    fun addAttachmentsBreadcrumb(draft: Draft, step: String) = with(draft) {
+    fun addDraftsBreadcrumbs(drafts: List<Draft>, step: String) {
+        drafts.forEach { addDraftBreadcrumbs(it, step) }
+    }
+
+    fun addDraftBreadcrumbs(draft: Draft, step: String) = with(draft) {
 
         var count = 1
         val data = mutableMapOf<String, Any>()
@@ -132,6 +136,7 @@ object SentryDebug {
 
         addDraftData(key = "localUuid", value = localUuid)
         addDraftData(key = "remoteUuid", value = remoteUuid.toString())
+        addDraftData(key = "messageUid", value = messageUid.toString())
         addDraftData(key = "action", value = action?.name.toString())
 
         val draftMode = when {

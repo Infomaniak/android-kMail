@@ -127,6 +127,11 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     private suspend fun handleDraftsActions(): Result {
 
+        SentryDebug.addDraftsBreadcrumbs(
+            drafts = draftController.getAllDrafts(mailboxContentRealm),
+            step = "before handleDraftsActions",
+        )
+
         // List containing the callback function to update/delete drafts in Realm
         // We keep these Realm changes in a List to execute them all in a unique Realm transaction at the end of the worker
         val realmActionsOnDraft = mutableListOf<(MutableRealm) -> Unit>()
@@ -194,6 +199,11 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         mailboxContentRealm.executeRealmCallbacks(realmActionsOnDraft)
+
+        SentryDebug.addDraftsBreadcrumbs(
+            drafts = draftController.getAllDrafts(mailboxContentRealm),
+            step = "after handleDraftsActions",
+        )
 
         mailboxContentRealm.writeBlocking {
             val orphans = DraftController.getOrphanDrafts(realm = this)
@@ -284,10 +294,9 @@ class DraftsActionsWorker @AssistedInject constructor(
         var scheduledDate: String? = null
         var savedDraftUuid: String? = null
 
-        SentryDebug.addAttachmentsBreadcrumb(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
+        SentryDebug.addDraftBreadcrumbs(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
 
-        // TODO: Remove this whole `draft.attachments.any { … }` + `addAttachmentsBreadcrumb()`
-        //  when the Attachments issue is fixed.
+        // TODO: Remove this whole `draft.attachments.any { … }` + `addDraftBreadcrumbs()` when the Attachments issue is fixed.
         if (draft.attachments.any { it.uploadStatus != UploadStatus.FINISHED }) {
 
             Sentry.captureMessage(

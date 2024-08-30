@@ -202,7 +202,7 @@ object AttachmentExtensions {
                     add(remoteAttachment)
                 }
 
-                SentryDebug.addAttachmentsBreadcrumb(draft, step = "update local Attachment after success upload")
+                SentryDebug.addDraftBreadcrumbs(draft, step = "update local Attachment after success upload")
             }
         }
     }

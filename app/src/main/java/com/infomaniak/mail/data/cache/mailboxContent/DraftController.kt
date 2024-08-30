@@ -43,6 +43,10 @@ class DraftController @Inject constructor(
         return getDraftsWithActionsCount(mailboxContentRealm())
     }
 
+    fun getAllDrafts(realm: TypedRealm): RealmResults<Draft> {
+        return getDraftsQuery(realm = realm).find()
+    }
+
     fun getDraft(localUuid: String): Draft? {
         return getDraft(localUuid, mailboxContentRealm())
     }
