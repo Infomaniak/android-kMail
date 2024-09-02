@@ -388,19 +388,18 @@ class RefreshController @Inject constructor(
         apiResponse.data?.messages?.let { messages ->
 
             writeBlocking {
-                findLatest(folder)?.let { latestFolder ->
-                    val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
-                    val allImpactedThreads = createThreads(scope, latestFolder, messages, isConversationMode).also { threads ->
-                        val foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id
-                        foldersIds.forEach { refreshUnreadCount(id = it, realm = this) }
-                    }
-                    SentryLog.d(
-                        "Realm",
-                        "Saved Messages: ${latestFolder.displayForSentry()} | ${latestFolder.messages.count()}",
-                    )
-
-                    impactedThreads += allImpactedThreads.filter { it.folderId == folder.id }
+                val upToDateFolder = getUpToDateFolder(folder.id)
+                val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
+                val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode).also { threads ->
+                    val foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id
+                    foldersIds.forEach { refreshUnreadCount(id = it, realm = this) }
                 }
+                SentryLog.d(
+                    "Realm",
+                    "Saved Messages: ${upToDateFolder.displayForSentry()} | ${upToDateFolder.messages.count()}",
+                )
+
+                impactedThreads += allImpactedThreads.filter { it.folderId == upToDateFolder.id }
             }
         }
 
@@ -725,16 +724,15 @@ class RefreshController @Inject constructor(
 
     private fun Realm.sendSentryOrphans(folder: Folder, previousCursor: String? = null) {
         writeBlocking {
-            findLatest(folder)?.let {
-                SentryDebug.sendOrphanMessages(previousCursor, folder = it).also { orphans ->
-                    MessageController.deleteMessages(appContext, mailbox, orphans, realm = this)
+            val upToDateFolder = getUpToDateFolder(folder.id)
+            SentryDebug.sendOrphanMessages(previousCursor, folder = upToDateFolder).also { orphans ->
+                MessageController.deleteMessages(appContext, mailbox, orphans, realm = this)
+            }
+            SentryDebug.sendOrphanThreads(previousCursor, folder = upToDateFolder, realm = this).also { orphans ->
+                orphans.forEach { thread ->
+                    MessageController.deleteMessages(appContext, mailbox, thread.messages, realm = this)
                 }
-                SentryDebug.sendOrphanThreads(previousCursor, folder = it, realm = this).also { orphans ->
-                    orphans.forEach { thread ->
-                        MessageController.deleteMessages(appContext, mailbox, thread.messages, realm = this)
-                    }
-                    delete(orphans)
-                }
+                delete(orphans)
             }
         }
     }
