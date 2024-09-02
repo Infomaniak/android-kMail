@@ -22,24 +22,64 @@ import io.realm.kotlin.log.RealmLogger
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class SentryRealmLogger : RealmLogger {
 
-    override val level: LogLevel = LogLevel.DEBUG
+    private val mutex = Mutex()
+    private val messagesMap = mutableMapOf<Long, MutableList<String>>()
 
-    override val tag: String = "Realm"
+    override val level = LogLevel.DEBUG
+    override val tag = "Realm"
 
     override fun log(level: LogLevel, throwable: Throwable?, message: String?, vararg args: Any?) {
+
         val throwableMessage = throwable?.message
-        val breadcrumb = if (throwableMessage == null) {
-            Breadcrumb().apply {
-                this.level = SentryLevel.INFO
-                this.category = tag
-                this.message = "($tag): $message"
-            }
-        } else {
-            Breadcrumb.error(throwableMessage).apply { category = "exception" }
+        if (throwableMessage != null) {
+            val breadcrumb = Breadcrumb.error(throwableMessage).apply { category = "exception" }
+            Sentry.addBreadcrumb(breadcrumb)
+            return
         }
-        Sentry.addBreadcrumb(breadcrumb)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            mutex.withLock {
+                val now = System.currentTimeMillis() / MAX_DELAY
+
+                message?.let {
+                    if (messagesMap[now] == null) {
+                        messagesMap[now] = mutableListOf(it)
+                    } else {
+                        messagesMap[now]?.add(it)
+                    }
+                }
+
+                var shouldContinue = true
+                while (shouldContinue) {
+                    val key = messagesMap.keys.firstOrNull()
+                    val values = messagesMap[key]
+                    if (key != null && (key < now || values!!.count() > MAX_ZIP)) {
+                        val breadcrumb = Breadcrumb().apply {
+                            this.level = SentryLevel.INFO
+                            this.category = tag
+                            this.message = values?.joinToString(separator = "\n") { it }
+                        }
+                        Sentry.addBreadcrumb(breadcrumb)
+                        messagesMap.remove(key)
+
+                    } else {
+                        shouldContinue = false
+                    }
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val MAX_DELAY = 100
+        private const val MAX_ZIP = 100
     }
 }
