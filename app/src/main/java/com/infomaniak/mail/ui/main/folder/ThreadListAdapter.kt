@@ -49,6 +49,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -74,6 +75,7 @@ import com.infomaniak.lib.core.R as RCore
 class ThreadListAdapter @Inject constructor(
     @ActivityContext context: Context,
     private val localSettings: LocalSettings,
+    private val mailboxContentRealm: RealmDatabase.MailboxContent,
 ) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private var formatListJob: Job? = null
@@ -199,7 +201,11 @@ class ThreadListAdapter @Inject constructor(
             // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
             //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
             callbacks?.deleteThreadInRealm?.invoke(thread.uid)
-            SentryDebug.sendEmptyThread(thread, "No Message in the Thread when displaying it in ThreadList")
+            SentryDebug.sendEmptyThread(
+                thread = thread,
+                message = "No Message in the Thread when displaying it in ThreadList",
+                realm = mailboxContentRealm(),
+            )
             return
         }
 

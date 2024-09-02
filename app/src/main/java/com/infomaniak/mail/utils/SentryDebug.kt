@@ -172,18 +172,24 @@ object SentryDebug {
     //  If this doesn't trigger after a certain amount of time, you can remove it.
     //
     //  Also added in ThreadListAdapter & ThreadController the 04/06/24.
-    fun sendEmptyThread(thread: Thread, message: String) = with(thread) {
+    fun sendEmptyThread(thread: Thread, message: String, realm: TypedRealm) = with(thread) {
+
+        val messageFromThreadUid = MessageController.getMessage(uid, realm)
+
         Sentry.captureMessage(message, SentryLevel.ERROR) { scope ->
-            scope.setExtra("currentUserId", "${AccountUtils.currentUserId}")
-            scope.setExtra("currentMailboxEmail", AccountUtils.currentMailboxEmail.toString())
-            scope.setExtra("folderId", folderId)
-            scope.setExtra("folder.id", folder.id)
-            scope.setExtra("folder.role", folder.role?.name.toString())
-            scope.setExtra("uid", uid)
-            scope.setExtra("messages.count", "${messages.count()}")
-            scope.setExtra("duplicates.count", "${duplicates.count()}")
-            scope.setExtra("isFromSearch", "$isFromSearch")
-            scope.setExtra("hasDrafts", "$hasDrafts")
+            scope.setExtra("01. currentUserId", "${AccountUtils.currentUserId}")
+            scope.setExtra("02. currentMailboxEmail", AccountUtils.currentMailboxEmail.toString())
+            scope.setExtra("03. folderId", folderId)
+            scope.setExtra("04. folder.id", folder.id)
+            scope.setExtra("05. folder.role", folder.role?.name.toString())
+            scope.setExtra("06. thread.uid", uid)
+            scope.setExtra("07. thread.messages.count", "${messages.count()}")
+            scope.setExtra("08. thread.duplicates.count", "${duplicates.count()}")
+            scope.setExtra("09. thread.isFromSearch", "$isFromSearch")
+            scope.setExtra("10. thread.hasDrafts", "$hasDrafts")
+            scope.setExtra("11. message.uid", "${messageFromThreadUid?.uid}")
+            scope.setExtra("12. message.folderId", "${messageFromThreadUid?.folderId}")
+            scope.setExtra("13. message.folder.id", "${messageFromThreadUid?.folder?.id}")
         }
     }
 
