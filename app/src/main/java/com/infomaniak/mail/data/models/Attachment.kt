@@ -82,10 +82,10 @@ class Attachment : EmbeddedRealmObject, Attachable {
      * After uploading an Attachment, we replace the local version with the remote one.
      * The remote one doesn't know about local data, so we have to backup them.
      */
-    fun backupLocalData(oldAttachment: Attachment, uploadStatus: UploadStatus, draft: Draft) {
+    fun backupLocalData(oldAttachment: Attachment, draft: Draft) {
         localUuid = oldAttachment.localUuid
         uploadLocalUri = oldAttachment.uploadLocalUri
-        setUploadStatus(uploadStatus, draft, "backupLocalData -> setUploadStatus")
+        setUploadStatus(UploadStatus.FINISHED, draft, "backupLocalData -> setUploadStatus")
     }
 
     fun setUploadStatus(uploadStatus: UploadStatus, draft: Draft? = null, step: String = "") {

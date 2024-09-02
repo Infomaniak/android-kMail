@@ -115,7 +115,7 @@ object SentryDebug {
         fun Int.countPadding(): String = toString().padStart(length = 2, '0')
 
         fun addData(category: String, key: String = "", value: String) {
-            data[count.countPadding() + "." + category.padStart(length = 15) + key] = value
+            data[count.countPadding() + "." + (category + key).padStart(length = 19)] = value
             count++
         }
 

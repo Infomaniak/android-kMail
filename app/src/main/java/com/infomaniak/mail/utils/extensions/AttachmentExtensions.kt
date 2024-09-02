@@ -34,7 +34,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Attachment.UploadStatus
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
@@ -191,7 +190,7 @@ object AttachmentExtensions {
                 SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (uuids to localUris): $uuidToLocalUri")
                 SentryLog.d(ATTACHMENT_TAG, "Target uploadLocalUri is: $uploadLocalUri")
 
-                remoteAttachment.backupLocalData(oldAttachment = this@updateLocalAttachment, UploadStatus.FINISHED, draft)
+                remoteAttachment.backupLocalData(oldAttachment = this@updateLocalAttachment, draft)
 
                 SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment uuid: ${remoteAttachment.uuid}")
                 SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment localUuid: ${remoteAttachment.localUuid}")
