@@ -323,7 +323,7 @@ class NewMessageViewModel @Inject constructor(
                         resource = previousMessage.attachments.find { it.name == name }?.resource
                         setUploadStatus(UploadStatus.FINISHED)
                     }
-                    SentryDebug.addAttachmentsBreadcrumb(draft, step = "set previousMessage when reply/replyAll/Forward")
+                    SentryDebug.addDraftBreadcrumbs(draft, step = "set previousMessage when reply/replyAll/Forward")
                 }
 
                 initialQuote = replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)
@@ -413,7 +413,7 @@ class NewMessageViewModel @Inject constructor(
 
         if (mailToUri != null) handleMailTo(draft, mailToUri)
 
-        SentryDebug.addAttachmentsBreadcrumb(draft, step = "populate Draft with external mail data")
+        SentryDebug.addDraftBreadcrumbs(draft, step = "populate Draft with external mail data")
     }
 
     private fun Draft.flagRecipientsAsAutomaticallyEntered() {
@@ -986,7 +986,7 @@ class NewMessageViewModel @Inject constructor(
             addAll(updatedAttachments)
         }
 
-        SentryDebug.addAttachmentsBreadcrumb(draft = this, step)
+        SentryDebug.addDraftBreadcrumbs(draft = this, step)
     }
 
     private fun isSnapshotTheSame(subjectValue: String?, uiBodyValue: String): Boolean {

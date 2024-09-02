@@ -89,7 +89,7 @@ class Attachment : EmbeddedRealmObject, Attachable {
     }
 
     fun setUploadStatus(uploadStatus: UploadStatus, draft: Draft? = null, step: String = "") {
-        draft?.let { SentryDebug.addAttachmentsBreadcrumb(it, step) }
+        draft?.let { SentryDebug.addDraftBreadcrumbs(it, step) }
         _uploadStatus = uploadStatus.name
     }
 
