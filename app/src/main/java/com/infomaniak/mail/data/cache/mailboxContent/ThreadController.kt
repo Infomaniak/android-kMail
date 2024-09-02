@@ -301,7 +301,7 @@ class ThreadController @Inject constructor(
 
                 if (apiResponse.isSuccess()) return@runCatching apiResponse.data
 
-                SentryLog.e(TAG, "Could not fetch SwissTransfer container")
+                SentryLog.i(TAG, "Could not fetch SwissTransfer container")
                 return@runCatching null
             }.getOrNull()
 

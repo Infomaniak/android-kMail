@@ -167,9 +167,11 @@ object AttachmentExtensions {
         if (apiResponse.isSuccess() && apiResponse.data != null) {
             updateLocalAttachment(draftLocalUuid, apiResponse.data!!, draftController, realm)
         } else {
-            SentryLog.e(
+            val baseMessage = "Upload failed for attachment $localUuid"
+            val errorMessage = "error : ${apiResponse.translatedError}"
+            SentryLog.i(
                 tag = ATTACHMENT_TAG,
-                msg = "Upload failed for attachment $localUuid - error : ${apiResponse.translatedError} - data : ${apiResponse.data}",
+                msg = "$baseMessage - $errorMessage - data : ${apiResponse.data}",
                 throwable = apiResponse.getApiException(),
             )
 
