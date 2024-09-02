@@ -34,7 +34,6 @@ class SentryRealmLogger : RealmLogger {
     private val messagesMap = mutableMapOf<Long, MutableList<String>>()
 
     override val level = LogLevel.DEBUG
-
     override val tag = "Realm"
 
     override fun log(level: LogLevel, throwable: Throwable?, message: String?, vararg args: Any?) {
