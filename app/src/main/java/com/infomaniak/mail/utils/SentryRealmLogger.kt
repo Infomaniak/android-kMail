@@ -45,7 +45,7 @@ class SentryRealmLogger : RealmLogger {
             return
         }
 
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             mutex.withLock {
                 val now = System.currentTimeMillis() / MAX_DELAY
 
