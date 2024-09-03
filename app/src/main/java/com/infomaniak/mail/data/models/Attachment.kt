@@ -26,6 +26,7 @@ import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.types.EmbeddedRealmObject
+import io.sentry.Sentry
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -61,8 +62,13 @@ class Attachment : EmbeddedRealmObject, Attachable {
     private var _uploadStatus: String = UploadStatus.AWAITING.name
     //endregion
 
-    val uploadStatus: UploadStatus
-        get() = enumValueOf<UploadStatus>(_uploadStatus)
+    val uploadStatus: UploadStatus?
+        get() = runCatching {
+            enumValueOf<UploadStatus>(_uploadStatus)
+        }.getOrElse {
+            Sentry.captureException(it) { scope -> scope.setTag("_uploadStatus", _uploadStatus) }
+            null
+        }
 
     val isCalendarEvent: Boolean get() = AttachableMimeTypeUtils.calendarMatches.contains(mimeType)
 
