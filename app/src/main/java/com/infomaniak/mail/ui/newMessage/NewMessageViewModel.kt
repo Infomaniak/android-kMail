@@ -772,18 +772,13 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent("deleteRecipient")
     }
 
-    fun deleteAttachment(position: Int) {
-        runCatching {
-            val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
-            val attachment = attachments[position]
-            attachment.getUploadLocalFile()?.delete()
-            LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
-            attachments.removeAt(position)
-            attachmentsLiveData.value = attachments
-        }.onFailure { exception ->
-            // TODO: If we don't see this Sentry after mid-2024, we can remove it.
-            SentryLog.e(TAG, " Attachment $position doesn't exist", exception)
-        }
+    fun deleteAttachment(position: Int) = runCatching {
+        val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
+        val attachment = attachments[position]
+        attachment.getUploadLocalFile()?.delete()
+        LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
+        attachments.removeAt(position)
+        attachmentsLiveData.value = attachments
     }
 
     fun updateIsSendingAllowed(
