@@ -82,6 +82,8 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     private fun MutableList<Any>.addMailboxes(mailboxes: List<Mailbox>, areMailboxesExpanded: Boolean) {
         val currentMailboxIndex = mailboxes.indexOfFirst { it.mailboxId == AccountUtils.currentMailboxId }
+        if (mailboxes.isEmpty() || currentMailboxIndex == -1) return
+
         val otherMailboxes = mailboxes.toMutableList()
         val currentMailbox = otherMailboxes.removeAt(currentMailboxIndex)
 
