@@ -155,7 +155,7 @@ object SentryDebug {
             )
             addAttachmentData(
                 index = index,
-                value = "uploadStatus: ${it.uploadStatus.name} | size: ${it.size}",
+                value = "uploadStatus: ${it.uploadStatus?.name} | size: ${it.size}",
             )
         }
 
