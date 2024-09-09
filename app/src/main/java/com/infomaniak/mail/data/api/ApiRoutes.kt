@@ -180,7 +180,7 @@ object ApiRoutes {
     }
 
     fun getMessagesByUids(mailboxUuid: String, folderId: String, uids: List<Int>): String {
-        return "${getMessages(mailboxUuid, folderId)}/messages?uids=${uids.joinToString(",")}"
+        return "${getMessages(mailboxUuid, folderId)}/messages?uids=${uids.joinToString(separator = ",")}"
     }
     //endregion
 

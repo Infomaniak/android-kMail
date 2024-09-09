@@ -239,7 +239,7 @@ class AiPropositionFragment : Fragment() {
 
     private fun generateNewAiProposition() {
         val formattedRecipientsString = newMessageViewModel.toLiveData.valueOrEmpty()
-            .joinToString(", ") { it.name }
+            .joinToString(separator = ", ") { it.name }
             .takeIf { it.isNotBlank() }
         val currentMailboxUuid = newMessageViewModel.currentMailbox.uuid
         currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
