@@ -121,7 +121,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             }
         }
 
-        val filtersQuery = queriesList.joinToString(" AND ") { it }
+        val filtersQuery = queriesList.joinToString(separator = " AND ")
 
         return if (searchQuery?.isNotBlank() == true) {
             val containsSubject = "${Message::subject.name} CONTAINS[c] $0"

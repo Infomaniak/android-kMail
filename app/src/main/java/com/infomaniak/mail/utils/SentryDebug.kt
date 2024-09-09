@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.os.Bundle
+import android.util.Log
 import androidx.navigation.NavController
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -115,7 +116,7 @@ object SentryDebug {
         fun Int.countPadding(): String = toString().padStart(length = 2, '0')
 
         fun addData(category: String, key: String = "", value: String) {
-            data[count.countPadding() + "." + (category + key).padStart(length = 19)] = value
+            data[count.countPadding() + "." + (category + key).padStart(length = 20)] = value
             count++
         }
 
@@ -159,7 +160,9 @@ object SentryDebug {
             )
         }
 
-        addInfoBreadcrumb(category = "Attachments_Situation", data = data)
+        val category = "Attachments_Situation"
+        Log.i(category, data.map { "${it.key}: ${it.value}" }.joinToString(separator = "\n"))
+        addInfoBreadcrumb(category = category, data = data)
     }
 
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {

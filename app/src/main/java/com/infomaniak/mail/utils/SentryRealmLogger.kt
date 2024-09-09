@@ -65,7 +65,7 @@ class SentryRealmLogger : RealmLogger {
                         val breadcrumb = Breadcrumb().apply {
                             this.level = SentryLevel.INFO
                             this.category = tag
-                            this.message = values?.joinToString(separator = "\n") { it }
+                            this.message = values?.joinToString(separator = "\n")
                         }
                         Sentry.addBreadcrumb(breadcrumb)
                         messagesMap.remove(key)
