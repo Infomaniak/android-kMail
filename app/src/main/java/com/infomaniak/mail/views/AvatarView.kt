@@ -232,14 +232,12 @@ class AvatarView @JvmOverloads constructor(
         if (correspondent.shouldDisplayUserAvatar()) {
             this@AvatarView.loadAvatar(AccountUtils.currentUser!!)
         } else {
-            val avatar = (correspondent as? MergedContact)?.avatar
-            val color = context.getColor(R.color.onColorfulBackground)
             loadAvatar(
                 backgroundColor = context.getBackgroundColorBasedOnId(correspondent.email.hashCode(), R.array.AvatarColors),
-                avatarUrl = avatar,
+                avatarUrl = (correspondent as? MergedContact)?.avatar,
                 initials = correspondent.initials,
                 imageLoader = context.imageLoader,
-                initialsColor = color,
+                initialsColor = context.getColor(R.color.onColorfulBackground),
             )
         }
     }
