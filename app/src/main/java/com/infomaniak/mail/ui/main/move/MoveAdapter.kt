@@ -60,8 +60,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
 
         selectedFolderId = newSelectedFolderId
 
-        var shouldForceNotify = false
-        if (newShouldDisplayIndent != shouldDisplayIndent) shouldForceNotify = true
+        val shouldForceNotify = newShouldDisplayIndent != shouldDisplayIndent
         shouldDisplayIndent = newShouldDisplayIndent
 
         submitList(newFolders)

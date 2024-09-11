@@ -69,7 +69,7 @@ class MoveViewModel @Inject constructor(
             allFolders = folderController.getMoveFolders()
                 .flattenFolderChildrenAndRemoveMessages()
                 .addDividerBeforeFirstCustomFolder(dividerType = Unit)
-                .also { filterResults.postValue(it to true) }
+                .also { folders -> filterResults.postValue(folders to true) }
         }
     }
 
