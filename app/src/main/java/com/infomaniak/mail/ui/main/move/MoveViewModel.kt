@@ -55,7 +55,7 @@ class MoveViewModel @Inject constructor(
 
     private var allFolders = emptyList<Any>()
     val sourceFolderIdLiveData = MutableLiveData<String>()
-    val filterResults = MutableLiveData<List<Any>>()
+    val filterResults = MutableLiveData<Pair<List<Any>, Boolean>>()
     var hasAlreadyTrackedSearch = false
 
     init {
@@ -69,7 +69,7 @@ class MoveViewModel @Inject constructor(
             allFolders = folderController.getMoveFolders()
                 .flattenFolderChildrenAndRemoveMessages()
                 .addDividerBeforeFirstCustomFolder(dividerType = Unit)
-                .also(filterResults::postValue)
+                .also { filterResults.postValue(it to true) }
         }
     }
 
@@ -78,7 +78,7 @@ class MoveViewModel @Inject constructor(
             searchFolders(query, shouldDebounce)
         } else {
             cancelSearch()
-            filterResults.value = allFolders
+            filterResults.value = allFolders to true
         }
     }
 
@@ -103,7 +103,7 @@ class MoveViewModel @Inject constructor(
                 }
             }
 
-            filterResults.postValue(filteredFolders)
+            filterResults.postValue(filteredFolders to false)
         }
     }
 

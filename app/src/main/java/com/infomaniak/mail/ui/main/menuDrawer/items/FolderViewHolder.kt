@@ -98,15 +98,18 @@ class FolderViewHolder(
         setFolderUi(folder, iconId, isSelected = folder.id == currentFolderId)
 
         initOnCollapsableClickListener { onCollapseChildrenClicked(folder.id, isCollapsed) }
+
         isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
         unreadCount = unread?.count ?: 0
         isCollapsed = folder.isCollapsed
         canBeCollapsed = folder.canBeCollapsed
+
         setIndent(
             indent = folderIndent,
             hasCollapsableFolder = hasCollapsableFolder,
             canBeCollapsed = canBeCollapsed,
         )
+
         setCollapsingButtonContentDescription(folderName)
 
         setOnClickListener {
@@ -123,6 +126,6 @@ class FolderViewHolder(
     )
 
     companion object {
-        private const val MAX_SUB_FOLDERS_INDENT = 2
+        const val MAX_SUB_FOLDERS_INDENT = 2
     }
 }

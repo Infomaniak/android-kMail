@@ -97,8 +97,9 @@ class MoveFragment : Fragment() {
     }
 
     private fun observeSearchResults() = with(moveViewModel) {
-        Utils.waitInitMediator(sourceFolderIdLiveData, filterResults).observe(viewLifecycleOwner) { (sourceFolderId, folders) ->
-            moveAdapter.setFolders(sourceFolderId, folders)
+        Utils.waitInitMediator(sourceFolderIdLiveData, filterResults).observe(viewLifecycleOwner) { (sourceFolderId, results) ->
+            val (folders, shouldDisplayIndent) = results
+            moveAdapter.setFolders(sourceFolderId, shouldDisplayIndent, folders)
         }
     }
 
