@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.move
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -27,13 +28,17 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemDividerHorizontalBinding
 import com.infomaniak.mail.databinding.ItemSelectableFolderBinding
-import com.infomaniak.mail.ui.main.move.MoveAdapter.FolderViewHolder
+import com.infomaniak.mail.ui.main.menuDrawer.items.FolderViewHolder
+import com.infomaniak.mail.ui.main.move.MoveAdapter.MoveFolderViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.views.itemViews.SelectableFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import javax.inject.Inject
+import kotlin.math.min
 
-class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(FolderDiffCallback()) {
+class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>(FolderDiffCallback()) {
+
+    var shouldDisplayIndent: Boolean = false
 
     private var selectedFolderId: String? = null
 
@@ -50,9 +55,16 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(Fol
         return this
     }
 
-    fun setFolders(newSelectedFolderId: String, newFolders: List<Any>) = runCatchingRealm {
+    @SuppressLint("NotifyDataSetChanged")
+    fun setFolders(newSelectedFolderId: String, newShouldDisplayIndent: Boolean, newFolders: List<Any>) = runCatchingRealm {
+
         selectedFolderId = newSelectedFolderId
+
+        val shouldForceNotify = newShouldDisplayIndent != shouldDisplayIndent
+        shouldDisplayIndent = newShouldDisplayIndent
+
         submitList(newFolders)
+        if (shouldForceNotify) notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = runCatchingRealm { currentList.size }.getOrDefault(0)
@@ -64,17 +76,17 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(Fol
         }
     }.getOrDefault(super.getItemViewType(position))
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoveFolderViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = if (viewType == DisplayType.FOLDER.layout) {
             ItemSelectableFolderBinding.inflate(layoutInflater, parent, false)
         } else {
             ItemDividerHorizontalBinding.inflate(layoutInflater, parent, false)
         }
-        return FolderViewHolder(binding)
+        return MoveFolderViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
+    override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
         if (payloads.firstOrNull() == Unit) {
             val isSelected = selectedFolderId == (currentList[position] as Folder).id
             (holder.binding as ItemSelectableFolderBinding).root.setSelectedState(isSelected)
@@ -83,7 +95,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(Fol
         }
     }.getOrDefault(Unit)
 
-    override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
+    override fun onBindViewHolder(holder: MoveFolderViewHolder, position: Int) = with(holder.binding) {
         if (getItemViewType(position) == DisplayType.FOLDER.layout) {
             (this as ItemSelectableFolderBinding).root.displayFolder(currentList[position] as Folder)
         }
@@ -91,22 +103,24 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, FolderViewHolder>(Fol
 
     private fun SelectableFolderItemView.displayFolder(folder: Folder) {
 
-        val isSelected = folder.id == selectedFolderId
-
-        folder.role?.let {
-            setFolderUi(folder, it.folderIconRes, isSelected)
-        } ?: run {
-            setFolderUi(
-                folder = folder,
-                iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
-                isSelected = isSelected,
-            )
+        val iconId = when {
+            folder.role != null -> folder.role!!.folderIconRes
+            folder.isFavorite -> R.drawable.ic_folder_star
+            else -> R.drawable.ic_folder
         }
+        setFolderUi(folder, iconId, isSelected = folder.id == selectedFolderId)
+
+        val folderIndent = when {
+            !shouldDisplayIndent -> 0
+            folder.role != null -> 0
+            else -> min(folder.path.split(folder.separator).size - 1, FolderViewHolder.MAX_SUB_FOLDERS_INDENT)
+        }
+        setIndent(indent = folderIndent, hasCollapsableFolder = false, canBeCollapsed = false)
 
         setOnClickListener { onFolderClicked.invoke(folder.id) }
     }
 
-    class FolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
+    class MoveFolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 
     private enum class DisplayType(val layout: Int) {
         FOLDER(R.layout.item_selectable_folder),
