@@ -108,22 +108,14 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
             folder.isFavorite -> R.drawable.ic_folder_star
             else -> R.drawable.ic_folder
         }
-        setFolderUi(
-            folder = folder,
-            iconId = iconId,
-            isSelected = folder.id == selectedFolderId,
-        )
+        setFolderUi(folder, iconId, isSelected = folder.id == selectedFolderId)
 
         val folderIndent = when {
             !shouldDisplayIndent -> 0
             folder.role != null -> 0
             else -> min(folder.path.split(folder.separator).size - 1, FolderViewHolder.MAX_SUB_FOLDERS_INDENT)
         }
-        setIndent(
-            indent = folderIndent,
-            hasCollapsableFolder = false,
-            canBeCollapsed = false,
-        )
+        setIndent(indent = folderIndent, hasCollapsableFolder = false, canBeCollapsed = false)
 
         setOnClickListener { onFolderClicked.invoke(folder.id) }
     }
