@@ -74,6 +74,7 @@ class ThreadViewModel @Inject constructor(
 
     val threadLive = MutableLiveData<Thread?>()
     val messagesLive = MutableLiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>()
+    val batchedMessages = SingleLiveEvent<List<Any>>()
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
@@ -244,6 +245,23 @@ class ThreadViewModel @Inject constructor(
         }
 
         return@withContext message
+    }
+
+    fun displayBatchedMessages(items: List<Any>) = viewModelScope.launch(ioCoroutineContext) {
+
+        tailrec suspend fun sendBatchesRecursively(input: List<Any>, output: MutableList<Any>, batchSize: Int = 1) {
+
+            val batch = input.take(batchSize)
+            output.addAll(batch)
+            batchedMessages.postValue(output.toMutableList())
+            if (batch.size < batchSize) return
+
+            delay(50L)
+
+            sendBatchesRecursively(input.subList(batchSize, input.size), output)
+        }
+
+        sendBatchesRecursively(input = items, output = mutableListOf(), batchSize = 2)
     }
 
     fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
@@ -449,7 +467,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     companion object {
-        private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
+        const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
     }
 }
