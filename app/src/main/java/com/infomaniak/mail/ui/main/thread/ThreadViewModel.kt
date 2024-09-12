@@ -253,11 +253,13 @@ class ThreadViewModel @Inject constructor(
 
             val batch = input.take(batchSize)
             output.addAll(batch)
-            batchedMessages.postValue(output.toMutableList())
+
+            // We need to post a different list each time, because the `submitList` function in AsyncListDiffer
+            // won't trigger if we send the same list object (https://stackoverflow.com/questions/49726385).
+            batchedMessages.postValue(ArrayList(output))
+
             if (batch.size < batchSize) return
-
             delay(50L)
-
             sendBatchesRecursively(input.subList(batchSize, input.size), output)
         }
 
