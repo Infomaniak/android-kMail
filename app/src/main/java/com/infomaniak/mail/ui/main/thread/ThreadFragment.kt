@@ -46,6 +46,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
+import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
@@ -71,10 +72,7 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
-import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
-import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
@@ -110,6 +108,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var phoneContextualMenuAlertDialog: PhoneContextualMenuAlertDialog
+
+    @Inject
+    lateinit var confirmationToBlockUserDialog: ConfirmationToBlockUserDialog
 
     @Inject
     lateinit var permissionUtils: PermissionUtils
@@ -155,10 +156,24 @@ class ThreadFragment : Fragment() {
         observeAutoAdvance()
 
         observeReportDisplayProblemResult()
+
+        observeMessageOfUserToBlock()
     }
 
     private fun observeReportDisplayProblemResult() {
         mainViewModel.reportDisplayProblemTrigger.observe(viewLifecycleOwner) { descriptionDialog.resetLoadingAndDismiss() }
+    }
+
+    private fun observeMessageOfUserToBlock() = with(confirmationToBlockUserDialog) {
+        mainViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) {
+            setPositiveButtonCallback { messageOfUserToBlock ->
+                messageOfUserToBlock?.let {
+                    trackBottomSheetThreadActionsEvent("blockUser")
+                    mainViewModel.blockUser(messageOfUserToBlock)
+                }
+            }
+            show(it)
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

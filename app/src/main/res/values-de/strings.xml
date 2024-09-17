@@ -106,6 +106,7 @@
     <string name="attendeesListTitle">Liste der Teilnehmer (%d)</string>
     <string name="bccTitle">Bcc:</string>
     <string name="blockAnExpeditorTitle">Einen Absender blockieren</string>
+    <string name="blockExpeditorTitle">Block %s</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Passwort blockiert</item>
         <item quantity="other">Blockierte Passwörter</item>
@@ -176,6 +177,7 @@
     <string name="commercialFolder">Werbeaktionen</string>
     <string name="confirmLogoutDescription">Sind Sie sicher, dass Sie sich von %s abmelden möchten?</string>
     <string name="confirmLogoutTitle">Abmelden</string>
+    <string name="confirmationToBlockAnExpeditorText">Diese E-Mail und alle zukünftigen Nachrichten von %s werden in den Junk-Mail-Ordner verschoben.</string>
     <string name="contactActionAddToContacts">Zu Kontakten hinzufügen</string>
     <string name="contactActionCopyEmailAddress">E-Mail Adresse kopieren</string>
     <string name="contactActionWriteEmail">Schreiben Sie eine E-Mail</string>

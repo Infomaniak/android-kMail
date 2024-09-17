@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +25,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetUserToBlockBinding
 import com.infomaniak.mail.ui.MainViewModel
 
@@ -32,6 +33,9 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetUserToBlockBinding by safeBinding()
     private val navigationArgs: UserToBlockBottomSheetDialogArgs by navArgs()
+
+    private var messageOfUserToBlock: Message? = null
+
     override val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -43,11 +47,15 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
         mainViewModel.getMessagesFromUniqueExpeditors(threadUid).observe(viewLifecycleOwner) { messages ->
             messages?.let {
                 binding.recipients.adapter = UserToBlockAdapter(messages) { message ->
-                    trackBottomSheetThreadActionsEvent("blockUser")
-                    mainViewModel.blockUser(message)
+                    messageOfUserToBlock = message
                     dismiss()
                 }
             }
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        messageOfUserToBlock?.let { mainViewModel.messageOfUserToBlock.value = it }
     }
 }

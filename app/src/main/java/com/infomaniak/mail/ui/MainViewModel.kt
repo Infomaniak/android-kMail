@@ -119,6 +119,7 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
+    val messageOfUserToBlock = SingleLiveEvent<Message>()
 
     val autoAdvanceThreadsUids = MutableLiveData<List<String>>()
 
@@ -1062,8 +1063,14 @@ class MainViewModel @Inject constructor(
         emit(hasOtherExpeditors)
     }
 
+    fun hasMoreThanOneExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
+        val hasMoreThanOneExpeditors =
+            (threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.filter { it.isMe() }?.size ?: 0) > 1
+        emit(hasMoreThanOneExpeditors)
+    }
+
     fun getMessagesFromUniqueExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
-        val messageToRecipient = threadController.getThread(threadUid)?.messages?.flatMap { message ->
+        val messageToRecipient = threadController.getThread(threadUid)?.messages?.distinctBy { it.from }?.flatMap { message ->
             message.from.filterNot { it.isMe() }
                 .distinct()
                 .map { from -> message to from }
