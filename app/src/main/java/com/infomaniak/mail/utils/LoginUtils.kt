@@ -123,7 +123,7 @@ class LoginUtils @Inject constructor(
         infomaniakLogin.deleteToken(
             okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
             token = apiToken,
-            onError = { SentryLog.e("DeleteTokenError", "API response error: $it") },
+            onError = { SentryLog.i("DeleteTokenError", "API response error: $it") },
         )
     }
 
