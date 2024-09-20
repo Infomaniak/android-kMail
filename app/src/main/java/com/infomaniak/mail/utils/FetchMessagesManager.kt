@@ -149,7 +149,7 @@ class FetchMessagesManager @Inject constructor(
         }
 
         // Notify Threads with new Messages
-        val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
+        val unReadThreadsCount = threadsWithNewMessages.count()
         threadsWithNewMessages.forEachIndexed { index, thread ->
             thread.showThreadNotification(
                 userId = userId,
