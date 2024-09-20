@@ -469,7 +469,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     companion object {
-        const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
+        private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
     }
 }
