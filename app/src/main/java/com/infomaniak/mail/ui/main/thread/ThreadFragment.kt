@@ -429,7 +429,7 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            if (items.count() > ThreadViewModel.SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT) {
+            if (threadState.hasSuperCollapsedBlockBeenClicked) {
                 displayBatchedMessages(items)
             } else {
                 threadAdapter.submitList(items)
