@@ -259,7 +259,7 @@ class ThreadViewModel @Inject constructor(
             batchedMessages.postValue(ArrayList(output))
 
             if (batch.size < batchSize) return
-            delay(50L)
+            delay(DELAY_BETWEEN_EACH_BATCHED_MESSAGES)
             sendBatchesRecursively(input.subList(batchSize, input.size), output)
         }
 
@@ -471,5 +471,6 @@ class ThreadViewModel @Inject constructor(
     companion object {
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
+        private const val DELAY_BETWEEN_EACH_BATCHED_MESSAGES = 50L
     }
 }
