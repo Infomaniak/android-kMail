@@ -28,6 +28,7 @@ import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
+import com.infomaniak.lib.core.R as RCore
 
 @ActivityScoped
 class ConfirmationToBlockUserDialog @Inject constructor(
@@ -47,7 +48,7 @@ class ConfirmationToBlockUserDialog @Inject constructor(
             .setPositiveButton(R.string.buttonConfirm) { _, _ ->
                 onPositiveButtonClick?.invoke(messageOfUserToBlock)
             }
-            .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
+            .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
     }
 

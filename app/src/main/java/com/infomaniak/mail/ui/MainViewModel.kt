@@ -1063,10 +1063,10 @@ class MainViewModel @Inject constructor(
         emit(hasOtherExpeditors)
     }
 
-    fun hasMoreThanOneExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
-        val hasMoreThanOneExpeditors =
+    fun hasMoreThanOneExpeditor(threadUid: String) = liveData(ioCoroutineContext) {
+        val hasMoreThanOneExpeditor =
             (threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.filter { it.isMe() }?.size ?: 0) > 1
-        emit(hasMoreThanOneExpeditors)
+        emit(hasMoreThanOneExpeditor)
     }
 
     fun getMessagesFromUniqueExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
