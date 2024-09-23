@@ -106,6 +106,7 @@
     <string name="attendeesListTitle">Lista de asistentes (%d)</string>
     <string name="bccTitle">CCO:</string>
     <string name="blockAnExpeditorTitle">Bloquear un remitente</string>
+    <string name="blockExpeditorTitle">Bloquear %s</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Contraseña bloqueada</item>
         <item quantity="other">Contraseñas bloqueadas</item>
@@ -176,6 +177,7 @@
     <string name="commercialFolder">Promociones</string>
     <string name="confirmLogoutDescription">¿Seguro que quieres desconectarte de %s?</string>
     <string name="confirmLogoutTitle">Cerrar sesión</string>
+    <string name="confirmationToBlockAnExpeditorText">Este correo electrónico y todos los futuros mensajes de %s se moverán a la carpeta de correo no deseado.</string>
     <string name="contactActionAddToContacts">Añadir a contactos</string>
     <string name="contactActionCopyEmailAddress">Copiar dirección de correo electrónico</string>
     <string name="contactActionWriteEmail">Escriba un correo electrónico</string>

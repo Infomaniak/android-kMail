@@ -43,6 +43,9 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetJunkBinding by safeBinding()
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
+
+    private var messageOfUserToBlock: Message? = null
+
     override val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
@@ -56,6 +59,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
+            this@JunkBottomSheetDialog.messageOfUserToBlock = message
             handleButtons(threadUid, message)
         }
 
@@ -70,24 +74,35 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun observeExpeditorsResult(threadUid: String) = with(binding) {
-        mainViewModel.hasOtherExpeditors(threadUid).observe(viewLifecycleOwner) { hasOtherExpeditors ->
-            if (hasOtherExpeditors) {
-                blockSender.setClosingOnClickListener {
+    private fun observeHasMoreThanOneExpeditor(threadUid: String) {
+        mainViewModel.hasMoreThanOneExpeditor(threadUid).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
+            binding.blockSender.setClosingOnClickListener {
+                if (hasMoreThanOneExpeditor) {
                     safeNavigate(
                         resId = R.id.userToBlockBottomSheetDialog,
                         args = UserToBlockBottomSheetDialogArgs(threadUid).toBundle(),
                         currentClassName = JunkBottomSheetDialog::class.java.name,
                     )
+                } else {
+                    messageOfUserToBlock?.let {
+                        mainViewModel.messageOfUserToBlock.value = messageOfUserToBlock
+                    }
                 }
+            }
+        }
+    }
+
+    private fun observeExpeditorsResult(threadUid: String) {
+        mainViewModel.hasOtherExpeditors(threadUid).observe(viewLifecycleOwner) { hasOtherExpeditors ->
+            if (hasOtherExpeditors) {
+                observeHasMoreThanOneExpeditor(threadUid)
             } else {
-                blockSender.isGone = true
+                binding.blockSender.isGone = true
             }
         }
     }
 
     private fun handleButtons(threadUid: String, message: Message) = with(binding) {
-
         spam.setClosingOnClickListener {
             trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = message.folder.role == FolderRole.SPAM)
             mainViewModel.toggleThreadSpamStatus(threadUid)

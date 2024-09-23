@@ -105,7 +105,8 @@
     </plurals>
     <string name="attendeesListTitle">Elenco dei partecipanti (%d)</string>
     <string name="bccTitle">Bcc:</string>
-    <string name="blockAnExpeditorTitle">Bloccare un mittente</string>
+    <string name="blockAnExpeditorTitle">Blocca un mittente</string>
+    <string name="blockExpeditorTitle">Blocca %s</string>
     <plurals name="blockedPasswordTitle">
         <item quantity="one">Password bloccata</item>
         <item quantity="other">Password bloccate</item>
@@ -176,6 +177,7 @@
     <string name="commercialFolder">Promozioni</string>
     <string name="confirmLogoutDescription">Sei sicuro di volerti disconnettere da %s?</string>
     <string name="confirmLogoutTitle">Disconnettersi</string>
+    <string name="confirmationToBlockAnExpeditorText">Questa e-mail e tutti i futuri messaggi di %s saranno spostati nella cartella della posta indesiderata.</string>
     <string name="contactActionAddToContacts">Aggiungi ai contatti</string>
     <string name="contactActionCopyEmailAddress">Copia l’indirizzo e-mail</string>
     <string name="contactActionWriteEmail">Scrivi un’e-mail</string>
