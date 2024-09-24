@@ -158,7 +158,7 @@ object UiUtils {
             ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
                 setDuration(duration)
                 addUpdateListener { animator ->
-                    lifecycleScope.launch(Dispatchers.Main) { applyColor(animator.animatedValue as Int) }
+                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { applyColor(animator.animatedValue as Int) }
                 }
                 start()
             }
