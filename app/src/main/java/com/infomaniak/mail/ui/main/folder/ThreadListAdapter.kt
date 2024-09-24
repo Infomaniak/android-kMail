@@ -212,7 +212,7 @@ class ThreadListAdapter @Inject constructor(
         refreshCachedSelectedPosition(thread.uid, position) // If item changed position, update cached position.
         setupThreadDensityDependentUi()
         displayAvatar(thread)
-
+        displaySpamSpecificUi(thread)
         displayFolderName(thread)
 
         // This method is only useful for old Threads already stored in Realm, where they
@@ -265,6 +265,16 @@ class ThreadListAdapter @Inject constructor(
         }
 
         updateSelectedUi(thread)
+    }
+
+    private fun CardviewThreadItemBinding.displaySpamSpecificUi(thread: Thread) {
+        val (mailAddressText, isVisible) = if (folderRole == FolderRole.SPAM) {
+            thread.from.first().quotedEmail() to true
+        } else {
+            "" to false
+        }
+        mailAddress.text = mailAddressText
+        mailAddress.isVisible = isVisible
     }
 
     private fun CardviewThreadItemBinding.displayFolderName(thread: Thread) {
@@ -467,25 +477,27 @@ class ThreadListAdapter @Inject constructor(
         newMailBullet.isInvisible = true
 
         expeditor.setBodyRegularSecondary()
+        mailAddress.setBodyRegularSecondary()
         mailSubject.setBodyRegularSecondary()
 
         threadCountText.setTextAppearance(R.style.Label_Secondary)
         threadCountCard.strokeColor = context.getColor(R.color.threadCountBorderRead)
     }
 
-    private fun TextView.setBodyRegularSecondary() {
-        setTextAppearance(R.style.Body)
-        setTextColor(context.getColor(R.color.secondaryTextColor))
-    }
-
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
 
         expeditor.setBodyMediumPrimary()
+        mailAddress.setBodyMediumPrimary()
         mailSubject.setBodyMediumPrimary()
 
         threadCountText.setTextAppearance(R.style.LabelMedium)
         threadCountCard.strokeColor = context.getColor(R.color.threadCountBorderUnread)
+    }
+
+    private fun TextView.setBodyRegularSecondary() {
+        setTextAppearance(R.style.Body)
+        setTextColor(context.getColor(R.color.secondaryTextColor))
     }
 
     private fun TextView.setBodyMediumPrimary() {
