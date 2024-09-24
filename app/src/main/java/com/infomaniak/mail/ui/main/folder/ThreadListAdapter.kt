@@ -213,6 +213,8 @@ class ThreadListAdapter @Inject constructor(
         setupThreadDensityDependentUi()
         displayAvatar(thread)
 
+        displaySpamSpecificUI(thread)
+
         displayFolderName(thread)
 
         // This method is only useful for old Threads already stored in Realm, where they
@@ -265,6 +267,13 @@ class ThreadListAdapter @Inject constructor(
         }
 
         updateSelectedUi(thread)
+    }
+
+    private fun CardviewThreadItemBinding.displaySpamSpecificUI(thread: Thread) {
+        if (folderRole == FolderRole.SPAM) {
+            mail.text = thread.from.first().quotedEmail()
+            mail.isVisible = true
+        }
     }
 
     private fun CardviewThreadItemBinding.displayFolderName(thread: Thread) {

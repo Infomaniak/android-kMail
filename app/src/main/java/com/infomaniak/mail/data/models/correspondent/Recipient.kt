@@ -73,6 +73,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     }
 
     fun quotedDisplayName(): String = "${("$name ").ifBlank { "" }}<$email>"
+    fun quotedEmail(): String = "<$email>"
 
     override fun toString(): String = "($email -> $name)"
 
