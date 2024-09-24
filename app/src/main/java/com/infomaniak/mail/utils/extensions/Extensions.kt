@@ -95,12 +95,15 @@ import com.infomaniak.mail.ui.main.thread.SubjectFormatter.EllipsizeConfiguratio
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
+import com.infomaniak.mail.utils.WebViewUtils
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -471,11 +474,7 @@ fun Fragment.changeToolbarColorOnScroll(
     var headerColorState = HeaderState.LOWERED
 
     viewLifecycleOwner.lifecycle.addObserver(
-        object : LifecycleEventObserver {
-            override fun onStateChanged(source: LifecycleOwner, event: Event) {
-                if (event == Event.ON_DESTROY) valueAnimator?.cancel()
-            }
-        },
+        LifecycleEventObserver { _, event -> if (event == Event.ON_DESTROY) valueAnimator?.cancel() },
     )
 
     nestedScrollView.setOnScrollChangeListener { view, _, _, _, _ ->
@@ -488,7 +487,7 @@ fun Fragment.changeToolbarColorOnScroll(
         if (newColor == oldColor) return@setOnScrollChangeListener
 
         valueAnimator?.cancel()
-        valueAnimator = UiUtils.animateColorChange(oldColor, newColor, animate = true) { color ->
+        valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
             oldColor = color
             toolbar.setBackgroundColor(color)
             if (shouldUpdateStatusBar()) requireActivity().window.statusBarColor = color

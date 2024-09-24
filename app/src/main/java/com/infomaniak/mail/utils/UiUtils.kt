@@ -33,12 +33,16 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 object UiUtils {
 
@@ -143,7 +147,7 @@ object UiUtils {
         return isSingleField
     }
 
-    fun animateColorChange(
+    fun Fragment.animateColorChange(
         @ColorInt oldColor: Int,
         @ColorInt newColor: Int,
         duration: Long = 150L,
@@ -153,7 +157,9 @@ object UiUtils {
         return if (animate) {
             ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
                 setDuration(duration)
-                addUpdateListener { animator -> applyColor(animator.animatedValue as Int) }
+                addUpdateListener { animator ->
+                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { applyColor(animator.animatedValue as Int) }
+                }
                 start()
             }
         } else {

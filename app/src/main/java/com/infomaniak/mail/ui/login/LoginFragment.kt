@@ -38,7 +38,7 @@ import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
-import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -152,7 +152,7 @@ class LoginFragment : Fragment() {
         val oldPrimary = oldAccentColor.getPrimary(context)
         val ripple = newAccentColor.getRipple(context)
 
-        UiUtils.animateColorChange(oldPrimary, newPrimary) { color ->
+        animateColorChange(oldPrimary, newPrimary) { color ->
             dotsIndicator.selectedDotColor = color
             connectButton.setBackgroundColor(color)
             nextButton.backgroundTintList = ColorStateList.valueOf(color)
@@ -165,7 +165,7 @@ class LoginFragment : Fragment() {
         val newOnPrimary = newAccentColor.getOnPrimary(context)
         val oldOnPrimary = oldAccentColor.getOnPrimary(context)
 
-        UiUtils.animateColorChange(oldOnPrimary, newOnPrimary) { color ->
+        animateColorChange(oldOnPrimary, newOnPrimary) { color ->
             connectButton.setTextColor(color)
             nextButton.imageTintList = ColorStateList.valueOf(color)
         }
@@ -175,7 +175,7 @@ class LoginFragment : Fragment() {
         val newSecondaryBackground = newAccentColor.getOnboardingSecondaryBackground(requireContext())
         val oldSecondaryBackground = oldAccentColor.getOnboardingSecondaryBackground(requireContext())
 
-        UiUtils.animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
+        animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
             requireActivity().window.statusBarColor = color
         }
     }
