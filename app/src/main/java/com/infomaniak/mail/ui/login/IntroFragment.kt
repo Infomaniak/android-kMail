@@ -40,7 +40,7 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
-import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.extensions.enumValueFrom
 import com.infomaniak.mail.utils.extensions.repeatFrame
 import dagger.hilt.android.AndroidEntryPoint
@@ -170,7 +170,7 @@ class IntroFragment : Fragment() {
         val newColor = newAccentColor.getOnboardingSecondaryBackground(context)
         val oldColor = oldAccentColor.getOnboardingSecondaryBackground(context)
 
-        colorAnimator = UiUtils.animateColorChange(oldColor, newColor) { color ->
+        colorAnimator = animateColorChange(oldColor, newColor) { color ->
             waveBackground.imageTintList = ColorStateList.valueOf(color)
         }
     }
@@ -183,7 +183,7 @@ class IntroFragment : Fragment() {
         val newPrimary = newAccentColor.getPrimary(context)
         val oldPrimary = oldAccentColor.getPrimary(context)
 
-        UiUtils.animateColorChange(oldPrimary, newPrimary) { color ->
+        animateColorChange(oldPrimary, newPrimary) { color ->
             pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
         }
     }

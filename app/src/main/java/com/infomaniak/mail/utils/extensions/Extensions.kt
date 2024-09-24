@@ -97,6 +97,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.HeaderState
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiRecipients
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
@@ -488,7 +489,7 @@ fun Fragment.changeToolbarColorOnScroll(
         if (newColor == oldColor) return@setOnScrollChangeListener
 
         valueAnimator?.cancel()
-        valueAnimator = UiUtils.animateColorChange(oldColor, newColor, animate = true) { color ->
+        valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
             oldColor = color
             toolbar.setBackgroundColor(color)
             if (shouldUpdateStatusBar()) requireActivity().window.statusBarColor = color
