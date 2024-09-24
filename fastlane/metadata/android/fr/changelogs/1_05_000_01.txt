@@ -1,0 +1,2 @@
+- Ajout d'un correcteur orthographique à l'éditeur
+- Ajout d'un dialogue de confirmation lors du blocage d'un utilisateur

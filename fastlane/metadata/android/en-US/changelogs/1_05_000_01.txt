@@ -1,0 +1,2 @@
+- Add spellcheck to editor content
+- Add confirmation dialog when blocking an user
