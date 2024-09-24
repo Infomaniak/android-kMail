@@ -101,8 +101,6 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         isSnackbarFeedbackNeeded = !mainApplication.isAppInBackground
 
-        notifyNewDraftDetected()
-
         return@withContext handleDraftsActions()
     }
 
@@ -114,15 +112,6 @@ class DraftsActionsWorker @AssistedInject constructor(
     override suspend fun getForegroundInfo(): ForegroundInfo {
         val builder = notificationUtils.buildDraftActionsNotification()
         return ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, builder.build())
-    }
-
-    private suspend fun notifyNewDraftDetected() {
-        draftLocalUuid?.let { localUuid ->
-            val draft = draftController.getDraft(localUuid) ?: return@let
-            if (draft.action == DraftAction.SEND && isSnackbarFeedbackNeeded) {
-                setProgress(workDataOf(PROGRESS_DRAFT_ACTION_KEY to DraftAction.SEND.name))
-            }
-        }
     }
 
     private suspend fun handleDraftsActions(): Result {
@@ -445,7 +434,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
         private const val DRAFT_LOCAL_UUID_KEY = "draftLocalUuidKey"
-        const val PROGRESS_DRAFT_ACTION_KEY = "progressDraftActionKey"
         const val ERROR_MESSAGE_RESID_KEY = "errorMessageResIdKey"
         const val REMOTE_DRAFT_UUID_KEY = "remoteDraftUuidKey"
         const val ASSOCIATED_MAILBOX_UUID_KEY = "associatedMailboxUuidKey"
