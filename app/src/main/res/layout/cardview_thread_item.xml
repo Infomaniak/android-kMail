@@ -177,7 +177,7 @@
                     tools:text="@tools:sample/full_names" />
 
                 <TextView
-                    android:id="@+id/mail"
+                    android:id="@+id/mailAddress"
                     style="@style/BodyMedium"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -269,7 +269,7 @@
                     android:lines="1"
                     app:layout_constraintEnd_toStartOf="@+id/folderNameCompactMode"
                     app:layout_constraintStart_toEndOf="@+id/iconReplyOrForwardLayout"
-                    app:layout_constraintTop_toBottomOf="@+id/mail"
+                    app:layout_constraintTop_toBottomOf="@+id/mailAddress"
                     tools:text="@tools:sample/lorem[10]" />
 
                 <TextView
