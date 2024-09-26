@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:centerHorizontally="true"
+    tools:context=".ui.bottomSheetDialogs.AccountBottomSheetDialog">
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/H2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/marginStandardMedium"
+        android:gravity="center"
+        android:text="@string/titleMyAccount" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingTop="@dimen/marginStandardMedium"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="4"
+                tools:listitem="@layout/item_switch_user_account" />
+
+            <com.google.android.material.divider.MaterialDivider android:layout_marginBottom="@dimen/marginStandard" style="@style/ItemDivider" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addAccount"
+                style="@style/TextButtonSecondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/suisseintl_regular"
+                android:gravity="start|center_vertical"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                android:text="@string/buttonAddAccount"
+                android:textColor="@color/black"
+                app:icon="@drawable/ic_add_thin"
+                app:iconPadding="@dimen/marginStandardMedium" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logout"
+                style="@style/TextButtonSecondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/suisseintl_regular"
+                android:gravity="start|center_vertical"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                android:text="@string/buttonAccountDisconnect"
+                android:textColor="@color/red_light"
+                app:icon="@drawable/ic_logout"
+                app:iconPadding="@dimen/marginStandardMedium"
+                app:iconTint="@color/red_light" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</com.infomaniak.mail.views.BottomSheetScaffoldingView>

@@ -120,6 +120,7 @@
     <string name="buttonAccountSwitch">Changer de compte</string>
     <string name="buttonAddAccount">Ajouter un compte</string>
     <string name="buttonAddEmailAddress">Ajouter une adresse mail</string>
+    <string name="buttonAddExistingAddress">Ajouter une adresse existante</string>
     <string name="buttonAttachMailbox">Ajouter l’adresse mail</string>
     <string name="buttonAttachment">Ajouter une pièce jointe</string>
     <string name="buttonAttendees">Participants</string>
@@ -233,6 +234,7 @@
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>
     <string name="dateTitle">Date :</string>
+    <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
     <string name="displayMailIssueDescription">Pour corriger les problèmes d’affichage, veuillez mettre à jour l’application Android System Webview.</string>
     <string name="displayMailIssueTitle">Problème d’affichage de vos e-mails</string>
     <string name="draftFolder">Brouillons</string>
@@ -414,6 +416,7 @@
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>
     <string name="settingsAccentColorDescription">Choisissez la couleur d’accentuation de l’application</string>
+    <string name="settingsAccountManagementTitle">Gestion du compte</string>
     <string name="settingsAiEngineDescription">Sélectionnez votre assistant à la rédaction</string>
     <string name="settingsAppLock">Verrouillage de l’application</string>
     <string name="settingsAuthorizeTracking">Autoriser le suivi</string>
@@ -586,6 +589,7 @@
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/91aeb5c2-f609-4b9c-9787-755e83ed940c/</string>
+    <string name="usernameTitle">Nom d’utilisateur</string>
     <string name="warningEventHasPassed">Cet évènement est déjà passé</string>
     <string name="warningEventIsCancelled">Cet évènement a été annulé</string>
     <string name="workInProgressTitle">Disponible prochainement</string>

@@ -118,6 +118,7 @@
     <string name="buttonAccountSwitch">Cambiar de cuenta</string>
     <string name="buttonAddAccount">Añadir una cuenta</string>
     <string name="buttonAddEmailAddress">Añadir una dirección de correo electrónico</string>
+    <string name="buttonAddExistingAddress">Añadir una dirección existente</string>
     <string name="buttonAttachMailbox">Añadir dirección de correo electrónico</string>
     <string name="buttonAttachment">Añadir un archivo adjunto</string>
     <string name="buttonAttendees">Asistentes</string>
@@ -231,6 +232,7 @@
     <string name="createFolderNoParent">Ninguno</string>
     <string name="createFolderParent">Carpeta principal</string>
     <string name="dateTitle">Date:</string>
+    <string name="deleteAccountWarning">La eliminación de su cuenta será definitiva. No podrá reactivar su cuenta.</string>
     <string name="displayMailIssueDescription">Para solucionar los problemas de visualización, actualice la aplicación Android System Webview.</string>
     <string name="displayMailIssueTitle">Problema de visualización de sus emails</string>
     <string name="draftFolder">Borradores</string>
@@ -406,6 +408,7 @@
     <string name="sentFolder">Mensajes enviados</string>
     <string name="settingsAccentColor">Color de acento</string>
     <string name="settingsAccentColorDescription">Elija el color de acento para la aplicación</string>
+    <string name="settingsAccountManagementTitle">Gestión de cuentas</string>
     <string name="settingsAiEngineDescription">Seleccione su asistente de redacción</string>
     <string name="settingsAppLock">Bloqueo de aplicaciones</string>
     <string name="settingsAuthorizeTracking">Autorizar el seguimiento</string>
@@ -572,6 +575,7 @@
     <string name="urlEntryTitle">Crear un hiperenlace</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/f0daec0a-6950-4891-a064-7d040bdce127/</string>
+    <string name="usernameTitle">Nombre de usuario</string>
     <string name="warningEventHasPassed">Este acontecimiento ya ha pasado</string>
     <string name="warningEventIsCancelled">Este evento ha sido cancelado</string>
     <string name="workInProgressTitle">Disponible en breve</string>

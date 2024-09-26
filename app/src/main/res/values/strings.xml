@@ -124,6 +124,7 @@
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>
     <string name="buttonAddEmailAddress">Add an email address</string>
+    <string name="buttonAddExistingAddress">Add an existing address</string>
     <string name="buttonAttachMailbox">Add this email address</string>
     <string name="buttonAttachment">Add an attachment</string>
     <string name="buttonAttendees">Attendees</string>
@@ -237,6 +238,7 @@
     <string name="createFolderNoParent">None</string>
     <string name="createFolderParent">Parent folder</string>
     <string name="dateTitle">Date:</string>
+    <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
     <string name="displayMailIssueDescription">To fix display problems, please update the Android System Webview application.</string>
     <string name="displayMailIssueTitle">Problem displaying your emails</string>
     <string name="draftFolder">Drafts</string>
@@ -412,6 +414,7 @@
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
+    <string name="settingsAccountManagementTitle">Account management</string>
     <string name="settingsAiEngineDescription">Select your AI writing assistant</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsAuthorizeTracking">Authorize tracking</string>
@@ -578,6 +581,7 @@
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/dbf02b8c-36f7-4388-839c-a2b6a3029704/</string>
+    <string name="usernameTitle">Username</string>
     <string name="warningEventHasPassed">This event has already passed</string>
     <string name="warningEventIsCancelled">This event has been cancelled</string>
     <string name="workInProgressTitle">Available soon</string>

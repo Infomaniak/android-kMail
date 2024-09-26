@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AccountViewModel @Inject constructor(
+class AttachMailboxViewModel @Inject constructor(
     application: Application,
     private val mailboxController: MailboxController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -44,18 +44,18 @@ class AccountViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    suspend fun updateMailboxes(): Boolean {
-        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(AccountUtils.currentUserId)).data ?: return false
-        mailboxController.updateMailboxes(mailboxes)
-
-        return AccountUtils.manageMailboxesEdgeCases(appContext, mailboxes)
-    }
-
     fun attachNewMailbox(
         address: String,
         password: String,
     ): LiveData<ApiResponse<MailboxLinkedResult>> = liveData(ioCoroutineContext) {
         emit(ApiRepository.addNewMailbox(address, password))
+    }
+
+    private suspend fun updateMailboxes(): Boolean {
+        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(AccountUtils.currentUserId)).data ?: return false
+        mailboxController.updateMailboxes(mailboxes)
+
+        return AccountUtils.manageMailboxesEdgeCases(appContext, mailboxes)
     }
 
     fun switchToNewMailbox(newMailboxId: Int) = viewModelScope.launch(ioCoroutineContext) {

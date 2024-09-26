@@ -43,7 +43,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class AttachMailboxFragment : Fragment() {
 
     private var binding: FragmentAttachMailboxBinding by safeBinding()
-    private val accountViewModel: AccountViewModel by viewModels()
+    private val attachMailboxViewModel: AttachMailboxViewModel by viewModels()
 
     private val attachMailboxButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
 
@@ -103,13 +103,13 @@ class AttachMailboxFragment : Fragment() {
     }
 
     private fun attachMailbox() = with(binding) {
-        accountViewModel.attachNewMailbox(
+        attachMailboxViewModel.attachNewMailbox(
             address = mailInput.trimmedText,
             password = passwordInput.trimmedText,
         ).observe(viewLifecycleOwner) { apiResponse ->
             when {
                 apiResponse.isSuccess() -> {
-                    apiResponse.data?.mailboxId?.let(accountViewModel::switchToNewMailbox)
+                    apiResponse.data?.mailboxId?.let(attachMailboxViewModel::switchToNewMailbox)
                     return@observe
                 }
                 apiResponse.error?.code == ErrorCode.INVALID_CREDENTIALS -> {

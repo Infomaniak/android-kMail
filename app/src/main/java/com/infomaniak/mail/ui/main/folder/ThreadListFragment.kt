@@ -374,9 +374,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
             )
         }
 
-        userAvatar.setOnClickListener {
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToAccountFragment())
-        }
+        userAvatar.setOnClickListener { safeNavigate(resId = R.id.accountBottomSheetDialog,) }
 
         newMessageFab.setOnClickListener {
             trackNewMessageEvent("openFromFab")
