@@ -93,7 +93,14 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun observeAccounts() = with(switchUserViewModel) {
-        accounts.observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
+        accounts.observe(viewLifecycleOwner) {
+            binding.root.title = requireContext().resources.getQuantityString(
+                R.plurals.titleMyAccount,
+                it.size,
+                it.size,
+            )
+            accountsAdapter.initializeAccounts(it)
+        }
         getAccountsInDB()
     }
 }

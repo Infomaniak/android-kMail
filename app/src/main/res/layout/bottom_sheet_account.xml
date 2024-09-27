@@ -21,7 +21,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:centerHorizontally="true"
-    app:title="@string/titleMyAccount"
     tools:context=".ui.bottomSheetDialogs.AccountBottomSheetDialog">
 
     <androidx.core.widget.NestedScrollView
@@ -66,7 +65,7 @@
                 app:iconColor="@color/redDestructiveAction"
                 app:iconPaddingEnd="@dimen/marginStandardMedium"
                 app:iconPaddingStart="@dimen/marginStandard"
-                app:text="@string/buttonAccountDisconnect"
+                app:text="@string/buttonAccountLogOut"
                 app:textColor="@color/redDestructiveAction"
                 app:visibleDivider="false" />
 

@@ -117,6 +117,7 @@
     <string name="buttonAccountAssociatedEmailAddresses">Adresses mail associées au compte</string>
     <string name="buttonAccountDelete">Supprimer mon compte</string>
     <string name="buttonAccountDisconnect">Me déconnecter de ce compte</string>
+    <string name="buttonAccountLogOut">Se déconnecter</string>
     <string name="buttonAccountSwitch">Changer de compte</string>
     <string name="buttonAddAccount">Ajouter un compte</string>
     <string name="buttonAddEmailAddress">Ajouter une adresse mail</string>
@@ -580,8 +581,10 @@
     <string name="threadListSectionToday">Aujourd’hui</string>
     <string name="threadListSpamHint">Les messages placés dans le dossier spam pendant plus de 30 jours seront automatiquement supprimés.</string>
     <string name="threadListTrashHint">Les messages placés dans la corbeille pendant plus de 30 jours seront automatiquement supprimés.</string>
-    <string name="titleMyAccount">Mon compte</string>
-    <string name="titleMyAccounts">Mes comptes</string>
+    <plurals name="titleMyAccount">
+        <item quantity="one">Mon compte</item>
+        <item quantity="other">Mes comptes</item>
+    </plurals>
     <string name="toTitle">À :</string>
     <string name="tooManyRecipients">Vous ne pouvez pas ajouter cette adresse car vous avez atteint la limite de destinataires</string>
     <string name="trashFolder">Corbeille</string>
