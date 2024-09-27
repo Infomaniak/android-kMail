@@ -121,7 +121,7 @@ class MainViewModel @Inject constructor(
     val canInstallUpdate = MutableLiveData(false)
     val messageOfUserToBlock = SingleLiveEvent<Message>()
 
-    val autoAdvanceThreadsUids = MutableLiveData<List<String>>()
+    val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
 
     val mailboxesLive = mailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
