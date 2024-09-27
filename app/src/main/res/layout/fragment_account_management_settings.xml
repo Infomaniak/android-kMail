@@ -83,31 +83,14 @@
                 app:icon="@drawable/ic_bin"
                 app:iconTint="@color/redDestructiveAction" />
 
-            <LinearLayout
+            <com.infomaniak.mail.views.InformationBlockView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginTop="@dimen/marginStandard"
-                android:background="@drawable/background_rounded"
-                android:backgroundTint="@color/commonColor1"
-                android:orientation="horizontal"
-                android:padding="@dimen/marginStandardMedium">
-
-                <ImageView
-                    android:id="@+id/waringIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandardMedium"
-                    android:src="@drawable/ic_warning" />
-
-                <TextView
-                    android:id="@+id/deleteAccountWarningText"
-                    style="@style/Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/deleteAccountWarning" />
-
-            </LinearLayout>
+                app:icon="@drawable/ic_warning"
+                app:showCloseIcon="false"
+                app:title="@string/deleteAccountWarning" />
 
         </LinearLayout>
 
