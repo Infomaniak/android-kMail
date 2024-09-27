@@ -57,7 +57,7 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
             val externalData = ExternalData(
                 emailDictionary = mergedContacts.second,
                 aliases = currentMailbox.aliases,
-                trustedDomains = currentMailbox.trustedDomains,
+                trustedDomains = currentMailbox.local.trustedDomains,
             )
 
             updateFields(shouldWarnForExternal, externalData)

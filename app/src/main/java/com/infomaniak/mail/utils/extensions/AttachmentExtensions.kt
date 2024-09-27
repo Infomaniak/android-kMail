@@ -149,7 +149,7 @@ object AttachmentExtensions {
             }
         }
 
-        val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return
+        val userApiToken = AccountUtils.getUserById(mailbox.local.userId)?.apiToken?.accessToken ?: return
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
             .addUnsafeNonAscii("x-ws-attachment-filename", name)
@@ -161,7 +161,7 @@ object AttachmentExtensions {
             .post(attachmentFile!!.asRequestBody(mimeType.toMediaType()))
             .build()
 
-        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
+        val response = AccountUtils.getHttpClient(mailbox.local.userId).newCall(request).execute()
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {

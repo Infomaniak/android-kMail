@@ -346,7 +346,7 @@ class MainViewModel @Inject constructor(
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) {
                 mailboxController.updateMailbox(mailbox.objectId) {
-                    it.quotas = data
+                    it.local.quotas = data
                 }
             }
         }
@@ -356,7 +356,7 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
             if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
-                it.permissions = data
+                it.local.permissions = data
             }
         }
     }
@@ -378,7 +378,7 @@ class MainViewModel @Inject constructor(
             data?.let { externalMailInfo ->
                 mailboxController.updateMailbox(mailbox.objectId) {
                     it.local.externalMailFlagEnabled = externalMailInfo.externalMailFlagEnabled
-                    it.trustedDomains = externalMailInfo.trustedDomains.toRealmList()
+                    it.local.trustedDomains = externalMailInfo.trustedDomains.toRealmList()
                 }
             }
         }
@@ -928,7 +928,7 @@ class MainViewModel @Inject constructor(
 
         val mailbox = currentMailbox.value ?: return@launch
 
-        val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return@launch
+        val userApiToken = AccountUtils.getUserById(mailbox.local.userId)?.apiToken?.accessToken ?: return@launch
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
             .build()
@@ -937,7 +937,7 @@ class MainViewModel @Inject constructor(
             .get()
             .build()
 
-        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
+        val response = AccountUtils.getHttpClient(mailbox.local.userId).newCall(request).execute()
 
         if (!response.isSuccessful || response.body == null) {
             reportDisplayProblemTrigger.postValue(Unit)

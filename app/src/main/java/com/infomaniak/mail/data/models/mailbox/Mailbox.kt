@@ -21,7 +21,6 @@ package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.UnreadDisplay
@@ -29,7 +28,6 @@ import com.infomaniak.mail.utils.extensions.getDefault
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -71,12 +69,6 @@ class Mailbox : RealmObject {
     var local = MailboxLocalValues()
     //endregion
 
-    //region UI data (Transient & Ignore)
-    @Transient
-    @Ignore
-    val featureFlags = FeatureFlagSet()
-    //endregion
-
     inline val channelGroupId get() = "$mailboxId"
     inline val channelId get() = "${mailboxId}_channel_id"
     inline val notificationGroupId get() = uuid.hashCode()
@@ -86,18 +78,18 @@ class Mailbox : RealmObject {
 
     val unreadCountDisplay: UnreadDisplay
         get() = UnreadDisplay(
-            count = unreadCountLocal,
-            shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
+            count = local.unreadCountLocal,
+            shouldDisplayPastille = local.unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
-    fun initLocalValues(userId: Int, local: MailboxLocalValues) {
-        this.objectId = createObjectId(userId)
-        this.local = local
+    fun initLocalValues(userId: Int, localValues: MailboxLocalValues?) {
+        objectId = createObjectId(userId)
+        localValues?.let { local = it }
     }
 
-    fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature {
+    fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature = with(local) {
         return signatures.getDefault(draftMode) ?: signatures.first()
     }
 
@@ -105,16 +97,5 @@ class Mailbox : RealmObject {
         val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
         val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
         return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
-    }
-
-    inner class FeatureFlagSet {
-        fun contains(featureFlag: FeatureFlag): Boolean {
-            return _featureFlags.contains(featureFlag.apiName)
-        }
-
-        fun setFeatureFlags(featureFlags: List<String>) = with(_featureFlags) {
-            clear()
-            addAll(featureFlags)
-        }
     }
 }

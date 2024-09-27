@@ -204,7 +204,7 @@ class NewMessageViewModel @Inject constructor(
 
         runCatching {
 
-            signatures = currentMailbox.signatures
+            signatures = currentMailbox.local.signatures
                 .also { signaturesCount = it.count() }
                 .toMutableList()
                 .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox.email)) }
@@ -264,7 +264,7 @@ class NewMessageViewModel @Inject constructor(
 
                         setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
 
-                        val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
+                        val isAiEnabled = currentMailbox.local.featureFlags.contains(FeatureFlag.AI)
                         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!, fullMessage.uid)
 
                         previousMessage = fullMessage

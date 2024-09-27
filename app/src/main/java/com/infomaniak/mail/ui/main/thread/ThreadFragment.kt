@@ -473,7 +473,7 @@ class ThreadFragment : Fragment() {
                     emailDictionary = result.mergedContacts ?: emptyMap(),
                     aliases = result.mailbox?.aliases ?: emptyList(),
                     externalMailFlagEnabled = result.mailbox?.local?.externalMailFlagEnabled ?: false,
-                    trustedDomains = result.mailbox?.trustedDomains ?: emptyList(),
+                    trustedDomains = result.mailbox?.local?.trustedDomains ?: emptyList(),
                 ),
             ) { description ->
                 informationDialog.show(

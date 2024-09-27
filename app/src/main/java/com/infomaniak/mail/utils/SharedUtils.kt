@@ -134,8 +134,8 @@ class SharedUtils @Inject constructor(
     suspend fun updateFeatureFlags(mailboxObjectId: String, mailboxUuid: String) {
         with(ApiRepository.getFeatureFlags(mailboxUuid)) {
             if (isSuccess()) {
-                mailboxController.updateMailbox(mailboxObjectId) {
-                    it.featureFlags.setFeatureFlags(featureFlags = data ?: emptyList())
+                mailboxController.updateMailbox(mailboxObjectId) { mailbox ->
+                    mailbox.local.featureFlags.setFeatureFlags(featureFlags = data ?: emptyList())
                 }
             }
         }
@@ -171,7 +171,7 @@ class SharedUtils @Inject constructor(
                     val signaturesResult = data!!
                     customRealm.write {
                         MailboxController.getMailbox(mailbox.objectId, realm = this)?.let { mailbox ->
-                            mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
+                            mailbox.local.signatures = signaturesResult.signatures.toMutableList().apply {
                                 firstOrNull { it.id == signaturesResult.defaultSignatureId }?.isDefault = true
                                 firstOrNull { it.id == signaturesResult.defaultReplySignatureId }?.isDefaultReply = true
                             }.toRealmList()

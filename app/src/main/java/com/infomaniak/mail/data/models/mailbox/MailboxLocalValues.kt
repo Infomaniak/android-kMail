@@ -18,19 +18,36 @@
 package com.infomaniak.mail.data.models.mailbox
 
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.signature.Signature
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.EmbeddedRealmObject
+import io.realm.kotlin.types.annotations.Ignore
 
-class MailboxLocalValues: EmbeddedRealmObject {
+class MailboxLocalValues : EmbeddedRealmObject {
     var userId: Int = AppSettings.DEFAULT_ID
     var quotas: Quotas? = null
     var unreadCountLocal: Int = 0
     var permissions: MailboxPermissions? = null
     var signatures = realmListOf<Signature>()
-    var _featureFlags = realmSetOf<String>()
+    private var _featureFlags = realmSetOf<String>()
     var externalMailFlagEnabled: Boolean = false
     var trustedDomains = realmListOf<String>()
+
+    //region UI data (Transient & Ignore)
+    @Ignore
+    val featureFlags = FeatureFlags()
+    //endregion
+
+    inner class FeatureFlags {
+
+        fun contains(featureFlag: FeatureFlag): Boolean = _featureFlags.contains(featureFlag.apiName)
+
+        fun setFeatureFlags(featureFlags: List<String>) = with(_featureFlags) {
+            clear()
+            addAll(featureFlags)
+        }
+    }
 }

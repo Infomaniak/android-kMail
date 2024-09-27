@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.MailboxLocalValues
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
@@ -100,9 +101,10 @@ class MailboxController @Inject constructor(
         val mailboxes = mailboxInfoRealm.write {
             return@write remoteMailboxes.map { remoteMailbox ->
                 remoteMailbox.also {
-                    getMailbox(userId, remoteMailbox.mailboxId, realm = this)?.let { localMailbox ->
-                        it.initLocalValues(userId = userId, localMailbox.local)
-                    }
+                    it.initLocalValues(
+                        userId = userId,
+                        localValues = getMailbox(userId, remoteMailbox.mailboxId, realm = this)?.local,
+                    )
                 }
             }
         }
@@ -115,7 +117,7 @@ class MailboxController @Inject constructor(
         // Get current data
         SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
         val localQuotasAndPermissions = getMailboxes(userId, mailboxInfoRealm).associate {
-            it.objectId to (it.quotas to it.permissions)
+            it.objectId to (it.local.quotas to it.local.permissions)
         }
 
         mailboxInfoRealm.write {
@@ -134,8 +136,8 @@ class MailboxController @Inject constructor(
     ) {
         remoteMailboxes.forEach { remoteMailbox ->
             remoteMailbox.apply {
-                quotas = localQuotasAndPermissions[objectId]?.first
-                permissions = localQuotasAndPermissions[objectId]?.second
+                local.quotas = localQuotasAndPermissions[objectId]?.first
+                local.permissions = localQuotasAndPermissions[objectId]?.second
             }
             copyToRealm(remoteMailbox, UpdatePolicy.ALL)
         }

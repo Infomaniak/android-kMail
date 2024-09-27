@@ -64,7 +64,7 @@ class SignatureSettingFragment : Fragment() {
 
     private fun setupAdapter(mailbox: Mailbox) {
         binding.signatureList.adapter = SignatureSettingAdapter(
-            canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
+            canManageSignature = mailbox.local.permissions?.canManageSignatures ?: false,
             onSignatureSelected = ::onSignatureClicked,
         )
     }
