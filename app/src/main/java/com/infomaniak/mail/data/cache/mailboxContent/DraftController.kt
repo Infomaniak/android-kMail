@@ -65,6 +65,12 @@ class DraftController @Inject constructor(
         val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: mailboxContentRealm().writeBlocking(block)
     }
+
+    fun deleteDraft(draft: Draft) {
+        mailboxContentRealm().writeBlocking {
+            delete(getDraftQuery(Draft::localUuid.name, draft.localUuid, realm = this))
+        }
+    }
     //endregion
 
     //region Open Draft
