@@ -44,7 +44,7 @@
 
             <TextView
                 android:id="@+id/username"
-                style="@style/Body"
+                style="@style/Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -63,7 +63,7 @@
 
             <TextView
                 android:id="@+id/email"
-                style="@style/Body"
+                style="@style/Body.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
