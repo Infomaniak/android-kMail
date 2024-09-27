@@ -104,8 +104,12 @@ class MailboxController @Inject constructor(
                     it.initLocalValues(
                         userId = userId,
                         quotas = localMailbox?.quotas,
-                        inboxUnreadCount = localMailbox?.unreadCountLocal ?: 0,
+                        inboxUnreadCount = localMailbox?.unreadCountLocal,
                         permissions = localMailbox?.permissions,
+                        signatures = localMailbox?.signatures,
+                        featureFlags = localMailbox?._featureFlags,
+                        externalMailFlagEnabled = localMailbox?.externalMailFlagEnabled,
+                        trustedDomains = localMailbox?.trustedDomains,
                     )
                 }
             }
