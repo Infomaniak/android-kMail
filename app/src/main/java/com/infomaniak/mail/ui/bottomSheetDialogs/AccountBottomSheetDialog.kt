@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
@@ -66,11 +67,11 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
         return BottomSheetAccountBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        binding.recyclerViewAccount.adapter = accountsAdapter
-        binding.addAccount.setOnClickListener { safeNavigate(resId = R.id.attachMailboxFragment) }
-        binding.logout.setOnClickListener {
+        recyclerViewAccount.adapter = accountsAdapter
+        addAccount.setOnClickListener { safeNavigate(resId = R.id.attachMailboxFragment) }
+        logout.setOnClickListener {
             requireContext().trackAccountEvent("logOut")
             descriptionDialog.show(
                 title = getString(R.string.confirmLogoutTitle),
@@ -79,9 +80,9 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
                 onPositiveButtonClicked = ::logoutCurrentUser,
             )
         }
-        binding.addAccount.setOnClickListener {
-            requireContext().trackAccountEvent("add")
-            requireContext().launchLoginActivity()
+        addAccount.setOnClickListener {
+            context.trackAccountEvent("add")
+            context.launchLoginActivity()
         }
 
         observeAccounts()

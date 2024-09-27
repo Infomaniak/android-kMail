@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,8 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginTop="@dimen/marginStandard"
-                android:text="@string/usernameTitle"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:text="@string/usernameTitle"/>
 
             <TextView
                 android:id="@+id/username"
@@ -48,7 +47,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                app:layout_constraintTop_toBottomOf="@id/userNameTitle"
                 tools:text="Test" />
 
             <TextView
@@ -58,8 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginTop="@dimen/marginStandardMedium"
-                android:text="@string/attachMailboxInputHint"
-                app:layout_constraintTop_toBottomOf="@id/username" />
+                android:text="@string/attachMailboxInputHint" />
 
             <TextView
                 android:id="@+id/email"
@@ -68,15 +65,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:paddingBottom="@dimen/marginStandardMedium"
-                app:layout_constraintTop_toBottomOf="@id/emailTitle"
                 tools:text="test@noreply.com" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider"
-                style="@style/ItemDivider"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/email" />
+                style="@style/ItemDivider" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/deleteAccountButton"
@@ -88,9 +81,7 @@
                 android:text="@string/buttonAccountDelete"
                 android:textColor="@color/redDestructiveAction"
                 app:icon="@drawable/ic_bin"
-                app:iconTint="@color/redDestructiveAction"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider" />
+                app:iconTint="@color/redDestructiveAction" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -100,9 +91,7 @@
                 android:background="@drawable/background_rounded"
                 android:backgroundTint="@color/commonColor1"
                 android:orientation="horizontal"
-                android:padding="@dimen/marginStandardMedium"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/deleteAccountButton">
+                android:padding="@dimen/marginStandardMedium">
 
                 <ImageView
                     android:id="@+id/waringIcon"
@@ -116,14 +105,11 @@
                     style="@style/Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/deleteAccountWarning"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/waringIcon"
-                    app:layout_constraintTop_toBottomOf="@id/deleteAccountButton" />
+                    android:text="@string/deleteAccountWarning" />
 
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
