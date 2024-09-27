@@ -80,7 +80,8 @@ class Mailbox : RealmObject {
     @Transient
     var signatures = realmListOf<Signature>()
     @Transient
-    private var _featureFlags = realmSetOf<String>()
+    var _featureFlags = realmSetOf<String>()
+        private set
     @Transient
     var externalMailFlagEnabled: Boolean = false
     @Transient
@@ -108,12 +109,25 @@ class Mailbox : RealmObject {
 
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
-    fun initLocalValues(userId: Int, quotas: Quotas?, inboxUnreadCount: Int, permissions: MailboxPermissions?) {
+    fun initLocalValues(
+        userId: Int,
+        quotas: Quotas?,
+        inboxUnreadCount: Int?,
+        permissions: MailboxPermissions?,
+        signatures: List<Signature>?,
+        featureFlags: Set<String>?,
+        externalMailFlagEnabled: Boolean?,
+        trustedDomains: List<String>?,
+    ) {
         this.objectId = createObjectId(userId)
         this.userId = userId
         this.quotas = quotas
-        this.unreadCountLocal = inboxUnreadCount
+        inboxUnreadCount?.let { this.unreadCountLocal = it }
         this.permissions = permissions
+        signatures?.let(this.signatures::addAll)
+        featureFlags?.let(this._featureFlags::addAll)
+        externalMailFlagEnabled?.let { this.externalMailFlagEnabled = it }
+        trustedDomains?.let(this.trustedDomains::addAll)
     }
 
     fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature {
