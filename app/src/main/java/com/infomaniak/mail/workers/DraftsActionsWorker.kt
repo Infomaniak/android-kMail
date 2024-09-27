@@ -293,7 +293,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                 SentryLevel.ERROR,
             )
 
-            // Remove the draft if it's corrupted instead of sending a sentry every time the worker starts again
+            // Remove the Draft if it's corrupted instead of sending a Sentry every time the worker starts again
             draftController.deleteDraft(draft)
             SentryLog.i("CorruptedAttachment", "Remove draft from realm due to corrupted attachment")
 
