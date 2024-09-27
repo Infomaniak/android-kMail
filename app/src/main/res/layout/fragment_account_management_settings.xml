@@ -86,9 +86,9 @@
                 android:fontFamily="@font/suisseintl_regular"
                 android:paddingHorizontal="@dimen/mediumButtonHorizontalMargin"
                 android:text="@string/buttonAccountDelete"
-                android:textColor="@color/red_light"
+                android:textColor="@color/redDestructiveAction"
                 app:icon="@drawable/ic_bin"
-                app:iconTint="@color/red_light"
+                app:iconTint="@color/redDestructiveAction"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider" />
 
