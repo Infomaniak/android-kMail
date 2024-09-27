@@ -894,7 +894,7 @@ class NewMessageViewModel @Inject constructor(
             to = toLiveData.valueOrEmpty(),
             cc = ccLiveData.valueOrEmpty(),
             bcc = bccLiveData.valueOrEmpty(),
-            externalMailFlagEnabled = currentMailbox.externalMailFlagEnabled,
+            externalMailFlagEnabled = currentMailbox.local.externalMailFlagEnabled,
         )
     }
 

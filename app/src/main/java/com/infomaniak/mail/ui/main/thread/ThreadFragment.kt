@@ -472,7 +472,7 @@ class ThreadFragment : Fragment() {
                     thread = result.thread ?: return@observe,
                     emailDictionary = result.mergedContacts ?: emptyMap(),
                     aliases = result.mailbox?.aliases ?: emptyList(),
-                    externalMailFlagEnabled = result.mailbox?.externalMailFlagEnabled ?: false,
+                    externalMailFlagEnabled = result.mailbox?.local?.externalMailFlagEnabled ?: false,
                     trustedDomains = result.mailbox?.trustedDomains ?: emptyList(),
                 ),
             ) { description ->

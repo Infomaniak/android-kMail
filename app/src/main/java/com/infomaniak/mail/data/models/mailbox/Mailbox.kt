@@ -22,13 +22,11 @@ package com.infomaniak.mail.data.models.mailbox
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.FeatureFlag
-import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.extensions.getDefault
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
@@ -70,22 +68,7 @@ class Mailbox : RealmObject {
     @PrimaryKey
     var objectId: String = ""
     @Transient
-    var userId: Int = AppSettings.DEFAULT_ID
-    @Transient
-    var quotas: Quotas? = null
-    @Transient
-    var unreadCountLocal: Int = 0
-    @Transient
-    var permissions: MailboxPermissions? = null
-    @Transient
-    var signatures = realmListOf<Signature>()
-    @Transient
-    var _featureFlags = realmSetOf<String>()
-        private set
-    @Transient
-    var externalMailFlagEnabled: Boolean = false
-    @Transient
-    var trustedDomains = realmListOf<String>()
+    var local = MailboxLocalValues()
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -109,25 +92,9 @@ class Mailbox : RealmObject {
 
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
-    fun initLocalValues(
-        userId: Int,
-        quotas: Quotas?,
-        inboxUnreadCount: Int?,
-        permissions: MailboxPermissions?,
-        signatures: List<Signature>?,
-        featureFlags: Set<String>?,
-        externalMailFlagEnabled: Boolean?,
-        trustedDomains: List<String>?,
-    ) {
+    fun initLocalValues(userId: Int, local: MailboxLocalValues) {
         this.objectId = createObjectId(userId)
-        this.userId = userId
-        this.quotas = quotas
-        inboxUnreadCount?.let { this.unreadCountLocal = it }
-        this.permissions = permissions
-        signatures?.let(this.signatures::addAll)
-        featureFlags?.let(this._featureFlags::addAll)
-        externalMailFlagEnabled?.let { this.externalMailFlagEnabled = it }
-        trustedDomains?.let(this.trustedDomains::addAll)
+        this.local = local
     }
 
     fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature {

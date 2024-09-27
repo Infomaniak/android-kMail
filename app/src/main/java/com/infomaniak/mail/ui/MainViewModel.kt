@@ -377,7 +377,7 @@ class MainViewModel @Inject constructor(
             if (!isSuccess()) return@launch
             data?.let { externalMailInfo ->
                 mailboxController.updateMailbox(mailbox.objectId) {
-                    it.externalMailFlagEnabled = externalMailInfo.externalMailFlagEnabled
+                    it.local.externalMailFlagEnabled = externalMailInfo.externalMailFlagEnabled
                     it.trustedDomains = externalMailInfo.trustedDomains.toRealmList()
                 }
             }
