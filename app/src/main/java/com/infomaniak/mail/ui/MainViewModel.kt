@@ -810,11 +810,9 @@ class MainViewModel @Inject constructor(
         }
         val uids = messages.getUids()
 
-        /*threadController.updateFavoriteStatus(threadsUids, !isFavorite)
+        threadController.updateFavoriteStatus(threadsUids, !isFavorite)
         messageController.updateIsFavoriteStatus(uids, !isFavorite)
 
-        val isSuccess = if (isFavorite) {
-            ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()*/
         val apiResponses = if (isFavorite) {
             ApiRepository.removeFromFavorites(mailbox.uuid, uids)
         } else {
@@ -874,6 +872,8 @@ class MainViewModel @Inject constructor(
 
         val messages = getMessagesToSpamOrHam(threads, message)
 
+        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = true)
+
         val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponses.atLeastOneSucceeded()) {
@@ -883,6 +883,8 @@ class MainViewModel @Inject constructor(
                 destinationFolderId = destinationFolder.id,
                 callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
+        } else {
+            threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
         }
 
         if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
