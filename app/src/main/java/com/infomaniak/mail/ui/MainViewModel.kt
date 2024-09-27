@@ -1150,12 +1150,11 @@ class MainViewModel @Inject constructor(
 
     private fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
         val isWorkingWithThread = message == null
-        return isWorkingWithThread || threadHasOnlyOneMessageLeftInCurrentFolder(threadsUids.first())
+        return isWorkingWithThread || threadHasOnlyOneMessageLeft(threadsUids.first())
     }
 
-    private fun threadHasOnlyOneMessageLeftInCurrentFolder(threadUid: String): Boolean {
-        val folderId = currentFolderId ?: return false
-        return messageController.getMessageCountInThreadForFolder(threadUid, folderId, mailboxContentRealm()) == 1L
+    private fun threadHasOnlyOneMessageLeft(threadUid: String): Boolean {
+        return messageController.getMessagesCountInThread(threadUid, mailboxContentRealm()) == 1
     }
 
     fun shareThreadUrl(messageUid: String, startShareActivity: ((String) -> Unit)) {
