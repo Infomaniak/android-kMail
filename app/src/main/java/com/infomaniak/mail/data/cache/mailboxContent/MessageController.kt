@@ -143,11 +143,8 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         return getMessagesQuery(messageUid, mailboxContentRealm()).first().asFlow()
     }
 
-    fun getMessageCountInThreadForFolder(threadUid: String, folderId: String, realm: Realm): Long? {
-        return ThreadController.getThread(threadUid, realm)
-            ?.messages?.query("${Message::folderId.name} == $0", folderId)
-            ?.count()
-            ?.find()
+    fun getMessagesCountInThread(threadUid: String, realm: Realm): Int? {
+        return ThreadController.getThread(threadUid, realm)?.messages?.count()
     }
     //endregion
 
