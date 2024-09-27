@@ -457,7 +457,7 @@
         android:id="@+id/accountManagementSettingsFragment"
         android:name="com.infomaniak.mail.ui.main.settings.privacy.AccountManagementSettingsFragment"
         android:label="AccountManagementSettingsFragment"
-        tools:layout="@layout/fragment_account_management_settings"/>
+        tools:layout="@layout/fragment_account_management_settings" />
 
     <fragment
         android:id="@+id/dataManagementMatomoSettingFragment"
@@ -665,7 +665,6 @@
         android:id="@+id/accountBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialog"
         android:label="AccountBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_account">
-    </dialog>
+        tools:layout="@layout/bottom_sheet_account"/>
 
 </navigation>

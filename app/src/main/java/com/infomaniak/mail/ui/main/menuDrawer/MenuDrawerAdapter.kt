@@ -88,7 +88,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         val currentMailbox = otherMailboxes.removeAt(currentMailboxIndex)
 
         add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
-        if (areMailboxesExpanded){
+        if (areMailboxesExpanded) {
             addAll(otherMailboxes)
             add(ItemType.ADD_MAILBOX)
         }
