@@ -31,7 +31,6 @@ import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomSheetScaffoldingBinding
-import com.infomaniak.mail.ui.main.menuDrawer.SimpleSettingView
 import com.infomaniak.lib.core.R as RCore
 
 class BottomSheetScaffoldingView @JvmOverloads constructor(
@@ -45,7 +44,7 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
     /**
      * We can receive 2 types of children:
      * - Children that come from the binding
-     * - Children of [SimpleSettingView] that are defined in the xml
+     * - Children of [BottomSheetScaffoldingView] that are defined in the xml
      *
      * We need to only add the second type of children to the `binding.cardView` to be able to display them
      */

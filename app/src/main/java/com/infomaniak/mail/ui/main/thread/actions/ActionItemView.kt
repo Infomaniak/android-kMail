@@ -19,12 +19,14 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.annotation.StyleableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -47,12 +49,16 @@ class ActionItemView @JvmOverloads constructor(
             with(binding) {
                 button.apply {
                     icon = getDrawable(R.styleable.ActionItemView_icon)
+                    getColorStateList(R.styleable.ActionItemView_iconColor)?.let(::setIconTint)
                     text = getString(R.styleable.ActionItemView_text)
+                    getColorStateList(R.styleable.ActionItemView_textColor)?.let(::setTextColor)
 
-                    getDimensionPixelSize(R.styleable.ActionItemView_padding, NOT_SET).takeIf { it != NOT_SET }?.let { padding ->
-                        iconPadding = padding
-                        setPaddingRelative(start = padding, end = padding)
-                    }
+                    val iconHorizontalPadding = getDimenOrNull(R.styleable.ActionItemView_iconPaddingHorizontal)
+                    val iconPaddingStart = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingStart)
+                    val iconPaddingEnd = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingEnd)
+
+                    iconPaddingEnd?.let { iconPadding = it }
+                    setPaddingRelative(start = iconPaddingStart)
                 }
 
                 divider.apply {
@@ -90,6 +96,10 @@ class ActionItemView @JvmOverloads constructor(
 
     fun setDividerVisibility(isVisible: Boolean) {
         binding.divider.isVisible = isVisible
+    }
+
+    private fun TypedArray.getDimenOrNull(@StyleableRes index: Int): Int? {
+        return getDimensionPixelSize(index, NOT_SET).takeIf { it != NOT_SET }
     }
 
     companion object {

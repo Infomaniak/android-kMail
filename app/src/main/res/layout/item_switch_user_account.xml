@@ -27,17 +27,15 @@
         android:id="@+id/accountCardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
-        android:layout_marginVertical="@dimen/marginStandardVerySmall"
         app:cardBackgroundColor="@color/backgroundColorSecondary"
-        app:cardCornerRadius="10dp"
+        app:cardCornerRadius="0dp"
         app:rippleColor="?attr/colorControlHighlight"
         app:strokeWidth="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/marginStandardSmall"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
             android:paddingVertical="@dimen/marginStandardSmall">
 
             <com.infomaniak.mail.views.AvatarView

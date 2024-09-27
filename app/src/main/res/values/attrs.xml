@@ -57,8 +57,12 @@
 
     <declare-styleable name="ActionItemView">
         <attr name="icon" />
-        <attr name="padding" />
+        <attr name="iconColor" />
+        <attr name="iconPaddingHorizontal" format="dimension" />
+        <attr name="iconPaddingStart" format="dimension" />
+        <attr name="iconPaddingEnd" format="dimension" />
         <attr name="text" />
+        <attr name="textColor" format="color" />
         <attr name="visibleDivider" format="boolean" />
         <attr name="dividerColor" format="color" />
         <attr name="staffOnly" format="boolean" />
