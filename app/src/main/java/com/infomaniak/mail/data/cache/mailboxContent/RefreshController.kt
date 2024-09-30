@@ -351,8 +351,8 @@ class RefreshController @Inject constructor(
         folder.unreadCountLocal = unreadCount
 
         if (folder.role == FolderRole.INBOX) {
-            mailboxController.updateMailbox(mailbox.objectId) { mailbox ->
-                mailbox.unreadCountLocal = unreadCount
+            mailboxController.updateMailbox(mailbox.objectId) {
+                it.unreadCountLocal = unreadCount
             }
         }
     }
