@@ -21,9 +21,7 @@ import android.content.Context
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
@@ -97,60 +95,35 @@ class MailboxController @Inject constructor(
     //region Edit data
     fun updateMailboxes(remoteMailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId) {
 
-        val mailboxes = mailboxInfoRealm.writeBlocking {
-            return@writeBlocking remoteMailboxes.map { remoteMailbox ->
-                remoteMailbox.also {
-                    val localMailbox = getMailbox(userId, remoteMailbox.mailboxId, realm = this)
-                    it.initLocalValues(
-                        userId = userId,
-                        quotas = localMailbox?.quotas,
-                        inboxUnreadCount = localMailbox?.unreadCountLocal,
-                        permissions = localMailbox?.permissions,
-                        signatures = localMailbox?.signatures,
-                        featureFlags = localMailbox?._featureFlags,
-                        externalMailFlagEnabled = localMailbox?.externalMailFlagEnabled,
-                        trustedDomains = localMailbox?.trustedDomains,
-                    )
-                }
-            }
-        }
-
-        update(mailboxes, userId)
-    }
-
-    private fun update(remoteMailboxes: List<Mailbox>, userId: Int) {
-
-        // Get current data
-        SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-        val localQuotasAndPermissions = getMailboxes(userId, mailboxInfoRealm).associate {
-            it.objectId to (it.quotas to it.permissions)
-        }
-
         mailboxInfoRealm.writeBlocking {
+            val remoteMailboxesIds = remoteMailboxes.map { remoteMailbox ->
 
-            SentryLog.d(RealmDatabase.TAG, "Mailboxes: Save new data")
-            upsertMailboxes(localQuotasAndPermissions, remoteMailboxes)
+                SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
+                val localMailbox = getMailbox(userId, remoteMailbox.mailboxId, realm = this)
+
+                SentryLog.d(RealmDatabase.TAG, "Mailboxes: Save new data")
+                remoteMailbox.initLocalValues(
+                    userId = userId,
+                    quotas = localMailbox?.quotas,
+                    inboxUnreadCount = localMailbox?.unreadCountLocal,
+                    permissions = localMailbox?.permissions,
+                    signatures = localMailbox?.signatures,
+                    featureFlags = localMailbox?._featureFlags,
+                    externalMailFlagEnabled = localMailbox?.externalMailFlagEnabled,
+                    trustedDomains = localMailbox?.trustedDomains,
+                )
+                copyToRealm(remoteMailbox, UpdatePolicy.ALL)
+
+                return@map remoteMailbox.mailboxId
+            }
 
             SentryLog.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
-            deleteOutdatedData(remoteMailboxes, userId)
+            deleteOutdatedData(remoteMailboxesIds, userId)
         }
     }
 
-    private fun MutableRealm.upsertMailboxes(
-        localQuotasAndPermissions: Map<String, Pair<Quotas?, MailboxPermissions?>>,
-        remoteMailboxes: List<Mailbox>,
-    ) {
-        remoteMailboxes.forEach { remoteMailbox ->
-            remoteMailbox.apply {
-                quotas = localQuotasAndPermissions[objectId]?.first
-                permissions = localQuotasAndPermissions[objectId]?.second
-            }
-            copyToRealm(remoteMailbox, UpdatePolicy.ALL)
-        }
-    }
-
-    private fun MutableRealm.deleteOutdatedData(remoteMailboxes: List<Mailbox>, userId: Int) {
-        val outdatedMailboxes = getMailboxes(userId, realm = this, remoteMailboxes.map { it.mailboxId })
+    private fun MutableRealm.deleteOutdatedData(remoteMailboxesIds: List<Int>, userId: Int) {
+        val outdatedMailboxes = getMailboxes(userId, realm = this, remoteMailboxesIds)
         val isCurrentMailboxDeleted = outdatedMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
             RealmDatabase.closeMailboxContent()
@@ -175,6 +148,7 @@ class MailboxController @Inject constructor(
 
         //region Queries
         private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
+
         private val isMailboxLocked = "${Mailbox::isLocked.name} == true"
         private val hasValidPassword = "${Mailbox::isPasswordValid.name} == true"
 
