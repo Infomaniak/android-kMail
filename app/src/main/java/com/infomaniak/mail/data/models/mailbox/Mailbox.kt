@@ -66,7 +66,9 @@ class Mailbox : RealmObject {
     @PrimaryKey
     var objectId: String = ""
     @Transient
-    var local = MailboxLocalValues()
+    var mailboxLocalValues: MailboxLocalValues? = MailboxLocalValues()
+        private set
+    val local get() = mailboxLocalValues!!
     //endregion
 
     inline val channelGroupId get() = "$mailboxId"
@@ -85,8 +87,9 @@ class Mailbox : RealmObject {
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
     fun initLocalValues(userId: Int, localValues: MailboxLocalValues?) {
+        localValues?.let { mailboxLocalValues = it }
         objectId = createObjectId(userId)
-        localValues?.let { local = it }
+        local.userId = userId
     }
 
     fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature = with(local) {

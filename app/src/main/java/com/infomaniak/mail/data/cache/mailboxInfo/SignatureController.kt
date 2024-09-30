@@ -31,7 +31,7 @@ class SignatureController @Inject constructor(
 
     //region Get data
     fun getSignaturesAsync(mailboxObjectId: String): Flow<RealmList<Signature>> {
-        return mailboxController.getMailboxAsync(mailboxObjectId).mapNotNull { it.obj?.signatures }
+        return mailboxController.getMailboxAsync(mailboxObjectId).mapNotNull { it.obj?.local?.signatures }
     }
     //endregion
 }

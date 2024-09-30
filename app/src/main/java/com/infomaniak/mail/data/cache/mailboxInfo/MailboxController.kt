@@ -170,7 +170,10 @@ class MailboxController @Inject constructor(
     companion object {
 
         //region Queries
-        private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
+        private fun checkHasUserId(userId: Int): String {
+            return "${Mailbox::mailboxLocalValues.name}.${MailboxLocalValues::userId.name} == '$userId'"
+        }
+
         private val isMailboxLocked = "${Mailbox::isLocked.name} == true"
         private val hasValidPassword = "${Mailbox::isPasswordValid.name} == true"
 

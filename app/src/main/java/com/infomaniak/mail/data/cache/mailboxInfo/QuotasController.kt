@@ -30,7 +30,7 @@ class QuotasController @Inject constructor(
 
     //region Get data
     fun getQuotasAsync(mailboxObjectId: String): Flow<Quotas?> {
-        return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.quotas }
+        return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.local?.quotas }
     }
     //endregion
 }
