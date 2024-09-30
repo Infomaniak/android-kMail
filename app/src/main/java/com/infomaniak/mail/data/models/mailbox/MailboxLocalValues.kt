@@ -27,6 +27,7 @@ import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
 
 class MailboxLocalValues : EmbeddedRealmObject {
+
     var userId: Int = AppSettings.DEFAULT_ID
     var quotas: Quotas? = null
     var unreadCountLocal: Int = 0
@@ -36,10 +37,8 @@ class MailboxLocalValues : EmbeddedRealmObject {
     var externalMailFlagEnabled: Boolean = false
     var trustedDomains = realmListOf<String>()
 
-    //region UI data (Transient & Ignore)
     @Ignore
     val featureFlags = FeatureFlags()
-    //endregion
 
     inner class FeatureFlags {
 
