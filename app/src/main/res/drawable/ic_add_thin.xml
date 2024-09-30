@@ -16,25 +16,20 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="25dp"
+    android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="25"
+    android:viewportWidth="24"
     android:viewportHeight="24">
-    <group>
-        <clip-path android:pathData="M0.982,0.002h24v24h-24z" />
-        <path
-            android:fillColor="#00000000"
-            android:pathData="M1.732,12.002H24.232"
-            android:strokeWidth="1.5"
-            android:strokeColor="#9F9F9F"
-            android:strokeLineCap="round"
-            android:strokeLineJoin="round" />
-        <path
-            android:fillColor="#00000000"
-            android:pathData="M12.982,0.752V23.252"
-            android:strokeWidth="1.5"
-            android:strokeColor="#9F9F9F"
-            android:strokeLineCap="round"
-            android:strokeLineJoin="round" />
-    </group>
+    <path
+        android:pathData="M0.75,12L23.25,12"
+        android:strokeWidth="1.5"
+        android:strokeColor="#9f9f9f"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M12,0.75L12,23.25"
+        android:strokeWidth="1.5"
+        android:strokeColor="#9f9f9f"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>
