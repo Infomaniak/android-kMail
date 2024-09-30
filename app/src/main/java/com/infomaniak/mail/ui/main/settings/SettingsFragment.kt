@@ -28,7 +28,6 @@ import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -52,8 +51,6 @@ class SettingsFragment : Fragment() {
     private var binding: FragmentSettingsBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    private val currentClassName: String = SettingsFragment::class.java.name
-
     @Inject
     lateinit var localSettings: LocalSettings
 
@@ -71,7 +68,6 @@ class SettingsFragment : Fragment() {
         setSystemBarsColors()
 
         setupMailboxesAdapter()
-        setupAddMailbox()
         setupListeners()
         setSubtitlesInitialState()
         observeFeatureFlag()
@@ -97,15 +93,6 @@ class SettingsFragment : Fragment() {
         mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
     }
 
-    private fun setupAddMailbox() = with(binding) {
-        addMailbox.setOnClickListener {
-            safeNavigate(
-                resId = R.id.attachMailboxFragment,
-                currentClassName = currentClassName,
-            )
-        }
-    }
-
     private fun setSubtitlesInitialState() = with(binding) {
         with(localSettings) {
             settingsAiEngine.setSubtitle(aiEngine.localisedNameRes)
@@ -123,6 +110,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
+        addMailbox.setOnClickListener { animatedNavigation(resId = R.id.attachMailboxFragment) }
 
         settingsNotifications.setOnClickListener {
             trackEvent("settingsNotifications", "openNotificationSettings")

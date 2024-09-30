@@ -24,8 +24,8 @@
     tools:title="My Account">
 
     <!--
-        We use useDefaultLayout to true, which embed recyclerViewAccount into a NestedScrollView. This
-        This prevent elements of the RecyclerView to be recycled. It should not be a big problem
+        We use useDefaultLayout to true, which embeds recyclerViewAccount into a NestedScrollView.
+        This prevents elements of the RecyclerView to be recycled. It should not be a big problem
         since we shouldn't have a lot of items here but this can be improved.
     -->
 
