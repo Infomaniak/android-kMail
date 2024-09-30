@@ -100,13 +100,10 @@ class MailboxController @Inject constructor(
             val remoteMailboxesIds = remoteMailboxes.map { remoteMailbox ->
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-                val previousLocalValues = getMailbox(userId, remoteMailbox.mailboxId, realm = this)?.local
+                val previousLocalValues = getMailbox(userId, remoteMailbox.mailboxId, realm = this)?.local?.copyFromRealm()
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Save new data")
-                remoteMailbox.initLocalValues(
-                    userId = userId,
-                    localValues = previousLocalValues,
-                )
+                remoteMailbox.initLocalValues(userId, previousLocalValues)
                 copyToRealm(remoteMailbox, UpdatePolicy.ALL)
 
                 return@map remoteMailbox.mailboxId

@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.extensions.getDefault
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmObject
@@ -89,6 +90,12 @@ class Mailbox : RealmObject {
         localValues?.let { mailboxLocalValues = it }
         objectId = createObjectId(userId)
         local.userId = userId
+    }
+
+    fun setFeatureFlags(featureFlags: List<String>) {
+        mailboxLocalValues = local.copyFromRealm().also {
+            it.featureFlags.setFeatureFlags(featureFlags)
+        }
     }
 
     fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature = with(local) {
