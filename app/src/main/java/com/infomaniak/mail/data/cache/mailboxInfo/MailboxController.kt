@@ -171,7 +171,7 @@ class MailboxController @Inject constructor(
 
         //region Queries
         private fun checkHasUserId(userId: Int): String {
-            return "${Mailbox::mailboxLocalValues.name}.${MailboxLocalValues::userId.name} == '$userId'"
+            return "${Mailbox.localValuesPropertyName}.${MailboxLocalValues::userId.name} == '$userId'"
         }
 
         private val isMailboxLocked = "${Mailbox::isLocked.name} == true"

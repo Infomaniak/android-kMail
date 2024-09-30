@@ -66,8 +66,7 @@ class Mailbox : RealmObject {
     @PrimaryKey
     var objectId: String = ""
     @Transient
-    var mailboxLocalValues: MailboxLocalValues? = MailboxLocalValues()
-        private set
+    private var mailboxLocalValues: MailboxLocalValues? = MailboxLocalValues()
     val local get() = mailboxLocalValues!!
     //endregion
 
@@ -100,5 +99,9 @@ class Mailbox : RealmObject {
         val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
         val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
         return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
+    }
+
+    companion object {
+        val localValuesPropertyName = Mailbox::mailboxLocalValues.name
     }
 }
