@@ -34,12 +34,12 @@
 
             <TextView
                 android:id="@+id/userNameTitle"
-                style="@style/BodyMedium"
+                style="@style/H2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginTop="@dimen/marginStandard"
-                android:text="@string/usernameTitle"/>
+                android:text="@string/usernameTitle" />
 
             <TextView
                 android:id="@+id/username"
@@ -47,11 +47,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardVerySmall"
                 tools:text="Test" />
 
             <TextView
                 android:id="@+id/emailTitle"
-                style="@style/BodyMedium"
+                style="@style/H2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -64,24 +65,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:paddingBottom="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardVerySmall"
+                android:layout_marginBottom="@dimen/marginStandardMedium"
                 tools:text="test@noreply.com" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider"
                 style="@style/ItemDivider" />
 
-            <com.google.android.material.button.MaterialButton
+            <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
                 android:id="@+id/deleteAccountButton"
-                style="@style/TextButtonSecondary"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/suisseintl_regular"
-                android:paddingHorizontal="@dimen/mediumButtonHorizontalMargin"
-                android:text="@string/buttonAccountDelete"
-                android:textColor="@color/redDestructiveAction"
                 app:icon="@drawable/ic_bin"
-                app:iconTint="@color/redDestructiveAction" />
+                app:iconColor="@color/redDestructiveAction"
+                app:iconSize="@dimen/standardIconSize"
+                app:text="@string/buttonAccountDelete"
+                app:textColor="@color/redDestructiveAction" />
 
             <com.infomaniak.mail.views.InformationBlockView
                 android:layout_width="match_parent"
