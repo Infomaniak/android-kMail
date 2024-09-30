@@ -125,7 +125,6 @@ class MenuDrawerFragment : Fragment() {
             callbacks = object : MenuDrawerAdapterCallbacks {
                 override var onMailboxesHeaderClicked: () -> Unit = ::onMailboxesHeaderClicked
                 override var onValidMailboxClicked: (Int) -> Unit = ::onValidMailboxClicked
-                override var onAddMailBoxClicked: () -> Unit = ::onAddMailboxClicked
                 override var onLockedMailboxClicked: (String) -> Unit = ::onLockedMailboxClicked
                 override var onInvalidPasswordMailboxClicked: (Mailbox) -> Unit = ::onInvalidPasswordMailboxClicked
                 override var onFoldersHeaderClicked: (Boolean) -> Unit = ::onFoldersHeaderClicked
@@ -213,6 +212,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onActionClicked(type: ActionType) {
         when (type) {
+            ActionType.ADD_MAILBOX -> onAddMailboxClicked()
             ActionType.SYNC_AUTO_CONFIG -> onSyncAutoConfigClicked()
             ActionType.IMPORT_MAILS -> onImportMailsClicked()
             ActionType.RESTORE_MAILS -> onRestoreMailsClicked()

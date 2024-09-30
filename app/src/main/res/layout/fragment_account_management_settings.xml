@@ -69,10 +69,6 @@
                 android:layout_marginBottom="@dimen/marginStandardMedium"
                 tools:text="test@noreply.com" />
 
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/divider"
-                style="@style/ItemDivider" />
-
             <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
                 android:id="@+id/deleteAccountButton"
                 android:layout_width="match_parent"

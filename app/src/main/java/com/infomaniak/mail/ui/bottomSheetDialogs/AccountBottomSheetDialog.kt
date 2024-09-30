@@ -36,6 +36,7 @@ import com.infomaniak.mail.ui.main.user.SwitchUserAdapter
 import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LogoutUser
+import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -84,8 +85,9 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
             context.trackAccountEvent("add")
             context.launchLoginActivity()
         }
-
         observeAccounts()
+
+        bindAlertToViewLifecycle(descriptionDialog)
     }
 
     private fun logoutCurrentUser() = lifecycleScope.launch(ioDispatcher) {

@@ -90,7 +90,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         add(MailboxesHeader(currentMailbox, otherMailboxes.isNotEmpty(), areMailboxesExpanded))
         if (areMailboxesExpanded) {
             addAll(otherMailboxes)
-            add(ItemType.ADD_MAILBOX)
+            add(ADD_MAILBOX_ACTION)
         }
     }
 
@@ -169,7 +169,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             ItemType.DIVIDER -> ItemType.DIVIDER.ordinal
             is MailboxesHeader -> ItemType.MAILBOXES_HEADER.ordinal
             is Mailbox -> if (item.isValid) ItemType.MAILBOX.ordinal else ItemType.INVALID_MAILBOX.ordinal
-            ItemType.ADD_MAILBOX -> ItemType.ADD_MAILBOX.ordinal
             ItemType.FOLDERS_HEADER -> ItemType.FOLDERS_HEADER.ordinal
             is Folder -> ItemType.FOLDER.ordinal
             ItemType.EMPTY_FOLDERS -> ItemType.EMPTY_FOLDERS.ordinal
@@ -188,7 +187,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             ItemType.MAILBOXES_HEADER.ordinal -> MailboxesHeaderViewHolder(inflater, parent)
             ItemType.MAILBOX.ordinal -> MailboxViewHolder(inflater, parent)
             ItemType.INVALID_MAILBOX.ordinal -> InvalidMailboxViewHolder(inflater, parent)
-            ItemType.ADD_MAILBOX.ordinal -> AddMailboxViewHolder(inflater, parent)
             ItemType.FOLDERS_HEADER.ordinal -> FoldersHeaderViewHolder(inflater, parent)
             ItemType.FOLDER.ordinal -> FolderViewHolder(inflater, parent)
             ItemType.EMPTY_FOLDERS.ordinal -> EmptyFoldersViewHolder(inflater, parent)
@@ -224,7 +222,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 onLockedMailboxClicked = callbacks.onLockedMailboxClicked,
                 onInvalidPasswordMailboxClicked = callbacks.onInvalidPasswordMailboxClicked,
             )
-            is AddMailboxViewHolder -> holder.setOnClickListener(callbacks.onAddMailBoxClicked)
             is FoldersHeaderViewHolder -> holder.displayFoldersHeader(
                 onFoldersHeaderClicked = callbacks.onFoldersHeaderClicked,
                 onCreateFolderClicked = callbacks.onCreateFolderClicked,
@@ -259,7 +256,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
         MAILBOXES_HEADER,
         MAILBOX,
         INVALID_MAILBOX,
-        ADD_MAILBOX,
         FOLDERS_HEADER,
         FOLDER,
         EMPTY_FOLDERS,
@@ -279,7 +275,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 ItemType.DIVIDER -> newItem == ItemType.DIVIDER
                 is MailboxesHeader -> newItem is MailboxesHeader && newItem.mailbox?.objectId == oldItem.mailbox?.objectId
                 is Mailbox -> newItem is Mailbox && newItem.objectId == oldItem.objectId
-                ItemType.ADD_MAILBOX -> newItem == ItemType.ADD_MAILBOX
                 ItemType.FOLDERS_HEADER -> newItem == ItemType.FOLDERS_HEADER
                 is Folder -> newItem is Folder && newItem.id == oldItem.id
                 ItemType.EMPTY_FOLDERS -> newItem == ItemType.EMPTY_FOLDERS
@@ -309,7 +304,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 ItemType.FOLDERS_HEADER,
                 ItemType.EMPTY_FOLDERS,
                 ItemType.ACTIONS_HEADER,
-                ItemType.ADD_MAILBOX,
                 is MenuDrawerAction -> true
                 else -> error("oldItem wasn't any known item type (in MenuDrawer `areContentsTheSame`)")
             }
@@ -325,6 +319,12 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
     }
 
     companion object {
+        private val ADD_MAILBOX_ACTION = MenuDrawerAction(
+            type = ActionType.ADD_MAILBOX,
+            icon = R.drawable.ic_add_circle_thin,
+            text = R.string.buttonAddExistingAddress,
+            maxLines = 1,
+        )
         private val SYNC_AUTO_CONFIG_ACTION = MenuDrawerAction(
             type = ActionType.SYNC_AUTO_CONFIG,
             icon = R.drawable.ic_synchronize,

@@ -29,7 +29,6 @@ import com.infomaniak.lib.core.ui.WebViewActivity
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.FragmentAccountManagementSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,21 +37,23 @@ class AccountManagementSettingsFragment : Fragment() {
 
     private var binding: FragmentAccountManagementSettingsBinding by safeBinding()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        saveFocusWhenNavigatingBack(getLayout = { binding.container }, lifecycle)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccountManagementSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
         setUi()
         setDeleteAccountClickListener()
+    }
+
+    private fun setUi() = with(binding) {
+        AccountUtils.currentUser?.let {
+            username.text = it.displayName
+            email.text = it.email
+        }
     }
 
     private fun setDeleteAccountClickListener() = with(binding) {
@@ -62,13 +63,6 @@ class AccountManagementSettingsFragment : Fragment() {
                 TERMINATE_ACCOUNT_FULL_URL,
                 mapOf("Authorization" to "Bearer ${InfomaniakCore.bearerToken}")
             )
-        }
-    }
-
-    private fun setUi() = with(binding) {
-        AccountUtils.currentUser?.let {
-            username.text = it.displayName
-            email.text = it.email
         }
     }
 

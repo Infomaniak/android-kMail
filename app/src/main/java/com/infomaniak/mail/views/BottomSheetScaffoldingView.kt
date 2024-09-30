@@ -88,6 +88,7 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
                 layoutParams = createMatchWrapLayoutParams()
                 orientation = LinearLayout.VERTICAL
                 if (centerHorizontally) gravity = Gravity.CENTER_HORIZONTAL
+                // Do not add margins to this view because it breaks the height of the RecyclerView. We don't know why yet.
                 setPaddingRelative(bottom = context.resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium))
             }
 
