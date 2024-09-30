@@ -120,7 +120,6 @@
     <string name="buttonAccept">Accept</string>
     <string name="buttonAccountAssociatedEmailAddresses">Email addresses associated with this account</string>
     <string name="buttonAccountDelete">Delete account</string>
-    <string name="buttonAccountDisconnect">Disconnect account</string>
     <string name="buttonAccountLogOut">Log out</string>
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>

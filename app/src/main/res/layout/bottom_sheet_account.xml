@@ -20,51 +20,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:useDefaultLayout="false"
-    tools:context=".ui.bottomSheetDialogs.AccountBottomSheetDialog">
+    tools:context=".ui.bottomSheetDialogs.AccountBottomSheetDialog"
+    tools:title="My Account">
 
-    <LinearLayout
+    <!--
+        We use useDefaultLayout to true, which embed recyclerViewAccount into a NestedScrollView. This
+        This prevent elements of the RecyclerView to be recycled. It should not be a big problem
+        since we shouldn't have a lot of items here but this can be improved.
+    -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewAccount"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="4"
+        tools:listitem="@layout/item_switch_user_account" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewAccount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:overScrollMode="never"
-            android:paddingTop="@dimen/marginStandardMedium"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="4"
-            tools:listitem="@layout/item_switch_user_account" />
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/ItemDivider"
+        android:layout_marginVertical="@dimen/marginStandardSmall" />
 
-        <com.google.android.material.divider.MaterialDivider
-            style="@style/ItemDivider"
-            android:layout_marginVertical="@dimen/marginStandardSmall" />
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/addAccount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_add_thin"
+        app:iconPaddingEnd="@dimen/marginStandardMedium"
+        app:iconPaddingStart="@dimen/marginStandard"
+        app:text="@string/buttonAddAccount"
+        app:visibleDivider="false" />
 
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/addAccount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_add_thin"
-            app:iconPaddingEnd="@dimen/marginStandardMedium"
-            app:iconPaddingStart="@dimen/marginStandard"
-            app:text="@string/buttonAddAccount"
-            app:visibleDivider="false" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/logout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_logout"
-            app:iconColor="@color/redDestructiveAction"
-            app:iconPaddingEnd="@dimen/marginStandardMedium"
-            app:iconPaddingStart="@dimen/marginStandard"
-            app:text="@string/buttonAccountLogOut"
-            app:textColor="@color/redDestructiveAction"
-            app:visibleDivider="false" />
-
-    </LinearLayout>
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_logout"
+        app:iconColor="@color/redDestructiveAction"
+        app:iconPaddingEnd="@dimen/marginStandardMedium"
+        app:iconPaddingStart="@dimen/marginStandard"
+        app:text="@string/buttonAccountLogOut"
+        app:textColor="@color/redDestructiveAction"
+        app:visibleDivider="false" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>

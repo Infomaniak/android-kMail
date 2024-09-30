@@ -114,7 +114,6 @@
     <string name="buttonAccept">Accetta</string>
     <string name="buttonAccountAssociatedEmailAddresses">Indirizzi e-mail associati a questo account</string>
     <string name="buttonAccountDelete">Cancellare l’account</string>
-    <string name="buttonAccountDisconnect">Disconnettere l’account</string>
     <string name="buttonAccountLogOut">Disconnettersi</string>
     <string name="buttonAccountSwitch">Modifica del conto</string>
     <string name="buttonAddAccount">Aggiungere un account</string>
