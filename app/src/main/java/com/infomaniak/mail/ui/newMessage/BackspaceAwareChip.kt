@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.KeyEvent
 import com.google.android.material.chip.Chip
@@ -31,6 +32,15 @@ class BackspaceAwareChip @JvmOverloads constructor(
 
     init {
         isFocusableInTouchMode = true
+    }
+
+    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        if (isInTouchMode && focused) {
+            performClick()
+            clearFocus()
+            return
+        }
+        super.onFocusChanged(focused, direction, previouslyFocusedRect)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
