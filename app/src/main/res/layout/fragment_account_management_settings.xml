@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2024 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<com.infomaniak.mail.ui.main.menuDrawer.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:title="@string/settingsAccountManagementTitle">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/userNameTitle"
+                style="@style/H2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandard"
+                android:text="@string/usernameTitle" />
+
+            <TextView
+                android:id="@+id/username"
+                style="@style/Body.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardVerySmall"
+                tools:text="Test" />
+
+            <TextView
+                android:id="@+id/emailTitle"
+                style="@style/H2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:text="@string/attachMailboxInputHint" />
+
+            <TextView
+                android:id="@+id/email"
+                style="@style/Body.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardVerySmall"
+                android:layout_marginBottom="@dimen/marginStandardMedium"
+                tools:text="test@noreply.com" />
+
+            <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+                android:id="@+id/deleteAccountButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_bin"
+                app:iconColor="@color/redDestructiveAction"
+                app:iconSize="@dimen/standardIconSize"
+                app:text="@string/buttonAccountDelete"
+                app:textColor="@color/redDestructiveAction" />
+
+            <com.infomaniak.mail.views.InformationBlockView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandard"
+                app:icon="@drawable/ic_warning"
+                app:showCloseIcon="false"
+                app:title="@string/deleteAccountWarning" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</com.infomaniak.mail.ui.main.menuDrawer.SimpleSettingView>

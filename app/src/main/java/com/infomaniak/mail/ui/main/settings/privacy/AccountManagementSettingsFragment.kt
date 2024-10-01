@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,59 +15,58 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.user
+package com.infomaniak.mail.ui.main.settings.privacy
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.BuildConfig.AUTOLOG_URL
+import com.infomaniak.lib.core.BuildConfig.TERMINATE_ACCOUNT_URL
+import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.ui.WebViewActivity
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.MatomoMail.trackAccountEvent
-import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
+import com.infomaniak.mail.databinding.FragmentAccountManagementSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SwitchUserFragment : Fragment() {
+class AccountManagementSettingsFragment : Fragment() {
 
-    private var binding: FragmentSwitchUserBinding by safeBinding()
-    private val switchUserViewModel: SwitchUserViewModel by viewModels()
-
-    private val accountsAdapter = SwitchUserAdapter(AccountUtils.currentUserId) { user ->
-        switchUserViewModel.switchAccount(user)
-    }
+    private var binding: FragmentAccountManagementSettingsBinding by safeBinding()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentSwitchUserBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentAccountManagementSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
-        setAdapter()
-        setupOnClickListener()
-        observeAccounts()
+        setUi()
+        setDeleteAccountClickListener()
     }
 
-    private fun setAdapter() {
-        binding.recyclerViewAccount.adapter = accountsAdapter
-    }
-
-    private fun setupOnClickListener() = with(binding) {
-        addAccount.setOnClickListener {
-            context.trackAccountEvent("add")
-            context.launchLoginActivity()
+    private fun setUi() = with(binding) {
+        AccountUtils.currentUser?.let {
+            username.text = it.displayName
+            email.text = it.email
         }
     }
 
-    private fun observeAccounts() = with(switchUserViewModel) {
-        accounts.observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
-        getAccountsInDB()
+    private fun setDeleteAccountClickListener() = with(binding) {
+        deleteAccountButton.setOnClickListener {
+            WebViewActivity.startActivity(
+                requireContext(),
+                TERMINATE_ACCOUNT_FULL_URL,
+                mapOf("Authorization" to "Bearer ${InfomaniakCore.bearerToken}")
+            )
+        }
+    }
+
+    companion object {
+        private const val TERMINATE_ACCOUNT_FULL_URL = "$AUTOLOG_URL/?url=$TERMINATE_ACCOUNT_URL"
     }
 }

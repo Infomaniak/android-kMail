@@ -52,11 +52,11 @@
         <!-- Endregion -->
 
         <action
+            android:id="@+id/action_threadListFragment_to_attachMailboxFragment"
+            app:destination="@+id/attachMailboxFragment" />
+        <action
             android:id="@+id/action_threadListFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_threadListFragment_to_accountFragment"
-            app:destination="@id/accountFragment" />
         <action
             android:id="@+id/action_threadListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
@@ -178,12 +178,6 @@
             app:argType="string" />
     </dialog>
 
-    <fragment
-        android:id="@+id/switchUserFragment"
-        android:name="com.infomaniak.mail.ui.main.user.SwitchUserFragment"
-        android:label="SwitchUserFragment"
-        tools:layout="@layout/fragment_switch_user" />
-
     <dialog
         android:id="@+id/detailedContactBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialog"
@@ -268,25 +262,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/accountFragment"
-        android:name="com.infomaniak.mail.ui.main.user.AccountFragment"
-        android:label="AccountFragment"
-        tools:layout="@layout/fragment_account">
-        <action
-            android:id="@+id/action_accountFragment_to_switchUserFragment"
-            app:destination="@id/switchUserFragment" />
-        <action
-            android:id="@+id/action_accountFragment_to_attachMailboxFragment"
-            app:destination="@+id/attachMailboxFragment" />
-        <action
-            android:id="@+id/action_accountFragment_to_lockedMailboxBottomSheetDialog"
-            app:destination="@id/lockedMailboxBottomSheetDialog" />
-        <action
-            android:id="@+id/action_accountFragment_to_invalidPasswordFragment"
-            app:destination="@id/invalidPasswordFragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/attachMailboxFragment"
         android:name="com.infomaniak.mail.ui.main.user.AttachMailboxFragment"
         android:label="AttachMailboxFragment"
@@ -330,6 +305,9 @@
         <action
             android:id="@+id/action_settings_to_dataManagementSettings"
             app:destination="@id/dataManagementSettingsFragment" />
+        <action
+            android:id="@+id/action_settings_to_accountManagementSettings"
+            app:destination="@id/accountManagementSettingsFragment" />
     </fragment>
 
     <fragment
@@ -474,6 +452,12 @@
             android:id="@+id/action_dataManagement_to_sentrySetting"
             app:destination="@id/dataManagementSentrySettingFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/accountManagementSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.privacy.AccountManagementSettingsFragment"
+        android:label="AccountManagementSettingsFragment"
+        tools:layout="@layout/fragment_account_management_settings" />
 
     <fragment
         android:id="@+id/dataManagementMatomoSettingFragment"
@@ -676,5 +660,11 @@
             android:name="position"
             app:argType="integer" />
     </fragment>
+
+    <dialog
+        android:id="@+id/accountBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialog"
+        android:label="AccountBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_account"/>
 
 </navigation>

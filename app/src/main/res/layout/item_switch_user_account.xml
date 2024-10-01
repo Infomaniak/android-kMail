@@ -27,18 +27,15 @@
         android:id="@+id/accountCardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardSmall"
-        android:layout_marginVertical="@dimen/marginStandardVerySmall"
         app:cardBackgroundColor="@color/backgroundColorSecondary"
-        app:cardCornerRadius="10dp"
+        app:cardCornerRadius="0dp"
         app:rippleColor="?attr/colorControlHighlight"
-        app:strokeColor="@color/cardViewStrokeColor"
-        app:strokeWidth="1dp">
+        app:strokeWidth="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/marginStandardSmall"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
             android:paddingVertical="@dimen/marginStandardSmall">
 
             <com.infomaniak.mail.views.AvatarView
@@ -57,7 +54,7 @@
                 style="@style/BodyMedium"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
                 app:layout_constraintBottom_toTopOf="@id/userMailAddress"
                 app:layout_constraintEnd_toStartOf="@id/checkmark"
                 app:layout_constraintStart_toEndOf="@id/userAvatar"
@@ -69,7 +66,7 @@
                 style="@style/BodySmall"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
                 app:layout_constraintBottom_toTopOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/checkmark"
                 app:layout_constraintStart_toEndOf="@id/userAvatar"

@@ -56,6 +56,7 @@ class ActionViewHolder(
     ) {
 
         enum class ActionType {
+            ADD_MAILBOX,
             SYNC_AUTO_CONFIG,
             IMPORT_MAILS,
             RESTORE_MAILS,

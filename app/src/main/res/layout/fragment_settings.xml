@@ -50,6 +50,13 @@
                 tools:itemCount="3"
                 tools:listitem="@layout/item_settings_mailbox" />
 
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/addMailbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/buttonAddExistingAddress" />
+
             <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
             <TextView
@@ -168,6 +175,14 @@
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
                 app:title="@string/settingsDataManagementTitle" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsAccountManagement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                android:visibility="gone"
+                app:title="@string/settingsAccountManagementTitle" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

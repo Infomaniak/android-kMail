@@ -114,10 +114,11 @@
     <string name="buttonAccept">Accetta</string>
     <string name="buttonAccountAssociatedEmailAddresses">Indirizzi e-mail associati a questo account</string>
     <string name="buttonAccountDelete">Cancellare l’account</string>
-    <string name="buttonAccountDisconnect">Disconnettere l’account</string>
+    <string name="buttonAccountLogOut">Disconnettersi</string>
     <string name="buttonAccountSwitch">Modifica del conto</string>
     <string name="buttonAddAccount">Aggiungere un account</string>
     <string name="buttonAddEmailAddress">Aggiungere un indirizzo e-mail</string>
+    <string name="buttonAddExistingAddress">Aggiungi un indirizzo esistente</string>
     <string name="buttonAttachMailbox">Aggiungi l’indirizzo e-mail</string>
     <string name="buttonAttachment">Aggiungere un allegato</string>
     <string name="buttonAttendees">Partecipanti</string>
@@ -231,6 +232,7 @@
     <string name="createFolderNoParent">Nessuno</string>
     <string name="createFolderParent">Cartella dei genitori</string>
     <string name="dateTitle">Data:</string>
+    <string name="deleteAccountWarning">La cancellazione dell’account sarà definitiva. Non sarà possibile riattivare l’account.</string>
     <string name="displayMailIssueDescription">Per risolvere i problemi di visualizzazione, aggiornare l’applicazione Android System Webview.</string>
     <string name="displayMailIssueTitle">Problema di visualizzazione delle email</string>
     <string name="draftFolder">Bozze</string>
@@ -406,6 +408,7 @@
     <string name="sentFolder">Messaggi inviati</string>
     <string name="settingsAccentColor">Colore d’accento</string>
     <string name="settingsAccentColorDescription">Scegliere il colore d’accento per l’applicazione</string>
+    <string name="settingsAccountManagementTitle">Gestione dei conti</string>
     <string name="settingsAiEngineDescription">Selezionare l’assistente di scrittura</string>
     <string name="settingsAppLock">Blocco dell’app</string>
     <string name="settingsAuthorizeTracking">Autorizza il tracciamento</string>
@@ -563,8 +566,10 @@
     <string name="threadListSectionToday">Oggi</string>
     <string name="threadListSpamHint">I messaggi che sono rimasti nella cartella spam per più di 30 giorni saranno eliminati automaticamente.</string>
     <string name="threadListTrashHint">I messaggi rimasti nel cestino per più di 30 giorni saranno automaticamente eliminati.</string>
-    <string name="titleMyAccount">Il mio account</string>
-    <string name="titleMyAccounts">I miei conti</string>
+    <plurals name="titleMyAccount">
+        <item quantity="one">Il mio account</item>
+        <item quantity="other">I miei conti</item>
+    </plurals>
     <string name="toTitle">A:</string>
     <string name="tooManyRecipients">Non è possibile aggiungere questo indirizzo perché è stato raggiunto il limite di destinatari</string>
     <string name="trashFolder">Cestino</string>
@@ -572,6 +577,7 @@
     <string name="urlEntryTitle">Creare un collegamento ipertestuale</string>
     <string name="urlPlaceholder">URL</string>
     <string name="urlUserReportAndroid">https://feedback.userreport.com/3cc072b7-61ff-4592-b1aa-307a58fdcec9/</string>
+    <string name="usernameTitle">Nome utente</string>
     <string name="warningEventHasPassed">Questo evento è già passato</string>
     <string name="warningEventIsCancelled">Questo evento è stato cancellato</string>
     <string name="workInProgressTitle">Disponibile a breve</string>

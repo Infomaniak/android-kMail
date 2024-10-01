@@ -110,6 +110,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
+        addMailbox.setOnClickListener { animatedNavigation(resId = R.id.attachMailboxFragment) }
 
         settingsNotifications.setOnClickListener {
             trackEvent("settingsNotifications", "openNotificationSettings")
@@ -165,6 +166,10 @@ class SettingsFragment : Fragment() {
 
         settingsDataManagement.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettings())
+        }
+
+        settingsAccountManagement.setOnClickListener {
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToAccountManagementSettings())
         }
 
         settingsAutomaticAdvance.setOnClickListener {

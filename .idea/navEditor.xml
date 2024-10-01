@@ -63,6 +63,18 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
+                  <entry key="acc">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="accentColorSettingFragment">
                     <value>
                       <LayoutPositions>
@@ -86,11 +98,6 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_accountFragment_to_attachMailboxFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
                             <entry key="action_accountFragment_to_invalidPasswordFragment">
                               <value>
                                 <LayoutPositions />
@@ -107,6 +114,18 @@
                               </value>
                             </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="accountManagementSettingsFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -580,12 +599,12 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_settingsFragment_to_aiEngineSettingFragment">
+                            <entry key="action_settings_to_accentColorSetting">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_settings_to_accentColorSetting">
+                            <entry key="action_settings_to_accountManagementSettings">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -778,6 +797,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_threadListFragment_to_attachMailboxFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_threadListFragment_to_invalidPasswordFragment">
                               <value>
                                 <LayoutPositions />
@@ -836,6 +860,18 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="1720" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="userToBlockBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
                             <option name="y" value="12" />
                           </Point>
                         </option>
@@ -927,6 +963,105 @@
                               </value>
                             </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </LayoutPositions>
+          </value>
+        </entry>
+        <entry key="no_valid_mailboxes_navigation.xml">
+          <value>
+            <LayoutPositions>
+              <option name="myPositions">
+                <map>
+                  <entry key="attachMailboxFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="256" />
+                            <option name="y" value="724" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="invalidPasswordFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="256" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="noValidMailboxesFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="76" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_noValidMailboxesFragment_to_attachMailboxFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_noValidMailboxesFragment_to_invalidPasswordFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_noValidMailboxesFragment_to_switchUserFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="switchUserFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="256" />
+                            <option name="y" value="368" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </LayoutPositions>
+          </value>
+        </entry>
+        <entry key="webview_navigation.xml">
+          <value>
+            <LayoutPositions>
+              <option name="myPositions">
+                <map>
+                  <entry key="webViewActivity">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>

@@ -606,7 +606,7 @@
 
     <style name="PopupWindowStyle" parent="Widget.Material3.PopupMenu">
         <item name="android:overlapAnchor">true</item>
-        <item name="android:popupBackground">@drawable/background_popup</item>
+        <item name="android:popupBackground">@drawable/background_rounded</item>
     </style>
 
     <style name="AvatarNameEmailPrimary" parent="BodyMedium" />
