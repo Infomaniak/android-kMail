@@ -30,10 +30,6 @@ class BackspaceAwareChip @JvmOverloads constructor(
 
     private var onBackspace: () -> Unit = {}
 
-    init {
-        isFocusableInTouchMode = true
-    }
-
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         if (isInTouchMode && focused) {
             performClick()

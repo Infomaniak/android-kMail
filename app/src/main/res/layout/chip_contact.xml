@@ -23,5 +23,6 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="2dp"
     android:ellipsize="end"
+    android:focusableInTouchMode="true"
     app:chipMinTouchTargetSize="44dp"
     tools:text="@tools:sample/full_names" />
