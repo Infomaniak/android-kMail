@@ -1,0 +1,5 @@
+- Add specific UI for thread when in SPAM folder
+- Delete draft that cannot ever be sent because of corrupted attachments
+- Fix AutoAdvance feature that was triggering too often
+- Fix BIMI that were blinking
+- Fix animated toolbar crash

@@ -1,0 +1,5 @@
+- Ajout d'une interface utilisateur spécifique pour les fils de discussion lorsqu'ils se trouvent dans le dossier SPAM
+- Suppression des brouillons qui ne peuvent jamais être envoyés en raison de pièces jointes corrompues
+- Correction de la fonction d'avance automatique qui se déclenchait trop souvent
+- Correction des BIMI qui clignotaient
+- Correction du crash de la barre d'outils animée
