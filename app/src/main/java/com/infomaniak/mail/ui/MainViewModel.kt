@@ -69,7 +69,6 @@ import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.sentry.Attachment
 import io.sentry.Sentry
@@ -346,7 +345,7 @@ class MainViewModel @Inject constructor(
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) {
                 mailboxController.updateMailbox(mailbox.objectId) {
-                    it.local.quotas = data
+                    it.setQuotas(data)
                 }
             }
         }
@@ -356,7 +355,7 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
             if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
-                it.local.permissions = data
+                it.setPermissions(data)
             }
         }
     }
@@ -377,8 +376,7 @@ class MainViewModel @Inject constructor(
             if (!isSuccess()) return@launch
             data?.let { externalMailInfo ->
                 mailboxController.updateMailbox(mailbox.objectId) {
-                    it.local.externalMailFlagEnabled = externalMailInfo.externalMailFlagEnabled
-                    it.local.trustedDomains = externalMailInfo.trustedDomains.toRealmList()
+                    it.setExternalMailInfo(externalMailInfo)
                 }
             }
         }

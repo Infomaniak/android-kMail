@@ -39,7 +39,6 @@ import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import javax.inject.Inject
 
@@ -171,10 +170,12 @@ class SharedUtils @Inject constructor(
                     val signaturesResult = data!!
                     customRealm.write {
                         MailboxController.getMailbox(mailbox.objectId, realm = this)?.let { mailbox ->
-                            mailbox.local.signatures = signaturesResult.signatures.toMutableList().apply {
-                                firstOrNull { it.id == signaturesResult.defaultSignatureId }?.isDefault = true
-                                firstOrNull { it.id == signaturesResult.defaultReplySignatureId }?.isDefaultReply = true
-                            }.toRealmList()
+                            mailbox.setSignatures(
+                                signatures = signaturesResult.signatures.toMutableList().apply {
+                                    firstOrNull { it.id == signaturesResult.defaultSignatureId }?.isDefault = true
+                                    firstOrNull { it.id == signaturesResult.defaultReplySignatureId }?.isDefaultReply = true
+                                },
+                            )
                         }
                     }
                     null

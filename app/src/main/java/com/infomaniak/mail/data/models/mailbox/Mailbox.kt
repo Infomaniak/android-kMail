@@ -21,6 +21,7 @@ package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.UnreadDisplay
@@ -87,9 +88,32 @@ class Mailbox : RealmObject {
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
     fun initLocalValues(userId: Int, localValues: MailboxLocalValues?) {
-        localValues?.let { mailboxLocalValues = it }
+
+        // If we have any backup from a previous Mailbox already stored in Realm, use it.
+        localValues?.let { mailboxLocalValues = it.copyFromRealm() }
+
         objectId = createObjectId(userId)
-        local.userId = userId
+        mailboxLocalValues = local.setUserId(userId, bypassRealmCopy = true)
+    }
+
+    fun setUnreadCountLocal(unreadCount: Int) {
+        mailboxLocalValues = local.setUnreadCountLocal(unreadCount)
+    }
+
+    fun setQuotas(quotas: Quotas?) {
+        mailboxLocalValues = local.setQuotas(quotas)
+    }
+
+    fun setPermissions(permissions: MailboxPermissions?) {
+        mailboxLocalValues = local.setPermissions(permissions)
+    }
+
+    fun setSignatures(signatures: List<Signature>) {
+        mailboxLocalValues = local.setSignatures(signatures)
+    }
+
+    fun setExternalMailInfo(externalMailInfo: MailboxExternalMailInfo) {
+        mailboxLocalValues = local.setExternalMailInfo(externalMailInfo)
     }
 
     fun setFeatureFlags(featureFlags: List<String>) {

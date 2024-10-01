@@ -21,6 +21,7 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.signature.Signature
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -29,16 +30,69 @@ import io.realm.kotlin.types.annotations.Ignore
 class MailboxLocalValues : EmbeddedRealmObject {
 
     var userId: Int = AppSettings.DEFAULT_ID
-    var quotas: Quotas? = null
+        private set
     var unreadCountLocal: Int = 0
+        private set
+    var quotas: Quotas? = null
+        private set
     var permissions: MailboxPermissions? = null
+        private set
     var signatures = realmListOf<Signature>()
-    private var _featureFlags = realmSetOf<String>()
+        private set
     var externalMailFlagEnabled: Boolean = false
+        private set
     var trustedDomains = realmListOf<String>()
+        private set
+    private var _featureFlags = realmSetOf<String>()
 
     @Ignore
     val featureFlags = FeatureFlags()
+
+    fun setUserId(userId: Int, bypassRealmCopy: Boolean = false): MailboxLocalValues {
+
+        fun updateUserId(local: MailboxLocalValues) {
+            local.userId = userId
+        }
+
+        return if (bypassRealmCopy)
+            this.also(::updateUserId)
+        else {
+            update(::updateUserId)
+        }
+    }
+
+    fun setUnreadCountLocal(unreadCount: Int): MailboxLocalValues {
+        return update { it.unreadCountLocal = unreadCount }
+    }
+
+    fun setQuotas(quotas: Quotas?): MailboxLocalValues {
+        return update { it.quotas = quotas }
+    }
+
+    fun setPermissions(permissions: MailboxPermissions?): MailboxLocalValues {
+        return update { it.permissions = permissions }
+    }
+
+    fun setSignatures(signatures: List<Signature>): MailboxLocalValues {
+        return update {
+            it.signatures.apply {
+                clear()
+                addAll(signatures)
+            }
+        }
+    }
+
+    fun setExternalMailInfo(externalMailInfo: MailboxExternalMailInfo): MailboxLocalValues {
+        return update {
+            it.externalMailFlagEnabled = externalMailInfo.externalMailFlagEnabled
+            it.trustedDomains.apply {
+                clear()
+                addAll(externalMailInfo.trustedDomains)
+            }
+        }
+    }
+
+    private fun update(onUpdate: (MailboxLocalValues) -> Unit): MailboxLocalValues = copyFromRealm().also(onUpdate)
 
     inner class FeatureFlags {
 
