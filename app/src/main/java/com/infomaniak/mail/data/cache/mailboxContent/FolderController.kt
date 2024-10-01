@@ -194,11 +194,11 @@ class FolderController @Inject constructor(
         //endregion
 
         //region Edit data
-        fun updateFolder(id: String, realm: Realm, onUpdate: (folder: Folder) -> Unit) {
+        fun updateFolder(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
             realm.writeBlocking { getFolder(id, realm = this)?.let(onUpdate) }
         }
 
-        fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (folder: Folder) -> Unit) {
+        fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
 
             tailrec fun updateChildrenRecursively(inputList: MutableList<Folder>) {
                 val folder = inputList.removeFirst()

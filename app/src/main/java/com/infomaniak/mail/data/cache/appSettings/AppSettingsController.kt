@@ -32,7 +32,7 @@ object AppSettingsController {
     //endregion
 
     //region Edit data
-    fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
+    fun updateAppSettings(onUpdate: (AppSettings) -> Unit) {
         RealmDatabase.appSettings().writeBlocking { onUpdate(getAppSettings(realm = this)) }
     }
 

@@ -133,7 +133,7 @@ class MailboxController @Inject constructor(
         delete(outdatedMailboxes)
     }
 
-    fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
+    fun updateMailbox(objectId: String, onUpdate: (Mailbox) -> Unit) {
         mailboxInfoRealm.writeBlocking { getMailbox(objectId, realm = this)?.let(onUpdate) }
     }
 
