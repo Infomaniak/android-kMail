@@ -34,9 +34,9 @@ class BackspaceAwareChip @JvmOverloads constructor(
         if (isInTouchMode && focused) {
             performClick()
             clearFocus()
-            return
+        } else {
+            super.onFocusChanged(focused, direction, previouslyFocusedRect)
         }
-        super.onFocusChanged(focused, direction, previouslyFocusedRect)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
