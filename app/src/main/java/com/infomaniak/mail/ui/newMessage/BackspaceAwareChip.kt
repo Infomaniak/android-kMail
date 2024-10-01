@@ -29,6 +29,10 @@ class BackspaceAwareChip @JvmOverloads constructor(
 
     private var onBackspace: () -> Unit = {}
 
+    init {
+        isFocusableInTouchMode = true
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_DEL) onBackspace()
         return super.onKeyDown(keyCode, event)
