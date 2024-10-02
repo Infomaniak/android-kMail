@@ -82,7 +82,7 @@
                 android:layout_marginHorizontal="@dimen/marginStandardSmall"
                 android:layout_marginTop="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardSmall"
-                app:cardBackgroundColor="@color/searchBarBackgroundColor"
+                app:cardBackgroundColor="@color/searchBarMoveBackgroundColor"
                 app:cardCornerRadius="4dp">
 
                 <com.infomaniak.lib.core.views.EndIconTextInputLayout
