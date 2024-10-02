@@ -82,7 +82,6 @@
                 android:layout_marginHorizontal="@dimen/marginStandardSmall"
                 android:layout_marginTop="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardSmall"
-                app:cardBackgroundColor="@color/searchBarMoveBackgroundColor"
                 app:cardCornerRadius="4dp">
 
                 <com.infomaniak.lib.core.views.EndIconTextInputLayout
@@ -96,7 +95,6 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/searchTextInput"
                         style="@style/SearchTextInputEditTextStyle"
-                        android:backgroundTint="@android:color/transparent"
                         android:drawablePadding="@dimen/marginStandardMedium"
                         android:hint="@string/moveSearchFieldPlaceholder" />
                 </com.infomaniak.lib.core.views.EndIconTextInputLayout>
