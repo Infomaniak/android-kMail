@@ -89,8 +89,8 @@ object ContactUtils {
                 val key = Recipient().initLocalValues(email, apiContact.name)
                 val contactAvatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
                 if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
-                    if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
-                        phoneMergedContacts[key]?.avatar = contactAvatar
+                    if (contactAvatar != null) { // Only replace the avatar if we have an api avatar to replace it with
+                        phoneMergedContacts[key]?.avatar = contactAvatar // Give priority to the api avatar
                     }
                 } else { // If we haven't yet encountered this user, add him
                     phoneMergedContacts[key] = MergedContact().initLocalValues(email, apiContact.name, contactAvatar)
