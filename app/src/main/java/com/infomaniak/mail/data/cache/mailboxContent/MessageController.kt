@@ -215,6 +215,18 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
             delete(query<Message>("${Message::isFromSearch.name} == true").find())
         }
+
+        fun updateFavoriteStatus(messageUids: List<String>, isFavorite: Boolean, realm: MutableRealm) {
+            getMessagesByUids(messageUids, realm).forEach {
+                it.isFavorite = isFavorite
+            }
+        }
+
+        fun updateSeenStatus(messageUids: List<String>, isSeen: Boolean, realm: MutableRealm) {
+            getMessagesByUids(messageUids, realm).forEach {
+                it.isSeen = isSeen
+            }
+        }
         //endregion
     }
 }

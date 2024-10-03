@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -180,6 +181,14 @@ class ThreadController @Inject constructor(
             delete(getThreadQuery(threadUid, realm = this))
         }
     }
+
+    fun updateIsLocallyMovedOutStatus(threadUids: List<String>, hasBeenMovedOut: Boolean) {
+        mailboxContentRealm().writeBlocking {
+            threadUids.forEach {
+                getThread(it, realm = this)?.isLocallyMovedOut = hasBeenMovedOut
+            }
+        }
+    }
     //endregion
 
     companion object {
@@ -213,7 +222,8 @@ class ThreadController @Inject constructor(
         private fun getThreadsQuery(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): RealmQuery<Thread> {
 
             val notFromSearch = "${Thread::isFromSearch.name} == false"
-            val realmQuery = folder.threads.query(notFromSearch).sort(Thread::date.name, Sort.DESCENDING)
+            val notLocallyMovedOut = " AND ${Thread::isLocallyMovedOut.name} == false"
+            val realmQuery = folder.threads.query(notFromSearch + notLocallyMovedOut).sort(Thread::date.name, Sort.DESCENDING)
 
             return if (filter == ThreadFilter.ALL) {
                 realmQuery
@@ -274,6 +284,39 @@ class ThreadController @Inject constructor(
             onUpdate(getThread(threadUid, realm))
         }
 
+        private fun fetchSwissTransferContainer(uuid: String): SwissTransferContainer? {
+            return runCatching {
+                val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
+
+                if (apiResponse.isSuccess()) return@runCatching apiResponse.data
+
+                SentryLog.i(TAG, "Could not fetch SwissTransfer container")
+                return@runCatching null
+            }.getOrNull()
+        }
+
+        private fun getApiCallsResults(
+            messages: List<Message>,
+            okHttpClient: OkHttpClient?,
+            failedMessagesUids: MutableList<String>
+        ): List<ApiCallsResults> {
+            return messages.mapNotNull { localMessage ->
+                return@mapNotNull runCatching {
+                    val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
+                    val swissTransferUuid = apiResponse.data?.swissTransferUuid
+                    var swissTransferContainer: SwissTransferContainer? = null
+                    if (apiResponse.isSuccess() && swissTransferUuid != null) {
+                        swissTransferContainer = fetchSwissTransferContainer(swissTransferUuid)
+                    }
+                    return@runCatching ApiCallsResults(localMessage, apiResponse, swissTransferContainer)
+                }.getOrElse {
+                    // This `getOrElse` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
+                    failedMessagesUids.add(localMessage.uid)
+                    return@getOrElse null
+                }
+            }
+        }
+
         /**
          * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
          *
@@ -296,66 +339,46 @@ class ThreadController @Inject constructor(
             val deletedMessagesUids = mutableListOf<String>()
             val failedMessagesUids = mutableListOf<String>()
 
-            fun fetchSwissTransferContainer(uuid: String): SwissTransferContainer? = runCatching {
-                val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
-
-                if (apiResponse.isSuccess()) return@runCatching apiResponse.data
-
-                SentryLog.i(TAG, "Could not fetch SwissTransfer container")
-                return@runCatching null
-            }.getOrNull()
-
-            fun handleFailure(uid: String, code: String? = null) {
-                if (code == ErrorCode.MESSAGE_NOT_FOUND) {
-                    MessageController.getMessage(uid, realm)?.isDeletedOnApi = true
-                    deletedMessagesUids.add(uid)
-                } else {
-                    failedMessagesUids.add(uid)
-                }
-            }
+            val apiCallsResults = getApiCallsResults(messages, okHttpClient, failedMessagesUids)
 
             realm.writeBlocking {
                 var hasAttachableInThread = false
 
-                messages.forEach { localMessage ->
+                apiCallsResults.forEach { (localMessage, apiResponse, swissTransferContainer) ->
 
                     if (localMessage.isFullyDownloaded()) return@forEach
 
-                    runCatching {
-                        val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
+                    if (apiResponse.isSuccess()) {
+                        apiResponse.data?.also { remoteMessage ->
+                            val swissTransferFiles = swissTransferContainer?.let { container ->
+                                SwissTransferContainerController.upsertSwissTransferContainer(container, realm = this)
+                                container.swissTransferFiles
+                            } ?: realmListOf()
 
-                        if (apiResponse.isSuccess()) {
-                            apiResponse.data?.also { remoteMessage ->
-                                val swissTransferFiles = remoteMessage.swissTransferUuid?.let { uuid ->
-                                    fetchSwissTransferContainer(uuid)?.let { container ->
-                                        SwissTransferContainerController.upsertSwissTransferContainer(container, realm = this)
-                                        container.swissTransferFiles
-                                    }
-                                } ?: realmListOf()
+                            remoteMessage.initLocalValues(
+                                MessageInitialState(
+                                    date = localMessage.date,
+                                    isFullyDownloaded = true,
+                                    isTrashed = localMessage.isTrashed,
+                                    isFromSearch = localMessage.isFromSearch,
+                                    draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                ),
+                                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
+                                messageIds = localMessage.messageIds,
+                                swissTransferFiles = swissTransferFiles,
+                            )
 
-                                remoteMessage.initLocalValues(
-                                    MessageInitialState(
-                                        date = localMessage.date,
-                                        isFullyDownloaded = true,
-                                        isTrashed = localMessage.isTrashed,
-                                        isFromSearch = localMessage.isFromSearch,
-                                        draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
-                                    ),
-                                    latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
-                                    messageIds = localMessage.messageIds,
-                                    swissTransferFiles = swissTransferFiles,
-                                )
+                            if (remoteMessage.hasAttachable) hasAttachableInThread = true
 
-                                if (remoteMessage.hasAttachable) hasAttachableInThread = true
-
-                                MessageController.upsertMessage(remoteMessage, realm = this)
-                            }
-                        } else {
-                            handleFailure(localMessage.uid, apiResponse.error?.code)
+                            MessageController.upsertMessage(remoteMessage, realm = this)
                         }
-                    }.onFailure {
-                        // This `onFailure` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
-                        handleFailure(localMessage.uid)
+                    } else {
+                        if (apiResponse.error?.code == ErrorCode.MESSAGE_NOT_FOUND) {
+                            MessageController.getMessage(localMessage.uid, realm = this)?.isDeletedOnApi = true
+                            deletedMessagesUids.add(localMessage.uid)
+                        } else {
+                            failedMessagesUids.add(localMessage.uid)
+                        }
                     }
 
                     // TODO: Remove this when the API returns the good value for `has_attachments`.
@@ -409,7 +432,25 @@ class ThreadController @Inject constructor(
                 }
             }
         }
+
+        fun updateFavoriteStatus(threadUids: List<String>, isFavorite: Boolean, realm: MutableRealm) {
+            threadUids.forEach {
+                getThread(it, realm)?.isFavorite = isFavorite
+            }
+        }
+
+        fun updateSeenStatus(threadUids: List<String>, isSeen: Boolean, realm: MutableRealm) {
+            threadUids.forEach {
+                getThread(it, realm)?.unseenMessagesCount = if (isSeen) 0 else 1
+            }
+        }
         //endregion
+
+        private data class ApiCallsResults(
+            val localMessage: Message,
+            val apiResponse: ApiResponse<Message>,
+            val swissTransferContainer: SwissTransferContainer?,
+        )
 
         private const val TAG = "ThreadController"
     }

@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -45,6 +46,7 @@ import javax.inject.Inject
 class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
+    private val threadController: ThreadController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
 ) {
@@ -75,6 +77,11 @@ class SharedUtils @Inject constructor(
             else -> messageController.getMessageAndDuplicates(threads.first(), message)
         }
 
+        val threadsUids = threads.map { it.uid }
+        val messagesUids = messages.map { it.uid }
+
+        updateSeenStatus(threadsUids, messagesUids, isSeen = true)
+
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
 
         if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
@@ -84,6 +91,15 @@ class SharedUtils @Inject constructor(
                 currentFolderId = currentFolderId,
                 callbacks = callbacks,
             )
+        }
+
+        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(threadsUids, messagesUids, isSeen = false)
+    }
+
+    private fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
+        mailboxContentRealm().writeBlocking {
+            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
+            ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
         }
     }
 

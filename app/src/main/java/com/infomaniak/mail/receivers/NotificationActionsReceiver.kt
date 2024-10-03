@@ -91,8 +91,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) = with(payload) {
-
+    private fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) {
         // Undo action
         if (action == UNDO_ACTION) {
             context.trackNotificationActionEvent("cancelClicked")
