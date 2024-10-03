@@ -75,22 +75,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/searchInputLayout"
-                style="@style/SearchTextInputLayoutStyle"
+            <com.google.android.material.card.MaterialCardView
+                style="@style/CardViewMail"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/searchViewHeight"
-                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:layout_marginHorizontal="@dimen/marginStandardSmall"
                 android:layout_marginTop="@dimen/marginStandardMedium"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardSmall">
+                android:layout_marginBottom="@dimen/marginStandardSmall"
+                app:cardCornerRadius="4dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/searchTextInput"
-                    style="@style/SearchTextInputEditTextStyle"
-                    android:drawablePadding="@dimen/marginStandardMedium"
-                    android:hint="@string/moveSearchFieldPlaceholder" />
-            </com.google.android.material.textfield.TextInputLayout>
+                <com.infomaniak.lib.core.views.EndIconTextInputLayout
+                    android:id="@+id/searchInputLayout"
+                    style="@style/SearchTextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    app:endIconPadding="@dimen/alternativeMargin">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/searchTextInput"
+                        style="@style/SearchTextInputEditTextStyle"
+                        android:drawablePadding="@dimen/marginStandardMedium"
+                        android:hint="@string/moveSearchFieldPlaceholder" />
+                </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/foldersRecyclerView"
