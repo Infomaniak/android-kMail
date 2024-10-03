@@ -490,7 +490,7 @@ class MainViewModel @Inject constructor(
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
 
-        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = true)
+        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
         val apiResponses = if (shouldPermanentlyDelete) {
             ApiRepository.deleteMessages(mailbox.uuid, uids)
@@ -517,7 +517,7 @@ class MainViewModel @Inject constructor(
             reassignCurrentThreadsLive()
         }
 
-        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
+        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
@@ -601,7 +601,7 @@ class MainViewModel @Inject constructor(
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
-        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = true)
+        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
         val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
@@ -616,7 +616,7 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
+        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
     }
@@ -746,8 +746,8 @@ class MainViewModel @Inject constructor(
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         val messages = getMessagesToMarkAsUnseen(threads, message)
-        val messagesUids = messages.map { it.uid }
         val threadsUids = threads.map { it.uid }
+        val messagesUids = messages.map { it.uid }
 
         updateSeenStatus(threadsUids, messagesUids, isSeen = false)
 
@@ -878,7 +878,7 @@ class MainViewModel @Inject constructor(
 
         val messages = getMessagesToSpamOrHam(threads, message)
 
-        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = true)
+        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
         val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
@@ -890,7 +890,7 @@ class MainViewModel @Inject constructor(
                 callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
         } else {
-            threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
+            threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
         }
 
         if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
@@ -1044,7 +1044,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun onDownloadStop(threadsUids: List<String>) {
-        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
+        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
         isDownloadingChanges.postValue(false)
     }
 

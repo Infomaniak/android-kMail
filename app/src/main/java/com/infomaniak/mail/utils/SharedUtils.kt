@@ -77,8 +77,8 @@ class SharedUtils @Inject constructor(
             else -> messageController.getMessageAndDuplicates(threads.first(), message)
         }
 
-        val messagesUids = messages.map { it.uid }
         val threadsUids = threads.map { it.uid }
+        val messagesUids = messages.map { it.uid }
 
         updateSeenStatus(threadsUids, messagesUids, isSeen = true)
 

@@ -182,12 +182,10 @@ class ThreadController @Inject constructor(
         }
     }
 
-    fun updateIsMovedOutLocally(threadUids: List<String>, hasBeenMovedOut: Boolean) {
+    fun updateIsLocallyMovedOutStatus(threadUids: List<String>, hasBeenMovedOut: Boolean) {
         mailboxContentRealm().writeBlocking {
             threadUids.forEach {
-                getThread(it, this)?.apply {
-                    this.isMovedOutLocally = hasBeenMovedOut
-                }
+                getThread(it, realm = this)?.isLocallyMovedOut = hasBeenMovedOut
             }
         }
     }
@@ -224,8 +222,8 @@ class ThreadController @Inject constructor(
         private fun getThreadsQuery(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): RealmQuery<Thread> {
 
             val notFromSearch = "${Thread::isFromSearch.name} == false"
-            val isMovedOutLocally = " AND ${Thread::isMovedOutLocally.name} == false"
-            val realmQuery = folder.threads.query(notFromSearch + isMovedOutLocally).sort(Thread::date.name, Sort.DESCENDING)
+            val notLocallyMovedOut = " AND ${Thread::isLocallyMovedOut.name} == false"
+            val realmQuery = folder.threads.query(notFromSearch + notLocallyMovedOut).sort(Thread::date.name, Sort.DESCENDING)
 
             return if (filter == ThreadFilter.ALL) {
                 realmQuery
