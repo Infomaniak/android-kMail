@@ -148,24 +148,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
     //endregion
 
-    //region Edit
-    fun updateIsFavoriteStatus(messageUids: List<String>, isFavorite: Boolean) {
-        mailboxContentRealm().writeBlocking {
-            getMessagesByUids(messageUids, realm = this).forEach {
-                it.isFavorite = isFavorite
-            }
-        }
-    }
-
-    fun updateReadStatus(messageUids: List<String>, isSeen: Boolean) {
-        mailboxContentRealm().writeBlocking {
-            getMessagesByUids(messageUids, realm = this).forEach {
-                it.isSeen = isSeen
-            }
-        }
-    }
-    //endregion
-
     companion object {
         private val isNotDraft = "${Message::isDraft.name} == false"
         private val isNotScheduled = "${Message::isScheduled.name} == false"
@@ -232,6 +214,18 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
         fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
             delete(query<Message>("${Message::isFromSearch.name} == true").find())
+        }
+
+        fun updateFavoriteStatus(messageUids: List<String>, isFavorite: Boolean, realm: MutableRealm) {
+            getMessagesByUids(messageUids, realm).forEach {
+                it.isFavorite = isFavorite
+            }
+        }
+
+        fun updateSeenStatus(messageUids: List<String>, isSeen: Boolean, realm: MutableRealm) {
+            getMessagesByUids(messageUids, realm).forEach {
+                it.isSeen = isSeen
+            }
         }
         //endregion
     }

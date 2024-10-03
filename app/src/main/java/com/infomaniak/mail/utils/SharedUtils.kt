@@ -80,11 +80,9 @@ class SharedUtils @Inject constructor(
         val messagesUids = messages.map { it.uid }
         val threadsUids = threads.map { it.uid }
 
-        updateThreadsAndMessagesSeenStatus(threadsUids, messagesUids, true)
+        updateSeenStatus(threadsUids, messagesUids, isSeen = true)
 
         val apiResponses = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids())
-
-        if (!apiResponses.atLeastOneSucceeded()) updateThreadsAndMessagesSeenStatus(threadsUids, messagesUids, false)
 
         if (apiResponses.atLeastOneSucceeded() && shouldRefreshThreads) {
             refreshFolders(
@@ -94,11 +92,15 @@ class SharedUtils @Inject constructor(
                 callbacks = callbacks,
             )
         }
+
+        if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(threadsUids, messagesUids, isSeen = false)
     }
 
-    private fun updateThreadsAndMessagesSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
-        messageController.updateReadStatus(messagesUids, isSeen = isSeen)
-        threadController.updateReadStatus(threadsUids)
+    private fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
+        mailboxContentRealm().writeBlocking {
+            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
+            ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+        }
     }
 
     fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {

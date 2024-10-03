@@ -749,8 +749,7 @@ class MainViewModel @Inject constructor(
         val messagesUids = messages.map { it.uid }
         val threadsUids = threads.map { it.uid }
 
-        messageController.updateReadStatus(messagesUids, isSeen = false)
-        threadController.updateReadStatus(threadsUids)
+        updateSeenStatus(threadsUids, messagesUids, isSeen = false)
 
         val apiResponses = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messagesUids)
 
@@ -761,14 +760,20 @@ class MainViewModel @Inject constructor(
                 callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         } else {
-            messageController.updateReadStatus(messagesUids, isSeen = true)
-            threadController.updateReadStatus(threadsUids)
+            updateSeenStatus(threadsUids, messagesUids, isSeen = true)
         }
     }
 
     private fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap(messageController::getLastMessageAndItsDuplicatesToExecuteAction)
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
+    }
+
+    private fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
+        mailboxContentRealm().writeBlocking {
+            MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
+            ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+        }
     }
     //endregion
 
@@ -806,8 +811,7 @@ class MainViewModel @Inject constructor(
         }
         val uids = messages.getUids()
 
-        threadController.updateFavoriteStatus(threadsUids, !isFavorite)
-        messageController.updateIsFavoriteStatus(uids, !isFavorite)
+        updateFavoriteStatus(threadsUids = threadsUids, messagesUids = uids, isFavorite = !isFavorite)
 
         val apiResponses = if (isFavorite) {
             ApiRepository.removeFromFavorites(mailbox.uuid, uids)
@@ -822,8 +826,7 @@ class MainViewModel @Inject constructor(
                 callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
             )
         } else {
-            threadController.updateFavoriteStatus(threadsUids, isFavorite)
-            messageController.updateIsFavoriteStatus(uids, isFavorite)
+            updateFavoriteStatus(threadsUids = threadsUids, messagesUids = uids, isFavorite = isFavorite)
         }
     }
 
@@ -835,6 +838,13 @@ class MainViewModel @Inject constructor(
     private fun getMessagesToUnfavorite(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap(messageController::getFavoriteMessages)
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
+    }
+
+    private fun updateFavoriteStatus(threadsUids: List<String>, messagesUids: List<String>, isFavorite: Boolean) {
+        mailboxContentRealm().writeBlocking {
+            MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
+            ThreadController.updateFavoriteStatus(threadsUids, isFavorite, realm = this)
+        }
     }
     //endregion
 

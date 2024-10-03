@@ -181,26 +181,6 @@ class ThreadController @Inject constructor(
         }
     }
 
-    fun updateFavoriteStatus(threadUids: List<String>, isFavorite: Boolean) {
-        mailboxContentRealm().writeBlocking {
-            threadUids.forEach {
-                getThread(it, this)?.apply {
-                    this.isFavorite = isFavorite
-                }
-            }
-        }
-    }
-
-    fun updateReadStatus(threadUids: List<String>) {
-        mailboxContentRealm().writeBlocking {
-            threadUids.forEach {
-                getThread(it, this)?.apply {
-                    this.unseenMessagesCount = messages.count { message -> !message.isSeen }
-                }
-            }
-        }
-    }
-
     fun updateIsMovedOutLocally(threadUids: List<String>, hasBeenMovedOut: Boolean) {
         mailboxContentRealm().writeBlocking {
             threadUids.forEach {
@@ -438,6 +418,18 @@ class ThreadController @Inject constructor(
                         it?.hasAttachable = hasAttachableInThread
                     }
                 }
+            }
+        }
+
+        fun updateFavoriteStatus(threadUids: List<String>, isFavorite: Boolean, realm: MutableRealm) {
+            threadUids.forEach {
+                getThread(it, realm)?.isFavorite = isFavorite
+            }
+        }
+
+        fun updateSeenStatus(threadUids: List<String>, isSeen: Boolean, realm: MutableRealm) {
+            threadUids.forEach {
+                getThread(it, realm)?.unseenMessagesCount = if (isSeen) 0 else 1
             }
         }
         //endregion
