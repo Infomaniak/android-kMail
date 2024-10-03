@@ -691,7 +691,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messagesFoldersIds,
                 destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
+                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
         }
 
@@ -887,7 +887,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
+                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
         } else {
             threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
