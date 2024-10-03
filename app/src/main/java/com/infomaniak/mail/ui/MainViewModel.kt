@@ -503,25 +503,21 @@ class MainViewModel @Inject constructor(
 
         deleteThreadOrMessageTrigger.postValue(Unit)
 
-        when {
-            apiResponses.atLeastOneSucceeded() -> {
-                if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
+        if (apiResponses.atLeastOneSucceeded()) {
+            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
-                refreshFoldersAsync(
-                    mailbox = mailbox,
-                    messagesFoldersIds = messages.getFoldersIds(exception = trashId),
-                    destinationFolderId = trashId,
-                    callbacks = RefreshCallbacks(::onDownloadStart, ::onDownloadStop),
-                )
-            }
-            !apiResponses.atLeastOneSucceeded() -> {
-                threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
-            }
-            isSwipe -> {
-                // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
-                reassignCurrentThreadsLive()
-            }
+            refreshFoldersAsync(
+                mailbox = mailbox,
+                messagesFoldersIds = messages.getFoldersIds(exception = trashId),
+                destinationFolderId = trashId,
+                callbacks = RefreshCallbacks(onStart = { onDownloadStart() }, onStop = { onDownloadStop(threadsUids) }),
+            )
+        } else if (isSwipe) {
+            // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
+            reassignCurrentThreadsLive()
         }
+
+        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
@@ -618,9 +614,9 @@ class MainViewModel @Inject constructor(
                 destinationFolderId = destinationFolder.id,
                 callbacks = RefreshCallbacks(onStart = { onDownloadStart() }, onStop = { onDownloadStop(threadsUids) }),
             )
-        } else {
-            threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
         }
+
+        threadController.updateIsMovedOutLocally(threadsUids, hasBeenMovedOut = false)
 
         showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
     }
