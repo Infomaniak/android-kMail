@@ -284,6 +284,39 @@ class ThreadController @Inject constructor(
             onUpdate(getThread(threadUid, realm))
         }
 
+        private fun fetchSwissTransferContainer(uuid: String): SwissTransferContainer? {
+            return runCatching {
+                val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
+
+                if (apiResponse.isSuccess()) return@runCatching apiResponse.data
+
+                SentryLog.i(TAG, "Could not fetch SwissTransfer container")
+                return@runCatching null
+            }.getOrNull()
+        }
+
+        private fun getApiCallsResults(
+            messages: List<Message>,
+            okHttpClient: OkHttpClient?,
+            failedMessagesUids: MutableList<String>
+        ): List<ApiCallsResults> {
+            return messages.mapNotNull { localMessage ->
+                return@mapNotNull runCatching {
+                    val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
+                    val swissTransferUuid = apiResponse.data?.swissTransferUuid
+                    var swissTransferContainer: SwissTransferContainer? = null
+                    if (apiResponse.isSuccess() && swissTransferUuid != null) {
+                        swissTransferContainer = fetchSwissTransferContainer(swissTransferUuid)
+                    }
+                    return@runCatching ApiCallsResults(localMessage, apiResponse, swissTransferContainer)
+                }.getOrElse {
+                    // This `getOrElse` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
+                    failedMessagesUids.add(localMessage.uid)
+                    return@getOrElse null
+                }
+            }
+        }
+
         /**
          * Asynchronously fetches heavy data for a list of messages within a given mailbox and realm.
          *
@@ -306,30 +339,7 @@ class ThreadController @Inject constructor(
             val deletedMessagesUids = mutableListOf<String>()
             val failedMessagesUids = mutableListOf<String>()
 
-            fun fetchSwissTransferContainer(uuid: String): SwissTransferContainer? = runCatching {
-                val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
-
-                if (apiResponse.isSuccess()) return@runCatching apiResponse.data
-
-                SentryLog.i(TAG, "Could not fetch SwissTransfer container")
-                return@runCatching null
-            }.getOrNull()
-
-            val apiCallsResults = messages.mapNotNull { localMessage ->
-                return@mapNotNull runCatching {
-                    val apiResponse = ApiRepository.getMessage(localMessage.resource, okHttpClient)
-                    val swissTransferUuid = apiResponse.data?.swissTransferUuid
-                    var swissTransferContainer: SwissTransferContainer? = null
-                    if (apiResponse.isSuccess() && swissTransferUuid != null) {
-                        swissTransferContainer = fetchSwissTransferContainer(swissTransferUuid)
-                    }
-                    return@runCatching ApiCallsResults(localMessage, apiResponse, swissTransferContainer)
-                }.getOrElse {
-                    // This `getOrElse` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
-                    failedMessagesUids.add(localMessage.uid)
-                    return@getOrElse null
-                }
-            }
+            val apiCallsResults = getApiCallsResults(messages, okHttpClient, failedMessagesUids)
 
             realm.writeBlocking {
                 var hasAttachableInThread = false

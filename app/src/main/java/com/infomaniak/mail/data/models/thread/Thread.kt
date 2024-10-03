@@ -91,7 +91,8 @@ class Thread : RealmObject {
     var isFromSearch: Boolean = false
     @Transient
     var hasAttachable: Boolean = false
-    // Has been moved (archived, spammed, deleted, moved) but API call hasn't been done yet. Used to filter locally the Threads' list.
+    // Has been moved (archived, spammed, deleted, moved) but API call hasn't been done yet.
+    // It's only used to filter locally the Threads' list.
     @Transient
     var isLocallyMovedOut: Boolean = false
     //endregion
