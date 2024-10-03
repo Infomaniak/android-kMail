@@ -510,7 +510,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = trashId),
                 destinationFolderId = trashId,
-                callbacks = RefreshCallbacks(onStart = { onDownloadStart() }, onStop = { onDownloadStop(threadsUids) }),
+                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
         } else if (isSwipe) {
             // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
@@ -612,7 +612,7 @@ class MainViewModel @Inject constructor(
                 mailbox = mailbox,
                 messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(onStart = { onDownloadStart() }, onStop = { onDownloadStop(threadsUids) }),
+                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
         }
 

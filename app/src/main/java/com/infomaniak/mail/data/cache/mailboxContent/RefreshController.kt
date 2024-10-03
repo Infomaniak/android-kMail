@@ -130,10 +130,10 @@ class RefreshController @Inject constructor(
         this.realm = realm
         this.okHttpClient = okHttpClient
         callbacks?.let {
-            onStart = it.onStart
-            onStop = it.onStop
+            this.onStart = it.onStart
+            this.onStop = it.onStop
         }
-        endOfMessagesReached = false
+        this.endOfMessagesReached = false
     }
 
     private suspend fun refreshWithRunCatching(job: Job): Pair<Set<Thread>?, Throwable?> = runCatching {
