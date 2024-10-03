@@ -17,11 +17,14 @@
  */
 package com.infomaniak.mail.ui.main.settings.privacy
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.BuildConfig.AUTOLOG_URL
 import com.infomaniak.lib.core.BuildConfig.TERMINATE_ACCOUNT_URL
 import com.infomaniak.lib.core.InfomaniakCore
@@ -37,6 +40,14 @@ class AccountManagementSettingsFragment : Fragment() {
 
     private var binding: FragmentAccountManagementSettingsBinding by safeBinding()
 
+    private val accountManagementSettingsViewModel: AccountManagementSettingsViewModel by viewModels()
+
+    private val currentUser by lazy { AccountUtils.currentUser }
+
+    private val resultActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) currentUser?.let(accountManagementSettingsViewModel::disconnectDeletedUser)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccountManagementSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -50,7 +61,7 @@ class AccountManagementSettingsFragment : Fragment() {
     }
 
     private fun setUi() = with(binding) {
-        AccountUtils.currentUser?.let {
+        currentUser?.let {
             username.text = it.displayName
             email.text = it.email
         }
@@ -59,14 +70,17 @@ class AccountManagementSettingsFragment : Fragment() {
     private fun setDeleteAccountClickListener() = with(binding) {
         deleteAccountButton.setOnClickListener {
             WebViewActivity.startActivity(
-                requireContext(),
-                TERMINATE_ACCOUNT_FULL_URL,
-                mapOf("Authorization" to "Bearer ${InfomaniakCore.bearerToken}")
+                context = requireContext(),
+                url = TERMINATE_ACCOUNT_FULL_URL,
+                headers = mapOf("Authorization" to "Bearer ${InfomaniakCore.bearerToken}"),
+                urlToQuit = URL_REDIRECT_SUCCESSFUL_ACCOUNT_DELETION,
+                activityResultLauncher = resultActivityResultLauncher,
             )
         }
     }
 
     companion object {
+        private const val URL_REDIRECT_SUCCESSFUL_ACCOUNT_DELETION = "login.infomaniak.com"
         private const val TERMINATE_ACCOUNT_FULL_URL = "$AUTOLOG_URL/?url=$TERMINATE_ACCOUNT_URL"
     }
 }
