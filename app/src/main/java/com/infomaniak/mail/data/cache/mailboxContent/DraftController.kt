@@ -61,7 +61,7 @@ class DraftController @Inject constructor(
         realm.copyToRealm(draft, UpdatePolicy.ALL)
     }
 
-    fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
+    fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (Draft) -> Unit) {
         val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: mailboxContentRealm().writeBlocking(block)
     }

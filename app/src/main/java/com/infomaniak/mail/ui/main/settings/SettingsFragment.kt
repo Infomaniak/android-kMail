@@ -110,7 +110,20 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        addMailbox.setOnClickListener { animatedNavigation(resId = R.id.attachMailboxFragment) }
+
+        addMailbox.setOnClickListener {
+            animatedNavigation(resId = R.id.attachMailboxFragment)
+        }
+
+        settingsAppLock.apply {
+            isVisible = context.isKeyguardSecure()
+            isChecked = localSettings.isAppLocked
+            setOnClickListener {
+                trackEvent("settingsGeneral", "lock", value = isChecked.toFloat())
+                // Reverse switch (before official parameter changed) by silent click
+                requireActivity().silentlyReverseSwitch(toggle!!) { isChecked -> localSettings.isAppLocked = isChecked }
+            }
+        }
 
         settingsNotifications.setOnClickListener {
             trackEvent("settingsNotifications", "openNotificationSettings")
@@ -126,18 +139,16 @@ class SettingsFragment : Fragment() {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
 
-        settingsAppLock.apply {
-            isVisible = context.isKeyguardSecure()
-            isChecked = localSettings.isAppLocked
-            setOnClickListener {
-                trackEvent("settingsGeneral", "lock", value = isChecked.toFloat())
-                // Reverse switch (before official parameter changed) by silent click
-                requireActivity().silentlyReverseSwitch(toggle!!) { isChecked -> localSettings.isAppLocked = isChecked }
-            }
-        }
-
         settingsAiEngine.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToAiEngineSetting())
+        }
+
+        settingsExternalContent.setOnClickListener {
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
+        }
+
+        settingsAutomaticAdvance.setOnClickListener {
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToAutoAdvanceSettings())
         }
 
         settingsThreadListDensity.setOnClickListener {
@@ -160,20 +171,12 @@ class SettingsFragment : Fragment() {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToThreadModeSetting())
         }
 
-        settingsExternalContent.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
-        }
-
         settingsDataManagement.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToDataManagementSettings())
         }
 
         settingsAccountManagement.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToAccountManagementSettings())
-        }
-
-        settingsAutomaticAdvance.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToAutoAdvanceSettings())
         }
     }
 

@@ -134,8 +134,8 @@ class SharedUtils @Inject constructor(
     fun updateFeatureFlags(mailboxObjectId: String, mailboxUuid: String) {
         with(ApiRepository.getFeatureFlags(mailboxUuid)) {
             if (isSuccess()) {
-                mailboxController.updateMailbox(mailboxObjectId) { mailbox ->
-                    mailbox.featureFlags.setFeatureFlags(featureFlags = data ?: emptyList())
+                mailboxController.updateMailbox(mailboxObjectId) {
+                    it.featureFlags.setFeatureFlags(featureFlags = data ?: emptyList())
                 }
             }
         }

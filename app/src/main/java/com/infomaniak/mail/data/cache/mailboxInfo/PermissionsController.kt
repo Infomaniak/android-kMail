@@ -28,7 +28,9 @@ class PermissionsController @Inject constructor(
     private val mailboxController: MailboxController,
 ) {
 
+    //region Get data
     fun getPermissionsAsync(mailboxObjectId: String): Flow<MailboxPermissions?> {
         return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.permissions }
     }
+    //endregion
 }

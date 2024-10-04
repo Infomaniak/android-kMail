@@ -307,7 +307,7 @@
     <plurals name="fileQuantity">
         <item quantity="one">%d fichier envoyé via SwissTransfer</item>
         <item quantity="other">%d fichiers envoyés via SwissTransfer</item>
-        <item quantity="many">%d fichiers envoyés via SwissTransfer</item>
+        <item quantity="many">%d de fichiers envoyés via SwissTransfer</item>
     </plurals>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
@@ -353,7 +353,7 @@
     <plurals name="newMessageNotificationSummary">
         <item quantity="one">%d nouveau message</item>
         <item quantity="other">%d nouveaux messages</item>
-        <item quantity="many">%d nouveaux messages</item>
+        <item quantity="many">%d de nouveaux messages</item>
     </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="noBodyTitle">Ce message est vide.</string>
@@ -365,10 +365,10 @@
     <string name="noSubjectTitle">(aucun sujet)</string>
     <string name="noUpdatedAt">Jamais mis à jour</string>
     <string name="noValidMailboxTitle">Aucune boîte valide n’a été trouvée. Ne peut être corrigé que sur le webmail pour l’instant.</string>
-    <string name="notificationGeneralChannelName">Notification générales</string>
+    <string name="notificationGeneralChannelName">Notifications générales</string>
     <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>
     <string name="notificationSyncDraftChannelName">Sauvegarde des brouillons</string>
-    <string name="notificationSyncMessagesChannelName">Récupération des nouveaux emails</string>
+    <string name="notificationSyncMessagesChannelName">Récupération des nouveaux e-mails</string>
     <string name="notificationTitleArchive">Archivé</string>
     <string name="notificationTitleCouldNotSaveDraft">Le brouillon n’a pas pu être sauvegardé</string>
     <string name="notificationTitleCouldNotSendDraft">L’e-mail n’a pas pu être envoyé</string>
