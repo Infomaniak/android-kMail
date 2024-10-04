@@ -60,6 +60,8 @@ object ContactUtils {
         return mailDictionary
     }
 
+    // Looks up the name and avatar associated to an email address according to the given contact id and creates a MergedContact
+    // instance representing this phone contact
     private fun Context.getMergedEmailsContacts(emails: Map<Long, Set<String>>): MutableMap<Recipient, MergedContact> {
         val projection = arrayOf(Contactables.CONTACT_ID, Contactables.DISPLAY_NAME, Contactables.PHOTO_THUMBNAIL_URI)
         val contacts: MutableMap<Recipient, MergedContact> = mutableMapOf()
@@ -74,7 +76,7 @@ object ContactUtils {
 
                     emails[id]!!.forEach { email ->
                         val key = Recipient().initLocalValues(email, name)
-                        contacts[key] = MergedContact().initLocalValues(email, name, photoUri)
+                        contacts[key] = MergedContact(email, name, photoUri, comesFromApi = false)
                     }
                 }
             }
@@ -87,13 +89,12 @@ object ContactUtils {
         apiContacts.forEach { apiContact ->
             apiContact.emails.forEach { email ->
                 val key = Recipient().initLocalValues(email, apiContact.name)
-                val contactAvatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
+
                 if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
-                    if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
-                        phoneMergedContacts[key]?.avatar = contactAvatar
-                    }
+                    phoneMergedContacts[key]!!.updatePhoneContactWithApiContact(apiContact)
                 } else { // If we haven't yet encountered this user, add him
-                    phoneMergedContacts[key] = MergedContact().initLocalValues(email, apiContact.name, contactAvatar)
+                    val contactAvatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
+                    phoneMergedContacts[key] = MergedContact(email, apiContact.name, contactAvatar, comesFromApi = true)
                 }
             }
         }
