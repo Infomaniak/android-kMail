@@ -164,7 +164,7 @@ class NewMessageViewModel @Inject constructor(
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
     val mergedContacts = liveData(ioCoroutineContext) {
-        val list = mergedContactController.getMergedContacts(sorted = true).copyFromRealm()
+        val list = mergedContactController.getSortedMergedContacts().copyFromRealm()
         emit(list to arrangeMergedContacts(list))
     }
 
