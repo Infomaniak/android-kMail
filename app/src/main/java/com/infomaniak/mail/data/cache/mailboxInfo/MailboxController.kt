@@ -29,6 +29,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
@@ -99,7 +100,7 @@ class MailboxController @Inject constructor(
             val remoteMailboxesIds = remoteMailboxes.map { remoteMailbox ->
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-                val localMailbox = getMailbox(userId, remoteMailbox.mailboxId, realm = this)
+                val localMailbox = getMailbox(userId, remoteMailbox.mailboxId, realm = this)?.copyFromRealm()
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Save new data")
                 remoteMailbox.initLocalValues(
