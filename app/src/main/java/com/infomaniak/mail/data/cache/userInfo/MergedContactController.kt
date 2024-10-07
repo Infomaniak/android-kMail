@@ -27,22 +27,23 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class MergedContactController @Inject constructor(@UserInfoRealm private val userInfoRealm: Realm) {
 
     //region Queries
-    private fun getMergedContactsQuery(sorted: Boolean = false): RealmQuery<MergedContact> {
-        return userInfoRealm.query<MergedContact>().apply {
-            if (sorted) sort(MergedContact::name.name)
-        }
+    private fun getMergedContactsQuery(): RealmQuery<MergedContact> {
+        return userInfoRealm.query<MergedContact>()
+            .sort(MergedContact::name.name)
+            .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
     }
     //endregion
 
     //region Get data
-    fun getMergedContacts(sorted: Boolean): RealmResults<MergedContact> {
-        return getMergedContactsQuery(sorted).find()
+    fun getSortedMergedContacts(): RealmResults<MergedContact> {
+        return getMergedContactsQuery().find()
     }
 
     fun getMergedContactsAsync(): Flow<ResultsChange<MergedContact>> {

@@ -23,28 +23,41 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-@Suppress("PROPERTY_WONT_BE_SERIALIZED")
-class MergedContact : RealmObject, Correspondent {
+@Suppress("PROPERTY_WONT_BE_SERIALIZED", "PARCELABLE_PRIMARY_CONSTRUCTOR_IS_EMPTY")
+class MergedContact() : RealmObject, Correspondent {
     @PrimaryKey
     var id: Long? = null
+        private set
+
     override var email: String = ""
     override var name: String = ""
     var avatar: String? = null
+        private set
+
+    var comesFromApi: Boolean = false // In opposition to coming from the phone's address book
+        private set
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    fun initLocalValues(email: String, name: String?, avatar: String? = null): MergedContact {
+    constructor(email: String, name: String?, avatar: String?, comesFromApi: Boolean) : this() {
         this.email = email
         this.name = name ?: ""
+        this.avatar = avatar
+        this.comesFromApi = comesFromApi
 
         // We need an ID which is unique for each pair of email/name. Therefore we stick
         // together the two 32 bits hashcodes to make one unique 64 bits hashcode.
         this.id = (this.email.hashCode().toLong() shl Int.SIZE_BITS) + this.name.hashCode()
+    }
 
-        avatar?.let { this.avatar = it }
-
-        return this
+    // If any change is made to this contact based on the api contact, make sure the contact is considered as
+    // "coming from the api". Only update contacts that represent the same name/email between the phone and the api.
+    fun updatePhoneContactWithApiContact(apiContact: Contact) {
+        if (avatar == null) { // Only replace the phone avatar with the api one if we didn't have any before
+            avatar = apiContact.avatar
+            comesFromApi = true
+        }
     }
 
     override fun toString(): String = "{$avatar, $email, $name}"
