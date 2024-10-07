@@ -1,0 +1,6 @@
+- Refonte de la vue du Profil et de la façon dont on peut ajouter une Boîte aux lettres
+- Correction de l'utilisation du retour arrière pour supprimer des Destinataires à partir de l'API 34
+- Correction de l'ondulation dans l'écran de Déplacement
+- Déconnexion correcte de l'Utilisateur lorsque celui-ci a été supprimé
+- Exécution immédiate des actions au lieu d'attendre les résultats des appels à l'API
+- La priorité est désormais donnée aux contacts autocomplétés par l'API plutôt qu'à ceux du téléphone

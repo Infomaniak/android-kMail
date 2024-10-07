@@ -1,0 +1,6 @@
+- Refactor Profile view and how we can add a Mailbox
+- Fix the usage of backspace to delete Recipients on API 34+
+- Fix ripple in the Move screen
+- Logout User properly when this one has been deleted
+- Execute mails actions right away instead of waiting for API calls results
+- Give priority to autocompleted API Contacts over phone contacts
