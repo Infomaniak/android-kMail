@@ -94,9 +94,9 @@ class MailboxController @Inject constructor(
     //endregion
 
     //region Edit data
-    fun updateMailboxes(remoteMailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId) {
+    suspend fun updateMailboxes(remoteMailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId) {
 
-        mailboxInfoRealm.writeBlocking {
+        mailboxInfoRealm.write {
             val remoteMailboxesIds = remoteMailboxes.map { remoteMailbox ->
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
@@ -138,10 +138,12 @@ class MailboxController @Inject constructor(
         mailboxInfoRealm.writeBlocking { getMailbox(objectId, realm = this)?.let(onUpdate) }
     }
 
-    fun deleteUserMailboxes(userId: Int) = mailboxInfoRealm.writeBlocking {
-        val mailboxes = getMailboxes(userId, realm = this)
-        appContext.deleteMailNotificationChannel(mailboxes)
-        delete(mailboxes)
+    suspend fun deleteUserMailboxes(userId: Int) {
+        mailboxInfoRealm.write {
+            val mailboxes = getMailboxes(userId, realm = this)
+            appContext.deleteMailNotificationChannel(mailboxes)
+            delete(mailboxes)
+        }
     }
     //endregion
 
