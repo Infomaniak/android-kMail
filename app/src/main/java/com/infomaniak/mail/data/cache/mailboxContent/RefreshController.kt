@@ -252,7 +252,7 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String) {
+    private suspend fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String) {
 
         val activities = getMessagesUidsDelta(folder.id, previousCursor) ?: return
         scope.ensureActive()
@@ -264,7 +264,7 @@ class RefreshController @Inject constructor(
 
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
-        writeBlocking {
+        write {
             val impactedFoldersIds = mutableSetOf<String>().apply {
                 addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id))
                 addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
@@ -387,7 +387,7 @@ class RefreshController @Inject constructor(
 
         apiResponse.data?.messages?.let { messages ->
 
-            writeBlocking {
+            write {
                 val upToDateFolder = getUpToDateFolder(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
                 val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode).also { threads ->
@@ -722,8 +722,8 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun Realm.sendSentryOrphans(folder: Folder, previousCursor: String? = null) {
-        writeBlocking {
+    private suspend fun Realm.sendSentryOrphans(folder: Folder, previousCursor: String? = null) {
+        write {
             val upToDateFolder = getUpToDateFolder(folder.id)
             SentryDebug.sendOrphanMessages(previousCursor, folder = upToDateFolder).also { orphans ->
                 MessageController.deleteMessages(appContext, mailbox, orphans, realm = this)
