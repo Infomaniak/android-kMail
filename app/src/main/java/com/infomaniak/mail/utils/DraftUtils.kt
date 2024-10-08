@@ -49,8 +49,8 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
 
     fun getAwaitingAttachments(): List<Attachment> = attachments.filter { it.uploadStatus == UploadStatus.AWAITING }
 
-    fun setUploadStatus(attachment: Attachment, uploadStatus: UploadStatus, step: String) {
-        realm.writeBlocking {
+    suspend fun setUploadStatus(attachment: Attachment, uploadStatus: UploadStatus, step: String) {
+        realm.write {
             draftController.updateDraft(localUuid, realm = this) {
                 it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it, step)
             }
