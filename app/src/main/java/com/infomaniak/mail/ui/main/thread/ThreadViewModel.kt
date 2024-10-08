@@ -360,7 +360,7 @@ class ThreadViewModel @Inject constructor(
                 fetchCalendarEvent(item, forceFetch)
             }
 
-            mailboxContentRealm().writeBlocking {
+            mailboxContentRealm().write {
                 results.forEach { (message, apiResponse) ->
                     updateCalendarEvent(message, apiResponse)
                 }
