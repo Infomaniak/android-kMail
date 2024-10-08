@@ -432,11 +432,11 @@ class MainViewModel @Inject constructor(
         )
     }
 
-    private fun updateAddressBooks() {
-        ApiRepository.getAddressBooks().data?.addressBooks?.let(addressBookController::update)
+    private suspend fun updateAddressBooks() {
+        ApiRepository.getAddressBooks().data?.addressBooks?.let { addressBookController.update(it) }
     }
 
-    private fun updateContacts() {
+    private suspend fun updateContacts() {
         ApiRepository.getContacts().data?.let { apiContacts ->
             val phoneMergedContacts = getPhoneContacts(appContext)
             mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)

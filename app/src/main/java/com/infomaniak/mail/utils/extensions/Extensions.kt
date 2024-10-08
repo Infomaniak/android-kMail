@@ -293,8 +293,8 @@ fun String.toShortUid(): Int = substringBefore('@').toInt()
 //endregion
 
 //region Realm
-inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
-    writeBlocking { update<T>(items) }
+suspend inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
+    write { update<T>(items) }
 }
 
 inline fun <reified T : RealmObject> MutableRealm.update(items: List<RealmObject>) {
