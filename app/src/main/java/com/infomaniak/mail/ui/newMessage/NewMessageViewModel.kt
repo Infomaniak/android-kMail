@@ -225,7 +225,7 @@ class NewMessageViewModel @Inject constructor(
             dismissNotification()
             markAsRead(currentMailbox, realm)
 
-            realm.writeBlocking { draftController.upsertDraft(it, realm = this) }
+            realm.write { draftController.upsertDraft(it, realm = this) }
             it.saveSnapshot(initialBody.content)
             it.initLiveData(signatures)
             _isShimmering.emit(false)
@@ -824,7 +824,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun uploadAttachmentsToServer(uiAttachments: List<Attachment>) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
-        val localDraft = mailboxContentRealm().writeBlocking {
+        val localDraft = mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)?.also {
                 it.updateDraftAttachmentsWithLiveData(
                     uiAttachments = uiAttachments,
@@ -877,11 +877,11 @@ class NewMessageViewModel @Inject constructor(
             return@with
         }
 
-        val hasFailed = mailboxContentRealm().writeBlocking {
+        val hasFailed = mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)
-                ?.updateDraftBeforeSavingRemotely(action, isFinishing, subject, uiBodyValue, realm = this@writeBlocking)
-                ?: return@writeBlocking true
-            return@writeBlocking false
+                ?.updateDraftBeforeSavingRemotely(action, isFinishing, subject, uiBodyValue, realm = this@write)
+                ?: return@write true
+            return@write false
         }
 
         if (hasFailed) return@with
@@ -996,8 +996,8 @@ class NewMessageViewModel @Inject constructor(
         } ?: false
     }
 
-    private fun removeDraftFromRealm(localUuid: String) {
-        mailboxContentRealm().writeBlocking {
+    private suspend fun removeDraftFromRealm(localUuid: String) {
+        mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)?.let(::delete)
         }
     }
