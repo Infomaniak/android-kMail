@@ -96,8 +96,8 @@ class SharedUtils @Inject constructor(
         if (!apiResponses.atLeastOneSucceeded()) updateSeenStatus(threadsUids, messagesUids, isSeen = false)
     }
 
-    private fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
-        mailboxContentRealm().writeBlocking {
+    private suspend fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
+        mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
             ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
         }
@@ -165,11 +165,11 @@ class SharedUtils @Inject constructor(
 
     companion object {
 
-        fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
+        suspend fun updateSignatures(mailbox: Mailbox, customRealm: Realm): Int? {
             return with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
                 return@with if (isSuccess()) {
                     val signaturesResult = data!!
-                    customRealm.writeBlocking {
+                    customRealm.write {
                         MailboxController.getMailbox(mailbox.objectId, realm = this)?.let { mailbox ->
                             mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
                                 firstOrNull { it.id == signaturesResult.defaultSignatureId }?.isDefault = true
