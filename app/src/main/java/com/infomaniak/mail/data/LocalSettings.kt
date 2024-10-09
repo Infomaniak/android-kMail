@@ -84,7 +84,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     }
 
     fun removeRegisteredFirebaseUser(userId: Int) {
-        firebaseRegisteredUsers = firebaseRegisteredUsers.filterNot { it == userId.toString() }.toSet()
+        firebaseRegisteredUsers = firebaseRegisteredUsers.filterNotTo(mutableSetOf()) { it == userId.toString() }
     }
 
     fun clearRegisteredFirebaseUsers() {

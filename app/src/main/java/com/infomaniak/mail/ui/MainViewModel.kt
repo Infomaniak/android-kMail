@@ -1158,7 +1158,7 @@ class MainViewModel @Inject constructor(
         val realm = mailboxContentRealm()
 
         val foldersToUpdate = realm.write {
-            uids.mapNotNull { MessageController.getMessage(it, realm = this)?.folder?.copyFromRealm()?.id }.toSet()
+            uids.mapNotNullTo(mutableSetOf()) { MessageController.getMessage(it, realm = this)?.folder?.copyFromRealm()?.id }
         }
 
         foldersToUpdate.forEach { folderId ->
