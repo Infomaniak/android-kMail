@@ -240,7 +240,7 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun Realm.fetchOldMessagesUids(scope: CoroutineScope, folder: Folder) {
+    private suspend fun Realm.fetchOldMessagesUids(scope: CoroutineScope, folder: Folder) {
 
         val result = getDateOrderedMessagesUids(folder.id)!!
         scope.ensureActive()

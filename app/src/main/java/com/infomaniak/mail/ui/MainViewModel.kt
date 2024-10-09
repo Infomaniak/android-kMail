@@ -384,7 +384,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateFolders(mailbox: Mailbox) {
+    private suspend fun updateFolders(mailbox: Mailbox) {
         SentryLog.d(TAG, "Force refresh Folders")
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
             if (!mailboxContentRealm().isClosed()) folderController.update(mailbox, folders, mailboxContentRealm())
@@ -1002,7 +1002,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region New Folder
-    private fun createNewFolderSync(name: String): String? {
+    private suspend fun createNewFolderSync(name: String): String? {
         val mailbox = currentMailbox.value ?: return null
         val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
 
