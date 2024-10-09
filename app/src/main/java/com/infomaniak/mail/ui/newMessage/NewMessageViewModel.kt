@@ -454,7 +454,7 @@ class NewMessageViewModel @Inject constructor(
             bcc = bcc.toSet(),
             subject = subject,
             uiBody = uiBodyValue,
-            attachmentsLocalUuids = attachments.map { it.localUuid }.toSet(),
+            attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
         )
     }
 
@@ -992,7 +992,8 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.bcc == bccLiveData.valueOrEmpty().toSet() &&
                     draftSnapshot.subject == subjectValue &&
                     draftSnapshot.uiBody == uiBodyValue &&
-                    draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty().map { it.localUuid }.toSet()
+                    draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
+                .mapTo(mutableSetOf()) { it.localUuid }
         } ?: false
     }
 

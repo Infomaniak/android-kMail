@@ -207,7 +207,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         }
 
         fun deleteMessages(context: Context, mailbox: Mailbox, messages: List<Message>, realm: MutableRealm) {
-            messages.reversed().forEach { message ->
+            messages.asReversed().forEach { message ->
                 deleteMessage(context, mailbox, message, realm)
             }
         }

@@ -64,7 +64,7 @@ class StandardPlayServicesUtils @Inject constructor(
 
     private fun FragmentActivity.checkFirebaseRegistration() = lifecycleScope.launch(ioDispatcher) {
 
-        val registeredUsersIds = localSettings.firebaseRegisteredUsers.map { it.toInt() }.toSet()
+        val registeredUsersIds = localSettings.firebaseRegisteredUsers.mapTo(mutableSetOf()) { it.toInt() }
         val noNeedUsersRegistration = AccountUtils.getAllUsersSync().map { it.id }.minus(registeredUsersIds).isEmpty()
 
         SentryLog.d("firebase", "checkFirebaseRegistration: (skip users registration): $noNeedUsersRegistration")

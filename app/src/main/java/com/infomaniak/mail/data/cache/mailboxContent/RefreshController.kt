@@ -399,7 +399,7 @@ class RefreshController @Inject constructor(
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
                 val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode).also { threads ->
                     inboxUnreadCount = updateFoldersUnreadCount(
-                        foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id,
+                        foldersIds = (if (isConversationMode) threads.mapTo(mutableSetOf()) { it.folderId } else emptySet()) + folder.id,
                         realm = this,
                     )
                 }
@@ -429,7 +429,7 @@ class RefreshController @Inject constructor(
 
             val message = MessageController.getMessage(uid = shortUid.toLongUid(folderId), realm = this) ?: return@forEach
 
-            for (thread in message.threads.reversed()) {
+            for (thread in message.threads.asReversed()) {
                 scope.ensureActive()
 
                 val isSuccess = thread.messages.remove(message)
@@ -628,7 +628,7 @@ class RefreshController @Inject constructor(
         scope: CoroutineScope,
         newMessage: Message,
         existingThreads: List<Thread>,
-        existingMessages: List<Message>,
+        existingMessages: Set<Message>,
     ): Thread? {
         var newThread: Thread? = null
 
@@ -646,7 +646,7 @@ class RefreshController @Inject constructor(
         scope: CoroutineScope,
         remoteMessage: Message,
         existingThreads: RealmResults<Thread>,
-        existingMessages: List<Message>,
+        existingMessages: Set<Message>,
         impactedThreadsManaged: MutableSet<Thread>,
     ) {
         if (existingThreads.isEmpty()) return
@@ -679,14 +679,14 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun getExistingMessages(existingThreads: List<Thread>): List<Message> {
-        return existingThreads.flatMap { it.messages }.toSet().toList()
+    private fun getExistingMessages(existingThreads: List<Thread>): Set<Message> {
+        return existingThreads.flatMapTo(mutableSetOf()) { it.messages }
     }
 
     private fun TypedRealm.addPreviousMessagesToThread(
         scope: CoroutineScope,
         newThread: Thread,
-        referenceMessages: List<Message>,
+        referenceMessages: Set<Message>,
     ) {
         referenceMessages.forEach { message ->
             scope.ensureActive()
