@@ -264,15 +264,14 @@ class RefreshController @Inject constructor(
 
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
+        var inboxUnreadCount: Int? = null
         write {
             val impactedFoldersIds = mutableSetOf<String>().apply {
                 addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id))
                 addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
             }
 
-            impactedFoldersIds.forEach { folderId ->
-                refreshUnreadCount(folderId, realm = this)
-            }
+            inboxUnreadCount = updateFoldersUnreadCount(impactedFoldersIds, realm = this)
 
             getUpToDateFolder(folder.id).let {
                 it.newMessagesUidsToFetch.addAll(activities.addedShortUids)
@@ -282,6 +281,8 @@ class RefreshController @Inject constructor(
                 SentryDebug.addCursorBreadcrumb("fetchActivities", it, activities.cursor)
             }
         }
+
+        updateMailboxUnreadCount(inboxUnreadCount)
 
         sendSentryOrphans(folder, previousCursor)
     }
@@ -343,17 +344,22 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
-    private fun refreshUnreadCount(id: String, realm: MutableRealm) {
+    private fun updateFoldersUnreadCount(foldersIds: Set<String>, realm: MutableRealm): Int? {
+        return foldersIds.firstNotNullOfOrNull {
+            val folder = realm.getUpToDateFolder(it)
 
-        val folder = realm.getUpToDateFolder(id)
+            val unreadCount = ThreadController.getUnreadThreadsCount(folder)
+            folder.unreadCountLocal = unreadCount
 
-        val unreadCount = ThreadController.getUnreadThreadsCount(folder)
-        folder.unreadCountLocal = unreadCount
+            return@firstNotNullOfOrNull if (folder.role == FolderRole.INBOX) unreadCount else null
+        }
+    }
 
-        if (folder.role == FolderRole.INBOX) {
-            mailboxController.updateMailbox(mailbox.objectId) {
-                it.unreadCountLocal = unreadCount
-            }
+    private suspend fun updateMailboxUnreadCount(unreadCount: Int?) {
+        if (unreadCount == null) return
+
+        mailboxController.updateMailbox(mailbox.objectId) {
+            it.unreadCountLocal = unreadCount
         }
     }
 
@@ -387,12 +393,15 @@ class RefreshController @Inject constructor(
 
         apiResponse.data?.messages?.let { messages ->
 
+            var inboxUnreadCount: Int? = null
             write {
                 val upToDateFolder = getUpToDateFolder(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
                 val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode).also { threads ->
-                    val foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id
-                    foldersIds.forEach { refreshUnreadCount(id = it, realm = this) }
+                    inboxUnreadCount = updateFoldersUnreadCount(
+                        foldersIds = (if (isConversationMode) threads.map { it.folderId }.toSet() else emptySet()) + folder.id,
+                        realm = this,
+                    )
                 }
                 SentryLog.d(
                     "Realm",
@@ -401,6 +410,8 @@ class RefreshController @Inject constructor(
 
                 impactedThreads += allImpactedThreads.filter { it.folderId == upToDateFolder.id }
             }
+
+            updateMailboxUnreadCount(inboxUnreadCount)
         }
 
         return impactedThreads
