@@ -131,7 +131,7 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun updateFeatureFlags(mailboxObjectId: String, mailboxUuid: String) {
+    suspend fun updateFeatureFlags(mailboxObjectId: String, mailboxUuid: String) {
         with(ApiRepository.getFeatureFlags(mailboxUuid)) {
             if (isSuccess()) {
                 mailboxController.updateMailbox(mailboxObjectId) {
