@@ -93,7 +93,7 @@ class FolderController @Inject constructor(
     }
 
     private fun MutableRealm.deleteOutdatedFolders(mailbox: Mailbox, remoteFolders: List<Folder>) {
-        getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
+        getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).asReversed().forEach { folder ->
             deleteLocalFolder(mailbox, folder)
         }
     }

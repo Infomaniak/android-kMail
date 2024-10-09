@@ -429,7 +429,7 @@ class RefreshController @Inject constructor(
 
             val message = MessageController.getMessage(uid = shortUid.toLongUid(folderId), realm = this) ?: return@forEach
 
-            for (thread in message.threads.reversed()) {
+            for (thread in message.threads.asReversed()) {
                 scope.ensureActive()
 
                 val isSuccess = thread.messages.remove(message)

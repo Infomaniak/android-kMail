@@ -136,7 +136,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         var haveAllDraftsSucceeded = true
 
-        drafts.reversed().forEach { draft ->
+        drafts.asReversed().forEach { draft ->
             val isTargetDraft = draft.localUuid == draftLocalUuid
             if (isTargetDraft) trackedDraftAction = draft.action
 
