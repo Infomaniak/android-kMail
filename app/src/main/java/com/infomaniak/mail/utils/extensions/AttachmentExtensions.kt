@@ -179,13 +179,13 @@ object AttachmentExtensions {
         }
     }
 
-    private fun Attachment.updateLocalAttachment(
+    private suspend fun Attachment.updateLocalAttachment(
         draftLocalUuid: String,
         remoteAttachment: Attachment,
         draftController: DraftController,
         realm: Realm,
     ) {
-        realm.writeBlocking {
+        realm.write {
             draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
 
                 val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }

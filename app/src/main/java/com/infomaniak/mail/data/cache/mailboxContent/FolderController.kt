@@ -79,10 +79,10 @@ class FolderController @Inject constructor(
     //endregion
 
     //region Edit data
-    fun update(mailbox: Mailbox, remoteFolders: List<Folder>, realm: Realm) {
+    suspend fun update(mailbox: Mailbox, remoteFolders: List<Folder>, realm: Realm) {
         val remoteFoldersWithChildren = remoteFolders.flattenFolderChildrenAndRemoveMessages()
 
-        realm.writeBlocking {
+        realm.write {
 
             SentryLog.d(RealmDatabase.TAG, "Folders: Delete outdated data")
             deleteOutdatedFolders(mailbox, remoteFoldersWithChildren)
@@ -194,11 +194,11 @@ class FolderController @Inject constructor(
         //endregion
 
         //region Edit data
-        fun updateFolder(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
-            realm.writeBlocking { getFolder(id, realm = this)?.let(onUpdate) }
+        suspend fun updateFolder(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
+            realm.write { getFolder(id, realm = this)?.let(onUpdate) }
         }
 
-        fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
+        suspend fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
 
             tailrec fun updateChildrenRecursively(inputList: MutableList<Folder>) {
                 val folder = inputList.removeFirst()
@@ -208,7 +208,7 @@ class FolderController @Inject constructor(
                 if (inputList.isNotEmpty()) updateChildrenRecursively(inputList)
             }
 
-            realm.writeBlocking {
+            realm.write {
                 getFolder(id, realm = this)?.let { folder -> updateChildrenRecursively(mutableListOf(folder)) }
             }
         }

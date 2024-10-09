@@ -52,7 +52,7 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
     //endregion
 
     //region Edit data
-    fun update(mergedContacts: List<MergedContact>) {
+    suspend fun update(mergedContacts: List<MergedContact>) {
         SentryLog.d(RealmDatabase.TAG, "MergedContacts: Save new data")
         userInfoRealm.update<MergedContact>(mergedContacts)
     }

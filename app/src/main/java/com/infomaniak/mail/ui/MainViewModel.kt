@@ -384,7 +384,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateFolders(mailbox: Mailbox) {
+    private suspend fun updateFolders(mailbox: Mailbox) {
         SentryLog.d(TAG, "Force refresh Folders")
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
             if (!mailboxContentRealm().isClosed()) folderController.update(mailbox, folders, mailboxContentRealm())
@@ -432,11 +432,11 @@ class MainViewModel @Inject constructor(
         )
     }
 
-    private fun updateAddressBooks() {
-        ApiRepository.getAddressBooks().data?.addressBooks?.let(addressBookController::update)
+    private suspend fun updateAddressBooks() {
+        ApiRepository.getAddressBooks().data?.addressBooks?.let { addressBookController.update(it) }
     }
 
-    private fun updateContacts() {
+    private suspend fun updateContacts() {
         ApiRepository.getContacts().data?.let { apiContacts ->
             val phoneMergedContacts = getPhoneContacts(appContext)
             mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
@@ -769,8 +769,8 @@ class MainViewModel @Inject constructor(
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
-    private fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
-        mailboxContentRealm().writeBlocking {
+    private suspend fun updateSeenStatus(threadsUids: List<String>, messagesUids: List<String>, isSeen: Boolean) {
+        mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
             ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
         }
@@ -840,8 +840,8 @@ class MainViewModel @Inject constructor(
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
-    private fun updateFavoriteStatus(threadsUids: List<String>, messagesUids: List<String>, isFavorite: Boolean) {
-        mailboxContentRealm().writeBlocking {
+    private suspend fun updateFavoriteStatus(threadsUids: List<String>, messagesUids: List<String>, isFavorite: Boolean) {
+        mailboxContentRealm().write {
             MessageController.updateFavoriteStatus(messagesUids, isFavorite, realm = this)
             ThreadController.updateFavoriteStatus(threadsUids, isFavorite, realm = this)
         }
@@ -1002,7 +1002,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region New Folder
-    private fun createNewFolderSync(name: String): String? {
+    private suspend fun createNewFolderSync(name: String): String? {
         val mailbox = currentMailbox.value ?: return null
         val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
 
@@ -1157,7 +1157,7 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value ?: return@launch
         val realm = mailboxContentRealm()
 
-        val foldersToUpdate = realm.writeBlocking {
+        val foldersToUpdate = realm.write {
             uids.mapNotNull { MessageController.getMessage(it, realm = this)?.folder?.copyFromRealm()?.id }.toSet()
         }
 

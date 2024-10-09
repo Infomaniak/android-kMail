@@ -40,7 +40,7 @@ class AddressBookController @Inject constructor(@UserInfoRealm private val userI
     //endregion
 
     //region Edit data
-    fun update(apiAddressBooks: List<AddressBook>) {
+    suspend fun update(apiAddressBooks: List<AddressBook>) {
         SentryLog.d(RealmDatabase.TAG, "AddressBooks: Save new data")
         userInfoRealm.update<AddressBook>(apiAddressBooks)
     }

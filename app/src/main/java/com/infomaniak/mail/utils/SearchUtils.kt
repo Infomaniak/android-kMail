@@ -72,7 +72,7 @@ class SearchUtils @Inject constructor(
     }
 
     suspend fun deleteRealmSearchData() = withContext(ioDispatcher) {
-        mailboxContentRealm().writeBlocking {
+        mailboxContentRealm().write {
             SentryLog.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
             MessageController.deleteSearchMessages(realm = this)
             ThreadController.deleteSearchThreads(realm = this)

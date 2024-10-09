@@ -194,7 +194,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             step = "after handleDraftsActions",
         )
 
-        mailboxContentRealm.writeBlocking {
+        mailboxContentRealm.write {
             val orphans = DraftController.getOrphanDrafts(realm = this)
             SentryDebug.sendOrphanDrafts(orphans)
             delete(orphans)
@@ -212,8 +212,8 @@ class DraftsActionsWorker @AssistedInject constructor(
         )
     }
 
-    private fun Realm.executeRealmCallbacks(realmActionsOnDraft: List<(MutableRealm) -> Unit>) {
-        writeBlocking {
+    private suspend fun Realm.executeRealmCallbacks(realmActionsOnDraft: List<(MutableRealm) -> Unit>) {
+        write {
             realmActionsOnDraft.forEach { realmAction -> realmAction(this) }
         }
     }
@@ -277,7 +277,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val isSuccess: Boolean,
     )
 
-    private fun executeDraftAction(draft: Draft, mailboxUuid: String, isFirstTime: Boolean = true): DraftActionResult {
+    private suspend fun executeDraftAction(draft: Draft, mailboxUuid: String, isFirstTime: Boolean = true): DraftActionResult {
 
         var realmActionOnDraft: ((MutableRealm) -> Unit)? = null
         var scheduledDate: String? = null
@@ -306,7 +306,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             )
         }
 
-        fun executeSaveAction() = with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
+        suspend fun executeSaveAction() = with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
             data?.let { data ->
                 realmActionOnDraft = { realm ->
                     realm.findLatest(draft)?.apply {
@@ -322,7 +322,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        fun executeSendAction() = with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
+        suspend fun executeSendAction() = with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
             when {
                 isSuccess() -> {
                     scheduledDate = data?.scheduledDate
@@ -357,7 +357,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         )
     }
 
-    private inline fun <reified T> ApiResponse<T>.retryWithNewIdentityOrThrow(
+    private suspend inline fun <reified T> ApiResponse<T>.retryWithNewIdentityOrThrow(
         draft: Draft,
         mailboxUuid: String,
         isFirstTime: Boolean,
@@ -369,13 +369,13 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
     }
 
-    private fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
+    private suspend fun updateSignaturesThenRetry(draft: Draft, mailboxUuid: String): DraftActionResult {
 
         updateSignatures(mailbox, mailboxContentRealm)
 
         val signature = mailbox.getDefaultSignatureWithFallback()
 
-        mailboxContentRealm.writeBlocking {
+        mailboxContentRealm.write {
             draftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
         }
 
