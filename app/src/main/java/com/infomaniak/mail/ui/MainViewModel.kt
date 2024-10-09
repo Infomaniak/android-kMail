@@ -739,11 +739,11 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun markAsUnseen(
+    private suspend fun markAsUnseen(
         mailbox: Mailbox,
         threads: List<Thread>,
         message: Message? = null,
-    ) = viewModelScope.launch(ioCoroutineContext) {
+    ) {
 
         val messages = getMessagesToMarkAsUnseen(threads, message)
         val threadsUids = threads.map { it.uid }
@@ -1043,7 +1043,7 @@ class MainViewModel @Inject constructor(
         isDownloadingChanges.postValue(true)
     }
 
-    private fun onDownloadStop(threadsUids: List<String>) {
+    private fun onDownloadStop(threadsUids: List<String> = emptyList()) = viewModelScope.launch(ioCoroutineContext) {
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
         isDownloadingChanges.postValue(false)
     }

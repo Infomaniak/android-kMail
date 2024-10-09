@@ -126,7 +126,7 @@ class ThreadController @Inject constructor(
             }
         }
 
-        return@withContext mailboxContentRealm().writeBlocking {
+        return@withContext mailboxContentRealm().write {
             val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
             val cachedFolderIds = mutableMapOf<String, String>()
 
@@ -167,8 +167,8 @@ class ThreadController @Inject constructor(
     //endregion
 
     //region Edit data
-    fun saveThreads(searchMessages: List<Message>) {
-        mailboxContentRealm().writeBlocking {
+    suspend fun saveThreads(searchMessages: List<Message>) {
+        mailboxContentRealm().write {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
                 messages = searchMessages.toRealmList()
                 threads = searchMessages.convertToSearchThreads().toRealmList()
@@ -176,14 +176,14 @@ class ThreadController @Inject constructor(
         }
     }
 
-    fun deleteThread(threadUid: String) {
-        mailboxContentRealm().writeBlocking {
+    suspend fun deleteThread(threadUid: String) {
+        mailboxContentRealm().write {
             delete(getThreadQuery(threadUid, realm = this))
         }
     }
 
-    fun updateIsLocallyMovedOutStatus(threadUids: List<String>, hasBeenMovedOut: Boolean) {
-        mailboxContentRealm().writeBlocking {
+    suspend fun updateIsLocallyMovedOutStatus(threadUids: List<String>, hasBeenMovedOut: Boolean) {
+        mailboxContentRealm().write {
             threadUids.forEach {
                 getThread(it, realm = this)?.isLocallyMovedOut = hasBeenMovedOut
             }
@@ -297,7 +297,7 @@ class ThreadController @Inject constructor(
          * @param okHttpClient An optional OkHttpClient instance to use for making network requests.
          *                     If not provided, a default client will be used.
          */
-        fun fetchMessagesHeavyData(
+        suspend fun fetchMessagesHeavyData(
             messages: List<Message>,
             realm: Realm,
             okHttpClient: OkHttpClient? = null,
@@ -308,7 +308,7 @@ class ThreadController @Inject constructor(
 
             val apiCallsResults = getApiCallsResults(messages, okHttpClient, failedMessagesUids)
 
-            realm.writeBlocking {
+            realm.write {
                 var hasAttachableInThread = false
 
                 apiCallsResults.forEach { (localMessage, apiResponse, swissTransferContainer) ->
@@ -349,7 +349,7 @@ class ThreadController @Inject constructor(
                     }
 
                     // TODO: Remove this when the API returns the good value for `has_attachments`.
-                    verifyAttachmentsValues(hasAttachableInThread, messages, this@writeBlocking)
+                    verifyAttachmentsValues(hasAttachableInThread, messages, this@write)
                 }
             }
 
@@ -398,8 +398,8 @@ class ThreadController @Inject constructor(
             delete(query<Thread>("${Thread::isFromSearch.name} == true"))
         }
 
-        fun deleteEmptyThreadsInFolder(folderId: String, realm: Realm) {
-            realm.writeBlocking {
+        suspend fun deleteEmptyThreadsInFolder(folderId: String, realm: Realm) {
+            realm.write {
                 val emptyThreadsQuery = getEmptyThreadsInFolderQuery(folderId, realm = this)
                 val emptyThreads = emptyThreadsQuery.find()
                 // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
