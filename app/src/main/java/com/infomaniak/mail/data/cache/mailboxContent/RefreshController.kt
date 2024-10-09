@@ -74,7 +74,7 @@ class RefreshController @Inject constructor(
     private lateinit var realm: Realm
     private var okHttpClient: OkHttpClient? = null
     private var onStart: (() -> Unit)? = null
-    private var onStop: ((List<String>) -> Unit)? = null
+    private var onStop: (() -> Unit)? = null
     private var endOfMessagesReached: Boolean = false
 
     //region Fetch Messages
@@ -110,7 +110,7 @@ class RefreshController @Inject constructor(
             ThreadController.deleteEmptyThreadsInFolder(folder.id, realm)
 
             if (threads != null) {
-                onStop?.invoke(emptyList())
+                onStop?.invoke()
                 SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.displayForSentry()})")
             }
         }
@@ -169,7 +169,7 @@ class RefreshController @Inject constructor(
             REFRESH_FOLDER_WITH_ROLE -> refreshWithRoleConsideration(scope)
             REFRESH_FOLDER -> {
                 refresh(scope, initialFolder).also {
-                    onStop?.invoke(emptyList())
+                    onStop?.invoke()
                     clearCallbacks()
                 }
             }
@@ -183,7 +183,7 @@ class RefreshController @Inject constructor(
     private suspend fun Realm.refreshWithRoleConsideration(scope: CoroutineScope): Set<Thread> {
 
         val impactedThreads = refresh(scope, initialFolder)
-        onStop?.invoke(emptyList())
+        onStop?.invoke()
         clearCallbacks()
 
         when (initialFolder.role) {
@@ -721,7 +721,7 @@ class RefreshController @Inject constructor(
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
 
         // This is the end. The `onStop` callback should be called before we are gone.
-        onStop?.invoke(emptyList())
+        onStop?.invoke()
         clearCallbacks()
     }
 
@@ -811,7 +811,7 @@ class RefreshController @Inject constructor(
 
     data class RefreshCallbacks(
         val onStart: (() -> Unit),
-        val onStop: ((List<String>) -> Unit),
+        val onStop: (() -> Unit),
     )
 
     companion object {

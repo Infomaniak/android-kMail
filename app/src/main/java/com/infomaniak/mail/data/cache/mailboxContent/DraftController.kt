@@ -73,7 +73,7 @@ class DraftController @Inject constructor(
     //endregion
 
     //region Open Draft
-    fun fetchHeavyDataIfNeeded(message: Message, realm: Realm): Pair<Message, Boolean> {
+    suspend fun fetchHeavyDataIfNeeded(message: Message, realm: Realm): Pair<Message, Boolean> {
         if (message.isFullyDownloaded()) return message to false
 
         val (deleted, failed) = ThreadController.fetchMessagesHeavyData(listOf(message), realm)
