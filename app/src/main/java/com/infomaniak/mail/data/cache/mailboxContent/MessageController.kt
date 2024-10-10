@@ -160,6 +160,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
             return getMessagesQuery(uid, realm).first()
         }
+
+        private fun getMessagesByFolderIdQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
+            return realm.query<Message>("${Message::folderId.name} == '$folderId'")
+        }
         //endregion
 
         //region Get data
@@ -169,6 +173,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
         fun getMessagesByUids(messagesUids: List<String>, realm: MutableRealm): List<Message> {
             return realm.query<Message>("${Message::uid.name} IN $0", messagesUids).find()
+        }
+
+        fun getMessagesByFolderId(folderId: String, realm: TypedRealm): List<Message> {
+            return getMessagesByFolderIdQuery(folderId, realm).find()
         }
 
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {

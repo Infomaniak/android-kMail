@@ -227,18 +227,16 @@ object SentryDebug {
             "Message is in wrong Folder (related to 'Message has multiple parent folders')",
             SentryLevel.ERROR,
         ) { scope ->
-            scope.setExtra(
-                "localMessageFolders",
-                "${localMessage?.foldersForSentry?.joinToString { "${it.role?.name} | ${it.id}" }}",
-            )
+            scope.setExtra("localMessage folderId", "${localMessage?.folderId}")
+            scope.setExtra("remoteMessage folderId", remoteMessage.folderId)
             scope.setExtra("remoteMessageUid", remoteMessage.uid)
             scope.setExtra("folderRole", "${folder.role?.name}")
             scope.setExtra("folderId", folder.id)
         }
     }
 
-    fun sendOrphanMessages(previousCursor: String?, folder: Folder): List<Message> {
-        val orphanMessages = folder.messages.filter { it.isOrphan() }
+    fun sendOrphanMessages(previousCursor: String?, folder: Folder, realm: TypedRealm): List<Message> {
+        val orphanMessages = MessageController.getMessagesByFolderId(folder.id, realm).filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
             Sentry.captureMessage("We found some orphan Messages.", SentryLevel.ERROR) { scope ->
                 scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
