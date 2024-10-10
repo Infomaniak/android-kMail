@@ -230,10 +230,12 @@ class SearchViewModel @Inject constructor(
 
         if (isFirstPage && isLastPage) searchUtils.deleteRealmSearchData()
 
-        if (apiResponse.isSuccess()) with(apiResponse) {
-            initSearchFolderThreads()
-            resourceNext = data?.resourceNext
-            isFirstPage = data?.resourcePrevious == null
+        if (apiResponse.isSuccess()) {
+            with(apiResponse) {
+                initSearchFolderThreads()
+                resourceNext = data?.resourceNext
+                isFirstPage = data?.resourcePrevious == null
+            }
         } else if (isLastPage) {
             threadController.saveThreads(searchMessages = messageController.searchMessages(query, newFilters, folderId))
         }

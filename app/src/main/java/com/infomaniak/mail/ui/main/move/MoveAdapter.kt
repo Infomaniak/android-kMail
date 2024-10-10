@@ -142,7 +142,6 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
                     oldFolder.name == newFolder.name &&
                     oldFolder.isFavorite == newFolder.isFavorite &&
                     oldFolder.path == newFolder.path &&
-                    oldFolder.unreadCountDisplay == newFolder.unreadCountDisplay &&
                     oldFolder.threads.count() == newFolder.threads.count() &&
                     oldFolder.isHidden == newFolder.isHidden &&
                     oldFolder.canBeCollapsed == newFolder.canBeCollapsed

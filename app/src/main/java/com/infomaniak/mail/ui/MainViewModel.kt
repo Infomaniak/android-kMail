@@ -68,7 +68,6 @@ import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.sentry.Attachment
@@ -1150,7 +1149,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun handleDeletedMessages(uids: Set<String>) = viewModelScope.launch(ioCoroutineContext) {
+    fun handleDeletedMessages(messagesUids: Set<String>) = viewModelScope.launch(ioCoroutineContext) {
 
         snackbarManager.postValue(appContext.getString(R.string.snackbarDeletedConversation))
 
@@ -1158,7 +1157,7 @@ class MainViewModel @Inject constructor(
         val realm = mailboxContentRealm()
 
         val foldersToUpdate = realm.write {
-            uids.mapNotNullTo(mutableSetOf()) { MessageController.getMessage(it, realm = this)?.folder?.copyFromRealm()?.id }
+            messagesUids.mapNotNullTo(mutableSetOf()) { MessageController.getMessage(it, realm = this)?.folderId }
         }
 
         foldersToUpdate.forEach { folderId ->
