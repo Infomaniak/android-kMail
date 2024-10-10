@@ -204,7 +204,7 @@ class NewMessageAiManager @Inject constructor(
 
     fun observeAiFeatureFlagUpdates() {
         newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
-            val isAiEnabled = mailbox.featureFlags.contains(FeatureFlag.AI)
+            val isAiEnabled = mailbox.local.featureFlags.contains(FeatureFlag.AI)
             binding.editorAi.isVisible = isAiEnabled
             if (isAiEnabled) navigateToDiscoveryBottomSheetIfFirstTime()
         }

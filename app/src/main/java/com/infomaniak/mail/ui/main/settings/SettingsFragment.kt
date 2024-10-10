@@ -182,7 +182,7 @@ class SettingsFragment : Fragment() {
 
     private fun observeFeatureFlag() {
         mainViewModel.currentMailbox.observeNotNull(viewLifecycleOwner) {
-            binding.settingsAiEngine.isVisible = it.featureFlags.contains(FeatureFlag.AI)
+            binding.settingsAiEngine.isVisible = it.local.featureFlags.contains(FeatureFlag.AI)
         }
     }
 }

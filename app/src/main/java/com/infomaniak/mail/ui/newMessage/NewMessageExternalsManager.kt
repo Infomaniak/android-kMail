@@ -53,11 +53,11 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
 
     fun observeExternals(arrivedFromExistingDraft: Boolean) = with(newMessageViewModel) {
         Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->
-            val shouldWarnForExternal = currentMailbox.externalMailFlagEnabled && !arrivedFromExistingDraft
+            val shouldWarnForExternal = currentMailbox.local.externalMailFlagEnabled && !arrivedFromExistingDraft
             val externalData = ExternalData(
                 emailDictionary = mergedContacts.second,
                 aliases = currentMailbox.aliases,
-                trustedDomains = currentMailbox.trustedDomains,
+                trustedDomains = currentMailbox.local.trustedDomains,
             )
 
             updateFields(shouldWarnForExternal, externalData)

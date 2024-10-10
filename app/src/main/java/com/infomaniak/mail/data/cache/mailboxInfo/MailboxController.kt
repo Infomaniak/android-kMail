@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.MailboxLocalValues
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
@@ -29,7 +30,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
@@ -100,19 +100,10 @@ class MailboxController @Inject constructor(
             val remoteMailboxesIds = remoteMailboxes.map { remoteMailbox ->
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-                val localMailbox = getMailbox(userId, remoteMailbox.mailboxId, realm = this)?.copyFromRealm()
+                val previousLocalValues = getMailbox(userId, remoteMailbox.mailboxId, realm = this)?.local
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Save new data")
-                remoteMailbox.initLocalValues(
-                    userId = userId,
-                    quotas = localMailbox?.quotas,
-                    inboxUnreadCount = localMailbox?.unreadCountLocal,
-                    permissions = localMailbox?.permissions,
-                    signatures = localMailbox?.signatures,
-                    featureFlags = localMailbox?._featureFlags,
-                    externalMailFlagEnabled = localMailbox?.externalMailFlagEnabled,
-                    trustedDomains = localMailbox?.trustedDomains,
-                )
+                remoteMailbox.initLocalValues(userId, previousLocalValues)
                 copyToRealm(remoteMailbox, UpdatePolicy.ALL)
 
                 return@map remoteMailbox.mailboxId
@@ -150,7 +141,9 @@ class MailboxController @Inject constructor(
     companion object {
 
         //region Queries
-        private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
+        private fun checkHasUserId(userId: Int): String {
+            return "${Mailbox.localValuesPropertyName}.${MailboxLocalValues::userId.name} == '$userId'"
+        }
 
         private val isMailboxLocked = "${Mailbox::isLocked.name} == true"
         private val hasValidPassword = "${Mailbox::isPasswordValid.name} == true"

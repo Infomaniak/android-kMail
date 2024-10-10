@@ -359,7 +359,7 @@ class RefreshController @Inject constructor(
         if (unreadCount == null) return
 
         mailboxController.updateMailbox(mailbox.objectId) {
-            it.unreadCountLocal = unreadCount
+            it.setUnreadCountLocal(unreadCount)
         }
     }
 

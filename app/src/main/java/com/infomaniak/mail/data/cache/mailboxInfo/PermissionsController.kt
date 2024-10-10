@@ -30,7 +30,7 @@ class PermissionsController @Inject constructor(
 
     //region Get data
     fun getPermissionsAsync(mailboxObjectId: String): Flow<MailboxPermissions?> {
-        return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.permissions }
+        return mailboxController.getMailboxAsync(mailboxObjectId).map { it.obj?.local?.permissions }
     }
     //endregion
 }

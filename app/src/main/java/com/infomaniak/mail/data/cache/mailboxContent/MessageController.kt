@@ -193,7 +193,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                     deleteDraftUploadDir(
                         context = context,
                         draftLocalUuid = draft.localUuid,
-                        userId = mailbox.userId,
+                        userId = mailbox.local.userId,
                         mailboxId = mailbox.mailboxId,
                         mustForceDelete = true,
                     )

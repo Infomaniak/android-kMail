@@ -69,7 +69,6 @@ import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.sentry.Attachment
 import io.sentry.Sentry
@@ -346,7 +345,7 @@ class MainViewModel @Inject constructor(
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) {
                 mailboxController.updateMailbox(mailbox.objectId) {
-                    it.quotas = data
+                    it.setQuotas(data)
                 }
             }
         }
@@ -356,7 +355,7 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
             if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
-                it.permissions = data
+                it.setPermissions(data)
             }
         }
     }
@@ -377,8 +376,7 @@ class MainViewModel @Inject constructor(
             if (!isSuccess()) return@launch
             data?.let { externalMailInfo ->
                 mailboxController.updateMailbox(mailbox.objectId) {
-                    it.externalMailFlagEnabled = externalMailInfo.externalMailFlagEnabled
-                    it.trustedDomains = externalMailInfo.trustedDomains.toRealmList()
+                    it.setExternalMailInfo(externalMailInfo)
                 }
             }
         }
@@ -928,7 +926,7 @@ class MainViewModel @Inject constructor(
 
         val mailbox = currentMailbox.value ?: return@launch
 
-        val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return@launch
+        val userApiToken = AccountUtils.getUserById(mailbox.local.userId)?.apiToken?.accessToken ?: return@launch
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
             .build()
@@ -937,7 +935,7 @@ class MainViewModel @Inject constructor(
             .get()
             .build()
 
-        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
+        val response = AccountUtils.getHttpClient(mailbox.local.userId).newCall(request).execute()
 
         if (!response.isSuccessful || response.body == null) {
             reportDisplayProblemTrigger.postValue(Unit)

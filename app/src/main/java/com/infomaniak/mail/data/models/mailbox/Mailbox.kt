@@ -21,17 +21,15 @@ package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.extensions.getDefault
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -70,28 +68,8 @@ class Mailbox : RealmObject {
     @PrimaryKey
     var objectId: String = ""
     @Transient
-    var userId: Int = AppSettings.DEFAULT_ID
-    @Transient
-    var quotas: Quotas? = null
-    @Transient
-    var unreadCountLocal: Int = 0
-    @Transient
-    var permissions: MailboxPermissions? = null
-    @Transient
-    var signatures = realmListOf<Signature>()
-    @Transient
-    var _featureFlags = realmSetOf<String>()
-        private set
-    @Transient
-    var externalMailFlagEnabled: Boolean = false
-    @Transient
-    var trustedDomains = realmListOf<String>()
-    //endregion
-
-    //region UI data (Transient & Ignore)
-    @Transient
-    @Ignore
-    val featureFlags = FeatureFlagSet()
+    private var mailboxLocalValues: MailboxLocalValues? = MailboxLocalValues()
+    val local get() = mailboxLocalValues!!
     //endregion
 
     inline val channelGroupId get() = "$mailboxId"
@@ -103,34 +81,48 @@ class Mailbox : RealmObject {
 
     val unreadCountDisplay: UnreadDisplay
         get() = UnreadDisplay(
-            count = unreadCountLocal,
-            shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
+            count = local.unreadCountLocal,
+            shouldDisplayPastille = local.unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
-    fun initLocalValues(
-        userId: Int,
-        quotas: Quotas?,
-        inboxUnreadCount: Int?,
-        permissions: MailboxPermissions?,
-        signatures: List<Signature>?,
-        featureFlags: Set<String>?,
-        externalMailFlagEnabled: Boolean?,
-        trustedDomains: List<String>?,
-    ) {
-        this.objectId = createObjectId(userId)
-        this.userId = userId
-        this.quotas = quotas
-        inboxUnreadCount?.let { this.unreadCountLocal = it }
-        this.permissions = permissions
-        signatures?.let(this.signatures::addAll)
-        featureFlags?.let(this._featureFlags::addAll)
-        externalMailFlagEnabled?.let { this.externalMailFlagEnabled = it }
-        trustedDomains?.let(this.trustedDomains::addAll)
+    fun initLocalValues(userId: Int, localValues: MailboxLocalValues?) {
+
+        // If we have any backup from a previous Mailbox already stored in Realm, use it.
+        localValues?.let { mailboxLocalValues = it.copyFromRealm() }
+
+        objectId = createObjectId(userId)
+        mailboxLocalValues = local.setUserId(userId, bypassRealmCopy = true)
     }
 
-    fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature {
+    fun setUnreadCountLocal(unreadCount: Int) {
+        mailboxLocalValues = local.setUnreadCountLocal(unreadCount)
+    }
+
+    fun setQuotas(quotas: Quotas?) {
+        mailboxLocalValues = local.setQuotas(quotas)
+    }
+
+    fun setPermissions(permissions: MailboxPermissions?) {
+        mailboxLocalValues = local.setPermissions(permissions)
+    }
+
+    fun setSignatures(signatures: List<Signature>) {
+        mailboxLocalValues = local.setSignatures(signatures)
+    }
+
+    fun setExternalMailInfo(externalMailInfo: MailboxExternalMailInfo) {
+        mailboxLocalValues = local.setExternalMailInfo(externalMailInfo)
+    }
+
+    fun setFeatureFlags(featureFlags: List<String>) {
+        mailboxLocalValues = local.copyFromRealm().also {
+            it.featureFlags.setFeatureFlags(featureFlags)
+        }
+    }
+
+    fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature = with(local) {
         return signatures.getDefault(draftMode) ?: signatures.first()
     }
 
@@ -140,14 +132,7 @@ class Mailbox : RealmObject {
         return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
     }
 
-    inner class FeatureFlagSet {
-        fun contains(featureFlag: FeatureFlag): Boolean {
-            return _featureFlags.contains(featureFlag.apiName)
-        }
-
-        fun setFeatureFlags(featureFlags: List<String>) = with(_featureFlags) {
-            clear()
-            addAll(featureFlags)
-        }
+    companion object {
+        val localValuesPropertyName = Mailbox::mailboxLocalValues.name
     }
 }

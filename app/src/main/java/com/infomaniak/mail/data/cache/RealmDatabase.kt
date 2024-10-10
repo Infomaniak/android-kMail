@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.MailboxLocalValues
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
@@ -160,7 +161,7 @@ object RealmDatabase {
 
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 2L
-        const val MAILBOX_INFO_SCHEMA_VERSION = 6L
+        const val MAILBOX_INFO_SCHEMA_VERSION = 7L
         const val MAILBOX_CONTENT_SCHEMA_VERSION = 18L
         //endregion
 
@@ -182,6 +183,7 @@ object RealmDatabase {
         )
         val mailboxInfoSet = setOf(
             Mailbox::class,
+            MailboxLocalValues::class,
             MailboxPermissions::class,
             Quotas::class,
             Signature::class,

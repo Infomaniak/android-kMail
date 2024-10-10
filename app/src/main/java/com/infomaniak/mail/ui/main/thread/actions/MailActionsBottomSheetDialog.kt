@@ -96,7 +96,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun computeReportDisplayProblemVisibility() = runBlocking {
         binding.reportDisplayProblem.isVisible =
-            mainViewModel.currentMailbox.value?.let { AccountUtils.getUserById(it.userId)?.isStaff } ?: false
+            mainViewModel.currentMailbox.value?.let { AccountUtils.getUserById(it.local.userId)?.isStaff } ?: false
     }
 
     private fun computeUnreadStyle(isSeen: Boolean) = if (isSeen) {
