@@ -31,7 +31,6 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
@@ -403,9 +402,11 @@ class RefreshController @Inject constructor(
                         realm = this,
                     )
                 }
+
+                val messagesCount = MessageController.getMessagesByFolderId(upToDateFolder.id, realm = this).count()
                 SentryLog.d(
                     "Realm",
-                    "Saved Messages: ${upToDateFolder.displayForSentry()} | ${upToDateFolder.messages.count()}",
+                    "Saved Messages: ${upToDateFolder.displayForSentry()} | $messagesCount",
                 )
 
                 impactedThreads += allImpactedThreads.filter { it.folderId == upToDateFolder.id }
@@ -502,7 +503,8 @@ class RefreshController @Inject constructor(
     ): Set<Thread> {
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
-        val folderMessages = folder.messages.associateByTo(mutableMapOf()) { it.uid }
+        val folderMessages = MessageController.getMessagesByFolderId(folder.id, realm = this)
+            .associateByTo(mutableMapOf()) { it.uid }
         val addedMessagesUids = mutableListOf<Int>()
 
         remoteMessages.forEach { remoteMessage ->
@@ -512,7 +514,9 @@ class RefreshController @Inject constructor(
                 SentryDebug.sendMessageInWrongFolder(remoteMessage, folder, realm = this)
             }
 
-            val shouldSkipThisMessage = addRemoteMessageToFolder(remoteMessage, folder, folderMessages)
+            remoteMessage.isTrashed = folder.role == FolderRole.TRASH
+
+            val shouldSkipThisMessage = isThisMessageAlreadyInRealm(remoteMessage, folder, folderMessages)
             if (shouldSkipThisMessage) return@forEach
 
             addedMessagesUids.add(remoteMessage.shortUid)
@@ -535,7 +539,7 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             it.recomputeThread(realm = this)
-            impactedThreadsUnmanaged.add(it.copyFromRealm(0u))
+            impactedThreadsUnmanaged.add(it.copyFromRealm(depth = 0u))
         }
 
         return impactedThreadsUnmanaged
@@ -566,7 +570,7 @@ class RefreshController @Inject constructor(
         return thread
     }
 
-    private fun MutableRealm.addRemoteMessageToFolder(
+    private fun MutableRealm.isThisMessageAlreadyInRealm(
         remoteMessage: Message,
         folder: Folder,
         folderMessages: MutableMap<String, Message>,
@@ -584,19 +588,6 @@ class RefreshController @Inject constructor(
             )
             return true
         }
-
-        remoteMessage.initLocalValues(
-            MessageInitialState(
-                date = remoteMessage.date,
-                isFullyDownloaded = false,
-                isTrashed = folder.role == FolderRole.TRASH,
-                isFromSearch = false,
-                draftLocalUuid = null,
-            ),
-            latestCalendarEventResponse = null,
-        )
-
-        if (existingMessage == null) folder.messages.add(remoteMessage)
 
         return false
     }
@@ -736,7 +727,7 @@ class RefreshController @Inject constructor(
     private suspend fun Realm.sendSentryOrphans(folder: Folder, previousCursor: String? = null) {
         write {
             val upToDateFolder = getUpToDateFolder(folder.id)
-            SentryDebug.sendOrphanMessages(previousCursor, folder = upToDateFolder).also { orphans ->
+            SentryDebug.sendOrphanMessages(previousCursor, folder = upToDateFolder, realm = this).also { orphans ->
                 MessageController.deleteMessages(appContext, mailbox, orphans, realm = this)
             }
             SentryDebug.sendOrphanThreads(previousCursor, folder = upToDateFolder, realm = this).also { orphans ->

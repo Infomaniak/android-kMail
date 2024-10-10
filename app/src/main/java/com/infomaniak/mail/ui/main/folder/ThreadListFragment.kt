@@ -130,7 +130,6 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = runCatchingRealm {
         navigateFromNotificationToNewMessage()
-
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(
             statusBarColor = R.color.backgroundHeaderColor,
