@@ -161,14 +161,17 @@ class Message : RealmObject {
     //  we will be able to replace this `first { … }` with `first()`.
     inline val folder
         get() = runCatching {
-            threads.first { it.folder.id == folderId }.folder
+            threads.single { it.folder.id == folderId }.folder
         }.getOrElse { exception ->
             // TODO: I think this Sentry can't happen, but better safe than sorry. Weird possibilities are endless.
-            val reason = if (threads.isEmpty()) {
-                "no parents Threads" // Message has 0 parent threads
-            } else {
-                "no parent Thread from correct Folder" // Message has parent threads, but none from the correct folder
+
+            val reason = when {
+                threads.isEmpty() -> "no parent Threads" // Message has 0 parent threads
+                exception is NoSuchElementException -> "no parent Thread from correct Folder" // Message has parent threads, but none from the correct folder
+                exception is IllegalArgumentException -> "multiple same parent Threads" // Message has multiple parent Threads from the correct Folder
+                else -> "null" // Impossibru
             }
+
             Sentry.captureMessage(
                 "Message doesn't have a parent Thread from its own Folder, it should not be possible",
                 SentryLevel.ERROR,
@@ -181,6 +184,7 @@ class Message : RealmObject {
                 scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                 scope.setExtra("exception", exception.message.toString())
             }
+
             threads.first().folder
         }
 
