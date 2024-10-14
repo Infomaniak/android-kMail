@@ -1,0 +1,2 @@
+- Set avatars background color to white so transparent BIMIs are displayed correctly
+- Various performances improvements

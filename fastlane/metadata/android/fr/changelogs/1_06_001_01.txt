@@ -1,0 +1,2 @@
+- La couleur d'arrière-plan des avatars est désormais le blanc pour que les BIMI transparents s'affichent correctement
+- Diverses améliorations de performances
