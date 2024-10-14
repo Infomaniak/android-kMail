@@ -119,7 +119,6 @@ class ThreadController @Inject constructor(
                 localMessage?.let(remoteMessage::keepHeavyData)
 
                 remoteThread.messagesIds += remoteMessage.messageIds
-                searchFolder.messages.add(remoteMessage)
 
                 // TODO: Remove this when the API returns the good value for `has_attachments`.
                 if (remoteMessage.hasAttachable) remoteThread.hasAttachable = true
@@ -170,7 +169,6 @@ class ThreadController @Inject constructor(
     suspend fun saveThreads(searchMessages: List<Message>) {
         mailboxContentRealm().write {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
-                messages = searchMessages.toRealmList()
                 threads = searchMessages.convertToSearchThreads().toRealmList()
             }
         }

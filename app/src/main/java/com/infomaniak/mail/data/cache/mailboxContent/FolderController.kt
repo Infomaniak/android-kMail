@@ -99,7 +99,7 @@ class FolderController @Inject constructor(
     }
 
     private fun MutableRealm.deleteLocalFolder(mailbox: Mailbox, folder: Folder) {
-        MessageController.deleteMessages(appContext, mailbox, folder.messages, realm = this)
+        MessageController.deleteMessages(appContext, mailbox, folder.messages(realm = this), realm = this)
         if (folder.threads.isNotEmpty()) delete(folder.threads)
         delete(folder)
     }
@@ -118,7 +118,6 @@ class FolderController @Inject constructor(
                     localFolder.cursor,
                     localFolder.unreadCountLocal,
                     localFolder.threads,
-                    localFolder.messages,
                     localFolder.oldMessagesUidsToFetch,
                     localFolder.newMessagesUidsToFetch,
                     localFolder.remainingOldMessagesToFetch,
@@ -214,7 +213,6 @@ class FolderController @Inject constructor(
         }
 
         fun deleteSearchFolderData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
-            messages = realmListOf()
             threads = realmListOf()
         }
         //endregion

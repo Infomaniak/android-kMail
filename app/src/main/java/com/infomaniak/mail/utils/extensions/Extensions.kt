@@ -340,8 +340,7 @@ fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: B
         val folder = inputList.removeFirst()
 
         val children = if (folder.isManaged()) {
-            // We remove the Messages because we don't need them here. And it can be a pretty big list.
-            outputList.add(folder.copyFromRealm(1u).apply { messages.clear() })
+            outputList.add(folder.copyFromRealm(depth = 1u))
             with(folder.children) {
                 (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
                     .sortFolders()

@@ -22,10 +22,8 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController.Companion.SEARCH_FOLDER_ID
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -159,37 +157,36 @@ class Message : RealmObject {
 
     private val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
-    private val _folders by backlinks(Folder::messages)
-    val folder
-        get() = run {
-            runCatching {
-                _folders.single { _folders.count() == 1 || it.id != SEARCH_FOLDER_ID }
-            }.getOrElse {
-                val reason = if (_folders.isEmpty()) {
-                    "no parents" // Message has 0 parent folders
-                } else {
-                    val allFoldersAreSearch = _folders.all { it.id == SEARCH_FOLDER_ID }
-                    val allFoldersAreTheSame = _folders.all { it.id == _folders.firstOrNull()?.id }
-                    when {
-                        allFoldersAreSearch -> "multiple SEARCH folder" // Message has multiple times the Search folder as parent
-                        allFoldersAreTheSame -> "multiple same parent" // Message has multiple times the same parent folder
-                        else -> "multiple parents" // Message has multiple parent folders
-                    }
-                }
-                Sentry.captureMessage(
-                    "Message doesn't have a unique parent Folder, it should not be possible",
-                    SentryLevel.ERROR,
-                ) { scope ->
-                    scope.setTag("issueType", reason)
-                    scope.setExtra("messageUid", uid)
-                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    scope.setExtra("folders", "${_folders.map { "role:[${it.role?.name}] (id:[${it.id}])" }}")
-                    scope.setExtra("foldersCount", "${_folders.count()}")
-                }
-                _folders.first()
+    // TODO: When there is no more issue with the `_folders` backlink in the Thread model,
+    //  we will be able to replace this `first { … }` with `first()`.
+    inline val folder
+        get() = runCatching {
+            threads.single { it.folder.id == folderId }.folder
+        }.getOrElse { exception ->
+            // TODO: I think this Sentry can't happen, but better safe than sorry. Weird possibilities are endless.
+
+            val reason = when {
+                threads.isEmpty() -> "no parent Threads" // Message has 0 parent threads
+                exception is NoSuchElementException -> "no parent Thread from correct Folder" // Message has parent threads, but none from the correct folder
+                exception is IllegalArgumentException -> "multiple same parent Threads" // Message has multiple parent Threads from the correct Folder
+                else -> "null" // Impossibru
             }
+
+            Sentry.captureMessage(
+                "Message doesn't have a parent Thread from its own Folder, it should not be possible",
+                SentryLevel.ERROR,
+            ) { scope ->
+                scope.setTag("issueType", reason)
+                scope.setExtra("threadsUid", threads.joinToString { it.uid })
+                scope.setExtra("threadsCount", "${threads.count()}")
+                scope.setExtra("threadsFolder", "${threads.map { "role:[${it.folder.role?.name}] (id:[${it.folder.id}])" }}")
+                scope.setExtra("messageUid", uid)
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                scope.setExtra("exception", exception.message.toString())
+            }
+
+            threads.first().folder
         }
-    val foldersForSentry get() = _folders // TODO: Remove this when no Sentry needs it.
 
     inline val sender get() = from.firstOrNull()
 

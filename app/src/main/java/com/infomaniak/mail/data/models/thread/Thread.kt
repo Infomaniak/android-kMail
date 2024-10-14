@@ -99,24 +99,34 @@ class Thread : RealmObject {
 
     private val _folders by backlinks(Folder::threads)
     val folder
-        get() = run {
-            runCatching {
-                _folders.single()
-            }.getOrElse { exception ->
-                Sentry.captureMessage(
-                    "Thread has several or 0 parent folders, it should not be possible",
-                    SentryLevel.ERROR,
-                ) { scope ->
-                    scope.setTag("foldersId", _folders.joinToString { it.id })
-                    scope.setTag("foldersCount", "${_folders.count()}")
-                    scope.setExtra("foldersCount", "${_folders.count()}")
-                    scope.setExtra("folders", "${_folders.map { "name:[${it.role?.name}] (id:[${it.id}])" }}")
-                    scope.setExtra("threadUid", uid)
-                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                    scope.setExtra("exception message", exception.message.toString())
+        get() = runCatching {
+            _folders.single()
+        }.getOrElse { exception ->
+            val reason = if (_folders.isEmpty()) {
+                "no parents" // Thread has 0 parent folders
+            } else {
+                val allFoldersAreSearch = _folders.all { it.id == FolderController.SEARCH_FOLDER_ID }
+                val allFoldersAreTheSame = _folders.all { it.id == _folders.firstOrNull()?.id }
+                when {
+                    allFoldersAreSearch -> "multiple SEARCH folder" // Thread has multiple times the Search folder as parent
+                    allFoldersAreTheSame -> "multiple same parent" // Thread has multiple times the same parent folder
+                    else -> "multiple parents" // Thread has multiple parent folders
                 }
-                _folders.first()
             }
+            Sentry.captureMessage(
+                "Thread doesn't have a unique parent Folder, it should not be possible",
+                SentryLevel.ERROR,
+            ) { scope ->
+                scope.setTag("issueType", reason)
+                scope.setTag("foldersId", _folders.joinToString { it.id })
+                scope.setTag("foldersCount", "${_folders.count()}")
+                scope.setExtra("folders_", "${_folders.map { "role:[${it.role?.name}] (id:[${it.id}])" }}")
+                scope.setExtra("foldersCount_", "${_folders.count()}")
+                scope.setExtra("threadUid", uid)
+                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                scope.setExtra("exception", exception.message.toString())
+            }
+            _folders.first()
         }
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
@@ -236,7 +246,7 @@ class Thread : RealmObject {
             else -> message.from
         }
 
-        recipients.firstOrNull() to message.bimi
+        return@runCatching recipients.firstOrNull() to message.bimi
 
     }.getOrElse { throwable ->
         Sentry.captureException(throwable) { scope ->
@@ -250,7 +260,7 @@ class Thread : RealmObject {
             scope.setExtra("thread.hasDrafts", "$hasDrafts")
         }
 
-        null to null
+        return@getOrElse null to null
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {
