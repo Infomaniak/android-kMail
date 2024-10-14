@@ -404,10 +404,10 @@ class RefreshController @Inject constructor(
                     )
                 }
 
-                val messagesCount = upToDateFolder.messages(realm = this).count()
+                val messagesCount = MessageController.getMessagesCountByFolderId(upToDateFolder.id, realm = this)
                 SentryLog.d(
                     "Realm",
-                    "Saved Messages: ${upToDateFolder.displayForSentry()} | $messagesCount",
+                    "Saved Messages: ${upToDateFolder.displayForSentry()} | ($messagesCount)",
                 )
 
                 impactedThreads += allImpactedThreads.filter { it.folderId == upToDateFolder.id }
