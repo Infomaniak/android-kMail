@@ -236,7 +236,7 @@ object SentryDebug {
     }
 
     fun sendOrphanMessages(previousCursor: String?, folder: Folder, realm: TypedRealm): List<Message> {
-        val orphanMessages = MessageController.getMessagesByFolderId(folder.id, realm).filter { it.isOrphan() }
+        val orphanMessages = folder.messages(realm).filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
             Sentry.captureMessage("We found some orphan Messages.", SentryLevel.ERROR) { scope ->
                 scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")

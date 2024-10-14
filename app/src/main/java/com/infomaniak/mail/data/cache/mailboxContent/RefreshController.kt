@@ -404,7 +404,7 @@ class RefreshController @Inject constructor(
                     )
                 }
 
-                val messagesCount = MessageController.getMessagesByFolderId(upToDateFolder.id, realm = this).count()
+                val messagesCount = upToDateFolder.messages(realm = this).count()
                 SentryLog.d(
                     "Realm",
                     "Saved Messages: ${upToDateFolder.displayForSentry()} | $messagesCount",
@@ -504,8 +504,7 @@ class RefreshController @Inject constructor(
     ): Set<Thread> {
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
-        val folderMessages = MessageController.getMessagesByFolderId(folder.id, realm = this)
-            .associateByTo(mutableMapOf()) { it.uid }
+        val folderMessages = folder.messages(realm = this).associateByTo(mutableMapOf()) { it.uid }
         val addedMessagesUids = mutableListOf<Int>()
 
         remoteMessages.forEach { remoteMessage ->

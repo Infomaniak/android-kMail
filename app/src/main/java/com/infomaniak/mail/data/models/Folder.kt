@@ -25,10 +25,13 @@ import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.Utils
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
@@ -136,6 +139,8 @@ class Folder : RealmObject, Cloneable {
 
         this.sortedName = this.name.lowercase().removeAccents()
     }
+
+    fun messages(realm: TypedRealm): List<Message> = MessageController.getMessagesByFolderId(id, realm)
 
     fun getLocalizedName(context: Context): String {
         return role?.folderNameRes?.let(context::getString) ?: name
