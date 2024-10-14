@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
@@ -514,7 +515,7 @@ class RefreshController @Inject constructor(
                 SentryDebug.sendMessageInWrongFolder(remoteMessage, folder, realm = this)
             }
 
-            remoteMessage.isTrashed = folder.role == FolderRole.TRASH
+            initMessageLocalValues(remoteMessage, folder)
 
             val shouldSkipThisMessage = isThisMessageAlreadyInRealm(remoteMessage, folder, folderMessages)
             if (shouldSkipThisMessage) return@forEach
@@ -568,6 +569,19 @@ class RefreshController @Inject constructor(
         if (isThereDuplicatedThreads) removeDuplicatedThreads(remoteMessage.messageIds, impactedThreadsManaged)
 
         return thread
+    }
+
+    private fun initMessageLocalValues(remoteMessage: Message, folder: Folder) {
+        remoteMessage.initLocalValues(
+            MessageInitialState(
+                date = remoteMessage.date,
+                isFullyDownloaded = false,
+                isTrashed = folder.role == FolderRole.TRASH,
+                isFromSearch = false,
+                draftLocalUuid = null,
+            ),
+            latestCalendarEventResponse = null,
+        )
     }
 
     private fun MutableRealm.isThisMessageAlreadyInRealm(
