@@ -67,7 +67,7 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     }
 
     private fun downloadAttachment() {
-        downloadAttachmentViewModel.downloadAttachment().observe(this) { cachedAttachment ->
+        downloadAttachmentViewModel.downloadAttachment().observe(viewLifecycleOwner) { cachedAttachment ->
             if (cachedAttachment == null) {
                 popBackStackWithError()
             } else {
