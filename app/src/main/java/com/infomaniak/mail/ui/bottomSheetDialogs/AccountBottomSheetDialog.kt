@@ -31,10 +31,13 @@ import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter
 import com.infomaniak.mail.ui.main.user.SwitchUserViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ConfettiUtils
+import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType.COLORED_SNOW
 import com.infomaniak.mail.utils.LogoutUser
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.launchLoginActivity
@@ -60,9 +63,20 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
 
     private val switchUserViewModel: SwitchUserViewModel by activityViewModels()
 
-    private val accountsAdapter = SwitchUserAdapter(AccountUtils.currentUserId) { user ->
-        switchUserViewModel.switchAccount(user)
-    }
+    private val accountsAdapter = SwitchUserAdapter(
+        currentUserId = AccountUtils.currentUserId,
+        onChangingUserAccount = { user ->
+            if (user.id == AccountUtils.currentUserId) {
+                ConfettiUtils.onEasterEggConfettiClicked(
+                    container = (activity as? MainActivity)?.getConfettiContainer(),
+                    type = COLORED_SNOW,
+                    matomoValue = "Avatar",
+                )
+            } else {
+                switchUserViewModel.switchAccount(user)
+            }
+        },
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetAccountBinding.inflate(inflater, container, false).also { binding = it }.root
