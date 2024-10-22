@@ -38,6 +38,8 @@ object MessageBodyUtils {
 
     private const val QUOTE_DETECTION_TIMEOUT = 1_500L
 
+    // Arbitrary maximum length that a Message's body can reach without provoking
+    // a crash when opened in a Thread with other equally long Messages.
     private const val MESSAGE_LENGTH_LIMIT = 104_448
 
     private val quoteDescriptors = arrayOf(
