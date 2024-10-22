@@ -38,6 +38,10 @@ object MessageBodyUtils {
 
     private const val QUOTE_DETECTION_TIMEOUT = 1_500L
 
+    // Arbitrary maximum length that a Message's body can reach without provoking
+    // a crash when opened in a Thread with other equally long Messages.
+    private const val MESSAGE_LENGTH_LIMIT = 104_448
+
     private val quoteDescriptors = arrayOf(
         "blockquote[type=cite]", // macOS and iOS mail client
         // The reply and forward #divRplyFwdMsg div only contains the header, the previous message body is written right next to
@@ -70,6 +74,12 @@ object MessageBodyUtils {
             block = {
                 // Do not nest jsoupParseWithLog and measureAndLogMemoryUsage so logs are independent from one another
                 val htmlDocument = jsoupParseWithLog(bodyContent)
+
+                if (htmlDocument.text().length > MESSAGE_LENGTH_LIMIT) {
+                    val content = bodyContent.substring(0, MESSAGE_LENGTH_LIMIT)
+                    return@executeWithTimeoutOrDefault SplitBody(content)
+                }
+
                 val (content, quotes) = measureAndLogMemoryUsage(
                     tag = "Split signature and quote memory usage",
                     actionName = "splitting",
