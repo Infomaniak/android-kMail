@@ -95,6 +95,8 @@ class Thread : RealmObject {
     // It's only used to filter locally the Threads' list.
     @Transient
     var isLocallyMovedOut: Boolean = false
+    @Transient
+    var hasScheduledDraft: Boolean = false
     //endregion
 
     private val _folders by backlinks(Folder::threads)
@@ -210,6 +212,7 @@ class Thread : RealmObject {
                 isAnswered = false
             }
             if (message.hasAttachable) hasAttachable = true
+            if (message.isScheduledDraft) hasScheduledDraft = true
         }
 
         date = messages.last { it.folderId == folderId }.date

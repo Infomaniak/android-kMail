@@ -80,6 +80,8 @@ class Message : RealmObject {
     var isDraft: Boolean = false
     @SerialName("draft_resource")
     var draftResource: String? = null
+    @SerialName("is_scheduled_draft")
+    var isScheduledDraft: Boolean = false
     var body: Body? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false

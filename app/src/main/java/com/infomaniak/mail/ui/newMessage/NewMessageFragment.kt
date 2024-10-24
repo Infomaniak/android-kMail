@@ -43,11 +43,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.FilePicker
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.lib.core.utils.isNightModeEnabled
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.richhtmleditor.StatusCommand.*
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -56,6 +53,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -64,6 +62,7 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduleDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -149,6 +148,9 @@ class NewMessageFragment : Fragment() {
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
+    @Inject
+    lateinit var selectDateAndTimeForScheduleDialog: SelectDateAndTimeForScheduleDialog
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
@@ -202,6 +204,24 @@ class NewMessageFragment : Fragment() {
             setOnFocusChangedListeners()
             observeContacts()
             observeCcAndBccVisibility()
+        }
+
+        if (newMessageViewModel.currentMailbox.featureFlags.contains(FeatureFlag.SCHEDULE_SEND_DRAFT)) {
+            binding.scheduleSendButton.isVisible = true
+        }
+
+        newMessageViewModel.showOrCloseSendBottomSheetDialog.observe(viewLifecycleOwner) { showDialog ->
+            if (showDialog) {
+                selectDateAndTimeForScheduleDialog.show(
+                    title = getString(R.string.datePickerTitle),
+                    onPositiveButtonClicked = {
+                        localSettings.lastSelectedSchedule = selectDateAndTimeForScheduleDialog.selectedDate.time
+                    },
+                    onNegativeButtonClicked = { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) },
+                )
+            } else {
+                selectDateAndTimeForScheduleDialog.resetLoadingAndDismiss()
+            }
         }
     }
 
@@ -338,7 +358,7 @@ class NewMessageFragment : Fragment() {
 
         initEditorUi()
 
-        setupSendButton()
+        setupSendButtons()
         externalsManager.setupExternalBanner()
 
         scrim.setOnClickListener {
@@ -677,11 +697,13 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.deleteAttachment(position)
     }
 
-    private fun setupSendButton() = with(binding) {
+    private fun setupSendButtons() = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
+            scheduleSendButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
+        scheduleSendButton.setOnClickListener { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) }
         sendButton.setOnClickListener { tryToSendEmail() }
     }
 

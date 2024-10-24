@@ -23,6 +23,7 @@ import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View.OnClickListener
@@ -39,8 +40,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME
 import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
@@ -350,6 +353,19 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date.toDate()
 
+        if (message.isScheduledDraft) {
+            scheduleSendIcon.isVisible = true
+
+            scheduleAlert.setDescription(
+                context.getString(
+                    R.string.scheduledEmailHeader,
+                    message.date.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME),
+                )
+            )
+            alertsGroup.isVisible = true
+            scheduleAlert.isVisible = true
+        }
+
         if (message.isDraft) {
             userAvatar.loadAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
@@ -438,6 +454,10 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindAlerts(messageUid: String) = with(binding) {
+        scheduleAlert.onAction1 { Log.e("TOTO", "bindAlerts: RESCHEDULE CLICKED!") }
+
+        scheduleAlert.onAction2 { Log.e("TOTO", "bindAlerts: MODIFY CLICKED!") }
+
         distantImagesAlert.onAction1 {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()

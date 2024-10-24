@@ -122,6 +122,8 @@ import java.util.Scanner
 import kotlin.collections.set
 import kotlin.math.roundToInt
 
+const val IK_FOLDER = ".ik"
+
 //region Type alias
 // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
 typealias MergedContactDictionary = Map<String, Map<String, MergedContact>>
@@ -340,14 +342,14 @@ fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: B
         val folder = inputList.removeFirst()
 
         val children = if (folder.isManaged()) {
-            outputList.add(folder.copyFromRealm(depth = 1u))
+            if (folder.name != IK_FOLDER) outputList.add(folder.copyFromRealm(depth = 1u))
             with(folder.children) {
                 (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
                     .sortFolders()
                     .find()
             }
         } else {
-            outputList.add(folder)
+            if (folder.name != IK_FOLDER) outputList.add(folder)
             (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children)
                 .sortFolders()
         }

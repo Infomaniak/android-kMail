@@ -127,11 +127,11 @@ object ApiRoutes {
     }
 
     fun folders(mailboxUuid: String): String {
-        return "${mailMailbox(mailboxUuid)}/folder"
+        return "${mailMailbox(mailboxUuid)}/folder?with=ik-static"
     }
 
     private fun folder(mailboxUuid: String, folderId: String): String {
-        return "${folders(mailboxUuid)}/$folderId"
+        return "${mailMailbox(mailboxUuid)}/folder/$folderId"
     }
 
     fun flushFolder(mailboxUuid: String, folderId: String): String {

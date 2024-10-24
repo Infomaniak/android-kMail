@@ -66,7 +66,7 @@ class FolderViewHolder(
         }
 
         val unread = when (folder.role) {
-            FolderRole.DRAFT -> UnreadDisplay(count = folder.threads.count())
+            FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS -> UnreadDisplay(count = folder.threads.count())
             FolderRole.SENT, FolderRole.TRASH -> UnreadDisplay(count = 0)
             else -> folder.unreadCountDisplay
         }

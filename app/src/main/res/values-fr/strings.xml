@@ -135,6 +135,7 @@
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateAccount">Créer un compte</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
+    <string name="buttonCustomSchedule">Horaire personnalisé</string>
     <string name="buttonDetachMailbox">détacher l’adresse</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
@@ -149,6 +150,7 @@
     <string name="buttonLogInDifferentAccount">Me connecter avec un autre compte</string>
     <string name="buttonLogin">Se connecter</string>
     <string name="buttonMaybe">Peut-être</string>
+    <string name="buttonModify">Modifier</string>
     <string name="buttonMore">Plus</string>
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
     <string name="buttonNewMessage">Nouveau message</string>
@@ -156,8 +158,10 @@
     <string name="buttonOpenMyCalendar">Ouvrir dans mon calendrier</string>
     <string name="buttonRefuse">Refuser</string>
     <string name="buttonRequestPassword">Demander le mot de passe</string>
+    <string name="buttonReschedule">Reprogrammer</string>
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
     <string name="buttonSchedule">Programmer l’envoi de l’e-mail</string>
+    <string name="buttonScheduleTitle">Programmer</string>
     <string name="buttonSee">Consulter</string>
     <string name="buttonSelectAll">Tout</string>
     <string name="buttonShare">Partager</string>
@@ -187,6 +191,7 @@
     <string name="contactMe">Moi</string>
     <string name="contactsSearch">Contacts</string>
     <string name="contentDescriptionAccountSelection">Compte sélectionné</string>
+    <string name="contentDescriptionActionIcon">Icône d\'action</string>
     <string name="contentDescriptionButtonBack">Retour</string>
     <string name="contentDescriptionButtonDelete">Supprimer %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
@@ -217,6 +222,9 @@
     <string name="contentDescriptionIconReply">Réponse</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
+    <string name="contentDescriptionScheduleIcon">Icône de programmation</string>
+    <string name="contentDescriptionScheduleSendIcon">Message programmé</string>
+    <string name="contentDescriptionScheduleText">Date programmée</string>
     <string name="contentDescriptionSelectedItem">Sélectionné</string>
     <string name="contentDescriptionUnreadPastille">Ce dossier contient des messages non lus</string>
     <string name="contentDescriptionUserAvatar">Avatar de l’utilisateur</string>
@@ -233,8 +241,11 @@
     <string name="createFolderName">Nom du dossier</string>
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>
+    <string name="datePickerTitle">Choisir une date et une heure</string>
     <string name="dateTitle">Date :</string>
     <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
+    <string name="disabledFeatureFlagDescription">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me \n(limite de stockage, horaire personnalisé, envoi et plus encore...)</string>
+    <string name="disabledFeatureFlagTitle">Besoin de plus de stockage et de fonctionnalités ?</string>
     <string name="displayMailIssueDescription">Pour corriger les problèmes d’affichage, veuillez mettre à jour l’application Android System Webview.</string>
     <string name="displayMailIssueTitle">Problème d’affichage de vos e-mails</string>
     <string name="draftFolder">Brouillons</string>
@@ -312,6 +323,8 @@
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="inboxFolder">Boîte de réception</string>
+    <string name="lastSelectedSchedule">Dernier horaire choisi</string>
+    <string name="laterThisMorning">Plus tard ce matin</string>
     <string name="linkingWord">et</string>
     <string name="loadingText">Chargement…</string>
     <string name="lockedMailboxBottomSheetDescription">L’accès à votre adresse mail est actuellement bloqué.\nPour plus d’informations, consultez les FAQ.</string>
@@ -333,6 +346,8 @@
     <string name="messageIsDraftOption">Brouillon</string>
     <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
     <string name="messageShowQuotedText">Afficher la conversation</string>
+    <string name="mondayAfternoon">Lundi après-midi</string>
+    <string name="mondayMorning">Lundi matin</string>
     <string name="moreStorageText1">Votre boîte est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
     <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
     <string name="moreStorageTitle">Votre boîte est pleine ? Obtenez plus de stockage !</string>
@@ -356,6 +371,7 @@
         <item quantity="many">%d de nouveaux messages</item>
     </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
+    <string name="nextMonday">Lundi prochain</string>
     <string name="noBodyTitle">Ce message est vide.</string>
     <string name="noConversationSelected">Aucune conversation sélectionnée dans %s</string>
     <string name="noFolderTitle">Vous n’avez pas encore de dossier…</string>
@@ -403,6 +419,8 @@
     <string name="reviewAlertTitle">Aimez-vous Infomaniak Mail ?</string>
     <string name="saveToDriveDeviceItem">Enregistrer sur l’appareil</string>
     <string name="saveToDriveItem">Enregistrer dans kDrive</string>
+    <string name="scheduleSendingTitle">Programmer l’envoi</string>
+    <string name="scheduledEmailHeader">Cet e-mail sera envoyé à cette date : %s</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>
     <string name="searchAllMessages">Tous les messages</string>
     <string name="searchFieldPlaceholder">Rechercher un message</string>
@@ -411,7 +429,9 @@
     <string name="searchFilterRead">Lus</string>
     <string name="searchFilterUnread">Non lus</string>
     <string name="searchFolderName">Recherche</string>
+    <string name="selectDateDialogTitle">Sélectionner la date</string>
     <string name="selectSignatureNone">Aucune signature</string>
+    <string name="selectTimeDialogTitle">Sélectionner l\'heure</string>
     <string name="send">Envoyer</string>
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>
@@ -553,6 +573,8 @@
     <string name="syncInstallDescription">Pour pouvoir télécharger l’application kSync sur le Play Store, cliquez sur \"Installer\" puis revenez sur votre application Mail.</string>
     <string name="syncInstalled">Installée</string>
     <string name="syncStartDescription">Activez les calendriers et carnets d’adresses dans kSync, que vous souhaitez synchroniser sur votre téléphone.</string>
+    <string name="thisAfternoon">Cet après-midi</string>
+    <string name="thisEvening">Ce soir</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Êtes-vous sûr de vouloir supprimer ce message définitivement ?</item>
         <item quantity="other">Êtes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
@@ -585,6 +607,7 @@
         <item quantity="other">Mes comptes</item>
     </plurals>
     <string name="toTitle">À :</string>
+    <string name="tomorrowMorning">Demain matin</string>
     <string name="tooManyRecipients">Vous ne pouvez pas ajouter cette adresse car vous avez atteint la limite de destinataires</string>
     <string name="trashFolder">Corbeille</string>
     <string name="unknownRecipientTitle">(inconnu)</string>
