@@ -52,8 +52,6 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
         val iconDrawable = AppCompatResources.getDrawable(requireContext(), navigationArgs.attachmentType.icon)
         binding.icon.setImageDrawable(iconDrawable)
 
-        downloadAttachment()
-
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(navigationArgs.attachmentName)
             .setView(binding.root)
@@ -66,8 +64,13 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
             .create()
     }
 
+    override fun onStart() {
+        super.onStart()
+        downloadAttachment()
+    }
+
     private fun downloadAttachment() {
-        downloadAttachmentViewModel.downloadAttachment().observe(viewLifecycleOwner) { cachedAttachment ->
+        downloadAttachmentViewModel.downloadAttachment().observe(this) { cachedAttachment ->
             if (cachedAttachment == null) {
                 popBackStackWithError()
             } else {
@@ -79,7 +82,7 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
     }
 
     private fun popBackStackWithError() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             mainViewModel.isNetworkAvailable.first { it != null }?.let { isNetworkAvailable ->
                 showSnackbar(title = if (isNetworkAvailable) R.string.anErrorHasOccurred else R.string.noConnection)
                 findNavController().popBackStack()
