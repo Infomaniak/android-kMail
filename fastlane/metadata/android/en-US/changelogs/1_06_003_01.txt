@@ -1,0 +1,1 @@
+- Fix memory issue when opening mail with a long body

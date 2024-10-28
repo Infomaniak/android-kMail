@@ -1,0 +1,1 @@
+- Correction d'un problème de mémoire lors de l'ouverture d'un courrier dont le corps est long
