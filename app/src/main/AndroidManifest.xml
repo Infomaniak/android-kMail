@@ -204,7 +204,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="@string/ATTACHMENTS_AUTHORITY"
+            android:authorities="@string/ALL_AUTHORITY"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
