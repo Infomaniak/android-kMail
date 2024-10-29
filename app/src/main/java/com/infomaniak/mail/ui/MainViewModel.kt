@@ -18,11 +18,11 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.util.Log
+import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.networking.NetworkAvailability
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -31,7 +31,6 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -67,6 +66,7 @@ import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.getIntentOrGoToPlayStore
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
@@ -78,7 +78,8 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import okhttp3.Request
+import java.io.File
+import java.io.IOException
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -1278,11 +1279,55 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun saveOnKDrive(messageUid: String, context: Context?) = viewModelScope.launch(ioCoroutineContext) {
+        val message = messageController.getMessage(messageUid) ?: return@launch
+        val mailbox = currentMailbox.value ?: return@launch
+
+        val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
+
+        if (!response.isSuccessful || response.body == null) {
+            reportDisplayProblemTrigger.postValue(Unit)
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+
+            return@launch
+        }
+
+        response.body?.bytes()?.let { byteArray ->
+            context?.let {
+                val uri = saveEmlToFile(context, byteArray, message.subject ?: "pas de nom test")
+                uri?.getIntentOrGoToPlayStore(it)
+            }
+        }
+
+    }
+
+    fun saveEmlToFile(context: Context, byteArray: ByteArray, fileName: String): Uri? {
+        val fileNameWithExtension = "$fileName.eml"
+        val fileDir = File(context.filesDir, "eml_export")
+
+        if (!fileDir.exists()) {
+            fileDir.mkdirs()
+        }
+
+        val file = File(fileDir, fileNameWithExtension)
+
+        return try {
+            file.outputStream().use { it.write(byteArray) }
+            FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
         private const val EML_CONTENT_TYPE = "message/rfc822"
+
+        private const val EML_EXPORT_DIR = "eml_export"
     }
 }
