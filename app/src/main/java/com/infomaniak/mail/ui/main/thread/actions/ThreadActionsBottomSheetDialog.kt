@@ -35,6 +35,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SAVE_KDRIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SHARE_LINK_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
@@ -193,6 +194,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                         trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
                         mainViewModel.shareThreadUrl(messageUidToReply)
                     }
+                }
+
+                override fun onSaveKDrive() {
+                    trackBottomSheetThreadActionsEvent(ACTION_SAVE_KDRIVE_NAME)
                 }
 
                 override fun onReportDisplayProblem() {
