@@ -21,6 +21,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
@@ -81,6 +82,14 @@ object AttachmentExtensions {
         }
     }
 
+    private fun Uri.saveToDriveIntent(): Intent {
+        return Intent().apply {
+            component = ComponentName(DRIVE_PACKAGE, SAVE_EXTERNAL_ACTIVITY_CLASS)
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, this@saveToDriveIntent)
+        }
+    }
+
     private fun Attachment.openWithIntent(context: Context): Intent {
         val file = getUploadLocalFile() ?: getCacheFile(context)
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), file)
@@ -102,6 +111,15 @@ object AttachmentExtensions {
         }
     }
 
+    // TODO Keep same logic
+    fun Uri.getIntentOrGoToPlayStore(context: Context) {
+        if (canSaveOnKDrive(context)) {
+            saveToDriveIntent().let(context::startActivity)
+        } else {
+            context.goToPlayStore(DRIVE_PACKAGE)
+        }
+    }
+
     fun Attachment.executeIntent(
         context: Context,
         intentType: AttachmentIntentType,
@@ -113,6 +131,7 @@ object AttachmentExtensions {
             navigateToDownloadProgressDialog(this, intentType)
         }
     }
+
 
     fun Attachment.openAttachment(
         context: Context,
