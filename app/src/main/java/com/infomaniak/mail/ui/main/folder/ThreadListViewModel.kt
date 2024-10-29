@@ -22,10 +22,10 @@ import android.text.format.DateUtils
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.webkit.WebViewCompat
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -66,25 +66,20 @@ class ThreadListViewModel @Inject constructor(
     }
 
     fun checkWebViewVersion(canShowWebViewOutdated: Boolean) {
-        val webViewPackage = WebViewCompat.getCurrentWebViewPackage(appContext)
-        val webViewPackageName = webViewPackage?.packageName
+        val versionData = getWebViewVersionData(appContext)
 
-        val (webViewVersionName, webViewMajorVersion) = webViewPackage?.versionName?.let { versionName ->
-            val majorVersion = runCatching {
-                versionName.substringBefore('.').toInt()
-            }.getOrDefault(defaultValue = DEFAULT_WEBVIEW_VERSION)
-
-            return@let versionName to majorVersion
-        } ?: (null to DEFAULT_WEBVIEW_VERSION)
-
-        val hasOutdatedMajorVersion = when (webViewPackageName) {
-            WEBVIEW_OFFICIAL_PACKAGE_NAME -> webViewMajorVersion < WEBVIEW_OFFICIAL_MIN_VERSION
-            else -> false // We'll add other package names in the future if needed here
+        val hasOutdatedMajorVersion = if (versionData == null)
+            false
+        else {
+            when (versionData.webViewPackageName) {
+                WEBVIEW_OFFICIAL_PACKAGE_NAME -> versionData.majorVersion < WEBVIEW_OFFICIAL_MIN_VERSION
+                else -> false // We'll add other package names in the future if needed here
+            }
         }
 
         // TODO: (23/07) Remove this log in a few weeks/month if we don't have any Sentry anymore
         if (hasOutdatedMajorVersion) {
-            SentryDebug.sendWebViewVersionName(webViewPackageName, webViewVersionName, webViewMajorVersion)
+            SentryDebug.sendWebViewVersionName(versionData)
         }
         isWebViewOutdated.value = canShowWebViewOutdated && hasOutdatedMajorVersion
     }
@@ -92,6 +87,5 @@ class ThreadListViewModel @Inject constructor(
     companion object {
         private const val WEBVIEW_OFFICIAL_PACKAGE_NAME = "com.google.android.webview"
         private const val WEBVIEW_OFFICIAL_MIN_VERSION = 124
-        private const val DEFAULT_WEBVIEW_VERSION = 0
     }
 }

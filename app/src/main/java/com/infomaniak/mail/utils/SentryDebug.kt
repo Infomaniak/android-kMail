@@ -325,13 +325,13 @@ object SentryDebug {
         }
     }
 
-    fun sendWebViewVersionName(webViewPackageName: String?, webViewVersionName: String?, majorVersion: Int) {
+    fun sendWebViewVersionName(versionData: WebViewVersionUtils.WebViewVersionData?) {
         Sentry.captureMessage(
             "WebView version name might be null on some devices. Checking that the version name is ok.",
         ) { scope ->
-            scope.setTag("webViewPackageName", "$webViewPackageName")
-            scope.setTag("webViewVersionName", "$webViewVersionName")
-            scope.setTag("majorVersion", "$majorVersion")
+            scope.setTag("webViewPackageName", versionData?.webViewPackageName.toString())
+            scope.setTag("webViewVersionName", versionData?.versionName.toString())
+            scope.setTag("majorVersion", versionData?.majorVersion.toString())
         }
     }
     //endregion

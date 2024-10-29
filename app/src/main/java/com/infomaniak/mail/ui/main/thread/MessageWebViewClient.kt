@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import java.io.ByteArrayInputStream
@@ -105,12 +106,18 @@ class MessageWebViewClient(
         runCatchingRealm {
             val widthInDp = webView.width.toDp()
             if (widthInDp <= 0) {
+                val versionData = getWebViewVersionData(context)
+
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.WARNING
                     scope.setExtra("width", webView.width.toString())
                     scope.setExtra("measuredWidth", webView.measuredWidth.toString())
                     scope.setExtra("height", webView.height.toString())
                     scope.setExtra("measuredHeight", webView.measuredHeight.toString())
+                    scope.setTag(
+                        "webview version",
+                        "${versionData?.webViewPackageName}: ${versionData?.versionName} - ${versionData?.majorVersion}"
+                    )
                     scope.setTag("visibility", webView.visibility.toString())
                     scope.setTag("messageUid", messageUid)
                     scope.setTag("shouldLoadDistantResources", shouldLoadDistantResources.toString())
