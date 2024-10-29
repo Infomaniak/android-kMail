@@ -451,6 +451,15 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
     }
 
+    fun getDownloadedAttachment(mailboxUuid: String, folderId: String, shortUid: Int): Response {
+        val request = Request.Builder().url(ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid))
+            .headers(HttpUtils.getHeaders(null))
+            .get()
+            .build()
+
+        return HttpClient.okHttpClient.newCall(request).execute()
+    }
+
     fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
         return ApiController.callApi(
             url = MyKSuiteApiRoutes.myKSuiteData(),
