@@ -32,6 +32,8 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import java.io.ByteArrayInputStream
 
 class MessageWebViewClient(
@@ -101,7 +103,22 @@ class MessageWebViewClient(
 
     override fun onPageFinished(webView: WebView, url: String?) {
         runCatchingRealm {
-            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth(${webView.width.toDp()}, '$messageUid')")
+            val widthInDp = webView.width.toDp()
+            if (widthInDp <= 0) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.WARNING
+                    scope.setExtra("width", webView.width.toString())
+                    scope.setExtra("measuredWidth", webView.measuredWidth.toString())
+                    scope.setExtra("height", webView.height.toString())
+                    scope.setExtra("measuredHeight", webView.measuredHeight.toString())
+                    scope.setTag("visibility", webView.visibility.toString())
+                    scope.setTag("messageUid", messageUid)
+                    scope.setTag("shouldLoadDistantResources", shouldLoadDistantResources.toString())
+                    Sentry.captureMessage("Zero width webview detected onPageFinished which prevents message width's normalization")
+                }
+            }
+
+            webView.loadUrl("javascript:removeAllProperties(); normalizeMessageWidth($widthInDp, '$messageUid')")
             onPageFinished?.invoke()
         }
     }
