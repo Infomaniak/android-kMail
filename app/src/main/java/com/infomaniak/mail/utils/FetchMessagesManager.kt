@@ -53,6 +53,14 @@ class FetchMessagesManager @Inject constructor(
 
     private lateinit var coroutineScope: CoroutineScope
 
+    private fun shouldLogToSentry(throwable: Throwable?): Boolean {
+        return when (throwable) {
+            is CancellationException, is NetworkException -> false
+            is ApiErrorException -> throwable.errorCode != ErrorCode.ACCESS_DENIED
+            else -> true
+        }
+    }
+
     // We can arrive here for Mailboxes we did not open yet. That's why we check before doing anything.
     suspend fun execute(
         scope: CoroutineScope,
@@ -96,7 +104,7 @@ class FetchMessagesManager @Inject constructor(
         ).let { (threads, throwable) ->
 
             if (threads == null) {
-                if (throwable !is CancellationException && throwable !is NetworkException) {
+                if (shouldLogToSentry(throwable)) {
                     SentryDebug.sendFailedNotification(
                         reason = "RefreshThreads failed",
                         sentryLevel = SentryLevel.ERROR,
