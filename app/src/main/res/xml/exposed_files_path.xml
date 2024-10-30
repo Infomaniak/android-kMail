@@ -25,10 +25,4 @@
     <files-path
         name="eml"
         path="eml_export" />
-    <!--<files-path-->
-    <!--    name="files"-->
-    <!--    path="/" />-->
-    <!--<external-path-->
-    <!--    name="extfiles"-->
-    <!--    path="/" />-->
 </paths>

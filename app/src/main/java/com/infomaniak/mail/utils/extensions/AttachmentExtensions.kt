@@ -111,8 +111,7 @@ object AttachmentExtensions {
         }
     }
 
-    // TODO Keep same logic
-    fun Uri.getIntentOrGoToPlayStore(context: Context) {
+    fun Uri.openKDriveOrPlayStore(context: Context) {
         if (canSaveOnKDrive(context)) {
             saveToDriveIntent().let(context::startActivity)
         } else {
@@ -131,7 +130,6 @@ object AttachmentExtensions {
             navigateToDownloadProgressDialog(this, intentType)
         }
     }
-
 
     fun Attachment.openAttachment(
         context: Context,
