@@ -66,7 +66,7 @@ import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.getIntentOrGoToPlayStore
+import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openKDriveOrPlayStore
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
@@ -1089,7 +1089,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun hasOtherExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
-        val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } ?: false
+        val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } == true
         emit(hasOtherExpeditors)
     }
 
@@ -1208,7 +1208,6 @@ class MainViewModel @Inject constructor(
         val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
 
         if (!response.isSuccessful || response.body == null) {
-            reportDisplayProblemTrigger.postValue(Unit)
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
 
             return@launch
@@ -1216,28 +1215,25 @@ class MainViewModel @Inject constructor(
 
         response.body?.bytes()?.let { byteArray ->
             context?.let {
-                val uri = saveEmlToFile(context, byteArray, message.subject ?: "pas de nom test")
-                uri?.getIntentOrGoToPlayStore(it)
+                val emlFileName: String = message.subject ?: NO_SUBJECT_FILE
+                val uri = saveEmlToFile(context, byteArray, emlFileName)
+                uri?.openKDriveOrPlayStore(it)
             }
         }
-
     }
 
-    fun saveEmlToFile(context: Context, byteArray: ByteArray, fileName: String): Uri? {
+    fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
         val fileNameWithExtension = "$fileName.eml"
-        val fileDir = File(context.filesDir, "eml_export")
+        val fileDir = File(context.filesDir, EML_EXPORT_DIR)
 
-        if (!fileDir.exists()) {
-            fileDir.mkdirs()
-        }
-
-        val file = File(fileDir, fileNameWithExtension)
+        if (!fileDir.exists()) fileDir.mkdirs()
 
         return try {
-            file.outputStream().use { it.write(byteArray) }
+            val file = File(fileDir, fileNameWithExtension)
+            file.outputStream().use { it.write(emlByteArray) }
             FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
-        } catch (e: IOException) {
-            e.printStackTrace()
+        } catch (_: IOException) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
             null
         }
     }
@@ -1248,8 +1244,9 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
-        private const val EML_CONTENT_TYPE = "message/rfc822"
 
+        private const val EML_CONTENT_TYPE = "message/rfc822"
         private const val EML_EXPORT_DIR = "eml_export"
+        private const val NO_SUBJECT_FILE = "message"
     }
 }
