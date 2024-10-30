@@ -132,11 +132,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
-                    if (input.isEmail()) {
-                        addRecipient(email = input, name = input)
-                    } else {
-                        snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
-                    }
+                    addRecipient(email = input, name = input)
                 },
                 snackbarManager = snackbarManager,
             )
@@ -311,6 +307,11 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addRecipient(email: String, name: String) {
+
+        if (!email.isEmail()) {
+            snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
+            return
+        }
 
         if (contactChipAdapter.itemCount > MAX_ALLOWED_RECIPIENT) {
             snackbarManager.setValue(context.getString(R.string.tooManyRecipients))
