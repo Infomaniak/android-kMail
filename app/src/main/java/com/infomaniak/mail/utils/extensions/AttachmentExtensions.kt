@@ -82,11 +82,11 @@ object AttachmentExtensions {
         }
     }
 
-    private fun Uri.saveToDriveIntent(): Intent {
+    private fun ArrayList<Uri>.saveToDriveIntent(): Intent {
         return Intent().apply {
             component = ComponentName(DRIVE_PACKAGE, SAVE_EXTERNAL_ACTIVITY_CLASS)
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_STREAM, this@saveToDriveIntent)
+            action = Intent.ACTION_SEND_MULTIPLE
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, this@saveToDriveIntent)
         }
     }
 
@@ -111,7 +111,7 @@ object AttachmentExtensions {
         }
     }
 
-    fun Uri.openKDriveOrPlayStore(context: Context) {
+    fun ArrayList<Uri>.openKDriveOrPlayStore(context: Context) {
         if (canSaveOnKDrive(context)) {
             saveToDriveIntent().let(context::startActivity)
         } else {

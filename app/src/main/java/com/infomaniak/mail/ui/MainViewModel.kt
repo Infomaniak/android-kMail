@@ -1299,25 +1299,28 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun saveOnKDrive(messageUid: String, context: Context?) = viewModelScope.launch(ioCoroutineContext) {
-        val message = messageController.getMessage(messageUid) ?: return@launch
+    fun saveOnKDrive(threadUid: String, context: Context?) = viewModelScope.launch(ioCoroutineContext) {
+        val thread = threadController.getThread(threadUid) ?: return@launch
         val mailbox = currentMailbox.value ?: return@launch
 
-        val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
+        val listUri: MutableList<Uri> = mutableListOf()
+        thread.messages.forEach { message ->
+            val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
 
-        if (!response.isSuccessful || response.body == null) {
-            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            if (!response.isSuccessful || response.body == null) {
+                snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
 
-            return@launch
-        }
+                return@launch
+            }
 
-        response.body?.bytes()?.let { byteArray ->
-            context?.let {
-                val emlFileName: String = message.subject ?: NO_SUBJECT_FILE
-                val uri = saveEmlToFile(context, byteArray, emlFileName)
-                uri?.openKDriveOrPlayStore(it)
+            response.body?.bytes()?.let { byteArray ->
+                context?.let {
+                    val emlFileName: String = message.subject ?: NO_SUBJECT_FILE
+                    saveEmlToFile(context, byteArray, emlFileName)?.let { listUri.add(it) }
+                }
             }
         }
+        context?.let { ArrayList(listUri).openKDriveOrPlayStore(it) }
     }
 
     fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
