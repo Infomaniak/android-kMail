@@ -198,7 +198,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onSaveKDrive() {
                     trackBottomSheetThreadActionsEvent(ACTION_SAVE_KDRIVE_NAME)
-                    mainViewModel.saveOnKDrive(messageUidToReply, context)
+                    mainViewModel.saveOnKDrive(threadUid, context)
                 }
 
                 override fun onReportDisplayProblem() {
