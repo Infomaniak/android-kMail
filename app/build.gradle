@@ -50,6 +50,9 @@ android {
         resValue 'string', 'EML_AUTHORITY', 'com.infomaniak.mail.eml'
         resValue 'string', 'FILES_AUTHORITY', 'com.infomaniak.mail.attachments;com.infomaniak.mail.eml'
 
+        resValue 'string', 'EXPOSED_EML_DIR', 'eml'
+        resValue 'string', 'EXPOSED_EML_PATH', 'eml_export'
+
         resourceConfigurations += ["en", "de", "es", "fr", "it"]
     }
 
