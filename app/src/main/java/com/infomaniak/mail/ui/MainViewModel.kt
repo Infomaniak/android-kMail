@@ -1299,28 +1299,33 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun saveOnKDrive(threadUid: String, context: Context?) = viewModelScope.launch(ioCoroutineContext) {
-        val thread = threadController.getThread(threadUid) ?: return@launch
-        val mailbox = currentMailbox.value ?: return@launch
+    fun saveOnKDrive(threadUid: List<String>, context: Context?) {
+        viewModelScope.launch(ioCoroutineContext) {
+            val mailbox = currentMailbox.value ?: return@launch
+            val listUri: MutableList<Uri> = mutableListOf()
 
-        val listUri: MutableList<Uri> = mutableListOf()
-        thread.messages.forEach { message ->
-            val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
+            threadUid.forEach {
+                val thread = threadController.getThread(it) ?: return@launch
 
-            if (!response.isSuccessful || response.body == null) {
-                snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+                thread.messages.forEach { message ->
+                    val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
 
-                return@launch
-            }
+                    if (!response.isSuccessful || response.body == null) {
+                        snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
 
-            response.body?.bytes()?.let { byteArray ->
-                context?.let {
-                    val emlFileName: String = message.subject ?: NO_SUBJECT_FILE
-                    saveEmlToFile(context, byteArray, emlFileName)?.let { listUri.add(it) }
+                        return@launch
+                    }
+
+                    response.body?.bytes()?.let { byteArray ->
+                        context?.let {
+                            val emlFileName: String = message.subject ?: NO_SUBJECT_FILE
+                            saveEmlToFile(context, byteArray, emlFileName)?.let { listUri.add(it) }
+                        }
+                    }
                 }
             }
+            context?.let { ArrayList(listUri).openKDriveOrPlayStore(it) }
         }
-        context?.let { ArrayList(listUri).openKDriveOrPlayStore(it) }
     }
 
     fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
