@@ -28,6 +28,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SAVE_KDRIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
@@ -116,6 +117,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, threadsCount, isFromBottomSheet = true)
             toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
+            isMultiSelectOn = false
+        }
+        binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
+            trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+            saveOnKDrive(selectedThreadsUids, context)
             isMultiSelectOn = false
         }
     }
