@@ -78,7 +78,6 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.File
-import java.io.IOException
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -1322,21 +1321,23 @@ class MainViewModel @Inject constructor(
     }
 
     fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
-        val fileNameWithExtension = "$fileName.eml"
-        val fileDir = File(context.filesDir, EML_EXPORT_DIR)
+        val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
+        val fileDir = File(context.filesDir, context.getString(R.string.EXPOSED_EML_PATH))
 
         if (!fileDir.exists()) fileDir.mkdirs()
 
-        return try {
+        runCatching {
             val file = File(fileDir, fileNameWithExtension)
             file.outputStream().use { it.write(emlByteArray) }
-            FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
-        } catch (_: IOException) {
+            return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
+        }.onFailure { exception ->
+            exception.printStackTrace()
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-            null
         }
+        return null
     }
 
+    fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
@@ -1345,7 +1346,6 @@ class MainViewModel @Inject constructor(
         private const val MAX_REFRESH_DELAY = 6_000L
 
         private const val EML_CONTENT_TYPE = "message/rfc822"
-        private const val EML_EXPORT_DIR = "eml_export"
         private const val NO_SUBJECT_FILE = "message"
     }
 }
