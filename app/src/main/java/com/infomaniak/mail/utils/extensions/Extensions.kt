@@ -49,6 +49,7 @@ import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.WebSettingsCompat
@@ -114,6 +115,8 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import org.jsoup.nodes.Document
 import java.util.Calendar
@@ -489,7 +492,9 @@ fun Fragment.changeToolbarColorOnScroll(
         valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
             oldColor = color
             toolbar.setBackgroundColor(color)
-            if (shouldUpdateStatusBar()) requireActivity().window.statusBarColor = color
+            if (shouldUpdateStatusBar()) {
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { requireActivity().window.statusBarColor = color }
+            }
             otherUpdates?.invoke(color)
         }
     }
