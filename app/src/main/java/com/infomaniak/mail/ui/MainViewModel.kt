@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
@@ -1254,7 +1253,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getAllFileNameInExportEmlDir(context: Context): List<String> {
-        val fileDir = File(context.filesDir, context.getString(R.string.EXPOSED_EML_PATH))
+        val fileDir = File(context.cacheDir, context.getString(R.string.EXPOSED_EML_PATH))
 
         if (!fileDir.exists()) fileDir.mkdirs()
 
@@ -1263,7 +1262,7 @@ class MainViewModel @Inject constructor(
 
     private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
         val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
-        val fileDir = File(context.filesDir, context.getString(R.string.EXPOSED_EML_PATH))
+        val fileDir = File(context.cacheDir, context.getString(R.string.EXPOSED_EML_PATH))
 
         if (!fileDir.exists()) fileDir.mkdirs()
 
