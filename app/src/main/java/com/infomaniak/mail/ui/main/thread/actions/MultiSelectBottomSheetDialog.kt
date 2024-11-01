@@ -119,7 +119,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-            saveOnKDrive(selectedThreadsUids, context)
+            context?.let { saveOnKDrive(selectedThreadsUids, it) }
             isMultiSelectOn = false
         }
     }
