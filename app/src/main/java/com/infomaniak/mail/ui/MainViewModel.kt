@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
@@ -1299,13 +1300,16 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun saveOnKDrive(threadUid: List<String>, context: Context?) {
+    fun saveOnKDrive(threadUids: List<String>, context: Context) {
         viewModelScope.launch(ioCoroutineContext) {
             val mailbox = currentMailbox.value ?: return@launch
-            val listUri: MutableList<Uri> = mutableListOf()
+            val listUri = mutableListOf<Uri>()
+            val listFileName = mutableSetOf<String>().also {
+                it.addAll(getAllFileNameInExportEmlDir(context))
+            }
 
-            threadUid.forEach {
-                val thread = threadController.getThread(it) ?: return@launch
+            threadUids.forEach { threadUid ->
+                val thread = threadController.getThread(threadUid) ?: return@launch
 
                 thread.messages.forEach { message ->
                     val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
@@ -1316,19 +1320,38 @@ class MainViewModel @Inject constructor(
                         return@launch
                     }
 
-                    response.body?.bytes()?.let { byteArray ->
-                        context?.let {
-                            val emlFileName: String = message.subject ?: NO_SUBJECT_FILE
-                            saveEmlToFile(context, byteArray, emlFileName)?.let { listUri.add(it) }
-                        }
+                    var messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
+                    createOriginalFileName(messageSubject, listFileName).let { fileName ->
+                        listFileName.add(fileName)
+                        saveEmlToFile(context, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
                     }
                 }
             }
-            context?.let { ArrayList(listUri).openKDriveOrPlayStore(it) }
+            ArrayList(listUri).openKDriveOrPlayStore(context)
         }
     }
 
-    fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
+    // TODO Extract this code in core2
+    private fun createOriginalFileName(originalFileName: String, listFileName: MutableSet<String>): String {
+        var postfix = 1
+        var fileName = originalFileName
+
+        while (listFileName.contains(fileName)) {
+            fileName = "$originalFileName (${postfix++})"
+        }
+
+        return fileName
+    }
+
+    private fun getAllFileNameInExportEmlDir(context: Context): List<String> {
+        val fileDir = File(context.filesDir, context.getString(R.string.EXPOSED_EML_PATH))
+
+        if (!fileDir.exists()) fileDir.mkdirs()
+
+        return fileDir.listFiles()?.map { it.name.removeSuffix(".eml") } ?: emptyList()
+    }
+
+    private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
         val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
         val fileDir = File(context.filesDir, context.getString(R.string.EXPOSED_EML_PATH))
 
