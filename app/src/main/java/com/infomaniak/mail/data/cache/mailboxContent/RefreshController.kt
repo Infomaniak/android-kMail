@@ -596,7 +596,7 @@ class RefreshController @Inject constructor(
         // Add Sentry log and leave if the Message already exists
         if (existingMessage != null && !existingMessage.isOrphan()) {
             SentryLog.i(
-                TAG,
+                "Realm",
                 "Already existing message in folder ${folder.displayForSentry()} | threadMode = ${localSettings.threadMode}",
             )
             return true
@@ -817,8 +817,4 @@ class RefreshController @Inject constructor(
         val onStart: (() -> Unit),
         val onStop: (() -> Unit),
     )
-
-    companion object {
-        private val TAG = RefreshController::class.java.simpleName
-    }
 }
