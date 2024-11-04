@@ -14,16 +14,16 @@ kotlin = "1.9.22" # Doesn't build when bumped to 1.9.24 (waiting for Kotlin 2.0)
 junitVersion = "1.2.1"
 ksp = "1.9.22-1.0.17"
 leakcanaryAndroid = "2.12"
-lifecycleProcess = "2.8.6"
-lottie = "6.5.2"
+lifecycleProcess = "2.8.7"
+lottie = "6.6.0"
 navigation = "2.7.7" # Doesn't build when bumped to 2.8.0 (waiting for Kotlin 2.0)
-realmKotlin = "1.16.0"
+realmKotlin = "1.16.0" # Doesn't build when bumped to 2.0.0 (waiting for Kotlin 2.0)
 richHtmlEditor = "0.2.0"
 sentryAndroidFragment = "7.15.0"
 webkit = "1.12.1"
 workConcurrentFutures = "1.2.0"
-workRuntimeKtx = "2.9.1"
-coilSvg = "2.6.0"
+workRuntimeKtx = "2.9.1" # Doesn't build when bumped to 2.10.0 (waiting for Kotlin 2.0)
+coilSvg = "2.7.0"
 
 [libraries]
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
