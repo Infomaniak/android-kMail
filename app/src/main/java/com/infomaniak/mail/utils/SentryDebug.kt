@@ -22,7 +22,6 @@ import android.util.Log
 import androidx.navigation.NavController
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -30,7 +29,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
-import io.realm.kotlin.query.RealmResults
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -247,21 +245,6 @@ object SentryDebug {
             }
         }
         return orphanMessages
-    }
-
-    fun sendOrphanThreads(previousCursor: String?, folder: Folder, realm: TypedRealm): RealmResults<Thread> {
-        val orphanThreads = ThreadController.getOrphanThreads(realm)
-        if (orphanThreads.isNotEmpty()) {
-            Sentry.captureMessage("We found some orphan Threads.", SentryLevel.ERROR) { scope ->
-                scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
-                scope.setExtra("number of Threads", "${orphanThreads.count()}")
-                scope.setExtra("number of Messages", "${orphanThreads.map { it.messages.count() }}")
-                scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "${folder.cursor}")
-                scope.setExtra("folder", folder.displayForSentry())
-            }
-        }
-        return orphanThreads
     }
 
     fun sendOrphanDrafts(orphans: List<Draft>) {
