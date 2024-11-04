@@ -22,6 +22,7 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.SwissTransferFile
@@ -157,11 +158,9 @@ class Message : RealmObject {
 
     private val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
-    // TODO: When there is no more issue with the `_folders` backlink in the Thread model,
-    //  we will be able to replace this `first { … }` with `first()`.
     inline val folder
         get() = runCatching {
-            threads.single { it.folder.id == folderId }.folder
+            threads.single { it.folder.id == folderId || it.folder.id == FolderController.SEARCH_FOLDER_ID }.folder
         }.getOrElse { exception ->
             // TODO: I think this Sentry can't happen, but better safe than sorry. Weird possibilities are endless.
 
