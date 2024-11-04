@@ -1,0 +1,2 @@
+- Add some Sentry to better understand Message display improvements that still leave some overscroll
+- Optimize performances when expanding a long Thread

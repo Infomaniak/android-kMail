@@ -1,0 +1,2 @@
+- Ajout d'un Sentry pour mieux comprendre les potentielles améliorations d'affichage des Messages qui créent encore un peu d'overscroll
+- Optimisation des performances lors de l'expansion d'un long fil de discussion
