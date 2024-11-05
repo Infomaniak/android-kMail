@@ -22,6 +22,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
 import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
@@ -53,6 +54,15 @@ class SyncMailboxesWorker @AssistedInject constructor(
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         SentryLog.d(TAG, "Work launched")
+
+        // Refresh User
+        AccountUtils.updateCurrentUser()
+
+        // Refresh Mailboxes
+        SentryLog.d(TAG, "Refresh mailboxes from remote")
+        with(ApiRepository.getMailboxes()) {
+            if (isSuccess()) mailboxController.updateMailboxes(data!!)
+        }
 
         AccountUtils.getAllUsersSync().forEach { user ->
             mailboxController.getMailboxes(user.id).forEach { mailbox ->
