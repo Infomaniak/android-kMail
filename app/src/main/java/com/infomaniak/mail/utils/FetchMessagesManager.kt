@@ -138,11 +138,9 @@ class FetchMessagesManager @Inject constructor(
             if (mailboxGroupNotifications.size == 1) cancel(mailbox.notificationGroupId)
         }
 
-        /**
-         * When we fetched Messages, we didn't find any new Message.
-         * It means we already got them all when we received a previous notification.
-         * We can leave safely.
-         */
+        // When we fetched Messages, we didn't find any new Message.
+        // It means we already got them all when we received a previous notification.
+        // We can leave safely.
         if (threadsWithNewMessages.isEmpty()) {
             realm.close()
             return

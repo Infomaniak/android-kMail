@@ -98,6 +98,14 @@ class RefreshController @Inject constructor(
 
         val folder = FolderController.getFolder(folderId, realm)!!
 
+        // If the Mailbox is invalid (i.e. the mailbox is locked or its password is wrong),
+        // we'll be denied permission to fetch it by the API, so we don't even try to do it.
+        // We can leave safely.
+        if (!mailbox.isValid) {
+            SentryLog.w("API", "Refresh threads: We left early because of a predictable denied access.")
+            return emptySet<Thread>() to null
+        }
+
         SentryLog.i("API", "Refresh threads with mode: $refreshMode | (${folder.displayForSentry()})")
 
         refreshThreadsJob?.cancel()
