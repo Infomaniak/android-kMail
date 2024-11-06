@@ -76,8 +76,12 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         }
 
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
-            // If the Mailbox doesn't exist in Realm anymore, it means it's not attached to this User anymore.
-            // We can leave safely.
+            // If the Mailbox doesn't exist in Realm, it's either because :
+            // - The Mailbox isn't attached to this User anymore.
+            // - The user POSSIBLY recently added this new Mailbox on its account, via the Infomaniak
+            //   WebMail or somewhere else. We need to wait until the user opens the app again to
+            //   fetch this new Mailbox. Then, we'll be able to handle Notifications for this Mailbox.
+            // Either way, we can leave safely.
             return@withContext Result.success()
         }
 
