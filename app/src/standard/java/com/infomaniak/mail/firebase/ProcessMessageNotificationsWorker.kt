@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.FetchMessagesManager
+import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
@@ -45,6 +46,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
     private val mailboxController: MailboxController,
+    private val notificationUtils: NotificationUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseProcessMessageNotificationsWorker(appContext, params) {
 
@@ -63,21 +65,20 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             SentryDebug.sendFailedNotification("No messageUid in Notification", SentryLevel.ERROR, userId, mailboxId)
             return@withContext Result.success()
         }
+
+        // Refresh current User and its Mailboxes
+        notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
+
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
-            // If the Mailbox doesn't exist in Realm, it's POSSIBLY because the user recently added
-            // this new Mailbox on its account, via the Infomaniak WebMail or somewhere else.
-            // We need to wait until the user opens the app again to fetch this new Mailbox.
-            // Then, we'll be able to handle Notifications for this Mailbox.
-            // Until then, we can leave safely.
-            SentryDebug.sendFailedNotification(
-                reason = "Received Notif: no Mailbox in Realm",
-                sentryLevel = SentryLevel.ERROR,
-                userId = userId,
-                mailboxId = mailboxId,
-                messageUid = messageUid,
-            )
+            // If the Mailbox doesn't exist in Realm, it's either because :
+            // - The Mailbox isn't attached to this User anymore.
+            // - The user POSSIBLY recently added this new Mailbox on its account, via the Infomaniak
+            //   WebMail or somewhere else. We need to wait until the user opens the app again to
+            //   fetch this new Mailbox. Then, we'll be able to handle Notifications for this Mailbox.
+            // Either way, we can leave safely.
             return@withContext Result.success()
         }
+
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
 
         return@withContext runCatching {
@@ -119,6 +120,8 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     }
 
     companion object {
+        private const val TAG = "ProcessMessageNotificationsWorker"
+
         private const val USER_ID_KEY = "userIdKey"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
         private const val MESSAGE_UID_KEY = "messageUidKey"
