@@ -184,7 +184,7 @@ class Message : RealmObject {
                 scope.setExtra("exception", exception.message.toString())
             }
 
-            threads.first().folder
+            return@getOrElse (threads.firstOrNull { it.folder.id == folderId } ?: threads.first()).folder
         }
 
     inline val sender get() = from.firstOrNull()
