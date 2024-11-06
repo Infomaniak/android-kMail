@@ -22,11 +22,11 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
 import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FetchMessagesManager
+import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -49,20 +49,15 @@ class SyncMailboxesWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
     private val mailboxController: MailboxController,
+    private val notificationUtils: NotificationUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
         SentryLog.d(TAG, "Work launched")
 
-        // Refresh User
-        AccountUtils.updateCurrentUser()
-
-        // Refresh Mailboxes
-        SentryLog.d(TAG, "Refresh mailboxes from remote")
-        with(ApiRepository.getMailboxes()) {
-            if (isSuccess()) mailboxController.updateMailboxes(data!!)
-        }
+        // Refresh current User and its Mailboxes
+        notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
         AccountUtils.getAllUsersSync().forEach { user ->
             mailboxController.getMailboxes(user.id).forEach { mailbox ->

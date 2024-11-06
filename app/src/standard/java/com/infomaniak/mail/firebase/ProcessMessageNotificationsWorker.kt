@@ -21,13 +21,12 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FetchMessagesManager
+import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
@@ -47,6 +46,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
     private val mailboxController: MailboxController,
+    private val notificationUtils: NotificationUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseProcessMessageNotificationsWorker(appContext, params) {
 
@@ -66,14 +66,8 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             return@withContext Result.success()
         }
 
-        // Refresh User
-        AccountUtils.updateCurrentUser()
-
-        // Refresh Mailboxes
-        SentryLog.d(TAG, "Refresh mailboxes from remote")
-        with(ApiRepository.getMailboxes()) {
-            if (isSuccess()) mailboxController.updateMailboxes(data!!)
-        }
+        // Refresh current User and its Mailboxes
+        notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
             // If the Mailbox doesn't exist in Realm, it's either because :

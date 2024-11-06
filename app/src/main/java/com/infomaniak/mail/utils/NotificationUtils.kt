@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -304,6 +305,17 @@ class NotificationUtils @Inject constructor(
         addAction(archiveAction)
         addAction(deleteAction)
         addAction(replyAction)
+    }
+
+    suspend fun updateUserAndMailboxes(mailboxController: MailboxController, tag: String) {
+        // Refresh User
+        AccountUtils.updateCurrentUser()
+
+        // Refresh Mailboxes
+        SentryLog.d(tag, "Refresh mailboxes from remote")
+        with(ApiRepository.getMailboxes()) {
+            if (isSuccess()) mailboxController.updateMailboxes(data!!)
+        }
     }
 
     companion object : NotificationUtilsCore() {
