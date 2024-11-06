@@ -502,14 +502,23 @@ class NewMessageViewModel @Inject constructor(
     private fun getLatestLocalDraft(localUuid: String?) = localUuid?.let(draftController::getDraft)?.copyFromRealm()
 
     private fun fetchDraft(): Draft? {
-        return ApiRepository.getDraft(draftResource!!).data?.also {
+        return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
+
+            /**
+             * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail),
+             * we need to set all of its Attachments to `FINISHED`, so we don't try to upload them again.
+             */
+            draft.attachments.forEach {
+                it.setUploadStatus(UploadStatus.FINISHED, draft, "fetchDraft at NewMessage opening")
+            }
+
             /**
              * If we are opening for the 1st time an existing Draft created somewhere else
              * (ex: webmail), we need to create the link between the Draft and its Message.
              * - The link in the Draft is added here, when creating the Draft.
              * - The link in the Message is added later, when saving the Draft.
              */
-            it.initLocalValues(messageUid!!)
+            draft.initLocalValues(messageUid!!)
         }
     }
 
