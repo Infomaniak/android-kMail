@@ -292,7 +292,7 @@ class RefreshController @Inject constructor(
 
         updateMailboxUnreadCount(inboxUnreadCount)
 
-        sendSentryOrphans(folder, previousCursor)
+        sendOrphanMessages(folder, previousCursor)
     }
 
     private suspend fun Realm.fetchAllNewPages(scope: CoroutineScope, folderId: String): Set<Thread> {
@@ -347,7 +347,7 @@ class RefreshController @Inject constructor(
             }
         }
 
-        sendSentryOrphans(folder)
+        sendOrphanMessages(folder)
 
         return impactedThreads
     }
@@ -745,17 +745,11 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.sendSentryOrphans(folder: Folder, previousCursor: String? = null) {
+    private suspend fun Realm.sendOrphanMessages(folder: Folder, previousCursor: String? = null) {
         write {
             val upToDateFolder = getUpToDateFolder(folder.id)
             SentryDebug.sendOrphanMessages(previousCursor, folder = upToDateFolder, realm = this).also { orphans ->
                 MessageController.deleteMessages(appContext, mailbox, orphans, realm = this)
-            }
-            SentryDebug.sendOrphanThreads(previousCursor, folder = upToDateFolder, realm = this).also { orphans ->
-                orphans.forEach { thread ->
-                    MessageController.deleteMessages(appContext, mailbox, thread.messages, realm = this)
-                }
-                delete(orphans)
             }
         }
     }
