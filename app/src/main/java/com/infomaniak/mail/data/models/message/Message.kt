@@ -158,11 +158,11 @@ class Message : RealmObject {
 
     private val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
+    // TODO: Remove this `runCatching / getOrElse` when the issue is fixed
     inline val folder
         get() = runCatching {
             threads.single { it.folder.id == folderId || it.folder.id == FolderController.SEARCH_FOLDER_ID }.folder
         }.getOrElse { exception ->
-            // TODO: I think this Sentry can't happen, but better safe than sorry. Weird possibilities are endless.
 
             val reason = when {
                 threads.isEmpty() -> "no parent Threads" // Message has 0 parent threads
