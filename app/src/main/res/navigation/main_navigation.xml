@@ -665,6 +665,6 @@
         android:id="@+id/accountBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialog"
         android:label="AccountBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_account"/>
+        tools:layout="@layout/bottom_sheet_account" />
 
 </navigation>
