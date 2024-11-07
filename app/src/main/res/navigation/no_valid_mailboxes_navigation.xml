@@ -27,21 +27,12 @@
         android:label="NoValidMailboxesFragment"
         tools:layout="@layout/fragment_no_valid_mailboxes">
         <action
-            android:id="@+id/action_noValidMailboxesFragment_to_switchUserFragment"
-            app:destination="@id/switchUserFragment" />
-        <action
             android:id="@+id/action_noValidMailboxesFragment_to_attachMailboxFragment"
             app:destination="@id/attachMailboxFragment" />
         <action
             android:id="@+id/action_noValidMailboxesFragment_to_invalidPasswordFragment"
             app:destination="@id/invalidPasswordFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/switchUserFragment"
-        android:name="com.infomaniak.mail.ui.main.user.SwitchUserFragment"
-        android:label="SwitchUserFragment"
-        tools:layout="@layout/fragment_switch_user" />
 
     <fragment
         android:id="@+id/attachMailboxFragment"
@@ -64,5 +55,11 @@
             android:name="mailboxEmail"
             app:argType="string" />
     </fragment>
+
+    <dialog
+        android:id="@+id/accountBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialog"
+        android:label="AccountBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_account" />
 
 </navigation>

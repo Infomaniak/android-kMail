@@ -84,7 +84,7 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
         changeAccountButton.setOnClickListener {
             trackNoValidMailboxesEvent("switchAccount")
-            safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToSwitchUserFragment())
+            safeNavigate(resId = R.id.accountBottomSheetDialog)
         }
 
         attachNewMailboxButton.setOnClickListener {
