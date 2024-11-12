@@ -28,13 +28,21 @@ class UrlTraceInterceptor : Interceptor {
         var request = chain.request()
 
         val requestContextId = UUID.randomUUID().toString()
-        SentryDebug.addUrlBreadcrumb(request.url.toString(), requestContextId)
 
         request.newBuilder().apply {
             header("x-infomaniak-request-context-id", requestContextId)
             request = build()
         }
 
-        return chain.proceed(request)
+        val response = runCatching {
+            chain.proceed(request)
+        }.onFailure {
+            SentryDebug.addUrlBreadcrumb(request.url.toString(), requestContextId, null)
+            throw it
+        }.getOrThrow()
+
+        SentryDebug.addUrlBreadcrumb(request.url.toString(), requestContextId, response.code)
+
+        return response
     }
 }

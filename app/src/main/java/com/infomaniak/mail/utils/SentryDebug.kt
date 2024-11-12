@@ -61,12 +61,13 @@ object SentryDebug {
         previousDestinationName = newDestinationName
     }
 
-    fun addUrlBreadcrumb(url: String, requestContextId: String) {
+    fun addUrlBreadcrumb(url: String, requestContextId: String, responseCode: Int?) {
         addInfoBreadcrumb(
             category = "API",
             data = mapOf(
                 "url" to url,
                 "requestContextId" to requestContextId,
+                "responseCode" to responseCode.toString(),
             ),
         )
     }
