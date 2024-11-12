@@ -1,4 +1,3 @@
-- Amélioration du chargement des messages dans les longs fils de discussion
 - Amélioration du timing de la récupération des messages
 - Correction d'un problème avec les pièces jointes distantes
 - Vérification que l'application est dans des conditions correctes avant de récupérer les notifications

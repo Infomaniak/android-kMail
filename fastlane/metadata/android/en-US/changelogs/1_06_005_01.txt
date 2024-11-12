@@ -1,4 +1,3 @@
-- Better loading of Messages in long Threads
 - Enhance timing of Messages fetching
 - Fix issue with remote Attachments
 - Make sure the app is in correct conditions before fetching Notifications
