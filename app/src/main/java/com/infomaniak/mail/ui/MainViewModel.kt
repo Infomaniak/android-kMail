@@ -1319,8 +1319,8 @@ class MainViewModel @Inject constructor(
                         return@launch
                     }
 
-                    var messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
-                    createOriginalFileName(messageSubject, listFileName).let { fileName ->
+                    val messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
+                    createOriginalFileName(messageSubject, listFileName.toList()).let { fileName ->
                         listFileName.add(fileName)
                         saveEmlToFile(context, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
                     }
@@ -1331,7 +1331,7 @@ class MainViewModel @Inject constructor(
     }
 
     // TODO Extract this code in core2
-    private fun createOriginalFileName(originalFileName: String, listFileName: MutableSet<String>): String {
+    private fun createOriginalFileName(originalFileName: String, listFileName: List<String>): String {
         var postfix = 1
         var fileName = originalFileName
 
