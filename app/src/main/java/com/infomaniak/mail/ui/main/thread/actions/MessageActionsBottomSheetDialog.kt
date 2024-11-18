@@ -40,6 +40,7 @@ import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
@@ -80,109 +81,113 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
             }
 
-            initOnClickListener(object : OnActionClick {
-                //region Main actions
-                override fun onReply() {
-                    trackBottomSheetMessageActionsEvent(ACTION_REPLY_NAME)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.REPLY,
-                        previousMessageUid = messageUid,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-                    )
-                }
-
-                override fun onReplyAll() {
-                    trackBottomSheetMessageActionsEvent(ACTION_REPLY_ALL_NAME)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.REPLY_ALL,
-                        previousMessageUid = messageUid,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-                    )
-                }
-
-                override fun onForward() {
-                    trackBottomSheetMessageActionsEvent(ACTION_FORWARD_NAME)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.FORWARD,
-                        previousMessageUid = messageUid,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
-                    )
-                }
-
-                override fun onDelete() {
-                    descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
-                        trackBottomSheetMessageActionsEvent(ACTION_DELETE_NAME)
-                        mainViewModel.deleteMessage(threadUid, message)
-                    }
-                }
-                //endregion
-
-                //region Actions
-                override fun onArchive() {
-                    trackBottomSheetMessageActionsEvent(ACTION_ARCHIVE_NAME, message.folder.role == FolderRole.ARCHIVE)
-                    mainViewModel.archiveMessage(threadUid, message)
-                }
-
-                override fun onReadUnread() {
-                    trackBottomSheetMessageActionsEvent(ACTION_MARK_AS_SEEN_NAME, message.isSeen)
-                    mainViewModel.toggleMessageSeenStatus(threadUid, message)
-                    twoPaneViewModel.closeThread()
-                }
-
-                override fun onMove() {
-                    trackBottomSheetMessageActionsEvent(ACTION_MOVE_NAME)
-                    animatedNavigation(
-                        resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
-                        currentClassName = currentClassName,
-                    )
-                }
-
-                override fun onPostpone() {
-                    trackBottomSheetMessageActionsEvent(ACTION_POSTPONE_NAME)
-                    notYetImplemented()
-                }
-
-                override fun onFavorite() {
-                    trackBottomSheetMessageActionsEvent(ACTION_FAVORITE_NAME, message.isFavorite)
-                    mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
-                }
-
-                override fun onReportJunk() = Unit
-
-                override fun onPrint() {
-                    trackBottomSheetMessageActionsEvent(ACTION_PRINT_NAME)
-                    safeNavigate(
-                        resId = R.id.printMailFragment,
-                        args = PrintMailFragmentArgs(messageUid).toBundle(),
-                        currentClassName = MessageActionsBottomSheetDialog::class.java.name,
-                    )
-                }
-
-                override fun onShare() {
-                    activity?.apply {
-                        trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
-                        mainViewModel.shareThreadUrl(message.uid)
-                    }
-                }
-
-                override fun onSaveKDrive() {
-                    trackBottomSheetThreadActionsEvent(ACTION_SAVE_KDRIVE_NAME)
-                    context?.let { mainViewModel.saveOnKDrive(listOf(threadUid), it) }
-                }
-
-                override fun onReportDisplayProblem() {
-                    descriptionDialog.show(
-                        title = getString(R.string.reportDisplayProblemTitle),
-                        description = getString(R.string.reportDisplayProblemDescription),
-                        onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(message.uid) },
-                    )
-                }
-                //endregion
-            })
+            initActionClickListener(messageUid, message, threadUid)
         }
+    }
+
+    private fun initActionClickListener(messageUid: String, message: Message, threadUid: String) {
+        initOnClickListener(object : OnActionClick {
+            //region Main actions
+            override fun onReply() {
+                trackBottomSheetMessageActionsEvent(ACTION_REPLY_NAME)
+                safeNavigateToNewMessageActivity(
+                    draftMode = DraftMode.REPLY,
+                    previousMessageUid = messageUid,
+                    currentClassName = currentClassName,
+                    shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
+                )
+            }
+
+            override fun onReplyAll() {
+                trackBottomSheetMessageActionsEvent(ACTION_REPLY_ALL_NAME)
+                safeNavigateToNewMessageActivity(
+                    draftMode = DraftMode.REPLY_ALL,
+                    previousMessageUid = messageUid,
+                    currentClassName = currentClassName,
+                    shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
+                )
+            }
+
+            override fun onForward() {
+                trackBottomSheetMessageActionsEvent(ACTION_FORWARD_NAME)
+                safeNavigateToNewMessageActivity(
+                    draftMode = DraftMode.FORWARD,
+                    previousMessageUid = messageUid,
+                    currentClassName = currentClassName,
+                    shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
+                )
+            }
+
+            override fun onDelete() {
+                descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+                    trackBottomSheetMessageActionsEvent(ACTION_DELETE_NAME)
+                    mainViewModel.deleteMessage(threadUid, message)
+                }
+            }
+            //endregion
+
+            //region Actions
+            override fun onArchive() {
+                trackBottomSheetMessageActionsEvent(ACTION_ARCHIVE_NAME, message.folder.role == FolderRole.ARCHIVE)
+                mainViewModel.archiveMessage(threadUid, message)
+            }
+
+            override fun onReadUnread() {
+                trackBottomSheetMessageActionsEvent(ACTION_MARK_AS_SEEN_NAME, message.isSeen)
+                mainViewModel.toggleMessageSeenStatus(threadUid, message)
+                twoPaneViewModel.closeThread()
+            }
+
+            override fun onMove() {
+                trackBottomSheetMessageActionsEvent(ACTION_MOVE_NAME)
+                animatedNavigation(
+                    resId = R.id.moveFragment,
+                    args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
+                    currentClassName = currentClassName,
+                )
+            }
+
+            override fun onPostpone() {
+                trackBottomSheetMessageActionsEvent(ACTION_POSTPONE_NAME)
+                notYetImplemented()
+            }
+
+            override fun onFavorite() {
+                trackBottomSheetMessageActionsEvent(ACTION_FAVORITE_NAME, message.isFavorite)
+                mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
+            }
+
+            override fun onReportJunk() = Unit
+
+            override fun onPrint() {
+                trackBottomSheetMessageActionsEvent(ACTION_PRINT_NAME)
+                safeNavigate(
+                    resId = R.id.printMailFragment,
+                    args = PrintMailFragmentArgs(messageUid).toBundle(),
+                    currentClassName = MessageActionsBottomSheetDialog::class.java.name,
+                )
+            }
+
+            override fun onShare() {
+                activity?.apply {
+                    trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
+                    mainViewModel.shareThreadUrl(message.uid)
+                }
+            }
+
+            override fun onSaveKDrive() {
+                trackBottomSheetThreadActionsEvent(ACTION_SAVE_KDRIVE_NAME)
+                context?.let { mainViewModel.saveOnKDrive(listOf(threadUid), it) }
+            }
+
+            override fun onReportDisplayProblem() {
+                descriptionDialog.show(
+                    title = getString(R.string.reportDisplayProblemTitle),
+                    description = getString(R.string.reportDisplayProblemDescription),
+                    onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(message.uid) },
+                )
+            }
+            //endregion
+        })
     }
 }
