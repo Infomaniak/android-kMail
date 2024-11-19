@@ -76,7 +76,7 @@ class MailboxesAdapter(
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when {
-            !mailboxes[position].isValid -> DisplayType.INVALID_MAILBOX.layout
+            !mailboxes[position].isAvailable -> DisplayType.INVALID_MAILBOX.layout
             isInMenuDrawer -> DisplayType.MENU_DRAWER_MAILBOX.layout
             else -> DisplayType.SIMPLE_MAILBOX.layout
         }
@@ -127,7 +127,7 @@ class MailboxesAdapter(
 
         itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
 
-        isPasswordOutdated = !mailbox.isPasswordValid
+        isPasswordOutdated = !mailbox.hasValidPassword
         isMailboxLocked = mailbox.isLocked
         hasNoValidMailboxes = !hasValidMailboxes
 

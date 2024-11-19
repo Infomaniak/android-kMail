@@ -53,7 +53,7 @@ class InvalidPasswordViewModel @Inject constructor(
     fun updatePassword(password: String) = viewModelScope.launch(ioCoroutineContext) {
         val apiResponse = ApiRepository.updateMailboxPassword(mailbox.mailboxId, password)
         if (apiResponse.isSuccess()) {
-            mailboxController.updateMailbox(mailboxObjectId) { it.isPasswordValid = true }
+            mailboxController.updateMailbox(mailboxObjectId) { it.hasValidPassword = true }
             AccountUtils.switchToMailbox(mailbox.mailboxId)
         } else {
             updatePasswordResult.postValue(apiResponse.translateError())

@@ -152,8 +152,9 @@ class MailboxController @Inject constructor(
         //region Queries
         private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
 
-        private val isMailboxLocked = "${Mailbox::isLocked.name} == true"
-        private val hasValidPassword = "${Mailbox::isPasswordValid.name} == true"
+        private val isValidInLdap = "${Mailbox.isValidInLdapPropertyName} == true"
+        private val isLocked = "${Mailbox.isLockedPropertyName} == true"
+        private val hasValidPassword = "${Mailbox::hasValidPassword.name} == true"
 
         private fun getMailboxesQuery(
             userId: Int? = null,
@@ -179,7 +180,7 @@ class MailboxController @Inject constructor(
         }
 
         private fun getValidMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-            return realm.query("${checkHasUserId(userId)} AND $hasValidPassword AND (NOT $isMailboxLocked)")
+            return realm.query("${checkHasUserId(userId)} AND $isValidInLdap AND NOT $isLocked AND $hasValidPassword")
         }
 
         private fun getMailboxesCountQuery(userId: Int, realm: TypedRealm): RealmScalarQuery<Long> {
@@ -196,11 +197,11 @@ class MailboxController @Inject constructor(
         }
 
         private fun getInvalidPasswordMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-            return realm.query("${checkHasUserId(userId)} AND NOT ($hasValidPassword OR $isMailboxLocked)")
+            return realm.query("${checkHasUserId(userId)} AND NOT $hasValidPassword AND NOT $isLocked AND $isValidInLdap")
         }
 
         private fun getLockedMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-            return realm.query("${checkHasUserId(userId)} AND $isMailboxLocked")
+            return realm.query("${checkHasUserId(userId)} AND ($isLocked OR NOT $isValidInLdap)")
         }
         //endregion
 

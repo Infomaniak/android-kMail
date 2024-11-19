@@ -251,7 +251,7 @@ class MainViewModel @Inject constructor(
             mailboxId = AccountUtils.currentMailboxId,
         ) ?: return null
 
-        if (mailbox.isLocked || !mailbox.isPasswordValid) {
+        if (!mailbox.isAvailable) {
             switchToValidMailbox()
             return null
         }
