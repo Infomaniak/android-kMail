@@ -464,10 +464,7 @@ class MainActivity : BaseActivity() {
                 trackInAppUpdateEvent(if (isWantingUpdate) MatomoMail.DISCOVER_NOW else MatomoMail.DISCOVER_LATER)
             },
             onInstallStart = { trackInAppUpdateEvent("installUpdate") },
-            onInstallFailure = {
-                Sentry.captureException(it)
-                snackbarManager.setValue(getString(RCore.string.errorUpdateInstall))
-            },
+            onInstallFailure = { snackbarManager.setValue(getString(RCore.string.errorUpdateInstall)) },
             onInAppUpdateUiChange = { isUpdateDownloaded ->
                 SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
                 mainViewModel.canInstallUpdate.value = isUpdateDownloaded
