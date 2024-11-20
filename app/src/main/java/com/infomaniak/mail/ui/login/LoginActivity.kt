@@ -121,7 +121,7 @@ class LoginActivity : AppCompatActivity() {
                         context.trackUserInfo("nbMailboxes", mailboxes.count())
                         AccountUtils.addUser(user)
                         mailboxController.updateMailboxes(mailboxes)
-                        return@let if (mailboxes.none { it.isValid }) MailboxErrorCode.NO_VALID_MAILBOX else user
+                        return@let if (mailboxes.none { it.isAvailable }) MailboxErrorCode.NO_VALID_MAILBOX else user
                     } ?: run {
                         getErrorResponse(RCore.string.serverError)
                     }

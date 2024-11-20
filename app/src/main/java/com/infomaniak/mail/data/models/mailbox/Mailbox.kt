@@ -54,12 +54,14 @@ class Mailbox : RealmObject {
     var linkId: Int = 0
     @SerialName("is_limited")
     var isLimited: Boolean = false
-    @SerialName("is_password_valid")
-    var isPasswordValid: Boolean = true
     @SerialName("is_primary")
     var isPrimary: Boolean = false
+    @SerialName("is_valid")
+    private var _isValidInLdap: Boolean = true
     @SerialName("is_locked")
-    var isLocked: Boolean = false
+    private var _isLocked: Boolean = false
+    @SerialName("is_password_valid")
+    var hasValidPassword: Boolean = true
     @SerialName("unseen_messages")
     var unreadCountRemote: Int = 0
     var aliases = realmListOf<String>()
@@ -99,7 +101,8 @@ class Mailbox : RealmObject {
     inline val notificationGroupId get() = uuid.hashCode()
     inline val notificationGroupKey get() = uuid
 
-    inline val isValid get() = isPasswordValid && !isLocked
+    val isLocked get() = _isLocked || !_isValidInLdap
+    inline val isAvailable get() = !isLocked && hasValidPassword
 
     val unreadCountDisplay: UnreadDisplay
         get() = UnreadDisplay(
@@ -149,5 +152,10 @@ class Mailbox : RealmObject {
             clear()
             addAll(featureFlags)
         }
+    }
+
+    companion object {
+        val isValidInLdapPropertyName get() = Mailbox::_isValidInLdap.name
+        val isLockedPropertyName get() = Mailbox::_isLocked.name
     }
 }

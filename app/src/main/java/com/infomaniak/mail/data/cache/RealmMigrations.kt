@@ -18,6 +18,9 @@
 package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.utils.SentryDebug
+import io.realm.kotlin.dynamic.DynamicMutableRealmObject
+import io.realm.kotlin.dynamic.DynamicRealmObject
+import io.realm.kotlin.dynamic.getValue
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 
@@ -29,6 +32,7 @@ val USER_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
 val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
+    migrationContext.keepDefaultValuesAfterSixthMigration()
 }
 
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
@@ -39,4 +43,33 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
 // Migrate to version #1
 private fun MigrationContext.deleteRealmFromFirstMigration() {
     if (oldRealm.schemaVersion() < 1L) newRealm.deleteAll()
+}
+
+/**
+ * Migrate from version #6
+ *
+ * This whole migration needs to be done because of this issue :
+ * https://github.com/realm/realm-swift/issues/1793
+ *
+ * Yes the issue is on the Realm-Swift repository, but all Realm projects are impacted.
+ *
+ * Documentation to handle manual migrations :
+ * https://www.mongodb.com/docs/atlas/device-sdks/sdk/kotlin/realm-database/schemas/change-an-object-model/
+ */
+private fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
+    if (oldRealm.schemaVersion() <= 6L) {
+        enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+
+                // Add property with default value
+                set(propertyName = "_isValidInLdap", value = true)
+
+                // Rename property without losing its previous value
+                set(propertyName = "_isLocked", value = oldObject.getValue<Boolean>(fieldName = "isLocked"))
+
+                // Rename property without losing its previous value
+                set(propertyName = "hasValidPassword", value = oldObject.getValue<Boolean>(fieldName = "isPasswordValid"))
+            }
+        }
+    }
 }
