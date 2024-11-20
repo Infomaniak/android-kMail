@@ -95,7 +95,6 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
         return html?.let(::jsoupParseWithLog)
     }
 
-
     private fun computePreviousFullBody(previousBody: String, message: Message): String {
         return message.body?.let { body ->
             MessageBodyUtils.mergeSplitBodyAndSubBodies(previousBody, body.subBodies, message.uid)
