@@ -3,7 +3,7 @@ androidGradlePlugin = "8.7.2"
 coilSvg = "2.7.0"
 dotsindicator = "5.1.0"
 dragdropswipeRecyclerview = "1.2.0"
-firebaseMessagingKtx = "24.1.0" # Doesn't build when bumped to 24.0.0 (waiting for Kotlin 2.0)
+firebaseMessagingKtx = "24.1.0"
 flexbox = "3.0.0"
 googleServices = "4.4.2"
 hiltAndroid = "2.55"
@@ -11,20 +11,20 @@ hiltAndroidx = "1.2.0"
 jsoup = "1.18.3"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-kapt = "2.0.20" # Doesn't build when bumped to 1.9.24 (waiting for Kotlin 2.0)
-kotlin = "2.0.21" # Doesn't build when bumped to 1.9.24 (waiting for Kotlin 2.0)
+kapt = "2.0.20"
+kotlin = "2.0.21"
 ksp = "2.0.20-1.0.25"
 leakcanaryAndroid = "2.12"
 lifecycleProcess = "2.8.7"
 lottie = "6.6.2"
-navigation = "2.8.4" # Doesn't build when bumped to 2.8.0 (waiting for Kotlin 2.0)
+navigation = "2.8.4"
 playServices = "18.5.0"
 realmKotlin = "3.0.0"
 richHtmlEditor = "0.2.0"
 sentryAndroidFragment = "7.20.0"
 webkit = "1.12.1"
 workConcurrentFutures = "1.2.0"
-workRuntimeKtx = "2.10.0" # Doesn't build when bumped to 2.10.0 (waiting for Kotlin 2.0)
+workRuntimeKtx = "2.10.0"
 
 [libraries]
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilSvg" }
