@@ -1,4 +1,5 @@
 [versions]
+androidGradlePlugin = "8.7.2"
 coilSvg = "2.7.0"
 dotsindicator = "5.1.0"
 dragdropswipeRecyclerview = "1.2.0"
