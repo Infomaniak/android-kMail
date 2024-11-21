@@ -39,7 +39,7 @@ object WorkerUtils {
         tag: String,
         workManager: WorkManager,
         states: List<WorkInfo.State>,
-    ): LiveData<MutableList<WorkInfo>> {
+    ): LiveData<List<WorkInfo>> {
         val workQuery = WorkQuery.Builder.fromTags(listOf(tag)).addStates(states).build()
         return workManager.getWorkInfosLiveData(workQuery)
     }
