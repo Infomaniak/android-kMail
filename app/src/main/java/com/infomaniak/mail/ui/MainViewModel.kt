@@ -18,9 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.content.Context
-import android.net.Uri
-import androidx.core.content.FileProvider
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.NetworkAvailability
@@ -64,7 +61,6 @@ import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openKDriveOrPlayStore
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -77,7 +73,6 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.io.File
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -1299,76 +1294,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun saveOnKDrive(threadUids: List<String>, context: Context) {
-        viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = currentMailbox.value ?: return@launch
-            val listUri = mutableListOf<Uri>()
-            val listFileName = mutableSetOf<String>().also {
-                it.addAll(getAllFileNameInExportEmlDir(context))
-            }
-
-            threadUids.forEach { threadUid ->
-                val thread = threadController.getThread(threadUid) ?: return@launch
-
-                thread.messages.forEach { message ->
-                    val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
-
-                    if (!response.isSuccessful || response.body == null) {
-                        snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-
-                        return@launch
-                    }
-
-                    val messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
-                    createOriginalFileName(messageSubject, listFileName.toList()).let { fileName ->
-                        listFileName.add(fileName)
-                        saveEmlToFile(context, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
-                    }
-                }
-            }
-            ArrayList(listUri).openKDriveOrPlayStore(context)
-        }
-    }
-
-    // TODO Extract this code in core2
-    private fun createOriginalFileName(originalFileName: String, listFileName: List<String>): String {
-        var postfix = 1
-        var fileName = originalFileName
-
-        while (listFileName.contains(fileName)) {
-            fileName = "$originalFileName (${postfix++})"
-        }
-
-        return fileName
-    }
-
-    private fun getAllFileNameInExportEmlDir(context: Context): List<String> {
-        val fileDir = File(context.cacheDir, context.getString(R.string.EXPOSED_EML_PATH))
-
-        if (!fileDir.exists()) fileDir.mkdirs()
-
-        return fileDir.listFiles()?.map { it.name.removeSuffix(".eml") } ?: emptyList()
-    }
-
-    private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
-        val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
-        val fileDir = File(context.cacheDir, context.getString(R.string.EXPOSED_EML_PATH))
-
-        if (!fileDir.exists()) fileDir.mkdirs()
-
-        runCatching {
-            val file = File(fileDir, fileNameWithExtension)
-            file.outputStream().use { it.write(emlByteArray) }
-            return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
-        }.onFailure { exception ->
-            exception.printStackTrace()
-            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
-        }
-        return null
-    }
-
-    fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")
-
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
@@ -1376,6 +1301,5 @@ class MainViewModel @Inject constructor(
         private const val MAX_REFRESH_DELAY = 6_000L
 
         private const val EML_CONTENT_TYPE = "message/rfc822"
-        private const val NO_SUBJECT_FILE = "message"
     }
 }

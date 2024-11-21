@@ -36,6 +36,7 @@ import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.login.NoMailboxActivity
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialog
+import com.infomaniak.mail.ui.main.thread.actions.DownloadThreadsProgressDialogArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils
@@ -86,6 +87,14 @@ fun Fragment.navigateToDownloadProgressDialog(
     safeNavigate(
         resId = R.id.downloadAttachmentProgressDialog,
         args = attachment.createDownloadDialogNavArgs(attachmentIntentType),
+        currentClassName = currentClassName,
+    )
+}
+
+fun Fragment.navigateToDownloadThreadsProgressDialog(threadUuids: List<String>, currentClassName: String) {
+    safeNavigate(
+        resId = R.id.downloadThreadsProgressDialog,
+        args = DownloadThreadsProgressDialogArgs(threadUuids = threadUuids.toTypedArray()).toBundle(),
         currentClassName = currentClassName,
     )
 }

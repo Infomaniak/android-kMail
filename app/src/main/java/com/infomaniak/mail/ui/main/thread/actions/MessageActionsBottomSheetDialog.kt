@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
@@ -177,7 +178,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onSaveKDrive() {
                 trackBottomSheetThreadActionsEvent(ACTION_SAVE_KDRIVE_NAME)
-                context?.let { mainViewModel.saveOnKDrive(listOf(threadUid), it) }
+                navigateToDownloadThreadsProgressDialog(listOf(messageUid), MessageActionsBottomSheetDialog::class.java.name)
             }
 
             override fun onReportDisplayProblem() {

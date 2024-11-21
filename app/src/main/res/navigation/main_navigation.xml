@@ -591,6 +591,16 @@
     </dialog>
 
     <dialog
+        android:id="@+id/downloadThreadsProgressDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.DownloadThreadsProgressDialog"
+        android:label="DownloadThreadsProgressDialog"
+        tools:layout="@layout/dialog_download_progress">
+        <argument
+            android:name="threadUuids"
+            app:argType="string[]" />
+    </dialog>
+
+    <dialog
         android:id="@+id/multiSelectBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog"
         android:label="MultiSelectBottomSheetDialog"

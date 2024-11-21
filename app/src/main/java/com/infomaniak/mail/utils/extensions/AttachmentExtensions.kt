@@ -59,6 +59,15 @@ object AttachmentExtensions {
     private const val DRIVE_PACKAGE = "com.infomaniak.drive"
     private const val SAVE_EXTERNAL_ACTIVITY_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
 
+    fun ArrayList<Uri>.openKDriveOrPlayStore(context: Context): Intent? {
+        return if (canSaveOnKDrive(context)) {
+            saveToDriveIntent()
+        } else {
+            context.goToPlayStore(DRIVE_PACKAGE)
+            null
+        }
+    }
+
     //region Intent
     private fun canSaveOnKDrive(context: Context) = runCatching {
         val packageInfo = context.packageManager.getPackageInfo(DRIVE_PACKAGE, PackageManager.GET_ACTIVITIES)
@@ -111,13 +120,7 @@ object AttachmentExtensions {
         }
     }
 
-    fun ArrayList<Uri>.openKDriveOrPlayStore(context: Context) {
-        if (canSaveOnKDrive(context)) {
-            saveToDriveIntent().let(context::startActivity)
-        } else {
-            context.goToPlayStore(DRIVE_PACKAGE)
-        }
-    }
+
 
     fun Attachment.executeIntent(
         context: Context,
