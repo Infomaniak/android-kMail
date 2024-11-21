@@ -1294,6 +1294,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun getMessagesUidsFromThreadUids(selectedThreadsUuids: List<String>): List<String> {
+        val messageUids = mutableListOf<String>()
+        selectedThreadsUuids.forEach { threadUuid ->
+            val thread = threadController.getThread(threadUuid) ?: return@forEach
+            messageUids.addAll(thread.messages.map { it.uid })
+        }
+        return messageUids
+    }
+
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
