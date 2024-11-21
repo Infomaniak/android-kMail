@@ -27,7 +27,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.coroutineContext
@@ -41,14 +41,14 @@ import javax.inject.Inject
 class DownloadThreadsViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
-    private val threadController: ThreadController,
+    private val messageController: MessageController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val messageLocalUids
-        inline get() = savedStateHandle.get<Array<String>>(DownloadThreadsProgressDialogArgs::threadUuids.name)!!
+    private val messageLocalUuids
+        inline get() = savedStateHandle.get<Array<String>>(DownloadThreadsProgressDialogArgs::messageUuids.name)!!
 
     fun downloadThreads(currentMailbox: Mailbox?) = liveData(ioCoroutineContext) {
         val downloadedThreadUris: List<Uri>? = runCatching {
@@ -56,21 +56,16 @@ class DownloadThreadsViewModel @Inject constructor(
             val listUri = mutableListOf<Uri>()
             val listFileName = mutableSetOf<String>().also { it.addAll(getAllFileNameInExportEmlDir(appContext)) }
 
-            messageLocalUids.forEach { threadUid ->
-                val thread = threadController.getThread(threadUid) ?: return@runCatching null
+            messageLocalUuids.forEach { messageUid ->
+                val message = messageController.getMessage(messageUid) ?: return@runCatching null
+                val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
 
-                thread.messages.forEach { message ->
-                    val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
+                if (!response.isSuccessful || response.body == null) return@runCatching null
 
-                    if (!response.isSuccessful || response.body == null) {
-                        return@runCatching null
-                    }
-
-                    val messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
-                    createOriginalFileName(messageSubject, listFileName.toList()).let { fileName ->
-                        listFileName.add(fileName)
-                        saveEmlToFile(appContext, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
-                    }
+                val messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
+                createOriginalFileName(messageSubject, listFileName.toList()).let { fileName ->
+                    listFileName.add(fileName)
+                    saveEmlToFile(appContext, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
                 }
             }
             listUri

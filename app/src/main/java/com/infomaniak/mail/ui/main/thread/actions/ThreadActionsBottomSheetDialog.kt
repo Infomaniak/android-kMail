@@ -198,7 +198,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onSaveKDrive() {
                     trackBottomSheetThreadActionsEvent(ACTION_SAVE_KDRIVE_NAME)
-                    navigateToDownloadThreadsProgressDialog(listOf(threadUid), ThreadActionsBottomSheetDialog::class.java.name)
+                    navigateToDownloadThreadsProgressDialog(
+                        messageUuids = thread.messages.map { it.uid },
+                        ThreadActionsBottomSheetDialog::class.java.name
+                    )
                 }
 
                 override fun onReportDisplayProblem() {
