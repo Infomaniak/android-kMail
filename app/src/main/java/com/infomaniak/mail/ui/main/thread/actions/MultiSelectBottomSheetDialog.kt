@@ -123,7 +123,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
             navigateToDownloadThreadsProgressDialog(
-                messageUuids = mainViewModel.getMessagesUidsFromThreadUids(selectedThreadsUids),
+                messageUids = mainViewModel.getMessagesUidsFromThreadUids(selectedThreadsUids),
                 MultiSelectBottomSheetDialog::class.java.name
             )
             isMultiSelectOn = false
