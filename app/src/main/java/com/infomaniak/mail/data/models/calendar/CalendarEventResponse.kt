@@ -105,4 +105,6 @@ class CalendarEventResponse() : EmbeddedRealmObject {
         REPLY,
         CANCEL,
     }
+
+    companion object
 }

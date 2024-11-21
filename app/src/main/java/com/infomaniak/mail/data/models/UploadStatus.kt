@@ -15,30 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListKSerializer::class)
-
 package com.infomaniak.mail.data.models
 
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
-
-@Serializable
-class SwissTransferContainer : RealmObject {
-    //region Remote data
-    @PrimaryKey
-    var uuid: String = ""
-    @SerialName("nbfiles")
-    var filesNumber: Int = 0
-    var size: Long = 0L
-    var expiredDate: String = ""
-    @SerialName("files")
-    var swissTransferFiles = realmListOf<SwissTransferFile>()
-    //endregion
-
-    companion object
+enum class UploadStatus {
+    AWAITING,
+    ONGOING,
+    FINISHED,
 }

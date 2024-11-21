@@ -22,7 +22,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Attachment.UploadStatus
+import com.infomaniak.mail.data.models.UploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.ATTACHMENT_TAG
