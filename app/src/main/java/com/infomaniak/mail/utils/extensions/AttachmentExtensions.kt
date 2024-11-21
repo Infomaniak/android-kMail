@@ -61,7 +61,7 @@ object AttachmentExtensions {
     //region Intent
     private fun canSaveOnKDrive(context: Context) = runCatching {
         val packageInfo = context.packageManager.getPackageInfo(DRIVE_PACKAGE, PackageManager.GET_ACTIVITIES)
-        packageInfo.activities.any { it.name == SAVE_EXTERNAL_ACTIVITY_CLASS }
+        packageInfo.activities!!.any { it.name == SAVE_EXTERNAL_ACTIVITY_CLASS }
     }.getOrElse {
         Sentry.captureException(it)
         false

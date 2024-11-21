@@ -20,19 +20,25 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import android.content.pm.PackageInfo
 import androidx.webkit.WebViewCompat
+import com.infomaniak.lib.core.utils.SentryLog
 
 object WebViewVersionUtils {
+    private val TAG = WebViewVersionUtils::class.java.simpleName
     private const val DEFAULT_WEBVIEW_VERSION = 0
 
     fun getWebViewVersionData(context: Context): WebViewVersionData? {
         val webViewPackage = WebViewCompat.getCurrentWebViewPackage(context) ?: return null
         val webViewPackageName = webViewPackage.packageName
-        val (versionName, majorVersion) = webViewPackage.getWebViewVersions()
+        val (versionName, majorVersion) = webViewPackage.getWebViewVersions() ?: return null
 
         return WebViewVersionData(versionName, majorVersion, webViewPackageName)
     }
 
-    private fun PackageInfo.getWebViewVersions(): Pair<String, Int> {
+    private fun PackageInfo.getWebViewVersions(): Pair<String, Int>? {
+        val versionName = this.versionName ?: run {
+            SentryLog.e(TAG, "PackageInfo.versionName is null")
+            return null
+        }
         val majorVersion = runCatching {
             versionName.substringBefore('.').toInt()
         }.getOrDefault(defaultValue = DEFAULT_WEBVIEW_VERSION)
