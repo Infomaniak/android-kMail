@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
@@ -121,7 +122,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-            context?.let { saveOnKDrive(selectedThreadsUids, it) }
+            safeNavigate(
+                resId = R.id.downloadThreadsProgressDialog,
+                args = DownloadThreadsProgressDialogArgs(threadUuids = selectedThreadsUids.toTypedArray()).toBundle(),
+                currentClassName = currentClassName,
+            )
             isMultiSelectOn = false
         }
     }
