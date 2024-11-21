@@ -68,7 +68,7 @@ class RecentSearchAdapter(
 
         while (count() > MAX_HISTORY_COUNT) {
             notifyItemRemoved(lastIndex)
-            removeLast()
+            removeAt(lastIndex)
         }
 
         return true
