@@ -47,8 +47,8 @@ class DownloadThreadsViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val messageLocalUuids
-        inline get() = savedStateHandle.get<Array<String>>(DownloadThreadsProgressDialogArgs::messageUuids.name)!!
+    private val messageLocalUids
+        inline get() = savedStateHandle.get<Array<String>>(DownloadThreadsProgressDialogArgs::messageUids.name)!!
 
     fun downloadThreads(currentMailbox: Mailbox?) = liveData(ioCoroutineContext) {
         val downloadedThreadUris: List<Uri>? = runCatching {
@@ -56,7 +56,7 @@ class DownloadThreadsViewModel @Inject constructor(
             val listUri = mutableListOf<Uri>()
             val listFileName = mutableSetOf<String>().also { it.addAll(getAllFileNameInExportEmlDir(appContext)) }
 
-            messageLocalUuids.forEach { messageUid ->
+            messageLocalUids.forEach { messageUid ->
                 val message = messageController.getMessage(messageUid) ?: return@runCatching null
                 val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
 

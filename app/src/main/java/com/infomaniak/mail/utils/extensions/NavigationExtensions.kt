@@ -91,10 +91,10 @@ fun Fragment.navigateToDownloadProgressDialog(
     )
 }
 
-fun Fragment.navigateToDownloadThreadsProgressDialog(messageUuids: List<String>, currentClassName: String) {
+fun Fragment.navigateToDownloadThreadsProgressDialog(messageUids: List<String>, currentClassName: String) {
     safeNavigate(
         resId = R.id.downloadThreadsProgressDialog,
-        args = DownloadThreadsProgressDialogArgs(messageUuids = messageUuids.toTypedArray()).toBundle(),
+        args = DownloadThreadsProgressDialogArgs(messageUids = messageUids.toTypedArray()).toBundle(),
         currentClassName = currentClassName,
     )
 }
