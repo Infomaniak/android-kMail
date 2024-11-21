@@ -29,4 +29,6 @@ class AddressBook : RealmObject {
     var id: Int = 0
     @SerialName("default")
     var isDefault: Boolean = false
+
+    companion object
 }

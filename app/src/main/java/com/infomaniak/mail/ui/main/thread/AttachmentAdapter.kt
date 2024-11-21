@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
+import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm

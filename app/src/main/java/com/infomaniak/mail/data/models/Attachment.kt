@@ -115,14 +115,5 @@ class Attachment : EmbeddedRealmObject, Attachable {
 
     fun getUploadLocalFile() = uploadLocalUri?.toUri()?.toFile()
 
-    enum class AttachmentDisposition {
-        INLINE,
-        ATTACHMENT,
-    }
-
-    enum class UploadStatus {
-        AWAITING,
-        ONGOING,
-        FINISHED,
-    }
+    companion object
 }
