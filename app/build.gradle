@@ -93,6 +93,7 @@ dependencies {
 
     implementation libs.realm.kotlin.base
 
+    standardImplementation libs.play.services.base
     standardImplementation libs.firebase.messaging.ktx
 
     implementation libs.lottie
