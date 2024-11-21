@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import io.realm.kotlin.log.LogCategory
 import io.realm.kotlin.log.LogLevel
 import io.realm.kotlin.log.RealmLogger
 import io.sentry.Breadcrumb
@@ -33,14 +34,13 @@ class SentryRealmLogger : RealmLogger {
     private val mutex = Mutex()
     private val messagesMap = mutableMapOf<Long, MutableList<String>>()
 
-    override val level = LogLevel.DEBUG
-    override val tag = "Realm"
+    private val tag = "Realm"
 
-    override fun log(level: LogLevel, throwable: Throwable?, message: String?, vararg args: Any?) {
+    override fun log(category: LogCategory, level: LogLevel, throwable: Throwable?, message: String?, vararg args: Any?) {
 
         val throwableMessage = throwable?.message
         if (throwableMessage != null) {
-            val breadcrumb = Breadcrumb.error(throwableMessage).apply { category = "exception" }
+            val breadcrumb = Breadcrumb.error(throwableMessage).apply { setCategory("exception") }
             Sentry.addBreadcrumb(breadcrumb)
             return
         }
