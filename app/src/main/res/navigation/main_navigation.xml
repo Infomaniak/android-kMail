@@ -596,7 +596,7 @@
         android:label="DownloadThreadsProgressDialog"
         tools:layout="@layout/dialog_download_progress">
         <argument
-            android:name="messageUuids"
+            android:name="messageUids"
             app:argType="string[]" />
     </dialog>
 
