@@ -41,7 +41,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.extensions.navigateToDownloadThreadsProgressDialog
+import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -122,7 +122,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-            navigateToDownloadThreadsProgressDialog(
+            navigateToDownloadMessagesProgressDialog(
                 messageUids = mainViewModel.getMessagesUidsFromThreadUids(selectedThreadsUids),
                 nameFirstMessage = selectedThreads.firstOrNull()?.subject,
                 MultiSelectBottomSheetDialog::class.java.name,
