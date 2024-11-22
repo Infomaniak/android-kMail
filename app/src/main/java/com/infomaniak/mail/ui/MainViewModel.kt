@@ -1018,7 +1018,7 @@ class MainViewModel @Inject constructor(
         val message = messageController.getMessage(messageUid) ?: return@launch
         val mailbox = currentMailbox.value ?: return@launch
 
-        val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
+        val response = ApiRepository.getDownloadedMessage(mailbox.uuid, message.folderId, message.shortUid)
 
         if (!response.isSuccessful || response.body == null) {
             reportDisplayProblemTrigger.postValue(Unit)
@@ -1312,7 +1312,6 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
-
         private const val EML_CONTENT_TYPE = "message/rfc822"
     }
 }
