@@ -17,59 +17,23 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.app.Dialog
-import android.os.Bundle
-import android.view.KeyEvent
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.R
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.setBackNavigationResult
-import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.getIntentOrGoToPlayStore
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DownloadAttachmentProgressDialog : DialogFragment() {
-
-    private val binding by lazy { DialogDownloadProgressBinding.inflate(layoutInflater) }
+class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val downloadAttachmentViewModel: DownloadAttachmentViewModel by viewModels()
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        isCancelable = false
-        val iconDrawable = AppCompatResources.getDrawable(requireContext(), navigationArgs.attachmentType.icon)
-        binding.icon.setImageDrawable(iconDrawable)
+    override val dialogTitle: String? by lazy { navigationArgs.attachmentName }
+    override val dialogIconDrawableRes: Int? by lazy { navigationArgs.attachmentType.icon }
 
-        return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(navigationArgs.attachmentName)
-            .setView(binding.root)
-            .setOnKeyListener { _, keyCode, event ->
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-                    findNavController().popBackStack()
-                    true
-                } else false
-            }
-            .create()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        downloadAttachment()
-    }
-
-    private fun downloadAttachment() {
+    override fun download() {
         downloadAttachmentViewModel.downloadAttachment().observe(this) { cachedAttachment ->
             if (cachedAttachment == null) {
                 popBackStackWithError()
@@ -77,15 +41,6 @@ class DownloadAttachmentProgressDialog : DialogFragment() {
                 cachedAttachment.getIntentOrGoToPlayStore(requireContext(), navigationArgs.intentType)?.let { openWithIntent ->
                     setBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, openWithIntent)
                 } ?: run { findNavController().popBackStack() }
-            }
-        }
-    }
-
-    private fun popBackStackWithError() {
-        lifecycleScope.launch {
-            mainViewModel.isNetworkAvailable.first { it != null }?.let { isNetworkAvailable ->
-                showSnackbar(title = if (isNetworkAvailable) R.string.anErrorHasOccurred else R.string.noConnection)
-                findNavController().popBackStack()
             }
         }
     }
