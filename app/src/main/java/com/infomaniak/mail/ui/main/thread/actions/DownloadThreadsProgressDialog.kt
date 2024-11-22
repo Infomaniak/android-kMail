@@ -17,66 +17,29 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.app.Dialog
-import android.os.Bundle
-import android.view.KeyEvent
-import androidx.core.view.isVisible
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
-import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openKDriveOrPlayStore
+import com.infomaniak.mail.utils.KDriveUtils.DRIVE_PACKAGE
+import com.infomaniak.mail.utils.KDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
+import com.infomaniak.mail.utils.KDriveUtils.canSaveOnKDrive
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
-class DownloadThreadsProgressDialog : DialogFragment() {
-    private val binding by lazy { DialogDownloadProgressBinding.inflate(layoutInflater) }
-    private val mainViewModel: MainViewModel by activityViewModels()
+class DownloadThreadsProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadThreadsViewModel by viewModels()
     private val navigationArgs: DownloadThreadsProgressDialogArgs by navArgs()
+    override val dialogTitle: String? by lazy { getDialogTitleFromArgs() }
+    override val dialogIconDrawableRes: Int? by lazy { null }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val context = requireContext()
-
-        isCancelable = false
-        binding.icon.isVisible = false
-
-        val textTitleDialog = if (navigationArgs.messageUids.size == 1) {
-            navigationArgs.nameFirstMessage
-        } else {
-            context.resources.getQuantityString(R.plurals.downloadingEmailsTitle, 1, navigationArgs.messageUids.size)
-            // TODO LOOK
-        }
-
-        return MaterialAlertDialogBuilder(context)
-            .setTitle(textTitleDialog)
-            .setView(binding.root)
-            .setOnKeyListener { _, keyCode, event ->
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-                    findNavController().popBackStack()
-                    true
-                } else false
-            }
-            .create()
-    }
-
-    override fun onStart() {
-        downloadThreads()
-        super.onStart()
-    }
-
-    private fun downloadThreads() {
+    override fun download() {
         downloadThreadsViewModel.downloadThreads(mainViewModel.currentMailbox.value).observe(this) { threadUris ->
             if (threadUris == null) {
                 popBackStackWithError()
@@ -88,12 +51,26 @@ class DownloadThreadsProgressDialog : DialogFragment() {
         }
     }
 
-    private fun popBackStackWithError() {
-        lifecycleScope.launch {
-            mainViewModel.isNetworkAvailable.first { it != null }?.let { isNetworkAvailable ->
-                showSnackbar(title = if (isNetworkAvailable) RCore.string.anErrorHasOccurred else RCore.string.noConnection)
-                findNavController().popBackStack()
-            }
+    private fun getDialogTitleFromArgs() = if (navigationArgs.messageUids.size == 1) {
+        navigationArgs.nameFirstMessage
+    } else {
+        requireContext().resources.getQuantityString(R.plurals.downloadingEmailsTitle, 1, navigationArgs.messageUids.size)
+    }
+
+    private fun ArrayList<Uri>.openKDriveOrPlayStore(context: Context): Intent? {
+        return if (canSaveOnKDrive(context)) {
+            saveToDriveIntent()
+        } else {
+            context.goToPlayStore(DRIVE_PACKAGE)
+            null
+        }
+    }
+
+    private fun ArrayList<Uri>.saveToDriveIntent(): Intent {
+        return Intent().apply {
+            component = ComponentName(DRIVE_PACKAGE, SAVE_EXTERNAL_ACTIVITY_CLASS)
+            action = Intent.ACTION_SEND_MULTIPLE
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, this@saveToDriveIntent)
         }
     }
 
