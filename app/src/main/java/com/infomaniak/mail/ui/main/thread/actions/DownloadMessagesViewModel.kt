@@ -26,6 +26,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -47,23 +48,28 @@ class DownloadMessagesViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val messageLocalUids
-        inline get() = savedStateHandle.get<Array<String>>(DownloadMessagesProgressDialogArgs::messageUids.name)!!
+    private val messageLocalUids: Array<String>
+        inline get() = savedStateHandle[DownloadMessagesProgressDialogArgs::messageUids.name]!!
 
     fun downloadThreads(currentMailbox: Mailbox?) = liveData(ioCoroutineContext) {
         val downloadedThreadUris: List<Uri>? = runCatching {
             val mailbox = currentMailbox ?: return@runCatching null
             val listUri = mutableListOf<Uri>()
-            val listFileName = mutableSetOf<String>().also { it.addAll(getAllFileNameInExportEmlDir(appContext)) }
+            val listFileName = getAllFileNameInExportEmlDir(appContext).toMutableSet()
 
             messageLocalUids.forEach { messageUid ->
                 val message = messageController.getMessage(messageUid) ?: return@runCatching null
-                val response = ApiRepository.getDownloadedMessage(mailbox.uuid, message.folderId, message.shortUid)
+                val response = ApiRepository.getDownloadedMessage(
+                    mailboxUuid = mailbox.uuid,
+                    folderId = message.folderId,
+                    shortUid = message.shortUid,
+                    contentType = EML_CONTENT_TYPE,
+                )
 
                 if (!response.isSuccessful || response.body == null) return@runCatching null
 
                 val messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
-                createOriginalFileName(messageSubject, listFileName.toList()).let { fileName ->
+                createUniqueFileName(messageSubject, listFileName.toList()).let { fileName ->
                     listFileName.add(fileName)
                     saveEmlToFile(appContext, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
                 }
@@ -75,7 +81,7 @@ class DownloadMessagesViewModel @Inject constructor(
     }
 
     // TODO Extract this code in core2
-    private fun createOriginalFileName(originalFileName: String, listFileName: List<String>): String {
+    private fun createUniqueFileName(originalFileName: String, listFileName: List<String>): String {
         var postfix = 1
         var fileName = originalFileName
 
@@ -85,21 +91,21 @@ class DownloadMessagesViewModel @Inject constructor(
     }
 
     private fun getAllFileNameInExportEmlDir(context: Context): List<String> {
-        val fileDir = File(context.cacheDir, context.getString(com.infomaniak.mail.R.string.EXPOSED_EML_PATH))
+        val fileDir = File(context.cacheDir, context.getString(R.string.EXPOSED_EML_PATH))
         if (!fileDir.exists()) fileDir.mkdirs()
         return fileDir.listFiles()?.map { it.name.removeSuffix(".eml") } ?: emptyList()
     }
 
     private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
         val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
-        val fileDir = File(context.cacheDir, context.getString(com.infomaniak.mail.R.string.EXPOSED_EML_PATH))
+        val fileDir = File(context.cacheDir, context.getString(R.string.EXPOSED_EML_PATH))
 
         if (!fileDir.exists()) fileDir.mkdirs()
 
         runCatching {
             val file = File(fileDir, fileNameWithExtension)
             file.outputStream().use { it.write(emlByteArray) }
-            return FileProvider.getUriForFile(context, context.getString(com.infomaniak.mail.R.string.EML_AUTHORITY), file)
+            return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
         }.onFailure { exception ->
             exception.printStackTrace()
         }
@@ -109,7 +115,7 @@ class DownloadMessagesViewModel @Inject constructor(
     private fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")
 
     companion object {
-        private const val EML_CONTENT_TYPE = "message/rfc822"
         private const val NO_SUBJECT_FILE = "message"
+        private const val EML_CONTENT_TYPE = "message/rfc822"
     }
 }

@@ -200,7 +200,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     trackBottomSheetThreadActionsEvent(ACTION_SAVE_KDRIVE_NAME)
                     navigateToDownloadMessagesProgressDialog(
                         messageUids = thread.messages.map { it.uid },
-                        nameFirstMessage = thread.subject,
+                        nameFirstMessage = thread.subject ?: "",
                         ThreadActionsBottomSheetDialog::class.java.name
                     )
                 }
