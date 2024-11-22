@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -134,11 +133,14 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val isHalloween = (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
+        if (!isHalloween) return
 
-        if ((month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)) {
-            (activity as? MainActivity)?.getHalloweenLayout()?.isVisible = true
-            captureMessage("Easter egg Halloween has been triggered! Woohoo!")
-            trackEasterEggEvent("halloween${Date().year()}")
-        }
+        val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return
+        if (halloween.isAnimating) return
+
+        halloween.playAnimation()
+        captureMessage("Easter egg Halloween has been triggered! Woohoo!")
+        trackEasterEggEvent("halloween${Date().year()}")
     }
 }
