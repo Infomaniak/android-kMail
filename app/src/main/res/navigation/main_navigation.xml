@@ -581,6 +581,10 @@
         <argument
             android:name="messageUids"
             app:argType="string[]" />
+        <argument
+            android:name="nameFirstMessage"
+            app:argType="string"
+            app:nullable="true" />
     </dialog>
 
     <dialog
