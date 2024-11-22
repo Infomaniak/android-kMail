@@ -27,7 +27,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetAccountBinding
 import com.infomaniak.mail.di.IoDispatcher
@@ -42,8 +44,11 @@ import com.infomaniak.mail.utils.LogoutUser
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry.captureMessage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -102,6 +107,8 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
         observeAccounts()
 
         bindAlertToViewLifecycle(descriptionDialog)
+
+        showEasterEggHalloween()
     }
 
     private fun logoutCurrentUser() = lifecycleScope.launch(ioDispatcher) {
@@ -119,5 +126,21 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
             accountsAdapter.initializeAccounts(it)
         }
         getAccountsInDB()
+    }
+
+    private fun showEasterEggHalloween() {
+
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val isHalloween = (month == Calendar.OCTOBER && day >= 26) || (month == Calendar.NOVEMBER && day <= 1)
+        if (!isHalloween) return
+
+        val halloween = (activity as? MainActivity)?.getHalloweenLayout() ?: return
+        if (halloween.isAnimating) return
+
+        halloween.playAnimation()
+        captureMessage("Easter egg Halloween has been triggered! Woohoo!")
+        trackEasterEggEvent("halloween${Date().year()}")
     }
 }

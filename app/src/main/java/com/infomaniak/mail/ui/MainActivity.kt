@@ -36,6 +36,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
+import com.airbnb.lottie.LottieAnimationView
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
@@ -513,6 +514,8 @@ class MainActivity : BaseActivity() {
     }
 
     fun getConfettiContainer(): ViewGroup = binding.easterEggConfettiContainer
+
+    fun getHalloweenLayout(): LottieAnimationView = binding.easterEggHalloween
 
     private fun handleShortcuts() {
         navigationArgs?.shortcutId?.let { shortcutId ->
