@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -120,13 +121,18 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
             isMultiSelectOn = false
         }
+
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-            navigateToDownloadMessagesProgressDialog(
-                messageUids = mainViewModel.getMessagesUidsFromThreadUids(selectedThreadsUids),
-                nameFirstMessage = selectedThreads.firstOrNull()?.subject,
-                MultiSelectBottomSheetDialog::class.java.name,
-            )
+            runCatching {
+                navigateToDownloadMessagesProgressDialog(
+                    messageUids = mainViewModel.getMessagesUidsFromThreadUids(selectedThreadsUids),
+                    nameFirstMessage = mainViewModel.getSubject(selectedThreadsUids.first()),
+                    currentClassName = MultiSelectBottomSheetDialog::class.java.name,
+                )
+            }.onFailure {
+                SentryLog.e(TAG, "SelectedThreadUids is empty, it should not happened")
+            }
             isMultiSelectOn = false
         }
     }
@@ -155,5 +161,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
         return if (isFromSpam) R.drawable.ic_non_spam to R.string.actionNonSpam else R.drawable.ic_spam to R.string.actionSpam
+    }
+
+    companion object {
+        private val TAG = this::class.java.simpleName
     }
 }

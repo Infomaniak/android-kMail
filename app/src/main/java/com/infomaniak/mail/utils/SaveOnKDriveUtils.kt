@@ -21,7 +21,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import io.sentry.Sentry
 
-object KDriveUtils {
+object SaveOnKDriveUtils {
     const val DRIVE_PACKAGE = "com.infomaniak.drive"
     const val SAVE_EXTERNAL_ACTIVITY_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
 

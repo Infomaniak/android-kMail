@@ -93,8 +93,8 @@ fun Fragment.navigateToDownloadProgressDialog(
 
 fun Fragment.navigateToDownloadMessagesProgressDialog(
     messageUids: List<String>,
-    nameFirstMessage: String?,
-    currentClassName: String
+    nameFirstMessage: String,
+    currentClassName: String,
 ) {
     safeNavigate(
         resId = R.id.downloadMessagesProgressDialog,
