@@ -453,7 +453,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): Response {
         val request = Request.Builder().url(ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid))
-            .headers(HttpUtils.getHeaders(null))
+            .headers(HttpUtils.getHeaders())
             .get()
             .build()
 

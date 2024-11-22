@@ -600,8 +600,7 @@
             app:argType="string[]" />
         <argument
             android:name="nameFirstMessage"
-            app:argType="string"
-            app:nullable="true" />
+            app:argType="string" />
     </dialog>
 
     <dialog

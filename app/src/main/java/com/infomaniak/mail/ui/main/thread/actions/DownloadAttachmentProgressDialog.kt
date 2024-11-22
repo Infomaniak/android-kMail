@@ -17,6 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -25,13 +31,17 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.getIntentOrGoToPlayStore
 import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
     private val downloadAttachmentViewModel: DownloadAttachmentViewModel by viewModels()
 
     override val dialogTitle: String? by lazy { navigationArgs.attachmentName }
-    override val dialogIconDrawableRes: Int? by lazy { navigationArgs.attachmentType.icon }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding.icon.isVisible = true
+        binding.icon.setImageDrawable(AppCompatResources.getDrawable(requireContext(), navigationArgs.attachmentType.icon))
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     override fun download() {
         downloadAttachmentViewModel.downloadAttachment().observe(this) { cachedAttachment ->

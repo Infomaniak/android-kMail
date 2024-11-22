@@ -1294,17 +1294,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getMessagesUidsFromThreadUids(selectedThreadsUuids: List<String>): List<String> {
+    fun getMessagesUidsFromThreadUids(selectedThreadsUids: List<String>): List<String> {
         val messageUids = mutableListOf<String>()
-        selectedThreadsUuids.forEach { threadUuid ->
+        selectedThreadsUids.forEach { threadUuid ->
             val thread = threadController.getThread(threadUuid) ?: return@forEach
             messageUids.addAll(thread.messages.map { it.uid })
         }
+
         return messageUids
     }
 
-    fun getSubject(threadUuid: String): String? {
-        return threadController.getThread(threadUuid)?.subject
+    fun getSubject(threadUid: String): String {
+        return threadController.getThread(threadUid)?.subject ?: ""
     }
 
     companion object {
