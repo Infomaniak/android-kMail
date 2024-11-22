@@ -27,17 +27,14 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.KDriveUtils.DRIVE_PACKAGE
-import com.infomaniak.mail.utils.KDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
-import com.infomaniak.mail.utils.KDriveUtils.canSaveOnKDrive
-import dagger.hilt.android.AndroidEntryPoint
+import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
+import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
+import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
 
-@AndroidEntryPoint
 class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
     private val navigationArgs: DownloadMessagesProgressDialogArgs by navArgs()
     override val dialogTitle: String? by lazy { getDialogTitleFromArgs() }
-    override val dialogIconDrawableRes: Int? by lazy { null }
 
     override fun download() {
         downloadThreadsViewModel.downloadThreads(mainViewModel.currentMailbox.value).observe(this) { threadUris ->
@@ -54,7 +51,11 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private fun getDialogTitleFromArgs() = if (navigationArgs.messageUids.size == 1) {
         navigationArgs.nameFirstMessage
     } else {
-        requireContext().resources.getQuantityString(R.plurals.downloadingEmailsTitle, 1, navigationArgs.messageUids.size)
+        requireContext().resources.getQuantityString(
+            R.plurals.downloadingEmailsTitle,
+            navigationArgs.messageUids.size,
+            navigationArgs.messageUids.size
+        )
     }
 
     private fun ArrayList<Uri>.openKDriveOrPlayStore(context: Context): Intent? {

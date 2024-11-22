@@ -20,9 +20,6 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.app.Dialog
 import android.os.Bundle
 import android.view.KeyEvent
-import androidx.annotation.DrawableRes
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -38,10 +35,13 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 abstract class DownloadProgressDialog : DialogFragment() {
+
     protected val binding by lazy { DialogDownloadProgressBinding.inflate(layoutInflater) }
     protected val mainViewModel: MainViewModel by activityViewModels()
+
     abstract val dialogTitle: String?
-    @get:DrawableRes abstract val dialogIconDrawableRes: Int?
+
+    protected abstract fun download()
 
     override fun onStart() {
         download()
@@ -50,10 +50,6 @@ abstract class DownloadProgressDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
-
-        dialogIconDrawableRes?.let { binding.icon.setImageDrawable(AppCompatResources.getDrawable(requireContext(), it)) }
-        binding.icon.isVisible = dialogIconDrawableRes == null
-
         isCancelable = false
 
         return MaterialAlertDialogBuilder(context)
@@ -67,8 +63,6 @@ abstract class DownloadProgressDialog : DialogFragment() {
             }
             .create()
     }
-
-    abstract fun download()
 
     protected fun popBackStackWithError() {
         lifecycleScope.launch {
