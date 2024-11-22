@@ -36,8 +36,6 @@ class NoValidMailboxesViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    val mailboxesCountLive = mailboxController.getMailboxesCount(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
-
     val lockedMailboxesLive = mailboxController.getLockedMailboxes(AccountUtils.currentUserId).asLiveData(ioCoroutineContext)
 
     val invalidPasswordMailboxesLive = mailboxController.getInvalidPasswordMailboxes(AccountUtils.currentUserId)
