@@ -591,9 +591,9 @@
     </dialog>
 
     <dialog
-        android:id="@+id/downloadThreadsProgressDialog"
-        android:name="com.infomaniak.mail.ui.main.thread.actions.DownloadThreadsProgressDialog"
-        android:label="DownloadThreadsProgressDialog"
+        android:id="@+id/downloadMessagesProgressDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog"
+        android:label="DownloadMessagesProgressDialog"
         tools:layout="@layout/dialog_download_progress">
         <argument
             android:name="messageUids"

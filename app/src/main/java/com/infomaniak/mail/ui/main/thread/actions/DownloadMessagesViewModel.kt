@@ -38,7 +38,7 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class DownloadThreadsViewModel @Inject constructor(
+class DownloadMessagesViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val messageController: MessageController,
@@ -48,7 +48,7 @@ class DownloadThreadsViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private val messageLocalUids
-        inline get() = savedStateHandle.get<Array<String>>(DownloadThreadsProgressDialogArgs::messageUids.name)!!
+        inline get() = savedStateHandle.get<Array<String>>(DownloadMessagesProgressDialogArgs::messageUids.name)!!
 
     fun downloadThreads(currentMailbox: Mailbox?) = liveData(ioCoroutineContext) {
         val downloadedThreadUris: List<Uri>? = runCatching {
@@ -58,7 +58,7 @@ class DownloadThreadsViewModel @Inject constructor(
 
             messageLocalUids.forEach { messageUid ->
                 val message = messageController.getMessage(messageUid) ?: return@runCatching null
-                val response = ApiRepository.getDownloadedAttachment(mailbox.uuid, message.folderId, message.shortUid)
+                val response = ApiRepository.getDownloadedMessage(mailbox.uuid, message.folderId, message.shortUid)
 
                 if (!response.isSuccessful || response.body == null) return@runCatching null
 

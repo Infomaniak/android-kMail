@@ -41,7 +41,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
-import com.infomaniak.mail.ui.main.thread.actions.DownloadThreadsProgressDialog.Companion.DOWNLOAD_THREADS_RESULT
+import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.extensions.*
 import javax.inject.Inject
 
@@ -121,7 +121,7 @@ abstract class TwoPaneFragment : Fragment() {
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
         getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
-        getBackNavigationResult(DOWNLOAD_THREADS_RESULT, ::startActivity)
+        getBackNavigationResult(DownloadMessagesProgressDialog.DOWNLOAD_MESSAGES_RESULT, ::startActivity)
 
         newMessageArgs.observe(viewLifecycleOwner) {
             safeNavigateToNewMessageActivity(args = it.toBundle())

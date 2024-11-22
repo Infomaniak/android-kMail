@@ -33,9 +33,9 @@ import com.infomaniak.mail.utils.KDriveUtils.canSaveOnKDrive
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DownloadThreadsProgressDialog : DownloadProgressDialog() {
-    private val downloadThreadsViewModel: DownloadThreadsViewModel by viewModels()
-    private val navigationArgs: DownloadThreadsProgressDialogArgs by navArgs()
+class DownloadMessagesProgressDialog : DownloadProgressDialog() {
+    private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
+    private val navigationArgs: DownloadMessagesProgressDialogArgs by navArgs()
     override val dialogTitle: String? by lazy { getDialogTitleFromArgs() }
     override val dialogIconDrawableRes: Int? by lazy { null }
 
@@ -45,7 +45,7 @@ class DownloadThreadsProgressDialog : DownloadProgressDialog() {
                 popBackStackWithError()
             } else {
                 ArrayList(threadUris).openKDriveOrPlayStore(requireContext())?.let { openKDriveIntent ->
-                    setBackNavigationResult(DOWNLOAD_THREADS_RESULT, openKDriveIntent)
+                    setBackNavigationResult(DOWNLOAD_MESSAGES_RESULT, openKDriveIntent)
                 } ?: run { findNavController().popBackStack() }
             }
         }
@@ -75,6 +75,6 @@ class DownloadThreadsProgressDialog : DownloadProgressDialog() {
     }
 
     companion object {
-        const val DOWNLOAD_THREADS_RESULT = "download_threads_result"
+        const val DOWNLOAD_MESSAGES_RESULT = "download_messages_result"
     }
 }
