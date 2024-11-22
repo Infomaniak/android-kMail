@@ -20,8 +20,6 @@ package com.infomaniak.mail.utils.extensions
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
@@ -39,6 +37,9 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.KDriveUtils.DRIVE_PACKAGE
+import com.infomaniak.mail.utils.KDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
+import com.infomaniak.mail.utils.KDriveUtils.canSaveOnKDrive
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
@@ -55,18 +56,6 @@ object AttachmentExtensions {
     // TODO: Delete logs with this tag when Attachments' `uuid` problem will be resolved
     const val ATTACHMENT_TAG = "attachmentUpload"
     const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
-
-    private const val DRIVE_PACKAGE = "com.infomaniak.drive"
-    private const val SAVE_EXTERNAL_ACTIVITY_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
-
-    fun ArrayList<Uri>.openKDriveOrPlayStore(context: Context): Intent? {
-        return if (canSaveOnKDrive(context)) {
-            saveToDriveIntent()
-        } else {
-            context.goToPlayStore(DRIVE_PACKAGE)
-            null
-        }
-    }
 
     //region Intent
     private fun canSaveOnKDrive(context: Context) = runCatching {
@@ -91,14 +80,6 @@ object AttachmentExtensions {
         }
     }
 
-    private fun ArrayList<Uri>.saveToDriveIntent(): Intent {
-        return Intent().apply {
-            component = ComponentName(DRIVE_PACKAGE, SAVE_EXTERNAL_ACTIVITY_CLASS)
-            action = Intent.ACTION_SEND_MULTIPLE
-            putParcelableArrayListExtra(Intent.EXTRA_STREAM, this@saveToDriveIntent)
-        }
-    }
-
     private fun Attachment.openWithIntent(context: Context): Intent {
         val file = getUploadLocalFile() ?: getCacheFile(context)
         val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), file)
@@ -119,8 +100,6 @@ object AttachmentExtensions {
             null
         }
     }
-
-
 
     fun Attachment.executeIntent(
         context: Context,
