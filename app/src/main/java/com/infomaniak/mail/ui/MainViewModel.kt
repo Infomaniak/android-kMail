@@ -1303,6 +1303,10 @@ class MainViewModel @Inject constructor(
         return messageUids
     }
 
+    fun getSubject(threadUuid: String): String? {
+        return threadController.getThread(threadUuid)?.subject
+    }
+
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
