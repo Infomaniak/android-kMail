@@ -124,7 +124,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
             navigateToDownloadThreadsProgressDialog(
                 messageUids = mainViewModel.getMessagesUidsFromThreadUids(selectedThreadsUids),
-                MultiSelectBottomSheetDialog::class.java.name
+                nameFirstMessage = selectedThreads.firstOrNull()?.subject,
+                MultiSelectBottomSheetDialog::class.java.name,
             )
             isMultiSelectOn = false
         }

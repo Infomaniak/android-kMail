@@ -79,18 +79,14 @@ class DownloadThreadsViewModel @Inject constructor(
         var postfix = 1
         var fileName = originalFileName
 
-        while (listFileName.contains(fileName)) {
-            fileName = "$originalFileName (${postfix++})"
-        }
+        while (listFileName.contains(fileName)) fileName = "$originalFileName (${postfix++})"
 
         return fileName
     }
 
     private fun getAllFileNameInExportEmlDir(context: Context): List<String> {
         val fileDir = File(context.cacheDir, context.getString(com.infomaniak.mail.R.string.EXPOSED_EML_PATH))
-
         if (!fileDir.exists()) fileDir.mkdirs()
-
         return fileDir.listFiles()?.map { it.name.removeSuffix(".eml") } ?: emptyList()
     }
 

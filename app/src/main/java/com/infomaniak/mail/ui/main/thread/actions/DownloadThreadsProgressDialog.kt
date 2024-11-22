@@ -20,32 +20,47 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.app.Dialog
 import android.os.Bundle
 import android.view.KeyEvent
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogDownloadProgressBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openKDriveOrPlayStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class DownloadThreadsProgressDialog : DialogFragment() {
     private val binding by lazy { DialogDownloadProgressBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by activityViewModels()
     private val downloadThreadsViewModel: DownloadThreadsViewModel by viewModels()
+    private val navigationArgs: DownloadThreadsProgressDialogArgs by navArgs()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val context = requireContext()
+
         isCancelable = false
-        return MaterialAlertDialogBuilder(requireContext())
-            .setTitle("test")
+        binding.icon.isVisible = false
+
+        val textTitleDialog = if (navigationArgs.messageUids.size == 1) {
+            navigationArgs.nameFirstMessage
+        } else {
+            context.resources.getQuantityString(R.plurals.downloadingEmailsTitle, 1, navigationArgs.messageUids.size)
+            // TODO LOOK
+        }
+
+        return MaterialAlertDialogBuilder(context)
+            .setTitle(textTitleDialog)
             .setView(binding.root)
             .setOnKeyListener { _, keyCode, event ->
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
@@ -76,7 +91,7 @@ class DownloadThreadsProgressDialog : DialogFragment() {
     private fun popBackStackWithError() {
         lifecycleScope.launch {
             mainViewModel.isNetworkAvailable.first { it != null }?.let { isNetworkAvailable ->
-                showSnackbar(title = if (isNetworkAvailable) R.string.anErrorHasOccurred else R.string.noConnection)
+                showSnackbar(title = if (isNetworkAvailable) RCore.string.anErrorHasOccurred else RCore.string.noConnection)
                 findNavController().popBackStack()
             }
         }
