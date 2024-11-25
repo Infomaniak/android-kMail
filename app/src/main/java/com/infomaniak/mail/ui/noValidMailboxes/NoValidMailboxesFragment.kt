@@ -61,7 +61,6 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         setupAdapters()
         setupListeners()
 
-        observeMailboxesCount()
         observeMailboxesLive()
     }
 
@@ -97,23 +96,13 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         noValidMailboxesViewModel.invalidPasswordMailboxesLive.observe(viewLifecycleOwner) { invalidPasswordMailboxes ->
             invalidPasswordMailboxesAdapter.setMailboxes(invalidPasswordMailboxes)
             invalidPasswordMailboxesGroup.isVisible = invalidPasswordMailboxes.isNotEmpty()
+            invalidPasswordTitle.text = resources.getQuantityString(R.plurals.blockedPasswordTitle, invalidPasswordMailboxes.count())
         }
 
         noValidMailboxesViewModel.lockedMailboxesLive.observe(viewLifecycleOwner) { lockedMailboxes ->
             mailboxesAdapter.setMailboxes(lockedMailboxes)
             lockedMailboxesGroup.isVisible = lockedMailboxes.isNotEmpty()
+            lockedMailboxTitle.text = resources.getQuantityString(R.plurals.lockedMailboxTitle, lockedMailboxes.count())
         }
-    }
-
-    private fun observeMailboxesCount() {
-        noValidMailboxesViewModel.mailboxesCountLive.observe(viewLifecycleOwner, ::setQuantityTextTitle)
-    }
-
-    private fun setQuantityTextTitle(mailboxCount: Long) = with(binding) {
-        val count = mailboxCount.toInt()
-        val lockedMailboxTitleString = resources.getQuantityString(R.plurals.lockedMailboxTitle, count)
-
-        invalidPasswordTitle.text = resources.getQuantityString(R.plurals.blockedPasswordTitle, count)
-        lockedMailboxTitle.text = lockedMailboxTitleString
     }
 }
