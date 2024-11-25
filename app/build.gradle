@@ -16,12 +16,12 @@ android {
 
     namespace 'com.infomaniak.mail'
 
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId 'com.infomaniak.mail'
         minSdk 25
-        targetSdk 34
+        targetSdk 35
         versionCode 1_06_006_01
         versionName '1.6.6'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -93,6 +93,7 @@ dependencies {
 
     implementation libs.realm.kotlin.base
 
+    standardImplementation libs.play.services.base
     standardImplementation libs.firebase.messaging.ktx
 
     implementation libs.lottie

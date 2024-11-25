@@ -52,4 +52,6 @@ class SwissTransferFile : EmbeddedRealmObject, Attachable {
     fun initLocalValues(containerUuid: String) {
         resource = "/api/swisstransfer/containers/$containerUuid/files/$uuid"
     }
+
+    companion object
 }
