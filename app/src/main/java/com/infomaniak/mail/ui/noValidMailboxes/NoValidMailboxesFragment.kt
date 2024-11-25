@@ -99,10 +99,10 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
             invalidPasswordMailboxesGroup.isVisible = invalidPasswordMailboxes.isNotEmpty()
         }
 
-        noValidMailboxesViewModel.lockedMailboxesLive.observe(viewLifecycleOwner) { lockedMailboxes ->
-            mailboxesAdapter.setMailboxes(lockedMailboxes)
-            lockedMailboxesGroup.isVisible = lockedMailboxes.isNotEmpty()
-        }
+        // noValidMailboxesViewModel.lockedMailboxesLive.observe(viewLifecycleOwner) { lockedMailboxes ->
+        //     mailboxesAdapter.setMailboxes(lockedMailboxes)
+        //     lockedMailboxesGroup.isVisible = lockedMailboxes.isNotEmpty()
+        // }
     }
 
     private fun observeMailboxesCount() {
