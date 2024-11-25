@@ -1,0 +1,2 @@
+- Mise à jour de la méthode de calcul des tailles
+- Correction du pluriel de certains textes
