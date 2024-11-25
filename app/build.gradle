@@ -21,7 +21,6 @@ android {
     defaultConfig {
         applicationId 'com.infomaniak.mail'
         minSdk 25
-        //noinspection EditedTargetSdkVersion
         targetSdk 35
         versionCode 1_07_000_01
         versionName '1.7.0'
