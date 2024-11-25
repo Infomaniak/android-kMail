@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.models
 
-enum class UploadStatus {
+enum class AttachmentUploadStatus {
     AWAITING,
     ONGOING,
     FINISHED,
