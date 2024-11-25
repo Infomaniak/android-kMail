@@ -66,13 +66,13 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
 
     private fun setupAdapters() = with(binding) {
 
-        lockedMailboxesRecyclerView.adapter = MailboxesAdapter(isInMenuDrawer, hasValidMailboxes)
-
         invalidPasswordMailboxesRecyclerView.adapter = MailboxesAdapter(
             isInMenuDrawer = isInMenuDrawer,
             hasValidMailboxes = hasValidMailboxes,
             onInvalidPasswordMailboxClicked = { mailbox -> onInvalidPasswordMailboxClicked(mailbox) },
         )
+
+        lockedMailboxesRecyclerView.adapter = MailboxesAdapter(isInMenuDrawer, hasValidMailboxes)
     }
 
     private fun setupListeners() = with(binding) {
@@ -96,7 +96,8 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         noValidMailboxesViewModel.invalidPasswordMailboxesLive.observe(viewLifecycleOwner) { invalidPasswordMailboxes ->
             invalidPasswordMailboxesAdapter.setMailboxes(invalidPasswordMailboxes)
             invalidPasswordMailboxesGroup.isVisible = invalidPasswordMailboxes.isNotEmpty()
-            invalidPasswordTitle.text = resources.getQuantityString(R.plurals.blockedPasswordTitle, invalidPasswordMailboxes.count())
+            invalidPasswordTitle.text =
+                resources.getQuantityString(R.plurals.blockedPasswordTitle, invalidPasswordMailboxes.count())
         }
 
         noValidMailboxesViewModel.lockedMailboxesLive.observe(viewLifecycleOwner) { lockedMailboxes ->
