@@ -290,8 +290,8 @@ class MainActivity : BaseActivity() {
         val userId = getInt(DraftsActionsWorker.RESULT_USER_ID_KEY, 0)
         if (userId != AccountUtils.currentUserId) return
 
-        getLong(DraftsActionsWorker.BIGGEST_SCHEDULED_DATE_KEY, 0).takeIf { it > 0 }?.let { scheduledDate ->
-            mainViewModel.refreshDraftFolderWhenDraftArrives(scheduledDate)
+        getLong(DraftsActionsWorker.BIGGEST_ETOP_SCHEDULED_DATE_KEY, 0).takeIf { it > 0 }?.let { etopScheduledDate ->
+            mainViewModel.refreshDraftFolderWhenDraftArrives(etopScheduledDate)
         }
     }
 
