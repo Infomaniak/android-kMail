@@ -129,6 +129,8 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
             selectedDate = selectedDate.setMinute(minute)
 
             binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
+            // TODO: Display error message if the selected date is in the past.
+            // binding.scheduleDateError.isVisible =
         }
 
         this@SelectDateAndTimeForScheduleDialog.onPositiveButtonClicked = onPositiveButtonClicked

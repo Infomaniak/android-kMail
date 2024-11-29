@@ -87,6 +87,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
@@ -215,7 +216,13 @@ class NewMessageFragment : Fragment() {
                 selectDateAndTimeForScheduleDialog.show(
                     title = getString(R.string.datePickerTitle),
                     onPositiveButtonClicked = {
-                        localSettings.lastSelectedSchedule = selectDateAndTimeForScheduleDialog.selectedDate.time
+                        val scheduleDate = selectDateAndTimeForScheduleDialog.selectedDate.time
+                        localSettings.lastSelectedSchedule = scheduleDate
+
+                        newMessageViewModel.setScheduleDate(Date(scheduleDate))
+
+                        // TODO: Try to schedule the mail.
+                        tryToSendEmail()
                     },
                     onNegativeButtonClicked = { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) },
                 )
@@ -707,11 +714,12 @@ class NewMessageFragment : Fragment() {
         sendButton.setOnClickListener { tryToSendEmail() }
     }
 
+    // TODO:
     private fun tryToSendEmail() {
 
         fun setSnackbarActivityResult() {
             val resultIntent = Intent()
-            resultIntent.putExtra(MainActivity.DRAFT_ACTION_KEY, DraftAction.SEND.name)
+            resultIntent.putExtra(MainActivity.DRAFT_ACTION_KEY, DraftAction.SCHEDULE.name)
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
         }
 

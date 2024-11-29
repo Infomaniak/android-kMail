@@ -124,8 +124,17 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun saveDraft() {
+        // TODO: Add missing DraftAction (Scheduled).
+        val draftAction = if (newMessageViewModel.shouldScheduleInsteadOfSend) {
+            DraftAction.SCHEDULE
+        } else if (newMessageViewModel.shouldSendInsteadOfSave) {
+            DraftAction.SEND
+        } else {
+            DraftAction.SAVE
+        }
+
         val draftSaveConfiguration = DraftSaveConfiguration(
-            action = if (newMessageViewModel.shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
+            action = draftAction,
             isFinishing = isFinishing,
             isTaskRoot = isTaskRoot,
             startWorkerCallback = ::startWorker,

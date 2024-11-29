@@ -18,6 +18,7 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
@@ -132,11 +133,14 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
         SentryLog.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
+        Log.e("TOTO", "handleDraftsActions: ${drafts.joinToString { it.action.toString() }}")
         if (drafts.isEmpty()) return Result.failure()
 
         var haveAllDraftsSucceeded = true
 
         drafts.asReversed().forEach { draft ->
+            Log.e("TOTO", "handleDraftsActions DRAFT ACTION: ${draft.action}")
+
             val isTargetDraft = draft.localUuid == draftLocalUuid
             if (isTargetDraft) trackedDraftAction = draft.action
 
@@ -307,6 +311,8 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         suspend fun executeSaveAction() = with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
+            Log.e("TOTO", "executeSaveAction: SAVE!")
+
             data?.let { data ->
                 realmActionOnDraft = { realm ->
                     realm.findLatest(draft)?.apply {
@@ -323,6 +329,8 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         suspend fun executeSendAction() = with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
+            Log.e("TOTO", "executeSendAction: SEND!")
+
             when {
                 isSuccess() -> {
                     etopScheduledDate = data?.etopScheduledDate
@@ -342,9 +350,17 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
+        Log.e("TOTO", "executeDraftAction, draft.action: ${draft.action}")
+
         when (draft.action) {
             DraftAction.SAVE -> executeSaveAction()
             DraftAction.SEND -> executeSendAction()
+            // TODO: executeScheduleAction()
+            DraftAction.SCHEDULE -> {
+                Log.e("TOTO", "executeDraftAction: PAR ICI!")
+
+                executeSendAction()
+            }
             else -> Unit
         }
 

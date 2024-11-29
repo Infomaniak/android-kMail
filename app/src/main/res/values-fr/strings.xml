@@ -271,6 +271,7 @@
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachmentNotFound">Pièce jointe introuvable</string>
     <string name="errorCalendarChoiceCouldNotBeSent">Une erreur s’est produite lors de l’envoi de votre réponse</string>
+    <string name="errorChooseDateToCome">Choisissez une date à venir</string>
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>

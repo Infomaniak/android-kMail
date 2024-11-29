@@ -69,4 +69,13 @@
 
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/scheduleDateError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/BodyMedium.Error"
+        android:text="@string/errorChooseDateToCome"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </LinearLayout>

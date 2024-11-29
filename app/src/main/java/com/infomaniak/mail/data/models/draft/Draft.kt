@@ -27,13 +27,16 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.*
 import java.util.UUID
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 class Draft : RealmObject {
 
@@ -69,9 +72,29 @@ class Draft : RealmObject {
     var swissTransferUuid: String? = null
 
     /**
-     * This `delay` should NOT be removed. If we remove it, we won't receive any `etop` from the API when sending an Email.
+     * This `delay` should be set to 0 when `scheduleDate` is NOT set.
+     * Otherwise, if we remove it, we won't receive any `etop` from the API when sending an Email.
      */
-    var delay: Int = 0
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @Serializable(with = ConditionalIntSerializer::class)
+    var delay: Int? = 0
+        set(value) {
+            scheduleDate = null
+            field = value
+        }
+
+    /**
+     * The API requires that this field does not exist, except when scheduling a message.
+     * We use a custom serializer for this very reason.
+     */
+    @SerialName("schedule_date")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @Serializable(with = ConditionalStringSerializer::class)
+    var scheduleDate: String? = null
+        set(value) {
+            delay = null
+            field = value
+        }
     //endregion
 
     //region Local data (Transient)
@@ -102,6 +125,8 @@ class Draft : RealmObject {
     enum class DraftAction(val apiCallValue: String, val matomoValue: String) {
         SAVE("save", "saveDraft"),
         SEND("send", "sendMail"),
+        // TODO: Matomo.
+        SCHEDULE("schedule", "TODO"),
     }
 
     enum class DraftMode {
@@ -117,4 +142,29 @@ class Draft : RealmObject {
         val actionPropertyName get() = Draft::_action.name
         private val draftJson = Json(ApiController.json) { encodeDefaults = true }
     }
+}
+
+object ConditionalIntSerializer : KSerializer<Int?> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ConditionalIntField", PrimitiveKind.INT)
+
+    override fun serialize(encoder: Encoder, value: Int?) {
+        if (shouldSerialize(value)) encoder.encodeInt(value ?: 0)
+    }
+
+    override fun deserialize(decoder: Decoder): Int = decoder.decodeInt()
+
+    private fun shouldSerialize(value: Int?): Boolean = value != null
+}
+
+
+object ConditionalStringSerializer : KSerializer<String?> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ConditionalStringField", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: String?) {
+        if (shouldSerialize(value)) encoder.encodeString(value ?: "")
+    }
+
+    override fun deserialize(decoder: Decoder): String = decoder.decodeString()
+
+    private fun shouldSerialize(value: String?): Boolean = value != null
 }

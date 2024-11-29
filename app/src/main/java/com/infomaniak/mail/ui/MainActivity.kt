@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -109,6 +110,7 @@ class MainActivity : BaseActivity() {
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
+        Log.e("TOTO", "newMessageActivityResultLauncher, draftAction: $draftAction")
         if (draftAction == DraftAction.SEND) {
             showEasterXMas()
             showSendingSnackbarTimer.start()
@@ -282,6 +284,8 @@ class MainActivity : BaseActivity() {
                     }
                 }
                 DraftAction.SEND -> showSentDraftSnackbar()
+                // TODO: Use the correct snackbar for scheduled messages.
+                DraftAction.SCHEDULE -> showSentDraftSnackbar()
             }
         }
     }

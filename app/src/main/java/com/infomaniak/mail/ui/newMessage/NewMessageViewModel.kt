@@ -22,6 +22,7 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -81,6 +82,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import org.jsoup.nodes.Document
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -140,6 +142,8 @@ class NewMessageViewModel @Inject constructor(
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
+    // TODO: Find something better.
+    var shouldScheduleInsteadOfSend = false
     var shouldSendInsteadOfSave = false
     var signaturesCount = 0
     private var isNewMessage = false
@@ -853,6 +857,19 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
+    fun setScheduleDate(scheduleDate: Date) = viewModelScope.launch(ioDispatcher) {
+        shouldScheduleInsteadOfSend = true
+        val localUuid = draftLocalUuid ?: return@launch
+        mailboxContentRealm().write {
+            DraftController.getDraft(localUuid, realm = this)?.also { draft ->
+                // TODO:
+                // draft.action = DraftAction.SCHEDULE
+                Log.e("TOTO", "setScheduleDate: ${scheduleDate.format(FORMAT_SCHEDULE_MAIL)}")
+                draft.scheduleDate = scheduleDate.format(FORMAT_SCHEDULE_MAIL)
+            }
+        }
+    }
+
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
@@ -925,6 +942,9 @@ class NewMessageViewModel @Inject constructor(
         uiBodyValue: String,
         realm: MutableRealm,
     ) {
+        // TODO: Save selected date in viewmodel.
+
+        Log.e("TOTO", "updateDraftBeforeSavingRemotely, draftAction null ???: $draftAction")
 
         action = draftAction
         identityId = fromLiveData.value?.signature?.id.toString()
@@ -1033,6 +1053,10 @@ class NewMessageViewModel @Inject constructor(
             }
             DraftAction.SEND -> {
                 if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
+            }
+            DraftAction.SCHEDULE -> {
+                // TODO:
+                if (isTaskRoot) appContext.showToast("TODO")
             }
         }
     }
