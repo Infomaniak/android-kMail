@@ -1,0 +1,2 @@
+- Fix accessibility issue when composing a mail
+- Fix network detection issue
