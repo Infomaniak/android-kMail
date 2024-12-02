@@ -26,7 +26,7 @@
     <string name="actionForward">Inoltra</string>
     <string name="actionMarkAsRead">Segna come letto</string>
     <string name="actionMarkAsUnread">Segna come non letto</string>
-    <string name="actionMove">Sposta messaggio</string>
+    <string name="actionMove">Sposta</string>
     <string name="actionMoveToInbox">Sposta nella casella di posta</string>
     <string name="actionNonSpam">Segnala come non spam</string>
     <string name="actionOpenIn">Apri con</string>
