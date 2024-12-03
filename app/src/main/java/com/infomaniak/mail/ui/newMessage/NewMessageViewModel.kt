@@ -192,7 +192,6 @@ class NewMessageViewModel @Inject constructor(
     fun arrivedFromExistingDraft() = arrivedFromExistingDraft
     fun draftLocalUuid() = draftLocalUuid
     fun draftMode() = draftMode
-    fun recipient() = recipient
     fun shouldLoadDistantResources() = shouldLoadDistantResources
 
     fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
