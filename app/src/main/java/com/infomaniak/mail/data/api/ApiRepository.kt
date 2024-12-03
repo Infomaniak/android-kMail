@@ -435,6 +435,15 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
     }
 
+    fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): Response {
+        val request = Request.Builder().url(ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid))
+            .headers(HttpUtils.getHeaders())
+            .get()
+            .build()
+
+        return HttpClient.okHttpClient.newCall(request).execute()
+    }
+
     /**
      * Create batches of the given values to perform the given request
      * @param values Data to batch
