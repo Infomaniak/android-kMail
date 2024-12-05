@@ -79,8 +79,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     val matomoTracker: Tracker by lazy { buildTracker(shouldOptOut = !localSettings.isMatomoTrackingEnabled) }
     var isAppInBackground = true
         private set
-    var lastAppClosingTime: Long? = FIRST_LAUNCH_TIME
-        private set
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -145,7 +143,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        lastAppClosingTime = Date().time
         isAppInBackground = true
         owner.lifecycleScope.launch {
             syncMailboxesWorkerScheduler.scheduleWorkIfNeeded()
@@ -288,10 +285,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
-
-    fun resetLastAppClosing() {
-        lastAppClosingTime = null
-    }
 
     fun createSvgImageLoader(): ImageLoader {
         return CoilUtils.newImageLoader(
