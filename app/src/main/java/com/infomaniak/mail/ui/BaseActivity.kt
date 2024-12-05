@@ -49,23 +49,12 @@ open class BaseActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         trackScreen()
-    }
 
-    override fun onResume() {
-        super.onResume()
-
-        if (localSettings.isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
-            lastAppClosingTime?.let {
-                LockActivity.lockAfterTimeout(
-                    context = this@BaseActivity,
-                    destinationClass = this::class.java,
-                    lastAppClosingTime = it,
-                    primaryColor = localSettings.accentColor.getPrimary(this),
-                )
-            }
-
-            resetLastAppClosing()
-        }
+        LockActivity.scheduleLockIfNeeded(
+            targetActivity = this,
+            primaryColor = localSettings.accentColor.getPrimary(this),
+            isAppLockEnabled = { localSettings.isAppLocked }
+        )
     }
 
     fun getCurrentFragment(@IdRes fragmentContainerViewId: Int) = supportFragmentManager
