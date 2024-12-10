@@ -37,6 +37,7 @@ object ErrorCode {
     //region Mailbox
     const val MAILBOX_LOCKED = "mailbox_locked"
     const val ACCESS_DENIED = "access_denied"
+    const val NOT_AUTHORIZED = "not_authorized"
     const val ERROR_WHILE_LINKING_MAILBOX = "error_while_linking_mailbox"
     const val INVALID_MAILBOX_PASSWORD = "invalid_mailbox_password"
     //endregion
