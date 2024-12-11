@@ -706,18 +706,35 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {
 
-        val isCursorNull = currentFolderCursor == null
         val isNetworkConnected = mainViewModel.hasNetwork
-        val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
-        val areThereThreadsNow = (currentThreadsCount ?: 0) > 0
+
+        // The folder's cursor is null, meaning it's the 1st time we are opening this folder.
+        val isCursorNull = currentFolderCursor == null
+
+        // We have a cursor, but don't have any info about threads yet, meaning the app is still booting and loading things.
+        val isBooting = !isCursorNull && currentThreadsCount == null
+
+        // We know that there is existing threads in this folder, so if we wait long enough, they'll be there.
         val areThereThreadsSoon = mainViewModel.currentFolderLive.value?.oldMessagesUidsToFetch?.isNotEmpty() == true
-        val isWaitingFirstThreads = (isCursorNull || (!areThereThreadsNow && areThereThreadsSoon)) && isNetworkConnected
+
+        // If there is network connectivity, but we either don't have a cursor yet
+        // or don't have threads yet (but we know that they are coming), it means
+        // we are opening this folder for the 1st time and we know we'll have a result at the end.
+        val isWaitingFirstThreads = (isCursorNull || areThereThreadsSoon) && isNetworkConnected
+
+        // There is at least 1 thread available to be displayed right now.
+        val areThereThreadsNow = (currentThreadsCount ?: 0) > 0
+
+        // If we filtered on something, it means we have threads, so we want to display the Threads display mode.
         val isFilterEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
+
+        // If any of these conditions is true, it means Threads are on their way or the
+        // app is still loading things, so either way we want to display the Threads mode.
         val shouldDisplayThreadsView = isBooting || isWaitingFirstThreads || areThereThreadsNow || isFilterEnabled
 
         contentDisplayMode.value = when {
             shouldDisplayThreadsView -> ContentDisplayMode.Threads
-            isCursorNull || !isNetworkConnected -> ContentDisplayMode.NoNetwork
+            !isNetworkConnected -> ContentDisplayMode.NoNetwork
             else -> ContentDisplayMode.EmptyFolder
         }
     }
