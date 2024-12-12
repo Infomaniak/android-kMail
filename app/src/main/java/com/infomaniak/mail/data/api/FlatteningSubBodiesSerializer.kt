@@ -38,7 +38,7 @@ object FlatteningSubBodiesSerializer : JsonTransformingSerializer<RealmList<SubB
             outputList: MutableList<JsonElement> = mutableListOf(),
         ): List<JsonElement> {
 
-            val remoteSubBody = inputList.removeFirst() as? JsonObject
+            val remoteSubBody = inputList.removeAt(0) as? JsonObject
             val remoteBody = remoteSubBody?.get("body") as? JsonObject
             val remoteSubBodies = remoteBody?.get("subBody") as? JsonArray
 
