@@ -337,7 +337,7 @@ fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: B
         outputList: MutableList<Folder> = mutableListOf(),
     ): List<Folder> {
 
-        val folder = inputList.removeFirst()
+        val folder = inputList.removeAt(0)
 
         val children = if (folder.isManaged()) {
             outputList.add(folder.copyFromRealm(depth = 1u))
