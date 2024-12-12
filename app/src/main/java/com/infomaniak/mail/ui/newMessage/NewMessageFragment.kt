@@ -56,6 +56,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -601,7 +602,9 @@ class NewMessageFragment : Fragment() {
 
             // When removing an Attachment, both counts will be the same, because the Adapter is already notified.
             // We don't want to notify it again, because it will cancel the nice animation.
-            if (attachments.count() != attachmentAdapter.itemCount) attachmentAdapter.submitList(attachments)
+            if (attachments.count() != attachmentAdapter.itemCount) {
+                attachmentAdapter.submitList(attachments.filterNot { it.disposition == AttachmentDisposition.INLINE })
+            }
 
             if (attachments.isEmpty()) TransitionManager.beginDelayedTransition(binding.root)
             binding.attachmentsRecyclerView.isVisible = attachments.isNotEmpty()
