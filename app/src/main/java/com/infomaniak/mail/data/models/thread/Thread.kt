@@ -97,6 +97,7 @@ class Thread : RealmObject {
     var isLocallyMovedOut: Boolean = false
     //endregion
 
+    // TODO: Remove this `runCatching / getOrElse` when the issue is fixed
     private val _folders by backlinks(Folder::threads)
     val folder
         get() = runCatching {

@@ -40,7 +40,7 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.ext.toRealmSet
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
@@ -169,7 +169,7 @@ class ThreadController @Inject constructor(
     suspend fun saveThreads(searchMessages: List<Message>) {
         mailboxContentRealm().write {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
-                threads = searchMessages.convertToSearchThreads().toRealmList()
+                threads = searchMessages.convertToSearchThreads().toRealmSet()
             }
         }
     }
