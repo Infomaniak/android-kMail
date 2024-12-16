@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.LocalStorageUtils.getEmlCacheDir
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -90,14 +91,14 @@ class DownloadMessagesViewModel @Inject constructor(
     }
 
     private fun getAllFileNameInExportEmlDir(context: Context): List<String> {
-        val fileDir = File(context.cacheDir, context.getString(R.string.EXPOSED_EML_PATH))
+        val fileDir = getEmlCacheDir(context)
         if (!fileDir.exists()) fileDir.mkdirs()
         return fileDir.listFiles()?.map { it.name.removeSuffix(".eml") } ?: emptyList()
     }
 
     private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
         val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
-        val fileDir = File(context.cacheDir, context.getString(R.string.EXPOSED_EML_PATH))
+        val fileDir = getEmlCacheDir(context)
 
         if (!fileDir.exists()) fileDir.mkdirs()
 

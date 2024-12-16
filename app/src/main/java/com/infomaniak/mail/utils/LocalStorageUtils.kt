@@ -36,11 +36,14 @@ object LocalStorageUtils {
     private const val ATTACHMENTS_UPLOAD_DIR = "attachments_upload"
     private const val HIDDEN_FILE_NAME = "HIDDEN_FILE_NAME"
     private const val NAME_TOO_LONG_EXCEPTION = "ENAMETOOLONG"
+    private const val EML_CACHE_DIR = "eml_export"
 
     private inline val Context.attachmentsCacheRootDir get() = File(cacheDir, ATTACHMENTS_CACHE_DIR)
     private inline val Context.attachmentsUploadRootDir get() = File(filesDir, ATTACHMENTS_UPLOAD_DIR)
 
     //region Cache
+    fun getEmlCacheDir(context: Context): File = File(context.cacheDir, EML_CACHE_DIR)
+
     fun getAttachmentsCacheDir(
         context: Context,
         attachmentPath: String,
