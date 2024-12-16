@@ -67,6 +67,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -80,8 +81,6 @@ import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -164,6 +163,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeUpdateInstall()
         observeWebViewOutdated()
         observeLoadMoreTriggers()
+        observeContentDisplayMode()
     }.getOrDefault(Unit)
 
     @ColorRes
@@ -706,46 +706,60 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {
 
-        fun displayThreadsView(
-            areThereThreads: Boolean,
-            isFilterEnabled: Boolean,
-            isBooting: Boolean,
-            isWaitingFirstThreads: Boolean,
-        ) {
+        val isNetworkConnected = mainViewModel.hasNetwork
 
-            with(binding) {
-                emptyStateView.isGone = true
-                threadsList.isVisible = true
-            }
+        // The folder's cursor is null, meaning it's the 1st time we are opening this folder.
+        val isCursorNull = currentFolderCursor == null
 
-            if (!areThereThreads && !isFilterEnabled && !isBooting && !isWaitingFirstThreads) {
-                val currentFolder = mainViewModel.currentFolder.value
-                Sentry.captureMessage(
-                    "Should display threads is true but there are no threads to display",
-                    SentryLevel.WARNING,
-                ) { scope ->
-                    scope.setExtra("cursor", "$currentFolderCursor")
-                    scope.setExtra("folderRole", currentFolder?.role?.name.toString())
-                    scope.setExtra("folderThreadsCount", "${currentFolder?.threads?.count()}")
+        // We have a cursor, but don't have any info about threads yet, meaning the app is still booting and loading things.
+        val isBooting = !isCursorNull && currentThreadsCount == null
+
+        // We know that there is existing threads in this folder, so if we wait long enough, they'll be there.
+        val areThereThreadsSoon = mainViewModel.currentFolderLive.value?.oldMessagesUidsToFetch?.isNotEmpty() == true
+
+        // If there is network connectivity, but we either don't have a cursor yet
+        // or don't have threads yet (but we know that they are coming), it means
+        // we are opening this folder for the 1st time and we know we'll have a result at the end.
+        val isWaitingFirstThreads = (isCursorNull || areThereThreadsSoon) && isNetworkConnected
+
+        // There is at least 1 thread available to be displayed right now.
+        val areThereThreadsNow = (currentThreadsCount ?: 0) > 0
+
+        // If we filtered on something, it means we have threads, so we want to display the Threads display mode.
+        val isFilterEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
+
+        // If any of these conditions is true, it means Threads are on their way or the
+        // app is still loading things, so either way we want to display the Threads mode.
+        val shouldDisplayThreadsView = isBooting || isWaitingFirstThreads || areThereThreadsNow || isFilterEnabled
+
+        contentDisplayMode.value = when {
+            shouldDisplayThreadsView -> ContentDisplayMode.Threads
+            !isNetworkConnected -> ContentDisplayMode.NoNetwork
+            else -> ContentDisplayMode.EmptyFolder
+        }
+    }
+
+    private fun observeContentDisplayMode() {
+
+        fun folderEmptyState() = when {
+            isCurrentFolderRole(FolderRole.INBOX) -> EmptyState.INBOX
+            isCurrentFolderRole(FolderRole.TRASH) -> EmptyState.TRASH
+            else -> EmptyState.FOLDER
+        }
+
+        threadListViewModel.contentDisplayMode
+            .observe(viewLifecycleOwner) {
+                when (it) {
+                    ContentDisplayMode.Threads, null -> displayThreadsView()
+                    ContentDisplayMode.NoNetwork -> setEmptyState(EmptyState.NETWORK)
+                    ContentDisplayMode.EmptyFolder -> setEmptyState(folderEmptyState())
                 }
             }
-        }
+    }
 
-        val areThereThreads = (currentThreadsCount ?: 0) > 0
-        val isFilterEnabled = mainViewModel.currentFilter.value != ThreadFilter.ALL
-        val isCursorNull = currentFolderCursor == null
-        val isNetworkConnected = mainViewModel.hasNetwork
-        val isBooting = currentThreadsCount == null && !isCursorNull && isNetworkConnected
-        val isWaitingFirstThreads = isCursorNull && isNetworkConnected
-        val shouldDisplayThreadsView = isBooting || isWaitingFirstThreads || areThereThreads || isFilterEnabled
-
-        when {
-            shouldDisplayThreadsView -> displayThreadsView(areThereThreads, isFilterEnabled, isBooting, isWaitingFirstThreads)
-            isCursorNull || !isNetworkConnected -> setEmptyState(EmptyState.NETWORK)
-            isCurrentFolderRole(FolderRole.INBOX) -> setEmptyState(EmptyState.INBOX)
-            isCurrentFolderRole(FolderRole.TRASH) -> setEmptyState(EmptyState.TRASH)
-            else -> setEmptyState(EmptyState.FOLDER)
-        }
+    private fun displayThreadsView() = with(binding) {
+        emptyStateView.isGone = true
+        threadsList.isVisible = true
     }
 
     private fun setEmptyState(emptyState: EmptyState): Unit = with(binding) {
