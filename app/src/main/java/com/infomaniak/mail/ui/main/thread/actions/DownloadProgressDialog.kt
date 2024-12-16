@@ -49,10 +49,9 @@ abstract class DownloadProgressDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val context = requireContext()
         isCancelable = false
 
-        return MaterialAlertDialogBuilder(context)
+        return MaterialAlertDialogBuilder(requireContext())
             .setTitle(dialogTitle)
             .setView(binding.root)
             .setOnKeyListener { _, keyCode, event ->
