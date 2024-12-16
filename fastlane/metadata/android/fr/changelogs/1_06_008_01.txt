@@ -1,0 +1,2 @@
+- Correction d'un problème d'accessibilité lors de la rédaction d'un courrier
+- Correction d'un problème de détection du réseau
