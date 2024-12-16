@@ -63,7 +63,6 @@ class DownloadMessagesViewModel @Inject constructor(
                     mailboxUuid = mailbox.uuid,
                     folderId = message.folderId,
                     shortUid = message.shortUid,
-                    contentType = EML_CONTENT_TYPE,
                 )
 
                 if (!response.isSuccessful || response.body == null) return@runCatching null
@@ -116,6 +115,5 @@ class DownloadMessagesViewModel @Inject constructor(
 
     companion object {
         private const val NO_SUBJECT_FILE = "message"
-        private const val EML_CONTENT_TYPE = "message/rfc822"
     }
 }

@@ -452,8 +452,10 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): Response {
+        val emlContentType = "message/rfc822"
+
         val request = Request.Builder().url(ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid))
-            .headers(HttpUtils.getHeaders())
+            .headers(HttpUtils.getHeaders(emlContentType))
             .get()
             .build()
 
