@@ -161,7 +161,8 @@ class Message : RealmObject {
     // TODO: Remove this `runCatching / getOrElse` when the issue is fixed
     inline val folder
         get() = runCatching {
-            threads.single { it.folder.id == folderId || it.folder.id == FolderController.SEARCH_FOLDER_ID }.folder
+            (threads.singleOrNull { it.folder.id == folderId }
+                ?: threads.single { it.folder.id == FolderController.SEARCH_FOLDER_ID }).folder
         }.getOrElse { exception ->
 
             val reason = when {
@@ -180,6 +181,7 @@ class Message : RealmObject {
                 scope.setExtra("threadsCount", "${threads.count()}")
                 scope.setExtra("threadsFolder", "${threads.map { "role:[${it.folder.role?.name}] (id:[${it.folder.id}])" }}")
                 scope.setExtra("messageUid", uid)
+                scope.setExtra("folderId", folderId)
                 scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                 scope.setExtra("exception", exception.message.toString())
             }
@@ -322,7 +324,7 @@ class Message : RealmObject {
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
 
     fun toThread() = Thread().apply {
-        uid = this@Message.uid // TODO: Check if we can use random UUID instead ?
+        uid = this@Message.uid
         folderId = this@Message.folderId
         messagesIds += this@Message.messageIds
         messages += this@Message

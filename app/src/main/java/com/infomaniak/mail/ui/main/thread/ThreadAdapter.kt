@@ -203,7 +203,7 @@ class ThreadAdapter(
         bindHeader(message)
         bindAlerts(message.uid)
         bindCalendarEvent(message)
-        bindAttachment(message)
+        bindAttachments(message)
         bindContent(message)
 
         onExpandOrCollapseMessage(message, shouldTrack = false)
@@ -462,7 +462,7 @@ class ThreadAdapter(
     private fun ItemMessageBinding.areOneOrMoreAlertsVisible() = alerts.children.any { it.isVisible }
 
     @SuppressLint("SetTextI18n")
-    private fun MessageViewHolder.bindAttachment(message: Message) = with(binding) {
+    private fun MessageViewHolder.bindAttachments(message: Message) = with(binding) {
 
         if (!message.hasAttachable) {
             attachmentLayout.root.isVisible = false
@@ -482,7 +482,7 @@ class ThreadAdapter(
             )
         }
 
-        attachmentAdapter.setAttachments(attachments)
+        attachmentAdapter.submitList(attachments)
 
         attachmentLayout.attachmentsSizeText.text = totalAttachmentsSize
         attachmentLayout.attachmentsInfo.setOnClickListener { threadAdapterCallbacks?.onDownloadAllClicked?.invoke(message) }

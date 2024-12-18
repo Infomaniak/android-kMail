@@ -1,0 +1,3 @@
+- Mise à jour des traductions en italien
+- L'UI des pièces jointes est maintenant correctement mise à jour en mode tablette
+- L'état vide apparaît désormais correctement lors de la première ouverture d'un dossier

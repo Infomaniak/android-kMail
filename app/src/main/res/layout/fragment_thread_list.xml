@@ -232,8 +232,7 @@
                                 android:clipToPadding="false"
                                 android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                                 app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                                tools:listitem="@layout/cardview_thread_item"
-                                tools:visibility="visible" />
+                                tools:listitem="@layout/cardview_thread_item" />
 
                         </LinearLayout>
 

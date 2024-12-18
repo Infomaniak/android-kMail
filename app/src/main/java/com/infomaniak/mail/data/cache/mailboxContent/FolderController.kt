@@ -200,7 +200,7 @@ class FolderController @Inject constructor(
         suspend fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
 
             tailrec fun updateChildrenRecursively(inputList: MutableList<Folder>) {
-                val folder = inputList.removeFirst()
+                val folder = inputList.removeAt(0)
                 onUpdate(folder)
                 inputList.addAll(folder.children)
 

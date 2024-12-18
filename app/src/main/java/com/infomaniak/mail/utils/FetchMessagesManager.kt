@@ -56,7 +56,9 @@ class FetchMessagesManager @Inject constructor(
     private fun shouldLogToSentry(throwable: Throwable?): Boolean {
         return when (throwable) {
             is CancellationException, is NetworkException -> false
-            is ApiErrorException -> throwable.errorCode != ErrorCode.ACCESS_DENIED
+            is ApiErrorException -> {
+                throwable.errorCode != ErrorCode.ACCESS_DENIED && throwable.errorCode != ErrorCode.NOT_AUTHORIZED
+            }
             else -> true
         }
     }

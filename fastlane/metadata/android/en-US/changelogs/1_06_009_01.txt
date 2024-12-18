@@ -1,0 +1,3 @@
+- Update Italian translations
+- Attachments UI is now correctly updating in tablet mode
+- The empty state is now correctly appearing at first opening of a folder

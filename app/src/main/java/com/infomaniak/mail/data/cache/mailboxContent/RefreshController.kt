@@ -768,7 +768,7 @@ class RefreshController @Inject constructor(
                 "3_folderId" to folder.id,
                 "5_deleted" to activities.deletedShortUids.map { it },
                 "6_updated" to activities.updatedMessages.map { it.shortUid },
-                "7_updated" to activities.addedShortUids.map { it },
+                "7_added" to activities.addedShortUids.map { it },
             ),
         )
     }
