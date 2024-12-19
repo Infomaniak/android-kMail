@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.lib.applock.Utils.isKeyguardSecure
+import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.lib.core.utils.safeBinding
@@ -116,7 +116,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsAppLock.apply {
-            isVisible = context.isKeyguardSecure()
+            isVisible = LockActivity.hasBiometrics()
             isChecked = localSettings.isAppLocked
             setOnClickListener {
                 trackEvent("settingsGeneral", "lock", value = isChecked.toFloat())
