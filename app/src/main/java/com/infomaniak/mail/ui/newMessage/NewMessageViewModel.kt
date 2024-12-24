@@ -22,7 +22,6 @@ import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
@@ -124,11 +123,9 @@ class NewMessageViewModel @Inject constructor(
 
     val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
 
-    val showOrCloseSendBottomSheetDialog = SingleLiveEvent<Boolean>()
+    val showOrCloseSelectDateAndTimeForScheduleDialog = SingleLiveEvent<Boolean>()
 
-    fun showSendBottomSheetDialog() {
-        showOrCloseSendBottomSheetDialog.value = true
-    }
+    fun showSelectDateAndTimeForScheduleDialog() = showOrCloseSelectDateAndTimeForScheduleDialog.postValue(true)
 
     // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
     // 2. Inserting the AI proposition navigates back to NewMessageFragment.
@@ -147,6 +144,7 @@ class NewMessageViewModel @Inject constructor(
     var shouldSendInsteadOfSave = false
     var signaturesCount = 0
     private var isNewMessage = false
+    var scheduleDate: Date? = null
 
     private var snapshot: DraftSnapshot? = null
 
@@ -162,6 +160,7 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<InitResult>()
+    val sendMessageTrigger = SingleLiveEvent<Boolean>()
 
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
@@ -204,6 +203,7 @@ class NewMessageViewModel @Inject constructor(
     fun draftMode() = draftMode
     fun recipient() = recipient
     fun shouldLoadDistantResources() = shouldLoadDistantResources
+    fun triggerSendMessage() = sendMessageTrigger.postValue(true)
 
     fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
 
@@ -858,14 +858,14 @@ class NewMessageViewModel @Inject constructor(
     }
 
     fun setScheduleDate(scheduleDate: Date) = viewModelScope.launch(ioDispatcher) {
-        shouldScheduleInsteadOfSend = true
         val localUuid = draftLocalUuid ?: return@launch
+        this@NewMessageViewModel.scheduleDate = scheduleDate
+
+        shouldScheduleInsteadOfSend = true
+
         mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)?.also { draft ->
-                // TODO:
-                // draft.action = DraftAction.SCHEDULE
-                Log.e("TOTO", "setScheduleDate: ${scheduleDate.format(FORMAT_SCHEDULE_MAIL)}")
-                draft.scheduleDate = scheduleDate.format(FORMAT_SCHEDULE_MAIL)
+                draft.scheduleDate = this@NewMessageViewModel.scheduleDate?.format(FORMAT_SCHEDULE_MAIL)
             }
         }
     }
@@ -942,9 +942,6 @@ class NewMessageViewModel @Inject constructor(
         uiBodyValue: String,
         realm: MutableRealm,
     ) {
-        // TODO: Save selected date in viewmodel.
-
-        Log.e("TOTO", "updateDraftBeforeSavingRemotely, draftAction null ???: $draftAction")
 
         action = draftAction
         identityId = fromLiveData.value?.signature?.id.toString()
@@ -1055,8 +1052,7 @@ class NewMessageViewModel @Inject constructor(
                 if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
             }
             DraftAction.SCHEDULE -> {
-                // TODO:
-                if (isTaskRoot) appContext.showToast("TODO")
+                if (isTaskRoot) appContext.showToast(R.string.snackbarScheduling)
             }
         }
     }

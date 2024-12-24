@@ -231,7 +231,7 @@ class ThreadListAdapter @Inject constructor(
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
             mailDate.text = formatDate(context)
 
-            scheduleSendIcon.isVisible = hasScheduledDraft
+            scheduleSendIcon.isVisible = hasScheduledDraft && folderRole == FolderRole.SCHEDULED_DRAFTS
             draftPrefix.isVisible = hasDrafts
 
             val (isIconReplyVisible, isIconForwardVisible) = computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded)

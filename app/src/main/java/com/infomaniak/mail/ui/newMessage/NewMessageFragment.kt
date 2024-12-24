@@ -211,18 +211,23 @@ class NewMessageFragment : Fragment() {
             binding.scheduleSendButton.isVisible = true
         }
 
-        newMessageViewModel.showOrCloseSendBottomSheetDialog.observe(viewLifecycleOwner) { showDialog ->
+        newMessageViewModel.sendMessageTrigger.observe(viewLifecycleOwner) { tryToSendEmail(scheduled = true) }
+
+        observeSelectDateAndTimeForScheduleDialogState()
+    }
+
+    private fun observeSelectDateAndTimeForScheduleDialogState() {
+        newMessageViewModel.showOrCloseSelectDateAndTimeForScheduleDialog.observe(viewLifecycleOwner) { showDialog ->
             if (showDialog) {
                 selectDateAndTimeForScheduleDialog.show(
                     title = getString(R.string.datePickerTitle),
                     onPositiveButtonClicked = {
                         val scheduleDate = selectDateAndTimeForScheduleDialog.selectedDate.time
-                        localSettings.lastSelectedSchedule = scheduleDate
+                        localSettings.lastSelectedScheduleDate = scheduleDate
 
                         newMessageViewModel.setScheduleDate(Date(scheduleDate))
 
-                        // TODO: Try to schedule the mail.
-                        tryToSendEmail()
+                        tryToSendEmail(scheduled = true)
                     },
                     onNegativeButtonClicked = { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) },
                 )
@@ -714,12 +719,14 @@ class NewMessageFragment : Fragment() {
         sendButton.setOnClickListener { tryToSendEmail() }
     }
 
-    // TODO:
-    private fun tryToSendEmail() {
+    private fun tryToSendEmail(scheduled: Boolean = false) {
 
         fun setSnackbarActivityResult() {
             val resultIntent = Intent()
-            resultIntent.putExtra(MainActivity.DRAFT_ACTION_KEY, DraftAction.SCHEDULE.name)
+            resultIntent.putExtra(
+                MainActivity.DRAFT_ACTION_KEY,
+                if (scheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
+            )
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
         }
 

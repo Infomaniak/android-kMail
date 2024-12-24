@@ -18,8 +18,12 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.lib.core.BuildConfig.INFOMANIAK_API_V1
+import com.infomaniak.lib.core.utils.FORMAT_SCHEDULE_MAIL
+import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.BuildConfig.MAIL_API
 import com.infomaniak.mail.utils.Utils
+import java.net.URLEncoder
+import java.util.Date
 
 object ApiRoutes {
 
@@ -221,6 +225,15 @@ object ApiRoutes {
 
     fun draft(mailboxUuid: String, remoteDraftUuid: String): String {
         return "${draft(mailboxUuid)}/$remoteDraftUuid"
+    }
+
+    fun scheduleDraft(scheduleAction: String): String {
+        return "$MAIL_API$scheduleAction"
+    }
+
+    fun rescheduleDraft(draftResource: String, scheduleDate: Date): String {
+        val formatedDate = scheduleDate.format(FORMAT_SCHEDULE_MAIL)
+        return "$MAIL_API$draftResource/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
     }
 
     fun createAttachment(mailboxUuid: String): String {

@@ -27,6 +27,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -44,6 +45,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDialog() {
 
+    private val navigationArgs: ScheduleSendBottomSheetDialogArgs by navArgs()
+
     private var binding: BottomSheetScheduleSendBinding by safeBinding()
     override val mainViewModel: MainViewModel by activityViewModels()
 
@@ -59,8 +62,12 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        localSettings.lastSelectedSchedule?.let { lastSelectedSchedule ->
-            if (Date(lastSelectedSchedule).isInTheFuture()) {
+        localSettings.lastSelectedScheduleDate?.let { lastSelectedSchedule ->
+            Log.e(
+                "TOTO",
+                "onViewCreated, isAtLeastTenMinutesInTheFuture: ${Date(lastSelectedSchedule).isAtLeastTenMinutesInTheFuture()}"
+            )
+            if (Date(lastSelectedSchedule).isAtLeastTenMinutesInTheFuture()) {
                 lastScheduleItem.isVisible = true
                 lastScheduleItem.setDescription(
                     mostDetailedDate(
@@ -72,17 +79,36 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
             }
         }
 
-        lastScheduleItem.setClosingOnClickListener { Log.e("TOTO", "lastScheduleItem: CLICKED!") }
-        customScheduleItem.setClosingOnClickListener { newMessageViewModel.showSendBottomSheetDialog() }
+        lastScheduleItem.setClosingOnClickListener {
+            val draftResource = navigationArgs.draftResource
+            val lastSelectedScheduleDate = localSettings.lastSelectedScheduleDate
 
-        if (!newMessageViewModel.currentMailbox.isFree) {
-            customScheduleItem.setClosingOnClickListener { newMessageViewModel.showSendBottomSheetDialog() }
-        } else {
+            if (navigationArgs.isAlreadyScheduled) {
+                if (draftResource != null && lastSelectedScheduleDate != null) {
+                    mainViewModel.rescheduleDraft(draftResource, Date(lastSelectedScheduleDate))
+                }
+            } else {
+                lastSelectedScheduleDate?.let {
+                    newMessageViewModel.setScheduleDate(Date(it))
+                    newMessageViewModel.triggerSendMessage()
+                }
+            }
+        }
+
+        if (newMessageViewModel.currentMailbox.isFree) {
             customScheduleItem.setOnClickListener {
                 safeNavigate(
                     resId = R.id.upgradeProductBottomSheetDialog,
                     currentClassName = ScheduleSendBottomSheetDialog::class.java.name,
                 )
+            }
+        } else {
+            customScheduleItem.setClosingOnClickListener {
+                if (navigationArgs.isAlreadyScheduled) {
+                    mainViewModel.showSelectDateAndTimeForScheduleDialog()
+                } else {
+                    newMessageViewModel.showSelectDateAndTimeForScheduleDialog()
+                }
             }
         }
 
@@ -90,9 +116,13 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
             setTitle(schedule.scheduleTitleRes)
             setDescription(mostDetailedDate(context, date = schedule.date, format = FORMAT_DATE_DAY_MONTH))
             setIconResource(schedule.scheduleIconRes)
-            setOnClickListener {
-                // TODO: Schedule the mail, using the schedule's date.
-                Log.e("TOTO", "createScheduleItem: ${schedule.name} CLICKED!")
+            setClosingOnClickListener {
+                if (navigationArgs.isAlreadyScheduled) {
+                    navigationArgs.draftResource?.let { mainViewModel.rescheduleDraft(draftResource = it, schedule.date) }
+                } else {
+                    newMessageViewModel.setScheduleDate(schedule.date)
+                    newMessageViewModel.triggerSendMessage()
+                }
             }
         }
 
@@ -114,12 +144,14 @@ enum class TimeToDisplay {
     WEEKEND;
 
     companion object {
-        fun getTimeToDisplayFromDate(date: Date): TimeToDisplay = when (date.hours()) {
-            in 0..7 -> NIGHT
-            in 8..13 -> MORNING
-            in 14..19 -> AFTERNOON
-            in 20..23 -> EVENING
-            else -> NIGHT
+        fun getTimeToDisplayFromDate(date: Date): TimeToDisplay {
+            return if (date.isWeekend()) WEEKEND else when (date.hours()) {
+                in 0..7 -> NIGHT
+                in 8..13 -> MORNING
+                in 14..19 -> AFTERNOON
+                in 20..23 -> EVENING
+                else -> NIGHT
+            }
         }
     }
 }

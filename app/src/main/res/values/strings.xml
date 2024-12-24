@@ -544,6 +544,9 @@
     <string name="snackbarPhoneNumberCopiedToClipboard">Number copied to clipboard</string>
     <string name="snackbarReportPhishingConfirmation">Successfully reported</string>
     <string name="snackbarRestorationLaunched">Launching the restoration</string>
+    <string name="snackbarSaveInDraft">Your message has been saved in drafts.</string>
+    <string name="snackbarScheduleSaved">The message will be sent on %s</string>
+    <string name="snackbarScheduling">The message is being scheduled</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Sender successfully blacklisted</item>
         <item quantity="other">Senders successfully blacklisted</item>

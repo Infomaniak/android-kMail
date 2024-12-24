@@ -538,6 +538,9 @@
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero copiato negli appunti</string>
     <string name="snackbarReportPhishingConfirmation">Segnalato con successo</string>
     <string name="snackbarRestorationLaunched">Avvio del restauro</string>
+    <string name="snackbarSaveInDraft">Il tuo messaggio è stato salvato nelle bozze.</string>
+    <string name="snackbarScheduleSaved">Il messaggio verrà inviato il %s</string>
+    <string name="snackbarScheduling">Il messaggio è in fase di programmazione</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Mittente inserito nella lista nera con successo</item>
         <item quantity="other">Mittenti inseriti nella lista nera con successo</item>

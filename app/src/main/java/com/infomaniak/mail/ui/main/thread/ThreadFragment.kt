@@ -36,6 +36,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -65,6 +66,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
@@ -82,6 +84,7 @@ import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import java.util.Date
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -121,6 +124,9 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
+    @Inject
+    lateinit var selectDateAndTimeForScheduleDialog: SelectDateAndTimeForScheduleDialog
+
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
@@ -159,6 +165,8 @@ class ThreadFragment : Fragment() {
         observeReportDisplayProblemResult()
 
         observeMessageOfUserToBlock()
+
+        observeSelectDateAndTimeForScheduleDialogState()
     }
 
     private fun observeReportDisplayProblemResult() {
@@ -174,6 +182,28 @@ class ThreadFragment : Fragment() {
                 }
             }
             show(it)
+        }
+    }
+
+    private fun observeSelectDateAndTimeForScheduleDialogState() {
+        mainViewModel.showOrCloseSelectDateAndTimeForScheduleDialog.observe(viewLifecycleOwner) {
+            selectDateAndTimeForScheduleDialog.show(
+                title = getString(R.string.datePickerTitle),
+                onPositiveButtonClicked = {
+                    val scheduleDate = selectDateAndTimeForScheduleDialog.selectedDate.time
+                    localSettings.lastSelectedScheduleDate = scheduleDate
+
+                    mainViewModel.draftResource?.let { draftResource ->
+                        mainViewModel.rescheduleDraft(draftResource, Date(scheduleDate))
+                    }
+                },
+                onNegativeButtonClicked = {
+                    safeNavigate(
+                        resId = R.id.scheduleSendBottomSheetDialog,
+                        currentClassName = ThreadFragment::class.java.name,
+                    )
+                },
+            )
         }
     }
 
@@ -328,6 +358,32 @@ class ThreadFragment : Fragment() {
                         ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
                     }
                 },
+                onRescheduleClicked = { draftResource ->
+                    mainViewModel.draftResource = draftResource
+                    safeNavigate(
+                        resId = R.id.scheduleSendBottomSheetDialog,
+                        args = ScheduleSendBottomSheetDialogArgs(
+                            isAlreadyScheduled = true,
+                            draftResource = draftResource,
+                        ).toBundle(),
+                        currentClassName = ThreadFragment::class.java.name,
+                    )
+                },
+                onModifyClicked = { message ->
+                    val scheduleAction = message.scheduleAction
+                    val draftResource = message.draftResource
+
+                    if (scheduleAction != null && draftResource != null) {
+                        mainViewModel.modifyDraft(scheduleAction, draftResource) {
+                            // trackNewMessageEvent(OPEN_FROM_DRAFT_NAME) // TODO: Matomo.
+                            twoPaneViewModel.navigateToNewMessage(
+                                arrivedFromExistingDraft = true,
+                                draftResource = message.draftResource,
+                                messageUid = message.uid,
+                            )
+                        }
+                    }
+                }
             ),
         )
 

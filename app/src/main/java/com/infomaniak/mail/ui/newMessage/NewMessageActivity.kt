@@ -124,7 +124,6 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun saveDraft() {
-        // TODO: Add missing DraftAction (Scheduled).
         val draftAction = if (newMessageViewModel.shouldScheduleInsteadOfSend) {
             DraftAction.SCHEDULE
         } else if (newMessageViewModel.shouldSendInsteadOfSave) {
@@ -144,7 +143,10 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
+        draftsActionsWorkerScheduler.scheduleWork(
+            draftLocalUuid = newMessageViewModel.draftLocalUuid(),
+            scheduleDate = newMessageViewModel.scheduleDate,
+        )
     }
 
     data class DraftSaveConfiguration(

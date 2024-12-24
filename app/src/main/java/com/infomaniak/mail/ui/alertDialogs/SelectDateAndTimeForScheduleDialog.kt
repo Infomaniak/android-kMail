@@ -59,27 +59,12 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
     private fun initDialog(customThemeRes: Int? = null) = with(binding) {
         val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
 
-        selectedDate = Date().roundUpToNextFiveMinutes()
+        selectedDate = Date().roundUpToNextTenMinutes()
 
-        val constraintsBuilder =
-            CalendarConstraints.Builder()
-                .setValidator(DateValidatorPointForward.now())
-
-        datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText(context.getString(R.string.selectDateDialogTitle))
-            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-            .setCalendarConstraints(constraintsBuilder.build())
-            .build()
+        setTimePicker()
+        setDatePicker()
 
         dateField.setText(selectedDate.format(FORMAT_DATE_DAY_MONTH_YEAR))
-
-        timePicker = MaterialTimePicker.Builder()
-            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-            .setTimeFormat(TimeFormat.CLOCK_24H)
-            .setHour(selectedDate.hours())
-            .setMinute(selectedDate.minutes())
-            .setTitleText(context.getString(R.string.selectTimeDialogTitle))
-            .build()
 
         builder
             .setView(root)
@@ -152,6 +137,28 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
         }
     }
 
+    private fun setTimePicker() = with(binding) {
+        timePicker = MaterialTimePicker.Builder()
+            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setHour(selectedDate.hours())
+            .setMinute(selectedDate.minutes())
+            .setTitleText(context.getString(R.string.selectTimeDialogTitle))
+            .build()
+    }
+
+    private fun setDatePicker() = with(binding) {
+        val constraintsBuilder =
+            CalendarConstraints.Builder()
+                .setValidator(DateValidatorPointForward.now())
+
+        datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(context.getString(R.string.selectDateDialogTitle))
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .setCalendarConstraints(constraintsBuilder.build())
+            .build()
+    }
+
     private fun showDialogWithBasicInfo(
         title: String? = null,
         @StringRes positiveButtonText: Int? = null,
@@ -160,9 +167,12 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
 
         alertDialog.show()
 
-        selectedDate = Date().roundUpToNextFiveMinutes()
+        selectedDate = Date().roundUpToNextTenMinutes()
 
         binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
+
+        setTimePicker()
+        setDatePicker()
 
         title?.let(dialogTitle::setText)
 

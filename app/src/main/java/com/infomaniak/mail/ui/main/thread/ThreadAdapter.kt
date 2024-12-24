@@ -23,7 +23,6 @@ import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View.OnClickListener
@@ -204,7 +203,7 @@ class ThreadAdapter(
         initMapForNewMessage(message, position)
 
         bindHeader(message)
-        bindAlerts(message.uid)
+        bindAlerts(message)
         bindCalendarEvent(message)
         bindAttachment(message)
         bindContent(message)
@@ -453,16 +452,18 @@ class ThreadAdapter(
         detailedMessageDate.text = mostDetailedDate(context, messageDate)
     }
 
-    private fun MessageViewHolder.bindAlerts(messageUid: String) = with(binding) {
-        scheduleAlert.onAction1 { Log.e("TOTO", "bindAlerts: RESCHEDULE CLICKED!") }
+    private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
+        message.draftResource?.let { draftResource ->
+            scheduleAlert.onAction1 { threadAdapterCallbacks?.onRescheduleClicked?.invoke(draftResource) }
+        }
 
-        scheduleAlert.onAction2 { Log.e("TOTO", "bindAlerts: MODIFY CLICKED!") }
+        scheduleAlert.onAction2 { threadAdapterCallbacks?.onModifyClicked?.invoke(message) }
 
         distantImagesAlert.onAction1 {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
 
-            manuallyAllowedMessagesUids.add(messageUid)
+            manuallyAllowedMessagesUids.add(message.uid)
 
             reloadVisibleWebView()
 
@@ -765,6 +766,8 @@ class ThreadAdapter(
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
+        var onRescheduleClicked: ((String) -> Unit)? = null,
+        var onModifyClicked: ((Message) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {

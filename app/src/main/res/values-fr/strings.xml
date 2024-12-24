@@ -546,6 +546,9 @@
     <string name="snackbarPhoneNumberCopiedToClipboard">Numéro copié dans le presse-papiers</string>
     <string name="snackbarReportPhishingConfirmation">Signalement effectué avec succès</string>
     <string name="snackbarRestorationLaunched">Lancement de la restauration</string>
+    <string name="snackbarSaveInDraft">Votre message a été sauvegardé dans les brouillons.</string>
+    <string name="snackbarScheduleSaved">Le message sera envoyé le %s</string>
+    <string name="snackbarScheduling">Le message est en cours de planification</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Expéditeur blacklisté avec succès</item>
         <item quantity="other">Expéditeurs blacklistés avec succès</item>

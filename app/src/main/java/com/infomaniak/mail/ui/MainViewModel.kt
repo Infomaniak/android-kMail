@@ -233,6 +233,14 @@ class MainViewModel @Inject constructor(
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
     //endregion
 
+    //region Schedule draft
+    var draftResource: String? = null
+
+    val showOrCloseSelectDateAndTimeForScheduleDialog = SingleLiveEvent<Unit>()
+
+    fun showSelectDateAndTimeForScheduleDialog() = showOrCloseSelectDateAndTimeForScheduleDialog.postValue(Unit)
+    //endregion
+
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Update user info")
         updateAddressBooks()
@@ -399,6 +407,11 @@ class MainViewModel @Inject constructor(
         refreshThreads(folderId = folderId)
     }
 
+    private fun openDraftFolder() {
+        val draftFolder = folderController.getFolder(FolderRole.DRAFT)
+        draftFolder?.let { folder -> openFolder(folder.id) }
+    }
+
     fun flushFolder() = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
         val folderId = currentFolderId ?: return@launch
@@ -474,6 +487,7 @@ class MainViewModel @Inject constructor(
         deleteThreadsOrMessage(threadsUids = threadsUids)
     }
 
+    // TODO: When the back is done refactoring how scheduled drafts are deleted, work on this function shall resume.
     private fun deleteThreadsOrMessage(
         threadsUids: List<String>,
         message: Message? = null,
@@ -487,17 +501,21 @@ class MainViewModel @Inject constructor(
         val shouldPermanentlyDelete = isPermanentDeleteFolder(getActionFolderRole(threads, message))
 
         val messages = getMessagesToDelete(threads, message)
-        val uids = messages.getUids()
+
+        val messagesUids = messages.filter { it.isScheduledDraft.not() }.getUids()
+        val scheduledMessagesUuid = messages.filter { it.isScheduledDraft }.getUids()
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
         val apiResponses = if (shouldPermanentlyDelete) {
-            ApiRepository.deleteMessages(mailbox.uuid, uids)
+            ApiRepository.deleteMessages(mailbox.uuid, messagesUids)
+            // TODO: Delete scheduled messages separately, but avoid making too much call (waiting for API changes).
         } else {
             trashId = folderController.getFolder(FolderRole.TRASH)!!.id
-            ApiRepository.moveMessages(mailbox.uuid, uids, trashId).also {
+            ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId).also {
                 undoResources = it.mapNotNull { apiResponse -> apiResponse.data?.undoResource }
             }
+            // TODO: Move? scheduled messages separately.
         }
 
         deleteThreadOrMessageTrigger.postValue(Unit)
@@ -581,10 +599,65 @@ class MainViewModel @Inject constructor(
         showDraftDeletedSnackbar(apiResponse)
     }
 
+    fun deleteScheduleDraft(scheduleAction: String) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value!!
+        val apiResponse = ApiRepository.deleteScheduleDraft(scheduleAction)
+
+        if (apiResponse.isSuccess()) {
+            val draftFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+            refreshFoldersAsync(mailbox, listOf(draftFolderId))
+        }
+
+        showScheduleDraftDeletedSnackbar(apiResponse)
+    }
+
     private fun showDraftDeletedSnackbar(apiResponse: ApiResponse<Unit>) {
         val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
         snackbarManager.postValue(appContext.getString(titleRes))
     }
+
+    private fun showScheduleDraftDeletedSnackbar(apiResponse: ApiResponse<Unit>) {
+        if (apiResponse.isSuccess()) {
+            snackbarManager.postValue(
+                title = appContext.getString(R.string.snackbarSaveInDraft),
+                buttonTitle = R.string.draftFolder,
+                customBehavior = ::openDraftFolder,
+            )
+        } else {
+            snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
+        }
+    }
+    //endregion
+
+    //region Schedule draft
+    private fun getScheduleDraft(draftResource: String, onSuccess: () -> Unit) = viewModelScope.launch(ioCoroutineContext) {
+        val apiResponse = ApiRepository.getDraft(draftResource)
+
+        if (apiResponse.isSuccess()) {
+            onSuccess()
+        }
+    }
+
+    fun rescheduleDraft(draftResource: String, scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
+        val apiResponse = ApiRepository.rescheduleDraft(draftResource, scheduleDate)
+
+        if (apiResponse.isSuccess()) {
+            refreshScheduleDraftFolder()
+        } // TODO: Else, Sentry?
+    }
+
+    fun modifyDraft(scheduleAction: String, draftResource: String, onSuccess: () -> Unit) =
+        viewModelScope.launch(ioCoroutineContext) {
+            val mailbox = currentMailbox.value!!
+            val apiResponse = ApiRepository.deleteScheduleDraft(scheduleAction)
+
+            if (apiResponse.isSuccess()) {
+                val draftFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+                refreshFoldersAsync(mailbox, listOf(draftFolderId))
+
+                getScheduleDraft(draftResource, onSuccess)
+            }
+        }
     //endregion
 
     //region Move
@@ -1140,6 +1213,19 @@ class MainViewModel @Inject constructor(
             val delay = REFRESH_DELAY + max(etopScheduledDate - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+                mailbox = currentMailbox.value!!,
+                folderId = folder.id,
+                realm = mailboxContentRealm(),
+            )
+        }
+    }
+
+    private fun refreshScheduleDraftFolder() = viewModelScope.launch(ioCoroutineContext) {
+        val folder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)
+
+        if (folder?.cursor != null) {
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = currentMailbox.value!!,

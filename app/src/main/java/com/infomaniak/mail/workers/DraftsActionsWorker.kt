@@ -18,7 +18,6 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
@@ -33,9 +32,13 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment.UploadStatus
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -71,6 +74,8 @@ class DraftsActionsWorker @AssistedInject constructor(
     private val mainApplication: MainApplication,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
+    private val folderController: FolderController,
+    private val refreshController: RefreshController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
@@ -84,6 +89,9 @@ class DraftsActionsWorker @AssistedInject constructor(
     private lateinit var userApiToken: String
     private var isSnackbarFeedbackNeeded: Boolean = false
 
+    private var scheduleDate: Long? = null
+    private var scheduleAction: String? = null
+
     private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
     override suspend fun launchWork(): Result = withContext(ioDispatcher) {
@@ -95,6 +103,9 @@ class DraftsActionsWorker @AssistedInject constructor(
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
         mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@withContext Result.failure()
         draftLocalUuid = inputData.getString(DRAFT_LOCAL_UUID_KEY)
+
+        scheduleDate = inputData.getLongOrNull(SCHEDULE_DATE_KEY) ?: return@withContext Result.failure()
+        scheduleAction = inputData.getString(SCHEDULE_ACTION_KEY)
 
         userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return@withContext Result.failure()
         mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@withContext Result.failure()
@@ -133,13 +144,11 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
         SentryLog.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
-        Log.e("TOTO", "handleDraftsActions: ${drafts.joinToString { it.action.toString() }}")
         if (drafts.isEmpty()) return Result.failure()
 
         var haveAllDraftsSucceeded = true
 
         drafts.asReversed().forEach { draft ->
-            Log.e("TOTO", "handleDraftsActions DRAFT ACTION: ${draft.action}")
 
             val isTargetDraft = draft.localUuid == draftLocalUuid
             if (isTargetDraft) trackedDraftAction = draft.action
@@ -154,6 +163,8 @@ class DraftsActionsWorker @AssistedInject constructor(
                         }
                         etopScheduledDate?.let(etopScheduledDates::add)
                         realmActionOnDraft?.let(realmActionsOnDraft::add)
+
+                        this@DraftsActionsWorker.scheduleAction = scheduleAction
                     } else if (isTargetDraft) {
                         trackedDraftErrorMessageResId = errorMessageResId!!
                         isTrackedDraftSuccess = false
@@ -235,6 +246,20 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
     }
 
+    private suspend fun refreshScheduleDraftFolder() {
+        val currentMailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return
+        val folder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)
+
+        if (folder?.cursor != null) {
+            refreshController.refreshThreads(
+                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+                mailbox = currentMailbox,
+                folderId = folder.id,
+                realm = mailboxContentRealm,
+            )
+        }
+    }
+
     private fun computeResult(
         etopScheduledDates: MutableList<String>,
         haveAllDraftsSucceeded: Boolean,
@@ -254,6 +279,8 @@ class DraftsActionsWorker @AssistedInject constructor(
                     RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
                     BIGGEST_ETOP_SCHEDULED_DATE_KEY to biggestEtopScheduledDate,
                     RESULT_USER_ID_KEY to userId,
+                    SCHEDULE_DATE_KEY to scheduleDate,
+                    SCHEDULE_ACTION_KEY to scheduleAction,
                 )
             } else {
                 Data.EMPTY
@@ -276,6 +303,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     data class DraftActionResult(
         val realmActionOnDraft: ((MutableRealm) -> Unit)?,
         val etopScheduledDate: String?,
+        val scheduleAction: String?,
         val errorMessageResId: Int?,
         val savedDraftUuid: String?,
         val isSuccess: Boolean,
@@ -285,6 +313,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         var realmActionOnDraft: ((MutableRealm) -> Unit)? = null
         var etopScheduledDate: String? = null
+        var scheduleAction: String? = null
         var savedDraftUuid: String? = null
 
         SentryDebug.addDraftBreadcrumbs(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
@@ -304,6 +333,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             return DraftActionResult(
                 realmActionOnDraft = null,
                 etopScheduledDate = null,
+                scheduleAction = null,
                 errorMessageResId = R.string.errorCorruptAttachment,
                 savedDraftUuid = null,
                 isSuccess = false,
@@ -311,8 +341,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         suspend fun executeSaveAction() = with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
-            Log.e("TOTO", "executeSaveAction: SAVE!")
-
             data?.let { data ->
                 realmActionOnDraft = { realm ->
                     realm.findLatest(draft)?.apply {
@@ -329,8 +357,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         suspend fun executeSendAction() = with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
-            Log.e("TOTO", "executeSendAction: SEND!")
-
             when {
                 isSuccess() -> {
                     etopScheduledDate = data?.etopScheduledDate
@@ -350,23 +376,38 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        Log.e("TOTO", "executeDraftAction, draft.action: ${draft.action}")
+        suspend fun executeScheduleSendAction() = with(ApiRepository.sendScheduleDraft(mailboxUuid, draft, okHttpClient)) {
+            when {
+                isSuccess() -> {
+                    scheduleAction = data?.scheduleAction
+                    realmActionOnDraft = deleteDraftCallback(draft)
+                    refreshScheduleDraftFolder()
+                }
+                error?.exception is SerializationException -> {
+                    realmActionOnDraft = deleteDraftCallback(draft)
+                    Sentry.captureMessage("Return JSON for SendScheduleDraft API call was modified", SentryLevel.ERROR) { scope ->
+                        scope.setExtra("Is data null ?", "${data == null}")
+                        scope.setExtra("Error code", error?.code.toString())
+                        scope.setExtra("Error description", error?.description.toString())
+                    }
+                }
+                else -> {
+                    retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
+                }
+            }
+        }
 
         when (draft.action) {
             DraftAction.SAVE -> executeSaveAction()
             DraftAction.SEND -> executeSendAction()
-            // TODO: executeScheduleAction()
-            DraftAction.SCHEDULE -> {
-                Log.e("TOTO", "executeDraftAction: PAR ICI!")
-
-                executeSendAction()
-            }
+            DraftAction.SCHEDULE -> executeScheduleSendAction()
             else -> Unit
         }
 
         return DraftActionResult(
             realmActionOnDraft = realmActionOnDraft,
             etopScheduledDate = etopScheduledDate,
+            scheduleAction = scheduleAction,
             errorMessageResId = null,
             savedDraftUuid = savedDraftUuid,
             isSuccess = true,
@@ -414,7 +455,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         private val workManager: WorkManager,
     ) {
 
-        fun scheduleWork(draftLocalUuid: String? = null) {
+        fun scheduleWork(draftLocalUuid: String? = null, scheduleDate: Date? = null) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (draftController.getDraftsWithActionsCount() == 0L) return
@@ -425,6 +466,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                 USER_ID_KEY to AccountUtils.currentUserId,
                 MAILBOX_ID_KEY to AccountUtils.currentMailboxId,
                 DRAFT_LOCAL_UUID_KEY to draftLocalUuid,
+                SCHEDULE_DATE_KEY to scheduleDate?.time,
             )
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)
@@ -460,5 +502,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val RESULT_DRAFT_ACTION_KEY = "resultDraftActionKey"
         const val BIGGEST_ETOP_SCHEDULED_DATE_KEY = "biggestEtopScheduledDateKey"
         const val RESULT_USER_ID_KEY = "resultUserIdKey"
+        const val SCHEDULE_DATE_KEY = "scheduleDateKey"
+        const val SCHEDULE_ACTION_KEY = "scheduleActionKey"
     }
 }
