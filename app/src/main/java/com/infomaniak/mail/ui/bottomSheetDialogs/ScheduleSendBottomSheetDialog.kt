@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,10 +62,6 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
         super.onViewCreated(view, savedInstanceState)
 
         localSettings.lastSelectedScheduleDate?.let { lastSelectedSchedule ->
-            Log.e(
-                "TOTO",
-                "onViewCreated, isAtLeastTenMinutesInTheFuture: ${Date(lastSelectedSchedule).isAtLeastTenMinutesInTheFuture()}"
-            )
             if (Date(lastSelectedSchedule).isAtLeastTenMinutesInTheFuture()) {
                 lastScheduleItem.isVisible = true
                 lastScheduleItem.setDescription(
