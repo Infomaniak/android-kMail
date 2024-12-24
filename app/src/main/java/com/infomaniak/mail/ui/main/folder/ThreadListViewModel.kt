@@ -46,6 +46,8 @@ class ThreadListViewModel @Inject constructor(
     val updatedAtTrigger = MutableLiveData<Unit>()
     val isWebViewOutdated = MutableLiveData(false)
 
+    val contentDisplayMode = MutableLiveData(ContentDisplayMode.Threads)
+
     var currentFolderCursor: String? = null
     var currentThreadsCount: Int? = null
 
@@ -82,6 +84,12 @@ class ThreadListViewModel @Inject constructor(
             SentryDebug.sendWebViewVersionName(versionData)
         }
         isWebViewOutdated.value = canShowWebViewOutdated && hasOutdatedMajorVersion
+    }
+
+    enum class ContentDisplayMode {
+        Threads,
+        NoNetwork,
+        EmptyFolder,
     }
 
     companion object {

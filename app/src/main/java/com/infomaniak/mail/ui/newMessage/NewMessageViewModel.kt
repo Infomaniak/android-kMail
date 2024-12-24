@@ -201,7 +201,6 @@ class NewMessageViewModel @Inject constructor(
     fun arrivedFromExistingDraft() = arrivedFromExistingDraft
     fun draftLocalUuid() = draftLocalUuid
     fun draftMode() = draftMode
-    fun recipient() = recipient
     fun shouldLoadDistantResources() = shouldLoadDistantResources
     fun triggerSendMessage() = sendMessageTrigger.postValue(true)
 
