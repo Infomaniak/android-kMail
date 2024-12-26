@@ -21,11 +21,9 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import com.infomaniak.lib.applock.LockActivity
-import com.infomaniak.lib.applock.Utils.isKeyguardSecure
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.extensions.getMainApplication
 import io.sentry.Sentry
 import kotlinx.coroutines.runBlocking
 
@@ -49,23 +47,12 @@ open class BaseActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         trackScreen()
-    }
 
-    override fun onResume() {
-        super.onResume()
-
-        if (localSettings.isAppLocked && isKeyguardSecure()) with(getMainApplication()) {
-            lastAppClosingTime?.let {
-                LockActivity.lockAfterTimeout(
-                    context = this@BaseActivity,
-                    destinationClass = this::class.java,
-                    lastAppClosingTime = it,
-                    primaryColor = localSettings.accentColor.getPrimary(this),
-                )
-            }
-
-            resetLastAppClosing()
-        }
+        LockActivity.scheduleLockIfNeeded(
+            targetActivity = this,
+            primaryColor = localSettings.accentColor.getPrimary(this),
+            isAppLockEnabled = { localSettings.isAppLocked }
+        )
     }
 
     fun getCurrentFragment(@IdRes fragmentContainerViewId: Int) = supportFragmentManager
