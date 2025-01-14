@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -714,17 +715,19 @@ class RefreshController @Inject constructor(
     //region API calls
     private fun getDateOrderedMessagesUids(folderId: String): NewMessagesResult? {
         return with(ApiRepository.getDateOrderedMessagesUids(mailbox.uuid, folderId, okHttpClient)) {
-            if (!isSuccess()) throwErrorAsException()
+            if (canThrowException()) throwErrorAsException()
             return@with data
         }
     }
 
     private fun getMessagesUidsDelta(folderId: String, previousCursor: String): ActivitiesResult? {
         return with(ApiRepository.getMessagesUidsDelta(mailbox.uuid, folderId, previousCursor, okHttpClient)) {
-            if (!isSuccess()) throwErrorAsException()
+            if (canThrowException()) throwErrorAsException()
             return@with data
         }
     }
+
+    private fun <T> ApiResponse<T>.canThrowException() = !isSuccess() && error?.code != ErrorCode.NOT_AUTHORIZED
     //endregion
 
     //region Handle errors
