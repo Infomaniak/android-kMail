@@ -283,13 +283,6 @@ object SentryDebug {
         }
     }
 
-    fun sendSubBodiesTrigger(messageUid: String) {
-        Sentry.captureMessage("Received an email with SubBodies!!") { scope ->
-            scope.setExtra("email", "${AccountUtils.currentMailboxEmail}")
-            scope.setExtra("messageUid", messageUid)
-        }
-    }
-
     fun sendCredentialsIssue(infomaniakLogin: String?, infomaniakPassword: String) {
         Sentry.captureMessage("Credentials issue when trying to auto-sync user", SentryLevel.ERROR) { scope ->
             scope.setExtra("email", "${AccountUtils.currentUser?.email}")

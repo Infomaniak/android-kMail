@@ -132,8 +132,6 @@ object MessageBodyUtils {
             }
         }
 
-        if (subBodiesContent.isNotEmpty()) SentryDebug.sendSubBodiesTrigger(messageUid)
-
         return subBodiesContent
     }
 
