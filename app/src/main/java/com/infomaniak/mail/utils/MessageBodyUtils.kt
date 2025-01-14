@@ -118,11 +118,11 @@ object MessageBodyUtils {
         }
     }
 
-    fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>, messageUid: String): String {
-        return body + formatSubBodiesContent(subBodies, messageUid)
+    fun mergeSplitBodyAndSubBodies(body: String, subBodies: List<SubBody>): String {
+        return body + formatSubBodiesContent(subBodies)
     }
 
-    private fun formatSubBodiesContent(subBodies: List<SubBody>, messageUid: String): String {
+    private fun formatSubBodiesContent(subBodies: List<SubBody>): String {
         var subBodiesContent = ""
 
         subBodies.forEach { subBody ->
