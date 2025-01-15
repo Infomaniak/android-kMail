@@ -176,13 +176,33 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
                 val isNetworkException = event.exceptions?.any { it.type == "ApiController\$NetworkException" } ?: false
+                val isAccessDeniedException = event.exceptions?.any {
+                    // TODO: Check in Sentry if this `value.contains()` is the correct way to find this exception.
+                    it.type == "ApiErrorException" && it.value?.contains("access_denied") == true
+                } ?: false
+                val isNotAuthorizedException = event.exceptions?.any {
+                    // TODO: Check in Sentry if this `value.contains()` is the correct way to find this exception.
+                    it.type == "ApiErrorException" && it.value?.contains("not_authorized") == true
+                } ?: false
                 /**
                  * Reasons to discard Sentry events :
                  * - Application is in Debug mode
                  * - User deactivated Sentry tracking in DataManagement settings
                  * - The exception was a NetworkException, and we don't want to send them to Sentry
+                 * - The exception was a ApiErrorException with `access_denied` or `not_authorized` error code,
+                 *   and we don't want to send them to Sentry
                  */
-                if (!BuildConfig.DEBUG && localSettings.isSentryTrackingEnabled && !isNetworkException) event else null
+                if (
+                    !BuildConfig.DEBUG &&
+                    localSettings.isSentryTrackingEnabled &&
+                    !isNetworkException &&
+                    !isAccessDeniedException &&
+                    !isNotAuthorizedException
+                ) {
+                    event
+                } else {
+                    null
+                }
             }
             options.addIntegration(
                 FragmentLifecycleIntegration(
