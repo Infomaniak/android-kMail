@@ -1,0 +1,2 @@
+- feat : Verrouille l'application lorsque l'écran s'éteint
+- fix : N'affiche pas un contact si l'email est incorrect
