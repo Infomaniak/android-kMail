@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -341,17 +341,26 @@ fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: B
 
         val folder = inputList.removeAt(0)
 
+        /*
+        * There are two types of folders:
+        * - user's folders (with or without a role)
+        * - hidden IK folders (scheduled drafts, snoozed, etc…)
+        *
+        * We want to display the user's folders, and also the IK folders for which we handle the role.
+        * IK folders where we don't handle the role are dismissed.
+        */
+        fun shouldThisFolderBeAdded(): Boolean = folder.path.startsWith(IK_FOLDER).not() || folder.role != null
+
         val children = if (folder.isManaged()) {
-            if (folder.name != IK_FOLDER) outputList.add(folder.copyFromRealm(depth = 1u))
+            if (shouldThisFolderBeAdded()) outputList.add(folder.copyFromRealm(depth = 1u))
+
             with(folder.children) {
-                (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
-                    .sortFolders()
-                    .find()
+                (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
             }
         } else {
-            if (folder.name != IK_FOLDER) outputList.add(folder)
-            (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children)
-                .sortFolders()
+            if (shouldThisFolderBeAdded()) outputList.add(folder)
+
+            (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
         }
 
         inputList.addAll(index = 0, children)
@@ -579,7 +588,7 @@ fun Context.postfixWithTag(
                 tag,
                 getTagsPaint(this),
                 ellipsizeConfiguration.maxWidth,
-                ellipsizeConfiguration.truncateAt
+                ellipsizeConfiguration.truncateAt,
             ).toString()
         } ?: tag
     }

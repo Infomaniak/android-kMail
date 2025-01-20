@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -169,6 +169,7 @@ class Folder : RealmObject, Cloneable {
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 8, "commercialFolder"),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 7, "socialNetworksFolder"),
         SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 6, "sentFolder"),
+        // TODO: Matomo
         SCHEDULED_DRAFTS(R.string.scheduledMessagesFolder, R.drawable.ic_schedule_send, 5, "scheduledMessagesFolder"),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftFolder"),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, "spamFolder"),
