@@ -13,6 +13,9 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url 'https://jitpack.io' }
     }
+    versionCatalogs {
+        create("core") { from(files("Core/gradle/core.versions.toml")) }
+    }
 }
 
 rootProject.name = 'Infomaniak Mail'
