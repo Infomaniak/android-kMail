@@ -3,6 +3,10 @@ buildscript {
         classpath libs.navigation.safeargs
         classpath libs.google.services
     }
+
+    project.ext.sharedCompileSdk = 35
+    project.ext.sharedMinSdk = 24
+    project.ext.sharedJavaVersion = JavaVersion.VERSION_17
 }
 
 plugins {
