@@ -56,7 +56,7 @@ class DownloadMessagesViewModel @Inject constructor(
         val downloadedThreadUris: List<Uri>? = runCatching {
             val mailbox = currentMailbox ?: return@runCatching null
             val listUri = mutableListOf<Uri>()
-            val listFileName = getAllFileNameInExportEmlDir(appContext)
+            val listFileName = hashMapOf<String, Int>()
 
             messageLocalUids.forEach { messageUid ->
                 val message = messageController.getMessage(messageUid) ?: return@runCatching null
@@ -87,32 +87,6 @@ class DownloadMessagesViewModel @Inject constructor(
         }.getOrNull()
 
         emit(downloadedThreadUris)
-    }
-
-    private fun getAllFileNameInExportEmlDir(context: Context): HashMap<String, Int> {
-
-        val fileNameMap = HashMap<String, Int>()
-        val fileDir = getEmlCacheDir(context)
-        if (!fileDir.exists()) fileDir.mkdirs()
-
-        fileDir.listFiles()?.forEach { file ->
-            val nameWithoutExtension = file.name.removeSuffix(".eml")
-
-            val regex = Regex("\\((\\d+)\\)$")
-            val match = regex.find(nameWithoutExtension)
-            val numberInParentheses = match?.groupValues?.last()
-
-            var fileNumber = numberInParentheses?.toInt() ?: 0
-            val fileName = nameWithoutExtension.replace(regex, "").trim()
-
-            fileNameMap[fileName]?.let {
-                fileNumber = if (it > fileNumber) it else fileNumber
-            }
-
-            fileNameMap[fileName] = fileNumber
-        }
-
-        return fileNameMap
     }
 
     private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
