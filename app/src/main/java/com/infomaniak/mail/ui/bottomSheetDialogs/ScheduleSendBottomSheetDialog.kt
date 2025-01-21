@@ -62,7 +62,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
         super.onViewCreated(view, savedInstanceState)
 
         localSettings.lastSelectedScheduleDate?.let { lastSelectedSchedule ->
-            if (Date(lastSelectedSchedule).isAtLeastTenMinutesInTheFuture()) {
+            if (Date(lastSelectedSchedule).isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)) {
                 lastScheduleItem.isVisible = true
                 lastScheduleItem.setDescription(
                     mostDetailedDate(
@@ -128,6 +128,10 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
 
         val shouldDisplayDivider = lastScheduleItem.isVisible
         (scheduleItems.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
+    }
+
+    companion object {
+        const val MIN_SCHEDULE_DELAY_MINUTES = 5
     }
 }
 

@@ -269,7 +269,10 @@
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
     <string name="errorAttachmentNotFound">No se ha encontrado el adjunto</string>
     <string name="errorCalendarChoiceCouldNotBeSent">Se ha producido un error al enviar su respuesta</string>
-    <string name="errorChooseDateToCome">Elija una fecha próxima</string>
+    <plurals name="errorChooseDateToComeMinutesInTheFuture">
+        <item quantity="one">Elija una fecha próxima, al menos %d minutos en el futuro</item>
+        <item quantity="other">Elija una fecha próxima, al menos %d minutos en el futuro</item>
+    </plurals>
     <string name="errorCorruptAttachment">No se ha podido gestionar el borrador, un archivo adjunto está dañado</string>
     <string name="errorDraftNotFound">No se puede encontrar el borrador</string>
     <string name="errorEditScheduledMessage">Imposible modificar un mensaje programado o enviado</string>

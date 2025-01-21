@@ -269,7 +269,10 @@
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
     <string name="errorAttachmentNotFound">Dateianhang unauffindbar</string>
     <string name="errorCalendarChoiceCouldNotBeSent">Beim Senden Ihrer Antwort ist ein Fehler aufgetreten</string>
-    <string name="errorChooseDateToCome">Wählen Sie ein zukünftiges Datum</string>
+    <plurals name="errorChooseDateToComeMinutesInTheFuture">
+        <item quantity="one">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
+        <item quantity="other">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
+    </plurals>
     <string name="errorCorruptAttachment">Der Entwurf konnte nicht bearbeitet werden, ein Anhang ist beschädigt</string>
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>

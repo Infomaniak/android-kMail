@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
 import androidx.annotation.StringRes
+import androidx.core.view.isVisible
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -29,6 +30,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeForScheduleBinding
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import java.util.Date
@@ -57,6 +59,13 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
     lateinit var localSettings: LocalSettings
 
     private fun initDialog(customThemeRes: Int? = null) = with(binding) {
+
+        scheduleDateError.text = context.resources.getQuantityString(
+            R.plurals.errorChooseDateToComeMinutesInTheFuture,
+            MIN_SCHEDULE_DELAY_MINUTES,
+            MIN_SCHEDULE_DELAY_MINUTES,
+        )
+
         val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
 
         selectedDate = Date().roundUpToNextTenMinutes()
@@ -114,8 +123,9 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
             selectedDate = selectedDate.setMinute(minute)
 
             binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
-            // TODO: Display error message if the selected date is in the past.
-            // binding.scheduleDateError.isVisible =
+
+            binding.scheduleDateError.isVisible = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES).not()
+            positiveButton.isEnabled = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)
         }
 
         this@SelectDateAndTimeForScheduleDialog.onPositiveButtonClicked = onPositiveButtonClicked
