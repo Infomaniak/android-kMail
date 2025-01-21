@@ -56,7 +56,7 @@ class DownloadMessagesViewModel @Inject constructor(
         val downloadedThreadUris: List<Uri>? = runCatching {
             val mailbox = currentMailbox ?: return@runCatching null
             val listUri = mutableListOf<Uri>()
-            val listFileName = getAllFileNameInExportEmlDir(appContext).toMutableSet()
+            val listFileName = getAllFileNameInExportEmlDir(appContext)
 
             messageLocalUids.forEach { messageUid ->
                 val message = messageController.getMessage(messageUid) ?: return@runCatching null
@@ -69,10 +69,16 @@ class DownloadMessagesViewModel @Inject constructor(
                 if (!response.isSuccessful || response.body == null) return@runCatching null
 
                 val messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
-                createUniqueFileName(messageSubject, listFileName.toList()).let { fileName ->
-                    listFileName.add(fileName)
-                    saveEmlToFile(appContext, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
+
+                val fileName = if (listFileName[messageSubject] == null) {
+                    listFileName[messageSubject] = 0
+                    messageSubject
+                } else {
+                    listFileName[messageSubject] = listFileName[messageSubject]!! + 1
+                    "$messageSubject (${listFileName[messageSubject]!! + 1})"
                 }
+
+                saveEmlToFile(appContext, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
             }
             listUri
         }.getOrNull()
@@ -80,20 +86,30 @@ class DownloadMessagesViewModel @Inject constructor(
         emit(downloadedThreadUris)
     }
 
-    // TODO Extract this code in core2
-    private fun createUniqueFileName(originalFileName: String, listFileName: List<String>): String {
-        var postfix = 1
-        var fileName = originalFileName
+    private fun getAllFileNameInExportEmlDir(context: Context): HashMap<String, Int> {
 
-        while (listFileName.contains(fileName)) fileName = "$originalFileName (${postfix++})"
-
-        return fileName
-    }
-
-    private fun getAllFileNameInExportEmlDir(context: Context): List<String> {
+        val fileNameMap = HashMap<String, Int>()
         val fileDir = getEmlCacheDir(context)
         if (!fileDir.exists()) fileDir.mkdirs()
-        return fileDir.listFiles()?.map { it.name.removeSuffix(".eml") } ?: emptyList()
+
+        fileDir.listFiles()?.forEach { file ->
+            val nameWithoutExtension = file.name.removeSuffix(".eml")
+
+            val regex = Regex("\\((\\d+)\\)$")
+            val match = regex.find(nameWithoutExtension)
+            val numberInParentheses = match?.groupValues?.last()
+
+            var fileNumber = numberInParentheses?.toInt() ?: 0
+            val fileName = nameWithoutExtension.replace(regex, "").trim()
+
+            fileNameMap[fileName]?.let {
+                fileNumber = if (it > fileNumber) it else fileNumber
+            }
+
+            fileNameMap[fileName] = fileNumber
+        }
+
+        return fileNameMap
     }
 
     private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {

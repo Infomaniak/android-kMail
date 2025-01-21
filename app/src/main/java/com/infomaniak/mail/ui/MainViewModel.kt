@@ -1294,8 +1294,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getMessagesUidsFromThreadUids(selectedThreadsUids: List<String>): List<String> {
-        val messageUids = mutableListOf<String>()
+    fun getMessagesUidsFromThreadUids(selectedThreadsUids: List<String>): Set<String> {
+        val messageUids = mutableSetOf<String>()
         selectedThreadsUids.forEach { threadUuid ->
             val thread = threadController.getThread(threadUuid) ?: return@forEach
             messageUids.addAll(thread.messages.map { it.uid })
