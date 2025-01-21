@@ -69,6 +69,7 @@ class DownloadMessagesViewModel @Inject constructor(
                 if (!response.isSuccessful || response.body == null) return@runCatching null
 
                 val messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
+                    .take(MAX_FILE_NAME_LENGTH)
 
                 val fileName = if (listFileName[messageSubject] == null) {
                     listFileName[messageSubject] = 0
@@ -131,5 +132,6 @@ class DownloadMessagesViewModel @Inject constructor(
 
     companion object {
         private const val NO_SUBJECT_FILE = "message"
+        private const val MAX_FILE_NAME_LENGTH = 256
     }
 }
