@@ -178,7 +178,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onSaveKDrive() {
                 trackBottomSheetThreadActionsEvent(ACTION_SAVE_KDRIVE_NAME)
                 navigateToDownloadMessagesProgressDialog(
-                    messageUids = listOf(messageUid),
+                    messageUids = setOf(messageUid),
                     nameFirstMessage = mainViewModel.getSubject(threadUid),
                     currentClassName = MessageActionsBottomSheetDialog::class.java.name,
                 )
