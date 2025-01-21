@@ -41,7 +41,7 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
             if (threadUris == null) {
                 popBackStackWithError()
             } else {
-                ArrayList(threadUris).openKDriveOrPlayStore(requireContext())?.let { openKDriveIntent ->
+                threadUris.openKDriveOrPlayStore(requireContext())?.let { openKDriveIntent ->
                     setBackNavigationResult(DOWNLOAD_MESSAGES_RESULT, openKDriveIntent)
                 } ?: run { findNavController().popBackStack() }
             }
@@ -58,7 +58,7 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
         )
     }
 
-    private fun ArrayList<Uri>.openKDriveOrPlayStore(context: Context): Intent? {
+    private fun List<Uri>.openKDriveOrPlayStore(context: Context): Intent? {
         return if (canSaveOnKDrive(context)) {
             saveToDriveIntent()
         } else {
@@ -67,11 +67,11 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
         }
     }
 
-    private fun ArrayList<Uri>.saveToDriveIntent(): Intent {
+    private fun List<Uri>.saveToDriveIntent(): Intent {
         return Intent().apply {
             component = ComponentName(DRIVE_PACKAGE, SAVE_EXTERNAL_ACTIVITY_CLASS)
             action = Intent.ACTION_SEND_MULTIPLE
-            putParcelableArrayListExtra(Intent.EXTRA_STREAM, this@saveToDriveIntent)
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(this@saveToDriveIntent))
         }
     }
 
