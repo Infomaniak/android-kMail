@@ -92,7 +92,7 @@ fun Fragment.navigateToDownloadProgressDialog(
 }
 
 fun Fragment.navigateToDownloadMessagesProgressDialog(
-    messageUids: List<String>,
+    messageUids: Set<String>,
     nameFirstMessage: String,
     currentClassName: String,
 ) {
