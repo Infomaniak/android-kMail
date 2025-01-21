@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
             }
         }
 
-        val timeToDisplay = TimeToDisplay.getTimeToDisplayFromDate(Date())
+        val timeToDisplay = TimeToDisplay.getTimeToDisplayFromDate()
         Schedule.entries.filter { schedule -> timeToDisplay in schedule.timeToDisplay }.forEach { schedule ->
             scheduleItems.addView(createScheduleItem(schedule))
         }
@@ -139,12 +139,14 @@ enum class TimeToDisplay {
     WEEKEND;
 
     companion object {
-        fun getTimeToDisplayFromDate(date: Date): TimeToDisplay {
-            return if (date.isWeekend()) WEEKEND else when (date.hours()) {
-                in 0..7 -> NIGHT
-                in 8..13 -> MORNING
-                in 14..19 -> AFTERNOON
-                in 20..23 -> EVENING
+        fun getTimeToDisplayFromDate(): TimeToDisplay {
+            val now = Date()
+            val timeSlot = Date(now.time)
+            return if (now.isWeekend()) WEEKEND else when (now) {
+                in timeSlot.setHour(0).setMinute(0)..timeSlot.setHour(7).setMinute(54) -> NIGHT
+                in timeSlot.setHour(7).setMinute(55)..timeSlot.setHour(13).setMinute(54) -> MORNING
+                in timeSlot.setHour(13).setMinute(55)..timeSlot.setHour(17).setMinute(54) -> AFTERNOON
+                in timeSlot.setHour(17).setMinute(55)..timeSlot.setHour(23).setMinute(54) -> EVENING
                 else -> NIGHT
             }
         }
