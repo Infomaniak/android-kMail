@@ -78,7 +78,9 @@ class DownloadMessagesViewModel @Inject constructor(
                     "$messageSubject (${listFileName[messageSubject]!! + 1})"
                 }
 
-                saveEmlToFile(appContext, response.body!!.bytes(), fileName)?.let { listUri.add(it) }
+                saveEmlToFile(appContext, response.body!!.bytes(), fileName)?.let(listUri::add) ?: {
+                    // TODO: Manage error case
+                }
             }
             listUri
         }.getOrNull()
@@ -118,14 +120,11 @@ class DownloadMessagesViewModel @Inject constructor(
 
         if (!fileDir.exists()) fileDir.mkdirs()
 
-        runCatching {
+        return runCatching {
             val file = File(fileDir, fileNameWithExtension)
             file.outputStream().use { it.write(emlByteArray) }
             return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
-        }.onFailure { exception ->
-            exception.printStackTrace()
-        }
-        return null
+        }.getOrNull()
     }
 
     private fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")
