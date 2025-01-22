@@ -248,6 +248,8 @@
     <string name="displayMailIssueTitle">Problem mit der Anzeige Ihrer E-Mails</string>
     <string name="draftFolder">Entwürfe</string>
     <string name="draftPrefix">(Entwurf)</string>
+    <string name="editSendDescription">Programmierung abgebrochen. Diese Nachricht wird in Ihre Entwürfe verschoben, damit Sie sie senden können, wann immer Sie möchten.</string>
+    <string name="editSendTitle">Senden bearbeiten</string>
     <string name="emailWithoutSubjectDescription">Sie sind dabei, eine Nachricht ohne Betreff zu senden. Möchten Sie fortfahren?</string>
     <string name="emailWithoutSubjectTitle">Leeres Thema</string>
     <string name="emptyStateFolderDescription">Hier gibt es nichts zu sehen.</string>

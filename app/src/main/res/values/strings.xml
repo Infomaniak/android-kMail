@@ -254,6 +254,8 @@
     <string name="displayMailIssueTitle">Problem displaying your emails</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
+    <string name="editSendDescription">Programming cancelled. This message will be moved to your drafts to be sent whenever you want.</string>
+    <string name="editSendTitle">Edit Send</string>
     <string name="emailWithoutSubjectDescription">You are about to send a message without a subject. Do you want to continue?</string>
     <string name="emailWithoutSubjectTitle">Empty subject</string>
     <string name="emptyStateFolderDescription">There is nothing to see here.</string>

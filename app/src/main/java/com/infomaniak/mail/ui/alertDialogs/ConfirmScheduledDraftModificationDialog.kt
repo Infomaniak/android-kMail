@@ -19,29 +19,25 @@ package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
 import androidx.annotation.StringRes
-import androidx.core.view.isVisible
-import com.google.android.material.datepicker.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.databinding.DialogSelectDateAndTimeForScheduleBinding
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.MAX_SCHEDULE_DELAY_YEARS
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
+import com.infomaniak.mail.databinding.DialogConfirmScheduledDraftModificationBinding
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
-import java.util.Date
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
 @ActivityScoped
-open class SelectDateAndTimeForScheduleDialog @Inject constructor(
+open class ConfirmScheduledDraftModificationDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
 
-    val binding: DialogSelectDateAndTimeForScheduleBinding by lazy { DialogSelectDateAndTimeForScheduleBinding.inflate(activity.layoutInflater) }
+    val binding: DialogConfirmScheduledDraftModificationBinding by lazy {
+        DialogConfirmScheduledDraftModificationBinding.inflate(
+            activity.layoutInflater
+        )
+    }
 
     override val alertDialog = initDialog()
 
@@ -49,24 +45,9 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
     private var onNegativeButtonClicked: (() -> Unit)? = null
     private var onDismissed: (() -> Unit)? = null
 
-    lateinit var selectedDate: Date
-
-    private var datePicker: MaterialDatePicker<Long>? = null
-    private var timePicker: MaterialTimePicker? = null
-
-    @Inject
-    lateinit var localSettings: LocalSettings
-
     private fun initDialog(customThemeRes: Int? = null) = with(binding) {
 
         val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
-
-        selectedDate = Date().roundUpToNextTenMinutes()
-
-        setTimePicker()
-        setDatePicker()
-
-        dateField.setText(selectedDate.format(FORMAT_DATE_DAY_MONTH_YEAR))
 
         builder
             .setView(root)
@@ -83,22 +64,13 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
 
     fun show(
         title: String,
+        description: String,
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)? = null,
         onDismiss: (() -> Unit)? = null,
     ) {
-        showDialogWithBasicInfo(title, R.string.buttonScheduleTitle)
+        showDialogWithBasicInfo(title, description, R.string.buttonModify)
         setupListeners(onPositiveButtonClicked, onNegativeButtonClicked, onDismiss)
-    }
-
-    private fun getScheduleDateErrorText(): String = if (selectedDate.isInTheFuture().not()) {
-        activityContext.resources.getString(R.string.errorChooseUpcomingDate)
-    } else {
-        activityContext.resources.getQuantityString(
-            R.plurals.errorScheduleDelayTooShort,
-            MIN_SCHEDULE_DELAY_MINUTES,
-            MIN_SCHEDULE_DELAY_MINUTES,
-        )
     }
 
     private fun setupListeners(
@@ -107,41 +79,16 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
         onDismiss: (() -> Unit)?,
     ) = with(alertDialog) {
 
-        binding.dateField.setOnClickListener { datePicker?.show(super.activity.supportFragmentManager, "tag") }
-
-        datePicker?.addOnPositiveButtonClickListener { time ->
-            val date = Date().also { it.time = time }
-            selectedDate = selectedDate.setDay(date.day())
-
-            binding.dateField.setText(selectedDate.format(FORMAT_DATE_DAY_MONTH_YEAR))
-        }
-
-        binding.timeField.setOnClickListener { timePicker?.show(super.activity.supportFragmentManager, "tag") }
-
-        timePicker?.addOnPositiveButtonClickListener {
-            val hour: Int = timePicker!!.hour
-            val minute: Int = timePicker!!.minute
-
-            selectedDate = selectedDate.setHour(hour)
-            selectedDate = selectedDate.setMinute(minute)
-
-            binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
-
-            binding.scheduleDateError.text = getScheduleDateErrorText()
-            binding.scheduleDateError.isVisible = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES).not()
-            positiveButton.isEnabled = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)
-        }
-
-        this@SelectDateAndTimeForScheduleDialog.onPositiveButtonClicked = onPositiveButtonClicked
-        this@SelectDateAndTimeForScheduleDialog.onNegativeButtonClicked = onNegativeButtonClicked
+        this@ConfirmScheduledDraftModificationDialog.onPositiveButtonClicked = onPositiveButtonClicked
+        this@ConfirmScheduledDraftModificationDialog.onNegativeButtonClicked = onNegativeButtonClicked
 
         positiveButton.setOnClickListener {
-            this@SelectDateAndTimeForScheduleDialog.onPositiveButtonClicked?.invoke()
+            this@ConfirmScheduledDraftModificationDialog.onPositiveButtonClicked?.invoke()
             dismiss()
         }
 
         negativeButton.setOnClickListener {
-            this@SelectDateAndTimeForScheduleDialog.onNegativeButtonClicked?.invoke()
+            this@ConfirmScheduledDraftModificationDialog.onNegativeButtonClicked?.invoke()
             dismiss()
         }
 
@@ -151,49 +98,17 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
         }
     }
 
-    private fun setTimePicker() = with(binding) {
-        timePicker = MaterialTimePicker.Builder()
-            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-            .setTimeFormat(TimeFormat.CLOCK_24H)
-            .setHour(selectedDate.hours())
-            .setMinute(selectedDate.minutes())
-            .setTitleText(context.getString(R.string.selectTimeDialogTitle))
-            .build()
-    }
-
-    private fun setDatePicker() = with(binding) {
-        val dateValidators = listOf(
-            DateValidatorPointForward.now(),
-            DateValidatorPointBackward.before(Date().addYears(MAX_SCHEDULE_DELAY_YEARS).time),
-        )
-
-        val constraintsBuilder =
-            CalendarConstraints.Builder()
-                .setValidator(CompositeDateValidator.allOf(dateValidators))
-
-        datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText(context.getString(R.string.selectDateDialogTitle))
-            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-            .setCalendarConstraints(constraintsBuilder.build())
-            .build()
-    }
-
     private fun showDialogWithBasicInfo(
         title: String? = null,
+        description: String? = null,
         @StringRes positiveButtonText: Int? = null,
         @StringRes negativeButtonText: Int? = null,
     ) = with(binding) {
 
         alertDialog.show()
 
-        selectedDate = Date().roundUpToNextTenMinutes()
-
-        binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
-
-        setTimePicker()
-        setDatePicker()
-
-        title?.let(dialogTitle::setText)
+        title?.let(dialogDescriptionLayout.dialogTitle::setText)
+        description?.let(dialogDescriptionLayout.dialogDescription::setText)
 
         positiveButtonText?.let(positiveButton::setText)
         negativeButtonText?.let(negativeButton::setText)

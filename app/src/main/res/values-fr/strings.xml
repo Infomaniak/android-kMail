@@ -250,6 +250,8 @@
     <string name="displayMailIssueTitle">Problème d’affichage de vos e-mails</string>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
+    <string name="editSendDescription">Programmation annulée. Ce message sera déplacé dans vos brouillons pour être envoyé quand vous le souhaitez.</string>
+    <string name="editSendTitle">Modifier l’envoi</string>
     <string name="emailWithoutSubjectDescription">Vous êtes sur le point d’envoyer un message sans objet. Voulez-vous continuer ?</string>
     <string name="emailWithoutSubjectTitle">Objet vide</string>
     <string name="emptyStateFolderDescription">Il n’y a rien à voir par ici.</string>

@@ -127,6 +127,9 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var selectDateAndTimeForScheduledDraftDialog: SelectDateAndTimeForScheduledDraftDialog
 
+    @Inject
+    lateinit var confirmScheduledDraftModificationDialog: ConfirmScheduledDraftModificationDialog
+
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
@@ -370,19 +373,25 @@ class ThreadFragment : Fragment() {
                     )
                 },
                 onModifyClicked = { message ->
-                    val scheduleAction = message.scheduleAction
-                    val draftResource = message.draftResource
+                    confirmScheduledDraftModificationDialog.show(
+                        title = getString(R.string.editSendTitle),
+                        description = getString(R.string.editSendDescription),
+                        onPositiveButtonClicked = {
+                            val scheduleAction = message.scheduleAction
+                            val draftResource = message.draftResource
 
-                    if (scheduleAction != null && draftResource != null) {
-                        mainViewModel.modifyDraft(scheduleAction, draftResource) {
-                            // trackNewMessageEvent(OPEN_FROM_DRAFT_NAME) // TODO: Matomo.
-                            twoPaneViewModel.navigateToNewMessage(
-                                arrivedFromExistingDraft = true,
-                                draftResource = message.draftResource,
-                                messageUid = message.uid,
-                            )
-                        }
-                    }
+                            if (scheduleAction != null && draftResource != null) {
+                                mainViewModel.modifyDraft(scheduleAction, draftResource) {
+                                    // trackNewMessageEvent(OPEN_FROM_DRAFT_NAME) // TODO: Matomo.
+                                    twoPaneViewModel.navigateToNewMessage(
+                                        arrivedFromExistingDraft = true,
+                                        draftResource = message.draftResource,
+                                        messageUid = message.uid,
+                                    )
+                                }
+                            }
+                        },
+                    )
                 }
             ),
         )

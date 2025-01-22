@@ -248,6 +248,8 @@
     <string name="displayMailIssueTitle">Problema de visualización de sus emails</string>
     <string name="draftFolder">Borradores</string>
     <string name="draftPrefix">(Borrador)</string>
+    <string name="editSendDescription">Programmazione annullata. Questo messaggio verrà spostato nelle tue bozze per essere inviato quando vuoi.</string>
+    <string name="editSendTitle">Editar envío</string>
     <string name="emailWithoutSubjectDescription">Está a punto de enviar un mensaje sin asunto. ¿Desea continuar?</string>
     <string name="emailWithoutSubjectTitle">Asunto vacío</string>
     <string name="emptyStateFolderDescription">Aquí no hay nada que ver.</string>

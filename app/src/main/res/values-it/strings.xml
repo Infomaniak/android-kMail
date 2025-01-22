@@ -248,6 +248,8 @@
     <string name="displayMailIssueTitle">Problema di visualizzazione delle email</string>
     <string name="draftFolder">Bozze</string>
     <string name="draftPrefix">(Bozza)</string>
+    <string name="editSendDescription">Programmazione annullata. Questo messaggio verrà spostato nelle tue bozze per essere inviato quando vuoi.</string>
+    <string name="editSendTitle">Modifica invio</string>
     <string name="emailWithoutSubjectDescription">Stai per inviare un messaggio senza oggetto. Vuoi continuare?</string>
     <string name="emailWithoutSubjectTitle">Oggetto vuoto</string>
     <string name="emptyStateFolderDescription">Non c’è nulla da vedere qui.</string>
