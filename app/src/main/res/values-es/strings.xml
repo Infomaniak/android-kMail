@@ -269,10 +269,7 @@
     <string name="errorAtLeastOneRecipient">Se precisa al menos un destinatario</string>
     <string name="errorAttachmentNotFound">No se ha encontrado el adjunto</string>
     <string name="errorCalendarChoiceCouldNotBeSent">Se ha producido un error al enviar su respuesta</string>
-    <plurals name="errorChooseDateToComeMinutesInTheFuture">
-        <item quantity="one">Elija una fecha próxima, al menos %d minutos en el futuro</item>
-        <item quantity="other">Elija una fecha próxima, al menos %d minutos en el futuro</item>
-    </plurals>
+    <string name="errorChooseUpcomingDate">Elige una fecha futura</string>
     <string name="errorCorruptAttachment">No se ha podido gestionar el borrador, un archivo adjunto está dañado</string>
     <string name="errorDraftNotFound">No se puede encontrar el borrador</string>
     <string name="errorEditScheduledMessage">Imposible modificar un mensaje programado o enviado</string>
@@ -294,6 +291,10 @@
     <string name="errorNewFolderNameTooLong">El nombre de la carpeta no debe superar los 255 caracteres</string>
     <string name="errorRefusedRecipients">El servidor rechaza todos los destinatarios</string>
     <string name="errorRefusedSender">El servidor rechaza el remitente</string>
+    <plurals name="errorScheduleDelayTooShort">
+        <item quantity="one">No puedes programar un correo electrónico para dentro de menos de %d minuto</item>
+        <item quantity="other">No puedes programar un correo electrónico para dentro de menos de %d minutos</item>
+    </plurals>
     <string name="errorSendLimitExceeded">Límite de envío alcanzado</string>
     <string name="errorTooManyRecipients">Demasiados destinatarios</string>
     <string name="errorUnableToCreateFolder">No se puede crear la carpeta</string>

@@ -269,10 +269,7 @@
     <string name="errorAtLeastOneRecipient">Es ist mindestens ein Empfänger erforderlich</string>
     <string name="errorAttachmentNotFound">Dateianhang unauffindbar</string>
     <string name="errorCalendarChoiceCouldNotBeSent">Beim Senden Ihrer Antwort ist ein Fehler aufgetreten</string>
-    <plurals name="errorChooseDateToComeMinutesInTheFuture">
-        <item quantity="one">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
-        <item quantity="other">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
-    </plurals>
+    <string name="errorChooseUpcomingDate">Wählen Sie ein zukünftiges Datum</string>
     <string name="errorCorruptAttachment">Der Entwurf konnte nicht bearbeitet werden, ein Anhang ist beschädigt</string>
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>
@@ -294,6 +291,10 @@
     <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein.</string>
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorRefusedSender">Der Server lehnt den Absender ab</string>
+    <plurals name="errorScheduleDelayTooShort">
+        <item quantity="one">Sie können E-Mails frühestens in %d Minute senden</item>
+        <item quantity="other">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
+    </plurals>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>

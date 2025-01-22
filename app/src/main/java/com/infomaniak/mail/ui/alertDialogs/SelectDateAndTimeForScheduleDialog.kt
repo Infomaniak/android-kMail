@@ -20,9 +20,7 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.DateValidatorPointForward
-import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.datepicker.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -30,6 +28,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeForScheduleBinding
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.MAX_SCHEDULE_DELAY_YEARS
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
@@ -59,12 +58,6 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
     lateinit var localSettings: LocalSettings
 
     private fun initDialog(customThemeRes: Int? = null) = with(binding) {
-
-        scheduleDateError.text = context.resources.getQuantityString(
-            R.plurals.errorChooseDateToComeMinutesInTheFuture,
-            MIN_SCHEDULE_DELAY_MINUTES,
-            MIN_SCHEDULE_DELAY_MINUTES,
-        )
 
         val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
 
@@ -98,6 +91,16 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
         setupListeners(onPositiveButtonClicked, onNegativeButtonClicked, onDismiss)
     }
 
+    private fun getScheduleDateErrorText(): String = if (selectedDate.isInTheFuture().not()) {
+        activityContext.resources.getString(R.string.errorChooseUpcomingDate)
+    } else {
+        activityContext.resources.getQuantityString(
+            R.plurals.errorScheduleDelayTooShort,
+            MIN_SCHEDULE_DELAY_MINUTES,
+            MIN_SCHEDULE_DELAY_MINUTES,
+        )
+    }
+
     private fun setupListeners(
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)?,
@@ -124,6 +127,7 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
 
             binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
 
+            binding.scheduleDateError.text = getScheduleDateErrorText()
             binding.scheduleDateError.isVisible = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES).not()
             positiveButton.isEnabled = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)
         }
@@ -158,9 +162,14 @@ open class SelectDateAndTimeForScheduleDialog @Inject constructor(
     }
 
     private fun setDatePicker() = with(binding) {
+        val dateValidators = listOf(
+            DateValidatorPointForward.now(),
+            DateValidatorPointBackward.before(Date().addYears(MAX_SCHEDULE_DELAY_YEARS).time),
+        )
+
         val constraintsBuilder =
             CalendarConstraints.Builder()
-                .setValidator(DateValidatorPointForward.now())
+                .setValidator(CompositeDateValidator.allOf(dateValidators))
 
         datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText(context.getString(R.string.selectDateDialogTitle))

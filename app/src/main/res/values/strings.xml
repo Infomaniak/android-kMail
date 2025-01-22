@@ -275,10 +275,7 @@
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
     <string name="errorAttachmentNotFound">Attachment cannot be found</string>
     <string name="errorCalendarChoiceCouldNotBeSent">An error has occurred while sending your answer</string>
-    <plurals name="errorChooseDateToComeMinutesInTheFuture">
-        <item quantity="one">Choose an upcoming date, at least %d minutes in the future</item>
-        <item quantity="other">Choose an upcoming date, at least %d minutes in the future</item>
-    </plurals>
+    <string name="errorChooseUpcomingDate">Select an upcoming date</string>
     <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
     <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
@@ -300,6 +297,10 @@
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>
     <string name="errorRefusedSender">The server is refusing the sender</string>
+    <plurals name="errorScheduleDelayTooShort">
+        <item quantity="one">You can’t schedule an email less than %d minute in the future</item>
+        <item quantity="other">You can’t schedule an email less than %d minutes in the future</item>
+    </plurals>
     <string name="errorSendLimitExceeded">Sending limit reached</string>
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>

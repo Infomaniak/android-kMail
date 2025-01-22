@@ -74,8 +74,8 @@
         android:id="@+id/scheduleDateError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/BodyMedium.Error"
+        style="@style/Body.Error"
         android:visibility="gone"
         tools:visibility="visible"
-        tools:text="Choose an upcoming date, at least 5 minutes in the future" />
+        tools:text="You can’t schedule an email less than 5 minutes in the future" />
 </LinearLayout>

@@ -271,11 +271,7 @@
     <string name="errorAtLeastOneRecipient">Il faut au minimum un destinataire</string>
     <string name="errorAttachmentNotFound">Pièce jointe introuvable</string>
     <string name="errorCalendarChoiceCouldNotBeSent">Une erreur s’est produite lors de l’envoi de votre réponse</string>
-    <plurals name="errorChooseDateToComeMinutesInTheFuture">
-        <item quantity="one">Choisissez une date à venir, au moins %d minutes dans le future</item>
-        <item quantity="other">Choisissez une date à venir, au moins %d minutes dans le future</item>
-        <item quantity="many">Choisissez une date à venir, au moins %d de minutes dans le future</item>
-    </plurals>
+    <string name="errorChooseUpcomingDate">Choisissez une date à venir</string>
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
@@ -297,6 +293,11 @@
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
     <string name="errorRefusedSender">Le serveur refuse l’expéditeur</string>
+    <plurals name="errorScheduleDelayTooShort">
+        <item quantity="one">Vous ne pouvez pas programmer un e-mail dans moins de %d minute</item>
+        <item quantity="other">Vous ne pouvez pas programmer un e-mail dans moins de %d minutes</item>
+        <item quantity="many">Vous ne pouvez pas programmer un e-mail dans moins de %d de minutes</item>
+    </plurals>
     <string name="errorSendLimitExceeded">Limite d’envoi atteinte</string>
     <string name="errorTooManyRecipients">Trop de destinataires</string>
     <string name="errorUnableToCreateFolder">Impossible de créer le dossier</string>

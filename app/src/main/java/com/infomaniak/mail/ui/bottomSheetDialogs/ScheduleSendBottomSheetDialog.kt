@@ -132,6 +132,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
 
     companion object {
         const val MIN_SCHEDULE_DELAY_MINUTES = 5
+        const val MAX_SCHEDULE_DELAY_YEARS = 10
     }
 }
 

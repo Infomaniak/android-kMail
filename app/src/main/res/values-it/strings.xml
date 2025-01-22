@@ -269,10 +269,7 @@
     <string name="errorAtLeastOneRecipient">È richiesto almeno un destinatario</string>
     <string name="errorAttachmentNotFound">Allegato non trovato</string>
     <string name="errorCalendarChoiceCouldNotBeSent">Si è verificato un errore nell’invio della risposta</string>
-    <plurals name="errorChooseDateToComeMinutesInTheFuture">
-        <item quantity="one">Scegli una data futura, almeno %d minuti nel futuro</item>
-        <item quantity="other">Scegli una data futura, almeno %d minuti nel futuro</item>
-    </plurals>
+    <string name="errorChooseUpcomingDate">Scegli una data prossima</string>
     <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
     <string name="errorDraftNotFound">Bozza non trovata</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
@@ -294,6 +291,10 @@
     <string name="errorNewFolderNameTooLong">Il nome della cartella non deve superare i 255 caratteri</string>
     <string name="errorRefusedRecipients">Il server respinge tutti i destinatari</string>
     <string name="errorRefusedSender">Il server respinge il mittente</string>
+    <plurals name="errorScheduleDelayTooShort">
+        <item quantity="one">Non puoi programmare l\'invio di una e-mail tra meno di %d minuto</item>
+        <item quantity="other">Non puoi programmare l’invio di una e-mail tra meno di %d minuti</item>
+    </plurals>
     <string name="errorSendLimitExceeded">Limite d’invio raggiunto</string>
     <string name="errorTooManyRecipients">Troppi destinatari</string>
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
