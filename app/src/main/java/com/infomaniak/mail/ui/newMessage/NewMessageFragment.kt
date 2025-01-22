@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
-import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduleDialog
+import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -151,7 +151,7 @@ class NewMessageFragment : Fragment() {
     lateinit var snackbarManager: SnackbarManager
 
     @Inject
-    lateinit var selectDateAndTimeForScheduleDialog: SelectDateAndTimeForScheduleDialog
+    lateinit var selectDateAndTimeForScheduledDraftDialog: SelectDateAndTimeForScheduledDraftDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -220,10 +220,10 @@ class NewMessageFragment : Fragment() {
     private fun observeSelectDateAndTimeForScheduleDialogState() {
         newMessageViewModel.showOrCloseSelectDateAndTimeForScheduleDialog.observe(viewLifecycleOwner) { showDialog ->
             if (showDialog) {
-                selectDateAndTimeForScheduleDialog.show(
+                selectDateAndTimeForScheduledDraftDialog.show(
                     title = getString(R.string.datePickerTitle),
                     onPositiveButtonClicked = {
-                        val scheduleDate = selectDateAndTimeForScheduleDialog.selectedDate.time
+                        val scheduleDate = selectDateAndTimeForScheduledDraftDialog.selectedDate.time
                         localSettings.lastSelectedScheduleDate = scheduleDate
 
                         newMessageViewModel.setScheduleDate(Date(scheduleDate))
@@ -233,7 +233,7 @@ class NewMessageFragment : Fragment() {
                     onNegativeButtonClicked = { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) },
                 )
             } else {
-                selectDateAndTimeForScheduleDialog.resetLoadingAndDismiss()
+                selectDateAndTimeForScheduledDraftDialog.resetLoadingAndDismiss()
             }
         }
     }

@@ -125,7 +125,7 @@ class ThreadFragment : Fragment() {
     lateinit var snackbarManager: SnackbarManager
 
     @Inject
-    lateinit var selectDateAndTimeForScheduleDialog: SelectDateAndTimeForScheduleDialog
+    lateinit var selectDateAndTimeForScheduledDraftDialog: SelectDateAndTimeForScheduledDraftDialog
 
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -187,10 +187,10 @@ class ThreadFragment : Fragment() {
 
     private fun observeSelectDateAndTimeForScheduleDialogState() {
         mainViewModel.showOrCloseSelectDateAndTimeForScheduleDialog.observe(viewLifecycleOwner) {
-            selectDateAndTimeForScheduleDialog.show(
+            selectDateAndTimeForScheduledDraftDialog.show(
                 title = getString(R.string.datePickerTitle),
                 onPositiveButtonClicked = {
-                    val scheduleDate = selectDateAndTimeForScheduleDialog.selectedDate.time
+                    val scheduleDate = selectDateAndTimeForScheduledDraftDialog.selectedDate.time
                     localSettings.lastSelectedScheduleDate = scheduleDate
 
                     mainViewModel.draftResource?.let { draftResource ->
