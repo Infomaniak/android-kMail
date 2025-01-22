@@ -24,7 +24,7 @@ richHtmlEditor = "0.2.0"
 sentryAndroidFragment = "7.20.0"
 webkit = "1.12.1"
 workConcurrentFutures = "1.2.0"
-workRuntimeKtx = "2.9.1" # Waiting SDK 35 before to update
+workRuntimeKtx = "2.9.1" # Doesn't build when bumped (waiting for Android SDK 35)
 
 [libraries]
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilSvg" }

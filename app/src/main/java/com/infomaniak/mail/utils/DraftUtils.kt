@@ -47,12 +47,14 @@ suspend fun uploadAttachmentsWithMutex(
 
 private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: DraftController, realm: Realm) {
 
-    fun getAwaitingAttachments(): List<Attachment> = attachments.filter { it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING }
+    fun getAwaitingAttachments(): List<Attachment> = attachments.filter {
+        it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING
+    }
 
-    suspend fun setUploadStatus(attachment: Attachment, attachmentUploadStatus: AttachmentUploadStatus, step: String) {
+    suspend fun setUploadStatus(attachment: Attachment, uploadStatus: AttachmentUploadStatus, step: String) {
         realm.write {
             draftController.updateDraft(localUuid, realm = this) {
-                it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(attachmentUploadStatus, draft = it, step)
+                it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it, step)
             }
         }
     }
