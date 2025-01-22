@@ -35,7 +35,7 @@ import com.infomaniak.mail.utils.LocalStorageUtils.getEmlCacheDir
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.*
 import java.io.File
 import javax.inject.Inject
 
@@ -58,31 +58,42 @@ class DownloadMessagesViewModel @Inject constructor(
             val listUri = mutableListOf<Uri>()
             val listFileName = hashMapOf<String, Int>()
 
-            messageLocalUids.forEach { messageUid ->
-                val message = messageController.getMessage(messageUid) ?: return@runCatching null
-                val response = ApiRepository.getDownloadedMessage(
-                    mailboxUuid = mailbox.uuid,
-                    folderId = message.folderId,
-                    shortUid = message.shortUid,
-                )
+            coroutineScope {
+                val deferredResponses: List<Deferred<Uri?>> = messageLocalUids.map { messageUid ->
+                    async {
+                        val message = messageController.getMessage(messageUid) ?: return@async null
+                        val response = ApiRepository.getDownloadedMessage(
+                            mailboxUuid = mailbox.uuid,
+                            folderId = message.folderId,
+                            shortUid = message.shortUid,
+                        )
 
-                if (!response.isSuccessful || response.body == null) return@runCatching null
+                        val messageSubject: String = message.subject?.removeIllegalFileNameCharacter()
+                            ?: NO_SUBJECT_FILE
+                        val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
 
-                val messageSubject: String = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
-                    .take(MAX_FILE_NAME_LENGTH)
+                        val fileName = if (listFileName[truncatedSubject] == null) {
+                            listFileName[truncatedSubject] = 0
+                            truncatedSubject
+                        } else {
+                            listFileName[truncatedSubject] = listFileName[truncatedSubject]!! + 1
+                            "$truncatedSubject (${listFileName[truncatedSubject]!! + 1})"
+                        }
 
-                val fileName = if (listFileName[messageSubject] == null) {
-                    listFileName[messageSubject] = 0
-                    messageSubject
-                } else {
-                    listFileName[messageSubject] = listFileName[messageSubject]!! + 1
-                    "$messageSubject (${listFileName[messageSubject]!! + 1})"
+                        if (!response.isSuccessful || response.body == null) return@async null
+
+                        saveEmlToFile(appContext, response.body!!.bytes(), fileName).also {
+                            if (it == null) {
+                                // TODO: Manage error case
+                            }
+                        }
+                    }
                 }
 
-                saveEmlToFile(appContext, response.body!!.bytes(), fileName)?.let(listUri::add) ?: {
-                    // TODO: Manage error case
-                }
+                val uris = deferredResponses.awaitAll()
+                listUri.addAll(uris.filterNotNull())
             }
+
             listUri
         }.getOrNull()
 
