@@ -343,4 +343,6 @@ class Message : RealmObject {
         val isFromSearch: Boolean,
         val draftLocalUuid: String?,
     )
+
+    companion object
 }

@@ -34,4 +34,6 @@ class Body : EmbeddedRealmObject {
     @SerialName("subBody")
     var subBodies = realmListOf<SubBody>()
     //endregion
+
+    companion object
 }

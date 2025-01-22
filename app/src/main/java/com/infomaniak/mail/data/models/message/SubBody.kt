@@ -49,4 +49,6 @@ class SubBody : EmbeddedRealmObject {
     @SerialName("body_type")
     var bodyType: String? = null
     //endregion
+
+    companion object
 }

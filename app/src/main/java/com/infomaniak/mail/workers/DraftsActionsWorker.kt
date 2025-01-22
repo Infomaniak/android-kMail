@@ -34,7 +34,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.Attachment.UploadStatus
+import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -286,7 +286,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         SentryDebug.addDraftBreadcrumbs(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
 
         // TODO: Remove this whole `draft.attachments.any { … }` + `addDraftBreadcrumbs()` when the Attachments issue is fixed.
-        if (draft.attachments.any { it.uploadStatus != UploadStatus.FINISHED }) {
+        if (draft.attachments.any { it.attachmentUploadStatus != AttachmentUploadStatus.FINISHED }) {
 
             Sentry.captureMessage(
                 "We tried to [${draft.action?.name}] a Draft, but an Attachment wasn't uploaded.",
@@ -420,15 +420,15 @@ class DraftsActionsWorker @AssistedInject constructor(
             workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
-        fun getCompletedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
+        fun getCompletedWorkInfoLiveData(): LiveData<List<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.SUCCEEDED))
         }
 
-        fun getFailedWorkInfoLiveData(): LiveData<MutableList<WorkInfo>> {
+        fun getFailedWorkInfoLiveData(): LiveData<List<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.FAILED))
         }
 
-        fun getCompletedAndFailedInfoLiveData(): LiveData<MutableList<WorkInfo>> {
+        fun getCompletedAndFailedInfoLiveData(): LiveData<List<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.SUCCEEDED, State.FAILED))
         }
     }

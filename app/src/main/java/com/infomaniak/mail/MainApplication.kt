@@ -245,7 +245,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun configureRealmLog() = with(RealmLog) {
-        level = LogLevel.DEBUG
+        setLevel(LogLevel.DEBUG)
         removeAll() // Removing Realm system logs to avoid spamming the logcat
         add(SentryRealmLogger()) // Adding our own Realm logger to log to Sentry
     }

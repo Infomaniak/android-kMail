@@ -58,11 +58,11 @@ class Attachment : EmbeddedRealmObject, Attachable {
     @Transient
     var uploadLocalUri: String? = null
     @Transient
-    private var _uploadStatus: String = UploadStatus.AWAITING.name
+    private var _uploadStatus: String = AttachmentUploadStatus.AWAITING.name
     //endregion
 
-    val uploadStatus: UploadStatus?
-        get() = enumValueOfOrNull<UploadStatus>(_uploadStatus)
+    val attachmentUploadStatus: AttachmentUploadStatus?
+        get() = enumValueOfOrNull<AttachmentUploadStatus>(_uploadStatus)
 
     val isCalendarEvent: Boolean get() = AttachableMimeTypeUtils.calendarMatches.contains(mimeType)
 
@@ -85,12 +85,12 @@ class Attachment : EmbeddedRealmObject, Attachable {
     fun backupLocalData(oldAttachment: Attachment, draft: Draft) {
         localUuid = oldAttachment.localUuid
         uploadLocalUri = oldAttachment.uploadLocalUri
-        setUploadStatus(UploadStatus.FINISHED, draft, "backupLocalData -> setUploadStatus")
+        setUploadStatus(AttachmentUploadStatus.FINISHED, draft, "backupLocalData -> setUploadStatus")
     }
 
-    fun setUploadStatus(uploadStatus: UploadStatus, draft: Draft? = null, step: String = "") {
+    fun setUploadStatus(attachmentUploadStatus: AttachmentUploadStatus, draft: Draft? = null, step: String = "") {
         draft?.let { SentryDebug.addDraftBreadcrumbs(it, step) }
-        _uploadStatus = uploadStatus.name
+        _uploadStatus = attachmentUploadStatus.name
     }
 
     override fun getFileTypeFromMimeType() = AttachableMimeTypeUtils.getFileTypeFromMimeType(safeMimeType)
@@ -115,14 +115,5 @@ class Attachment : EmbeddedRealmObject, Attachable {
 
     fun getUploadLocalFile() = uploadLocalUri?.toUri()?.toFile()
 
-    enum class AttachmentDisposition {
-        INLINE,
-        ATTACHMENT,
-    }
-
-    enum class UploadStatus {
-        AWAITING,
-        ONGOING,
-        FINISHED,
-    }
+    companion object
 }

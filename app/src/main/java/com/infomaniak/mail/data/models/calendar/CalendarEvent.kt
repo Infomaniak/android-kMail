@@ -113,4 +113,6 @@ class CalendarEvent() : EmbeddedRealmObject {
         TENTATIVE("TENTATIVE"),
         CANCELLED("CANCELLED"),
     }
+
+    companion object
 }
