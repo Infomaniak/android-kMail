@@ -175,14 +175,36 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
+
+                val shouldLog = mutableListOf<Boolean>()
+
+                // Sentry events are discarded is the app is in Debug mode
+                val isInReleaseMode = !BuildConfig.DEBUG
+                shouldLog.add(isInReleaseMode)
+
+                // Sentry events are discarded if the user deactivated Sentry tracking in DataManagement settings
+                val isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled
+                shouldLog.add(isSentryTrackingEnabled)
+
+                // Network exceptions are discarded
                 val isNetworkException = event.exceptions?.any { it.type == "ApiController\$NetworkException" } ?: false
-                /**
-                 * Reasons to discard Sentry events :
-                 * - Application is in Debug mode
-                 * - User deactivated Sentry tracking in DataManagement settings
-                 * - The exception was a NetworkException, and we don't want to send them to Sentry
-                 */
-                if (!BuildConfig.DEBUG && localSettings.isSentryTrackingEnabled && !isNetworkException) event else null
+                shouldLog.add(!isNetworkException)
+
+                // AccessDenied exceptions are discarded
+                val isAccessDeniedException = event.exceptions?.any {
+                    // TODO: Check in Sentry if this `value.contains()` is the correct way to find this exception.
+                    it.type == "ApiErrorException" && it.value?.contains("access_denied") == true
+                } ?: false
+                shouldLog.add(!isAccessDeniedException)
+
+                // NotAuthorized exceptions are discarded
+                val isNotAuthorizedException = event.exceptions?.any {
+                    // TODO: Check in Sentry if this `value.contains()` is the correct way to find this exception.
+                    it.type == "ApiErrorException" && it.value?.contains("not_authorized") == true
+                } ?: false
+                shouldLog.add(!isNotAuthorizedException)
+
+                if (shouldLog.all { true }) event else null
             }
             options.addIntegration(
                 FragmentLifecycleIntegration(
