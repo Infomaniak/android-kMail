@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.Sort
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -202,7 +203,10 @@ class MainViewModel @Inject constructor(
         currentThreadsLiveJob = viewModelScope.launch(ioCoroutineContext) {
             observeFolderAndFilter()
                 .flatMapLatest { (folder, filter) ->
-                    folder?.let { threadController.getThreadsAsync(it, filter) } ?: emptyFlow()
+                    folder?.let {
+                        val sortOrder = if (folder.role == FolderRole.SCHEDULED_DRAFTS) Sort.ASCENDING else Sort.DESCENDING
+                        threadController.getThreadsAsync(it, filter, sortOrder)
+                    } ?: emptyFlow()
                 }
                 .collect(currentThreadsLive::postValue)
         }
