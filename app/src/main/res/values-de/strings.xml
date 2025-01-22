@@ -552,8 +552,8 @@
     </plurals>
     <string name="threadListEmptyDraftButton">Leere Entwürfe</string>
     <string name="threadListEmptyFolderAlertDescription">Sind Sie sicher, dass Sie alle Nachrichten in diesem Ordner dauerhaft löschen wollen?</string>
-    <string name="threadListEmptySpamButton">Leerer Spam</string>
-    <string name="threadListEmptyTrashButton">Leeren Mülleimer</string>
+    <string name="threadListEmptySpamButton">Spam leeren</string>
+    <string name="threadListEmptyTrashButton">Papierkorb leeren</string>
     <string name="threadListHeaderLastUpdate">Aktualisiert %s</string>
     <string name="threadListHeaderLastUpdateNow">jetzt</string>
     <plurals name="threadListHeaderUnreadCount">
