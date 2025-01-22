@@ -9,19 +9,20 @@ plugins {
     alias(libs.plugins.realm.kotlin)
 }
 
-def javaVersion = JavaVersion.VERSION_17
 def enableLeakCanary = false
 
+def appCompileSdk = rootProject.ext["appCompileSdk"]
+def appMinSdk = rootProject.ext["appMinSdk"]
+def javaVersion = rootProject.ext["javaVersion"]
+
 android {
-
     namespace 'com.infomaniak.mail'
-
-    compileSdk 34
+    compileSdk appCompileSdk
 
     defaultConfig {
         applicationId 'com.infomaniak.mail'
-        minSdk 25
-        targetSdk 34
+        minSdk appMinSdk
+        targetSdk appCompileSdk
         versionCode 1_07_000_01
         versionName '1.7.0'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
