@@ -1194,15 +1194,21 @@ class MainViewModel @Inject constructor(
         return messageController.getMessagesCountInThread(threadUid, mailboxContentRealm()) == 1
     }
 
-    fun shareThreadUrl(messageUid: String, startShareActivity: ((String) -> Unit)) {
-        messageController.getMessage(messageUid)?.let { message ->
-            val mailboxUuid = currentMailbox.value?.uuid ?: return
+    private val _shareThreadUrlResult = MutableSharedFlow<String?>()
+    val shareThreadUrlResult = _shareThreadUrlResult.shareIn(viewModelScope, SharingStarted.Lazily)
 
-            viewModelScope.launch(ioCoroutineContext) {
-                val response = ApiRepository.getShareLink(mailboxUuid, message.folderId, message.shortUid)
+    fun shareThreadUrl(messageUid: String) {
+        viewModelScope.launch {
+            val mailboxUuid = currentMailbox.value?.uuid
+            if (mailboxUuid == null || !hasNetwork) {
+                _shareThreadUrlResult.emit(null)
+                return@launch
+            }
 
-                if (response.isSuccess() && response.data != null) {
-                    startShareActivity.invoke(response.data!!.url)
+            withContext(ioCoroutineContext) {
+                messageController.getMessage(messageUid)?.let { message ->
+                    val response = ApiRepository.getShareLink(mailboxUuid, message.folderId, message.shortUid)
+                    _shareThreadUrlResult.emit(response.data?.url)
                 }
             }
         }
