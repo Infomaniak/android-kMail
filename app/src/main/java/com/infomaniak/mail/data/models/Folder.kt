@@ -169,8 +169,7 @@ class Folder : RealmObject, Cloneable {
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 8, "commercialFolder"),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 7, "socialNetworksFolder"),
         SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 6, "sentFolder"),
-        // TODO: Matomo
-        SCHEDULED_DRAFTS(R.string.scheduledMessagesFolder, R.drawable.ic_schedule_send, 5, "scheduledMessagesFolder"),
+        SCHEDULED_DRAFTS(R.string.scheduledMessagesFolder, R.drawable.ic_schedule_send, 5, "scheduledDraftsFolder"),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftFolder"),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, "spamFolder"),
         TRASH(R.string.trashFolder, R.drawable.ic_bin, 2, "trashFolder"),

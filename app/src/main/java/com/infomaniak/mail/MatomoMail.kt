@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -267,6 +267,10 @@ object MatomoMail : MatomoCore {
 
     fun Fragment.trackAutoAdvanceEvent(name: String) {
         trackEvent("settingsAutoAdvance", name)
+    }
+
+    fun Fragment.trackScheduleSendEvent(name: String) {
+        trackEvent("scheduleSend", name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions

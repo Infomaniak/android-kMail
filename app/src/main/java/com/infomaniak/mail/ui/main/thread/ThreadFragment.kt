@@ -382,7 +382,7 @@ class ThreadFragment : Fragment() {
 
                             if (scheduleAction != null && draftResource != null) {
                                 mainViewModel.modifyDraft(scheduleAction, draftResource) {
-                                    // trackNewMessageEvent(OPEN_FROM_DRAFT_NAME) // TODO: Matomo.
+                                    trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                                     twoPaneViewModel.navigateToNewMessage(
                                         arrivedFromExistingDraft = true,
                                         draftResource = message.draftResource,

@@ -28,6 +28,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.BottomSheetScheduleSendBinding
@@ -80,10 +81,12 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
 
             if (navigationArgs.isAlreadyScheduled) {
                 if (draftResource != null && lastSelectedScheduleDate != null) {
+                    trackScheduleSendEvent("lastSchedule")
                     mainViewModel.rescheduleDraft(draftResource, Date(lastSelectedScheduleDate))
                 }
             } else {
                 lastSelectedScheduleDate?.let {
+                    trackScheduleSendEvent("lastSchedule")
                     newMessageViewModel.setScheduleDate(Date(it))
                     newMessageViewModel.triggerSendMessage()
                 }
@@ -113,8 +116,12 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
             setIconResource(schedule.scheduleIconRes)
             setClosingOnClickListener {
                 if (navigationArgs.isAlreadyScheduled) {
-                    navigationArgs.draftResource?.let { mainViewModel.rescheduleDraft(draftResource = it, schedule.date) }
+                    navigationArgs.draftResource?.let {
+                        trackScheduleSendEvent(schedule.matomoValue)
+                        mainViewModel.rescheduleDraft(draftResource = it, schedule.date)
+                    }
                 } else {
+                    trackScheduleSendEvent(schedule.matomoValue)
                     newMessageViewModel.setScheduleDate(schedule.date)
                     newMessageViewModel.triggerSendMessage()
                 }
@@ -163,47 +170,55 @@ enum class Schedule(
     @DrawableRes val scheduleIconRes: Int,
     val date: Date,
     val timeToDisplay: List<TimeToDisplay>,
+    val matomoValue: String,
 ) {
     LATER_THIS_MORNING(
         R.string.laterThisMorning,
         R.drawable.ic_morning_sunrise_schedule,
         Date().getMorning(),
         listOf(TimeToDisplay.NIGHT),
+        "laterThisMorning",
     ),
     MONDAY_MORNING(
         R.string.mondayMorning,
         R.drawable.ic_morning_schedule,
         Date().getNextMonday().getMorning(),
         listOf(TimeToDisplay.WEEKEND),
+        "nextMondayMorning",
     ),
     MONDAY_AFTERNOON(
         R.string.mondayAfternoon,
         R.drawable.ic_afternoon_schedule,
         Date().getNextMonday().getAfternoon(),
         listOf(TimeToDisplay.WEEKEND),
+        "nextMondayAfternoon",
     ),
     THIS_AFTERNOON(
         R.string.thisAfternoon,
         R.drawable.ic_afternoon_schedule,
         Date().getAfternoon(),
         listOf(TimeToDisplay.MORNING),
+        "thisAfternoon",
     ),
     THIS_EVENING(
         R.string.thisEvening,
         R.drawable.ic_evening_schedule,
         Date().getEvening(),
-        listOf(TimeToDisplay.AFTERNOON)
+        listOf(TimeToDisplay.AFTERNOON),
+        "thisEvening",
     ),
     TOMORROW_MORNING(
         R.string.tomorrowMorning,
         R.drawable.ic_morning_schedule,
         Date().getTomorrow().getMorning(),
         listOf(TimeToDisplay.NIGHT, TimeToDisplay.MORNING, TimeToDisplay.AFTERNOON, TimeToDisplay.EVENING),
+        "tomorrowMorning",
     ),
     NEXT_MONDAY(
         R.string.nextMonday,
         R.drawable.ic_arrow_return,
         Date().getNextMonday().getMorning(),
         listOf(TimeToDisplay.NIGHT, TimeToDisplay.MORNING, TimeToDisplay.AFTERNOON, TimeToDisplay.EVENING),
+        "nextMonday",
     )
 }

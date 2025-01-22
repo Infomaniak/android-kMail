@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,8 +125,7 @@ class Draft : RealmObject {
     enum class DraftAction(val apiCallValue: String, val matomoValue: String) {
         SAVE("save", "saveDraft"),
         SEND("send", "sendMail"),
-        // TODO: Matomo.
-        SCHEDULE("schedule", "TODO"),
+        SCHEDULE("schedule", "scheduleDraft"),
     }
 
     enum class DraftMode {
