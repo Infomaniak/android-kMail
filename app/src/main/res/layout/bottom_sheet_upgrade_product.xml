@@ -20,28 +20,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.thread.actions.JunkBottomSheetDialog">
+    app:centerHorizontally="true"
+    tools:context=".ui.bottomSheetDialogs.UpgradeProductBottomSheetDialog">
 
-    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-        android:id="@+id/spam"
+    <ImageView
+        android:id="@+id/info_illustration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/marginStandardMedium"
+        android:importantForAccessibility="no"
+        android:maxHeight="270dp"
+        android:src="@drawable/illu_update_required" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/H2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:icon="@drawable/ic_spam"
-        app:title="@string/actionSpam"
-        app:visibleDivider="false" />
+        android:layout_margin="@dimen/marginStandardMedium"
+        android:gravity="center"
+        android:text="@string/disabledFeatureFlagTitle" />
 
-    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-        android:id="@+id/phishing"
+    <TextView
+        android:id="@+id/description"
+        style="@style/Body.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:icon="@drawable/ic_email_action_phishing"
-        app:title="@string/actionPhishing" />
+        android:layout_margin="@dimen/marginStandardMedium"
+        android:gravity="center"
+        android:text="@string/disabledFeatureFlagDescription" />
 
-    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-        android:id="@+id/blockSender"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/actionButton"
+        style="@style/TextButtonPrimary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:icon="@drawable/ic_email_action_block_user"
-        app:title="@string/actionBlockSender" />
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        android:layout_marginBottom="@dimen/marginStandardSmall"
+        android:text="@string/buttonClose" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>

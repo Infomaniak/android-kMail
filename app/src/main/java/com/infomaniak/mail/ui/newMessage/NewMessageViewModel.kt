@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import org.jsoup.nodes.Document
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -122,6 +123,10 @@ class NewMessageViewModel @Inject constructor(
 
     val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
 
+    val showOrCloseSelectDateAndTimeForScheduleDialog = SingleLiveEvent<Boolean>()
+
+    fun showSelectDateAndTimeForScheduleDialog() = showOrCloseSelectDateAndTimeForScheduleDialog.postValue(true)
+
     // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
     // 2. Inserting the AI proposition navigates back to NewMessageFragment.
     // 3. When saving or sending the draft now, the channel still holds the previous body as it wasn't consumed.
@@ -134,9 +139,11 @@ class NewMessageViewModel @Inject constructor(
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
+    var shouldScheduleInsteadOfSend = false
     var shouldSendInsteadOfSave = false
     var signaturesCount = 0
     private var isNewMessage = false
+    var scheduleDate: Date? = null
 
     private var snapshot: DraftSnapshot? = null
 
@@ -152,6 +159,7 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<InitResult>()
+    val sendMessageTrigger = SingleLiveEvent<Boolean>()
 
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
@@ -193,6 +201,7 @@ class NewMessageViewModel @Inject constructor(
     fun draftLocalUuid() = draftLocalUuid
     fun draftMode() = draftMode
     fun shouldLoadDistantResources() = shouldLoadDistantResources
+    fun triggerSendMessage() = sendMessageTrigger.postValue(true)
 
     fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
 
@@ -855,6 +864,19 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
+    fun setScheduleDate(scheduleDate: Date) = viewModelScope.launch(ioDispatcher) {
+        val localUuid = draftLocalUuid ?: return@launch
+        this@NewMessageViewModel.scheduleDate = scheduleDate
+
+        shouldScheduleInsteadOfSend = true
+
+        mailboxContentRealm().write {
+            DraftController.getDraft(localUuid, realm = this)?.also { draft ->
+                draft.scheduleDate = this@NewMessageViewModel.scheduleDate?.format(FORMAT_SCHEDULE_MAIL)
+            }
+        }
+    }
+
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
@@ -1035,6 +1057,9 @@ class NewMessageViewModel @Inject constructor(
             }
             DraftAction.SEND -> {
                 if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
+            }
+            DraftAction.SCHEDULE -> {
+                if (isTaskRoot) appContext.showToast(R.string.snackbarScheduling)
             }
         }
     }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2024 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.infomaniak.mail.data.models.draft
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SendDraftResult(
-    @SerialName("etop")
-    val etopScheduledDate: String,
+data class SendScheduleDraftResult(
+    val uuid: String,
+    @SerialName("schedule_action")
+    val scheduleAction: String,
+    val uid: String,
 )

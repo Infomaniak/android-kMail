@@ -23,15 +23,15 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setPaddingRelative
+import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
 import com.infomaniak.mail.utils.AccountUtils
@@ -47,19 +47,20 @@ class ActionItemView @JvmOverloads constructor(
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
             with(binding) {
-                button.apply {
-                    icon = getDrawable(R.styleable.ActionItemView_icon)
-                    getColorStateList(R.styleable.ActionItemView_iconColor)?.let(::setIconTint)
-                    text = getString(R.styleable.ActionItemView_text)
-                    getColorStateList(R.styleable.ActionItemView_textColor)?.let(::setTextColor)
-
-                    val iconHorizontalPadding = getDimenOrNull(R.styleable.ActionItemView_iconPaddingHorizontal)
-                    val iconPaddingStart = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingStart)
-                    val iconPaddingEnd = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingEnd)
-
-                    iconPaddingEnd?.let { iconPadding = it }
-                    setPaddingRelative(start = iconPaddingStart)
+                icon.setImageDrawable(getDrawable(R.styleable.ActionItemView_icon))
+                getColorStateList(R.styleable.ActionItemView_iconColor)?.let(::setIconTint) ?: run {
+                    icon.imageTintList = AppCompatResources.getColorStateList(context, R.color.icon_button_primary_color)
                 }
+
+                title.text = getString(R.styleable.ActionItemView_title)
+                getColorStateList(R.styleable.ActionItemView_titleColor)?.let(::setTitleColor)
+
+                val iconHorizontalPadding = getDimenOrNull(R.styleable.ActionItemView_iconPaddingHorizontal)
+                val iconPaddingStart = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingStart)
+                val iconPaddingEnd = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingEnd)
+
+                icon.setMarginsRelative(start = iconPaddingStart)
+                description.setMarginsRelative(end = iconPaddingEnd)
 
                 divider.apply {
                     isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
@@ -68,31 +69,40 @@ class ActionItemView @JvmOverloads constructor(
 
                 if (getBoolean(R.styleable.ActionItemView_staffOnly, false)) {
                     if (isInEditMode || AccountUtils.currentUser?.isStaff == true) {
-                        button.apply {
-                            setIconTintResource(R.color.staffOnlyColor)
-                            setTextColor(AppCompatResources.getColorStateList(context, R.color.staffOnlyColor))
-                        }
+                        icon.imageTintList = AppCompatResources.getColorStateList(context, R.color.staffOnlyColor)
+                        title.setTextColor(AppCompatResources.getColorStateList(context, R.color.staffOnlyColor))
                     } else {
                         isGone = true
                     }
                 }
 
-                if (getBoolean(R.styleable.ActionItemView_keepIconTint, false)) button.iconTint = null
+                if (getBoolean(R.styleable.ActionItemView_keepIconTint, false)) icon.imageTintList = null
+
+                description.isVisible = true
+
+                if (getBoolean(R.styleable.ActionItemView_showActionIcon, false)) actionIcon.isVisible = true
             }
         }
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
-        binding.button.setOnClickListener(onClickListener)
+        findViewById<ConstraintLayout>(R.id.itemBottomSheetAction).setOnClickListener(onClickListener)
     }
 
-    fun setIconResource(@DrawableRes iconResourceId: Int) = binding.button.setIconResource(iconResourceId)
+    fun setIconResource(@DrawableRes iconResourceId: Int) = binding.icon.setImageResource(iconResourceId)
 
-    fun setIconTint(@ColorInt color: Int) {
-        binding.button.iconTint = ColorStateList.valueOf(color)
+    private fun setIconTint(color: ColorStateList) {
+        binding.icon.imageTintList = color
     }
 
-    fun setText(@StringRes textResourceId: Int) = binding.button.setText(textResourceId)
+    fun setTitle(@StringRes textResourceId: Int) = binding.title.setText(textResourceId)
+
+    private fun setTitleColor(color: ColorStateList) = binding.title.setTextColor(color)
+
+    fun setDescription(text: String) = with(binding.description) {
+        this.text = text
+        isVisible = true
+    }
 
     fun setDividerVisibility(isVisible: Boolean) {
         binding.divider.isVisible = isVisible

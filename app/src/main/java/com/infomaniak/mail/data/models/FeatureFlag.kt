@@ -21,4 +21,5 @@ package com.infomaniak.mail.data.models
 enum class FeatureFlag(val apiName: String) {
     AI("ai-mail-composer"),
     BIMI("bimi"),
+    SCHEDULE_SEND_DRAFT("schedule-send-draft"),
 }

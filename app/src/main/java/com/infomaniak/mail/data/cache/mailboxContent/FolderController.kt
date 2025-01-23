@@ -46,19 +46,34 @@ class FolderController @Inject constructor(
 
     //region Get data
     fun getMenuDrawerDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.CUSTOM, withoutChildren = true).asFlow()
+        return getFoldersQuery(
+            mailboxContentRealm(),
+            withoutTypes = listOf(FoldersType.CUSTOM),
+            withoutChildren = true,
+            visibleFoldersOnly = true,
+        ).asFlow()
     }
 
     fun getMenuDrawerCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.DEFAULT, withoutChildren = true).asFlow()
+        return getFoldersQuery(
+            mailboxContentRealm(),
+            withoutTypes = listOf(FoldersType.DEFAULT),
+            withoutChildren = true,
+            visibleFoldersOnly = true,
+        ).asFlow()
     }
 
     fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
+        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true, visibleFoldersOnly = true).asFlow()
     }
 
     fun getMoveFolders(): RealmResults<Folder> {
-        return getFoldersQuery(mailboxContentRealm(), withoutType = FoldersType.DRAFT, withoutChildren = true).find()
+        return getFoldersQuery(
+            mailboxContentRealm(),
+            withoutTypes = listOf(FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
+            withoutChildren = true,
+            visibleFoldersOnly = true,
+        ).find()
     }
 
     fun getFolder(id: String): Folder? {
@@ -108,20 +123,25 @@ class FolderController @Inject constructor(
 
         remoteFolders.forEach { remoteFolder ->
 
-            getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
+            val localFolder = getFolder(remoteFolder.id, realm = this)
+
+            if (remoteFolder.role == FolderRole.SCHEDULED_DRAFTS && localFolder == null) remoteFolder.isDisplayed = false
+
+            localFolder?.let {
 
                 val collapseStateNeedsReset = remoteFolder.isRoot && remoteFolder.children.isEmpty()
-                val isCollapsed = if (collapseStateNeedsReset) false else localFolder.isCollapsed
+                val isCollapsed = if (collapseStateNeedsReset) false else it.isCollapsed
 
                 remoteFolder.initLocalValues(
-                    localFolder.lastUpdatedAt,
-                    localFolder.cursor,
-                    localFolder.unreadCountLocal,
-                    localFolder.threads,
-                    localFolder.oldMessagesUidsToFetch,
-                    localFolder.newMessagesUidsToFetch,
-                    localFolder.remainingOldMessagesToFetch,
-                    localFolder.isHidden,
+                    it.lastUpdatedAt,
+                    it.cursor,
+                    it.unreadCountLocal,
+                    it.threads,
+                    it.oldMessagesUidsToFetch,
+                    it.newMessagesUidsToFetch,
+                    it.remainingOldMessagesToFetch,
+                    it.isDisplayed,
+                    it.isHidden,
                     isCollapsed,
                 )
             }
@@ -134,6 +154,7 @@ class FolderController @Inject constructor(
     enum class FoldersType {
         DEFAULT,
         CUSTOM,
+        SCHEDULED_DRAFTS,
         DRAFT,
     }
 
@@ -145,17 +166,21 @@ class FolderController @Inject constructor(
         //region Queries
         private fun getFoldersQuery(
             realm: TypedRealm,
-            withoutType: FoldersType? = null,
+            withoutTypes: List<FoldersType> = emptyList(),
             withoutChildren: Boolean = false,
+            visibleFoldersOnly: Boolean = false,
         ): RealmQuery<Folder> {
             val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
-            val typeQuery = when (withoutType) {
-                FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
-                FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != nil"
-                FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
-                null -> ""
+            val typeQuery = withoutTypes.joinToString(separator = "") {
+                when (it) {
+                    FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
+                    FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != nil"
+                    FoldersType.SCHEDULED_DRAFTS -> " AND ${Folder.rolePropertyName} != '${FolderRole.SCHEDULED_DRAFTS.name}'"
+                    FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
+                }
             }
-            return realm.query<Folder>("$isNotSearch${rootsQuery}${typeQuery}").sortFolders()
+            val visibilityQuery = if (visibleFoldersOnly) " AND ${Folder::isDisplayed.name} == true" else ""
+            return realm.query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}").sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {

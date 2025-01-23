@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,6 +92,8 @@ class Folder : RealmObject, Cloneable {
     var roleOrder: Int = role?.order ?: CUSTOM_FOLDER_ROLE_ORDER
     @Transient
     var sortedName: String = name
+    @Transient
+    var isDisplayed: Boolean = true
     //endregion
 
     private val _parents by backlinks(Folder::children)
@@ -123,6 +125,7 @@ class Folder : RealmObject, Cloneable {
         oldMessagesUidsToFetch: RealmList<Int>,
         newMessagesUidsToFetch: RealmList<Int>,
         remainingOldMessagesToFetch: Int,
+        isDisplayed: Boolean,
         isHidden: Boolean,
         isCollapsed: Boolean,
     ) {
@@ -134,6 +137,7 @@ class Folder : RealmObject, Cloneable {
         this.oldMessagesUidsToFetch.addAll(oldMessagesUidsToFetch)
         this.newMessagesUidsToFetch.addAll(newMessagesUidsToFetch)
         this.remainingOldMessagesToFetch = remainingOldMessagesToFetch
+        this.isDisplayed = isDisplayed
         this.isHidden = isHidden
         this.isCollapsed = isCollapsed
 
@@ -161,10 +165,11 @@ class Folder : RealmObject, Cloneable {
         val order: Int,
         val matomoValue: String,
     ) {
-        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 8, "inboxFolder"),
-        COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 7, "commercialFolder"),
-        SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 6, "socialNetworksFolder"),
-        SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 5, "sentFolder"),
+        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 9, "inboxFolder"),
+        COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 8, "commercialFolder"),
+        SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 7, "socialNetworksFolder"),
+        SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 6, "sentFolder"),
+        SCHEDULED_DRAFTS(R.string.scheduledMessagesFolder, R.drawable.ic_schedule_send, 5, "scheduledDraftsFolder"),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftFolder"),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, "spamFolder"),
         TRASH(R.string.trashFolder, R.drawable.ic_bin, 2, "trashFolder"),

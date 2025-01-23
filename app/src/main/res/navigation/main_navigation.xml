@@ -246,6 +246,22 @@
             app:argType="boolean" />
     </dialog>
 
+    <dialog
+        android:id="@+id/scheduleSendBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog"
+        android:label="ScheduleSendBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_schedule_send">
+        <argument
+            android:name="isAlreadyScheduled"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="draftResource"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
+
     <fragment
         android:id="@+id/moveFragment"
         android:name="com.infomaniak.mail.ui.main.move.MoveFragment"
@@ -666,5 +682,11 @@
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialog"
         android:label="AccountBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_account" />
+
+    <dialog
+        android:id="@+id/upgradeProductBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.UpgradeProductBottomSheetDialog"
+        android:label="UpgradeProductBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_upgrade_product" />
 
 </navigation>

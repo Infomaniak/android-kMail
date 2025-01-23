@@ -195,9 +195,10 @@ class RefreshController @Inject constructor(
         clearCallbacks()
 
         when (initialFolder.role) {
-            FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT)
-            FolderRole.SENT -> listOf(FolderRole.INBOX, FolderRole.DRAFT)
-            FolderRole.DRAFT -> listOf(FolderRole.INBOX, FolderRole.SENT)
+            FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS)
+            FolderRole.SENT -> listOf(FolderRole.INBOX, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS)
+            FolderRole.DRAFT -> listOf(FolderRole.INBOX, FolderRole.SENT, FolderRole.SCHEDULED_DRAFTS)
+            FolderRole.SCHEDULED_DRAFTS -> listOf(FolderRole.INBOX, FolderRole.SENT, FolderRole.DRAFT)
             else -> emptyList()
         }.forEach { role ->
             scope.ensureActive()
@@ -285,6 +286,7 @@ class RefreshController @Inject constructor(
                 it.newMessagesUidsToFetch.addAll(activities.addedShortUids)
                 it.unreadCountRemote = activities.unreadCountRemote
                 it.lastUpdatedAt = Date().toRealmInstant()
+                if (it.role == FolderRole.SCHEDULED_DRAFTS) it.isDisplayed = it.threads.isNotEmpty()
                 it.cursor = activities.cursor
                 SentryDebug.addCursorBreadcrumb("fetchActivities", it, activities.cursor)
             }
@@ -345,6 +347,8 @@ class RefreshController @Inject constructor(
                     max(it.remainingOldMessagesToFetch - uidsToFetch.count(), 0)
                 }
             }
+
+            if (it.role == FolderRole.SCHEDULED_DRAFTS) it.isDisplayed = it.threads.isNotEmpty()
         }
 
         sendOrphanMessages(folder)

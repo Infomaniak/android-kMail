@@ -65,6 +65,8 @@ class Mailbox : RealmObject {
     @SerialName("unseen_messages")
     var unreadCountRemote: Int = 0
     var aliases = realmListOf<String>()
+    @SerialName("is_free")
+    var isFree: Boolean = false
     //endregion
 
     //region Local data (Transient)

@@ -80,4 +80,26 @@
             app:argType="com.infomaniak.mail.utils.extensions.AttachmentExtensions$AttachmentIntentType" />
     </dialog>
 
+    <dialog
+        android:id="@+id/scheduleSendBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog"
+        android:label="ScheduleSendBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_schedule_send">
+        <argument
+            android:name="isAlreadyScheduled"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="draftResource"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/upgradeProductBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.UpgradeProductBottomSheetDialog"
+        android:label="UpgradeProductBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_upgrade_product" />
+
 </navigation>

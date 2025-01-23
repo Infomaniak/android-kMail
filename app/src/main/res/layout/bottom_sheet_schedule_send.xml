@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023-2024 Infomaniak Network SA
+  ~ Copyright (C) 2024 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -20,28 +20,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.thread.actions.JunkBottomSheetDialog">
+    tools:context=".ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog">
 
-    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-        android:id="@+id/spam"
+    <TextView
+        android:id="@+id/title"
+        style="@style/BodyMedium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:icon="@drawable/ic_spam"
-        app:title="@string/actionSpam"
-        app:visibleDivider="false" />
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginBottom="@dimen/marginStandardMedium"
+        android:gravity="center_horizontal"
+        android:text="@string/scheduleSendingTitle" />
 
     <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-        android:id="@+id/phishing"
+        android:id="@+id/lastScheduleItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:icon="@drawable/ic_email_action_phishing"
-        app:title="@string/actionPhishing" />
+        android:visibility="gone"
+        app:icon="@drawable/ic_last_schedule_selected"
+        app:title="@string/lastSelectedSchedule"
+        app:visibleDivider="false"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/scheduleItems"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
     <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-        android:id="@+id/blockSender"
+        android:id="@+id/customScheduleItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:icon="@drawable/ic_email_action_block_user"
-        app:title="@string/actionBlockSender" />
+        app:icon="@drawable/ic_pen"
+        app:iconTint="?attr/colorPrimary"
+        app:showActionIcon="true"
+        app:title="@string/buttonCustomSchedule" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>

@@ -69,6 +69,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var autoAdvanceNaturalThread by sharedValue("autoAdvanceNaturalThreadKey", AutoAdvanceMode.FOLLOWING_THREAD)
     var showWebViewOutdated by sharedValue("showWebViewOutdatedKey", true)
     var accessTokenApiCallRecord by sharedValue<ApiCallRecord>("accessTokenApiCallRecordKey", null)
+    var lastSelectedScheduleDate by sharedValue<Long>("lastSelectedSchedule", null)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 

@@ -80,6 +80,8 @@ class Message : RealmObject {
     var isDraft: Boolean = false
     @SerialName("draft_resource")
     var draftResource: String? = null
+    @SerialName("is_scheduled_draft")
+    var isScheduledDraft: Boolean = false
     var body: Body? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
@@ -99,6 +101,8 @@ class Message : RealmObject {
     @SerialName("has_unsubscribe_link")
     var hasUnsubscribeLink: Boolean? = null
     var bimi: Bimi? = null
+    @SerialName("schedule_action")
+    var scheduleAction: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
