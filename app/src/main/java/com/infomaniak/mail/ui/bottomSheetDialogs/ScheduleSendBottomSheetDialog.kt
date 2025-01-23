@@ -210,7 +210,7 @@ enum class Schedule(
     TOMORROW_MORNING(
         R.string.tomorrowMorning,
         R.drawable.ic_morning_schedule,
-        Date().getTomorrow().getMorning(),
+        Date().tomorrow().getMorning(),
         listOf(TimeToDisplay.NIGHT, TimeToDisplay.MORNING, TimeToDisplay.AFTERNOON, TimeToDisplay.EVENING),
         "tomorrowMorning",
     ),
