@@ -41,7 +41,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ReplyForwardFooterManager
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Attachment.UploadStatus
+import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -273,7 +273,7 @@ class NewMessageViewModel @Inject constructor(
                         setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
 
                         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
-                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!, fullMessage.uid)
+                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
 
                         previousMessage = fullMessage
                     }
@@ -329,7 +329,7 @@ class NewMessageViewModel @Inject constructor(
                 ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
                     draft.attachments += attachment.apply {
                         resource = previousMessage.attachments.find { it.name == name }?.resource
-                        setUploadStatus(UploadStatus.FINISHED)
+                        setUploadStatus(AttachmentUploadStatus.FINISHED)
                     }
                     SentryDebug.addDraftBreadcrumbs(draft, step = "set previousMessage when reply/replyAll/Forward")
                 }
@@ -517,7 +517,7 @@ class NewMessageViewModel @Inject constructor(
              * we need to set all of its Attachments to `FINISHED`, so we don't try to upload them again.
              */
             draft.attachments.forEach {
-                it.setUploadStatus(UploadStatus.FINISHED, draft, "fetchDraft at NewMessage opening")
+                it.setUploadStatus(AttachmentUploadStatus.FINISHED, draft, "fetchDraft at NewMessage opening")
             }
 
             /**
@@ -530,18 +530,18 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body, messageUid: String) {
+    private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
-            aiSharedData.previousMessageBodyPlainText = previousMessageBody.asPlainText(messageUid)
+            aiSharedData.previousMessageBodyPlainText = previousMessageBody.asPlainText()
         }
     }
 
-    private suspend fun Body.asPlainText(messageUid: String): String? {
+    private suspend fun Body.asPlainText(): String? {
         //TODO: When the API handles blank characters, remove ifBlank
         return when (type) {
             Utils.TEXT_HTML -> {
                 val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
-                val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies, messageUid)
+                val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies)
                 fullBody.htmlToText()
             }
             else -> value
@@ -986,7 +986,7 @@ class NewMessageViewModel @Inject constructor(
          * Then it means the Attachments list hasn't been edited by the user, so we have nothing to do here.
          */
         val isForwardingUneditedAttachmentsList = draftMode == DraftMode.FORWARD &&
-                uiAttachments.all { it.uploadStatus == UploadStatus.FINISHED } &&
+                uiAttachments.all { it.attachmentUploadStatus == AttachmentUploadStatus.FINISHED } &&
                 uiAttachments.count() == attachments.count()
         if (isForwardingUneditedAttachmentsList) return
 
@@ -999,7 +999,7 @@ class NewMessageViewModel @Inject constructor(
              * be some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of the
              * Attachment, this data will be lost forever and we won't be able to save/send the Draft.
              */
-            return@map if (localAttachment != null && localAttachment.uploadStatus != UploadStatus.AWAITING) {
+            return@map if (localAttachment != null && localAttachment.attachmentUploadStatus != AttachmentUploadStatus.AWAITING) {
                 localAttachment.copyFromRealm()
             } else {
                 uiAttachment

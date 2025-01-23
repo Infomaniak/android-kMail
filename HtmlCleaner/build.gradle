@@ -1,18 +1,18 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+def appCompileSdk = rootProject.ext["appCompileSdk"]
+def appMinSdk = rootProject.ext["appMinSdk"]
+def javaVersion = rootProject.ext["javaVersion"]
+
 android {
-
     namespace 'com.infomaniak.html.cleaner'
-
-    compileSdk 34
+    compileSdk appCompileSdk
 
     defaultConfig {
-        minSdk 25
-        targetSdk 34
+        minSdk appMinSdk
+        targetSdk appCompileSdk
     }
-
-    def javaVersion = JavaVersion.VERSION_17
 
     compileOptions {
         sourceCompatibility javaVersion

@@ -1,7 +1,13 @@
 buildscript {
     dependencies {
-        classpath libs.navigation.safeargs
-        classpath libs.google.services
+        classpath(libs.navigation.safeargs)
+        classpath(libs.google.services)
+    }
+
+    extra.apply {
+        set("appCompileSdk", 34)
+        set("appMinSdk", 25)
+        set("javaVersion", JavaVersion.VERSION_17)
     }
 }
 
@@ -16,4 +22,4 @@ plugins {
     alias(libs.plugins.realm.kotlin) apply false
 }
 
-tasks.register('clean', Delete) { delete rootProject.layout.buildDirectory }
+tasks.register("clean", Delete::class) { delete(rootProject.layout.buildDirectory) }

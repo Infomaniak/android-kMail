@@ -13,7 +13,10 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url 'https://jitpack.io' }
     }
+    versionCatalogs {
+        create("core") { from(files("Core/gradle/core.versions.toml")) }
+    }
 }
 
 rootProject.name = 'Infomaniak Mail'
-include ':app', ':Core', ':Core:AppLock', ':Core:BugTracker', ':Core:Confetti', ':Core:Stores', ':HtmlCleaner'
+include ':app', ':Core:Legacy', ':Core:Legacy:AppLock', ':Core:Legacy:BugTracker', ':Core:Legacy:Confetti', ':Core:Legacy:Stores', ':HtmlCleaner'

@@ -22,7 +22,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Attachment.UploadStatus
+import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.ATTACHMENT_TAG
@@ -47,9 +47,11 @@ suspend fun uploadAttachmentsWithMutex(
 
 private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: DraftController, realm: Realm) {
 
-    fun getAwaitingAttachments(): List<Attachment> = attachments.filter { it.uploadStatus == UploadStatus.AWAITING }
+    fun getAwaitingAttachments(): List<Attachment> = attachments.filter {
+        it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING
+    }
 
-    suspend fun setUploadStatus(attachment: Attachment, uploadStatus: UploadStatus, step: String) {
+    suspend fun setUploadStatus(attachment: Attachment, uploadStatus: AttachmentUploadStatus, step: String) {
         realm.write {
             draftController.updateDraft(localUuid, realm = this) {
                 it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it, step)
@@ -69,10 +71,10 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
 
     attachmentsToUpload.forEach { attachment ->
         runCatching {
-            setUploadStatus(attachment, UploadStatus.ONGOING, step = "before starting upload")
+            setUploadStatus(attachment, AttachmentUploadStatus.ONGOING, step = "before starting upload")
             attachment.startUpload(localUuid, mailbox, draftController, realm)
         }.onFailure { exception ->
-            setUploadStatus(attachment, UploadStatus.AWAITING, step = "after failing upload")
+            setUploadStatus(attachment, AttachmentUploadStatus.AWAITING, step = "after failing upload")
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
             if ((exception as Exception).isNetworkException()) throw NetworkException()
             throw exception

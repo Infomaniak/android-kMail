@@ -155,7 +155,7 @@ object SentryDebug {
             )
             addAttachmentData(
                 index = index,
-                value = "uploadStatus: ${it.uploadStatus?.name} | size: ${it.size}",
+                value = "uploadStatus: ${it.attachmentUploadStatus?.name} | size: ${it.size}",
             )
         }
 
@@ -280,13 +280,6 @@ object SentryDebug {
             scope.setExtra("errorName", errorName)
             scope.setExtra("errorMessage", errorMessage)
             scope.setExtra("errorStack", errorStack)
-        }
-    }
-
-    fun sendSubBodiesTrigger(messageUid: String) {
-        Sentry.captureMessage("Received an email with SubBodies!!") { scope ->
-            scope.setExtra("email", "${AccountUtils.currentMailboxEmail}")
-            scope.setExtra("messageUid", messageUid)
         }
     }
 

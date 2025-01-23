@@ -9,19 +9,20 @@ plugins {
     alias(libs.plugins.realm.kotlin)
 }
 
-def javaVersion = JavaVersion.VERSION_17
 def enableLeakCanary = false
 
+def appCompileSdk = rootProject.ext["appCompileSdk"]
+def appMinSdk = rootProject.ext["appMinSdk"]
+def javaVersion = rootProject.ext["javaVersion"]
+
 android {
-
     namespace 'com.infomaniak.mail'
-
-    compileSdk 34
+    compileSdk appCompileSdk
 
     defaultConfig {
         applicationId 'com.infomaniak.mail'
-        minSdk 25
-        targetSdk 34
+        minSdk appMinSdk
+        targetSdk appCompileSdk
         versionCode 1_07_000_01
         versionName '1.7.0'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -82,17 +83,18 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':Core')
-    implementation project(path: ':Core:AppLock')
-    implementation project(path: ':Core:BugTracker')
-    implementation project(path: ':Core:Confetti')
-    implementation project(path: ':Core:Stores')
+    implementation project(path: ':Core:Legacy')
+    implementation project(path: ':Core:Legacy:AppLock')
+    implementation project(path: ':Core:Legacy:BugTracker')
+    implementation project(path: ':Core:Legacy:Confetti')
+    implementation project(path: ':Core:Legacy:Stores')
     implementation project(path: ':HtmlCleaner')
 
     implementation libs.rich.html.editor
 
     implementation libs.realm.kotlin.base
 
+    standardImplementation libs.play.services.base
     standardImplementation libs.firebase.messaging.ktx
 
     implementation libs.lottie
