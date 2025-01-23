@@ -89,6 +89,7 @@ dependencies {
     implementation project(path: ':Core:Legacy:BugTracker')
     implementation project(path: ':Core:Legacy:Confetti')
     implementation project(path: ':Core:Legacy:Stores')
+    implementation project(path: ':Core:MyKSuite')
     implementation project(path: ':HtmlCleaner')
 
     implementation libs.rich.html.editor
@@ -119,6 +120,9 @@ dependencies {
     implementation libs.sentry.android.fragment
 
     implementation libs.coil.svg
+
+    // Compose
+    implementation libs.compose.ui.android
 
     // Test
     testImplementation libs.junit
