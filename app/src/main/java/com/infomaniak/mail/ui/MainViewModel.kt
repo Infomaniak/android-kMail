@@ -647,7 +647,9 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess()) {
             refreshScheduleDraftFolder()
-        } // TODO: Else, Sentry?
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
+        }
     }
 
     fun modifyDraft(scheduleAction: String, draftResource: String, onSuccess: () -> Unit) =
