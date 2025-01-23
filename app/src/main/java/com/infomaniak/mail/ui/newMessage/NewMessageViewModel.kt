@@ -264,7 +264,7 @@ class NewMessageViewModel @Inject constructor(
                         setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
 
                         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
-                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!, fullMessage.uid)
+                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
 
                         previousMessage = fullMessage
                     }
@@ -521,18 +521,18 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body, messageUid: String) {
+    private suspend fun parsePreviousMailToAnswerWithAi(previousMessageBody: Body) {
         if (draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL) {
-            aiSharedData.previousMessageBodyPlainText = previousMessageBody.asPlainText(messageUid)
+            aiSharedData.previousMessageBodyPlainText = previousMessageBody.asPlainText()
         }
     }
 
-    private suspend fun Body.asPlainText(messageUid: String): String? {
+    private suspend fun Body.asPlainText(): String? {
         //TODO: When the API handles blank characters, remove ifBlank
         return when (type) {
             Utils.TEXT_HTML -> {
                 val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
-                val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies, messageUid)
+                val fullBody = MessageBodyUtils.mergeSplitBodyAndSubBodies(splitBodyContent, subBodies)
                 fullBody.htmlToText()
             }
             else -> value

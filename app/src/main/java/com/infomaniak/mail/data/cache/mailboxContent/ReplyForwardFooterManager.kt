@@ -97,7 +97,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
 
     private fun computePreviousFullBody(previousBody: String, message: Message): String {
         return message.body?.let { body ->
-            MessageBodyUtils.mergeSplitBodyAndSubBodies(previousBody, body.subBodies, message.uid)
+            MessageBodyUtils.mergeSplitBodyAndSubBodies(previousBody, body.subBodies)
         } ?: previousBody
     }
 
