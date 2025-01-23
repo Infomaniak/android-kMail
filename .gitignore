@@ -9,6 +9,7 @@ env.properties
 .externalNativeBuild
 .gradle
 **/.idea
+!.idea/icon.svg
 *.iml
 .kotlin/errors
 .kotlin/sessions
