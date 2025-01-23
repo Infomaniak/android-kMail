@@ -33,8 +33,10 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -662,8 +664,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun observeShareUrlResult() {
         viewLifecycleOwner.lifecycleScope.launch {
-            mainViewModel.shareThreadUrlResult.collect { url ->
-                if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
+            repeatOnLifecycle(State.STARTED) {
+                mainViewModel.shareThreadUrlResult.collect { url ->
+                    if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
+                }
             }
         }
     }

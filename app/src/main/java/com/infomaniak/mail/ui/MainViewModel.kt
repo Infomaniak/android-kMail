@@ -233,6 +233,11 @@ class MainViewModel @Inject constructor(
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
     //endregion
 
+    //region Share Thread URL
+    private val _shareThreadUrlResult = MutableSharedFlow<String?>()
+    val shareThreadUrlResult = _shareThreadUrlResult.shareIn(viewModelScope, SharingStarted.Lazily)
+    //endregion
+
     fun updateUserInfo() = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Update user info")
         updateAddressBooks()
@@ -1194,12 +1199,10 @@ class MainViewModel @Inject constructor(
         return messageController.getMessagesCountInThread(threadUid, mailboxContentRealm()) == 1
     }
 
-    private val _shareThreadUrlResult = MutableSharedFlow<String?>()
-    val shareThreadUrlResult = _shareThreadUrlResult.shareIn(viewModelScope, SharingStarted.Lazily)
-
     fun shareThreadUrl(messageUid: String) {
+        val mailboxUuid = currentMailbox.value?.uuid
+
         viewModelScope.launch {
-            val mailboxUuid = currentMailbox.value?.uuid
             if (mailboxUuid == null || !hasNetwork) {
                 _shareThreadUrlResult.emit(null)
                 return@launch
