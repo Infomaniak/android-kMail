@@ -639,6 +639,8 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess()) {
             onSuccess()
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
         }
     }
 
@@ -648,7 +650,7 @@ class MainViewModel @Inject constructor(
         if (apiResponse.isSuccess()) {
             refreshScheduleDraftFolder()
         } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
         }
     }
 
@@ -662,6 +664,8 @@ class MainViewModel @Inject constructor(
                 refreshFoldersAsync(mailbox, listOf(draftFolderId))
 
                 getScheduleDraft(draftResource, onSuccess)
+            } else {
+                snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
             }
         }
     //endregion
