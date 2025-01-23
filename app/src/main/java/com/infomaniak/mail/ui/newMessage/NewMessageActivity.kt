@@ -124,8 +124,16 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun saveDraft() {
+        val draftAction = if (newMessageViewModel.shouldScheduleInsteadOfSend) {
+            DraftAction.SCHEDULE
+        } else if (newMessageViewModel.shouldSendInsteadOfSave) {
+            DraftAction.SEND
+        } else {
+            DraftAction.SAVE
+        }
+
         val draftSaveConfiguration = DraftSaveConfiguration(
-            action = if (newMessageViewModel.shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
+            action = draftAction,
             isFinishing = isFinishing,
             isTaskRoot = isTaskRoot,
             startWorkerCallback = ::startWorker,
@@ -135,7 +143,10 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
+        draftsActionsWorkerScheduler.scheduleWork(
+            draftLocalUuid = newMessageViewModel.draftLocalUuid(),
+            scheduleDate = newMessageViewModel.scheduleDate,
+        )
     }
 
     data class DraftSaveConfiguration(

@@ -38,11 +38,9 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
-import com.infomaniak.lib.core.utils.hasPermissions
-import com.infomaniak.lib.core.utils.year
 import com.infomaniak.lib.stores.StoreUtils
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
@@ -69,10 +67,12 @@ import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
+import com.infomaniak.mail.workers.BaseCoroutineWorker.Companion.getLongOrNull
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -103,14 +103,23 @@ class MainActivity : BaseActivity() {
         (supportFragmentManager.findFragmentById(R.id.mainHostFragment) as NavHostFragment).navController
     }
 
+    private var draftAction: DraftAction? = null
+
     private val showSendingSnackbarTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer(milliseconds = 1_000L) { snackbarManager.setValue(getString(R.string.snackbarEmailSending)) }
+        Utils.createRefreshTimer(milliseconds = 1_000L) {
+            snackbarManager.setValue(
+                getString(if (draftAction == DraftAction.SCHEDULE) R.string.snackbarScheduling else R.string.snackbarEmailSending)
+            )
+        }
     }
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        val draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
+        draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
+
         if (draftAction == DraftAction.SEND) {
             showEasterXMas()
+            showSendingSnackbarTimer.start()
+        } else if (draftAction == DraftAction.SCHEDULE) {
             showSendingSnackbarTimer.start()
         }
     }
@@ -282,6 +291,14 @@ class MainActivity : BaseActivity() {
                     }
                 }
                 DraftAction.SEND -> showSentDraftSnackbar()
+                DraftAction.SCHEDULE -> {
+                    val scheduleDate = getLongOrNull(DraftsActionsWorker.SCHEDULE_DATE_KEY)
+                    val scheduleAction = getString(DraftsActionsWorker.SCHEDULE_ACTION_KEY)
+
+                    if (scheduleDate != null && scheduleAction != null) {
+                        showSentScheduleDraftSnackbar(scheduleDate = Date(scheduleDate), scheduleAction)
+                    }
+                }
             }
         }
     }
@@ -290,8 +307,8 @@ class MainActivity : BaseActivity() {
         val userId = getInt(DraftsActionsWorker.RESULT_USER_ID_KEY, 0)
         if (userId != AccountUtils.currentUserId) return
 
-        getLong(DraftsActionsWorker.BIGGEST_SCHEDULED_DATE_KEY, 0).takeIf { it > 0 }?.let { scheduledDate ->
-            mainViewModel.refreshDraftFolderWhenDraftArrives(scheduledDate)
+        getLong(DraftsActionsWorker.BIGGEST_ETOP_SCHEDULED_DATE_KEY, 0).takeIf { it > 0 }?.let { etopScheduledDate ->
+            mainViewModel.refreshDraftFolderWhenDraftArrives(etopScheduledDate)
         }
     }
 
@@ -310,6 +327,23 @@ class MainActivity : BaseActivity() {
     private fun showSentDraftSnackbar() {
         showSendingSnackbarTimer.cancel()
         snackbarManager.setValue(getString(R.string.snackbarEmailSent))
+    }
+
+    // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
+    private fun showSentScheduleDraftSnackbar(scheduleDate: Date, scheduleAction: String) {
+        showSendingSnackbarTimer.cancel()
+
+        val dateString = mostDetailedDate(
+            context = this,
+            date = scheduleDate,
+            format = FORMAT_DATE_DAY_MONTH,
+        )
+
+        snackbarManager.setValue(
+            title = String.format(getString(R.string.snackbarScheduleSaved), dateString),
+            buttonTitle = RCore.string.buttonCancel,
+            customBehavior = { mainViewModel.deleteScheduleDraft(scheduleAction) },
+        )
     }
 
     private fun loadCurrentMailbox() {

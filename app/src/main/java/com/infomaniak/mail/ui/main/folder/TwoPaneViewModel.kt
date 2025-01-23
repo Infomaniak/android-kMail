@@ -86,15 +86,17 @@ class TwoPaneViewModel @Inject constructor(
         messageUid: String? = null,
         mailToUri: Uri? = null,
     ) {
-        newMessageArgs.value = NewMessageActivityArgs(
-            draftMode = draftMode,
-            previousMessageUid = previousMessageUid,
-            shouldLoadDistantResources = shouldLoadDistantResources,
-            arrivedFromExistingDraft = arrivedFromExistingDraft,
-            draftLocalUuid = draftLocalUuid,
-            draftResource = draftResource,
-            messageUid = messageUid,
-            mailToUri = mailToUri,
+        newMessageArgs.postValue(
+            NewMessageActivityArgs(
+                draftMode = draftMode,
+                previousMessageUid = previousMessageUid,
+                shouldLoadDistantResources = shouldLoadDistantResources,
+                arrivedFromExistingDraft = arrivedFromExistingDraft,
+                draftLocalUuid = draftLocalUuid,
+                draftResource = draftResource,
+                messageUid = messageUid,
+                mailToUri = mailToUri,
+            )
         )
     }
 
