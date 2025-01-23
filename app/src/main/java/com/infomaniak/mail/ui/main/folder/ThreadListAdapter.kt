@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -231,6 +231,7 @@ class ThreadListAdapter @Inject constructor(
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
             mailDate.text = formatDate(context)
 
+            scheduleSendIcon.isVisible = numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS
             draftPrefix.isVisible = hasDrafts
 
             val (isIconReplyVisible, isIconForwardVisible) = computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded)

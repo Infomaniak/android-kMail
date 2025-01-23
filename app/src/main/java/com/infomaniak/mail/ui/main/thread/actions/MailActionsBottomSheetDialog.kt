@@ -112,19 +112,19 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     fun setMarkAsReadUi(isSeen: Boolean) = with(binding.markAsReadUnread) {
         val (readIconRes, readTextRes) = computeUnreadStyle(isSeen)
         setIconResource(readIconRes)
-        setText(readTextRes)
+        setTitle(readTextRes)
     }
 
     fun setFavoriteUi(isFavorite: Boolean) = with(binding.favorite) {
         val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
         setIconResource(favoriteIconRes)
-        setText(favoriteText)
+        setTitle(favoriteText)
     }
 
     fun setArchiveUi(isFromArchive: Boolean) = with(binding.archive) {
         if (isFromArchive) {
             setIconResource(R.drawable.ic_drawer_inbox)
-            setText(R.string.actionMoveToInbox)
+            setTitle(R.string.actionMoveToInbox)
         }
     }
 

@@ -552,7 +552,6 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/sendButton"
                     app:layout_constraintStart_toEndOf="@id/editorTextOptions"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -666,17 +665,34 @@
                     </HorizontalScrollView>
                 </FrameLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/sendButton"
-                    style="@style/IconButton"
-                    android:layout_width="80dp"
+                <LinearLayout
+                    android:id="@+id/sendLayout"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_gravity="end"
-                    android:contentDescription="@string/send"
-                    app:icon="@drawable/ic_send"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/scheduleSendButton"
+                        style="@style/IconButton"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/scheduleSendingTitle"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_schedule_send"
+                        tools:visibility="visible" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/sendButton"
+                        style="@style/IconButton"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/send"
+                        app:icon="@drawable/ic_send" />
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
