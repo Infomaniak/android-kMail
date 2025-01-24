@@ -376,7 +376,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        suspend fun executeScheduleSendAction() = with(ApiRepository.sendScheduleDraft(mailboxUuid, draft, okHttpClient)) {
+        suspend fun executeScheduleSendAction() = with(ApiRepository.scheduleDraft(mailboxUuid, draft, okHttpClient)) {
             when {
                 isSuccess() -> {
                     scheduleAction = data?.scheduleAction

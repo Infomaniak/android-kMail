@@ -42,8 +42,8 @@ import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
+import com.infomaniak.mail.data.models.draft.ScheduleDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
-import com.infomaniak.mail.data.models.draft.SendScheduleDraftResult
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
@@ -193,13 +193,13 @@ object ApiRepository : ApiRepositoryCore() {
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
-    fun sendScheduleDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SendScheduleDraftResult> {
+    fun scheduleDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<ScheduleDraftResult> {
 
         val body = getDraftBody(draft)
 
-        fun postDraft(): ApiResponse<SendScheduleDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
+        fun postDraft(): ApiResponse<ScheduleDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
-        fun putDraft(uuid: String): ApiResponse<SendScheduleDraftResult> =
+        fun putDraft(uuid: String): ApiResponse<ScheduleDraftResult> =
             callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
