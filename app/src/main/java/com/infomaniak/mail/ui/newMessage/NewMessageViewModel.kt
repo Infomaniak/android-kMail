@@ -139,8 +139,7 @@ class NewMessageViewModel @Inject constructor(
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
-    var shouldScheduleInsteadOfSend = false
-    var shouldSendInsteadOfSave = false
+    var draftAction = DraftAction.SAVE
     var signaturesCount = 0
     private var isNewMessage = false
     var scheduleDate: Date? = null
@@ -868,7 +867,7 @@ class NewMessageViewModel @Inject constructor(
         val localUuid = draftLocalUuid ?: return@launch
         this@NewMessageViewModel.scheduleDate = scheduleDate
 
-        shouldScheduleInsteadOfSend = true
+        draftAction = DraftAction.SCHEDULE
 
         mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)?.also { draft ->
