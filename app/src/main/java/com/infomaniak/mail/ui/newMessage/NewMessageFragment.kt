@@ -734,7 +734,7 @@ class NewMessageFragment : Fragment() {
         }
 
         fun sendEmail() {
-            newMessageViewModel.shouldSendInsteadOfSave = true
+            newMessageViewModel.draftAction = if (scheduled) DraftAction.SCHEDULE else DraftAction.SEND
             setSnackbarActivityResult()
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
