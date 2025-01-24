@@ -72,8 +72,10 @@ class Draft : RealmObject {
     var swissTransferUuid: String? = null
 
     /**
-     * This `delay` should be set to 0 when `scheduleDate` is NOT set.
-     * Otherwise, if we remove it, we won't receive any `etop` from the API when sending an Email.
+     * We can't have both `delay` & `scheduleDate`. They are mutually exclusive.
+     *
+     * `delay` should be set to 0 when `scheduleDate` is not set.
+     * If we don't set it to 0, we won't receive any `etop` from the API when sending an Email.
      */
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     @Serializable(with = ConditionalIntSerializer::class)
@@ -84,12 +86,14 @@ class Draft : RealmObject {
         }
 
     /**
+     * We can't have both `delay` & `scheduleDate`. They are mutually exclusive.
+     *
      * The API requires that this field does not exist, except when scheduling a message.
      * We use a custom serializer for this very reason.
      */
-    @SerialName("schedule_date")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     @Serializable(with = ConditionalStringSerializer::class)
+    @SerialName("schedule_date")
     var scheduleDate: String? = null
         set(value) {
             delay = null
