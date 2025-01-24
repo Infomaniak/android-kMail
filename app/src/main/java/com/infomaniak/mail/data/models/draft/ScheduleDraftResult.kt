@@ -23,8 +23,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ScheduleDraftResult(
-    val uuid: String,
     @SerialName("schedule_action")
     val scheduleAction: String,
-    val uid: String,
 )
