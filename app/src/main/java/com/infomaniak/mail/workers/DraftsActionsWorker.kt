@@ -104,7 +104,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@withContext Result.failure()
         draftLocalUuid = inputData.getString(DRAFT_LOCAL_UUID_KEY)
 
-        scheduleDate = inputData.getLongOrNull(SCHEDULE_DATE_KEY) ?: return@withContext Result.failure()
+        scheduleDate = inputData.getLongOrNull(SCHEDULE_DATE_KEY)
         scheduleAction = inputData.getString(SCHEDULE_ACTION_KEY)
 
         userApiToken = AccountUtils.getUserById(userId)?.apiToken?.accessToken ?: return@withContext Result.failure()
