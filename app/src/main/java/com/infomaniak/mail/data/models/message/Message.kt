@@ -117,7 +117,7 @@ class Message : RealmObject {
     // ------------- !IMPORTANT! -------------
     // Every field that is added in this Transient region should be declared in 'initLocalValue()' too
     // to avoid loosing data when updating from API.
-    // If the Field is a "heavy data" (i.e an embedded object), it should also be added in 'keepHeavyData()'
+    // If the Field is a "heavy data" (i.e. an embedded object), it should also be added in 'keepHeavyData()'
 
     @Transient
     @PersistedName("isFullyDownloaded")
