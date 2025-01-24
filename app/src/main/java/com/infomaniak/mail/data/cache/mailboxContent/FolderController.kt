@@ -50,7 +50,6 @@ class FolderController @Inject constructor(
             mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.CUSTOM),
             withoutChildren = true,
-            visibleFoldersOnly = true,
         ).asFlow()
     }
 
@@ -59,12 +58,11 @@ class FolderController @Inject constructor(
             mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.DEFAULT),
             withoutChildren = true,
-            visibleFoldersOnly = true,
         ).asFlow()
     }
 
     fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true, visibleFoldersOnly = true).asFlow()
+        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
     }
 
     fun getMoveFolders(): RealmResults<Folder> {
@@ -72,7 +70,6 @@ class FolderController @Inject constructor(
             mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
             withoutChildren = true,
-            visibleFoldersOnly = true,
         ).find()
     }
 
@@ -168,7 +165,7 @@ class FolderController @Inject constructor(
             realm: TypedRealm,
             withoutTypes: List<FoldersType> = emptyList(),
             withoutChildren: Boolean = false,
-            visibleFoldersOnly: Boolean = false,
+            visibleFoldersOnly: Boolean = true,
         ): RealmQuery<Folder> {
             val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
             val typeQuery = withoutTypes.joinToString(separator = "") {
@@ -195,7 +192,7 @@ class FolderController @Inject constructor(
         //region Get data
         private fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm): RealmResults<Folder> {
             val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
-                getFoldersQuery(realm)
+                getFoldersQuery(realm, visibleFoldersOnly = false)
             } else {
                 getFoldersQuery(exceptionsFoldersIds, realm)
             }
