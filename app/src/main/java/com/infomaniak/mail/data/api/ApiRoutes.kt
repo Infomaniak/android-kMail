@@ -228,12 +228,12 @@ object ApiRoutes {
     }
 
     fun scheduleDraft(scheduleAction: String): String {
-        return "$MAIL_API$scheduleAction"
+        return "${MAIL_API}${scheduleAction}"
     }
 
     fun rescheduleDraft(draftResource: String, scheduleDate: Date): String {
         val formatedDate = scheduleDate.format(FORMAT_SCHEDULE_MAIL)
-        return "$MAIL_API$draftResource/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
+        return "${MAIL_API}${draftResource}/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
     }
 
     fun createAttachment(mailboxUuid: String): String {
