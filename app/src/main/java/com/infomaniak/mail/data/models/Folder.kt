@@ -93,7 +93,7 @@ class Folder : RealmObject, Cloneable {
     @Transient
     var sortedName: String = name
     @Transient
-    var isDisplayed: Boolean = true
+    var isDisplayed: Boolean = true // Used to hide folders on specific conditions (i.e. ScheduledDrafts folder when its empty)
     //endregion
 
     private val _parents by backlinks(Folder::children)
