@@ -38,6 +38,7 @@ val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
+    migrationContext.keepDefaultValuesAfterNineteenthMigration()
 }
 
 // Migrate to version #1
@@ -45,6 +46,7 @@ private fun MigrationContext.deleteRealmFromFirstMigration() {
     if (oldRealm.schemaVersion() < 1L) newRealm.deleteAll()
 }
 
+//region Use default property values when adding a new column in a migration
 /**
  * Migrate from version #6
  *
@@ -73,3 +75,16 @@ private fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
         }
     }
 }
+
+// Migrate from version #19
+private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
+    if (oldRealm.schemaVersion() <= 19L) {
+        enumerate(className = "Folder") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Add property with default value
+                set(propertyName = "isDisplayed", value = true)
+            }
+        }
+    }
+}
+//endregion
