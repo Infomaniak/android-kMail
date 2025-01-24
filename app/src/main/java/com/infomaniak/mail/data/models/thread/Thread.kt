@@ -242,12 +242,14 @@ class Thread : RealmObject {
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
 
-        val message = messages
-            .lastOrNull { it.folder.role != FolderRole.SENT && it.folder.role != FolderRole.DRAFT }
-            ?: messages.last()
+        val message = messages.lastOrNull {
+            it.folder.role != FolderRole.SENT &&
+                    it.folder.role != FolderRole.DRAFT &&
+                    it.folder.role != FolderRole.SCHEDULED_DRAFTS
+        } ?: messages.last()
 
         val recipients = when (message.folder.role) {
-            FolderRole.SENT, FolderRole.DRAFT -> message.to
+            FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS -> message.to
             else -> message.from
         }
 
@@ -269,7 +271,7 @@ class Thread : RealmObject {
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {
-        FolderRole.SENT, FolderRole.DRAFT -> to
+        FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS -> to
         else -> from
     }
 
