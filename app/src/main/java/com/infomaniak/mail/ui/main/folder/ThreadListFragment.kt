@@ -33,8 +33,10 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,6 +51,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -164,6 +167,7 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         observeWebViewOutdated()
         observeLoadMoreTriggers()
         observeContentDisplayMode()
+        observeShareUrlResult()
     }.getOrDefault(Unit)
 
     @ColorRes
@@ -658,6 +662,16 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         }
     }
 
+    private fun observeShareUrlResult() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(State.STARTED) {
+                mainViewModel.shareThreadUrlResult.collect { url ->
+                    if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
+                }
+            }
+        }
+    }
+
     private fun checkLastUpdateDay() {
         if (lastUpdatedDate?.isToday() == false) mainViewModel.forceTriggerCurrentFolder()
     }
@@ -787,6 +801,10 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
 
     private fun showRefreshLayout() {
         binding.swipeRefreshLayout.isRefreshing = true
+    }
+
+    private fun showErrorShareUrl() {
+        showSnackbar(title = if (mainViewModel.hasNetwork) RCore.string.anErrorHasOccurred else RCore.string.noConnection)
     }
 
     private enum class EmptyState(

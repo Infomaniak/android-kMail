@@ -164,7 +164,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 override fun onShare() {
                     activity?.apply {
                         trackBottomSheetThreadActionsEvent(ACTION_SHARE_LINK_NAME)
-                        mainViewModel.shareThreadUrl(message.uid, ::shareString)
+                        mainViewModel.shareThreadUrl(message.uid)
                     }
                 }
 
