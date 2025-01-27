@@ -21,9 +21,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.R
@@ -35,8 +36,17 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
     override val dialogTitle: String? by lazy { getDialogTitleFromArgs() }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        observeDownload()
+        super.onCreate(savedInstanceState)
+    }
+
     override fun download() {
-        downloadThreadsViewModel.downloadThreads(mainViewModel.currentMailbox.value).observe(this) { threadUris ->
+        downloadThreadsViewModel.downloadThreads(mainViewModel.currentMailbox.value)
+    }
+
+    private fun observeDownload() {
+        downloadThreadsViewModel.downloadMessagesLiveData.observe(this) { threadUris ->
             if (threadUris == null) {
                 popBackStackWithError()
             } else {
