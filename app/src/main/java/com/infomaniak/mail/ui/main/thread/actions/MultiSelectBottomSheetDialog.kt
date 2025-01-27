@@ -126,8 +126,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
             runCatching {
                 navigateToDownloadMessagesProgressDialog(
-                    messageUids = mainViewModel.getMessagesUidsFromThreadUids(selectedThreadsUids),
-                    nameFirstMessage = mainViewModel.getSubject(selectedThreadsUids.first()),
+                    threadUids = selectedThreadsUids,
                     currentClassName = MultiSelectBottomSheetDialog::class.java.name,
                 )
             }.onFailure {

@@ -33,7 +33,6 @@ import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
 
 class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
-    private val navigationArgs: DownloadMessagesProgressDialogArgs by navArgs()
     override val dialogTitle: String? by lazy { getDialogTitleFromArgs() }
 
     override fun download() {
@@ -48,14 +47,18 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
         }
     }
 
-    private fun getDialogTitleFromArgs() = if (navigationArgs.messageUids.size == 1) {
-        navigationArgs.nameFirstMessage
-    } else {
-        requireContext().resources.getQuantityString(
-            R.plurals.downloadingEmailsTitle,
-            navigationArgs.messageUids.size,
-            navigationArgs.messageUids.size
-        )
+    private fun getDialogTitleFromArgs(): String {
+        val numberOfMessagesToDownload = downloadThreadsViewModel.numberOfMessagesToDownloads()
+
+        return if (numberOfMessagesToDownload == 1) {
+            downloadThreadsViewModel.getSubject() ?: requireContext().getString(R.string.noSubjectTitle)
+        } else {
+            requireContext().resources.getQuantityString(
+                R.plurals.downloadingEmailsTitle,
+                numberOfMessagesToDownload,
+                numberOfMessagesToDownload,
+            )
+        }
     }
 
     private fun List<Uri>.openKDriveOrPlayStore(context: Context): Intent? {

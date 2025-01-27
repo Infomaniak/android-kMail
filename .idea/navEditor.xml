@@ -310,7 +310,7 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="downloadThreadsProgressDialog">
+                  <entry key="downloadMessagesProgressDialog">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">

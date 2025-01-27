@@ -92,15 +92,15 @@ fun Fragment.navigateToDownloadProgressDialog(
 }
 
 fun Fragment.navigateToDownloadMessagesProgressDialog(
-    messageUids: Set<String>,
-    nameFirstMessage: String,
+    messageUids: List<String>? = null,
+    threadUids: List<String>? = null,
     currentClassName: String,
 ) {
     safeNavigate(
         resId = R.id.downloadMessagesProgressDialog,
         args = DownloadMessagesProgressDialogArgs(
-            messageUids = messageUids.toTypedArray(),
-            nameFirstMessage = nameFirstMessage
+            messageUids = messageUids?.toTypedArray(),
+            threadUids = threadUids?.toTypedArray(),
         ).toBundle(),
         currentClassName = currentClassName,
     )
