@@ -596,11 +596,13 @@
         android:label="DownloadMessagesProgressDialog"
         tools:layout="@layout/dialog_download_progress">
         <argument
-            android:name="messageUids"
-            app:argType="string[]" />
+            android:name="threadUids"
+            app:argType="string[]"
+            app:nullable="true" />
         <argument
-            android:name="nameFirstMessage"
-            app:argType="string" />
+            android:name="messageUids"
+            app:argType="string[]"
+            app:nullable="true" />
     </dialog>
 
     <dialog

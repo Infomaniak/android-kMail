@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
@@ -29,7 +30,9 @@ import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LocalStorageUtils.getEmlCacheDir
 import com.infomaniak.mail.utils.coroutineContext
@@ -44,13 +47,17 @@ class DownloadMessagesViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val messageController: MessageController,
+    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val messageLocalUids: Array<String>
-        inline get() = savedStateHandle[DownloadMessagesProgressDialogArgs::messageUids.name]!!
+    private val messageLocalUids: Array<String>?
+        inline get() = savedStateHandle[DownloadMessagesProgressDialogArgs::messageUids.name]
+
+    private val threadLocalUids: Array<String>?
+        inline get() = savedStateHandle[DownloadMessagesProgressDialogArgs::threadUids.name]
 
     fun downloadThreads(currentMailbox: Mailbox?) = liveData(ioCoroutineContext) {
         val downloadedThreadUris: List<Uri>? = runCatching {
@@ -59,9 +66,8 @@ class DownloadMessagesViewModel @Inject constructor(
             val listFileName = hashMapOf<String, Int>()
 
             coroutineScope {
-                val deferredResponses: List<Deferred<Uri?>> = messageLocalUids.map { messageUid ->
+                val deferredResponses: List<Deferred<Uri?>> = getAllMessages().map { message ->
                     async {
-                        val message = messageController.getMessage(messageUid) ?: return@async null
                         val response = ApiRepository.getDownloadedMessage(
                             mailboxUuid = mailbox.uuid,
                             folderId = message.folderId,
@@ -100,6 +106,18 @@ class DownloadMessagesViewModel @Inject constructor(
         emit(downloadedThreadUris)
     }
 
+    private fun getAllMessages(): Set<Message> {
+        val messages = mutableSetOf<Message>()
+        messageLocalUids?.mapNotNull { messageController.getMessage(it) }?.let { messages.addAll(it) }
+
+        threadLocalUids?.forEach { threadUid ->
+            threadController.getThread(threadUid)?.let { thread ->
+                messages.addAll(thread.messages)
+            }
+        }
+        return messages
+    }
+
     private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
         val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
         val fileDir = getEmlCacheDir(context)
@@ -111,6 +129,15 @@ class DownloadMessagesViewModel @Inject constructor(
             file.outputStream().use { it.write(emlByteArray) }
             return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
         }.getOrNull()
+    }
+
+    fun getSubject(): String? {
+        val messages = getAllMessages()
+        return messages.firstOrNull()?.subject
+    }
+
+    fun numberOfMessagesToDownloads(): Int {
+        return (messageLocalUids?.size ?: 0) + (threadLocalUids?.size ?: 0)
     }
 
     private fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")
