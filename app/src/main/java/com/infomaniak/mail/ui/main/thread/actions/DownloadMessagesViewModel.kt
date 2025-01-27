@@ -20,11 +20,10 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.app.Application
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.mail.R
@@ -41,6 +40,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.io.File
 import javax.inject.Inject
+import kotlin.collections.set
 
 @HiltViewModel
 class DownloadMessagesViewModel @Inject constructor(
@@ -59,52 +59,7 @@ class DownloadMessagesViewModel @Inject constructor(
     private val threadLocalUids: Array<String>?
         inline get() = savedStateHandle[DownloadMessagesProgressDialogArgs::threadUids.name]
 
-    fun downloadThreads(currentMailbox: Mailbox?) = liveData(ioCoroutineContext) {
-        val downloadedThreadUris: List<Uri>? = runCatching {
-            val mailbox = currentMailbox ?: return@runCatching null
-            val listUri = mutableListOf<Uri>()
-            val listFileName = hashMapOf<String, Int>()
-
-            coroutineScope {
-                val deferredResponses: List<Deferred<Uri?>> = getAllMessages().map { message ->
-                    async {
-                        val response = ApiRepository.getDownloadedMessage(
-                            mailboxUuid = mailbox.uuid,
-                            folderId = message.folderId,
-                            shortUid = message.shortUid,
-                        )
-
-                        val messageSubject: String = message.subject?.removeIllegalFileNameCharacter()
-                            ?: NO_SUBJECT_FILE
-                        val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
-
-                        val fileName = if (listFileName[truncatedSubject] == null) {
-                            listFileName[truncatedSubject] = 0
-                            truncatedSubject
-                        } else {
-                            listFileName[truncatedSubject] = listFileName[truncatedSubject]!! + 1
-                            "$truncatedSubject (${listFileName[truncatedSubject]!! + 1})"
-                        }
-
-                        if (!response.isSuccessful || response.body == null) return@async null
-
-                        saveEmlToFile(appContext, response.body!!.bytes(), fileName).also {
-                            if (it == null) {
-                                // TODO: Manage error case
-                            }
-                        }
-                    }
-                }
-
-                val uris = deferredResponses.awaitAll()
-                listUri.addAll(uris.filterNotNull())
-            }
-
-            listUri
-        }.getOrNull()
-
-        emit(downloadedThreadUris)
-    }
+    val downloadMessagesLiveData = MutableLiveData<List<Uri>?>()
 
     private fun getAllMessages(): Set<Message> {
         val messages = mutableSetOf<Message>()
@@ -116,6 +71,52 @@ class DownloadMessagesViewModel @Inject constructor(
             }
         }
         return messages
+    }
+
+    fun downloadThreads(currentMailbox: Mailbox?) {
+        viewModelScope.launch(ioCoroutineContext) {
+            val downloadedThreadUris: List<Uri>? = runCatching {
+
+                val mailbox = currentMailbox ?: return@runCatching null
+                val listUri = mutableListOf<Uri>()
+                val listFileName = hashMapOf<String, Int>()
+
+                coroutineScope {
+                    val deferredResponses: List<Deferred<Uri?>> = getAllMessages().map { message ->
+                        async {
+                            val response = ApiRepository.getDownloadedMessage(
+                                mailboxUuid = mailbox.uuid,
+                                folderId = message.folderId,
+                                shortUid = message.shortUid,
+                            )
+
+                            val messageSubject: String = message.subject?.removeIllegalFileNameCharacter()
+                                ?: NO_SUBJECT_FILE
+                            val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
+
+                            val fileName = if (listFileName[truncatedSubject] == null) {
+                                listFileName[truncatedSubject] = 0
+                                truncatedSubject
+                            } else {
+                                listFileName[truncatedSubject] = listFileName[truncatedSubject]!! + 1
+                                "$truncatedSubject (${listFileName[truncatedSubject]!! + 1})"
+                            }
+
+                            if (!response.isSuccessful || response.body == null) return@async null
+
+                            saveEmlToFile(appContext, response.body!!.bytes(), fileName) ?: return@async null
+                        }
+                    }
+
+                    val uris = deferredResponses.awaitAll()
+                    listUri.addAll(uris.filterNotNull())
+                }
+
+                listUri
+            }.getOrNull()
+
+            downloadMessagesLiveData.postValue(downloadedThreadUris)
+        }
     }
 
     private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
@@ -137,7 +138,7 @@ class DownloadMessagesViewModel @Inject constructor(
     }
 
     fun numberOfMessagesToDownloads(): Int {
-        return (messageLocalUids?.size ?: 0) + (threadLocalUids?.size ?: 0)
+        return getAllMessages().size
     }
 
     private fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")
