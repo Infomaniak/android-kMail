@@ -40,7 +40,6 @@ import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDial
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
-import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
