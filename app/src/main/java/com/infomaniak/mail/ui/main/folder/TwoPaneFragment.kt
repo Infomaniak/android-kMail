@@ -126,10 +126,7 @@ abstract class TwoPaneFragment : Fragment() {
     private val resultActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val fileDir: File = getEmlCacheDir(requireContext())
-
-            if (!fileDir.deleteRecursively()) {
-                // TODO: Manage error
-            }
+            fileDir.deleteRecursively()
         }
     }
 
