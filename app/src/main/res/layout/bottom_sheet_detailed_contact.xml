@@ -58,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_contact_action_write"
-        app:text="@string/contactActionWriteEmail"
+        app:title="@string/contactActionWriteEmail"
         app:visibleDivider="false" />
 
     <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -66,13 +66,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_contact_action_add_user"
-        app:text="@string/contactActionAddToContacts" />
+        app:title="@string/contactActionAddToContacts" />
 
     <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
         android:id="@+id/copyAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_contact_action_copy"
-        app:text="@string/contactActionCopyEmailAddress" />
+        app:title="@string/contactActionCopyEmailAddress" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>

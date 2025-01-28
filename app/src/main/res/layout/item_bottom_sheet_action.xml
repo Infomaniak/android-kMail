@@ -18,28 +18,73 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemBottomSheetAction"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
         android:layout_marginVertical="0dp"
+        android:layout_marginStart="@dimen/marginStandardMedium"
         app:dividerColor="@color/dividerColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button"
-        style="@style/DetailedContactButton"
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/standardIconSize"
+        android:layout_height="@dimen/standardIconSize"
+        android:layout_marginVertical="@dimen/marginStandardMedium"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:contentDescription="@string/contentDescriptionScheduleIcon"
+        android:src="@drawable/ic_afternoon_schedule"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/BodySmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:text="@string/restoreEmailsTitle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/icon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider"
-        tools:icon="@drawable/ic_envelope"
-        tools:text="@string/actionMarkAsRead" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/description"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:visibility="gone"
+            tools:text="@string/restoreEmailsNoBackup"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/actionIcon"
+            style="@style/BodySmall.Secondary"
+            android:layout_width="@dimen/smallIconSize"
+            android:layout_height="@dimen/smallIconSize"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:contentDescription="@string/contentDescriptionActionIcon"
+            android:src="@drawable/ic_chevron_right"
+            android:visibility="gone" />
+
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

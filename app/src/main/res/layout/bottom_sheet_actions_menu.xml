@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:icon="@drawable/ic_view_in_light"
-            app:text="@string/actionViewInLight"
+            app:title="@string/actionViewInLight"
             app:visibleDivider="false"
             tools:visibility="visible" />
 
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:icon="@drawable/ic_alarm_clock"
-            app:text="@string/actionPostpone"
+            app:title="@string/actionPostpone"
             app:visibleDivider="false"
             tools:visibility="visible" />
 
@@ -63,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_move"
-            app:text="@string/actionMove"
+            app:title="@string/actionMove"
             app:visibleDivider="false" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:icon="@drawable/ic_report_junk"
-            app:text="@string/actionReportJunk"
+            app:title="@string/actionReportJunk"
             app:visibleDivider="false"
             tools:visibility="visible" />
 
@@ -81,7 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_envelope"
-            app:text="@string/actionMarkAsUnread"
+            app:title="@string/actionMarkAsUnread"
             app:visibleDivider="false" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_archive_folder"
-            app:text="@string/actionArchive"
+            app:title="@string/actionArchive"
             app:visibleDivider="false" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -97,7 +97,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_star"
-            app:text="@string/actionStar"
+            app:title="@string/actionStar"
             app:visibleDivider="false" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -106,7 +106,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:icon="@drawable/ic_email_action_print"
-            app:text="@string/actionPrint"
+            app:title="@string/actionPrint"
             app:visibleDivider="false"
             tools:visibility="visible" />
 
@@ -115,7 +115,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_share"
-            app:text="@string/shareEmail"
+            app:title="@string/shareEmail"
             app:visibleDivider="false" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
@@ -125,7 +125,7 @@
             android:visibility="gone"
             app:icon="@drawable/ic_feedbacks"
             app:staffOnly="true"
-            app:text="@string/actionReportDisplayProblem"
+            app:title="@string/actionReportDisplayProblem"
             app:visibleDivider="false"
             tools:visibility="visible" />
 

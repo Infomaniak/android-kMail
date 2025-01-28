@@ -30,7 +30,6 @@ import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.LocalSettings.AiEngine
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult
@@ -43,6 +42,7 @@ import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
+import com.infomaniak.mail.data.models.draft.ScheduleDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
@@ -193,6 +193,18 @@ object ApiRepository : ApiRepositoryCore() {
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
+    fun scheduleDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<ScheduleDraftResult> {
+
+        val body = getDraftBody(draft)
+
+        fun postDraft(): ApiResponse<ScheduleDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
+
+        fun putDraft(uuid: String): ApiResponse<ScheduleDraftResult> =
+            callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
+
+        return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
+    }
+
     private fun getDraftBody(draft: Draft): String {
         val updatedDraft = if (draft.identityId == Draft.NO_IDENTITY.toString()) {
             // When we select no signature, we create a dummy signature with -1 (NO_IDENTITY) as identity ID.
@@ -238,6 +250,14 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun deleteDraft(mailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {
         return callApi(ApiRoutes.draft(mailboxUuid, remoteDraftUuid), DELETE)
+    }
+
+    fun deleteScheduleDraft(scheduleAction: String): ApiResponse<Unit> {
+        return callApi(ApiRoutes.scheduleDraft(scheduleAction), DELETE)
+    }
+
+    fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {
+        return callApi(ApiRoutes.rescheduleDraft(draftResource, scheduleDate), PUT)
     }
 
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
