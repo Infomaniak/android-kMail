@@ -73,10 +73,33 @@ class DownloadMessagesViewModel @Inject constructor(
         return messages
     }
 
-    fun downloadThreads(currentMailbox: Mailbox?) {
+    private fun createUniqueFileName(listFileName: HashMap<String, Int>, truncatedSubject: String): String {
+        val fileName = if (listFileName[truncatedSubject] == null) {
+            listFileName[truncatedSubject] = 0
+            truncatedSubject
+        } else {
+            listFileName[truncatedSubject] = listFileName[truncatedSubject]!! + 1
+            "$truncatedSubject (${listFileName[truncatedSubject]!! + 1})"
+        }
+        return fileName
+    }
+
+    private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
+        val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
+        val fileDir = getEmlCacheDir(context)
+
+        if (!fileDir.exists()) fileDir.mkdirs()
+
+        return runCatching {
+            val file = File(fileDir, fileNameWithExtension)
+            file.outputStream().use { it.write(emlByteArray) }
+            return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
+        }.getOrNull()
+    }
+
+    fun downloadMessages(currentMailbox: Mailbox?) {
         viewModelScope.launch(ioCoroutineContext) {
             val mailbox = currentMailbox ?: return@launch
-            val messages = getAllMessages()
 
             runCatching {
                 coroutineScope {
@@ -103,9 +126,8 @@ class DownloadMessagesViewModel @Inject constructor(
                     deferredResponses.awaitAll().filterNotNull()
                 }
             }.onSuccess { downloadedThreadUris ->
-                if (downloadedThreadUris.size != messages.size) {
-                    // TODO: Manage error
-                }
+                if (downloadedThreadUris.size != numberOfMessagesToDownloads()) downloadMessagesLiveData.postValue(null)
+
                 downloadMessagesLiveData.postValue(downloadedThreadUris)
             }.onFailure { _ ->
                 downloadMessagesLiveData.postValue(null)
@@ -113,37 +135,13 @@ class DownloadMessagesViewModel @Inject constructor(
         }
     }
 
-    private fun createUniqueFileName(listFileName: HashMap<String, Int>, truncatedSubject: String): String {
-        val fileName = if (listFileName[truncatedSubject] == null) {
-            listFileName[truncatedSubject] = 0
-            truncatedSubject
-        } else {
-            listFileName[truncatedSubject] = listFileName[truncatedSubject]!! + 1
-            "$truncatedSubject (${listFileName[truncatedSubject]!! + 1})"
-        }
-        return fileName
-    }
-
-    private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
-        val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
-        val fileDir = getEmlCacheDir(context)
-
-        if (!fileDir.exists()) fileDir.mkdirs()
-
-        return runCatching {
-            val file = File(fileDir, fileNameWithExtension)
-            file.outputStream().use { it.write(emlByteArray) }
-            return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
-        }.getOrNull()
-    }
-
-    fun getSubject(): String? {
+    fun getFirstMessageSubject(): String? {
         val messages = getAllMessages()
         return messages.firstOrNull()?.subject
     }
 
     fun numberOfMessagesToDownloads(): Int {
-        return getAllMessages().size
+        return (messageLocalUids?.size ?: 0) + (threadLocalUids?.size ?: 0)
     }
 
     private fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")
