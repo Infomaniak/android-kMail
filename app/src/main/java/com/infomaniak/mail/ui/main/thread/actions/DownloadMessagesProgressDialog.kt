@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.goToPlayStore
@@ -34,7 +33,7 @@ import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
 
 class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
-    override val dialogTitle: String? by lazy { getDialogTitleFromArgs() }
+    override val dialogTitle: String? by lazy { getDialogName() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         observeDownload()
@@ -42,7 +41,7 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     }
 
     override fun download() {
-        downloadThreadsViewModel.downloadThreads(mainViewModel.currentMailbox.value)
+        downloadThreadsViewModel.downloadMessages(mainViewModel.currentMailbox.value)
     }
 
     private fun observeDownload() {
@@ -57,11 +56,11 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
         }
     }
 
-    private fun getDialogTitleFromArgs(): String {
+    private fun getDialogName(): String {
         val numberOfMessagesToDownload = downloadThreadsViewModel.numberOfMessagesToDownloads()
 
         return if (numberOfMessagesToDownload == 1) {
-            downloadThreadsViewModel.getSubject() ?: requireContext().getString(R.string.noSubjectTitle)
+            downloadThreadsViewModel.getFirstMessageSubject() ?: requireContext().getString(R.string.noSubjectTitle)
         } else {
             requireContext().resources.getQuantityString(
                 R.plurals.downloadingEmailsTitle,
