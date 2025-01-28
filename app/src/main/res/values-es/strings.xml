@@ -248,7 +248,7 @@
     <string name="displayMailIssueTitle">Problema de visualización de sus emails</string>
     <string name="draftFolder">Borradores</string>
     <string name="draftPrefix">(Borrador)</string>
-    <string name="editSendDescription">Programmazione annullata. Questo messaggio verrà spostato nelle tue bozze per essere inviato quando vuoi.</string>
+    <string name="editSendDescription">Este mensaje se moverá a tus borradores para que puedas enviarlo cuando lo desees.</string>
     <string name="editSendTitle">Editar envío</string>
     <string name="emailWithoutSubjectDescription">Está a punto de enviar un mensaje sin asunto. ¿Desea continuar?</string>
     <string name="emailWithoutSubjectTitle">Asunto vacío</string>
@@ -419,6 +419,7 @@
     <string name="reviewAlertTitle">¿Te gusta Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Guardar en el dispositivo</string>
     <string name="saveToDriveItem">Guardar en kDrive</string>
+    <string name="scheduleCancelled">Horario cancelado.</string>
     <string name="scheduleSendingTitle">Programar envío</string>
     <string name="scheduledEmailHeader">Este correo electrónico se enviará en esta fecha: %s</string>
     <string name="scheduledMessagesFolder">Mensajes programados</string>
