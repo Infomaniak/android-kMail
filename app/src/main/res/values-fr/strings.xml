@@ -250,7 +250,7 @@
     <string name="displayMailIssueTitle">Problème d’affichage de vos e-mails</string>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
-    <string name="editSendDescription">Programmation annulée. Ce message sera déplacé dans vos brouillons pour être envoyé quand vous le souhaitez.</string>
+    <string name="editSendDescription">Ce message sera déplacé dans vos brouillons pour être envoyé quand vous le souhaitez.</string>
     <string name="editSendTitle">Modifier l’envoi</string>
     <string name="emailWithoutSubjectDescription">Vous êtes sur le point d’envoyer un message sans objet. Voulez-vous continuer ?</string>
     <string name="emailWithoutSubjectTitle">Objet vide</string>
@@ -427,6 +427,7 @@
     <string name="reviewAlertTitle">Aimez-vous Infomaniak Mail ?</string>
     <string name="saveToDriveDeviceItem">Enregistrer sur l’appareil</string>
     <string name="saveToDriveItem">Enregistrer dans kDrive</string>
+    <string name="scheduleCancelled">Programmation annulée.</string>
     <string name="scheduleSendingTitle">Programmer l’envoi</string>
     <string name="scheduledEmailHeader">Cet e-mail sera envoyé à cette date : %s</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>
