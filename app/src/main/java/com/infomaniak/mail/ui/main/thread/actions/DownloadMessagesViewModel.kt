@@ -75,14 +75,14 @@ class DownloadMessagesViewModel @Inject constructor(
 
     fun downloadThreads(currentMailbox: Mailbox?) {
         viewModelScope.launch(ioCoroutineContext) {
-            val downloadedThreadUris: List<Uri>? = runCatching {
+            val mailbox = currentMailbox ?: return@launch
+            val messages = getAllMessages()
 
-                val mailbox = currentMailbox ?: return@runCatching null
-                val listUri = mutableListOf<Uri>()
-                val listFileName = hashMapOf<String, Int>()
-
+            runCatching {
                 coroutineScope {
-                    val deferredResponses: List<Deferred<Uri?>> = getAllMessages().map { message ->
+                    val listFileName = HashMap<String, Int>()
+
+                    val deferredResponses = getAllMessages().map { message ->
                         async {
                             val response = ApiRepository.getDownloadedMessage(
                                 mailboxUuid = mailbox.uuid,
@@ -90,33 +90,38 @@ class DownloadMessagesViewModel @Inject constructor(
                                 shortUid = message.shortUid,
                             )
 
-                            val messageSubject: String = message.subject?.removeIllegalFileNameCharacter()
-                                ?: NO_SUBJECT_FILE
-                            val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
-
-                            val fileName = if (listFileName[truncatedSubject] == null) {
-                                listFileName[truncatedSubject] = 0
-                                truncatedSubject
-                            } else {
-                                listFileName[truncatedSubject] = listFileName[truncatedSubject]!! + 1
-                                "$truncatedSubject (${listFileName[truncatedSubject]!! + 1})"
-                            }
-
                             if (!response.isSuccessful || response.body == null) return@async null
 
-                            saveEmlToFile(appContext, response.body!!.bytes(), fileName) ?: return@async null
+                            val messageSubject = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
+                            val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
+                            val fileName = createUniqueFileName(listFileName, truncatedSubject)
+
+                            saveEmlToFile(appContext, response.body!!.bytes(), fileName)
                         }
                     }
 
-                    val uris = deferredResponses.awaitAll()
-                    listUri.addAll(uris.filterNotNull())
+                    deferredResponses.awaitAll().filterNotNull()
                 }
-
-                listUri
-            }.getOrNull()
-
-            downloadMessagesLiveData.postValue(downloadedThreadUris)
+            }.onSuccess { downloadedThreadUris ->
+                if (downloadedThreadUris.size != messages.size) {
+                    // TODO: Manage error
+                }
+                downloadMessagesLiveData.postValue(downloadedThreadUris)
+            }.onFailure { _ ->
+                downloadMessagesLiveData.postValue(null)
+            }
         }
+    }
+
+    private fun createUniqueFileName(listFileName: HashMap<String, Int>, truncatedSubject: String): String {
+        val fileName = if (listFileName[truncatedSubject] == null) {
+            listFileName[truncatedSubject] = 0
+            truncatedSubject
+        } else {
+            listFileName[truncatedSubject] = listFileName[truncatedSubject]!! + 1
+            "$truncatedSubject (${listFileName[truncatedSubject]!! + 1})"
+        }
+        return fileName
     }
 
     private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
