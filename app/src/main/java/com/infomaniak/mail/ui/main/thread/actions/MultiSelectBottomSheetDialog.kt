@@ -22,12 +22,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SAVE_KDRIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
@@ -40,6 +42,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -116,6 +119,19 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             toggleThreadsFavoriteStatus(selectedThreadsUids, shouldFavorite)
             isMultiSelectOn = false
         }
+
+        binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
+            trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+            runCatching {
+                navigateToDownloadMessagesProgressDialog(
+                    threadUids = selectedThreadsUids,
+                    currentClassName = MultiSelectBottomSheetDialog::class.java.name,
+                )
+            }.onFailure {
+                SentryLog.e(TAG, "SelectedThreadUids is empty, it should not happened")
+            }
+            isMultiSelectOn = false
+        }
     }
 
     private fun setStateDependentUi(shouldRead: Boolean, shouldFavorite: Boolean) {
@@ -142,5 +158,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
         return if (isFromSpam) R.drawable.ic_non_spam to R.string.actionNonSpam else R.drawable.ic_spam to R.string.actionSpam
+    }
+
+    companion object {
+        private val TAG = this::class.java.simpleName
     }
 }
