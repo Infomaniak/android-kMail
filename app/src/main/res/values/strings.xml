@@ -254,7 +254,7 @@
     <string name="displayMailIssueTitle">Problem displaying your emails</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
-    <string name="editSendDescription">Programming cancelled. This message will be moved to your drafts to be sent whenever you want.</string>
+    <string name="editSendDescription">This message will be moved to your drafts to be sent whenever you want.</string>
     <string name="editSendTitle">Edit Send</string>
     <string name="emailWithoutSubjectDescription">You are about to send a message without a subject. Do you want to continue?</string>
     <string name="emailWithoutSubjectTitle">Empty subject</string>
@@ -424,6 +424,7 @@
     <string name="reviewAlertTitle">Do you like Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Save to device</string>
     <string name="saveToDriveItem">Save to kDrive</string>
+    <string name="scheduleCancelled">Schedule cancelled.</string>
     <string name="scheduleSendingTitle">Schedule sending</string>
     <string name="scheduledEmailHeader">This email will be sent on this date: %s</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>

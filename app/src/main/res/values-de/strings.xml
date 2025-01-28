@@ -248,7 +248,7 @@
     <string name="displayMailIssueTitle">Problem mit der Anzeige Ihrer E-Mails</string>
     <string name="draftFolder">Entwürfe</string>
     <string name="draftPrefix">(Entwurf)</string>
-    <string name="editSendDescription">Programmierung abgebrochen. Diese Nachricht wird in Ihre Entwürfe verschoben, damit Sie sie senden können, wann immer Sie möchten.</string>
+    <string name="editSendDescription">Diese Nachricht wird in Ihre Entwürfe verschoben, damit Sie sie senden können, wann immer Sie möchten.</string>
     <string name="editSendTitle">Senden bearbeiten</string>
     <string name="emailWithoutSubjectDescription">Sie sind dabei, eine Nachricht ohne Betreff zu senden. Möchten Sie fortfahren?</string>
     <string name="emailWithoutSubjectTitle">Leeres Thema</string>
@@ -418,6 +418,7 @@
     <string name="reviewAlertTitle">Mögen Sie Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Auf dem Gerät speichern</string>
     <string name="saveToDriveItem">In kDrive speichern</string>
+    <string name="scheduleCancelled">Zeitplan abgesagt.</string>
     <string name="scheduleSendingTitle">Planen Sie den Versand</string>
     <string name="scheduledEmailHeader">Diese E-Mail wird an diesem Datum gesendet: %s</string>
     <string name="scheduledMessagesFolder">Geplante Nachrichten</string>
