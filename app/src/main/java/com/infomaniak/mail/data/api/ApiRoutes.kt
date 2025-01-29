@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -225,10 +225,6 @@ object ApiRoutes {
 
     fun draft(mailboxUuid: String, remoteDraftUuid: String): String {
         return "${draft(mailboxUuid)}/$remoteDraftUuid"
-    }
-
-    fun scheduleDraft(scheduleAction: String): String {
-        return "${MAIL_API}${scheduleAction}"
     }
 
     fun rescheduleDraft(draftResource: String, scheduleDate: Date): String {
