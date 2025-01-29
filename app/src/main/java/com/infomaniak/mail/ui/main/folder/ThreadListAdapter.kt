@@ -676,13 +676,17 @@ class ThreadListAdapter @Inject constructor(
             var previousSectionTitle = ""
             threads.forEach { thread ->
                 scope.ensureActive()
-                val sectionTitle = thread.getSectionTitle(context)
-                when {
-                    sectionTitle != previousSectionTitle -> {
-                        add(sectionTitle)
-                        previousSectionTitle = sectionTitle
+
+                if (folderRole != FolderRole.SCHEDULED_DRAFTS) {
+                    val sectionTitle = thread.getSectionTitle(context)
+                    when {
+                        sectionTitle != previousSectionTitle -> {
+                            add(sectionTitle)
+                            previousSectionTitle = sectionTitle
+                        }
                     }
                 }
+
                 add(thread)
             }
         }
