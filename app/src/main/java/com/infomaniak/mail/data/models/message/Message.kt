@@ -80,6 +80,7 @@ class Message : RealmObject {
     var isDraft: Boolean = false
     @SerialName("draft_resource")
     var draftResource: String? = null
+    // Boolean used to know if this Message is scheduled to be sent sometime in the future, or not
     @SerialName("is_scheduled_draft")
     var isScheduledDraft: Boolean = false
     var body: Body? = null
@@ -94,6 +95,8 @@ class Message : RealmObject {
     var isAnswered: Boolean = false
     @SerialName("flagged")
     var isFavorite: Boolean = false
+    // Boolean used to know if this Message is currently being sent, but can
+    // still be cancelled during 10~30 sec, depending on user configuration
     @SerialName("scheduled")
     var isScheduled: Boolean = false
     var preview: String = ""
