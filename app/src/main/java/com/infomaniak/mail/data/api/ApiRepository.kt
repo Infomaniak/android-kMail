@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -253,7 +253,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun deleteScheduleDraft(scheduleAction: String): ApiResponse<Unit> {
-        return callApi(ApiRoutes.scheduleDraft(scheduleAction), DELETE)
+        return callApi(ApiRoutes.resource(scheduleAction), DELETE)
     }
 
     fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {
