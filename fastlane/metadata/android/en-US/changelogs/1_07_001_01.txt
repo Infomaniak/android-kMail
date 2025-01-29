@@ -1,0 +1,2 @@
+- Update translations
+- Better error handling

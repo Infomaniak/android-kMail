@@ -1,0 +1,2 @@
+- Mise à jour des traductions
+- Meilleure gestion des erreurs

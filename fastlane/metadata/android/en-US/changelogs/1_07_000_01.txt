@@ -1,2 +1,2 @@
-- feat: Lock the app when the screen turns off
-- fix: Don't show a contact if the email is incorrect
+- Lock the app when the screen turns off
+- Don't show a contact if the email is incorrect
