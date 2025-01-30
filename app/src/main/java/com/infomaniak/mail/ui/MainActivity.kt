@@ -338,7 +338,7 @@ class MainActivity : BaseActivity() {
         snackbarManager.setValue(
             title = String.format(getString(R.string.snackbarScheduleSaved), dateString),
             buttonTitle = RCore.string.buttonCancel,
-            customBehavior = { mainViewModel.deleteScheduledDraft(scheduleAction) },
+            customBehavior = { mainViewModel.unscheduleDraft(scheduleAction) },
         )
     }
 

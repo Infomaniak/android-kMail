@@ -414,11 +414,6 @@ class MainViewModel @Inject constructor(
         refreshThreads(folderId = folderId)
     }
 
-    private fun openDraftFolder() {
-        val draftFolder = folderController.getFolder(FolderRole.DRAFT)
-        draftFolder?.let { folder -> openFolder(folder.id) }
-    }
-
     fun flushFolder() = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
         val folderId = currentFolderId ?: return@launch
@@ -603,27 +598,30 @@ class MainViewModel @Inject constructor(
             refreshFoldersAsync(mailbox, listOf(draftFolderId))
         }
 
-        showDraftDeletedSnackbar(apiResponse)
+        showDeletedDraftSnackbar(apiResponse)
     }
 
-    fun deleteScheduledDraft(scheduleAction: String) = viewModelScope.launch(ioCoroutineContext) {
+    private fun showDeletedDraftSnackbar(apiResponse: ApiResponse<Unit>) {
+        val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
+        snackbarManager.postValue(appContext.getString(titleRes))
+    }
+
+    fun unscheduleDraft(scheduleAction: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.deleteScheduledDraft(scheduleAction)
+        val apiResponse = ApiRepository.unscheduleDraft(scheduleAction)
 
         if (apiResponse.isSuccess()) {
             val draftFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
             refreshFoldersAsync(mailbox, listOf(draftFolderId))
         }
 
-        showScheduleDraftDeletedSnackbar(apiResponse)
+        showUnscheduledDraftSnackbar(apiResponse)
     }
 
-    private fun showDraftDeletedSnackbar(apiResponse: ApiResponse<Unit>) {
-        val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
-        snackbarManager.postValue(appContext.getString(titleRes))
-    }
+    private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
 
-    private fun showScheduleDraftDeletedSnackbar(apiResponse: ApiResponse<Unit>) {
+        fun openDraftFolder() = folderController.getFolder(FolderRole.DRAFT)?.id?.let(::openFolder)
+
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(
                 title = appContext.getString(R.string.snackbarSaveInDraft),
@@ -660,7 +658,7 @@ class MainViewModel @Inject constructor(
     fun modifyDraft(scheduleAction: String, draftResource: String, onSuccess: () -> Unit) =
         viewModelScope.launch(ioCoroutineContext) {
             val mailbox = currentMailbox.value!!
-            val apiResponse = ApiRepository.deleteScheduledDraft(scheduleAction)
+            val apiResponse = ApiRepository.unscheduleDraft(scheduleAction)
 
             if (apiResponse.isSuccess()) {
                 val draftFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
