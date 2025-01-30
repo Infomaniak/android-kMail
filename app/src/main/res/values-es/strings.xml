@@ -242,7 +242,7 @@
     <string name="datePickerTitle">Elige una fecha y hora</string>
     <string name="dateTitle">Date:</string>
     <string name="deleteAccountWarning">La eliminación de su cuenta será definitiva. No podrá reactivar su cuenta.</string>
-    <string name="disabledFeatureFlagDescription">Pronto podrás desbloquear los límites de tu dirección de correo electrónico ik.me\n(límite de almacenamiento, programación personalizada, envío y más...)</string>
+    <string name="disabledFeatureFlagDescription">Pronto podrás desbloquear los límites de tu dirección de correo electrónico ik.me\n(límite de almacenamiento, programación personalizada, envío y más…)</string>
     <string name="disabledFeatureFlagTitle">¿Necesita más almacenamiento y funciones?</string>
     <string name="displayMailIssueDescription">Para solucionar los problemas de visualización, actualice la aplicación Android System Webview.</string>
     <string name="displayMailIssueTitle">Problema de visualización de sus emails</string>
@@ -432,7 +432,7 @@
     <string name="searchFolderName">Buscar en</string>
     <string name="selectDateDialogTitle">Seleccione la fecha</string>
     <string name="selectSignatureNone">Sin firma</string>
-    <string name="selectTimeDialogTitle">Selezionare l\'ora</string>
+    <string name="selectTimeDialogTitle">Seleccionar la hora</string>
     <string name="send">Enviar</string>
     <string name="sentFolder">Mensajes enviados</string>
     <string name="settingsAccentColor">Color de acento</string>

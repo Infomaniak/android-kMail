@@ -191,7 +191,7 @@
     <string name="contactMe">Moi</string>
     <string name="contactsSearch">Contacts</string>
     <string name="contentDescriptionAccountSelection">Compte sélectionné</string>
-    <string name="contentDescriptionActionIcon">Icône d\'action</string>
+    <string name="contentDescriptionActionIcon">Icône d’action</string>
     <string name="contentDescriptionButtonBack">Retour</string>
     <string name="contentDescriptionButtonDelete">Supprimer %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
@@ -244,7 +244,7 @@
     <string name="datePickerTitle">Choisir une date et une heure</string>
     <string name="dateTitle">Date :</string>
     <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
-    <string name="disabledFeatureFlagDescription">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me \n(limite de stockage, horaire personnalisé, envoi et plus encore...)</string>
+    <string name="disabledFeatureFlagDescription">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me\n(limite de stockage, horaire personnalisé, envoi et plus encore…)</string>
     <string name="disabledFeatureFlagTitle">Besoin de plus de stockage et de fonctionnalités ?</string>
     <string name="displayMailIssueDescription">Pour corriger les problèmes d’affichage, veuillez mettre à jour l’application Android System Webview.</string>
     <string name="displayMailIssueTitle">Problème d’affichage de vos e-mails</string>
@@ -440,7 +440,7 @@
     <string name="searchFolderName">Recherche</string>
     <string name="selectDateDialogTitle">Sélectionner la date</string>
     <string name="selectSignatureNone">Aucune signature</string>
-    <string name="selectTimeDialogTitle">Sélectionner l\'heure</string>
+    <string name="selectTimeDialogTitle">Sélectionner l’heure</string>
     <string name="send">Envoyer</string>
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>
