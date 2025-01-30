@@ -242,7 +242,7 @@
     <string name="datePickerTitle">Scegli una data e un’ora</string>
     <string name="dateTitle">Data:</string>
     <string name="deleteAccountWarning">La cancellazione dell’account sarà definitiva. Non sarà possibile riattivare l’account.</string>
-    <string name="disabledFeatureFlagDescription">Presto sarai in grado di sbloccare i limiti del tuo indirizzo email ik.me\n(limite di archiviazione, pianificazione personalizzata, invio e altro...)</string>
+    <string name="disabledFeatureFlagDescription">Presto sarai in grado di sbloccare i limiti del tuo indirizzo email ik.me\n(limite di archiviazione, pianificazione personalizzata, invio e altro…)</string>
     <string name="disabledFeatureFlagTitle">Hai bisogno di più spazio di archiviazione e funzionalità?</string>
     <string name="displayMailIssueDescription">Per risolvere i problemi di visualizzazione, aggiornare l’applicazione Android System Webview.</string>
     <string name="displayMailIssueTitle">Problema di visualizzazione delle email</string>
@@ -294,7 +294,7 @@
     <string name="errorRefusedRecipients">Il server respinge tutti i destinatari</string>
     <string name="errorRefusedSender">Il server respinge il mittente</string>
     <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">Non puoi programmare l\'invio di una e-mail tra meno di %d minuto</item>
+        <item quantity="one">Non puoi programmare l’invio di una e-mail tra meno di %d minuto</item>
         <item quantity="other">Non puoi programmare l’invio di una e-mail tra meno di %d minuti</item>
     </plurals>
     <string name="errorSendLimitExceeded">Limite d’invio raggiunto</string>
@@ -431,7 +431,7 @@
     <string name="searchFolderName">Ricerca</string>
     <string name="selectDateDialogTitle">Selezionare la data</string>
     <string name="selectSignatureNone">Nessuna firma</string>
-    <string name="selectTimeDialogTitle">Selezionare l\'ora</string>
+    <string name="selectTimeDialogTitle">Selezionare l’ora</string>
     <string name="send">Invia</string>
     <string name="sentFolder">Messaggi inviati</string>
     <string name="settingsAccentColor">Colore d’accento</string>

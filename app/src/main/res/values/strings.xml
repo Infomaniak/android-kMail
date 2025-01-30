@@ -248,7 +248,7 @@
     <string name="datePickerTitle">Choose a date and time</string>
     <string name="dateTitle">Date:</string>
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
-    <string name="disabledFeatureFlagDescription">You will soon be able to unlock the limits of your ik.me email address (storage limit, custom schedule, sending and more...)</string>
+    <string name="disabledFeatureFlagDescription">You will soon be able to unlock the limits of your ik.me email address\n(storage limit, custom schedule, sending and more…)</string>
     <string name="disabledFeatureFlagTitle">Need more storage and features?</string>
     <string name="displayMailIssueDescription">To fix display problems, please update the Android System Webview application.</string>
     <string name="displayMailIssueTitle">Problem displaying your emails</string>
