@@ -28,6 +28,8 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
+import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
+import com.infomaniak.lib.login.InfomaniakLogin.TokenResult
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
@@ -37,9 +39,7 @@ import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @ActivityScoped
@@ -75,26 +75,36 @@ class LoginUtils @Inject constructor(
     }
 
     private fun Fragment.authenticateUser(authCode: String, infomaniakLogin: InfomaniakLogin) {
-        lifecycleScope.launch(ioDispatcher) {
-            infomaniakLogin.getToken(
-                okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
-                code = authCode,
-                onSuccess = { onAuthenticateUserSuccess(it, infomaniakLogin) },
-                onError = { onAuthenticateUserError(it) },
-            )
+        lifecycleScope.launch {
+            runCatching {
+                val tokenResult = infomaniakLogin.getToken(
+                    okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
+                    code = authCode,
+                )
+                when (tokenResult) {
+                    is TokenResult.Success -> onAuthenticateUserSuccess(tokenResult.apiToken, infomaniakLogin)
+                    is TokenResult.Error -> onAuthenticateUserError(tokenResult.errorStatus)
+                }
+            }.onFailure { exception ->
+                if (exception is CancellationException) throw exception
+                onAuthenticateUserError(ErrorStatus.UNKNOWN)
+                SentryLog.e("authenticateUser", "Failure on getToken", exception)
+            }
         }
     }
 
     private fun Fragment.onAuthenticateUserSuccess(
         apiToken: ApiToken,
         infomaniakLogin: InfomaniakLogin,
-    ) = lifecycleScope.launch(ioDispatcher) {
+    ) = lifecycleScope.launch {
 
         val context = requireContext()
 
         suspend fun loginSuccess(user: User) {
             context.trackAccountEvent("loggedIn")
-            mailboxController.getFirstValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+            ioDispatcher {
+                mailboxController.getFirstValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+            }
             AccountUtils.reloadApp?.invoke()
         }
 
@@ -120,17 +130,29 @@ class LoginUtils @Inject constructor(
             else -> otherError()
         }
 
-        infomaniakLogin.deleteToken(
-            okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
-            token = apiToken,
-            onError = { SentryLog.i("DeleteTokenError", "API response error: $it") },
-        )
+        logout(infomaniakLogin, apiToken)
     }
 
-    private fun Fragment.onAuthenticateUserError(errorStatus: InfomaniakLogin.ErrorStatus) {
+    private suspend fun logout(infomaniakLogin: InfomaniakLogin, apiToken: ApiToken) {
+        runCatching {
+            val errorStatus = infomaniakLogin.deleteToken(
+                okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
+                token = apiToken,
+            )
+
+            if (errorStatus != null) {
+                SentryLog.e("DeleteTokenError", "API response error $errorStatus")
+            }
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+            SentryLog.e("DeleteTokenError", "Failure on deleteToken")
+        }
+    }
+
+    private fun Fragment.onAuthenticateUserError(errorStatus: ErrorStatus) {
         val errorResId = when (errorStatus) {
-            InfomaniakLogin.ErrorStatus.SERVER -> R.string.serverError
-            InfomaniakLogin.ErrorStatus.CONNECTION -> R.string.connectionError
+            ErrorStatus.SERVER -> R.string.serverError
+            ErrorStatus.CONNECTION -> R.string.connectionError
             else -> R.string.anErrorHasOccurred
         }
         showError(requireContext().getString(errorResId))
