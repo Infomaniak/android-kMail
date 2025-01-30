@@ -246,18 +246,16 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun refreshScheduleDraftFolder() {
+    private suspend fun refreshScheduledDraftsFolder() {
         val currentMailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return
-        val folder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)
+        val folderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)?.id ?: return
 
-        if (folder?.cursor != null) {
-            refreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-                mailbox = currentMailbox,
-                folderId = folder.id,
-                realm = mailboxContentRealm,
-            )
-        }
+        refreshController.refreshThreads(
+            refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
+            mailbox = currentMailbox,
+            folderId = folderId,
+            realm = mailboxContentRealm,
+        )
     }
 
     private fun computeResult(
@@ -376,12 +374,12 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
-        suspend fun executeScheduleSendAction() = with(ApiRepository.scheduleDraft(mailboxUuid, draft, okHttpClient)) {
+        suspend fun executeScheduleAction() = with(ApiRepository.scheduleDraft(mailboxUuid, draft, okHttpClient)) {
             when {
                 isSuccess() -> {
                     scheduleAction = data?.scheduleAction
                     realmActionOnDraft = deleteDraftCallback(draft)
-                    refreshScheduleDraftFolder()
+                    refreshScheduledDraftsFolder()
                 }
                 error?.exception is SerializationException -> {
                     realmActionOnDraft = deleteDraftCallback(draft)
@@ -400,7 +398,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         when (draft.action) {
             DraftAction.SAVE -> executeSaveAction()
             DraftAction.SEND -> executeSendAction()
-            DraftAction.SCHEDULE -> executeScheduleSendAction()
+            DraftAction.SCHEDULE -> executeScheduleAction()
             else -> Unit
         }
 
