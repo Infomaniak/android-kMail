@@ -96,7 +96,7 @@ class TwoPaneViewModel @Inject constructor(
                 draftResource = draftResource,
                 messageUid = messageUid,
                 mailToUri = mailToUri,
-            )
+            ),
         )
     }
 
