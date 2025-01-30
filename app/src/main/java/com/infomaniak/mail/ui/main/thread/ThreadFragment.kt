@@ -383,7 +383,6 @@ class ThreadFragment : Fragment() {
                             if (scheduleAction != null && draftResource != null) {
                                 mainViewModel.modifyScheduledDraft(
                                     scheduleAction = scheduleAction,
-                                    draftResource = draftResource,
                                     onSuccess = {
                                         trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                                         twoPaneViewModel.navigateToNewMessage(

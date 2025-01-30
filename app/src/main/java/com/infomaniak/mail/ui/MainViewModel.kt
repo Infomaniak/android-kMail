@@ -618,7 +618,6 @@ class MainViewModel @Inject constructor(
 
     fun modifyScheduledDraft(
         scheduleAction: String,
-        draftResource: String,
         onSuccess: () -> Unit,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
@@ -627,9 +626,7 @@ class MainViewModel @Inject constructor(
         if (apiResponse.isSuccess()) {
             val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
             refreshFoldersAsync(mailbox, listOf(scheduledDraftsFolderId))
-
-            // TODO: Check if we can directly execute the onSuccess, and the NewMessageActivity will handle by itself the `getDraft` API call?
-            getDraft(draftResource, onSuccess)
+            onSuccess()
         } else {
             snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
         }
@@ -645,16 +642,6 @@ class MainViewModel @Inject constructor(
         }
 
         showUnscheduledDraftSnackbar(apiResponse)
-    }
-
-    private fun getDraft(draftResource: String, onSuccess: () -> Unit) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.getDraft(draftResource)
-
-        if (apiResponse.isSuccess()) {
-            onSuccess()
-        } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
-        }
     }
 
     private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
