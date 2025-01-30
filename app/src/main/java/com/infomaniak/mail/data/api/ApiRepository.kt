@@ -180,15 +180,24 @@ object ApiRepository : ApiRepositoryCore() {
         return uploadDraft(mailboxUuid, draft, okHttpClient)
     }
 
-    private fun <T> uploadDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<T> {
-
+    private inline fun <reified T> uploadDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<T> {
         val body = getDraftBody(draft)
-
-        fun putDraft(uuid: String): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
-        fun postDraft(): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
-
-        return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
+        return draft.remoteUuid?.let { putDraft(mailboxUuid, body, okHttpClient, it) }
+            ?: run { postDraft(mailboxUuid, body, okHttpClient) }
     }
+
+    private inline fun <reified T> putDraft(
+        mailboxUuid: String,
+        body: String,
+        okHttpClient: OkHttpClient,
+        uuid: String,
+    ): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
+
+    private inline fun <reified T> postDraft(
+        mailboxUuid: String,
+        body: String,
+        okHttpClient: OkHttpClient,
+    ): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
     private fun getDraftBody(draft: Draft): String {
         val updatedDraft = if (draft.identityId == Draft.NO_IDENTITY.toString()) {
