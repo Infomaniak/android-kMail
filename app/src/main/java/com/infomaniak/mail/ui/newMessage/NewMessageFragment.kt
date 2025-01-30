@@ -151,7 +151,7 @@ class NewMessageFragment : Fragment() {
     lateinit var snackbarManager: SnackbarManager
 
     @Inject
-    lateinit var selectDateAndTimeForScheduledDraftDialog: SelectDateAndTimeForScheduledDraftDialog
+    lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -218,23 +218,17 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeSelectDateAndTimeForScheduleDialogState() {
-        newMessageViewModel.showOrCloseSelectDateAndTimeForScheduleDialog.observe(viewLifecycleOwner) { showDialog ->
-            if (showDialog) {
-                selectDateAndTimeForScheduledDraftDialog.show(
-                    title = getString(R.string.datePickerTitle),
-                    onPositiveButtonClicked = {
-                        val scheduleDate = selectDateAndTimeForScheduledDraftDialog.selectedDate.time
-                        localSettings.lastSelectedScheduleDate = scheduleDate
-
-                        newMessageViewModel.setScheduleDate(Date(scheduleDate))
-
-                        tryToSendEmail(scheduled = true)
-                    },
-                    onNegativeButtonClicked = { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) },
-                )
-            } else {
-                selectDateAndTimeForScheduledDraftDialog.resetLoadingAndDismiss()
-            }
+        newMessageViewModel.dateAndTimeScheduledDialogTrigger.observe(viewLifecycleOwner) {
+            dateAndTimeScheduleDialog.show(
+                title = getString(R.string.datePickerTitle),
+                onPositiveButtonClicked = {
+                    val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
+                    localSettings.lastSelectedScheduleDate = scheduleDate
+                    newMessageViewModel.setScheduleDate(Date(scheduleDate))
+                    tryToSendEmail(scheduled = true)
+                },
+                onNegativeButtonClicked = { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) },
+            )
         }
     }
 

@@ -237,12 +237,10 @@ class MainViewModel @Inject constructor(
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
     //endregion
 
-    //region Schedule draft
+    //region Scheduled Draft
     var draftResource: String? = null
-
-    val showOrCloseSelectDateAndTimeForScheduleDialog = SingleLiveEvent<Unit>()
-
-    fun showSelectDateAndTimeForScheduleDialog() = showOrCloseSelectDateAndTimeForScheduleDialog.postValue(Unit)
+    val dateAndTimeScheduledDialogTrigger = SingleLiveEvent<Unit>()
+    fun showDateAndTimeScheduleDialog() = dateAndTimeScheduledDialogTrigger.postValue(Unit)
     //endregion
 
     //region Share Thread URL
@@ -638,7 +636,7 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
-    //region Schedule draft
+    //region Scheduled Draft
     private fun getScheduleDraft(draftResource: String, onSuccess: () -> Unit) = viewModelScope.launch(ioCoroutineContext) {
         val apiResponse = ApiRepository.getDraft(draftResource)
 
