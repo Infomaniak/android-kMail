@@ -31,7 +31,7 @@ android {
 
         buildConfigField 'String', 'CLIENT_ID', '"E90BC22D-67A8-452C-BE93-28DA33588CA4"'
         buildConfigField 'String', 'CREATE_ACCOUNT_URL', '"https://welcome.infomaniak.com/signup/ikmail?app=true"'
-        buildConfigField 'String', 'CREATE_ACCOUNT_SUCCESS_HOST', '"mail.infomaniak.com"'
+        buildConfigField 'String', 'CREATE_ACCOUNT_SUCCESS_HOST', '"ksuite.infomaniak.com"'
         buildConfigField 'String', 'CREATE_ACCOUNT_CANCEL_HOST', '"welcome.infomaniak.com"'
         buildConfigField 'String', 'IMPORT_EMAILS_URL', '"https://import-email.infomaniak.com"'
         buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
