@@ -29,8 +29,8 @@
         android:id="@+id/divider"
         android:layout_width="0dp"
         android:layout_height="1dp"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
         android:layout_marginVertical="0dp"
-        android:layout_marginStart="@dimen/marginStandardMedium"
         app:dividerColor="@color/dividerColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,10 +43,10 @@
         android:layout_marginVertical="@dimen/marginStandardMedium"
         android:layout_marginStart="@dimen/marginStandardMedium"
         android:contentDescription="@string/contentDescriptionScheduleIcon"
-        android:src="@drawable/ic_afternoon_schedule"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_afternoon_schedule" />
 
     <TextView
         android:id="@+id/title"
@@ -54,10 +54,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardMedium"
-        android:text="@string/restoreEmailsTitle"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/restoreEmailsTitle" />
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -83,8 +83,7 @@
             android:layout_height="@dimen/smallIconSize"
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:contentDescription="@string/contentDescriptionActionIcon"
-            android:src="@drawable/ic_chevron_right"
-            android:visibility="gone" />
-
+            android:visibility="gone"
+            tools:src="@drawable/ic_chevron_right" />
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

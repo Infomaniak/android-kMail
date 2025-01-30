@@ -67,7 +67,6 @@
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toEndOf="@id/userAvatar"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_goneMarginEnd="@dimen/marginStandardVerySmall"
                     tools:text="@tools:sample/full_names" />
 
                 <ImageView
@@ -76,12 +75,46 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardVerySmall"
                     android:src="@drawable/ic_certified"
-                    app:layout_constraintBottom_toBottomOf="@+id/expeditorName"
-                    app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
-                    app:layout_constraintStart_toEndOf="@+id/expeditorName"
-                    app:layout_constraintTop_toTopOf="@+id/expeditorName"
-                    app:layout_goneMarginEnd="@dimen/marginStandardVerySmall"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditorName"
+                    app:layout_constraintEnd_toStartOf="@id/iconsSpace"
+                    app:layout_constraintStart_toEndOf="@id/expeditorName"
+                    app:layout_constraintTop_toTopOf="@id/expeditorName"
                     tools:ignore="ContentDescription" />
+
+                <Space
+                    android:id="@+id/iconsSpace"
+                    android:layout_width="@dimen/marginStandardVerySmall"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="@id/iconCertified"
+                    app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
+                    app:layout_constraintStart_toEndOf="@id/iconCertified"
+                    app:layout_constraintTop_toTopOf="@id/iconCertified" />
+
+                <ImageView
+                    android:id="@+id/scheduleSendIcon"
+                    android:layout_width="@dimen/smallIconSize"
+                    android:layout_height="@dimen/smallIconSize"
+                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                    android:contentDescription="@string/contentDescriptionScheduleSendIcon"
+                    android:src="@drawable/ic_scheduled_messages"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/shortMessageDate"
+                    app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
+                    app:layout_constraintStart_toEndOf="@+id/iconsSpace"
+                    app:layout_constraintTop_toTopOf="@+id/shortMessageDate"
+                    app:tint="@color/scheduledIconColor"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/shortMessageDate"
+                    style="@style/Label.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    app:layout_constraintBaseline_toBaselineOf="@id/expeditorName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/scheduleSendIcon"
+                    tools:text="9 déc 2021 à 11:00" />
 
                 <LinearLayout
                     android:id="@+id/recipientLayout"
@@ -130,32 +163,6 @@
                     app:layout_constraintEnd_toEndOf="@id/recipientLayout"
                     app:layout_constraintStart_toStartOf="@id/recipientLayout"
                     app:layout_constraintTop_toTopOf="@id/recipientLayout" />
-
-                <ImageView
-                    android:id="@+id/scheduleSendIcon"
-                    android:layout_width="@dimen/smallIconSize"
-                    android:layout_height="@dimen/smallIconSize"
-                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-                    android:contentDescription="@string/contentDescriptionScheduleSendIcon"
-                    android:src="@drawable/ic_scheduled_messages"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/shortMessageDate"
-                    app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
-                    app:layout_constraintStart_toEndOf="@+id/iconCertified"
-                    app:layout_constraintTop_toTopOf="@+id/shortMessageDate"
-                    app:tint="@color/scheduledIconColor"
-                    tools:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/shortMessageDate"
-                    style="@style/Label.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_constraintBaseline_toBaselineOf="@id/expeditorName"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/scheduleSendIcon"
-                    tools:text="9 déc 2021 à 11:00" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
