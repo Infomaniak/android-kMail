@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.extensions.getInfomaniakLogin
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -75,11 +76,17 @@ class LogoutUser @Inject constructor(
     }
 
     private fun User.logoutToken() = globalCoroutineScope.launch(ioDispatcher) {
-        appContext.getInfomaniakLogin().deleteToken(
-            okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
-            token = apiToken,
-            onError = { SentryLog.i("DeleteTokenError", "API response error: $it") },
-        )
+        runCatching {
+            appContext.getInfomaniakLogin().deleteToken(
+                okHttpClient = HttpClient.okHttpClientNoTokenInterceptor,
+                token = apiToken,
+            )?.let { errorStatus ->
+                SentryLog.i(TAG, "API response error: $errorStatus")
+            }
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+            SentryLog.e(TAG, "Failure on logoutToken ", exception)
+        }
     }
 
     private suspend fun resetSettings() {
@@ -92,5 +99,9 @@ class LogoutUser @Inject constructor(
         }
         // Dismiss all current notifications
         (appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
+    }
+
+    companion object {
+        private val TAG = LogoutUser::class.java.simpleName
     }
 }
