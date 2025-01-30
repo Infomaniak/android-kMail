@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.content.Context
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -100,37 +101,37 @@ class LoginUtils @Inject constructor(
 
         val context = requireContext()
 
-        suspend fun loginSuccess(user: User) {
-            context.trackAccountEvent("loggedIn")
-            ioDispatcher {
-                mailboxController.getFirstValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
-            }
-            AccountUtils.reloadApp?.invoke()
-        }
-
-        suspend fun mailboxError(errorCode: MailboxErrorCode) = withContext(mainDispatcher) {
-            when (errorCode) {
-                MailboxErrorCode.NO_MAILBOX -> context.launchNoMailboxActivity()
-                MailboxErrorCode.NO_VALID_MAILBOX -> context.launchNoValidMailboxesActivity()
-            }
-        }
-
-        suspend fun apiError(apiResponse: ApiResponse<*>) = withContext(mainDispatcher) {
-            showError(context.getString(apiResponse.translatedError))
-        }
-
-        suspend fun otherError() = withContext(mainDispatcher) {
-            showError(context.getString(R.string.anErrorHasOccurred))
-        }
-
         when (val returnValue = LoginActivity.authenticateUser(context, apiToken, mailboxController)) {
-            is User -> return@launch loginSuccess(returnValue)
-            is MailboxErrorCode -> mailboxError(returnValue)
-            is ApiResponse<*> -> apiError(returnValue)
-            else -> otherError()
+            is User -> return@launch context.loginSuccess(returnValue)
+            is MailboxErrorCode -> context.mailboxError(returnValue)
+            is ApiResponse<*> -> context.apiError(returnValue)
+            else -> context.otherError()
         }
 
         logout(infomaniakLogin, apiToken)
+    }
+
+    private suspend fun Context.loginSuccess(user: User) {
+        trackAccountEvent("loggedIn")
+        ioDispatcher {
+            mailboxController.getFirstValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+        }
+        AccountUtils.reloadApp?.invoke()
+    }
+
+    private suspend fun Context.mailboxError(errorCode: MailboxErrorCode) {
+        when (errorCode) {
+            MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
+            MailboxErrorCode.NO_VALID_MAILBOX -> launchNoValidMailboxesActivity()
+        }
+    }
+
+    private suspend fun Context.apiError(apiResponse: ApiResponse<*>) = withContext(mainDispatcher) {
+        showError(getString(apiResponse.translatedError))
+    }
+
+    private suspend fun Context.otherError() = withContext(mainDispatcher) {
+        showError(getString(R.string.anErrorHasOccurred))
     }
 
     private suspend fun logout(infomaniakLogin: InfomaniakLogin, apiToken: ApiToken) {
