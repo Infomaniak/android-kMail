@@ -503,21 +503,17 @@ class MainViewModel @Inject constructor(
         val shouldPermanentlyDelete = isPermanentDeleteFolder(getActionFolderRole(threads, message))
 
         val messages = getMessagesToDelete(threads, message)
-
-        val messagesUids = messages.filter { it.isScheduledDraft.not() }.getUids()
-        val scheduledMessagesUuid = messages.filter { it.isScheduledDraft }.getUids()
+        val uids = messages.getUids()
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
         val apiResponses = if (shouldPermanentlyDelete) {
-            ApiRepository.deleteMessages(mailbox.uuid, messagesUids)
-            // TODO: Delete scheduled messages separately, but avoid making too much call (waiting for API changes).
+            ApiRepository.deleteMessages(mailbox.uuid, uids)
         } else {
             trashId = folderController.getFolder(FolderRole.TRASH)!!.id
-            ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId).also {
+            ApiRepository.moveMessages(mailbox.uuid, uids, trashId).also {
                 undoResources = it.mapNotNull { apiResponse -> apiResponse.data?.undoResource }
             }
-            // TODO: Move? scheduled messages separately.
         }
 
         deleteThreadOrMessageTrigger.postValue(Unit)
