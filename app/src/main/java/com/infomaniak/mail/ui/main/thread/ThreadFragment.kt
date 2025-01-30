@@ -481,7 +481,7 @@ class ThreadFragment : Fragment() {
                 iconTint = ColorStateList.valueOf(color)
             }
 
-            binding.quickActionBar.isGone = thread.numberOfScheduledDrafts == thread.messages.size
+            binding.quickActionBar.isVisible = thread.numberOfScheduledDrafts != thread.messages.size
         }
     }
 

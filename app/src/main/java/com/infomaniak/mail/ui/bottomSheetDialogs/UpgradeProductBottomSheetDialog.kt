@@ -28,7 +28,7 @@ class UpgradeProductBottomSheetDialog : InformationBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
 
         title.setText(R.string.disabledFeatureFlagTitle)
-        description.text = getString(R.string.disabledFeatureFlagDescription)
+        description.setText(R.string.disabledFeatureFlagDescription)
         infoIllustration.setBackgroundResource(R.drawable.ic_update_logo)
 
         actionButton.apply {
