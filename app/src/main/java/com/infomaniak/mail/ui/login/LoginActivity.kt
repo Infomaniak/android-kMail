@@ -44,6 +44,8 @@ import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.extensions.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
@@ -101,7 +103,7 @@ class LoginActivity : AppCompatActivity() {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
 
             InfomaniakCore.bearerToken = apiToken.accessToken
-            val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor)
+            val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor) }
 
             if (userProfileResponse.result == ApiResponseStatus.ERROR) return userProfileResponse
             if (userProfileResponse.data == null) return getErrorResponse(RCore.string.anErrorHasOccurred)
@@ -111,7 +113,7 @@ class LoginActivity : AppCompatActivity() {
                 this.organizations = arrayListOf()
             }
 
-            val apiResponse = ApiRepository.getMailboxes(HttpClient.okHttpClientNoTokenInterceptor)
+            val apiResponse = Dispatchers.IO { ApiRepository.getMailboxes(HttpClient.okHttpClientNoTokenInterceptor) }
 
             return when {
                 !apiResponse.isSuccess() -> apiResponse
