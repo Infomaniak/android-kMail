@@ -381,14 +381,18 @@ class ThreadFragment : Fragment() {
                             val draftResource = message.draftResource
 
                             if (scheduleAction != null && draftResource != null) {
-                                mainViewModel.modifyDraft(scheduleAction, draftResource) {
-                                    trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-                                    twoPaneViewModel.navigateToNewMessage(
-                                        arrivedFromExistingDraft = true,
-                                        draftResource = message.draftResource,
-                                        messageUid = message.uid,
-                                    )
-                                }
+                                mainViewModel.modifyScheduledDraft(
+                                    scheduleAction = scheduleAction,
+                                    draftResource = draftResource,
+                                    onSuccess = {
+                                        trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+                                        twoPaneViewModel.navigateToNewMessage(
+                                            arrivedFromExistingDraft = true,
+                                            draftResource = draftResource,
+                                            messageUid = message.uid,
+                                        )
+                                    },
+                                )
                             }
                         },
                     )
