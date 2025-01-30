@@ -353,14 +353,13 @@ class ThreadAdapter(
         val messageDate = message.date.toDate()
 
         if (message.isScheduledDraft) {
-            scheduleSendIcon.isVisible = true
-
             scheduleAlert.setDescription(
                 context.getString(
                     R.string.scheduledEmailHeader,
                     message.date.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME),
-                )
+                ),
             )
+            scheduleSendIcon.isVisible = true
             alertsGroup.isVisible = true
             scheduleAlert.isVisible = true
         }

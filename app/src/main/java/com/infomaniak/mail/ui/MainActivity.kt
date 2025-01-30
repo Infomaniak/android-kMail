@@ -107,21 +107,16 @@ class MainActivity : BaseActivity() {
 
     private val showSendingSnackbarTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer(milliseconds = 1_000L) {
-            snackbarManager.setValue(
-                getString(if (draftAction == DraftAction.SCHEDULE) R.string.snackbarScheduling else R.string.snackbarEmailSending)
-            )
+            val resId = if (draftAction == DraftAction.SCHEDULE) R.string.snackbarScheduling else R.string.snackbarEmailSending
+            snackbarManager.setValue(getString(resId))
         }
     }
 
     private val newMessageActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         draftAction = result.data?.getStringExtra(DRAFT_ACTION_KEY)?.let(DraftAction::valueOf)
 
-        if (draftAction == DraftAction.SEND) {
-            showEasterXMas()
-            showSendingSnackbarTimer.start()
-        } else if (draftAction == DraftAction.SCHEDULE) {
-            showSendingSnackbarTimer.start()
-        }
+        if (draftAction == DraftAction.SEND) showEasterXMas()
+        if (draftAction == DraftAction.SEND || draftAction == DraftAction.SCHEDULE) showSendingSnackbarTimer.start()
     }
 
     private val syncAutoConfigActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -290,13 +285,14 @@ class MainActivity : BaseActivity() {
                         showSavedDraftSnackbar(associatedMailboxUuid, remoteDraftUuid)
                     }
                 }
-                DraftAction.SEND -> showSentDraftSnackbar()
+                DraftAction.SEND -> {
+                    showSentDraftSnackbar()
+                }
                 DraftAction.SCHEDULE -> {
                     val scheduleDate = getLongOrNull(DraftsActionsWorker.SCHEDULE_DATE_KEY)
                     val scheduleAction = getString(DraftsActionsWorker.SCHEDULE_ACTION_KEY)
-
                     if (scheduleDate != null && scheduleAction != null) {
-                        showSentScheduleDraftSnackbar(scheduleDate = Date(scheduleDate), scheduleAction)
+                        showScheduledDraftSnackbar(scheduleDate = Date(scheduleDate), scheduleAction = scheduleAction)
                     }
                 }
             }
@@ -330,7 +326,7 @@ class MainActivity : BaseActivity() {
     }
 
     // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
-    private fun showSentScheduleDraftSnackbar(scheduleDate: Date, scheduleAction: String) {
+    private fun showScheduledDraftSnackbar(scheduleDate: Date, scheduleAction: String) {
         showSendingSnackbarTimer.cancel()
 
         val dateString = mostDetailedDate(
@@ -342,7 +338,7 @@ class MainActivity : BaseActivity() {
         snackbarManager.setValue(
             title = String.format(getString(R.string.snackbarScheduleSaved), dateString),
             buttonTitle = RCore.string.buttonCancel,
-            customBehavior = { mainViewModel.deleteScheduleDraft(scheduleAction) },
+            customBehavior = { mainViewModel.deleteScheduledDraft(scheduleAction) },
         )
     }
 

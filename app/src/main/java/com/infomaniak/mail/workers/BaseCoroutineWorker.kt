@@ -55,6 +55,6 @@ abstract class BaseCoroutineWorker(appContext: Context, params: WorkerParameters
     companion object {
         private const val MAX_RETRIES = 3
 
-        fun Data.getLongOrNull(key: String) = getLong(key, 0).run { if (this == 0L) null else this }
+        fun Data.getLongOrNull(key: String) = getLong(key, 0L).run { if (this == 0L) null else this }
     }
 }

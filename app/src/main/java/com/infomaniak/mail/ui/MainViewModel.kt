@@ -608,7 +608,7 @@ class MainViewModel @Inject constructor(
         showDraftDeletedSnackbar(apiResponse)
     }
 
-    fun deleteScheduleDraft(scheduleAction: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun deleteScheduledDraft(scheduleAction: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
         val apiResponse = ApiRepository.deleteScheduledDraft(scheduleAction)
 

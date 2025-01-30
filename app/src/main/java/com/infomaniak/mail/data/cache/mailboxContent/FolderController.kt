@@ -47,7 +47,7 @@ class FolderController @Inject constructor(
     //region Get data
     fun getMenuDrawerDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(
-            mailboxContentRealm(),
+            realm = mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.CUSTOM),
             withoutChildren = true,
         ).asFlow()
@@ -55,7 +55,7 @@ class FolderController @Inject constructor(
 
     fun getMenuDrawerCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(
-            mailboxContentRealm(),
+            realm = mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.DEFAULT),
             withoutChildren = true,
         ).asFlow()
@@ -67,7 +67,7 @@ class FolderController @Inject constructor(
 
     fun getMoveFolders(): RealmResults<Folder> {
         return getFoldersQuery(
-            mailboxContentRealm(),
+            realm = mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
             withoutChildren = true,
         ).find()
