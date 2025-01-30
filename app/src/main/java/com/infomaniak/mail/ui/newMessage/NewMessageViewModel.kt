@@ -123,9 +123,10 @@ class NewMessageViewModel @Inject constructor(
 
     val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
 
-    val showOrCloseSelectDateAndTimeForScheduleDialog = SingleLiveEvent<Boolean>()
-
-    fun showSelectDateAndTimeForScheduleDialog() = showOrCloseSelectDateAndTimeForScheduleDialog.postValue(true)
+    //region Scheduled Draft
+    val dateAndTimeScheduledDialogTrigger = SingleLiveEvent<Unit>()
+    fun showDateAndTimeScheduleDialog() = dateAndTimeScheduledDialogTrigger.postValue(Unit)
+    //endregion
 
     // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
     // 2. Inserting the AI proposition navigates back to NewMessageFragment.

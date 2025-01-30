@@ -103,9 +103,9 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
         } else {
             customScheduleItem.setClosingOnClickListener {
                 if (navigationArgs.isAlreadyScheduled) {
-                    mainViewModel.showSelectDateAndTimeForScheduleDialog()
+                    mainViewModel.showDateAndTimeScheduleDialog()
                 } else {
-                    newMessageViewModel.showSelectDateAndTimeForScheduleDialog()
+                    newMessageViewModel.showDateAndTimeScheduleDialog()
                 }
             }
         }

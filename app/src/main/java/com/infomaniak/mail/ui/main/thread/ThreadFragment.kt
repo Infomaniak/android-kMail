@@ -125,7 +125,7 @@ class ThreadFragment : Fragment() {
     lateinit var snackbarManager: SnackbarManager
 
     @Inject
-    lateinit var selectDateAndTimeForScheduledDraftDialog: SelectDateAndTimeForScheduledDraftDialog
+    lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
 
     @Inject
     lateinit var confirmScheduledDraftModificationDialog: ConfirmScheduledDraftModificationDialog
@@ -169,7 +169,7 @@ class ThreadFragment : Fragment() {
 
         observeMessageOfUserToBlock()
 
-        observeSelectDateAndTimeForScheduleDialogState()
+        observeDateAndTimeScheduleDialogState()
     }
 
     private fun observeReportDisplayProblemResult() {
@@ -188,12 +188,12 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeSelectDateAndTimeForScheduleDialogState() {
-        mainViewModel.showOrCloseSelectDateAndTimeForScheduleDialog.observe(viewLifecycleOwner) {
-            selectDateAndTimeForScheduledDraftDialog.show(
+    private fun observeDateAndTimeScheduleDialogState() {
+        mainViewModel.dateAndTimeScheduledDialogTrigger.observe(viewLifecycleOwner) {
+            dateAndTimeScheduleDialog.show(
                 title = getString(R.string.datePickerTitle),
                 onPositiveButtonClicked = {
-                    val scheduleDate = selectDateAndTimeForScheduledDraftDialog.selectedDate.time
+                    val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
                     localSettings.lastSelectedScheduleDate = scheduleDate
 
                     mainViewModel.draftResource?.let { draftResource ->
