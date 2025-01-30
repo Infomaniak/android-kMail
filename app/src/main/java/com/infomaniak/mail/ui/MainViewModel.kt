@@ -601,17 +601,60 @@ class MainViewModel @Inject constructor(
         val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
         snackbarManager.postValue(appContext.getString(titleRes))
     }
+    //endregion
+
+    //region Scheduled Drafts
+    fun rescheduleDraft(draftResource: String, scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
+
+        val apiResponse = ApiRepository.rescheduleDraft(draftResource, scheduleDate)
+
+        if (apiResponse.isSuccess()) {
+            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+            refreshFoldersAsync(currentMailbox.value!!, listOf(scheduledDraftsFolderId))
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
+        }
+    }
+
+    fun modifyScheduledDraft(
+        scheduleAction: String,
+        draftResource: String,
+        onSuccess: () -> Unit,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value!!
+        val apiResponse = ApiRepository.unscheduleDraft(scheduleAction)
+
+        if (apiResponse.isSuccess()) {
+            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+            refreshFoldersAsync(mailbox, listOf(scheduledDraftsFolderId))
+
+            // TODO: Check if we can directly execute the onSuccess, and the NewMessageActivity will handle by itself the `getDraft` API call?
+            getDraft(draftResource, onSuccess)
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
+        }
+    }
 
     fun unscheduleDraft(scheduleAction: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
         val apiResponse = ApiRepository.unscheduleDraft(scheduleAction)
 
         if (apiResponse.isSuccess()) {
-            val draftFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-            refreshFoldersAsync(mailbox, listOf(draftFolderId))
+            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+            refreshFoldersAsync(mailbox, listOf(scheduledDraftsFolderId))
         }
 
         showUnscheduledDraftSnackbar(apiResponse)
+    }
+
+    private fun getDraft(draftResource: String, onSuccess: () -> Unit) = viewModelScope.launch(ioCoroutineContext) {
+        val apiResponse = ApiRepository.getDraft(draftResource)
+
+        if (apiResponse.isSuccess()) {
+            onSuccess()
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
+        }
     }
 
     private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
@@ -628,43 +671,6 @@ class MainViewModel @Inject constructor(
             snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
         }
     }
-    //endregion
-
-    //region Scheduled Draft
-    private fun getScheduleDraft(draftResource: String, onSuccess: () -> Unit) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.getDraft(draftResource)
-
-        if (apiResponse.isSuccess()) {
-            onSuccess()
-        } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
-        }
-    }
-
-    fun rescheduleDraft(draftResource: String, scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.rescheduleDraft(draftResource, scheduleDate)
-
-        if (apiResponse.isSuccess()) {
-            refreshScheduleDraftFolder()
-        } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
-        }
-    }
-
-    fun modifyDraft(scheduleAction: String, draftResource: String, onSuccess: () -> Unit) =
-        viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = currentMailbox.value!!
-            val apiResponse = ApiRepository.unscheduleDraft(scheduleAction)
-
-            if (apiResponse.isSuccess()) {
-                val draftFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-                refreshFoldersAsync(mailbox, listOf(draftFolderId))
-
-                getScheduleDraft(draftResource, onSuccess)
-            } else {
-                snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
-            }
-        }
     //endregion
 
     //region Move
@@ -1220,19 +1226,6 @@ class MainViewModel @Inject constructor(
             val delay = REFRESH_DELAY + max(etopScheduledDate - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
-            refreshController.refreshThreads(
-                refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
-                mailbox = currentMailbox.value!!,
-                folderId = folder.id,
-                realm = mailboxContentRealm(),
-            )
-        }
-    }
-
-    private fun refreshScheduleDraftFolder() = viewModelScope.launch(ioCoroutineContext) {
-        val folder = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)
-
-        if (folder?.cursor != null) {
             refreshController.refreshThreads(
                 refreshMode = RefreshMode.REFRESH_FOLDER_WITH_ROLE,
                 mailbox = currentMailbox.value!!,
