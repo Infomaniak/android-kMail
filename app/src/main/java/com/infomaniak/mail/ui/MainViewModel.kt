@@ -610,7 +610,7 @@ class MainViewModel @Inject constructor(
 
     fun deleteScheduleDraft(scheduleAction: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.deleteScheduleDraft(scheduleAction)
+        val apiResponse = ApiRepository.deleteScheduledDraft(scheduleAction)
 
         if (apiResponse.isSuccess()) {
             val draftFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
@@ -662,7 +662,7 @@ class MainViewModel @Inject constructor(
     fun modifyDraft(scheduleAction: String, draftResource: String, onSuccess: () -> Unit) =
         viewModelScope.launch(ioCoroutineContext) {
             val mailbox = currentMailbox.value!!
-            val apiResponse = ApiRepository.deleteScheduleDraft(scheduleAction)
+            val apiResponse = ApiRepository.deleteScheduledDraft(scheduleAction)
 
             if (apiResponse.isSuccess()) {
                 val draftFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
