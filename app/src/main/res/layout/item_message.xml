@@ -98,10 +98,10 @@
                     android:contentDescription="@string/contentDescriptionScheduleSendIcon"
                     android:src="@drawable/ic_scheduled_messages"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/shortMessageDate"
+                    app:layout_constraintBottom_toBottomOf="@id/shortMessageDate"
                     app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
-                    app:layout_constraintStart_toEndOf="@+id/iconsSpace"
-                    app:layout_constraintTop_toTopOf="@+id/shortMessageDate"
+                    app:layout_constraintStart_toEndOf="@id/iconsSpace"
+                    app:layout_constraintTop_toTopOf="@id/shortMessageDate"
                     app:tint="@color/scheduledIconColor"
                     tools:visibility="visible" />
 
@@ -113,7 +113,7 @@
                     android:layout_marginEnd="@dimen/marginStandardSmall"
                     app:layout_constraintBaseline_toBaselineOf="@id/expeditorName"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/scheduleSendIcon"
+                    app:layout_constraintStart_toEndOf="@id/scheduleSendIcon"
                     tools:text="9 déc 2021 à 11:00" />
 
                 <LinearLayout

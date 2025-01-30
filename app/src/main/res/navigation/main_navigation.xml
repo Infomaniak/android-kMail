@@ -53,7 +53,7 @@
 
         <action
             android:id="@+id/action_threadListFragment_to_attachMailboxFragment"
-            app:destination="@+id/attachMailboxFragment" />
+            app:destination="@id/attachMailboxFragment" />
         <action
             android:id="@+id/action_threadListFragment_to_searchFragment"
             app:destination="@id/searchFragment" />

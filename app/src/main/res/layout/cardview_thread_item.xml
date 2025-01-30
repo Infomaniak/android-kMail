@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="2dp"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
-        android:nextFocusRight="@+id/newMessageFab"
+        android:nextFocusRight="@id/newMessageFab"
         app:cardCornerRadius="@null"
         app:cardPreventCornerOverlap="false"
         app:shapeAppearanceOverlay="@style/RoundedDecoratedTextItemShapeAppearance">
@@ -171,7 +171,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@+id/threadCountCard"
+                    app:layout_constraintEnd_toStartOf="@id/threadCountCard"
                     app:layout_constraintStart_toEndOf="@id/draftPrefix"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="@tools:sample/full_names" />
@@ -224,9 +224,9 @@
                     android:contentDescription="@string/contentDescriptionScheduleSendIcon"
                     android:src="@drawable/ic_scheduled_messages"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/mailDate"
-                    app:layout_constraintEnd_toStartOf="@+id/mailDate"
-                    app:layout_constraintTop_toTopOf="@+id/mailDate"
+                    app:layout_constraintBottom_toBottomOf="@id/mailDate"
+                    app:layout_constraintEnd_toStartOf="@id/mailDate"
+                    app:layout_constraintTop_toTopOf="@id/mailDate"
                     app:tint="@color/scheduledIconColor"
                     tools:visibility="visible" />
 
@@ -246,9 +246,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
-                    app:layout_constraintEnd_toStartOf="@+id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/mailSubject"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/mailSubject">
+                    app:layout_constraintTop_toTopOf="@id/mailSubject">
 
                     <ImageView
                         android:id="@+id/iconForward"
@@ -281,9 +281,9 @@
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintEnd_toStartOf="@+id/folderNameCompactMode"
-                    app:layout_constraintStart_toEndOf="@+id/iconReplyOrForwardLayout"
-                    app:layout_constraintTop_toBottomOf="@+id/mailAddress"
+                    app:layout_constraintEnd_toStartOf="@id/folderNameCompactMode"
+                    app:layout_constraintStart_toEndOf="@id/iconReplyOrForwardLayout"
+                    app:layout_constraintTop_toBottomOf="@id/mailAddress"
                     tools:text="@tools:sample/lorem[10]" />
 
                 <TextView
