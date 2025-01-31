@@ -28,7 +28,9 @@ import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
@@ -37,6 +39,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
@@ -70,6 +73,16 @@ class SettingsFragment : Fragment() {
         setupMailboxesAdapter()
         setupListeners()
         setSubtitlesInitialState()
+        binding.myKSuiteSubscription.setOnClickListener {
+            AccountUtils.currentUser?.let { user ->
+                val args = MyKSuiteDashboardFragmentArgs(
+                    userName = user.displayName ?: "",
+                    avatarUri = user.avatar ?: "",
+                    dailySendLimit = "500",
+                )
+                safeNavigate(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
+            }
+        }
         observeFeatureFlag()
     }
 
