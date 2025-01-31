@@ -744,6 +744,9 @@ class NewMessageFragment : Fragment() {
                     trackNewMessageEvent("sendWithoutSubjectConfirm")
                     sendEmail()
                 },
+                onNegativeButtonClicked = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+                // TODO: The `onDismiss` triggers everytime the Dialog is closed, even when it's not actually dismissed by the user
+                // onDismiss = { if (scheduled) newMessageViewModel.resetScheduledDate() },
             )
         } else {
             sendEmail()
