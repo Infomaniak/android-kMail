@@ -69,8 +69,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 
         setTimePicker()
         setDatePicker()
-
-        dateField.setText(selectedDate.format(FORMAT_DATE_DAY_MONTH_YEAR))
+        setDate()
 
         builder
             .setView(root)
@@ -116,8 +115,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         datePicker?.addOnPositiveButtonClickListener { time ->
             val date = Date().also { it.time = time }
             selectedDate = selectedDate.setDay(date.day())
-
-            binding.dateField.setText(selectedDate.format(FORMAT_DATE_DAY_MONTH_YEAR))
+            setDate()
         }
 
         binding.timeField.setOnClickListener { timePicker?.show(super.activity.supportFragmentManager, "tag") }
@@ -170,16 +168,17 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
             DateValidatorPointForward.now(),
             DateValidatorPointBackward.before(Date().addYears(MAX_SCHEDULE_DELAY_YEARS).time),
         )
-
-        val constraintsBuilder =
-            CalendarConstraints.Builder()
-                .setValidator(CompositeDateValidator.allOf(dateValidators))
+        val constraintsBuilder = CalendarConstraints.Builder().setValidator(CompositeDateValidator.allOf(dateValidators))
 
         datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText(context.getString(R.string.selectDateDialogTitle))
             .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
             .setCalendarConstraints(constraintsBuilder.build())
             .build()
+    }
+
+    private fun setDate() {
+        binding.dateField.setText(selectedDate.format(FORMAT_DATE_DAY_MONTH_YEAR))
     }
 
     private fun showDialogWithBasicInfo(
