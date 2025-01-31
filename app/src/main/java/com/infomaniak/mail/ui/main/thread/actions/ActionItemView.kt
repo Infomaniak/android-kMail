@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,9 +48,7 @@ class ActionItemView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
             with(binding) {
                 icon.setImageDrawable(getDrawable(R.styleable.ActionItemView_icon))
-                getColorStateList(R.styleable.ActionItemView_iconColor)?.let(::setIconTint) ?: run {
-                    icon.imageTintList = AppCompatResources.getColorStateList(context, R.color.icon_button_primary_color)
-                }
+                getColorStateList(R.styleable.ActionItemView_iconColor)?.let(::setIconTint)
 
                 title.text = getString(R.styleable.ActionItemView_title)
                 getColorStateList(R.styleable.ActionItemView_titleColor)?.let(::setTitleColor)
