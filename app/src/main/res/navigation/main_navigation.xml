@@ -688,4 +688,28 @@
         android:label="UpgradeProductBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_upgrade_product" />
 
+    <dialog
+        android:id="@+id/myKSuiteUpgradeBottomSheet"
+        android:name="com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialog"
+        android:label="MyKSuiteUpgradeBottomSheet">
+        <argument
+            android:name="kSuiteApp"
+            app:argType="com.infomaniak.core.myksuite.ui.screens.KSuiteApp" />
+    </dialog>
+
+    <fragment
+        android:id="@+id/myKSuiteDashboardFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.KSuiteDashboardFragment"
+        android:label="MyKSuiteDashboardFragment">
+        <argument
+            android:name="userName"
+            app:argType="string" />
+        <argument
+            android:name="avatarUri"
+            app:argType="string" />
+        <argument
+            android:name="dailySendLimit"
+            app:argType="string" />
+    </fragment>
+
 </navigation>
