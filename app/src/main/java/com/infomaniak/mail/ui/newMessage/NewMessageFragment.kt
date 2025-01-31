@@ -223,7 +223,7 @@ class NewMessageFragment : Fragment() {
                 title = getString(R.string.datePickerTitle),
                 onPositiveButtonClicked = {
                     val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
-                    localSettings.lastSelectedScheduleDate = scheduleDate
+                    localSettings.lastSelectedScheduleEpoch = scheduleDate
                     newMessageViewModel.setScheduleDate(Date(scheduleDate))
                     tryToSendEmail(scheduled = true)
                 },

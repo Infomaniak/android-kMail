@@ -62,7 +62,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        localSettings.lastSelectedScheduleDate?.let { lastSelectedSchedule ->
+        localSettings.lastSelectedScheduleEpoch?.let { lastSelectedSchedule ->
             if (Date(lastSelectedSchedule).isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)) {
                 lastScheduleItem.isVisible = true
                 lastScheduleItem.setDescription(
@@ -77,7 +77,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
 
         lastScheduleItem.setClosingOnClickListener {
             val draftResource = navigationArgs.draftResource
-            val lastSelectedScheduleDate = localSettings.lastSelectedScheduleDate
+            val lastSelectedScheduleDate = localSettings.lastSelectedScheduleEpoch
 
             if (navigationArgs.isAlreadyScheduled) {
                 if (draftResource != null && lastSelectedScheduleDate != null) {

@@ -194,7 +194,7 @@ class ThreadFragment : Fragment() {
                 title = getString(R.string.datePickerTitle),
                 onPositiveButtonClicked = {
                     val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
-                    localSettings.lastSelectedScheduleDate = scheduleDate
+                    localSettings.lastSelectedScheduleEpoch = scheduleDate
 
                     mainViewModel.draftResource?.let { draftResource ->
                         mainViewModel.rescheduleDraft(draftResource, Date(scheduleDate))
