@@ -42,9 +42,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 ) : BaseAlertDialog(activityContext) {
 
     val binding: DialogSelectDateAndTimeForScheduledDraftBinding by lazy {
-        DialogSelectDateAndTimeForScheduledDraftBinding.inflate(
-            activity.layoutInflater
-        )
+        DialogSelectDateAndTimeForScheduledDraftBinding.inflate(activity.layoutInflater)
     }
 
     override val alertDialog = initDialog()
@@ -61,9 +59,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
     @Inject
     lateinit var localSettings: LocalSettings
 
-    private fun initDialog(customThemeRes: Int? = null) = with(binding) {
-
-        val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
+    private fun initDialog() = with(binding) {
 
         selectedDate = Date().roundUpToNextTenMinutes()
 
@@ -71,7 +67,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         setDatePicker()
         setDate()
 
-        builder
+        MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm, null)
             .setNegativeButton(RCore.string.buttonCancel, null)

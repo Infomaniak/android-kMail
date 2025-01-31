@@ -159,7 +159,7 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<InitResult>()
-    val sendMessageTrigger = SingleLiveEvent<Boolean>()
+    val scheduleMessageTrigger = SingleLiveEvent<Unit>()
 
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
@@ -201,7 +201,7 @@ class NewMessageViewModel @Inject constructor(
     fun draftLocalUuid() = draftLocalUuid
     fun draftMode() = draftMode
     fun shouldLoadDistantResources() = shouldLoadDistantResources
-    fun triggerSendMessage() = sendMessageTrigger.postValue(true)
+    fun triggerScheduleMessage() = scheduleMessageTrigger.postValue(Unit)
 
     fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
 
@@ -867,7 +867,6 @@ class NewMessageViewModel @Inject constructor(
     fun setScheduleDate(scheduleDate: Date) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
         this@NewMessageViewModel.scheduleDate = scheduleDate
-
         draftAction = DraftAction.SCHEDULE
 
         mailboxContentRealm().write {

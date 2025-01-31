@@ -88,7 +88,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
                 lastSelectedScheduleDate?.let {
                     trackScheduleSendEvent("lastSchedule")
                     newMessageViewModel.setScheduleDate(Date(it))
-                    newMessageViewModel.triggerSendMessage()
+                    newMessageViewModel.triggerScheduleMessage()
                 }
             }
         }
@@ -123,7 +123,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
                 } else {
                     trackScheduleSendEvent(schedule.matomoValue)
                     newMessageViewModel.setScheduleDate(schedule.date)
-                    newMessageViewModel.triggerSendMessage()
+                    newMessageViewModel.triggerScheduleMessage()
                 }
             }
         }

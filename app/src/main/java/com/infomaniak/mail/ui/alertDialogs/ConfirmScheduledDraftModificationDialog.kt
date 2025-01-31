@@ -34,9 +34,7 @@ open class ConfirmScheduledDraftModificationDialog @Inject constructor(
 ) : BaseAlertDialog(activityContext) {
 
     val binding: DialogConfirmScheduledDraftModificationBinding by lazy {
-        DialogConfirmScheduledDraftModificationBinding.inflate(
-            activity.layoutInflater
-        )
+        DialogConfirmScheduledDraftModificationBinding.inflate(activity.layoutInflater)
     }
 
     override val alertDialog = initDialog()
@@ -45,11 +43,8 @@ open class ConfirmScheduledDraftModificationDialog @Inject constructor(
     private var onNegativeButtonClicked: (() -> Unit)? = null
     private var onDismissed: (() -> Unit)? = null
 
-    private fun initDialog(customThemeRes: Int? = null) = with(binding) {
-
-        val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
-
-        builder
+    private fun initDialog() = with(binding) {
+        MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm, null)
             .setNegativeButton(RCore.string.buttonCancel, null)

@@ -605,6 +605,7 @@ class RefreshController @Inject constructor(
         val existingMessage = folderMessages[remoteMessage.uid]?.let {
             if (it.isManaged()) it else MessageController.getMessage(it.uid, realm = this)
         }
+
         // Add Sentry log and leave if the Message already exists
         if (existingMessage != null && !existingMessage.isOrphan()) {
             SentryLog.i(
