@@ -64,6 +64,9 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_DATE_AND_TIME_SCHEDULE_DIALOG
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_SEND_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -189,6 +192,8 @@ class NewMessageFragment : Fragment() {
         observeUiQuote()
         observeShimmering()
 
+        observeScheduleSend()
+
         with(editorManager) {
             observeEditorFormatActions()
             observeEditorStatus()
@@ -211,14 +216,33 @@ class NewMessageFragment : Fragment() {
         if (newMessageViewModel.currentMailbox.featureFlags.contains(FeatureFlag.SCHEDULE_SEND_DRAFT)) {
             binding.scheduleSendButton.isVisible = true
         }
-
-        newMessageViewModel.scheduleMessageTrigger.observe(viewLifecycleOwner) { tryToSendEmail(scheduled = true) }
-
-        observeSelectDateAndTimeForScheduleDialogState()
     }
 
-    private fun observeSelectDateAndTimeForScheduleDialogState() {
-        newMessageViewModel.dateAndTimeScheduledDialogTrigger.observe(viewLifecycleOwner) {
+    private fun observeShimmering() {
+        lifecycleScope.launch {
+            newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
+        }
+    }
+
+    private fun observeScheduleSend() {
+        getBackNavigationResult(SCHEDULE_SEND_RESULT) { selectedScheduleEpoch: Long ->
+            newMessageViewModel.setScheduleDate(Date(selectedScheduleEpoch))
+            tryToSendEmail(scheduled = true)
+        }
+
+        fun navigateBackToBottomSheet() {
+            safeNavigate(
+                resId = R.id.scheduleSendBottomSheetDialog,
+                args = ScheduleSendBottomSheetDialogArgs(
+                    isAlreadyScheduled = false,
+                    lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                    isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFree,
+                    matomoCategory = "scheduleSend",
+                ).toBundle(),
+            )
+        }
+
+        getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 title = getString(R.string.datePickerTitle),
                 onPositiveButtonClicked = {
@@ -227,14 +251,9 @@ class NewMessageFragment : Fragment() {
                     newMessageViewModel.setScheduleDate(Date(scheduleDate))
                     tryToSendEmail(scheduled = true)
                 },
-                onNegativeButtonClicked = { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) },
+                onNegativeButtonClicked = ::navigateBackToBottomSheet,
+                onCancel = ::navigateBackToBottomSheet,
             )
-        }
-    }
-
-    private fun observeShimmering() {
-        lifecycleScope.launch {
-            newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
         }
     }
 
@@ -712,7 +731,17 @@ class NewMessageFragment : Fragment() {
             sendButton.isEnabled = it
         }
 
-        scheduleSendButton.setOnClickListener { safeNavigate(resId = R.id.scheduleSendBottomSheetDialog) }
+        scheduleSendButton.setOnClickListener {
+            safeNavigate(
+                resId = R.id.scheduleSendBottomSheetDialog,
+                args = ScheduleSendBottomSheetDialogArgs(
+                    isAlreadyScheduled = false,
+                    lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                    isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFree,
+                    matomoCategory = "scheduleSend",
+                ).toBundle(),
+            )
+        }
         sendButton.setOnClickListener { tryToSendEmail() }
     }
 

@@ -50,6 +50,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
     private var onPositiveButtonClicked: (() -> Unit)? = null
     private var onNegativeButtonClicked: (() -> Unit)? = null
     private var onDismissed: (() -> Unit)? = null
+    private var onCancelled: (() -> Unit)? = null
 
     lateinit var selectedDate: Date
 
@@ -78,6 +79,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         onPositiveButtonClicked = null
         onNegativeButtonClicked = null
         onDismissed = null
+        onCancelled = null
     }
 
     fun show(
@@ -85,9 +87,10 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)? = null,
         onDismiss: (() -> Unit)? = null,
+        onCancel: (() -> Unit)? = null,
     ) {
         showDialogWithBasicInfo(title, R.string.buttonScheduleTitle)
-        setupListeners(onPositiveButtonClicked, onNegativeButtonClicked, onDismiss)
+        setupListeners(onPositiveButtonClicked, onNegativeButtonClicked, onDismiss, onCancel)
     }
 
     private fun getScheduleDateErrorText(): String = if (selectedDate.isInTheFuture().not()) {
@@ -104,6 +107,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)?,
         onDismiss: (() -> Unit)?,
+        onCancel: (() -> Unit)?,
     ) = with(alertDialog) {
 
         binding.dateField.setOnClickListener { datePicker?.show(super.activity.supportFragmentManager, "tag") }
@@ -140,12 +144,17 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 
         negativeButton.setOnClickListener {
             this@SelectDateAndTimeForScheduledDraftDialog.onNegativeButtonClicked?.invoke()
-            dismiss()
+            cancel()
         }
 
         onDismiss.let {
             onDismissed = it
             setOnDismissListener { onDismissed?.invoke() }
+        }
+
+        onCancel?.let {
+            onCancelled = it
+            setOnCancelListener { onCancelled?.invoke() }
         }
     }
 

@@ -123,11 +123,6 @@ class NewMessageViewModel @Inject constructor(
 
     val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
 
-    //region Scheduled Draft
-    val dateAndTimeScheduledDialogTrigger = SingleLiveEvent<Unit>()
-    fun showDateAndTimeScheduleDialog() = dateAndTimeScheduledDialogTrigger.postValue(Unit)
-    //endregion
-
     // 1. Navigating to AiPropositionFragment causes NewMessageFragment to export its body to `subjectAndBodyChannel`.
     // 2. Inserting the AI proposition navigates back to NewMessageFragment.
     // 3. When saving or sending the draft now, the channel still holds the previous body as it wasn't consumed.
