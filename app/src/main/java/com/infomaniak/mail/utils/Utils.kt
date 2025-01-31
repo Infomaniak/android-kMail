@@ -54,8 +54,12 @@ object Utils {
 
     fun colorToHexRepresentation(color: Int) = "#" + color.toHexString().substring(2 until 8)
 
-    fun isPermanentDeleteFolder(role: FolderRole?): Boolean {
-        return role == FolderRole.DRAFT || role == FolderRole.SCHEDULED_DRAFTS || role == FolderRole.SPAM || role == FolderRole.TRASH
+    fun isPermanentDeleteFolder(role: FolderRole?): Boolean = when (role) {
+        FolderRole.SCHEDULED_DRAFTS,
+        FolderRole.DRAFT,
+        FolderRole.SPAM,
+        FolderRole.TRASH -> true
+        else -> false
     }
 
     fun kSyncAccountUri(accountName: String): Uri = "content://com.infomaniak.sync.accounts/account/$accountName".toUri()
