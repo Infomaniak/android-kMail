@@ -36,6 +36,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
@@ -66,6 +67,8 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_DATE_AND_TIME_SCHEDULE_DIALOG
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_SEND_RESULT
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
@@ -165,11 +168,11 @@ class ThreadFragment : Fragment() {
         observeThreadOpening()
         observeAutoAdvance()
 
+        observeScheduleSend()
+
         observeReportDisplayProblemResult()
 
         observeMessageOfUserToBlock()
-
-        observeDateAndTimeScheduleDialogState()
     }
 
     private fun observeReportDisplayProblemResult() {
@@ -185,28 +188,6 @@ class ThreadFragment : Fragment() {
                 }
             }
             show(it)
-        }
-    }
-
-    private fun observeDateAndTimeScheduleDialogState() {
-        mainViewModel.dateAndTimeScheduledDialogTrigger.observe(viewLifecycleOwner) {
-            dateAndTimeScheduleDialog.show(
-                title = getString(R.string.datePickerTitle),
-                onPositiveButtonClicked = {
-                    val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
-                    localSettings.lastSelectedScheduleEpoch = scheduleDate
-
-                    mainViewModel.draftResource?.let { draftResource ->
-                        mainViewModel.rescheduleDraft(draftResource, Date(scheduleDate))
-                    }
-                },
-                onNegativeButtonClicked = {
-                    safeNavigate(
-                        resId = R.id.scheduleSendBottomSheetDialog,
-                        currentClassName = ThreadFragment::class.java.name,
-                    )
-                },
-            )
         }
     }
 
@@ -368,6 +349,9 @@ class ThreadFragment : Fragment() {
                         args = ScheduleSendBottomSheetDialogArgs(
                             isAlreadyScheduled = true,
                             draftResource = draftResource,
+                            lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                            isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFree ?: true,
+                            matomoCategory = "scheduleSend",
                         ).toBundle(),
                         currentClassName = ThreadFragment::class.java.name,
                     )
@@ -585,6 +569,37 @@ class ThreadFragment : Fragment() {
 
     private fun observeAutoAdvance() {
         mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner, ::tryToAutoAdvance)
+    }
+
+    private fun observeScheduleSend() {
+        getBackNavigationResult(SCHEDULE_SEND_RESULT) { selectedScheduleEpoch: Long ->
+            mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch))
+        }
+
+        fun navigateBackToBottomSheet() {
+            safeNavigate(
+                resId = R.id.scheduleSendBottomSheetDialog,
+                args = ScheduleSendBottomSheetDialogArgs(
+                    isAlreadyScheduled = false,
+                    draftResource = mainViewModel.draftResource,
+                    lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                    isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFree ?: true,
+                    matomoCategory = "scheduleSend",
+                ).toBundle(),
+            )
+        }
+
+        getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
+            dateAndTimeScheduleDialog.show(
+                title = getString(R.string.datePickerTitle),
+                onPositiveButtonClicked = {
+                    val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
+                    localSettings.lastSelectedScheduleEpoch = scheduleDate
+                },
+                onNegativeButtonClicked = ::navigateBackToBottomSheet,
+                onCancel = ::navigateBackToBottomSheet,
+            )
+        }
     }
 
     private fun displayThreadView() = with(binding) {

@@ -239,8 +239,6 @@ class MainViewModel @Inject constructor(
 
     //region Scheduled Draft
     var draftResource: String? = null
-    val dateAndTimeScheduledDialogTrigger = SingleLiveEvent<Unit>()
-    fun showDateAndTimeScheduleDialog() = dateAndTimeScheduledDialogTrigger.postValue(Unit)
     //endregion
 
     //region Share Thread URL
@@ -604,7 +602,13 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Scheduled Drafts
-    fun rescheduleDraft(draftResource: String, scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
+    fun rescheduleDraft(scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
+        val draftResource = this@MainViewModel.draftResource
+
+        if (draftResource.isNullOrBlank()) {
+            snackbarManager.postValue(title = appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
 
         val apiResponse = ApiRepository.rescheduleDraft(draftResource, scheduleDate)
 

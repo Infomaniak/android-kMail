@@ -28,14 +28,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.*
-import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.BottomSheetScheduleSendBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -50,10 +48,22 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
     private var binding: BottomSheetScheduleSendBinding by safeBinding()
     override val mainViewModel: MainViewModel by activityViewModels()
 
-    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+    // Navigation args does not support nullable primitive types, so we use 0L
+    // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
+    private var lastSelectedScheduleEpoch: Long = 0L
 
-    @Inject
-    lateinit var localSettings: LocalSettings
+    private fun computeLastScheduleItem() = with(binding) {
+        if (Date(lastSelectedScheduleEpoch).isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)) {
+            lastScheduleItem.isVisible = true
+            lastScheduleItem.setDescription(
+                mostDetailedDate(
+                    context,
+                    date = Date(lastSelectedScheduleEpoch),
+                    format = FORMAT_DATE_DAY_MONTH,
+                )
+            )
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetScheduleSendBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -62,69 +72,44 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        localSettings.lastSelectedScheduleEpoch?.let { lastSelectedSchedule ->
-            if (Date(lastSelectedSchedule).isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)) {
-                lastScheduleItem.isVisible = true
-                lastScheduleItem.setDescription(
-                    text = mostDetailedDate(
-                        context = context,
-                        date = Date(lastSelectedSchedule),
-                        format = FORMAT_DATE_DAY_MONTH,
-                    ),
-                )
-            }
-        }
+        lastSelectedScheduleEpoch = navigationArgs.lastSelectedScheduleEpoch
 
-        lastScheduleItem.setClosingOnClickListener {
+        computeLastScheduleItem()
+
+        lastScheduleItem.setOnClickListener {
             val draftResource = navigationArgs.draftResource
-            val lastSelectedScheduleDate = localSettings.lastSelectedScheduleEpoch
 
             if (navigationArgs.isAlreadyScheduled) {
-                if (draftResource != null && lastSelectedScheduleDate != null) {
-                    trackScheduleSendEvent("lastSchedule")
-                    mainViewModel.rescheduleDraft(draftResource, Date(lastSelectedScheduleDate))
+                if (draftResource != null && lastSelectedScheduleEpoch != 0L) {
+                    trackEvent(navigationArgs.matomoCategory, "lastSchedule")
+                    setBackNavigationResult(SCHEDULE_SEND_RESULT, lastSelectedScheduleEpoch)
                 }
             } else {
-                lastSelectedScheduleDate?.let {
-                    trackScheduleSendEvent("lastSchedule")
-                    newMessageViewModel.setScheduleDate(Date(it))
-                    newMessageViewModel.triggerScheduleMessage()
+                if (lastSelectedScheduleEpoch != 0L) {
+                    trackEvent(navigationArgs.matomoCategory, "lastSchedule")
+                    setBackNavigationResult(SCHEDULE_SEND_RESULT, lastSelectedScheduleEpoch)
                 }
             }
         }
 
-        if (newMessageViewModel.currentMailbox.isFree) {
-            customScheduleItem.setOnClickListener {
+        customScheduleItem.setOnClickListener {
+            if (navigationArgs.isCurrentMailboxFree) {
                 safeNavigate(
                     resId = R.id.upgradeProductBottomSheetDialog,
                     currentClassName = ScheduleSendBottomSheetDialog::class.java.name,
                 )
-            }
-        } else {
-            customScheduleItem.setClosingOnClickListener {
-                if (navigationArgs.isAlreadyScheduled) {
-                    mainViewModel.showDateAndTimeScheduleDialog()
-                } else {
-                    newMessageViewModel.showDateAndTimeScheduleDialog()
-                }
+            } else {
+                setBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG, true)
             }
         }
 
         fun createScheduleItem(schedule: Schedule): ActionItemView = ActionItemView(this.context).apply {
             setTitle(schedule.scheduleTitleRes)
-            setDescription(mostDetailedDate(context, date = schedule.date, format = FORMAT_DATE_DAY_MONTH))
+            setDescription(mostDetailedDate(context, date = schedule.date(), format = FORMAT_DATE_DAY_MONTH))
             setIconResource(schedule.scheduleIconRes)
-            setClosingOnClickListener {
-                if (navigationArgs.isAlreadyScheduled) {
-                    navigationArgs.draftResource?.let {
-                        trackScheduleSendEvent(schedule.matomoValue)
-                        mainViewModel.rescheduleDraft(draftResource = it, schedule.date)
-                    }
-                } else {
-                    trackScheduleSendEvent(schedule.matomoValue)
-                    newMessageViewModel.setScheduleDate(schedule.date)
-                    newMessageViewModel.triggerScheduleMessage()
-                }
+            setOnClickListener {
+                trackEvent(navigationArgs.matomoCategory, schedule.matomoValue)
+                setBackNavigationResult(SCHEDULE_SEND_RESULT, schedule.date().time)
             }
         }
 
@@ -140,6 +125,9 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
     companion object {
         const val MIN_SCHEDULE_DELAY_MINUTES = 5
         const val MAX_SCHEDULE_DELAY_YEARS = 10
+
+        const val SCHEDULE_SEND_RESULT = "schedule_send_result"
+        const val OPEN_DATE_AND_TIME_SCHEDULE_DIALOG = "open_date_and_time_schedule_dialog"
     }
 }
 
@@ -171,56 +159,56 @@ enum class TimeToDisplay {
 enum class Schedule(
     @StringRes val scheduleTitleRes: Int,
     @DrawableRes val scheduleIconRes: Int,
-    val date: Date,
+    val date: () -> Date,
     val timeToDisplay: List<TimeToDisplay>,
     val matomoValue: String,
 ) {
     LATER_THIS_MORNING(
         R.string.laterThisMorning,
         R.drawable.ic_morning_sunrise_schedule,
-        Date().getMorning(),
+        { Date().getMorning() },
         listOf(TimeToDisplay.NIGHT),
         "laterThisMorning",
     ),
     MONDAY_MORNING(
         R.string.mondayMorning,
         R.drawable.ic_morning_schedule,
-        Date().getNextMonday().getMorning(),
+        { Date().getNextMonday().getMorning() },
         listOf(TimeToDisplay.WEEKEND),
         "nextMondayMorning",
     ),
     MONDAY_AFTERNOON(
         R.string.mondayAfternoon,
         R.drawable.ic_afternoon_schedule,
-        Date().getNextMonday().getAfternoon(),
+        { Date().getNextMonday().getAfternoon() },
         listOf(TimeToDisplay.WEEKEND),
         "nextMondayAfternoon",
     ),
     THIS_AFTERNOON(
         R.string.thisAfternoon,
         R.drawable.ic_afternoon_schedule,
-        Date().getAfternoon(),
+        { Date().getAfternoon() },
         listOf(TimeToDisplay.MORNING),
         "thisAfternoon",
     ),
     THIS_EVENING(
         R.string.thisEvening,
         R.drawable.ic_evening_schedule,
-        Date().getEvening(),
+        { Date().getEvening() },
         listOf(TimeToDisplay.AFTERNOON),
         "thisEvening",
     ),
     TOMORROW_MORNING(
         R.string.tomorrowMorning,
         R.drawable.ic_morning_schedule,
-        Date().tomorrow().getMorning(),
+        { Date().tomorrow().getMorning() },
         listOf(TimeToDisplay.NIGHT, TimeToDisplay.MORNING, TimeToDisplay.AFTERNOON, TimeToDisplay.EVENING),
         "tomorrowMorning",
     ),
     NEXT_MONDAY(
         R.string.nextMonday,
         R.drawable.ic_arrow_return,
-        Date().getNextMonday().getMorning(),
+        { Date().getNextMonday().getMorning() },
         listOf(TimeToDisplay.NIGHT, TimeToDisplay.MORNING, TimeToDisplay.AFTERNOON, TimeToDisplay.EVENING),
         "nextMonday",
     )
