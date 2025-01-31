@@ -36,6 +36,19 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:orientation="vertical">
+            
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/myKSuiteName" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/myKSuiteSubscription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/myKSuiteDashboardTitle" />
+
+            <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
             <TextView
                 style="@style/SettingHeader"
