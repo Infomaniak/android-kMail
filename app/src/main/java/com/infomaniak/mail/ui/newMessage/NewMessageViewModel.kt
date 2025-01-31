@@ -876,6 +876,18 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
+    fun resetScheduledDate() = viewModelScope.launch(ioDispatcher) {
+        val localUuid = draftLocalUuid ?: return@launch
+        scheduleDate = null
+        draftAction = DraftAction.SAVE
+
+        mailboxContentRealm().write {
+            DraftController.getDraft(localUuid, realm = this)?.also { draft ->
+                draft.scheduleDate = null
+            }
+        }
+    }
+
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
