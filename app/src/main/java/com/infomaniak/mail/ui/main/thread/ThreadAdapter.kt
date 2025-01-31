@@ -362,6 +362,10 @@ class ThreadAdapter(
             scheduleSendIcon.isVisible = true
             alertsGroup.isVisible = true
             scheduleAlert.isVisible = true
+        } else {
+            scheduleSendIcon.isGone = true
+            alertsGroup.isGone = true
+            scheduleAlert.isGone = true
         }
 
         if (message.isDraft) {
