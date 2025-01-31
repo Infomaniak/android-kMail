@@ -66,11 +66,11 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
             if (Date(lastSelectedSchedule).isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)) {
                 lastScheduleItem.isVisible = true
                 lastScheduleItem.setDescription(
-                    mostDetailedDate(
-                        context,
+                    text = mostDetailedDate(
+                        context = context,
                         date = Date(lastSelectedSchedule),
                         format = FORMAT_DATE_DAY_MONTH,
-                    )
+                    ),
                 )
             }
         }
@@ -154,12 +154,15 @@ enum class TimeToDisplay {
         fun getTimeToDisplayFromDate(): TimeToDisplay {
             val now = Date()
             val timeSlot = Date(now.time)
-            return if (now.isWeekend()) WEEKEND else when (now) {
-                in timeSlot.setHour(0).setMinute(0)..timeSlot.setHour(7).setMinute(54) -> NIGHT
-                in timeSlot.setHour(7).setMinute(55)..timeSlot.setHour(13).setMinute(54) -> MORNING
-                in timeSlot.setHour(13).setMinute(55)..timeSlot.setHour(17).setMinute(54) -> AFTERNOON
-                in timeSlot.setHour(17).setMinute(55)..timeSlot.setHour(23).setMinute(54) -> EVENING
-                else -> NIGHT
+            return if (now.isWeekend()) {
+                WEEKEND
+            } else {
+                when (now) {
+                    in timeSlot.setHour(7).setMinute(55)..timeSlot.setHour(13).setMinute(54) -> MORNING
+                    in timeSlot.setHour(13).setMinute(55)..timeSlot.setHour(17).setMinute(54) -> AFTERNOON
+                    in timeSlot.setHour(17).setMinute(55)..timeSlot.setHour(23).setMinute(54) -> EVENING
+                    else -> NIGHT // Between 23:55 and 7:54, inclusive
+                }
             }
         }
     }
