@@ -212,7 +212,7 @@ class NewMessageFragment : Fragment() {
             binding.scheduleSendButton.isVisible = true
         }
 
-        newMessageViewModel.sendMessageTrigger.observe(viewLifecycleOwner) { tryToSendEmail(scheduled = true) }
+        newMessageViewModel.scheduleMessageTrigger.observe(viewLifecycleOwner) { tryToSendEmail(scheduled = true) }
 
         observeSelectDateAndTimeForScheduleDialogState()
     }
