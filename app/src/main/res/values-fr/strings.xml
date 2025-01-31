@@ -222,8 +222,8 @@
     <string name="contentDescriptionIconReply">Réponse</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
     <string name="contentDescriptionOpenMailActions">Ouvrir les actions du message</string>
-    <string name="contentDescriptionScheduleIcon">Icône de programmation</string>
-    <string name="contentDescriptionScheduleSendIcon">Message programmé</string>
+    <string name="contentDescriptionSchedule">Icône de programmation</string>
+    <string name="contentDescriptionScheduleSend">Message programmé</string>
     <string name="contentDescriptionScheduleText">Date programmée</string>
     <string name="contentDescriptionSelectedItem">Sélectionné</string>
     <string name="contentDescriptionUnreadPastille">Ce dossier contient des messages non lus</string>

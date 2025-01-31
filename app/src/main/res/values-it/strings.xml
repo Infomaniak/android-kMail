@@ -220,8 +220,8 @@
     <string name="contentDescriptionIconReply">Risposta</string>
     <string name="contentDescriptionIconStorage">Stato di conservazione</string>
     <string name="contentDescriptionOpenMailActions">Azioni di apertura dei messaggi</string>
-    <string name="contentDescriptionScheduleIcon">Icona del programma</string>
-    <string name="contentDescriptionScheduleSendIcon">Messaggio programmato</string>
+    <string name="contentDescriptionSchedule">Icona del programma</string>
+    <string name="contentDescriptionScheduleSend">Messaggio programmato</string>
     <string name="contentDescriptionScheduleText">Data programmata</string>
     <string name="contentDescriptionSelectedItem">Selezionato</string>
     <string name="contentDescriptionUnreadPastille">Questa cartella contiene i messaggi non letti</string>

@@ -226,8 +226,8 @@
     <string name="contentDescriptionIconReply">Reply</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionOpenMailActions">Open mail actions</string>
-    <string name="contentDescriptionScheduleIcon">Schedule icon</string>
-    <string name="contentDescriptionScheduleSendIcon">Scheduled message</string>
+    <string name="contentDescriptionSchedule">Schedule icon</string>
+    <string name="contentDescriptionScheduleSend">Scheduled message</string>
     <string name="contentDescriptionScheduleText">Scheduled date</string>
     <string name="contentDescriptionSelectedItem">Selected</string>
     <string name="contentDescriptionUnreadPastille">This folder contains unread mails</string>
