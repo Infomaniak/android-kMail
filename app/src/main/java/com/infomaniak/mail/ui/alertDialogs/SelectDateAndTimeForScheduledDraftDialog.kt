@@ -32,6 +32,7 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.C
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
@@ -114,7 +115,11 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 
         datePicker?.addOnPositiveButtonClickListener { time ->
             val date = Date().also { it.time = time }
-            selectedDate = selectedDate.setDay(date.day())
+
+            selectedDate = Calendar.getInstance().apply {
+                set(date.year(), date.month(), date.day(), selectedDate.hours(), selectedDate.minutes(), 0)
+            }.time
+
             setDate()
         }
 
@@ -125,7 +130,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
             val minute: Int = timePicker!!.minute
 
             selectedDate = selectedDate.setHour(hour)
-            selectedDate = selectedDate.setMinute(minute)
+                .setMinute(minute)
 
             binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
 
