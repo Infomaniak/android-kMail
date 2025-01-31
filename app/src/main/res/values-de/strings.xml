@@ -220,8 +220,8 @@
     <string name="contentDescriptionIconReply">Antwort</string>
     <string name="contentDescriptionIconStorage">Speicherstatus</string>
     <string name="contentDescriptionOpenMailActions">Mail-Aktionen öffnen</string>
-    <string name="contentDescriptionScheduleIcon">Zeitplan-Symbol</string>
-    <string name="contentDescriptionScheduleSendIcon">Geplante Nachricht</string>
+    <string name="contentDescriptionSchedule">Zeitplan-Symbol</string>
+    <string name="contentDescriptionScheduleSend">Geplante Nachricht</string>
     <string name="contentDescriptionScheduleText">Geplantes Datum</string>
     <string name="contentDescriptionSelectedItem">Ausgewählte</string>
     <string name="contentDescriptionUnreadPastille">Dieser Ordner enthält ungelesene Nachrichten</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@
                     android:layout_width="@dimen/smallIconSize"
                     android:layout_height="@dimen/smallIconSize"
                     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-                    android:contentDescription="@string/contentDescriptionScheduleSendIcon"
+                    android:contentDescription="@string/contentDescriptionScheduleSend"
                     android:src="@drawable/ic_scheduled_messages"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/shortMessageDate"
