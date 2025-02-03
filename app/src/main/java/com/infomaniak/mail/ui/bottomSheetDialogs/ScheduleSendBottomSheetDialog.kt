@@ -60,7 +60,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
                     context,
                     date = Date(lastSelectedScheduleEpoch),
                     format = FORMAT_DATE_DAY_MONTH,
-                )
+                ),
             )
         }
     }

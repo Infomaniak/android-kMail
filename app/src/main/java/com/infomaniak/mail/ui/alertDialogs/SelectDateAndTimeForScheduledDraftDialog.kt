@@ -129,8 +129,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
             val hour: Int = timePicker!!.hour
             val minute: Int = timePicker!!.minute
 
-            selectedDate = selectedDate.setHour(hour)
-                .setMinute(minute)
+            selectedDate = selectedDate.setHour(hour).setMinute(minute)
 
             binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
 
