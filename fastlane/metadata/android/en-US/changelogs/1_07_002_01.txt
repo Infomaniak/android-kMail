@@ -1,0 +1,2 @@
+- Add SSO login
+- Correctly redirect user in the app after creating an account

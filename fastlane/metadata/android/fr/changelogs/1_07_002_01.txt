@@ -1,0 +1,2 @@
+- Ajout du login par SSO
+- Redirige correctement l'utilisateur dans l'application après la création d'un compte
