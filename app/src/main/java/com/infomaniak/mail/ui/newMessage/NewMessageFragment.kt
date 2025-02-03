@@ -186,13 +186,12 @@ class NewMessageFragment : Fragment() {
         observeRecipients()
         observeAttachments()
         observeImportAttachmentsResult()
-        observeOpenAttachment()
         observeBodyLoader()
         observeUiSignature()
         observeUiQuote()
         observeShimmering()
 
-        observeScheduleSend()
+        setupBackActionHandler()
 
         with(editorManager) {
             observeEditorFormatActions()
@@ -224,11 +223,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeScheduleSend() {
-        getBackNavigationResult(SCHEDULE_SEND_RESULT) { selectedScheduleEpoch: Long ->
-            newMessageViewModel.setScheduleDate(Date(selectedScheduleEpoch))
-            tryToSendEmail(scheduled = true)
-        }
+    private fun setupBackActionHandler() {
 
         fun navigateBackToBottomSheet() {
             safeNavigate(
@@ -255,6 +250,13 @@ class NewMessageFragment : Fragment() {
                 onCancel = ::navigateBackToBottomSheet,
             )
         }
+
+        getBackNavigationResult(SCHEDULE_SEND_RESULT) { selectedScheduleEpoch: Long ->
+            newMessageViewModel.setScheduleDate(Date(selectedScheduleEpoch))
+            tryToSendEmail(scheduled = true)
+        }
+
+        getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
 
     private fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {
@@ -665,10 +667,6 @@ class NewMessageFragment : Fragment() {
                 attachmentsLiveData.postValue(currentAttachments + newAttachments)
             }
         }
-    }
-
-    private fun observeOpenAttachment() {
-        getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
 
     private fun observeImportAttachmentsResult() = with(newMessageViewModel) {

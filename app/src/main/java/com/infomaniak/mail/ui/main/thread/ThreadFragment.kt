@@ -168,7 +168,7 @@ class ThreadFragment : Fragment() {
         observeThreadOpening()
         observeAutoAdvance()
 
-        observeScheduleSend()
+        setupBackActionHandler()
 
         observeReportDisplayProblemResult()
 
@@ -571,10 +571,7 @@ class ThreadFragment : Fragment() {
         mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner, ::tryToAutoAdvance)
     }
 
-    private fun observeScheduleSend() {
-        getBackNavigationResult(SCHEDULE_SEND_RESULT) { selectedScheduleEpoch: Long ->
-            mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch))
-        }
+    private fun setupBackActionHandler() {
 
         fun navigateBackToBottomSheet() {
             safeNavigate(
@@ -599,6 +596,10 @@ class ThreadFragment : Fragment() {
                 onNegativeButtonClicked = ::navigateBackToBottomSheet,
                 onCancel = ::navigateBackToBottomSheet,
             )
+        }
+
+        getBackNavigationResult(SCHEDULE_SEND_RESULT) { selectedScheduleEpoch: Long ->
+            mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch))
         }
     }
 
