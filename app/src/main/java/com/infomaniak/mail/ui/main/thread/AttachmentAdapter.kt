@@ -54,7 +54,7 @@ class AttachmentAdapter(
         toggleEndIconVisibility(shouldDisplayCloseButton)
 
         if (shouldDisplayCloseButton) {
-            closeButton.apply {
+            attachmentCloseButton.apply {
                 contentDescription = context.getString(R.string.contentDescriptionButtonDelete, attachment.name)
                 setOnClickListener {
                     val index = attachments.indexOf(attachment)
@@ -83,7 +83,7 @@ class AttachmentAdapter(
     }
 
     private fun ItemAttachmentBinding.toggleEndIconVisibility(shouldDisplayCloseButton: Boolean) {
-        closeButton.isVisible = shouldDisplayCloseButton
+        attachmentCloseButton.isVisible = shouldDisplayCloseButton
         moreButton.isVisible = !shouldDisplayCloseButton
     }
 
