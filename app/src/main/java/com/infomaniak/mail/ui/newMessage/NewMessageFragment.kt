@@ -445,11 +445,9 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun removeInlineAttachmentsUsedInQuote() {
-        newMessageViewModel.uiQuoteLiveData.value?.let { html ->
-            newMessageViewModel.attachmentsLiveData.value?.let { attachments ->
-                newMessageViewModel.attachmentsLiveData.value = attachments.filterOutHtmlCids(html)
-            }
+    private fun removeInlineAttachmentsUsedInQuote() = with(newMessageViewModel) {
+        uiQuoteLiveData.value?.let { html ->
+            attachmentsLiveData.value?.filterOutHtmlCids(html)?.let { attachmentsLiveData.value = it }
         }
     }
 
@@ -600,8 +598,10 @@ class NewMessageFragment : Fragment() {
                 newMessageViewModel.uploadAttachmentsToServer(attachments)
             }
 
-            // When removing an Attachment, both counts will be the same, because the Adapter is already notified.
-            // We don't want to notify it again, because it will cancel the nice animation.
+            /*
+             * When removing an Attachment, both counts will be the same, because the Adapter is already notified.
+             * We don't want to notify it again, because it will cancel the nice animation.
+             */
             if (attachments.count() != attachmentAdapter.itemCount) {
                 attachmentAdapter.submitList(attachments.filterNot { it.disposition == AttachmentDisposition.INLINE })
             }
