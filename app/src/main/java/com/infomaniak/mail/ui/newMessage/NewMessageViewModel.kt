@@ -787,6 +787,9 @@ class NewMessageViewModel @Inject constructor(
         LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
         attachments.removeAt(position)
         attachmentsLiveData.value = attachments
+
+        // If we are removing Attachments, cancel the previous upload so we don't try to upload removed Attachments.
+        uploadAttachmentsToServer(attachments)
     }
 
     fun updateIsSendingAllowed(
