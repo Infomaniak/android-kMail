@@ -780,16 +780,24 @@ class NewMessageViewModel @Inject constructor(
         if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent("deleteRecipient")
     }
 
-    fun deleteAttachment(position: Int) = runCatching {
-        val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
-        val attachment = attachments[position]
-        attachment.getUploadLocalFile()?.delete()
-        LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
-        attachments.removeAt(position)
-        attachmentsLiveData.value = attachments
+    fun deleteAttachment(position: Int) = viewModelScope.launch(ioCoroutineContext) {
+        runCatching {
+            val attachments = attachmentsLiveData.valueOrEmpty().toMutableList()
+            val attachment = attachments[position]
+            attachment.getUploadLocalFile()?.delete()
+            LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
 
-        // If we are removing Attachments, cancel the previous upload so we don't try to upload removed Attachments.
-        uploadAttachmentsToServer(attachments)
+            mailboxContentRealm().write {
+                draftController.updateDraft(draftLocalUuid!!, realm = this) { draftToUpdate ->
+                    draftToUpdate.attachments.apply {
+                        findSpecificAttachment(attachment)?.let(::delete)
+                    }
+                }
+            }
+
+            attachments.removeAt(position)
+            attachmentsLiveData.postValue(attachments)
+        }
     }
 
     fun updateIsSendingAllowed(
