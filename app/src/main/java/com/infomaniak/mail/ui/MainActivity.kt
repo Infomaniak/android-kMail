@@ -71,8 +71,8 @@ import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
+import com.infomaniak.mail.utils.extensions.getLongOrNull
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
-import com.infomaniak.mail.workers.BaseCoroutineWorker.Companion.getLongOrNull
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
