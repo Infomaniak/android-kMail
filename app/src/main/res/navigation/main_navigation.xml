@@ -262,15 +262,12 @@
             app:nullable="true" />
         <argument
             android:name="lastSelectedScheduleEpoch"
-            app:argType="long"
-            android:defaultValue="0L" />
+            android:defaultValue="0L"
+            app:argType="long" />
         <argument
             android:name="isCurrentMailboxFree"
             android:defaultValue="true"
             app:argType="boolean" />
-        <argument
-            android:name="matomoCategory"
-            app:argType="string" />
     </dialog>
 
     <fragment

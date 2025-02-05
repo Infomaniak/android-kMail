@@ -351,7 +351,6 @@ class ThreadFragment : Fragment() {
                             draftResource = draftResource,
                             lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
                             isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFree ?: true,
-                            matomoCategory = "scheduleSend",
                         ).toBundle(),
                         currentClassName = ThreadFragment::class.java.name,
                     )
@@ -581,7 +580,6 @@ class ThreadFragment : Fragment() {
                     draftResource = mainViewModel.draftResource,
                     lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
                     isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFree ?: true,
-                    matomoCategory = "scheduleSend",
                 ).toBundle(),
             )
         }

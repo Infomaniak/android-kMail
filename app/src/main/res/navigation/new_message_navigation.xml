@@ -102,9 +102,6 @@
             android:name="isCurrentMailboxFree"
             android:defaultValue="true"
             app:argType="boolean" />
-        <argument
-            android:name="matomoCategory"
-            app:argType="string" />
     </dialog>
 
     <dialog
