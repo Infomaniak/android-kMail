@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.api
 
+import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.api.ApiController
@@ -30,7 +31,6 @@ import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.LocalSettings.AiEngine
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult
@@ -58,13 +58,13 @@ import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.copyFromRealm
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.util.Date
+import com.infomaniak.core.myksuite.ui.network.ApiRoutes as MyKSuiteApiRoutes
 
 object ApiRepository : ApiRepositoryCore() {
 
@@ -433,6 +433,15 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getShareLink(mailboxUuid: String, folderId: String, mailId: Int): ApiResponse<ShareThread> {
         return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
+    }
+
+    fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
+        return ApiController.callApi(
+            url = MyKSuiteApiRoutes.myKSuiteData,
+            method = ApiController.ApiMethod.GET,
+            okHttpClient = okHttpClient,
+            useKotlinxSerialization = true,
+        )
     }
 
     /**
