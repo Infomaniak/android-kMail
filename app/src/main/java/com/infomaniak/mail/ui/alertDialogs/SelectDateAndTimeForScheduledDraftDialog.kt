@@ -28,8 +28,6 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeForScheduledDraftBinding
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.MAX_SCHEDULE_DELAY_YEARS
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import java.util.Calendar
@@ -209,5 +207,10 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 
         positiveButtonText?.let(positiveButton::setText)
         negativeButtonText?.let(negativeButton::setText)
+    }
+
+    companion object {
+        const val MIN_SCHEDULE_DELAY_MINUTES = 5
+        const val MAX_SCHEDULE_DELAY_YEARS = 10
     }
 }

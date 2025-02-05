@@ -32,6 +32,7 @@ import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleSendBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
@@ -130,9 +131,6 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
     }
 
     companion object {
-        const val MIN_SCHEDULE_DELAY_MINUTES = 5
-        const val MAX_SCHEDULE_DELAY_YEARS = 10
-
         const val SCHEDULE_SEND_RESULT = "schedule_send_result"
         const val OPEN_DATE_AND_TIME_SCHEDULE_DIALOG = "open_date_and_time_schedule_dialog"
     }
