@@ -168,7 +168,7 @@ class Folder : RealmObject, Cloneable {
         INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 9, "inboxFolder"),
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 8, "commercialFolder"),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 7, "socialNetworksFolder"),
-        SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 6, "sentFolder"),
+        SENT(R.string.sentFolder, R.drawable.ic_send, 6, "sentFolder"),
         SCHEDULED_DRAFTS(R.string.scheduledMessagesFolder, R.drawable.ic_schedule_send, 5, "scheduledDraftsFolder"),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftFolder"),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, "spamFolder"),
