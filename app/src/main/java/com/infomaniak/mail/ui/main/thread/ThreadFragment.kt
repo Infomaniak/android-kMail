@@ -61,6 +61,7 @@ import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwissTransferFile
+import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -270,30 +271,11 @@ class ThreadFragment : Fragment() {
                         args = DetailedContactBottomSheetDialogArgs(recipient, bimi).toBundle(),
                     )
                 },
-                onDraftClicked = { message ->
-                    trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-                    twoPaneViewModel.navigateToNewMessage(
-                        arrivedFromExistingDraft = true,
-                        draftLocalUuid = message.draftLocalUuid,
-                        draftResource = message.draftResource,
-                        messageUid = message.uid,
-                    )
-                },
-                onDeleteDraftClicked = { message ->
-                    trackMessageActionsEvent("deleteDraft")
-                    mainViewModel.currentMailbox.value?.let { mailbox -> deleteDraft(message, mailbox) }
-                },
-                onAttachmentClicked = ::onAttachmentClicked,
-                onAttachmentOptionsClicked = {
-                    safeNavigate(
-                        resId = R.id.attachmentActionsBottomSheetDialog,
-                        args = AttachmentActionsBottomSheetDialogArgs(it.localUuid, it is SwissTransferFile).toBundle(),
-                    )
-                },
-                onDownloadAllClicked = { message ->
-                    trackAttachmentActionsEvent("downloadAll")
-                    downloadAllAttachments(message)
-                },
+                onDraftClicked = ::openDraft,
+                onDeleteDraftClicked = ::deleteDraft,
+                onAttachmentClicked = ::onAttachableClicked,
+                onAttachmentOptionsClicked = ::navigateToAttachmentActions,
+                onDownloadAllClicked = ::downloadAllAttachments,
                 onReplyClicked = { message ->
                     trackMessageActionsEvent(ACTION_REPLY_NAME)
                     replyTo(message)
@@ -301,12 +283,7 @@ class ThreadFragment : Fragment() {
                 onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
                 onAllExpandedMessagesLoaded = ::scrollToFirstUnseenMessage,
                 onSuperCollapsedBlockClicked = ::expandSuperCollapsedBlock,
-                navigateToAttendeeBottomSheet = { attendees ->
-                    safeNavigate(
-                        resId = R.id.attendeesBottomSheetDialog,
-                        args = AttendeesBottomSheetDialogArgs(attendees.toTypedArray()).toBundle(),
-                    )
-                },
+                navigateToAttendeeBottomSheet = ::navigateToAttendees,
                 navigateToNewMessageActivity = { twoPaneViewModel.navigateToNewMessage(mailToUri = it) },
                 navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
                     navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
@@ -342,43 +319,8 @@ class ThreadFragment : Fragment() {
                         ContextMenuType.PHONE -> phoneContextualMenuAlertDialog.show(data)
                     }
                 },
-                onRescheduleClicked = { draftResource ->
-                    mainViewModel.draftResource = draftResource
-                    safeNavigate(
-                        resId = R.id.scheduleSendBottomSheetDialog,
-                        args = ScheduleSendBottomSheetDialogArgs(
-                            isAlreadyScheduled = true,
-                            draftResource = draftResource,
-                            lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                            isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFree ?: true,
-                        ).toBundle(),
-                        currentClassName = ThreadFragment::class.java.name,
-                    )
-                },
-                onModifyClicked = { message ->
-                    confirmScheduledDraftModificationDialog.show(
-                        title = getString(R.string.editSendTitle),
-                        description = getString(R.string.editSendDescription),
-                        onPositiveButtonClicked = {
-                            val scheduleAction = message.scheduleAction
-                            val draftResource = message.draftResource
-
-                            if (scheduleAction != null && draftResource != null) {
-                                mainViewModel.modifyScheduledDraft(
-                                    scheduleAction = scheduleAction,
-                                    onSuccess = {
-                                        trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
-                                        twoPaneViewModel.navigateToNewMessage(
-                                            arrivedFromExistingDraft = true,
-                                            draftResource = draftResource,
-                                            messageUid = message.uid,
-                                        )
-                                    },
-                                )
-                            }
-                        },
-                    )
-                }
+                onRescheduleClicked = ::rescheduleDraft,
+                onModifyScheduledClicked = ::modifyScheduledDraft,
             ),
         )
 
@@ -393,7 +335,22 @@ class ThreadFragment : Fragment() {
         threadAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
 
-    private fun onAttachmentClicked(attachable: Attachable) {
+    private fun openDraft(message: Message) {
+        trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+        twoPaneViewModel.navigateToNewMessage(
+            arrivedFromExistingDraft = true,
+            draftLocalUuid = message.draftLocalUuid,
+            draftResource = message.draftResource,
+            messageUid = message.uid,
+        )
+    }
+
+    private fun deleteDraft(message: Message) {
+        trackMessageActionsEvent("deleteDraft")
+        mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
+    }
+
+    private fun onAttachableClicked(attachable: Attachable) {
         when (attachable) {
             is Attachment -> {
                 trackAttachmentActionsEvent(ACTION_OPEN_NAME)
@@ -401,9 +358,9 @@ class ThreadFragment : Fragment() {
                     context = requireContext(),
                     navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
                         navigateToDownloadProgressDialog(
-                            attachment,
-                            attachmentIntentType,
-                            ThreadFragment::class.java.name,
+                            attachment = attachment,
+                            attachmentIntentType = attachmentIntentType,
+                            currentClassName = ThreadFragment::class.java.name,
                         )
                     },
                     snackbarManager = snackbarManager,
@@ -414,6 +371,13 @@ class ThreadFragment : Fragment() {
                 downloadSwissTransferFile(swissTransferFile = attachable)
             }
         }
+    }
+
+    private fun navigateToAttachmentActions(attachable: Attachable) {
+        safeNavigate(
+            resId = R.id.attachmentActionsBottomSheetDialog,
+            args = AttachmentActionsBottomSheetDialogArgs(attachable.localUuid, attachable is SwissTransferFile).toBundle(),
+        )
     }
 
     private fun setupDialogs() {
@@ -665,6 +629,8 @@ class ThreadFragment : Fragment() {
     }
 
     private fun downloadAllAttachments(message: Message) {
+        trackAttachmentActionsEvent("downloadAll")
+
         val truncatedSubject = message.subject?.let { it.substring(0..min(MAXIMUM_SUBJECT_LENGTH, it.lastIndex)) }
 
         if (message.hasAttachments) downloadAttachments(message, allAttachmentsFileName(truncatedSubject ?: ""))
@@ -761,6 +727,52 @@ class ThreadFragment : Fragment() {
     private fun expandSuperCollapsedBlock() = with(threadViewModel) {
         threadState.hasSuperCollapsedBlockBeenClicked = true
         reassignMessagesLive(twoPaneViewModel.currentThreadUid.value!!)
+    }
+
+    private fun navigateToAttendees(attendees: List<Attendee>) {
+        safeNavigate(
+            resId = R.id.attendeesBottomSheetDialog,
+            args = AttendeesBottomSheetDialogArgs(attendees.toTypedArray()).toBundle(),
+        )
+    }
+
+    private fun rescheduleDraft(draftResource: String) {
+        mainViewModel.draftResource = draftResource
+        safeNavigate(
+            resId = R.id.scheduleSendBottomSheetDialog,
+            args = ScheduleSendBottomSheetDialogArgs(
+                isAlreadyScheduled = true,
+                draftResource = draftResource,
+                lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFree ?: true,
+            ).toBundle(),
+            currentClassName = ThreadFragment::class.java.name,
+        )
+    }
+
+    private fun modifyScheduledDraft(message: Message) {
+        confirmScheduledDraftModificationDialog.show(
+            title = getString(R.string.editSendTitle),
+            description = getString(R.string.editSendDescription),
+            onPositiveButtonClicked = {
+                val scheduleAction = message.scheduleAction
+                val draftResource = message.draftResource
+
+                if (scheduleAction != null && draftResource != null) {
+                    mainViewModel.modifyScheduledDraft(
+                        scheduleAction = scheduleAction,
+                        onSuccess = {
+                            trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+                            twoPaneViewModel.navigateToNewMessage(
+                                arrivedFromExistingDraft = true,
+                                draftResource = draftResource,
+                                messageUid = message.uid,
+                            )
+                        },
+                    )
+                }
+            },
+        )
     }
 
     private fun shouldLoadDistantResources(messageUid: String): Boolean {

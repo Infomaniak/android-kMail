@@ -1054,20 +1054,26 @@ class NewMessageViewModel @Inject constructor(
         isTaskRoot: Boolean,
     ) = withContext(mainDispatcher) {
         when (action) {
-            DraftAction.SAVE -> {
-                if (isFinishing) {
-                    if (isTaskRoot) appContext.showToast(R.string.snackbarDraftSaving)
-                } else {
-                    appContext.showToast(R.string.snackbarDraftSaving)
-                }
-            }
-            DraftAction.SEND -> {
-                if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
-            }
-            DraftAction.SCHEDULE -> {
-                if (isTaskRoot) appContext.showToast(R.string.snackbarScheduling)
-            }
+            DraftAction.SAVE -> showSaveToast(isFinishing, isTaskRoot)
+            DraftAction.SEND -> showSendToast(isTaskRoot)
+            DraftAction.SCHEDULE -> showScheduleToast(isTaskRoot)
         }
+    }
+
+    private fun showSaveToast(isFinishing: Boolean, isTaskRoot: Boolean) {
+        if (isFinishing) {
+            if (isTaskRoot) appContext.showToast(R.string.snackbarDraftSaving)
+        } else {
+            appContext.showToast(R.string.snackbarDraftSaving)
+        }
+    }
+
+    private fun showSendToast(isTaskRoot: Boolean) {
+        if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
+    }
+
+    private fun showScheduleToast(isTaskRoot: Boolean) {
+        if (isTaskRoot) appContext.showToast(R.string.snackbarScheduling)
     }
 
     private fun MutableLiveData<UiRecipients>.addRecipientThenSetValue(recipient: Recipient) {

@@ -665,12 +665,7 @@ class ThreadListAdapter @Inject constructor(
         }
 
         if (threadDensity == ThreadDensity.COMPACT) {
-            if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
-                multiSelection?.selectedItems?.removeAll {
-                    scope.ensureActive()
-                    !threads.contains(it)
-                }
-            }
+            cleanMultiSelectionItems(threads, scope)
             addAll(threads)
         } else {
             var previousSectionTitle = ""
@@ -688,6 +683,15 @@ class ThreadListAdapter @Inject constructor(
                 }
 
                 add(thread)
+            }
+        }
+    }
+
+    private fun cleanMultiSelectionItems(threads: List<Thread>, scope: CoroutineScope) {
+        if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
+            multiSelection?.selectedItems?.removeAll {
+                scope.ensureActive()
+                !threads.contains(it)
             }
         }
     }

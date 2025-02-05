@@ -79,7 +79,7 @@ private fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
 // Migrate from version #19
 private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
     if (oldRealm.schemaVersion() <= 19L) {
-        enumerate(className = "Folder") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+        enumerate(className = "Folder") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Add property with default value
                 set(propertyName = "isDisplayed", value = true)

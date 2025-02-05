@@ -460,7 +460,7 @@ class ThreadAdapter(
             scheduleAlert.onAction1 { threadAdapterCallbacks?.onRescheduleClicked?.invoke(draftResource) }
         }
 
-        scheduleAlert.onAction2 { threadAdapterCallbacks?.onModifyClicked?.invoke(message) }
+        scheduleAlert.onAction2 { threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message) }
 
         distantImagesAlert.onAction1 {
             bodyWebViewClient.unblockDistantResources()
@@ -770,7 +770,7 @@ class ThreadAdapter(
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
         var onRescheduleClicked: ((String) -> Unit)? = null,
-        var onModifyClicked: ((Message) -> Unit)? = null,
+        var onModifyScheduledClicked: ((Message) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {
