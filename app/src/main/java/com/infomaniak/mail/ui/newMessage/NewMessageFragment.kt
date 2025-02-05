@@ -212,15 +212,7 @@ class NewMessageFragment : Fragment() {
             observeCcAndBccVisibility()
         }
 
-        if (newMessageViewModel.currentMailbox.featureFlags.contains(FeatureFlag.SCHEDULE_SEND_DRAFT)) {
-            binding.scheduleSendButton.isVisible = true
-        }
-    }
-
-    private fun observeShimmering() {
-        lifecycleScope.launch {
-            newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
-        }
+        observeScheduledDraftsFeatureFlagUpdates()
     }
 
     private fun setupBackActionHandler() {
@@ -697,6 +689,17 @@ class NewMessageFragment : Fragment() {
             } else {
                 quoteWebView.loadContent(quote, quoteGroup)
             }
+        }
+    }
+
+    private fun observeShimmering() = lifecycleScope.launch {
+        newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
+    }
+
+    private fun observeScheduledDraftsFeatureFlagUpdates() {
+        newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
+            val isScheduledDraftsEnabled = mailbox.featureFlags.contains(FeatureFlag.SCHEDULE_SEND_DRAFT)
+            binding.scheduleSendButton.isVisible = isScheduledDraftsEnabled
         }
     }
 
