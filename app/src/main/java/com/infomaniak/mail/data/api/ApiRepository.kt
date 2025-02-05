@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.api
 
+import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.api.ApiController
@@ -64,6 +65,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.util.Date
+import com.infomaniak.core.myksuite.ui.network.ApiRoutes as MyKSuiteApiRoutes
 
 object ApiRepository : ApiRepositoryCore() {
 
@@ -447,6 +449,15 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getShareLink(mailboxUuid: String, folderId: String, mailId: Int): ApiResponse<ShareThread> {
         return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
+    }
+
+    fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
+        return ApiController.callApi(
+            url = MyKSuiteApiRoutes.myKSuiteData,
+            method = ApiController.ApiMethod.GET,
+            okHttpClient = okHttpClient,
+            useKotlinxSerialization = true,
+        )
     }
 
     /**
