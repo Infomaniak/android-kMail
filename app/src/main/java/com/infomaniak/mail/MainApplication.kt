@@ -125,7 +125,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         if (BuildConfig.DEBUG) configureDebugMode()
         configureSentry()
         enforceAppTheme()
-        configureAccountUtils()
+        configureRoomDatabase()
         configureAppReloading()
         configureInfomaniakCore()
         notificationUtils.initNotificationChannel()
@@ -217,8 +217,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         AppCompatDelegate.setDefaultNightMode(localSettings.theme.mode)
     }
 
-    private fun configureAccountUtils() {
+    private fun configureRoomDatabase() {
         AccountUtils.init(this)
+        MyKSuiteDataUtils.initDatabase(this)
     }
 
     private fun configureAppReloading() {
