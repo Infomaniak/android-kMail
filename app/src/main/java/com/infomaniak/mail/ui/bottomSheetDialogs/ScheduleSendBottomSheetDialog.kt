@@ -28,7 +28,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.*
-import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleSendBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -78,15 +78,16 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
 
         lastScheduleItem.setOnClickListener {
             val draftResource = navigationArgs.draftResource
+            val matomoName = "lastSelectedSchedule"
 
             if (navigationArgs.isAlreadyScheduled) {
                 if (draftResource != null && lastSelectedScheduleEpoch != 0L) {
-                    trackEvent(navigationArgs.matomoCategory, "lastSchedule")
+                    trackScheduleSendEvent(matomoName)
                     setBackNavigationResult(SCHEDULE_SEND_RESULT, lastSelectedScheduleEpoch)
                 }
             } else {
                 if (lastSelectedScheduleEpoch != 0L) {
-                    trackEvent(navigationArgs.matomoCategory, "lastSchedule")
+                    trackScheduleSendEvent(matomoName)
                     setBackNavigationResult(SCHEDULE_SEND_RESULT, lastSelectedScheduleEpoch)
                 }
             }
@@ -108,7 +109,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
             setDescription(mostDetailedDate(context, date = schedule.date(), format = FORMAT_DATE_DAY_MONTH))
             setIconResource(schedule.scheduleIconRes)
             setOnClickListener {
-                trackEvent(navigationArgs.matomoCategory, schedule.matomoValue)
+                trackScheduleSendEvent(schedule.matomoValue)
                 setBackNavigationResult(SCHEDULE_SEND_RESULT, schedule.date().time)
             }
         }

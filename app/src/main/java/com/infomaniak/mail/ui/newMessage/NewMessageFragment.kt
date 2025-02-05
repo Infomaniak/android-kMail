@@ -232,7 +232,6 @@ class NewMessageFragment : Fragment() {
                     isAlreadyScheduled = false,
                     lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
                     isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFree,
-                    matomoCategory = "scheduleSend",
                 ).toBundle(),
             )
         }
@@ -736,7 +735,6 @@ class NewMessageFragment : Fragment() {
                     isAlreadyScheduled = false,
                     lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
                     isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFree,
-                    matomoCategory = "scheduleSend",
                 ).toBundle(),
             )
         }
