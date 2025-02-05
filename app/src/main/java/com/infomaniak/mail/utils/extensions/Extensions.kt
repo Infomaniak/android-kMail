@@ -53,6 +53,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -114,7 +115,6 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
-import kotlinx.serialization.encodeToString
 import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
@@ -693,3 +693,5 @@ fun WebView.enableAlgorithmicDarkening(isEnabled: Boolean) {
         WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isEnabled)
     }
 }
+
+fun Data.getLongOrNull(key: String) = getLong(key, 0L).run { if (this == 0L) null else this }
