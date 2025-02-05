@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.networking.NetworkAvailability
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
@@ -54,16 +55,13 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
-import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -299,6 +297,9 @@ class MainViewModel @Inject constructor(
 
             // Refresh User
             AccountUtils.updateCurrentUser()
+
+            // Refresh My kSuite
+            launch { ApiRepository.getMyKSuiteData(HttpClient.okHttpClient).data?.let { MyKSuiteDataUtils.upsertKSuiteData(it) } }
 
             // Refresh Mailboxes
             SentryLog.d(TAG, "Refresh mailboxes from remote")
