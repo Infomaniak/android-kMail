@@ -52,6 +52,28 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
     // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
     private var lastSelectedScheduleEpoch: Long = 0L
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return BottomSheetScheduleSendBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
+
+        lastSelectedScheduleEpoch = navigationArgs.lastSelectedScheduleEpoch
+
+        computeLastScheduleItem()
+        setLastScheduleClickListener()
+        setCustomScheduleClickListener()
+
+        val timeToDisplay = TimeToDisplay.getTimeToDisplayFromDate()
+        Schedule.entries.filter { schedule -> timeToDisplay in schedule.timeToDisplay }.forEach { schedule ->
+            scheduleItems.addView(createScheduleItem(schedule))
+        }
+
+        val shouldDisplayDivider = lastScheduleItem.isVisible
+        (scheduleItems.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
+    }
+
     private fun computeLastScheduleItem() = with(binding) {
         if (Date(lastSelectedScheduleEpoch).isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)) {
             lastScheduleItem.isVisible = true
@@ -65,18 +87,8 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return BottomSheetScheduleSendBinding.inflate(inflater, container, false).also { binding = it }.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
-        super.onViewCreated(view, savedInstanceState)
-
-        lastSelectedScheduleEpoch = navigationArgs.lastSelectedScheduleEpoch
-
-        computeLastScheduleItem()
-
-        lastScheduleItem.setOnClickListener {
+    private fun setLastScheduleClickListener() {
+        binding.lastScheduleItem.setOnClickListener {
             val draftResource = navigationArgs.draftResource
             val matomoName = "lastSelectedSchedule"
 
@@ -92,8 +104,10 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
                 }
             }
         }
+    }
 
-        customScheduleItem.setOnClickListener {
+    private fun setCustomScheduleClickListener() {
+        binding.customScheduleItem.setOnClickListener {
             if (navigationArgs.isCurrentMailboxFree) {
                 safeNavigate(
                     resId = R.id.upgradeProductBottomSheetDialog,
@@ -103,24 +117,16 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
                 setBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG, true)
             }
         }
+    }
 
-        fun createScheduleItem(schedule: Schedule): ActionItemView = ActionItemView(this.context).apply {
-            setTitle(schedule.scheduleTitleRes)
-            setDescription(mostDetailedDate(context, date = schedule.date(), format = FORMAT_DATE_DAY_MONTH))
-            setIconResource(schedule.scheduleIconRes)
-            setOnClickListener {
-                trackScheduleSendEvent(schedule.matomoValue)
-                setBackNavigationResult(SCHEDULE_SEND_RESULT, schedule.date().time)
-            }
+    private fun createScheduleItem(schedule: Schedule): ActionItemView = ActionItemView(requireContext()).apply {
+        setTitle(schedule.scheduleTitleRes)
+        setDescription(mostDetailedDate(context, date = schedule.date(), format = FORMAT_DATE_DAY_MONTH))
+        setIconResource(schedule.scheduleIconRes)
+        setOnClickListener {
+            trackScheduleSendEvent(schedule.matomoValue)
+            setBackNavigationResult(SCHEDULE_SEND_RESULT, schedule.date().time)
         }
-
-        val timeToDisplay = TimeToDisplay.getTimeToDisplayFromDate()
-        Schedule.entries.filter { schedule -> timeToDisplay in schedule.timeToDisplay }.forEach { schedule ->
-            scheduleItems.addView(createScheduleItem(schedule))
-        }
-
-        val shouldDisplayDivider = lastScheduleItem.isVisible
-        (scheduleItems.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
     }
 
     companion object {
