@@ -424,7 +424,6 @@
     <string name="reviewAlertTitle">Do you like Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Save to device</string>
     <string name="saveToDriveItem">Save to kDrive</string>
-    <string name="scheduleCancelled">Schedule cancelled.</string>
     <string name="scheduleSendingTitle">Schedule sending</string>
     <string name="scheduledEmailHeader">This email will be sent on this date: %s</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>

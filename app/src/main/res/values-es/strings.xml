@@ -159,7 +159,7 @@
     <string name="buttonReschedule">Reprogramar</string>
     <string name="buttonRestoreEmails">Restaurar correos electrónicos</string>
     <string name="buttonSchedule">Programar un correo electrónico para enviarlo más tarde</string>
-    <string name="buttonScheduleTitle">Cronograma</string>
+    <string name="buttonScheduleTitle">Programar</string>
     <string name="buttonSee">Véase</string>
     <string name="buttonSelectAll">Todos</string>
     <string name="buttonShare">Compartir</string>
@@ -347,7 +347,7 @@
     <string name="messageIsDraftOption">Borrador</string>
     <string name="messageReplyHeader">El %1$s, %2$s escribió:</string>
     <string name="messageShowQuotedText">Mostrar la conversación</string>
-    <string name="mondayAfternoon">lunes por la tarde</string>
+    <string name="mondayAfternoon">Lunes por la tarde</string>
     <string name="mondayMorning">Lunes mañana</string>
     <string name="moreStorageText1">Tu buzón está lleno y no puedes recibir más mensajes 🥲</string>
     <string name="moreStorageText2">Pronto podrás desbloquear los límites de tu dirección de correo electrónico ik.me (límite de almacenamiento, envío, reenvío, …)</string>
@@ -419,7 +419,6 @@
     <string name="reviewAlertTitle">¿Te gusta Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Guardar en el dispositivo</string>
     <string name="saveToDriveItem">Guardar en kDrive</string>
-    <string name="scheduleCancelled">Horario cancelado.</string>
     <string name="scheduleSendingTitle">Programar envío</string>
     <string name="scheduledEmailHeader">Este correo electrónico se enviará en esta fecha: %s</string>
     <string name="scheduledMessagesFolder">Mensajes programados</string>

@@ -427,7 +427,6 @@
     <string name="reviewAlertTitle">Aimez-vous Infomaniak Mail ?</string>
     <string name="saveToDriveDeviceItem">Enregistrer sur l’appareil</string>
     <string name="saveToDriveItem">Enregistrer dans kDrive</string>
-    <string name="scheduleCancelled">Programmation annulée.</string>
     <string name="scheduleSendingTitle">Programmer l’envoi</string>
     <string name="scheduledEmailHeader">Cet e-mail sera envoyé à cette date : %s</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>
