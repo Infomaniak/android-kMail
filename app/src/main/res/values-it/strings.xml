@@ -159,7 +159,7 @@
     <string name="buttonReschedule">Riprogrammare</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
     <string name="buttonSchedule">Programmare l’invio di un’e-mail in un secondo momento</string>
-    <string name="buttonScheduleTitle">Programma</string>
+    <string name="buttonScheduleTitle">Pianifica</string>
     <string name="buttonSee">Vedi</string>
     <string name="buttonSelectAll">Tutti</string>
     <string name="buttonShare">Condividi</string>
@@ -418,7 +418,6 @@
     <string name="reviewAlertTitle">Ti piace la posta di Infomaniak?</string>
     <string name="saveToDriveDeviceItem">Salva sul dispositivo</string>
     <string name="saveToDriveItem">Salva in kDrive</string>
-    <string name="scheduleCancelled">Programma annullato.</string>
     <string name="scheduleSendingTitle">Pianifica l’invio</string>
     <string name="scheduledEmailHeader">Questa email verrà inviata in questa data: %s</string>
     <string name="scheduledMessagesFolder">Messaggi programmati</string>
