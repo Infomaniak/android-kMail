@@ -27,9 +27,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
+import com.infomaniak.core.myksuite.ui.screens.components.KSuiteProductsWithQuotas
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
+import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showToast
@@ -99,14 +101,13 @@ class SettingsFragment : Fragment() {
         settingsViewModel.getMyKSuiteMailbox(myKSuiteData.mail.mailboxId)
 
         myKSuiteSubscription.setOnClickListener {
-            AccountUtils.currentUser?.let { user ->
-                val args = MyKSuiteDashboardFragmentArgs(
-                    userName = user.displayName ?: "",
-                    avatarUri = user.avatar ?: "",
-                    dailySendLimit = "500",
-                )
-                animatedNavigation(resId = RMyKSuite.id.myKSuiteDashboardFragment, args = args.toBundle())
-            }
+            val args = MyKSuiteDashboardFragmentArgs(
+                email = myKSuiteData.mail.email,
+                avatarUri = AccountUtils.currentUser?.avatar ?: "",
+                dailySendLimit = myKSuiteData.mail.dailyLimitSent.toString(),
+                kSuiteAppsWithQuotas = getKSuiteQuotasApp(myKSuiteData),
+            )
+            animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
         }
     }
 
@@ -125,6 +126,31 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun getKSuiteQuotasApp(myKSuite: MyKSuiteData): Array<KSuiteProductsWithQuotas> {
+        val mailProduct = if (myKSuite.isMyKSuitePlus) {
+            // TODO: Management for My kSuite Plus (and pack check name like in kDrive)
+            null
+        } else {
+            with(myKSuite.mail) {
+                KSuiteProductsWithQuotas.Mail(
+                    usedSize = { requireContext().formatShortFileSize(usedSize) },
+                    maxSize = { requireContext().formatShortFileSize(storageSizeLimit) },
+                    progress = { (usedSize.toDouble() / storageSizeLimit.toDouble()).toFloat() }
+                )
+            }
+        }
+
+        val driveProduct = with(myKSuite.drive) {
+            KSuiteProductsWithQuotas.Drive(
+                usedSize = { requireContext().formatShortFileSize(usedSize) },
+                maxSize = { requireContext().formatShortFileSize(size) },
+                progress = { (usedSize.toDouble() / size.toDouble()).toFloat() }
+            )
+        }
+
+        return if (mailProduct == null) arrayOf(driveProduct) else arrayOf(mailProduct, driveProduct)
     }
 
     override fun onResume() {
