@@ -111,6 +111,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             val workRequest = OneTimeWorkRequestBuilder<ProcessMessageNotificationsWorker>()
                 .addTag(TAG)
                 .setInputData(workData)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .build()
 
