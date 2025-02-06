@@ -644,11 +644,11 @@ class ThreadAdapter(
             setOnClickListener { threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message) }
         }
         replyButton.apply {
-            isVisible = isExpanded
+            isVisible = isExpanded && message.isScheduledDraft.not()
             setOnClickListener { threadAdapterCallbacks?.onReplyClicked?.invoke(message) }
         }
         menuButton.apply {
-            isVisible = isExpanded
+            isVisible = isExpanded && message.isScheduledDraft.not()
             setOnClickListener { threadAdapterCallbacks?.onMenuClicked?.invoke(message) }
         }
 
