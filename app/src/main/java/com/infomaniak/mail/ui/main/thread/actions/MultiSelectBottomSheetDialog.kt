@@ -63,8 +63,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         // This `.toSet()` is used to make an immutable local copy of `selectedThreads`.
         val threads = selectedThreads.toSet()
-        val selectedThreadsUids = threads.map { it.uid }
-        val selectedThreadsCount = selectedThreadsUids.count()
+        val threadsUids = threads.map { it.uid }
+        val threadsCount = threadsUids.count()
         val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
 
         setStateDependentUi(shouldRead, shouldFavorite)
@@ -72,29 +72,29 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             when (id) {
                 R.id.actionMove -> {
-                    trackMultiSelectActionEvent(ACTION_MOVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
+                    trackMultiSelectActionEvent(ACTION_MOVE_NAME, threadsCount, isFromBottomSheet = true)
                     animatedNavigation(
                         directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
-                            threadsUids = selectedThreadsUids.toTypedArray(),
+                            threadsUids = threadsUids.toTypedArray(),
                         ),
                         currentClassName = currentClassName,
                     )
                 }
                 R.id.actionReadUnread -> {
-                    trackMultiSelectActionEvent(ACTION_MARK_AS_SEEN_NAME, selectedThreadsCount, isFromBottomSheet = true)
-                    toggleThreadsSeenStatus(selectedThreadsUids, shouldRead)
+                    trackMultiSelectActionEvent(ACTION_MARK_AS_SEEN_NAME, threadsCount, isFromBottomSheet = true)
+                    toggleThreadsSeenStatus(threadsUids, shouldRead)
                 }
                 R.id.actionArchive -> {
-                    trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-                    archiveThreads(selectedThreadsUids)
+                    trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, threadsCount, isFromBottomSheet = true)
+                    archiveThreads(threadsUids)
                 }
                 R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(
                         folderRole = getActionFolderRole(threads.firstOrNull()),
-                        count = selectedThreadsCount,
+                        count = threadsCount,
                     ) {
-                        trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-                        deleteThreads(selectedThreadsUids)
+                        trackMultiSelectActionEvent(ACTION_DELETE_NAME, threadsCount, isFromBottomSheet = true)
+                        deleteThreads(threadsUids)
                     }
                 }
             }
@@ -108,14 +108,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         // }
 
         binding.spam.setClosingOnClickListener(shouldCloseMultiSelection = true) {
-            trackMultiSelectActionEvent(ACTION_SPAM_NAME, selectedThreadsCount, isFromBottomSheet = true)
-            toggleThreadsSpamStatus(selectedThreadsUids)
+            trackMultiSelectActionEvent(ACTION_SPAM_NAME, threadsCount, isFromBottomSheet = true)
+            toggleThreadsSpamStatus(threadsUids)
             isMultiSelectOn = false
         }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
-            trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, selectedThreadsCount, isFromBottomSheet = true)
-            toggleThreadsFavoriteStatus(selectedThreadsUids, shouldFavorite)
+            trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, threadsCount, isFromBottomSheet = true)
+            toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
             isMultiSelectOn = false
         }
     }
