@@ -34,10 +34,12 @@ import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -70,7 +72,7 @@ class Folder : RealmObject, Cloneable {
     @Transient
     var unreadCountLocal: Int = 0
     @Transient
-    var threads = realmListOf<Thread>()
+    var threads = realmSetOf<Thread>()
 
     /**
      * List of old Messages UIDs of this Folder that we need to fetch.
@@ -119,7 +121,7 @@ class Folder : RealmObject, Cloneable {
         lastUpdatedAt: RealmInstant?,
         cursor: String?,
         unreadCount: Int,
-        threads: RealmList<Thread>,
+        threads: RealmSet<Thread>,
         oldMessagesUidsToFetch: RealmList<Int>,
         newMessagesUidsToFetch: RealmList<Int>,
         remainingOldMessagesToFetch: Int,
