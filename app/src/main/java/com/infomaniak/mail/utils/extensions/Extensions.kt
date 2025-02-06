@@ -347,7 +347,7 @@ private tailrec fun formatFolderWithAllChildren(
     /*
     * There are two types of folders:
     * - user's folders (with or without a role)
-    * - hidden IK folders (scheduled drafts, snoozed, etc…)
+    * - hidden IK folders (ScheduledDrafts, Snoozed, etc…)
     *
     * We want to display the user's folders, and also the IK folders for which we handle the role.
     * IK folders where we don't handle the role are dismissed.
