@@ -24,13 +24,12 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
@@ -73,6 +72,14 @@ class SettingsFragment : Fragment() {
         setupMailboxesAdapter()
         setupListeners()
         setSubtitlesInitialState()
+        setupMyKSuite()
+
+        observeFeatureFlag()
+    }
+
+    private fun setupMyKSuite() {
+        binding.myKSuitelayout.isVisible = mainViewModel.currentMailbox.value?.isFree == true
+
         binding.myKSuiteSubscription.setOnClickListener {
             AccountUtils.currentUser?.let { user ->
                 val args = MyKSuiteDashboardFragmentArgs(
@@ -80,10 +87,9 @@ class SettingsFragment : Fragment() {
                     avatarUri = user.avatar ?: "",
                     dailySendLimit = "500",
                 )
-                safeNavigate(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
+                animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
             }
         }
-        observeFeatureFlag()
     }
 
     override fun onResume() {
