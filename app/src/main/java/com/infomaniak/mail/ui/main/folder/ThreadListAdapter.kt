@@ -106,6 +106,8 @@ class ThreadListAdapter @Inject constructor(
         private set
     //endregion
 
+    private val isMultiselectDisabledInThisFolder: Boolean get() = folderRole == FolderRole.SCHEDULED_DRAFTS
+
     init {
         setHasStableIds(true)
     }
@@ -243,7 +245,7 @@ class ThreadListAdapter @Inject constructor(
             iconFavorite.isVisible = isFavorite
 
             val messagesCount = messages.count()
-            threadCountText.text = messagesCount.toString()
+            threadCountText.text = "$messagesCount"
             threadCountCard.isVisible = messagesCount > 1
 
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
@@ -253,13 +255,15 @@ class ThreadListAdapter @Inject constructor(
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
-                onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
+                onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.LONG_PRESS)
                 true
             }
             expeditorAvatar.apply {
-                setOnClickListener { onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.CLICK) }
+                setOnClickListener {
+                    onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.CLICK)
+                }
                 setOnLongClickListener {
-                    onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
+                    onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.LONG_PRESS)
                     true
                 }
             }
@@ -311,9 +315,15 @@ class ThreadListAdapter @Inject constructor(
 
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
         thread: Thread,
+        position: Int,
         listener: MultiSelectionListener<Thread>,
         action: TrackerAction,
     ) {
+        if (isMultiselectDisabledInThisFolder) {
+            onThreadClicked(thread, position)
+            return
+        }
+
         val hasOpened = openMultiSelectionIfClosed(listener, action)
         toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !hasOpened)
     }
