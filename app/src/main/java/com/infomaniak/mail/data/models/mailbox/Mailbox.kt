@@ -54,6 +54,8 @@ class Mailbox : RealmObject {
     var linkId: Int = 0
     @SerialName("is_limited")
     var isLimited: Boolean = false
+    @SerialName("is_free")
+    var isFree: Boolean = true
     @SerialName("is_primary")
     var isPrimary: Boolean = false
     @SerialName("is_valid")
