@@ -137,7 +137,6 @@ class NewMessageViewModel @Inject constructor(
     var isExternalBannerManuallyClosed = false
     var draftAction = DraftAction.SAVE
     var signaturesCount = 0
-    var scheduledDraftDate: Date? = null
     private var isNewMessage = false
 
     private var snapshot: DraftSnapshot? = null
@@ -859,12 +858,9 @@ class NewMessageViewModel @Inject constructor(
 
     fun setScheduleDate(date: Date?) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
-
-        scheduledDraftDate = date
-
         mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)?.also { draft ->
-                draft.scheduleDate = scheduledDraftDate?.format(FORMAT_SCHEDULE_MAIL)
+                draft.scheduleDate = date?.format(FORMAT_SCHEDULE_MAIL)
             }
         }
     }

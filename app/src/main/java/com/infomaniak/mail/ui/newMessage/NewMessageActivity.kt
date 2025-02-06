@@ -135,10 +135,7 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun startWorker() {
-        draftsActionsWorkerScheduler.scheduleWork(
-            draftLocalUuid = newMessageViewModel.draftLocalUuid(),
-            scheduleDate = newMessageViewModel.scheduledDraftDate,
-        )
+        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
     data class DraftSaveConfiguration(

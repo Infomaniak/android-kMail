@@ -756,12 +756,12 @@ class ThreadFragment : Fragment() {
             title = getString(R.string.editSendTitle),
             description = getString(R.string.editSendDescription),
             onPositiveButtonClicked = {
-                val scheduleAction = message.scheduleAction
+                val unscheduleDraftUrl = message.unscheduleDraftUrl
                 val draftResource = message.draftResource
 
-                if (scheduleAction != null && draftResource != null) {
+                if (unscheduleDraftUrl != null && draftResource != null) {
                     mainViewModel.modifyScheduledDraft(
-                        scheduleAction = scheduleAction,
+                        unscheduleDraftUrl = unscheduleDraftUrl,
                         onSuccess = {
                             trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
                             twoPaneViewModel.navigateToNewMessage(

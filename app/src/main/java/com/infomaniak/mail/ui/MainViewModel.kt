@@ -621,11 +621,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun modifyScheduledDraft(
-        scheduleAction: String,
+        unscheduleDraftUrl: String,
         onSuccess: () -> Unit,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.unscheduleDraft(scheduleAction)
+        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
 
         if (apiResponse.isSuccess()) {
             val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
@@ -636,9 +636,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun unscheduleDraft(scheduleAction: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun unscheduleDraft(unscheduleDraftUrl: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value!!
-        val apiResponse = ApiRepository.unscheduleDraft(scheduleAction)
+        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
 
         if (apiResponse.isSuccess()) {
             val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
