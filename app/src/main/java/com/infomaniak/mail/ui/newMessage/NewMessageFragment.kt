@@ -228,24 +228,25 @@ class NewMessageFragment : Fragment() {
             )
         }
 
+        fun scheduleDraft(timestamp: Long) {
+            newMessageViewModel.setScheduleDate(Date(timestamp))
+            tryToSendEmail(scheduled = true)
+        }
+
         getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 title = getString(R.string.datePickerTitle),
                 onPositiveButtonClicked = {
                     val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
                     localSettings.lastSelectedScheduleEpoch = scheduleDate
-                    newMessageViewModel.setScheduleDate(Date(scheduleDate))
-                    tryToSendEmail(scheduled = true)
+                    scheduleDraft(scheduleDate)
                 },
                 onNegativeButtonClicked = ::navigateBackToBottomSheet,
                 onCancel = ::navigateBackToBottomSheet,
             )
         }
 
-        getBackNavigationResult(SCHEDULE_DRAFT_RESULT) { selectedScheduleEpoch: Long ->
-            newMessageViewModel.setScheduleDate(Date(selectedScheduleEpoch))
-            tryToSendEmail(scheduled = true)
-        }
+        getBackNavigationResult(SCHEDULE_DRAFT_RESULT, ::scheduleDraft)
 
         getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
@@ -699,7 +700,7 @@ class NewMessageFragment : Fragment() {
     private fun observeScheduledDraftsFeatureFlagUpdates() {
         newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
             val isScheduledDraftsEnabled = mailbox.featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
-            binding.scheduleSendButton.isVisible = isScheduledDraftsEnabled
+            binding.scheduleButton.isVisible = isScheduledDraftsEnabled
         }
     }
 
@@ -727,11 +728,11 @@ class NewMessageFragment : Fragment() {
 
     private fun setupSendButtons() = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
-            scheduleSendButton.isEnabled = it
+            scheduleButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
-        scheduleSendButton.setOnClickListener {
+        scheduleButton.setOnClickListener {
             safeNavigate(
                 resId = R.id.scheduleSendBottomSheetDialog,
                 args = ScheduleSendBottomSheetDialogArgs(
@@ -773,8 +774,6 @@ class NewMessageFragment : Fragment() {
                     sendEmail()
                 },
                 onNegativeButtonClicked = { if (scheduled) newMessageViewModel.resetScheduledDate() },
-                // TODO: The `onDismiss` triggers everytime the Dialog is closed, even when it's not actually dismissed by the user
-                // onDismiss = { if (scheduled) newMessageViewModel.resetScheduledDate() },
             )
         } else {
             sendEmail()
