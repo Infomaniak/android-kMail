@@ -61,9 +61,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(mainViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
-        val selectedThreadsUids = selectedThreads.map { it.uid }
+        // This `.toSet()` is used to make an immutable local copy of `selectedThreads`.
+        val threads = selectedThreads.toSet()
+        val selectedThreadsUids = threads.map { it.uid }
         val selectedThreadsCount = selectedThreadsUids.count()
-        val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(selectedThreads)
+        val (shouldRead, shouldFavorite) = ThreadListMultiSelection.computeReadFavoriteStatus(threads)
 
         setStateDependentUi(shouldRead, shouldFavorite)
 
@@ -88,7 +90,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
                 R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
+                        folderRole = getActionFolderRole(threads.firstOrNull()),
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount, isFromBottomSheet = true)
