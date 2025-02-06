@@ -25,6 +25,7 @@ import android.view.MenuInflater
 import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
+import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.get
@@ -37,7 +38,7 @@ import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
 
 class BottomQuickActionBarView @JvmOverloads constructor(
     context: Context,
-    attrs: AttributeSet? = null,
+    val attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
@@ -47,8 +48,16 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     private val menu: Menu by lazy { ActionMenuView(context).menu }
 
     init {
+        init()
+    }
+
+    fun init(@MenuRes menuRes: Int? = null) {
         attrs?.getAttributes(context, R.styleable.BottomQuickActionBarView) {
-            MenuInflater(context).inflate(getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu), menu)
+
+            val menuResId = menuRes
+                ?: runCatching { getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu) }.getOrNull()
+                ?: return@getAttributes
+            MenuInflater(context).inflate(menuResId, menu)
 
             buttons.forEachIndexed { index, button ->
                 if (index >= menu.size) {

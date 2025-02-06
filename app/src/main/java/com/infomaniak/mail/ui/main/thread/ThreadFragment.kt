@@ -412,7 +412,7 @@ class ThreadFragment : Fragment() {
         mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
     }
 
-    private fun observeThreadLive() {
+    private fun observeThreadLive() = with(binding) {
 
         threadViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
 
@@ -421,7 +421,7 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            binding.iconFavorite.apply {
+            iconFavorite.apply {
                 setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
                 val color = if (thread.isFavorite) {
                     context.getColor(R.color.favoriteYellow)
@@ -431,7 +431,8 @@ class ThreadFragment : Fragment() {
                 iconTint = ColorStateList.valueOf(color)
             }
 
-            binding.quickActionBar.isVisible = thread.numberOfScheduledDrafts != thread.messages.size
+            val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == thread.messages.size
+            quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
         }
     }
 
