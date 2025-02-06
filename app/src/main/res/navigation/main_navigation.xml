@@ -696,7 +696,7 @@
         android:name="com.infomaniak.mail.ui.main.settings.KSuiteDashboardFragment"
         android:label="MyKSuiteDashboardFragment">
         <argument
-            android:name="userName"
+            android:name="email"
             app:argType="string" />
         <argument
             android:name="avatarUri"
@@ -704,5 +704,8 @@
         <argument
             android:name="dailySendLimit"
             app:argType="string" />
+        <argument
+            android:name="kSuiteAppsWithQuotas"
+            app:argType="com.infomaniak.core.myksuite.ui.screens.components.KSuiteProductsWithQuotas[]" />
     </fragment>
 </navigation>

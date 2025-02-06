@@ -18,14 +18,31 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
+import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import com.infomaniak.core.myksuite.R as RMyKSuite
 
 class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
+
+    private var kSuiteData: MyKSuiteData? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (kSuiteData == null) MyKSuiteDataUtils.requestKSuiteData(MyKSuiteDataUtils.myKSuiteId)
+            Log.e("TOTO", "onCreate: $kSuiteData")
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         setSystemBarsColors(statusBarColor = RMyKSuite.color.dashboardBackground)
