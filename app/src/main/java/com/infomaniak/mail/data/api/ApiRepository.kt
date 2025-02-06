@@ -246,8 +246,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.draft(mailboxUuid, remoteDraftUuid), DELETE)
     }
 
-    fun unscheduleDraft(scheduleAction: String): ApiResponse<Unit> {
-        return callApi(ApiRoutes.resource(scheduleAction), DELETE)
+    fun unscheduleDraft(unscheduleDraftUrl: String): ApiResponse<Unit> {
+        return callApi(ApiRoutes.resource(unscheduleDraftUrl), DELETE)
     }
 
     fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {

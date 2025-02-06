@@ -71,7 +71,6 @@ import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
-import com.infomaniak.mail.utils.extensions.getLongOrNull
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,8 +78,10 @@ import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
@@ -289,10 +290,13 @@ class MainActivity : BaseActivity() {
                     showSentDraftSnackbar()
                 }
                 DraftAction.SCHEDULE -> {
-                    val scheduleDate = getLongOrNull(DraftsActionsWorker.SCHEDULE_DATE_KEY)
-                    val scheduleAction = getString(DraftsActionsWorker.SCHEDULE_ACTION_KEY)
-                    if (scheduleDate != null && scheduleAction != null) {
-                        showScheduledDraftSnackbar(scheduleDate = Date(scheduleDate), scheduleAction = scheduleAction)
+                    val scheduleDate = getString(DraftsActionsWorker.SCHEDULED_DRAFT_DATE_KEY)
+                    val unscheduleDraftUrl = getString(DraftsActionsWorker.UNSCHEDULE_DRAFT_URL_KEY)
+                    if (scheduleDate != null && unscheduleDraftUrl != null) {
+                        showScheduledDraftSnackbar(
+                            scheduleDate = SimpleDateFormat(FORMAT_SCHEDULE_MAIL, Locale.getDefault()).parse(scheduleDate)!!,
+                            unscheduleDraftUrl = unscheduleDraftUrl,
+                        )
                     }
                 }
             }
@@ -326,7 +330,7 @@ class MainActivity : BaseActivity() {
     }
 
     // Still display the Snackbar even if it took three times 10 seconds of timeout to succeed
-    private fun showScheduledDraftSnackbar(scheduleDate: Date, scheduleAction: String) {
+    private fun showScheduledDraftSnackbar(scheduleDate: Date, unscheduleDraftUrl: String) {
         showSendingSnackbarTimer.cancel()
 
         val dateString = mostDetailedDate(
@@ -338,7 +342,7 @@ class MainActivity : BaseActivity() {
         snackbarManager.setValue(
             title = String.format(getString(R.string.snackbarScheduleSaved), dateString),
             buttonTitle = RCore.string.buttonCancel,
-            customBehavior = { mainViewModel.unscheduleDraft(scheduleAction) },
+            customBehavior = { mainViewModel.unscheduleDraft(unscheduleDraftUrl) },
         )
     }
 

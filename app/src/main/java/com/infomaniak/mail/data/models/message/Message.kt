@@ -105,7 +105,7 @@ class Message : RealmObject {
     var hasUnsubscribeLink: Boolean? = null
     var bimi: Bimi? = null
     @SerialName("schedule_action")
-    var scheduleAction: String? = null
+    var unscheduleDraftUrl: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.

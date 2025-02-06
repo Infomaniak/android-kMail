@@ -24,5 +24,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ScheduleDraftResult(
     @SerialName("schedule_action")
-    val scheduleAction: String,
+    val unscheduleDraftUrl: String,
 )
