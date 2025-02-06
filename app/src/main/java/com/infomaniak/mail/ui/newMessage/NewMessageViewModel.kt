@@ -137,8 +137,8 @@ class NewMessageViewModel @Inject constructor(
     var isExternalBannerManuallyClosed = false
     var draftAction = DraftAction.SAVE
     var signaturesCount = 0
+    var scheduledDraftDate: Date? = null
     private var isNewMessage = false
-    var scheduleDate: Date? = null
 
     private var snapshot: DraftSnapshot? = null
 
@@ -154,7 +154,6 @@ class NewMessageViewModel @Inject constructor(
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<InitResult>()
-    val scheduleMessageTrigger = SingleLiveEvent<Unit>()
 
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
@@ -196,7 +195,6 @@ class NewMessageViewModel @Inject constructor(
     fun draftLocalUuid() = draftLocalUuid
     fun draftMode() = draftMode
     fun shouldLoadDistantResources() = shouldLoadDistantResources
-    fun triggerScheduleMessage() = scheduleMessageTrigger.postValue(Unit)
 
     fun initDraftAndViewModel(intent: Intent): LiveData<Draft?> = liveData(ioCoroutineContext) {
 
@@ -859,21 +857,21 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
-    fun setScheduleDate(scheduleDate: Date) = viewModelScope.launch(ioDispatcher) {
+    fun setScheduleDate(date: Date) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
-        this@NewMessageViewModel.scheduleDate = scheduleDate
+        scheduledDraftDate = date
         draftAction = DraftAction.SCHEDULE
 
         mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)?.also { draft ->
-                draft.scheduleDate = this@NewMessageViewModel.scheduleDate?.format(FORMAT_SCHEDULE_MAIL)
+                draft.scheduleDate = scheduledDraftDate?.format(FORMAT_SCHEDULE_MAIL)
             }
         }
     }
 
     fun resetScheduledDate() = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
-        scheduleDate = null
+        scheduledDraftDate = null
         draftAction = DraftAction.SAVE
 
         mailboxContentRealm().write {

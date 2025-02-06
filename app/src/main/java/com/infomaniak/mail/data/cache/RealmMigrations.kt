@@ -78,13 +78,23 @@ private fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
 
 // Migrate from version #19
 private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
+
     if (oldRealm.schemaVersion() <= 19L) {
+
         enumerate(className = "Folder") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Add property with default value
                 set(propertyName = "isDisplayed", value = true)
             }
         }
+
+        enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Rename property without losing its previous value
+                set(propertyName = "isScheduledMessage", value = oldObject.getValue<Boolean>(fieldName = "isScheduled"))
+            }
+        }
+
     }
 }
 //endregion

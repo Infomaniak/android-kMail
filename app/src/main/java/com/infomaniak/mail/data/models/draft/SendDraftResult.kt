@@ -23,5 +23,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SendDraftResult(
     @SerialName("etop")
-    val etopScheduledDate: String,
+    val scheduledMessageEtop: String,
 )

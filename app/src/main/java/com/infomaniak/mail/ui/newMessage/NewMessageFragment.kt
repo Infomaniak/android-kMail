@@ -65,7 +65,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_DATE_AND_TIME_SCHEDULE_DIALOG
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_SEND_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
@@ -242,7 +242,7 @@ class NewMessageFragment : Fragment() {
             )
         }
 
-        getBackNavigationResult(SCHEDULE_SEND_RESULT) { selectedScheduleEpoch: Long ->
+        getBackNavigationResult(SCHEDULE_DRAFT_RESULT) { selectedScheduleEpoch: Long ->
             newMessageViewModel.setScheduleDate(Date(selectedScheduleEpoch))
             tryToSendEmail(scheduled = true)
         }
@@ -698,7 +698,7 @@ class NewMessageFragment : Fragment() {
 
     private fun observeScheduledDraftsFeatureFlagUpdates() {
         newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
-            val isScheduledDraftsEnabled = mailbox.featureFlags.contains(FeatureFlag.SCHEDULE_SEND_DRAFT)
+            val isScheduledDraftsEnabled = mailbox.featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
             binding.scheduleSendButton.isVisible = isScheduledDraftsEnabled
         }
     }

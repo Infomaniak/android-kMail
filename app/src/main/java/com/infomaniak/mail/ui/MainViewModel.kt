@@ -1208,13 +1208,13 @@ class MainViewModel @Inject constructor(
         selectedThreadsLiveData.value = selectedThreads
     }
 
-    fun refreshDraftFolderWhenDraftArrives(etopScheduledDate: Long) = viewModelScope.launch(ioCoroutineContext) {
+    fun refreshDraftFolderWhenDraftArrives(scheduledMessageEtop: Long) = viewModelScope.launch(ioCoroutineContext) {
         val folder = folderController.getFolder(FolderRole.DRAFT)
 
         if (folder?.cursor != null) {
 
             val timeNow = Date().time
-            val delay = REFRESH_DELAY + max(etopScheduledDate - timeNow, 0L)
+            val delay = REFRESH_DELAY + max(scheduledMessageEtop - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
             refreshController.refreshThreads(

@@ -44,7 +44,7 @@ data class ActivitiesResult(
         @SerialName("forwarded")
         val isForwarded: Boolean,
         @SerialName("scheduled")
-        val isScheduled: Boolean,
+        val isScheduledMessage: Boolean,
         @SerialName("seen")
         val isSeen: Boolean,
     )

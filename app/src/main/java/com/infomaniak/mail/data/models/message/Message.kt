@@ -98,7 +98,7 @@ class Message : RealmObject {
     // Boolean used to know if this Message is currently being sent, but can
     // still be cancelled during 10~30 sec, depending on user configuration
     @SerialName("scheduled")
-    var isScheduled: Boolean = false
+    var isScheduledMessage: Boolean = false
     var preview: String = ""
     var size: Int = 0
     @SerialName("has_unsubscribe_link")
@@ -325,7 +325,7 @@ class Message : RealmObject {
         isFavorite = flags.isFavorite
         isAnswered = flags.isAnswered
         isForwarded = flags.isForwarded
-        isScheduled = flags.isScheduled
+        isScheduledMessage = flags.isScheduledMessage
     }
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)

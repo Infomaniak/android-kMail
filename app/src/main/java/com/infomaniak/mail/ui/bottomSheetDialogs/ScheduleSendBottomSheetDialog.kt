@@ -96,12 +96,12 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
             if (navigationArgs.isAlreadyScheduled) {
                 if (draftResource != null && lastSelectedScheduleEpoch != 0L) {
                     trackScheduleSendEvent(matomoName)
-                    setBackNavigationResult(SCHEDULE_SEND_RESULT, lastSelectedScheduleEpoch)
+                    setBackNavigationResult(SCHEDULE_DRAFT_RESULT, lastSelectedScheduleEpoch)
                 }
             } else {
                 if (lastSelectedScheduleEpoch != 0L) {
                     trackScheduleSendEvent(matomoName)
-                    setBackNavigationResult(SCHEDULE_SEND_RESULT, lastSelectedScheduleEpoch)
+                    setBackNavigationResult(SCHEDULE_DRAFT_RESULT, lastSelectedScheduleEpoch)
                 }
             }
         }
@@ -126,12 +126,12 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDi
         setIconResource(schedule.scheduleIconRes)
         setOnClickListener {
             trackScheduleSendEvent(schedule.matomoValue)
-            setBackNavigationResult(SCHEDULE_SEND_RESULT, schedule.date().time)
+            setBackNavigationResult(SCHEDULE_DRAFT_RESULT, schedule.date().time)
         }
     }
 
     companion object {
-        const val SCHEDULE_SEND_RESULT = "schedule_send_result"
+        const val SCHEDULE_DRAFT_RESULT = "schedule_draft_result"
         const val OPEN_DATE_AND_TIME_SCHEDULE_DIALOG = "open_date_and_time_schedule_dialog"
     }
 }

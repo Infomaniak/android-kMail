@@ -85,11 +85,11 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
     fun getMovableMessages(thread: Thread): List<Message> {
         val byFolderId = "${Message::folderId.name} == '${thread.folderId}'"
-        return getMessagesAndDuplicates(thread, "$byFolderId AND $isNotScheduled")
+        return getMessagesAndDuplicates(thread, "$byFolderId AND $isNotScheduledMessage")
     }
 
     fun getUnscheduledMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread, isNotScheduled)
+        return getMessagesAndDuplicates(thread, isNotScheduledMessage)
     }
 
     private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {
@@ -152,7 +152,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
     companion object {
         private val isNotDraft = "${Message::isDraft.name} == false"
-        private val isNotScheduled = "${Message::isScheduled.name} == false"
+        private val isNotScheduledMessage = "${Message::isScheduledMessage.name} == false"
 
         //region Queries
         private fun getMessagesQuery(messageUid: String, realm: TypedRealm): RealmQuery<Message> {
