@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.networking.NetworkAvailability
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -29,7 +28,6 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -75,7 +73,6 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import okhttp3.Request
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -929,19 +926,9 @@ class MainViewModel @Inject constructor(
     fun reportDisplayProblem(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
 
         val message = messageController.getMessage(messageUid) ?: return@launch
-
         val mailbox = currentMailbox.value ?: return@launch
 
-        val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return@launch
-        val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
-            .set("Authorization", "Bearer $userApiToken")
-            .build()
-        val request = Request.Builder().url(ApiRoutes.downloadMessage(mailbox.uuid, message.folderId, message.shortUid))
-            .headers(headers)
-            .get()
-            .build()
-
-        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
+        val response = ApiRepository.getDownloadedMessage(mailbox.uuid, message.folderId, message.shortUid)
 
         if (!response.isSuccessful || response.body == null) {
             reportDisplayProblemTrigger.postValue(Unit)
@@ -1101,7 +1088,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun hasOtherExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
-        val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } ?: false
+        val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } == true
         emit(hasOtherExpeditors)
     }
 

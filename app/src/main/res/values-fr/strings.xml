@@ -237,6 +237,11 @@
     <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
     <string name="displayMailIssueDescription">Pour corriger les problèmes d’affichage, veuillez mettre à jour l’application Android System Webview.</string>
     <string name="displayMailIssueTitle">Problème d’affichage de vos e-mails</string>
+    <plurals name="downloadingEmailsTitle">
+        <item quantity="one">Téléchargement de %d e-mails</item>
+        <item quantity="other">Téléchargement de %d e-mails</item>
+        <item quantity="many">Téléchargement de %d d’e-mails</item>
+    </plurals>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
     <string name="emailWithoutSubjectDescription">Vous êtes sur le point d’envoyer un message sans objet. Voulez-vous continuer ?</string>
