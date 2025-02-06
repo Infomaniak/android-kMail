@@ -857,10 +857,10 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
-    fun setScheduleDate(date: Date) = viewModelScope.launch(ioDispatcher) {
+    fun setScheduleDate(date: Date?) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
+
         scheduledDraftDate = date
-        draftAction = DraftAction.SCHEDULE
 
         mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)?.also { draft ->
@@ -869,17 +869,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    fun resetScheduledDate() = viewModelScope.launch(ioDispatcher) {
-        val localUuid = draftLocalUuid ?: return@launch
-        scheduledDraftDate = null
-        draftAction = DraftAction.SAVE
-
-        mailboxContentRealm().write {
-            DraftController.getDraft(localUuid, realm = this)?.also { draft ->
-                draft.scheduleDate = null
-            }
-        }
-    }
+    fun resetScheduledDate() = setScheduleDate(date = null)
 
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {

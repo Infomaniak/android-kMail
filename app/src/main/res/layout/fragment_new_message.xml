@@ -675,7 +675,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/scheduleSendButton"
+                        android:id="@+id/scheduleButton"
                         style="@style/IconButton"
                         android:layout_width="80dp"
                         android:layout_height="match_parent"
