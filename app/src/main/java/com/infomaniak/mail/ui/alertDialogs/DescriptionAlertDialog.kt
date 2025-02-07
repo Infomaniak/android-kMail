@@ -41,7 +41,7 @@ open class DescriptionAlertDialog @Inject constructor(
 
     private var onPositiveButtonClicked: (() -> Unit)? = null
     private var onNegativeButtonClicked: (() -> Unit)? = null
-    private var onDismissed: (() -> Unit)? = null
+    private var onCancelled: (() -> Unit)? = null
 
     protected fun initDialog(customThemeRes: Int? = null) = with(binding) {
         val builder = customThemeRes?.let { MaterialAlertDialogBuilder(context, it) } ?: MaterialAlertDialogBuilder(context)
@@ -56,7 +56,7 @@ open class DescriptionAlertDialog @Inject constructor(
     final override fun resetCallbacks() {
         onPositiveButtonClicked = null
         onNegativeButtonClicked = null
-        onDismissed = null
+        onCancelled = null
     }
 
     fun show(
@@ -68,35 +68,35 @@ open class DescriptionAlertDialog @Inject constructor(
         @StringRes negativeButtonText: Int? = null,
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)? = null,
-        onDismiss: (() -> Unit)? = null,
+        onCancel: (() -> Unit)? = null,
     ) {
         showDialogWithBasicInfo(title, description, displayCancelButton, positiveButtonText, negativeButtonText)
         if (displayLoader) initProgress()
-        setupListeners(displayLoader, onPositiveButtonClicked, onNegativeButtonClicked, onDismiss)
+        setupListeners(displayLoader, onPositiveButtonClicked, onNegativeButtonClicked, onCancel)
     }
 
     private fun setupListeners(
         displayLoader: Boolean,
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)?,
-        onDismiss: (() -> Unit)?,
+        onCancel: (() -> Unit)?,
     ) = with(alertDialog) {
 
         this@DescriptionAlertDialog.onPositiveButtonClicked = onPositiveButtonClicked
-        this@DescriptionAlertDialog.onNegativeButtonClicked = onNegativeButtonClicked
-
         positiveButton.setOnClickListener {
             this@DescriptionAlertDialog.onPositiveButtonClicked?.invoke()
             if (displayLoader) startLoading() else dismiss()
         }
+
+        this@DescriptionAlertDialog.onNegativeButtonClicked = onNegativeButtonClicked
         negativeButton.setOnClickListener {
             this@DescriptionAlertDialog.onNegativeButtonClicked?.invoke()
-            dismiss()
+            cancel()
         }
 
-        onDismiss?.let {
-            onDismissed = it
-            setOnDismissListener { onDismissed?.invoke() }
+        onCancel?.let {
+            onCancelled = it
+            setOnCancelListener { onCancelled?.invoke() }
         }
     }
 
@@ -104,7 +104,7 @@ open class DescriptionAlertDialog @Inject constructor(
         deletedCount: Int,
         displayLoader: Boolean,
         onPositiveButtonClicked: () -> Unit,
-        onDismissed: (() -> Unit)? = null,
+        onCancel: (() -> Unit)? = null,
     ) = show(
         title = activityContext.resources.getQuantityString(
             R.plurals.threadListDeletionConfirmationAlertTitle,
@@ -117,7 +117,7 @@ open class DescriptionAlertDialog @Inject constructor(
         ),
         displayLoader = displayLoader,
         onPositiveButtonClicked = onPositiveButtonClicked,
-        onDismiss = onDismissed,
+        onCancel = onCancel,
     )
 
     protected fun showDialogWithBasicInfo(
