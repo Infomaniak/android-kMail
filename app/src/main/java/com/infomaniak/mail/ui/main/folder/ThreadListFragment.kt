@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener
@@ -91,7 +90,7 @@ import com.infomaniak.lib.core.R as RCore
 import com.infomaniak.lib.core.utils.Utils as UtilsCore
 
 @AndroidEntryPoint
-class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListener {
+class ThreadListFragment : TwoPaneFragment() {
 
     private var _binding: FragmentThreadListBinding? = null
     val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
@@ -278,18 +277,16 @@ class ThreadListFragment : TwoPaneFragment(), SwipeRefreshLayout.OnRefreshListen
         if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
     }
 
-    override fun onRefresh() {
-        if (mainViewModel.isDownloadingChanges.value == true) return
-        mainViewModel.forceRefreshThreads()
-    }
-
     private fun setupDensityDependentUi() = with(binding) {
         val paddingTop = resources.getDimension(RCore.dimen.marginStandardMedium).toInt()
         threadsList.setPaddingRelative(top = if (localSettings.threadDensity == COMPACT) paddingTop else 0)
     }
 
     private fun setupOnRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener(this)
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            if (mainViewModel.isDownloadingChanges.value == true) return@setOnRefreshListener
+            mainViewModel.forceRefreshThreads()
+        }
     }
 
     private fun setupAdapter() {
