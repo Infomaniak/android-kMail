@@ -217,17 +217,6 @@ class NewMessageFragment : Fragment() {
 
     private fun setupBackActionHandler() {
 
-        fun navigateBackToBottomSheet() {
-            safeNavigate(
-                resId = R.id.scheduleSendBottomSheetDialog,
-                args = ScheduleSendBottomSheetDialogArgs(
-                    isAlreadyScheduled = false,
-                    lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                    isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
-                ).toBundle(),
-            )
-        }
-
         fun scheduleDraft(timestamp: Long) {
             newMessageViewModel.setScheduleDate(Date(timestamp))
             tryToSendEmail(scheduled = true)
@@ -236,12 +225,11 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 title = getString(R.string.datePickerTitle),
-                onSchedule = {
-                    val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
-                    localSettings.lastSelectedScheduleEpoch = scheduleDate
-                    scheduleDraft(scheduleDate)
+                onSchedule = { timestamp ->
+                    localSettings.lastSelectedScheduleEpoch = timestamp
+                    scheduleDraft(timestamp)
                 },
-                onAbort = ::navigateBackToBottomSheet,
+                onAbort = ::navigateToScheduleSendBottomSheet,
             )
         }
 
@@ -731,18 +719,19 @@ class NewMessageFragment : Fragment() {
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener {
-            safeNavigate(
-                resId = R.id.scheduleSendBottomSheetDialog,
-                args = ScheduleSendBottomSheetDialogArgs(
-                    isAlreadyScheduled = false,
-                    lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                    isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
-                ).toBundle(),
-            )
-        }
+        scheduleButton.setOnClickListener { navigateToScheduleSendBottomSheet() }
 
         sendButton.setOnClickListener { tryToSendEmail() }
+    }
+
+    private fun navigateToScheduleSendBottomSheet() {
+        safeNavigate(
+            resId = R.id.scheduleSendBottomSheetDialog,
+            args = ScheduleSendBottomSheetDialogArgs(
+                lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
+            ).toBundle(),
+        )
     }
 
     private fun tryToSendEmail(scheduled: Boolean = false) {

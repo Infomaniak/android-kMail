@@ -86,19 +86,9 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
 
     private fun setLastScheduleClickListener() {
         binding.lastScheduleItem.setOnClickListener {
-            val draftResource = navigationArgs.draftResource
-            val matomoName = "lastSelectedSchedule"
-
-            if (navigationArgs.isAlreadyScheduled) {
-                if (draftResource != null && lastSelectedScheduleEpoch != 0L) {
-                    trackScheduleSendEvent(matomoName)
-                    setBackNavigationResult(SCHEDULE_DRAFT_RESULT, lastSelectedScheduleEpoch)
-                }
-            } else {
-                if (lastSelectedScheduleEpoch != 0L) {
-                    trackScheduleSendEvent(matomoName)
-                    setBackNavigationResult(SCHEDULE_DRAFT_RESULT, lastSelectedScheduleEpoch)
-                }
+            if (lastSelectedScheduleEpoch != 0L) {
+                trackScheduleSendEvent("lastSelectedSchedule")
+                setBackNavigationResult(SCHEDULE_DRAFT_RESULT, lastSelectedScheduleEpoch)
             }
         }
     }

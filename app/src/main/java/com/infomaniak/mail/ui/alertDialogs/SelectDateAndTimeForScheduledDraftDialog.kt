@@ -46,10 +46,10 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 
     override val alertDialog = initDialog()
 
-    private var onSchedule: (() -> Unit)? = null
+    private var onSchedule: ((Long) -> Unit)? = null
     private var onAbort: (() -> Unit)? = null
 
-    lateinit var selectedDate: Date
+    private lateinit var selectedDate: Date
 
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
@@ -77,7 +77,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         onAbort = null
     }
 
-    fun show(title: String, onSchedule: () -> Unit, onAbort: (() -> Unit)? = null) {
+    fun show(title: String, onSchedule: (Long) -> Unit, onAbort: (() -> Unit)? = null) {
         showDialogWithBasicInfo(title, R.string.buttonScheduleTitle)
         setupListeners(onSchedule, onAbort)
     }
@@ -92,7 +92,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         )
     }
 
-    private fun setupListeners(onSchedule: () -> Unit, onAbort: (() -> Unit)?) = with(alertDialog) {
+    private fun setupListeners(onSchedule: (Long) -> Unit, onAbort: (() -> Unit)?) = with(alertDialog) {
 
         binding.dateField.setOnClickListener { datePicker?.show(super.activity.supportFragmentManager, "tag") }
 
@@ -125,7 +125,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         this@SelectDateAndTimeForScheduledDraftDialog.onAbort = onAbort
 
         positiveButton.setOnClickListener {
-            this@SelectDateAndTimeForScheduledDraftDialog.onSchedule?.invoke()
+            this@SelectDateAndTimeForScheduledDraftDialog.onSchedule?.invoke(selectedDate.time)
             dismiss()
         }
 
