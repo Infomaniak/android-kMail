@@ -537,27 +537,14 @@ class ThreadFragment : Fragment() {
 
     private fun setupBackActionHandler() {
 
-        fun navigateBackToBottomSheet() {
-            safeNavigate(
-                resId = R.id.scheduleSendBottomSheetDialog,
-                args = ScheduleSendBottomSheetDialogArgs(
-                    isAlreadyScheduled = false,
-                    draftResource = mainViewModel.draftResource,
-                    lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                    isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
-                ).toBundle(),
-            )
-        }
-
         getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 title = getString(R.string.datePickerTitle),
-                onPositiveButtonClicked = {
+                onSchedule = {
                     val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
                     localSettings.lastSelectedScheduleEpoch = scheduleDate
                 },
-                onNegativeButtonClicked = ::navigateBackToBottomSheet,
-                onCancel = ::navigateBackToBottomSheet,
+                onAbort = { navigateToScheduleSendBottomSheet(isAlreadyScheduled = false) },
             )
         }
 
@@ -739,11 +726,15 @@ class ThreadFragment : Fragment() {
 
     private fun rescheduleDraft(draftResource: String) {
         mainViewModel.draftResource = draftResource
+        navigateToScheduleSendBottomSheet(isAlreadyScheduled = true)
+    }
+
+    private fun navigateToScheduleSendBottomSheet(isAlreadyScheduled: Boolean) {
         safeNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
-                isAlreadyScheduled = true,
-                draftResource = draftResource,
+                isAlreadyScheduled = isAlreadyScheduled,
+                draftResource = mainViewModel.draftResource,
                 lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
                 isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
