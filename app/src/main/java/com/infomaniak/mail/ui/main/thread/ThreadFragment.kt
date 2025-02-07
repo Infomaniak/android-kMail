@@ -544,7 +544,7 @@ class ThreadFragment : Fragment() {
                     isAlreadyScheduled = false,
                     draftResource = mainViewModel.draftResource,
                     lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                    isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFree ?: true,
+                    isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
                 ).toBundle(),
             )
         }
@@ -745,7 +745,7 @@ class ThreadFragment : Fragment() {
                 isAlreadyScheduled = true,
                 draftResource = draftResource,
                 lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFree ?: true,
+                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
             currentClassName = ThreadFragment::class.java.name,
         )
