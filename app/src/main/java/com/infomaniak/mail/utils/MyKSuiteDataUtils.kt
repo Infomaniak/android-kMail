@@ -24,15 +24,17 @@ import com.infomaniak.mail.data.models.AppSettings
 
 object MyKSuiteDataUtils : MyKSuiteDataManager() {
 
-    override var currentMyKSuiteId: Int = AppSettingsController.getAppSettings().currentMyKSuiteId
+    override val userId get() = AccountUtils.currentUserId
+
+    override var myKSuiteId: Int = AppSettingsController.getAppSettings().myKSuiteId
         set(myKSuiteId) {
             field = myKSuiteId
-            AppSettingsController.updateAppSettings { appSettings -> appSettings.currentMyKSuiteId = myKSuiteId }
+            AppSettingsController.updateAppSettings { appSettings -> appSettings.myKSuiteId = myKSuiteId }
         }
 
-    override var currentMyKSuite: MyKSuiteData? = null
+    override var myKSuite: MyKSuiteData? = null
         set(myKSuiteData) {
             field = myKSuiteData
-            currentMyKSuiteId = myKSuiteData?.id ?: AppSettings.DEFAULT_ID
+            myKSuiteId = myKSuiteData?.id ?: AppSettings.DEFAULT_ID
         }
 }
