@@ -74,6 +74,8 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import okhttp3.Request
 import java.util.Date
 import java.util.UUID
@@ -298,8 +300,8 @@ class MainViewModel @Inject constructor(
             // Refresh User
             AccountUtils.updateCurrentUser()
 
-            // Refresh My kSuite
-            launch { ApiRepository.getMyKSuiteData(HttpClient.okHttpClient).data?.let { MyKSuiteDataUtils.upsertKSuiteData(it) } }
+            // Refresh My kSuite asynchronously, because it's not required for the threads list display
+            launch { updateMyKSuiteData() }
 
             // Refresh Mailboxes
             SentryLog.d(TAG, "Refresh mailboxes from remote")
@@ -333,6 +335,21 @@ class MainViewModel @Inject constructor(
                         refreshThreads(mailbox, folder.id)
                     }
                 }
+        }
+    }
+
+    private suspend fun updateMyKSuiteData() {
+        MyKSuiteDataUtils.requestKSuiteData()
+        val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClient)
+        if (apiResponse.data != null) {
+            MyKSuiteDataUtils.upsertKSuiteData(apiResponse.data!!)
+        } else {
+            @OptIn(ExperimentalSerializationApi::class)
+            apiResponse.error?.exception?.let {
+                if (it is MissingFieldException || it.message?.contains("Unexpected JSON token") == true) {
+                    SentryLog.e(TAG, "Error decoding the api result MyKSuiteObject", it)
+                }
+            }
         }
     }
 
