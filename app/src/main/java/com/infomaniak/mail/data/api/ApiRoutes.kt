@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,12 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.lib.core.BuildConfig.INFOMANIAK_API_V1
+import com.infomaniak.lib.core.utils.FORMAT_SCHEDULE_MAIL
+import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.BuildConfig.MAIL_API
 import com.infomaniak.mail.utils.Utils
+import java.net.URLEncoder
+import java.util.Date
 
 object ApiRoutes {
 
@@ -127,11 +131,11 @@ object ApiRoutes {
     }
 
     fun folders(mailboxUuid: String): String {
-        return "${mailMailbox(mailboxUuid)}/folder"
+        return "${mailMailbox(mailboxUuid)}/folder?with=ik-static"
     }
 
     private fun folder(mailboxUuid: String, folderId: String): String {
-        return "${folders(mailboxUuid)}/$folderId"
+        return "${mailMailbox(mailboxUuid)}/folder/$folderId"
     }
 
     fun flushFolder(mailboxUuid: String, folderId: String): String {
@@ -221,6 +225,11 @@ object ApiRoutes {
 
     fun draft(mailboxUuid: String, remoteDraftUuid: String): String {
         return "${draft(mailboxUuid)}/$remoteDraftUuid"
+    }
+
+    fun rescheduleDraft(draftResource: String, scheduleDate: Date): String {
+        val formatedDate = scheduleDate.format(FORMAT_SCHEDULE_MAIL)
+        return "${MAIL_API}${draftResource}/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
     }
 
     fun createAttachment(mailboxUuid: String): String {

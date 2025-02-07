@@ -33,7 +33,7 @@
         app:cornerRadius="8dp"
         app:iconSize="24dp"
         app:iconTint="?android:attr/colorPrimary"
-        app:layout_constraintEnd_toStartOf="@+id/button2"
+        app:layout_constraintEnd_toStartOf="@id/button2"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -66,8 +66,8 @@
         app:iconTint="?android:attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="@id/button1"
         app:layout_constraintDimensionRatio="1"
-        app:layout_constraintEnd_toStartOf="@+id/button3"
-        app:layout_constraintStart_toEndOf="@+id/button1"
+        app:layout_constraintEnd_toStartOf="@id/button3"
+        app:layout_constraintStart_toEndOf="@id/button1"
         app:layout_constraintTop_toTopOf="parent"
         tools:icon="@drawable/ic_email_action_reply_to_all" />
 
@@ -98,8 +98,8 @@
         app:iconTint="?android:attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="@id/button1"
         app:layout_constraintDimensionRatio="1"
-        app:layout_constraintEnd_toStartOf="@+id/button4"
-        app:layout_constraintStart_toEndOf="@+id/button2"
+        app:layout_constraintEnd_toStartOf="@id/button4"
+        app:layout_constraintStart_toEndOf="@id/button2"
         app:layout_constraintTop_toTopOf="parent"
         tools:icon="@drawable/ic_email_action_send" />
 
@@ -131,7 +131,7 @@
         app:layout_constraintBottom_toBottomOf="@id/button1"
         app:layout_constraintDimensionRatio="1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button3"
+        app:layout_constraintStart_toEndOf="@id/button3"
         app:layout_constraintTop_toTopOf="parent"
         tools:icon="@drawable/ic_bin" />
 

@@ -126,8 +126,8 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         }
 
         editorActions.isGone = isExpanded
-        sendButton.isGone = isExpanded
-        formatOptionsScrollView.isVisible = isExpanded
+        sendLayout.isGone = isExpanded
+        formatOptionsLayout.isVisible = isExpanded
     }
 
     fun observeEditorStatus(): Unit = with(binding) {

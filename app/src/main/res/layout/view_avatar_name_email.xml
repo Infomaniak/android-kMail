@@ -93,10 +93,10 @@
                 android:layout_marginStart="@dimen/marginStandardSmall"
                 android:src="@drawable/ic_certified"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/userName"
+                app:layout_constraintBottom_toBottomOf="@id/userName"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/userName"
-                app:layout_constraintTop_toTopOf="@+id/userName"
+                app:layout_constraintStart_toEndOf="@id/userName"
+                app:layout_constraintTop_toTopOf="@id/userName"
                 tools:ignore="ContentDescription"
                 tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>

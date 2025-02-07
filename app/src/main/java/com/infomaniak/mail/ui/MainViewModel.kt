@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.Sort
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -202,7 +203,10 @@ class MainViewModel @Inject constructor(
         currentThreadsLiveJob = viewModelScope.launch(ioCoroutineContext) {
             observeFolderAndFilter()
                 .flatMapLatest { (folder, filter) ->
-                    folder?.let { threadController.getThreadsAsync(it, filter) } ?: emptyFlow()
+                    folder?.let {
+                        val sortOrder = if (folder.role == FolderRole.SCHEDULED_DRAFTS) Sort.ASCENDING else Sort.DESCENDING
+                        threadController.getThreadsAsync(it, filter, sortOrder)
+                    } ?: emptyFlow()
                 }
                 .collect(currentThreadsLive::postValue)
         }
@@ -231,6 +235,10 @@ class MainViewModel @Inject constructor(
 
     //region Merged Contacts
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
+    //endregion
+
+    //region Scheduled Draft
+    var draftResource: String? = null
     //endregion
 
     //region Share Thread URL
@@ -479,6 +487,7 @@ class MainViewModel @Inject constructor(
         deleteThreadsOrMessage(threadsUids = threadsUids)
     }
 
+    // TODO: When the back is done refactoring how scheduled drafts are deleted, work on this function shall resume.
     private fun deleteThreadsOrMessage(
         threadsUids: List<String>,
         message: Message? = null,
@@ -583,12 +592,72 @@ class MainViewModel @Inject constructor(
             refreshFoldersAsync(mailbox, listOf(draftFolderId))
         }
 
-        showDraftDeletedSnackbar(apiResponse)
+        showDeletedDraftSnackbar(apiResponse)
     }
 
-    private fun showDraftDeletedSnackbar(apiResponse: ApiResponse<Unit>) {
+    private fun showDeletedDraftSnackbar(apiResponse: ApiResponse<Unit>) {
         val titleRes = if (apiResponse.isSuccess()) R.string.snackbarDraftDeleted else apiResponse.translateError()
         snackbarManager.postValue(appContext.getString(titleRes))
+    }
+    //endregion
+
+    //region Scheduled Drafts
+    fun rescheduleDraft(scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
+        draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
+            with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
+                if (isSuccess()) {
+                    val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+                    refreshFoldersAsync(currentMailbox.value!!, listOf(scheduledDraftsFolderId))
+                } else {
+                    snackbarManager.postValue(title = appContext.getString(translatedError))
+                }
+            }
+        } ?: run {
+            snackbarManager.postValue(title = appContext.getString(RCore.string.anErrorHasOccurred))
+        }
+    }
+
+    fun modifyScheduledDraft(
+        unscheduleDraftUrl: String,
+        onSuccess: () -> Unit,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value!!
+        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
+
+        if (apiResponse.isSuccess()) {
+            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+            refreshFoldersAsync(mailbox, listOf(scheduledDraftsFolderId))
+            onSuccess()
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
+        }
+    }
+
+    fun unscheduleDraft(unscheduleDraftUrl: String) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value!!
+        val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
+
+        if (apiResponse.isSuccess()) {
+            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+            refreshFoldersAsync(mailbox, listOf(scheduledDraftsFolderId))
+        }
+
+        showUnscheduledDraftSnackbar(apiResponse)
+    }
+
+    private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
+
+        fun openDraftFolder() = folderController.getFolder(FolderRole.DRAFT)?.id?.let(::openFolder)
+
+        if (apiResponse.isSuccess()) {
+            snackbarManager.postValue(
+                title = appContext.getString(R.string.snackbarSaveInDraft),
+                buttonTitle = R.string.draftFolder,
+                customBehavior = ::openDraftFolder,
+            )
+        } else {
+            snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
+        }
     }
     //endregion
 
@@ -1136,13 +1205,13 @@ class MainViewModel @Inject constructor(
         selectedThreadsLiveData.value = selectedThreads
     }
 
-    fun refreshDraftFolderWhenDraftArrives(scheduledDate: Long) = viewModelScope.launch(ioCoroutineContext) {
+    fun refreshDraftFolderWhenDraftArrives(scheduledMessageEtop: Long) = viewModelScope.launch(ioCoroutineContext) {
         val folder = folderController.getFolder(FolderRole.DRAFT)
 
         if (folder?.cursor != null) {
 
             val timeNow = Date().time
-            val delay = REFRESH_DELAY + max(scheduledDate - timeNow, 0L)
+            val delay = REFRESH_DELAY + max(scheduledMessageEtop - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
             refreshController.refreshThreads(

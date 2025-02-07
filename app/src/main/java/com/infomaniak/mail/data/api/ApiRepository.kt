@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.LocalSettings.AiEngine
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.ai.AiMessage
 import com.infomaniak.mail.data.models.ai.AiResult
@@ -43,6 +42,7 @@ import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
+import com.infomaniak.mail.data.models.draft.ScheduleDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
@@ -58,7 +58,6 @@ import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.copyFromRealm
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -170,28 +169,35 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun saveDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SaveDraftResult> {
-
-        val body = getDraftBody(draft)
-
-        fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
-
-        fun putDraft(uuid: String): ApiResponse<SaveDraftResult> =
-            callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
-
-        return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
+        return uploadDraft(mailboxUuid, draft, okHttpClient)
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SendDraftResult> {
-
-        val body = getDraftBody(draft)
-
-        fun postDraft(): ApiResponse<SendDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
-
-        fun putDraft(uuid: String): ApiResponse<SendDraftResult> =
-            callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
-
-        return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
+        return uploadDraft(mailboxUuid, draft, okHttpClient)
     }
+
+    fun scheduleDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<ScheduleDraftResult> {
+        return uploadDraft(mailboxUuid, draft, okHttpClient)
+    }
+
+    private inline fun <reified T> uploadDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<T> {
+        val body = getDraftBody(draft)
+        return draft.remoteUuid?.let { putDraft(mailboxUuid, body, okHttpClient, it) }
+            ?: run { postDraft(mailboxUuid, body, okHttpClient) }
+    }
+
+    private inline fun <reified T> putDraft(
+        mailboxUuid: String,
+        body: String,
+        okHttpClient: OkHttpClient,
+        uuid: String,
+    ): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
+
+    private inline fun <reified T> postDraft(
+        mailboxUuid: String,
+        body: String,
+        okHttpClient: OkHttpClient,
+    ): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
     private fun getDraftBody(draft: Draft): String {
         val updatedDraft = if (draft.identityId == Draft.NO_IDENTITY.toString()) {
@@ -238,6 +244,14 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun deleteDraft(mailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {
         return callApi(ApiRoutes.draft(mailboxUuid, remoteDraftUuid), DELETE)
+    }
+
+    fun unscheduleDraft(unscheduleDraftUrl: String): ApiResponse<Unit> {
+        return callApi(ApiRoutes.resource(unscheduleDraftUrl), DELETE)
+    }
+
+    fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {
+        return callApi(ApiRoutes.rescheduleDraft(draftResource, scheduleDate), PUT)
     }
 
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)

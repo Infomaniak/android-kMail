@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var autoAdvanceNaturalThread by sharedValue("autoAdvanceNaturalThreadKey", AutoAdvanceMode.FOLLOWING_THREAD)
     var showWebViewOutdated by sharedValue("showWebViewOutdatedKey", true)
     var accessTokenApiCallRecord by sharedValue<ApiCallRecord>("accessTokenApiCallRecordKey", null)
+    var lastSelectedScheduleEpoch by sharedValue<Long>("lastSelectedScheduleEpochKey", null)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -75,11 +75,46 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardVerySmall"
                     android:src="@drawable/ic_certified"
-                    app:layout_constraintBottom_toBottomOf="@+id/expeditorName"
-                    app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
-                    app:layout_constraintStart_toEndOf="@+id/expeditorName"
-                    app:layout_constraintTop_toTopOf="@+id/expeditorName"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditorName"
+                    app:layout_constraintEnd_toStartOf="@id/iconsSpace"
+                    app:layout_constraintStart_toEndOf="@id/expeditorName"
+                    app:layout_constraintTop_toTopOf="@id/expeditorName"
                     tools:ignore="ContentDescription" />
+
+                <Space
+                    android:id="@+id/iconsSpace"
+                    android:layout_width="@dimen/marginStandardVerySmall"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="@id/iconCertified"
+                    app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
+                    app:layout_constraintStart_toEndOf="@id/iconCertified"
+                    app:layout_constraintTop_toTopOf="@id/iconCertified" />
+
+                <ImageView
+                    android:id="@+id/scheduleSendIcon"
+                    android:layout_width="@dimen/smallIconSize"
+                    android:layout_height="@dimen/smallIconSize"
+                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                    android:contentDescription="@string/contentDescriptionScheduleSend"
+                    android:src="@drawable/ic_scheduled_messages"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/shortMessageDate"
+                    app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
+                    app:layout_constraintStart_toEndOf="@id/iconsSpace"
+                    app:layout_constraintTop_toTopOf="@id/shortMessageDate"
+                    app:tint="@color/scheduledIconColor"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/shortMessageDate"
+                    style="@style/Label.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    app:layout_constraintBaseline_toBaselineOf="@id/expeditorName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/scheduleSendIcon"
+                    tools:text="9 déc 2021 à 11:00" />
 
                 <LinearLayout
                     android:id="@+id/recipientLayout"
@@ -128,18 +163,6 @@
                     app:layout_constraintEnd_toEndOf="@id/recipientLayout"
                     app:layout_constraintStart_toStartOf="@id/recipientLayout"
                     app:layout_constraintTop_toTopOf="@id/recipientLayout" />
-
-                <TextView
-                    android:id="@+id/shortMessageDate"
-                    style="@style/Label.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_constraintBaseline_toBaselineOf="@id/expeditorName"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/iconCertified"
-                    tools:text="9 déc 2021 à 11:00" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -364,7 +387,18 @@
             android:showDividers="middle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/alertsTopDivider">
+            app:layout_constraintTop_toBottomOf="@id/messageDetails">
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/scheduleAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/buttonReschedule"
+                app:action2="@string/buttonModify"
+                app:icon="@drawable/ic_schedule_send"
+                tools:description="Cet e-mail sera envoyé à cette date : mercredi 30 juillet 2024 à 09:00"
+                tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/distantImagesAlert"

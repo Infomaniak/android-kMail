@@ -80,6 +80,9 @@ class Message : RealmObject {
     var isDraft: Boolean = false
     @SerialName("draft_resource")
     var draftResource: String? = null
+    // Boolean used to know if this Message is scheduled to be sent sometime in the future, or not
+    @SerialName("is_scheduled_draft")
+    var isScheduledDraft: Boolean = false
     var body: Body? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
@@ -92,13 +95,17 @@ class Message : RealmObject {
     var isAnswered: Boolean = false
     @SerialName("flagged")
     var isFavorite: Boolean = false
+    // Boolean used to know if this Message is currently being sent, but can
+    // still be cancelled during 10~30 sec, depending on user configuration
     @SerialName("scheduled")
-    var isScheduled: Boolean = false
+    var isScheduledMessage: Boolean = false
     var preview: String = ""
     var size: Int = 0
     @SerialName("has_unsubscribe_link")
     var hasUnsubscribeLink: Boolean? = null
     var bimi: Bimi? = null
+    @SerialName("schedule_action")
+    var unscheduleDraftUrl: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
@@ -113,7 +120,7 @@ class Message : RealmObject {
     // ------------- !IMPORTANT! -------------
     // Every field that is added in this Transient region should be declared in 'initLocalValue()' too
     // to avoid loosing data when updating from API.
-    // If the Field is a "heavy data" (i.e an embedded object), it should also be added in 'keepHeavyData()'
+    // If the Field is a "heavy data" (i.e. an embedded object), it should also be added in 'keepHeavyData()'.
 
     @Transient
     @PersistedName("isFullyDownloaded")
@@ -318,7 +325,7 @@ class Message : RealmObject {
         isFavorite = flags.isFavorite
         isAnswered = flags.isAnswered
         isForwarded = flags.isForwarded
-        isScheduled = flags.isScheduled
+        isScheduledMessage = flags.isScheduledMessage
     }
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)

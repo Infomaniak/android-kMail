@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="2dp"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
-        android:nextFocusRight="@+id/newMessageFab"
+        android:nextFocusRight="@id/newMessageFab"
         app:cardCornerRadius="@null"
         app:cardPreventCornerOverlap="false"
         app:shapeAppearanceOverlay="@style/RoundedDecoratedTextItemShapeAppearance">
@@ -171,7 +171,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@+id/threadCountCard"
+                    app:layout_constraintEnd_toStartOf="@id/threadCountCard"
                     app:layout_constraintStart_toEndOf="@id/draftPrefix"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="@tools:sample/full_names" />
@@ -199,7 +199,7 @@
                     app:cardBackgroundColor="@color/backgroundColor"
                     app:cardCornerRadius="2dp"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                    app:layout_constraintEnd_toStartOf="@id/mailDate"
+                    app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
                     app:layout_constraintStart_toEndOf="@id/expeditor"
                     app:layout_constraintTop_toTopOf="@id/expeditor"
                     app:strokeColor="@color/progressbarTrackColor"
@@ -215,6 +215,20 @@
                         tools:text="8" />
 
                 </com.google.android.material.card.MaterialCardView>
+
+                <ImageView
+                    android:id="@+id/scheduleSendIcon"
+                    android:layout_width="@dimen/smallIconSize"
+                    android:layout_height="@dimen/smallIconSize"
+                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                    android:contentDescription="@string/contentDescriptionScheduleSend"
+                    android:src="@drawable/ic_scheduled_messages"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/mailDate"
+                    app:layout_constraintEnd_toStartOf="@id/mailDate"
+                    app:layout_constraintTop_toTopOf="@id/mailDate"
+                    app:tint="@color/scheduledIconColor"
+                    tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/mailDate"
@@ -232,9 +246,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
-                    app:layout_constraintEnd_toStartOf="@+id/mailSubject"
+                    app:layout_constraintEnd_toStartOf="@id/mailSubject"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/mailSubject">
+                    app:layout_constraintTop_toTopOf="@id/mailSubject">
 
                     <ImageView
                         android:id="@+id/iconForward"
@@ -267,9 +281,9 @@
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintEnd_toStartOf="@+id/folderNameCompactMode"
-                    app:layout_constraintStart_toEndOf="@+id/iconReplyOrForwardLayout"
-                    app:layout_constraintTop_toBottomOf="@+id/mailAddress"
+                    app:layout_constraintEnd_toStartOf="@id/folderNameCompactMode"
+                    app:layout_constraintStart_toEndOf="@id/iconReplyOrForwardLayout"
+                    app:layout_constraintTop_toBottomOf="@id/mailAddress"
                     tools:text="@tools:sample/lorem[10]" />
 
                 <TextView

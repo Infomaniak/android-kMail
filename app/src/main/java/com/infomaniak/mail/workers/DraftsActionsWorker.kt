@@ -32,6 +32,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
@@ -70,6 +72,8 @@ class DraftsActionsWorker @AssistedInject constructor(
     private val mainApplication: MainApplication,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
+    private val folderController: FolderController,
+    private val refreshController: RefreshController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
@@ -124,10 +128,12 @@ class DraftsActionsWorker @AssistedInject constructor(
         // List containing the callback function to update/delete drafts in Realm
         // We keep these Realm changes in a List to execute them all in a unique Realm transaction at the end of the worker
         val realmActionsOnDraft = mutableListOf<(MutableRealm) -> Unit>()
-        val scheduledDates = mutableListOf<String>()
+        val scheduledMessagesEtops = mutableListOf<String>()
         var trackedDraftErrorMessageResId: Int? = null
         var remoteUuidOfTrackedDraft: String? = null
         var trackedDraftAction: DraftAction? = null
+        var trackedScheduledDraftDate: String? = null
+        var trackedUnscheduledDraftUrl: String? = null
         var isTrackedDraftSuccess: Boolean? = null
 
         val drafts = draftController.getDraftsWithActions(mailboxContentRealm)
@@ -137,8 +143,12 @@ class DraftsActionsWorker @AssistedInject constructor(
         var haveAllDraftsSucceeded = true
 
         drafts.asReversed().forEach { draft ->
+
             val isTargetDraft = draft.localUuid == draftLocalUuid
-            if (isTargetDraft) trackedDraftAction = draft.action
+            if (isTargetDraft) {
+                trackedDraftAction = draft.action
+                trackedScheduledDraftDate = draft.scheduleDate
+            }
 
             runCatching {
                 val updatedDraft = uploadAttachmentsWithMutex(draft, mailbox, draftController, mailboxContentRealm)
@@ -146,10 +156,12 @@ class DraftsActionsWorker @AssistedInject constructor(
                     if (isSuccess) {
                         if (isTargetDraft) {
                             remoteUuidOfTrackedDraft = savedDraftUuid
+                            trackedUnscheduledDraftUrl = unscheduleDraftUrl
                             isTrackedDraftSuccess = true
                         }
-                        scheduledDate?.let(scheduledDates::add)
+                        scheduledMessageEtop?.let(scheduledMessagesEtops::add)
                         realmActionOnDraft?.let(realmActionsOnDraft::add)
+
                     } else if (isTargetDraft) {
                         trackedDraftErrorMessageResId = errorMessageResId!!
                         isTrackedDraftSuccess = false
@@ -203,12 +215,14 @@ class DraftsActionsWorker @AssistedInject constructor(
         showDraftErrorNotification(isTrackedDraftSuccess, trackedDraftErrorMessageResId, trackedDraftAction)
 
         return computeResult(
-            scheduledDates,
+            scheduledMessagesEtops,
             haveAllDraftsSucceeded,
             isTrackedDraftSuccess,
             remoteUuidOfTrackedDraft,
             trackedDraftAction,
             trackedDraftErrorMessageResId,
+            trackedScheduledDraftDate,
+            trackedUnscheduledDraftUrl,
         )
     }
 
@@ -232,15 +246,19 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     private fun computeResult(
-        scheduledDates: MutableList<String>,
+        scheduledMessagesEtops: MutableList<String>,
         haveAllDraftsSucceeded: Boolean,
         isTrackedDraftSuccess: Boolean?,
         remoteUuidOfTrackedDraft: String?,
         trackedDraftAction: DraftAction?,
         trackedDraftErrorMessageResId: Int?,
+        trackedScheduledDraftDate: String?,
+        trackedUnscheduleDraftUrl: String?,
     ): Result {
 
-        val biggestScheduledDate = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }.maxOrNull()
+        val biggestScheduledMessagesEtop = scheduledMessagesEtops.mapNotNull {
+            dateFormatWithTimezone.parse(it)?.time
+        }.maxOrNull()
 
         return if (haveAllDraftsSucceeded || isTrackedDraftSuccess == true) {
             val outputData = if (isSnackbarFeedbackNeeded) {
@@ -248,8 +266,10 @@ class DraftsActionsWorker @AssistedInject constructor(
                     REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
                     ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
                     RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
-                    BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
+                    BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY to biggestScheduledMessagesEtop,
                     RESULT_USER_ID_KEY to userId,
+                    SCHEDULED_DRAFT_DATE_KEY to trackedScheduledDraftDate,
+                    UNSCHEDULE_DRAFT_URL_KEY to trackedUnscheduleDraftUrl,
                 )
             } else {
                 Data.EMPTY
@@ -259,7 +279,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             val outputData = if (isSnackbarFeedbackNeeded) {
                 workDataOf(
                     ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
-                    BIGGEST_SCHEDULED_DATE_KEY to biggestScheduledDate,
+                    BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY to biggestScheduledMessagesEtop,
                     RESULT_USER_ID_KEY to userId,
                 )
             } else {
@@ -271,7 +291,8 @@ class DraftsActionsWorker @AssistedInject constructor(
 
     data class DraftActionResult(
         val realmActionOnDraft: ((MutableRealm) -> Unit)?,
-        val scheduledDate: String?,
+        val scheduledMessageEtop: String?,
+        val unscheduleDraftUrl: String?,
         val errorMessageResId: Int?,
         val savedDraftUuid: String?,
         val isSuccess: Boolean,
@@ -280,7 +301,8 @@ class DraftsActionsWorker @AssistedInject constructor(
     private suspend fun executeDraftAction(draft: Draft, mailboxUuid: String, isFirstTime: Boolean = true): DraftActionResult {
 
         var realmActionOnDraft: ((MutableRealm) -> Unit)? = null
-        var scheduledDate: String? = null
+        var scheduledMessageEtop: String? = null
+        var scheduleDraftAction: String? = null
         var savedDraftUuid: String? = null
 
         SentryDebug.addDraftBreadcrumbs(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
@@ -299,7 +321,8 @@ class DraftsActionsWorker @AssistedInject constructor(
 
             return DraftActionResult(
                 realmActionOnDraft = null,
-                scheduledDate = null,
+                scheduledMessageEtop = null,
+                unscheduleDraftUrl = null,
                 errorMessageResId = R.string.errorCorruptAttachment,
                 savedDraftUuid = null,
                 isSuccess = false,
@@ -315,7 +338,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                         action = null
                     }
                 }
-                scheduledDate = dateFormatWithTimezone.format(Date())
+                scheduledMessageEtop = dateFormatWithTimezone.format(Date())
                 savedDraftUuid = data.draftRemoteUuid
             } ?: run {
                 retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
@@ -325,8 +348,8 @@ class DraftsActionsWorker @AssistedInject constructor(
         suspend fun executeSendAction() = with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
             when {
                 isSuccess() -> {
-                    scheduledDate = data?.scheduledDate
                     realmActionOnDraft = deleteDraftCallback(draft)
+                    scheduledMessageEtop = data?.scheduledMessageEtop
                 }
                 error?.exception is SerializationException -> {
                     realmActionOnDraft = deleteDraftCallback(draft)
@@ -342,15 +365,38 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
         }
 
+        suspend fun executeScheduleAction() = with(ApiRepository.scheduleDraft(mailboxUuid, draft, okHttpClient)) {
+            when {
+                isSuccess() -> {
+                    realmActionOnDraft = deleteDraftCallback(draft)
+                    scheduledMessageEtop = dateFormatWithTimezone.format(Date())
+                    scheduleDraftAction = data?.unscheduleDraftUrl
+                }
+                error?.exception is SerializationException -> {
+                    realmActionOnDraft = deleteDraftCallback(draft)
+                    Sentry.captureMessage("Return JSON for SendScheduleDraft API call was modified", SentryLevel.ERROR) { scope ->
+                        scope.setExtra("Is data null ?", "${data == null}")
+                        scope.setExtra("Error code", error?.code.toString())
+                        scope.setExtra("Error description", error?.description.toString())
+                    }
+                }
+                else -> {
+                    retryWithNewIdentityOrThrow(draft, mailboxUuid, isFirstTime)
+                }
+            }
+        }
+
         when (draft.action) {
             DraftAction.SAVE -> executeSaveAction()
             DraftAction.SEND -> executeSendAction()
+            DraftAction.SCHEDULE -> executeScheduleAction()
             else -> Unit
         }
 
         return DraftActionResult(
             realmActionOnDraft = realmActionOnDraft,
-            scheduledDate = scheduledDate,
+            scheduledMessageEtop = scheduledMessageEtop,
+            unscheduleDraftUrl = scheduleDraftAction,
             errorMessageResId = null,
             savedDraftUuid = savedDraftUuid,
             isSuccess = true,
@@ -442,7 +488,9 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val REMOTE_DRAFT_UUID_KEY = "remoteDraftUuidKey"
         const val ASSOCIATED_MAILBOX_UUID_KEY = "associatedMailboxUuidKey"
         const val RESULT_DRAFT_ACTION_KEY = "resultDraftActionKey"
-        const val BIGGEST_SCHEDULED_DATE_KEY = "biggestScheduledDateKey"
+        const val BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY = "biggestScheduledMessagesEtopKey"
         const val RESULT_USER_ID_KEY = "resultUserIdKey"
+        const val SCHEDULED_DRAFT_DATE_KEY = "scheduledDraftDateKey"
+        const val UNSCHEDULE_DRAFT_URL_KEY = "unscheduleDraftUrlKey"
     }
 }
