@@ -23,11 +23,11 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
@@ -84,7 +84,7 @@ class ActionItemView @JvmOverloads constructor(
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
-        findViewById<ConstraintLayout>(R.id.itemBottomSheetAction).setOnClickListener(onClickListener)
+        findViewById<LinearLayout>(R.id.itemBottomSheetAction).setOnClickListener(onClickListener)
     }
 
     fun setIconResource(@DrawableRes iconResourceId: Int) = binding.icon.setImageResource(iconResourceId)
