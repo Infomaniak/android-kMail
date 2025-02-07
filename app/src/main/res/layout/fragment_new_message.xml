@@ -542,76 +542,75 @@
                     app:icon="@drawable/ic_editor_text_options"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/dynamicEditorActionsLayout"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <FrameLayout
+                <HorizontalScrollView
                     android:id="@+id/dynamicEditorActionsLayout"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/sendLayout"
                     app:layout_constraintStart_toEndOf="@id/editorTextOptions"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <LinearLayout
-                        android:id="@+id/editorActions"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        tools:visibility="gone">
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/editorAttachment"
-                            style="@style/EditorIconButton"
-                            android:layout_width="@dimen/newMessageToolbarItemWidth"
+                        <LinearLayout
+                            android:id="@+id/editorActions"
+                            android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:contentDescription="@string/buttonAttachment"
-                            app:icon="@drawable/ic_attachment" />
+                            android:orientation="horizontal"
+                            tools:visibility="gone">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/editorCamera"
-                            style="@style/EditorIconButton"
-                            android:layout_width="@dimen/newMessageToolbarItemWidth"
-                            android:layout_height="match_parent"
-                            android:contentDescription="@string/buttonCamera"
-                            android:visibility="gone"
-                            app:icon="@drawable/ic_editor_camera" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/editorAttachment"
+                                style="@style/EditorIconButton"
+                                android:layout_width="@dimen/newMessageToolbarItemWidth"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@string/buttonAttachment"
+                                app:icon="@drawable/ic_attachment" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/editorClock"
-                            style="@style/EditorIconButton"
-                            android:layout_width="@dimen/newMessageToolbarItemWidth"
-                            android:layout_height="match_parent"
-                            android:contentDescription="@string/buttonSchedule"
-                            android:visibility="gone"
-                            app:icon="@drawable/ic_editor_clock" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/editorCamera"
+                                style="@style/EditorIconButton"
+                                android:layout_width="@dimen/newMessageToolbarItemWidth"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@string/buttonCamera"
+                                android:visibility="gone"
+                                app:icon="@drawable/ic_editor_camera" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/editorAi"
-                            style="@style/EditorIconButton"
-                            android:layout_width="@dimen/newMessageToolbarItemWidth"
-                            android:layout_height="match_parent"
-                            android:contentDescription="@string/buttonSchedule"
-                            android:theme="@style/AiCursorAndPrimaryColorTheme"
-                            android:visibility="gone"
-                            app:icon="@drawable/ic_ai_magic_wand"
-                            app:iconTint="@color/aiColor"
-                            tools:visibility="visible" />
-                    </LinearLayout>
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/editorClock"
+                                style="@style/EditorIconButton"
+                                android:layout_width="@dimen/newMessageToolbarItemWidth"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@string/buttonSchedule"
+                                android:visibility="gone"
+                                app:icon="@drawable/ic_editor_clock" />
 
-                    <HorizontalScrollView
-                        android:id="@+id/formatOptionsScrollView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:visibility="gone"
-                        tools:visibility="visible">
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/editorAi"
+                                style="@style/EditorIconButton"
+                                android:layout_width="@dimen/newMessageToolbarItemWidth"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@string/buttonSchedule"
+                                android:theme="@style/AiCursorAndPrimaryColorTheme"
+                                android:visibility="gone"
+                                app:icon="@drawable/ic_ai_magic_wand"
+                                app:iconTint="@color/aiColor"
+                                tools:visibility="visible" />
+                        </LinearLayout>
 
                         <LinearLayout
                             android:id="@+id/formatOptionsLayout"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:visibility="gone"
+                            tools:visibility="visible">
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/buttonLink"
@@ -662,8 +661,8 @@
                                 app:icon="@drawable/ic_editor_strikethrough" />
 
                         </LinearLayout>
-                    </HorizontalScrollView>
-                </FrameLayout>
+                    </FrameLayout>
+                </HorizontalScrollView>
 
                 <LinearLayout
                     android:id="@+id/sendLayout"
@@ -677,7 +676,7 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/scheduleButton"
                         style="@style/IconButton"
-                        android:layout_width="80dp"
+                        android:layout_width="@dimen/newMessageToolbarItemWidth"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/scheduleSendingTitle"
                         android:visibility="gone"
@@ -687,7 +686,7 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/sendButton"
                         style="@style/IconButton"
-                        android:layout_width="80dp"
+                        android:layout_width="@dimen/newMessageToolbarItemWidth"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/send"
                         app:icon="@drawable/ic_send" />
