@@ -46,10 +46,8 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 
     override val alertDialog = initDialog()
 
-    private var onPositiveButtonClicked: (() -> Unit)? = null
-    private var onNegativeButtonClicked: (() -> Unit)? = null
-    private var onDismissed: (() -> Unit)? = null
-    private var onCancelled: (() -> Unit)? = null
+    private var onSchedule: (() -> Unit)? = null
+    private var onAbort: (() -> Unit)? = null
 
     lateinit var selectedDate: Date
 
@@ -75,21 +73,13 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
     }
 
     final override fun resetCallbacks() {
-        onPositiveButtonClicked = null
-        onNegativeButtonClicked = null
-        onDismissed = null
-        onCancelled = null
+        onSchedule = null
+        onAbort = null
     }
 
-    fun show(
-        title: String,
-        onPositiveButtonClicked: () -> Unit,
-        onNegativeButtonClicked: (() -> Unit)? = null,
-        onDismiss: (() -> Unit)? = null,
-        onCancel: (() -> Unit)? = null,
-    ) {
+    fun show(title: String, onSchedule: () -> Unit, onAbort: (() -> Unit)? = null) {
         showDialogWithBasicInfo(title, R.string.buttonScheduleTitle)
-        setupListeners(onPositiveButtonClicked, onNegativeButtonClicked, onDismiss, onCancel)
+        setupListeners(onSchedule, onAbort)
     }
 
     private fun getScheduleDateErrorText(): String = if (selectedDate.isInTheFuture().not()) {
@@ -102,12 +92,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         )
     }
 
-    private fun setupListeners(
-        onPositiveButtonClicked: () -> Unit,
-        onNegativeButtonClicked: (() -> Unit)?,
-        onDismiss: (() -> Unit)?,
-        onCancel: (() -> Unit)?,
-    ) = with(alertDialog) {
+    private fun setupListeners(onSchedule: () -> Unit, onAbort: (() -> Unit)?) = with(alertDialog) {
 
         binding.dateField.setOnClickListener { datePicker?.show(super.activity.supportFragmentManager, "tag") }
 
@@ -136,28 +121,17 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
             positiveButton.isEnabled = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)
         }
 
-        this@SelectDateAndTimeForScheduledDraftDialog.onPositiveButtonClicked = onPositiveButtonClicked
-        this@SelectDateAndTimeForScheduledDraftDialog.onNegativeButtonClicked = onNegativeButtonClicked
+        this@SelectDateAndTimeForScheduledDraftDialog.onSchedule = onSchedule
+        this@SelectDateAndTimeForScheduledDraftDialog.onAbort = onAbort
 
         positiveButton.setOnClickListener {
-            this@SelectDateAndTimeForScheduledDraftDialog.onPositiveButtonClicked?.invoke()
+            this@SelectDateAndTimeForScheduledDraftDialog.onSchedule?.invoke()
             dismiss()
         }
 
-        negativeButton.setOnClickListener {
-            this@SelectDateAndTimeForScheduledDraftDialog.onNegativeButtonClicked?.invoke()
-            cancel()
-        }
+        negativeButton.setOnClickListener { cancel() }
 
-        onDismiss.let {
-            onDismissed = it
-            setOnDismissListener { onDismissed?.invoke() }
-        }
-
-        onCancel?.let {
-            onCancelled = it
-            setOnCancelListener { onCancelled?.invoke() }
-        }
+        setOnCancelListener { onAbort?.invoke() }
     }
 
     private fun setTimePicker() = with(binding) {

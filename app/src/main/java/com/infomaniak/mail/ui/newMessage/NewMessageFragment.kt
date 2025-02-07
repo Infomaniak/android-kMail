@@ -236,13 +236,12 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 title = getString(R.string.datePickerTitle),
-                onPositiveButtonClicked = {
+                onSchedule = {
                     val scheduleDate = dateAndTimeScheduleDialog.selectedDate.time
                     localSettings.lastSelectedScheduleEpoch = scheduleDate
                     scheduleDraft(scheduleDate)
                 },
-                onNegativeButtonClicked = ::navigateBackToBottomSheet,
-                onCancel = ::navigateBackToBottomSheet,
+                onAbort = ::navigateBackToBottomSheet,
             )
         }
 
