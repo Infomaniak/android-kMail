@@ -307,7 +307,7 @@ class MainActivity : BaseActivity() {
         val userId = getInt(DraftsActionsWorker.RESULT_USER_ID_KEY, 0)
         if (userId != AccountUtils.currentUserId) return
 
-        getLong(DraftsActionsWorker.BIGGEST_SCHEDULED_MESSAGE_ETOP_KEY, 0).takeIf { it > 0 }?.let { scheduledMessageEtop ->
+        getLong(DraftsActionsWorker.BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY, 0).takeIf { it > 0 }?.let { scheduledMessageEtop ->
             mainViewModel.refreshDraftFolderWhenDraftArrives(scheduledMessageEtop)
         }
     }
