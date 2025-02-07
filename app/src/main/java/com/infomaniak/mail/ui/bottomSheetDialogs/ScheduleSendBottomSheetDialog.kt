@@ -25,16 +25,14 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleSendBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -42,12 +40,10 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class ScheduleSendBottomSheetDialog @Inject constructor() : ActionsBottomSheetDialog() {
+class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFragment() {
 
     private val navigationArgs: ScheduleSendBottomSheetDialogArgs by navArgs()
-
     private var binding: BottomSheetScheduleSendBinding by safeBinding()
-    override val mainViewModel: MainViewModel by activityViewModels()
 
     // Navigation args does not support nullable primitive types, so we use 0L
     // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
