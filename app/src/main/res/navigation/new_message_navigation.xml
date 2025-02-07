@@ -86,18 +86,9 @@
         android:label="ScheduleSendBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_schedule_send">
         <argument
-            android:name="isAlreadyScheduled"
-            android:defaultValue="false"
-            app:argType="boolean" />
-        <argument
-            android:name="draftResource"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
             android:name="lastSelectedScheduleEpoch"
-            app:argType="long"
-            android:defaultValue="0L" />
+            android:defaultValue="0L"
+            app:argType="long" />
         <argument
             android:name="isCurrentMailboxFree"
             android:defaultValue="true"

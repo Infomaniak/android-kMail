@@ -603,20 +603,17 @@ class MainViewModel @Inject constructor(
 
     //region Scheduled Drafts
     fun rescheduleDraft(scheduleDate: Date) = viewModelScope.launch(ioCoroutineContext) {
-        draftResource.let { resource ->
-            if (resource.isNullOrBlank()) {
-                snackbarManager.postValue(title = appContext.getString(RCore.string.anErrorHasOccurred))
-                return@launch
+        draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
+            with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
+                if (isSuccess()) {
+                    val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+                    refreshFoldersAsync(currentMailbox.value!!, listOf(scheduledDraftsFolderId))
+                } else {
+                    snackbarManager.postValue(title = appContext.getString(translatedError))
+                }
             }
-
-            val apiResponse = ApiRepository.rescheduleDraft(resource, scheduleDate)
-
-            if (apiResponse.isSuccess()) {
-                val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-                refreshFoldersAsync(currentMailbox.value!!, listOf(scheduledDraftsFolderId))
-            } else {
-                snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
-            }
+        } ?: run {
+            snackbarManager.postValue(title = appContext.getString(RCore.string.anErrorHasOccurred))
         }
     }
 
