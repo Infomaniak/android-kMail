@@ -223,7 +223,7 @@ class NewMessageFragment : Fragment() {
                 args = ScheduleSendBottomSheetDialogArgs(
                     isAlreadyScheduled = false,
                     lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                    isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFree,
+                    isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
                 ).toBundle(),
             )
         }
@@ -738,10 +738,11 @@ class NewMessageFragment : Fragment() {
                 args = ScheduleSendBottomSheetDialogArgs(
                     isAlreadyScheduled = false,
                     lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                    isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFree,
+                    isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
                 ).toBundle(),
             )
         }
+
         sendButton.setOnClickListener { tryToSendEmail() }
     }
 

@@ -112,6 +112,8 @@ class Mailbox : RealmObject {
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
 
+    val isFreeMailbox: Boolean get() = isFree && isLimited
+
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 
     fun initLocalValues(
