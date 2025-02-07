@@ -773,7 +773,7 @@ class NewMessageFragment : Fragment() {
                     trackNewMessageEvent("sendWithoutSubjectConfirm")
                     sendEmail()
                 },
-                onNegativeButtonClicked = { if (scheduled) newMessageViewModel.resetScheduledDate() },
+                onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
             )
         } else {
             sendEmail()
