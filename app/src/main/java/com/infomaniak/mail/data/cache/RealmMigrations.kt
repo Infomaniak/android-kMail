@@ -21,6 +21,7 @@ import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.DynamicRealmObject
 import io.realm.kotlin.dynamic.getValue
+import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 
@@ -38,6 +39,7 @@ val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
+    migrationContext.keepThreadsInFolderAfterNineteenthMigration()
 }
 
 // Migrate to version #1
@@ -69,6 +71,23 @@ private fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
 
                 // Rename property without losing its previous value
                 set(propertyName = "hasValidPassword", value = oldObject.getValue<Boolean>(fieldName = "isPasswordValid"))
+            }
+        }
+    }
+}
+
+/**
+ * Migrate from version #19
+ */
+private fun MigrationContext.keepThreadsInFolderAfterNineteenthMigration() {
+    if (oldRealm.schemaVersion() <= 19L) {
+        enumerate(className = "Folder") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Backup previous value
+                set(
+                    propertyName = "threads",
+                    value = oldObject.getObjectList(propertyName = "threads").mapTo(realmSetOf(), newRealm::findLatest),
+                )
             }
         }
     }
