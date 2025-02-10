@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -114,12 +115,13 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
-import kotlinx.serialization.encodeToString
 import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import kotlin.math.roundToInt
+
+const val IK_FOLDER = ".ik"
 
 //region Type alias
 // Explanation of this Map: Map<Email, Map<Name, MergedContact>>
@@ -331,32 +333,42 @@ fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: B
 
     if (isEmpty()) return this
 
-    tailrec fun formatFolderWithAllChildren(
-        inputList: MutableList<Folder>,
-        outputList: MutableList<Folder> = mutableListOf(),
-    ): List<Folder> {
+    return formatFolderWithAllChildren(dismissHiddenChildren, toMutableList())
+}
 
-        val folder = inputList.removeAt(0)
+private tailrec fun formatFolderWithAllChildren(
+    dismissHiddenChildren: Boolean,
+    inputList: MutableList<Folder>,
+    outputList: MutableList<Folder> = mutableListOf(),
+): List<Folder> {
 
-        val children = if (folder.isManaged()) {
-            outputList.add(folder.copyFromRealm(depth = 1u))
-            with(folder.children) {
-                (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query())
-                    .sortFolders()
-                    .find()
-            }
-        } else {
-            outputList.add(folder)
-            (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children)
-                .sortFolders()
+    val folder = inputList.removeAt(0)
+
+    /*
+    * There are two types of folders:
+    * - user's folders (with or without a role)
+    * - hidden IK folders (ScheduledDrafts, Snoozed, etc…)
+    *
+    * We want to display the user's folders, and also the IK folders for which we handle the role.
+    * IK folders where we don't handle the role are dismissed.
+    */
+    fun shouldThisFolderBeAdded(): Boolean = folder.path.startsWith(IK_FOLDER).not() || folder.role != null
+
+    val children = if (folder.isManaged()) {
+        if (shouldThisFolderBeAdded()) outputList.add(folder.copyFromRealm(depth = 1u))
+
+        with(folder.children) {
+            (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
         }
+    } else {
+        if (shouldThisFolderBeAdded()) outputList.add(folder)
 
-        inputList.addAll(index = 0, children)
-
-        return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
+        (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
     }
 
-    return formatFolderWithAllChildren(toMutableList())
+    inputList.addAll(index = 0, children)
+
+    return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(dismissHiddenChildren, inputList, outputList)
 }
 
 /**
@@ -398,10 +410,10 @@ fun DescriptionAlertDialog.deleteWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
     displayLoader: Boolean = true,
-    onDismiss: (() -> Unit)? = null,
+    onCancel: (() -> Unit)? = null,
     callback: () -> Unit,
 ) = if (isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT) { // We don't want to display the popup for Drafts
-    showDeletePermanentlyDialog(count, displayLoader, callback, onDismiss)
+    showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
 } else {
     callback()
 }
@@ -576,7 +588,7 @@ fun Context.postfixWithTag(
                 tag,
                 getTagsPaint(this),
                 ellipsizeConfiguration.maxWidth,
-                ellipsizeConfiguration.truncateAt
+                ellipsizeConfiguration.truncateAt,
             ).toString()
         } ?: tag
     }
@@ -682,3 +694,5 @@ fun WebView.enableAlgorithmicDarkening(isEnabled: Boolean) {
         WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isEnabled)
     }
 }
+
+fun Data.getLongOrNull(key: String) = getLong(key, 0L).run { if (this == 0L) null else this }

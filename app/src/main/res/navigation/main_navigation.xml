@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@
 
         <action
             android:id="@+id/action_threadListFragment_to_attachMailboxFragment"
-            app:destination="@+id/attachMailboxFragment" />
+            app:destination="@id/attachMailboxFragment" />
         <action
             android:id="@+id/action_threadListFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
@@ -243,6 +243,21 @@
             app:argType="string" />
         <argument
             android:name="shouldLoadDistantResources"
+            app:argType="boolean" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/scheduleSendBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog"
+        android:label="ScheduleSendBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_schedule_send">
+        <argument
+            android:name="lastSelectedScheduleEpoch"
+            android:defaultValue="0L"
+            app:argType="long" />
+        <argument
+            android:name="isCurrentMailboxFree"
+            android:defaultValue="true"
             app:argType="boolean" />
     </dialog>
 
@@ -666,5 +681,11 @@
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialog"
         android:label="AccountBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_account" />
+
+    <dialog
+        android:id="@+id/upgradeProductBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.UpgradeProductBottomSheetDialog"
+        android:label="UpgradeProductBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_upgrade_product" />
 
 </navigation>

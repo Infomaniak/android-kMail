@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,6 +95,8 @@ class Thread : RealmObject {
     // It's only used to filter locally the Threads' list.
     @Transient
     var isLocallyMovedOut: Boolean = false
+    @Transient
+    var numberOfScheduledDrafts: Int = 0
     //endregion
 
     private val _folders by backlinks(Folder::threads)
@@ -135,6 +137,7 @@ class Thread : RealmObject {
 
         val shouldAddMessage = when (FolderController.getFolder(folderId, realm)?.role) {
             FolderRole.DRAFT -> newMessage.isDraft // In Draft folder: only add draft Messages.
+            FolderRole.SCHEDULED_DRAFTS -> newMessage.isScheduledDraft // In ScheduledDrafts folder: only add scheduled Messages.
             FolderRole.TRASH -> newMessage.isTrashed // In Trash folder: only add deleted Messages.
             else -> !newMessage.isTrashed // In other folders: only add non-deleted Messages.
         }
@@ -188,6 +191,7 @@ class Thread : RealmObject {
         isAnswered = false
         isForwarded = false
         hasAttachable = false
+        numberOfScheduledDrafts = 0
     }
 
     private fun updateThread() {
@@ -210,6 +214,7 @@ class Thread : RealmObject {
                 isAnswered = false
             }
             if (message.hasAttachable) hasAttachable = true
+            if (message.isScheduledDraft) numberOfScheduledDrafts++
         }
 
         date = messages.last { it.folderId == folderId }.date
@@ -237,12 +242,14 @@ class Thread : RealmObject {
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
 
-        val message = messages
-            .lastOrNull { it.folder.role != FolderRole.SENT && it.folder.role != FolderRole.DRAFT }
-            ?: messages.last()
+        val message = messages.lastOrNull {
+            it.folder.role != FolderRole.SENT &&
+                    it.folder.role != FolderRole.DRAFT &&
+                    it.folder.role != FolderRole.SCHEDULED_DRAFTS
+        } ?: messages.last()
 
         val recipients = when (message.folder.role) {
-            FolderRole.SENT, FolderRole.DRAFT -> message.to
+            FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS -> message.to
             else -> message.from
         }
 
@@ -264,7 +271,7 @@ class Thread : RealmObject {
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {
-        FolderRole.SENT, FolderRole.DRAFT -> to
+        FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS -> to
         else -> from
     }
 

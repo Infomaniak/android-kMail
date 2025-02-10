@@ -131,14 +131,14 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
         binding.spam.apply {
             setIconResource(spamIcon)
-            setText(spamText)
+            setTitle(spamText)
         }
 
         val favoriteIcon = if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar
         val favoriteText = if (shouldFavorite) R.string.actionStar else R.string.actionUnstar
         binding.favorite.apply {
             setIconResource(favoriteIcon)
-            setText(favoriteText)
+            setTitle(favoriteText)
         }
     }
 

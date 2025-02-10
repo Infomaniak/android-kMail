@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ class NewMessageActivity : BaseActivity() {
 
     private fun saveDraft() {
         val draftSaveConfiguration = DraftSaveConfiguration(
-            action = if (newMessageViewModel.shouldSendInsteadOfSave) DraftAction.SEND else DraftAction.SAVE,
+            action = newMessageViewModel.draftAction,
             isFinishing = isFinishing,
             isTaskRoot = isTaskRoot,
             startWorkerCallback = ::startWorker,

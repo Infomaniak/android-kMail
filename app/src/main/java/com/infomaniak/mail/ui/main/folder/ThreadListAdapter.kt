@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,6 +105,8 @@ class ThreadListAdapter @Inject constructor(
     var openedThreadUid: String? = null
         private set
     //endregion
+
+    private val isMultiselectDisabledInThisFolder: Boolean get() = folderRole == FolderRole.SCHEDULED_DRAFTS
 
     init {
         setHasStableIds(true)
@@ -231,6 +233,7 @@ class ThreadListAdapter @Inject constructor(
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
             mailDate.text = formatDate(context)
 
+            scheduleSendIcon.isVisible = numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS
             draftPrefix.isVisible = hasDrafts
 
             val (isIconReplyVisible, isIconForwardVisible) = computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded)
@@ -242,7 +245,7 @@ class ThreadListAdapter @Inject constructor(
             iconFavorite.isVisible = isFavorite
 
             val messagesCount = messages.count()
-            threadCountText.text = messagesCount.toString()
+            threadCountText.text = "$messagesCount"
             threadCountCard.isVisible = messagesCount > 1
 
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
@@ -252,13 +255,15 @@ class ThreadListAdapter @Inject constructor(
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
-                onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
+                onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.LONG_PRESS)
                 true
             }
             expeditorAvatar.apply {
-                setOnClickListener { onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.CLICK) }
+                setOnClickListener {
+                    onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.CLICK)
+                }
                 setOnLongClickListener {
-                    onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
+                    onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.LONG_PRESS)
                     true
                 }
             }
@@ -310,9 +315,15 @@ class ThreadListAdapter @Inject constructor(
 
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
         thread: Thread,
+        position: Int,
         listener: MultiSelectionListener<Thread>,
         action: TrackerAction,
     ) {
+        if (isMultiselectDisabledInThisFolder) {
+            onThreadClicked(thread, position)
+            return
+        }
+
         val hasOpened = openMultiSelectionIfClosed(listener, action)
         toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !hasOpened)
     }
@@ -664,25 +675,33 @@ class ThreadListAdapter @Inject constructor(
         }
 
         if (threadDensity == ThreadDensity.COMPACT) {
-            if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
-                multiSelection?.selectedItems?.removeAll {
-                    scope.ensureActive()
-                    !threads.contains(it)
-                }
-            }
+            cleanMultiSelectionItems(threads, scope)
             addAll(threads)
         } else {
             var previousSectionTitle = ""
             threads.forEach { thread ->
                 scope.ensureActive()
-                val sectionTitle = thread.getSectionTitle(context)
-                when {
-                    sectionTitle != previousSectionTitle -> {
-                        add(sectionTitle)
-                        previousSectionTitle = sectionTitle
+
+                if (folderRole != FolderRole.SCHEDULED_DRAFTS) {
+                    val sectionTitle = thread.getSectionTitle(context)
+                    when {
+                        sectionTitle != previousSectionTitle -> {
+                            add(sectionTitle)
+                            previousSectionTitle = sectionTitle
+                        }
                     }
                 }
+
                 add(thread)
+            }
+        }
+    }
+
+    private fun cleanMultiSelectionItems(threads: List<Thread>, scope: CoroutineScope) {
+        if (multiSelection?.selectedItems?.let(threads::containsAll) == false) {
+            multiSelection?.selectedItems?.removeAll {
+                scope.ensureActive()
+                !threads.contains(it)
             }
         }
     }

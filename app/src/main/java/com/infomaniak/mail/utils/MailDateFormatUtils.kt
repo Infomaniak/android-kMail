@@ -47,10 +47,10 @@ object MailDateFormatUtils {
         }
     }
 
-    fun mostDetailedDate(context: Context, date: Date): String = with(date) {
+    fun mostDetailedDate(context: Context, date: Date, format: String = FORMAT_EMAIL_DATE_LONG_DATE): String = with(date) {
         return@with context.getString(
             R.string.messageDetailsDateAt,
-            format(FORMAT_EMAIL_DATE_LONG_DATE),
+            format(format),
             format(FORMAT_EMAIL_DATE_HOUR),
         )
     }

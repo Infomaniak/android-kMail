@@ -76,8 +76,8 @@
                 app:icon="@drawable/ic_bin"
                 app:iconColor="@color/redDestructiveAction"
                 app:iconSize="@dimen/standardIconSize"
-                app:text="@string/buttonAccountDelete"
-                app:textColor="@color/redDestructiveAction" />
+                app:title="@string/buttonAccountDelete"
+                app:titleColor="@color/redDestructiveAction" />
 
             <com.infomaniak.mail.views.InformationBlockView
                 android:layout_width="match_parent"

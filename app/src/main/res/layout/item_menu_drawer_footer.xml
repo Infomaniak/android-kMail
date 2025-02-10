@@ -92,7 +92,7 @@
             android:layout_marginStart="@dimen/marginStandardMedium"
             app:layout_constraintBottom_toBottomOf="@id/storageIndicator"
             app:layout_constraintStart_toEndOf="@id/storageIndicator"
-            app:layout_constraintTop_toTopOf="@+id/storageIndicator"
+            app:layout_constraintTop_toTopOf="@id/storageIndicator"
             tools:text="60.5 Ko / 20 Go utilisés" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

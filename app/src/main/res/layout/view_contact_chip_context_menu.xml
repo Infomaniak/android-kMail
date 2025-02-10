@@ -45,7 +45,7 @@
             app:dividerColor="@color/popupDividerColor"
             app:icon="@drawable/ic_contact_action_copy"
             app:iconPaddingHorizontal="@dimen/marginStandardMedium"
-            app:text="Copier l'adresse mail" />
+            app:title="Copier l'adresse mail" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/deleteContactButton"
@@ -54,7 +54,7 @@
             app:dividerColor="@color/popupDividerColor"
             app:icon="@drawable/ic_bin"
             app:iconPaddingHorizontal="@dimen/marginStandardMedium"
-            app:text="Supprimer" />
+            app:title="Supprimer" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

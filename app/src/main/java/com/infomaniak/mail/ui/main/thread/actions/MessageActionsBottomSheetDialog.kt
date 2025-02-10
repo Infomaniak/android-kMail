@@ -74,7 +74,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             if (requireContext().isNightModeEnabled()) {
                 binding.lightTheme.apply {
                     isVisible = true
-                    setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
+                    setTitle(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
                     setClosingOnClickListener { mainViewModel.toggleLightThemeForMessage.value = message }
                 }
             }

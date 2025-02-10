@@ -39,8 +39,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME
 import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
@@ -201,7 +203,7 @@ class ThreadAdapter(
         initMapForNewMessage(message, position)
 
         bindHeader(message)
-        bindAlerts(message.uid)
+        bindAlerts(message)
         bindCalendarEvent(message)
         bindAttachments(message)
         bindContent(message)
@@ -350,6 +352,22 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date.toDate()
 
+        if (message.isScheduledDraft) {
+            scheduleAlert.setDescription(
+                context.getString(
+                    R.string.scheduledEmailHeader,
+                    message.date.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME),
+                ),
+            )
+            scheduleSendIcon.isVisible = true
+            alertsGroup.isVisible = true
+            scheduleAlert.isVisible = true
+        } else {
+            scheduleSendIcon.isGone = true
+            alertsGroup.isGone = true
+            scheduleAlert.isGone = true
+        }
+
         if (message.isDraft) {
             userAvatar.loadAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
@@ -437,12 +455,18 @@ class ThreadAdapter(
         detailedMessageDate.text = mostDetailedDate(context, messageDate)
     }
 
-    private fun MessageViewHolder.bindAlerts(messageUid: String) = with(binding) {
+    private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
+        message.draftResource?.let { draftResource ->
+            scheduleAlert.onAction1 { threadAdapterCallbacks?.onRescheduleClicked?.invoke(draftResource) }
+        }
+
+        scheduleAlert.onAction2 { threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message) }
+
         distantImagesAlert.onAction1 {
             bodyWebViewClient.unblockDistantResources()
             fullMessageWebViewClient.unblockDistantResources()
 
-            manuallyAllowedMessagesUids.add(messageUid)
+            manuallyAllowedMessagesUids.add(message.uid)
 
             reloadVisibleWebView()
 
@@ -620,11 +644,11 @@ class ThreadAdapter(
             setOnClickListener { threadAdapterCallbacks?.onDeleteDraftClicked?.invoke(message) }
         }
         replyButton.apply {
-            isVisible = isExpanded
+            isVisible = isExpanded && message.isScheduledDraft.not()
             setOnClickListener { threadAdapterCallbacks?.onReplyClicked?.invoke(message) }
         }
         menuButton.apply {
-            isVisible = isExpanded
+            isVisible = isExpanded && message.isScheduledDraft.not()
             setOnClickListener { threadAdapterCallbacks?.onMenuClicked?.invoke(message) }
         }
 
@@ -745,6 +769,8 @@ class ThreadAdapter(
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
+        var onRescheduleClicked: ((String) -> Unit)? = null,
+        var onModifyScheduledClicked: ((Message) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {

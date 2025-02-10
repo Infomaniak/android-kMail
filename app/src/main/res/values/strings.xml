@@ -139,6 +139,7 @@
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateAccount">Create an account</string>
     <string name="buttonCreateFolder">Add a folder</string>
+    <string name="buttonCustomSchedule">Custom schedule</string>
     <string name="buttonDetachMailbox">detach mailbox</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
@@ -153,6 +154,7 @@
     <string name="buttonLogInDifferentAccount">Log in with another account</string>
     <string name="buttonLogin">Login</string>
     <string name="buttonMaybe">Maybe</string>
+    <string name="buttonModify">Modify</string>
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonNewMessage">New message</string>
@@ -160,8 +162,10 @@
     <string name="buttonOpenMyCalendar">Open in my calendar</string>
     <string name="buttonRefuse">Refuse</string>
     <string name="buttonRequestPassword">Request password</string>
+    <string name="buttonReschedule">Reschedule</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
+    <string name="buttonScheduleTitle">Schedule</string>
     <string name="buttonSee">See</string>
     <string name="buttonSelectAll">All</string>
     <string name="buttonShare">Share</string>
@@ -191,6 +195,7 @@
     <string name="contactMe">Me</string>
     <string name="contactsSearch">Contacts</string>
     <string name="contentDescriptionAccountSelection">Selected account</string>
+    <string name="contentDescriptionActionIcon">Action icon</string>
     <string name="contentDescriptionButtonBack">Back</string>
     <string name="contentDescriptionButtonDelete">Delete %s</string>
     <string name="contentDescriptionButtonDeleteDraft">Delete draft</string>
@@ -221,6 +226,9 @@
     <string name="contentDescriptionIconReply">Reply</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionOpenMailActions">Open mail actions</string>
+    <string name="contentDescriptionSchedule">Schedule icon</string>
+    <string name="contentDescriptionScheduleSend">Scheduled message</string>
+    <string name="contentDescriptionScheduleText">Scheduled date</string>
     <string name="contentDescriptionSelectedItem">Selected</string>
     <string name="contentDescriptionUnreadPastille">This folder contains unread mails</string>
     <string name="contentDescriptionUserAvatar">User avatar</string>
@@ -237,12 +245,17 @@
     <string name="createFolderName">Name of the folder</string>
     <string name="createFolderNoParent">None</string>
     <string name="createFolderParent">Parent folder</string>
+    <string name="datePickerTitle">Choose a date and time</string>
     <string name="dateTitle">Date:</string>
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
+    <string name="disabledFeatureFlagDescription">You will soon be able to unlock the limits of your ik.me email address\n(storage limit, custom schedule, sending and more…)</string>
+    <string name="disabledFeatureFlagTitle">Need more storage and features?</string>
     <string name="displayMailIssueDescription">To fix display problems, please update the Android System Webview application.</string>
     <string name="displayMailIssueTitle">Problem displaying your emails</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
+    <string name="editSendDescription">This message will be moved to your drafts to be sent whenever you want.</string>
+    <string name="editSendTitle">Edit Send</string>
     <string name="emailWithoutSubjectDescription">You are about to send a message without a subject. Do you want to continue?</string>
     <string name="emailWithoutSubjectTitle">Empty subject</string>
     <string name="emptyStateFolderDescription">There is nothing to see here.</string>
@@ -264,6 +277,7 @@
     <string name="errorAtLeastOneRecipient">At least one recipient is required</string>
     <string name="errorAttachmentNotFound">Attachment cannot be found</string>
     <string name="errorCalendarChoiceCouldNotBeSent">An error has occurred while sending your answer</string>
+    <string name="errorChooseUpcomingDate">Select an upcoming date</string>
     <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
     <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
@@ -285,6 +299,10 @@
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>
     <string name="errorRefusedSender">The server is refusing the sender</string>
+    <plurals name="errorScheduleDelayTooShort">
+        <item quantity="one">You can’t schedule an email less than %d minute in the future</item>
+        <item quantity="other">You can’t schedule an email less than %d minutes in the future</item>
+    </plurals>
     <string name="errorSendLimitExceeded">Sending limit reached</string>
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
@@ -313,6 +331,8 @@
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="inboxFolder">Inbox</string>
+    <string name="lastSelectedSchedule">Last selected schedule</string>
+    <string name="laterThisMorning">Later this morning</string>
     <string name="linkingWord">and</string>
     <string name="loadingText">Loading…</string>
     <string name="lockedMailboxBottomSheetDescription">Access to your mailbox is currently blocked.\nFor further information, please read FAQ.</string>
@@ -333,6 +353,8 @@
     <string name="messageIsDraftOption">Draft</string>
     <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
     <string name="messageShowQuotedText">Display the conversation</string>
+    <string name="mondayAfternoon">Monday afternoon</string>
+    <string name="mondayMorning">Monday morning</string>
     <string name="moreStorageText1">Your mailbox is full and you can‘t receive any more messages 🥲</string>
     <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, …)</string>
     <string name="moreStorageTitle">Is your box full? Get more storage!</string>
@@ -354,6 +376,7 @@
         <item quantity="other">%d new messages</item>
     </plurals>
     <string name="newMessagePlaceholderTitle">Type your message</string>
+    <string name="nextMonday">Next monday</string>
     <string name="noBodyTitle">This message is empty.</string>
     <string name="noConversationSelected">No conversation selected in %s</string>
     <string name="noFolderTitle">You don’t have any folder yet…</string>
@@ -401,6 +424,8 @@
     <string name="reviewAlertTitle">Do you like Infomaniak Mail?</string>
     <string name="saveToDriveDeviceItem">Save to device</string>
     <string name="saveToDriveItem">Save to kDrive</string>
+    <string name="scheduleSendingTitle">Schedule sending</string>
+    <string name="scheduledEmailHeader">This email will be sent on this date: %s</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
     <string name="searchAllMessages">All messages</string>
     <string name="searchFieldPlaceholder">Search an email</string>
@@ -409,7 +434,9 @@
     <string name="searchFilterRead">Read</string>
     <string name="searchFilterUnread">Unread</string>
     <string name="searchFolderName">Search</string>
+    <string name="selectDateDialogTitle">Select date</string>
     <string name="selectSignatureNone">No signature</string>
+    <string name="selectTimeDialogTitle">Select time</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>
@@ -523,6 +550,9 @@
     <string name="snackbarPhoneNumberCopiedToClipboard">Number copied to clipboard</string>
     <string name="snackbarReportPhishingConfirmation">Successfully reported</string>
     <string name="snackbarRestorationLaunched">Launching the restoration</string>
+    <string name="snackbarSaveInDraft">Your message has been saved in drafts.</string>
+    <string name="snackbarScheduleSaved">The message will be sent on %s</string>
+    <string name="snackbarScheduling">The message is being scheduled</string>
     <plurals name="snackbarSenderBlacklisted">
         <item quantity="one">Sender successfully blacklisted</item>
         <item quantity="other">Senders successfully blacklisted</item>
@@ -548,6 +578,8 @@
     <string name="syncInstallDescription">To download the kSync application from the Play Store, click on \"Install\", then return to your Mail application.</string>
     <string name="syncInstalled">Installed</string>
     <string name="syncStartDescription">Activate the calendars and address books in kSync that you wish to synchronize with your phone.</string>
+    <string name="thisAfternoon">This afternoon</string>
+    <string name="thisEvening">This evening</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
         <item quantity="one">Are you sure you want to delete this message permanently?</item>
         <item quantity="other">Are you sure you want to delete these messages permanently?</item>
@@ -577,6 +609,7 @@
         <item quantity="other">My accounts</item>
     </plurals>
     <string name="toTitle">To:</string>
+    <string name="tomorrowMorning">Tomorrow morning</string>
     <string name="tooManyRecipients">You can’t add this address because you have reached the limit of recipients</string>
     <string name="trashFolder">Trash</string>
     <string name="unknownRecipientTitle">(unknown)</string>

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,8 +58,8 @@ class ThreadController @Inject constructor(
 ) {
 
     //region Get data
-    fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folder, filter).asFlow()
+    fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL, sortOrder: Sort): Flow<ResultsChange<Thread>> {
+        return getThreadsQuery(folder, filter, sortOrder).asFlow()
     }
 
     fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
@@ -217,11 +217,15 @@ class ThreadController @Inject constructor(
             return folder.threads.query(unseen).count()
         }
 
-        private fun getThreadsQuery(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): RealmQuery<Thread> {
+        private fun getThreadsQuery(
+            folder: Folder,
+            filter: ThreadFilter = ThreadFilter.ALL,
+            sortOrder: Sort,
+        ): RealmQuery<Thread> {
 
             val notFromSearch = "${Thread::isFromSearch.name} == false"
             val notLocallyMovedOut = " AND ${Thread::isLocallyMovedOut.name} == false"
-            val realmQuery = folder.threads.query(notFromSearch + notLocallyMovedOut).sort(Thread::date.name, Sort.DESCENDING)
+            val realmQuery = folder.threads.query(notFromSearch + notLocallyMovedOut).sort(Thread::date.name, sortOrder)
 
             return if (filter == ThreadFilter.ALL) {
                 realmQuery

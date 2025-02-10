@@ -96,7 +96,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             R.string.actionReportJunk to R.drawable.ic_report_junk
         }
 
-        setText(text)
+        setTitle(text)
         setIconResource(icon)
         isVisible = true
     }

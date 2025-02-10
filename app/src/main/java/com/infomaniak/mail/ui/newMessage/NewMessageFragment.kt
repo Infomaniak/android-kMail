@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,11 +43,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.FilePicker
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.lib.core.utils.isNightModeEnabled
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.richhtmleditor.StatusCommand.*
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -57,6 +54,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -65,6 +63,10 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.InformationAlertDialog
+import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_DATE_AND_TIME_SCHEDULE_DIALOG
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
@@ -89,6 +91,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
 
@@ -150,6 +153,9 @@ class NewMessageFragment : Fragment() {
     @Inject
     lateinit var snackbarManager: SnackbarManager
 
+    @Inject
+    lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
@@ -180,11 +186,12 @@ class NewMessageFragment : Fragment() {
         observeRecipients()
         observeAttachments()
         observeImportAttachmentsResult()
-        observeOpenAttachment()
         observeBodyLoader()
         observeUiSignature()
         observeUiQuote()
         observeShimmering()
+
+        setupBackActionHandler()
 
         with(editorManager) {
             observeEditorFormatActions()
@@ -204,12 +211,31 @@ class NewMessageFragment : Fragment() {
             observeContacts()
             observeCcAndBccVisibility()
         }
+
+        observeScheduledDraftsFeatureFlagUpdates()
     }
 
-    private fun observeShimmering() {
-        lifecycleScope.launch {
-            newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
+    private fun setupBackActionHandler() {
+
+        fun scheduleDraft(timestamp: Long) {
+            newMessageViewModel.setScheduleDate(Date(timestamp))
+            tryToSendEmail(scheduled = true)
         }
+
+        getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
+            dateAndTimeScheduleDialog.show(
+                title = getString(R.string.datePickerTitle),
+                onSchedule = { timestamp ->
+                    localSettings.lastSelectedScheduleEpoch = timestamp
+                    scheduleDraft(timestamp)
+                },
+                onAbort = ::navigateToScheduleSendBottomSheet,
+            )
+        }
+
+        getBackNavigationResult(SCHEDULE_DRAFT_RESULT, ::scheduleDraft)
+
+        getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
 
     private fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {
@@ -339,7 +365,7 @@ class NewMessageFragment : Fragment() {
 
         initEditorUi()
 
-        setupSendButton()
+        setupSendButtons()
         externalsManager.setupExternalBanner()
 
         scrim.setOnClickListener {
@@ -622,10 +648,6 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeOpenAttachment() {
-        getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
-    }
-
     private fun observeImportAttachmentsResult() = with(newMessageViewModel) {
         importAttachmentsResult.observe(viewLifecycleOwner) { result ->
             if (result == ImportationResult.ATTACHMENTS_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
@@ -658,6 +680,17 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun observeShimmering() = lifecycleScope.launch {
+        newMessageViewModel.isShimmering.collect(::setShimmerVisibility)
+    }
+
+    private fun observeScheduledDraftsFeatureFlagUpdates() {
+        newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
+            val isScheduledDraftsEnabled = mailbox.featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
+            binding.scheduleButton.isVisible = isScheduledDraftsEnabled
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         newMessageViewModel.discardOldBodyAndSubjectChannelMessages()
@@ -680,24 +713,40 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.deleteAttachment(position)
     }
 
-    private fun setupSendButton() = with(binding) {
+    private fun setupSendButtons() = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
+            scheduleButton.isEnabled = it
             sendButton.isEnabled = it
         }
+
+        scheduleButton.setOnClickListener { navigateToScheduleSendBottomSheet() }
 
         sendButton.setOnClickListener { tryToSendEmail() }
     }
 
-    private fun tryToSendEmail() {
+    private fun navigateToScheduleSendBottomSheet() {
+        safeNavigate(
+            resId = R.id.scheduleSendBottomSheetDialog,
+            args = ScheduleSendBottomSheetDialogArgs(
+                lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
+            ).toBundle(),
+        )
+    }
+
+    private fun tryToSendEmail(scheduled: Boolean = false) {
 
         fun setSnackbarActivityResult() {
             val resultIntent = Intent()
-            resultIntent.putExtra(MainActivity.DRAFT_ACTION_KEY, DraftAction.SEND.name)
+            resultIntent.putExtra(
+                MainActivity.DRAFT_ACTION_KEY,
+                if (scheduled) DraftAction.SCHEDULE.name else DraftAction.SEND.name,
+            )
             requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
         }
 
         fun sendEmail() {
-            newMessageViewModel.shouldSendInsteadOfSave = true
+            newMessageViewModel.draftAction = if (scheduled) DraftAction.SCHEDULE else DraftAction.SEND
             setSnackbarActivityResult()
             requireActivity().finishAppAndRemoveTaskIfNeeded()
         }
@@ -713,6 +762,7 @@ class NewMessageFragment : Fragment() {
                     trackNewMessageEvent("sendWithoutSubjectConfirm")
                     sendEmail()
                 },
+                onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
             )
         } else {
             sendEmail()

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import org.jsoup.nodes.Document
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -134,7 +135,7 @@ class NewMessageViewModel @Inject constructor(
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
     var isExternalBannerManuallyClosed = false
-    var shouldSendInsteadOfSave = false
+    var draftAction = DraftAction.SAVE
     var signaturesCount = 0
     private var isNewMessage = false
 
@@ -855,6 +856,17 @@ class NewMessageViewModel @Inject constructor(
         }.onFailure(Sentry::captureException)
     }
 
+    fun setScheduleDate(date: Date?) = viewModelScope.launch(ioDispatcher) {
+        val localUuid = draftLocalUuid ?: return@launch
+        mailboxContentRealm().write {
+            DraftController.getDraft(localUuid, realm = this)?.also { draft ->
+                draft.scheduleDate = date?.format(FORMAT_SCHEDULE_MAIL)
+            }
+        }
+    }
+
+    fun resetScheduledDate() = setScheduleDate(date = null)
+
     fun storeBodyAndSubject(subject: String, html: String) {
         globalCoroutineScope.launch(ioDispatcher) {
             _subjectAndBodyChannel.send(SubjectAndBodyData(subject, html, channelExpirationIdTarget))
@@ -1026,17 +1038,26 @@ class NewMessageViewModel @Inject constructor(
         isTaskRoot: Boolean,
     ) = withContext(mainDispatcher) {
         when (action) {
-            DraftAction.SAVE -> {
-                if (isFinishing) {
-                    if (isTaskRoot) appContext.showToast(R.string.snackbarDraftSaving)
-                } else {
-                    appContext.showToast(R.string.snackbarDraftSaving)
-                }
-            }
-            DraftAction.SEND -> {
-                if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
-            }
+            DraftAction.SAVE -> showSaveToast(isFinishing, isTaskRoot)
+            DraftAction.SEND -> showSendToast(isTaskRoot)
+            DraftAction.SCHEDULE -> showScheduleToast(isTaskRoot)
         }
+    }
+
+    private fun showSaveToast(isFinishing: Boolean, isTaskRoot: Boolean) {
+        if (isFinishing) {
+            if (isTaskRoot) appContext.showToast(R.string.snackbarDraftSaving)
+        } else {
+            appContext.showToast(R.string.snackbarDraftSaving)
+        }
+    }
+
+    private fun showSendToast(isTaskRoot: Boolean) {
+        if (isTaskRoot) appContext.showToast(R.string.snackbarEmailSending)
+    }
+
+    private fun showScheduleToast(isTaskRoot: Boolean) {
+        if (isTaskRoot) appContext.showToast(R.string.snackbarScheduling)
     }
 
     private fun MutableLiveData<UiRecipients>.addRecipientThenSetValue(recipient: Recipient) {
