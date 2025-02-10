@@ -163,13 +163,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureSentry() {
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
-
-            /**
-             * The default value is 100.
-             * But Realm breadcrumbs are spamming a lot, so we increase this limit for now, to see if it's enough or not.
-             */
-            options.maxBreadcrumbs = 200
-
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
 
