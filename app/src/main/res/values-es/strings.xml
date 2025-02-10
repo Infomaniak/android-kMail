@@ -403,7 +403,6 @@
     <string name="pickerNoSelection">Sin selección</string>
     <string name="popupDetachMailboxDescription">¿Estás seguro de que quieres separar la dirección %s?</string>
     <string name="popupDetachMailboxTitle">Separar dirección</string>
-    <string name="publicFolderSubtitle">Este espacio pertenece a %s y centraliza los archivos comunes de tu organización.</string>
     <string name="readFAQ">Lea las preguntas frecuentes</string>
     <string name="readMore">Seguir leyendo</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
