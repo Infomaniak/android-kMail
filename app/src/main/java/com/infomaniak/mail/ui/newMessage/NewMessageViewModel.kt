@@ -788,10 +788,8 @@ class NewMessageViewModel @Inject constructor(
             LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
 
             mailboxContentRealm().write {
-                draftController.updateDraft(draftLocalUuid!!, realm = this) { draftToUpdate ->
-                    draftToUpdate.attachments.apply {
-                        findSpecificAttachment(attachment)?.let(::delete)
-                    }
+                draftController.updateDraft(draftLocalUuid!!, realm = this) {
+                    it.attachments.findSpecificAttachment(attachment)?.let(::delete)
                 }
             }
 
