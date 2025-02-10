@@ -208,14 +208,7 @@ object AttachmentExtensions {
         }
     }
 
-    fun List<Attachment>.findSpecificAttachment(attachment: Attachment) = this
-        .filter { it.localUuid == attachment.localUuid }
-        .also {
-            // TODO: If this Sentry never triggers, remove it and replace the
-            //  `filter { … }.also { … }.firstOrNull()` with `singleOrNull { … }`
-            if (it.count() > 1) Sentry.captureMessage("Found several Attachments with the same localUuid")
-        }
-        .firstOrNull()
+    fun List<Attachment>.findSpecificAttachment(attachment: Attachment) = singleOrNull { it.localUuid == attachment.localUuid }
 
     enum class AttachmentIntentType {
         OPEN_WITH,
