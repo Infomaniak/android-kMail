@@ -1,0 +1,4 @@
+- Add the possibility to schedule an email
+- Display confirmation popup when deleting several conversation from the trash
+- Enhance notifications reliability
+- Fix an issue when removing an attachment from an email

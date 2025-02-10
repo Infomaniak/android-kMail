@@ -1,0 +1,4 @@
+- Ajout de la possibilité de programmer un email
+- Affichage d'une fenêtre de confirmation lors de la suppression de plusieurs conversations dans la corbeille
+- Amélioration de la fiabilité des notifications
+- Correction d'un problème lors de la suppression d'une pièce jointe dans un courriel
