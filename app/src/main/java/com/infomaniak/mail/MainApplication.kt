@@ -56,8 +56,6 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
-import io.realm.kotlin.log.LogLevel
-import io.realm.kotlin.log.RealmLog
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -132,7 +130,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         configureInfomaniakCore()
         notificationUtils.initNotificationChannel()
         configureHttpClient()
-        configureRealmLog()
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -166,13 +163,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureSentry() {
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
-
-            /**
-             * The default value is 100.
-             * But Realm breadcrumbs are spamming a lot, so we increase this limit for now, to see if it's enough or not.
-             */
-            options.maxBreadcrumbs = 200
-
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
 
@@ -220,8 +210,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                     enableAutoFragmentLifecycleTracing = true,
                 )
             )
-            options.isReportHistoricalAnrs = true
-            options.isAttachAnrThreadDump = true
         }
     }
 
@@ -264,12 +252,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             ),
         )
         HttpClient.init(tokenInterceptorListener)
-    }
-
-    private fun configureRealmLog() = with(RealmLog) {
-        setLevel(LogLevel.DEBUG)
-        removeAll() // Removing Realm system logs to avoid spamming the logcat
-        add(SentryRealmLogger()) // Adding our own Realm logger to log to Sentry
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
