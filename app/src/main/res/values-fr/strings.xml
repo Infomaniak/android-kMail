@@ -580,6 +580,7 @@
         <item quantity="other">Conversations déplacées vers %s</item>
         <item quantity="many">Conversations déplacées vers %s</item>
     </plurals>
+    <string name="snoozedFolder">En attente</string>
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>
     <string name="startActivityCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
