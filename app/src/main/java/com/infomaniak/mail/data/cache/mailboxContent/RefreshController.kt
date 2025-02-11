@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -188,27 +188,32 @@ class RefreshController @Inject constructor(
         }
     }
 
+    private val FOLDER_ROLES_TO_REFRESH_TOGETHER = setOf(
+        FolderRole.INBOX,
+        FolderRole.SENT,
+        FolderRole.DRAFT,
+        FolderRole.SCHEDULED_DRAFTS,
+    )
+
     private suspend fun Realm.refreshWithRoleConsideration(scope: CoroutineScope): Set<Thread> {
 
         val impactedThreads = refresh(scope, initialFolder)
         onStop?.invoke()
         clearCallbacks()
 
-        when (initialFolder.role) {
-            FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS)
-            FolderRole.SENT -> listOf(FolderRole.INBOX, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS)
-            FolderRole.DRAFT -> listOf(FolderRole.INBOX, FolderRole.SENT, FolderRole.SCHEDULED_DRAFTS)
-            FolderRole.SCHEDULED_DRAFTS -> listOf(FolderRole.INBOX, FolderRole.SENT, FolderRole.DRAFT)
-            else -> emptyList()
-        }.forEach { role ->
-            scope.ensureActive()
+        if (initialFolder.role in FOLDER_ROLES_TO_REFRESH_TOGETHER) {
+            for (role in FOLDER_ROLES_TO_REFRESH_TOGETHER) {
+                scope.ensureActive()
 
-            runCatching {
-                FolderController.getFolder(role, realm = this)?.let {
-                    refresh(scope, folder = it)
+                if (initialFolder.role == role) continue
+
+                runCatching {
+                    FolderController.getFolder(role, realm = this)?.let {
+                        refresh(scope, folder = it)
+                    }
+                }.onFailure {
+                    throw ReturnThreadsException(impactedThreads, exception = it)
                 }
-            }.onFailure {
-                throw ReturnThreadsException(impactedThreads, exception = it)
             }
         }
 
