@@ -1,0 +1,1 @@
+- Correctly disconnect user if its token expires
