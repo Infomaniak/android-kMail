@@ -568,6 +568,7 @@
         <item quantity="one">Unterhaltung in %s verschoben</item>
         <item quantity="other">Unterhaltungen in %s verschoben</item>
     </plurals>
+    <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>
     <string name="startActivityCantHandleAction">Es wurde keine Anwendung gefunden, die diese Aktion bearbeitet</string>
