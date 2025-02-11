@@ -296,6 +296,7 @@ class Thread : RealmObject {
         STARRED("favoriteFilter"),
         ATTACHMENTS("attachmentFilter"),
         FOLDER(SEARCH_FOLDER_FILTER_NAME),
+        SNOOZED("la matomo value pour dire qu'on a ouvert le dossier snoozed ?"), // TODO: Matomo
     }
 
     companion object {

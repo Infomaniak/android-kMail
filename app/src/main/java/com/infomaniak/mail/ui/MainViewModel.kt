@@ -202,10 +202,19 @@ class MainViewModel @Inject constructor(
         currentThreadsLiveJob?.cancel()
         currentThreadsLiveJob = viewModelScope.launch(ioCoroutineContext) {
             observeFolderAndFilter()
-                .flatMapLatest { (folder, filter) ->
+                .flatMapLatest { (folder, filters) ->
                     folder?.let {
-                        val sortOrder = if (folder.role == FolderRole.SCHEDULED_DRAFTS) Sort.ASCENDING else Sort.DESCENDING
-                        threadController.getThreadsAsync(it, filter, sortOrder)
+                        val sortOrder = if (it.role == FolderRole.SCHEDULED_DRAFTS) Sort.ASCENDING else Sort.DESCENDING
+                        val realFolder = if (it.role == FolderRole.SNOOZED) FolderController.getFolder(FolderRole.INBOX) else it
+                        // Il faut changer le comportement par défaut du ThreadFilter.
+                        // Par défaut, il se met en `ALL` quand il est reset.
+                        // Là, on veut qu'il soit `NOT_SNOOZED` à la place de `ALL` dans l'INBOX, et `SNOOZED` à la place de `ALL` dans le dossier Snoozed.
+                        when (it.role) {
+                            FolderRole.INBOX -> filters.add(ThreadFilter.NOT_SNOOZED)
+                            FolderRole.SNOOZED -> filters.add(ThreadFilter.SNOOZED)
+                            else -> filters.add(ThreadFilter.ALL)
+                        }
+                        threadController.getThreadsAsync(realFolder, filters, sortOrder)
                     } ?: emptyFlow()
                 }
                 .collect(currentThreadsLive::postValue)
