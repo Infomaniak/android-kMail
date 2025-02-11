@@ -574,6 +574,7 @@
         <item quantity="one">Conversation moved to %s</item>
         <item quantity="other">Conversations moved to %s</item>
     </plurals>
+    <string name="snoozedFolder">Snoozed</string>
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>
     <string name="startActivityCantHandleAction">No application has been found to handle this action</string>
