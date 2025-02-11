@@ -568,6 +568,7 @@
         <item quantity="one">Conversación trasladada a %s</item>
         <item quantity="other">Conversaciones trasladadas a %s</item>
     </plurals>
+    <string name="snoozedFolder">En espera</string>
     <string name="socialNetworksFolder">Redes sociales</string>
     <string name="spamFolder">Spam</string>
     <string name="startActivityCantHandleAction">No se ha encontrado ninguna aplicación que gestione esta acción</string>
