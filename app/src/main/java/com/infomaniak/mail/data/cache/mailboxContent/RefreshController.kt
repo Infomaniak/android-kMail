@@ -241,10 +241,10 @@ class RefreshController @Inject constructor(
 
         var totalNewThreads = 0
         var upToDateFolder = getUpToDateFolder(folderId)
-        var maxPagesToFetch = Utils.MAX_OLD_PAGES_TO_FETCH_TO_GET_ENOUGH_NEW_THREADS
+        var maxPagesToFetch = Utils.MAX_OLD_PAGES_TO_FETCH_TO_GET_ENOUGH_THREADS
 
         while (
-            totalNewThreads < Utils.PAGE_SIZE / 2 &&
+            totalNewThreads < Utils.MIN_THREADS_TO_GET_ENOUGH_THREADS &&
             upToDateFolder.oldMessagesUidsToFetch.isNotEmpty() &&
             maxPagesToFetch > 0
         ) {

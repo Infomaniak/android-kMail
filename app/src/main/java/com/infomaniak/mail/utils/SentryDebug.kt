@@ -85,9 +85,9 @@ object SentryDebug {
             category = "Cursor",
             message = message,
             data = mapOf(
-                "folderName" to folder.name,
-                "previousFolderCursor" to "${folder.cursor}",
-                "newFolderCursor" to "$cursor",
+                "folderRole or folderId" to folder.displayForSentry(),
+                "previous folderCursor" to "${folder.cursor}",
+                "new folderCursor" to "$cursor",
             ),
         )
     }
