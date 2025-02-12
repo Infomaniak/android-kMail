@@ -135,18 +135,18 @@ class SettingsFragment : Fragment() {
         } else {
             with(myKSuite.mail) {
                 KSuiteProductsWithQuotas.Mail(
-                    usedSize = { requireContext().formatShortFileSize(usedSize) },
-                    maxSize = { requireContext().formatShortFileSize(storageSizeLimit) },
-                    progress = { (usedSize.toDouble() / storageSizeLimit.toDouble()).toFloat() }
+                    usedSize = requireContext().formatShortFileSize(usedSize),
+                    maxSize = requireContext().formatShortFileSize(storageSizeLimit),
+                    progress = (usedSize.toDouble() / storageSizeLimit.toDouble()).toFloat(),
                 )
             }
         }
 
         val driveProduct = with(myKSuite.drive) {
             KSuiteProductsWithQuotas.Drive(
-                usedSize = { requireContext().formatShortFileSize(usedSize) },
-                maxSize = { requireContext().formatShortFileSize(size) },
-                progress = { (usedSize.toDouble() / size.toDouble()).toFloat() }
+                usedSize = requireContext().formatShortFileSize(usedSize),
+                maxSize = requireContext().formatShortFileSize(size),
+                progress = (usedSize.toDouble() / size.toDouble()).toFloat(),
             )
         }
 

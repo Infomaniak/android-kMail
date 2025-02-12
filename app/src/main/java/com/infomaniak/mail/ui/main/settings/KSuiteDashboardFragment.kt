@@ -19,9 +19,7 @@ package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
@@ -44,8 +42,9 @@ class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         setSystemBarsColors(statusBarColor = RMyKSuite.color.dashboardBackground)
-        return super.onCreateView(inflater, container, savedInstanceState)
     }
 }
