@@ -204,10 +204,6 @@ class ThreadController @Inject constructor(
             return getThreadsQuery(messageIds, realm).distinct(Thread::folderId.name).count()
         }
 
-        private fun getOrphanThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
-            return realm.query("${Thread::folderId.name} == ''")
-        }
-
         private fun getSearchThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
             return realm.query<Thread>("${Thread::isFromSearch.name} == true").sort(Thread::date.name, Sort.DESCENDING)
         }
@@ -272,10 +268,6 @@ class ThreadController @Inject constructor(
 
         fun getUnreadThreadsCount(folder: Folder): Int {
             return getUnreadThreadsCountQuery(folder).find().toInt()
-        }
-
-        fun getOrphanThreads(realm: TypedRealm): RealmResults<Thread> {
-            return getOrphanThreadsQuery(realm).find()
         }
         //endregion
 

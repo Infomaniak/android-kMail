@@ -45,7 +45,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.RealmList
@@ -527,14 +526,7 @@ class RefreshController @Inject constructor(
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
 
-            if (remoteMessage.uid.substringAfter('@') != folder.id) {
-                SentryDebug.sendMessageInWrongFolder(remoteMessage, folder, realm = this)
-            }
-
             initMessageLocalValues(remoteMessage, folder)
-
-            val shouldSkipThisMessage = isThisMessageAlreadyInRealm(remoteMessage, folder, folderMessages)
-            if (shouldSkipThisMessage) return@forEach
 
             addedMessagesUids.add(remoteMessage.shortUid)
 
@@ -598,29 +590,6 @@ class RefreshController @Inject constructor(
             ),
             latestCalendarEventResponse = null,
         )
-    }
-
-    private fun MutableRealm.isThisMessageAlreadyInRealm(
-        remoteMessage: Message,
-        folder: Folder,
-        folderMessages: MutableMap<String, Message>,
-    ): Boolean {
-
-        // Get managed version of existing Message
-        val existingMessage = folderMessages[remoteMessage.uid]?.let {
-            if (it.isManaged()) it else MessageController.getMessage(it.uid, realm = this)
-        }
-
-        // Add Sentry log and leave if the Message already exists
-        if (existingMessage != null && !existingMessage.isOrphan()) {
-            SentryLog.i(
-                "Realm",
-                "Already existing message in folder ${folder.displayForSentry()} | threadMode = ${localSettings.threadMode}",
-            )
-            return true
-        }
-
-        return false
     }
 
     private fun MutableRealm.isThereDuplicatedThreads(messageIds: RealmSet<String>, threadsCount: Int): Boolean {
