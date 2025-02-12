@@ -215,8 +215,8 @@ class FolderController @Inject constructor(
         //endregion
 
         //region Edit data
-        suspend fun updateFolder(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
-            realm.write { getFolder(id, realm = this)?.let(onUpdate) }
+        suspend fun updateFolder(id: String, realm: Realm, onUpdate: (MutableRealm, Folder) -> Unit) {
+            realm.write { getFolder(id, realm = this)?.let { onUpdate(this, it) } }
         }
 
         suspend fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {

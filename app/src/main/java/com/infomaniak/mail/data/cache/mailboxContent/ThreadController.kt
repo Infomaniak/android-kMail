@@ -238,6 +238,10 @@ class ThreadController @Inject constructor(
             }
         }
 
+        private fun getThreadsByFolderIdQuery(folderId: String, realm: TypedRealm): RealmQuery<Thread> {
+            return realm.query<Thread>("${Thread::folderId.name} == $0", folderId)
+        }
+
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
             return realm.query<Thread>("${Thread::uid.name} == $0", uid).first()
         }
@@ -268,6 +272,10 @@ class ThreadController @Inject constructor(
 
         fun getUnreadThreadsCount(folder: Folder): Int {
             return getUnreadThreadsCountQuery(folder).find().toInt()
+        }
+
+        fun getThreadsByFolderId(folderId: String, realm: TypedRealm): RealmResults<Thread> {
+            return getThreadsByFolderIdQuery(folderId, realm).find()
         }
         //endregion
 
