@@ -557,7 +557,7 @@ class MainActivity : BaseActivity() {
                 Shortcuts.SEARCH.id -> {
                     navController.navigate(
                         R.id.searchFragment,
-                        SearchFragmentArgs(dummyFolderId = mainViewModel.currentFolderId ?: Folder.INBOX_FOLDER_ID).toBundle(),
+                        SearchFragmentArgs(dummyFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID).toBundle(),
                     )
                 }
                 Shortcuts.NEW_MESSAGE.id -> navController.navigate(R.id.newMessageActivity)

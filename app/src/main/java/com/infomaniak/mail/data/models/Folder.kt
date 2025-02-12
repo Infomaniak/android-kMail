@@ -180,7 +180,7 @@ class Folder : RealmObject, Cloneable {
         val rolePropertyName = Folder::_role.name
         val parentsPropertyName = Folder::_parents.name
 
-        const val INBOX_FOLDER_ID = "eJzz9HPyjwAABGYBgQ--"
+        const val DUMMY_FOLDER_ID = "eJzz9HPyjwAABGYBgQ--" // Fun fact: It's actually the INBOX folder id. But nobody cares.
         private const val CUSTOM_FOLDER_ROLE_ORDER = 0
     }
 }

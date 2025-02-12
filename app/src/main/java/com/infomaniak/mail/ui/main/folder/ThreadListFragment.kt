@@ -369,7 +369,7 @@ class ThreadListFragment : TwoPaneFragment() {
                 // We need a valid Folder ID for the API call to not fail, but the value itself won't be used.
                 // So if we don't have any, we use a hardcoded one (corresponding to "INBOX" folder).
                 ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(
-                    dummyFolderId = mainViewModel.currentFolderId ?: Folder.INBOX_FOLDER_ID
+                    dummyFolderId = mainViewModel.currentFolderId ?: Folder.DUMMY_FOLDER_ID
                 ),
             )
         }
