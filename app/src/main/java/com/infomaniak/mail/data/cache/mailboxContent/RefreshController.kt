@@ -258,7 +258,7 @@ class RefreshController @Inject constructor(
         val result = getDateOrderedMessagesUids(folder.id)!!
         scope.ensureActive()
 
-        FolderController.updateFolder(folder.id, realm = this) {
+        FolderController.updateFolder(folder.id, realm = this) { _, it ->
             it.oldMessagesUidsToFetch.replaceContent(result.addedShortUids)
             it.lastUpdatedAt = Date().toRealmInstant()
             it.cursor = result.cursor
@@ -339,7 +339,20 @@ class RefreshController @Inject constructor(
 
         val impactedThreads = handleAddedUids(scope, folder, uidsToFetch)
 
-        FolderController.updateFolder(folder.id, realm = this) {
+        var inboxUnreadCount: Int? = null
+
+        FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
+
+            val allThreads = ThreadController.getThreadsByFolderId(it.id, realm = mutableRealm)
+            it.threads.replaceContent(list = allThreads)
+
+            val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
+
+            inboxUnreadCount = updateFoldersUnreadCount(
+                foldersIds = (if (isConversationMode) allThreads.mapTo(mutableSetOf()) { it.folderId } else emptySet()) + folder.id,
+                realm = mutableRealm,
+            )
+
             if (direction == Direction.TO_THE_FUTURE) {
                 it.newMessagesUidsToFetch.replaceContent(uidsRemaining)
                 it.lastUpdatedAt = Date().toRealmInstant()
@@ -354,6 +367,8 @@ class RefreshController @Inject constructor(
 
             if (it.role == FolderRole.SCHEDULED_DRAFTS) it.isDisplayed = it.threads.isNotEmpty()
         }
+
+        updateMailboxUnreadCount(inboxUnreadCount)
 
         sendOrphanMessages(folder)
 
@@ -414,17 +429,12 @@ class RefreshController @Inject constructor(
 
         apiResponse.data?.messages?.let { messages ->
 
-            var inboxUnreadCount: Int? = null
             write {
                 val upToDateFolder = getUpToDateFolder(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
-                val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode).also { threads ->
-                    inboxUnreadCount = updateFoldersUnreadCount(
-                        foldersIds = (if (isConversationMode) threads.mapTo(mutableSetOf()) { it.folderId } else emptySet()) + folder.id,
-                        realm = this,
-                    )
-                }
+                val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode)
 
+                // TODO: This count will be false for INBOX & SNOOZED
                 val messagesCount = MessageController.getMessagesCountByFolderId(upToDateFolder.id, realm = this)
                 SentryLog.d(
                     "Realm",
@@ -433,8 +443,6 @@ class RefreshController @Inject constructor(
 
                 impactedThreads += allImpactedThreads.filter { it.folderId == upToDateFolder.id }
             }
-
-            updateMailboxUnreadCount(inboxUnreadCount)
         }
 
         return impactedThreads
@@ -541,7 +549,7 @@ class RefreshController @Inject constructor(
                 remoteMessage.toThread()
             }
 
-            newThread?.let { addNewThreadToFolder(it, folder, impactedThreadsManaged) }
+            newThread?.let { putNewThreadInRealm(it, impactedThreadsManaged) }
 
             folderMessages[remoteMessage.uid] = remoteMessage
         }
@@ -668,11 +676,8 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun MutableRealm.addNewThreadToFolder(newThread: Thread, folder: Folder, impactedThreadsManaged: MutableSet<Thread>) {
-        ThreadController.upsertThread(newThread, realm = this).also {
-            folder.threads.add(it)
-            impactedThreadsManaged += it
-        }
+    private fun MutableRealm.putNewThreadInRealm(newThread: Thread, impactedThreadsManaged: MutableSet<Thread>) {
+        impactedThreadsManaged += ThreadController.upsertThread(newThread, realm = this)
     }
 
     private fun getExistingMessages(existingThreads: List<Thread>): Set<Message> {
