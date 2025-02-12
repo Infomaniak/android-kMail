@@ -560,7 +560,7 @@ class RefreshController @Inject constructor(
         impactedThreadsManaged: MutableSet<Thread>,
     ): Thread? {
         // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
-        val existingThreads = ThreadController.getThreads(remoteMessage.messageIds, realm = this)
+        val existingThreads = ThreadController.getThreadsByMessageIds(remoteMessage.messageIds, realm = this)
         val existingMessages = getExistingMessages(existingThreads)
 
         // Some Messages don't have references to all previous Messages of the Thread (ex: these from the iOS Mail app).
@@ -601,7 +601,7 @@ class RefreshController @Inject constructor(
 
         // Create a map with all duplicated Threads of the same Thread in a list.
         val map = mutableMapOf<String, MutableList<Thread>>()
-        ThreadController.getThreads(messageIds, realm = this).forEach {
+        ThreadController.getThreadsByMessageIds(messageIds, realm = this).forEach {
             map.getOrPut(it.folderId) { mutableListOf() }.add(it)
         }
 
