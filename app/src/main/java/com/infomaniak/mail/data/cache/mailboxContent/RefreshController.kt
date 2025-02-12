@@ -328,14 +328,17 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.fetchOnePage(scope: CoroutineScope, folder: Folder, direction: Direction): Set<Thread> {
-
+    private fun computeUids(folder: Folder, direction: Direction): Pair<List<Int>, List<Int>> {
         val allUids = if (direction == Direction.TO_THE_FUTURE) folder.newMessagesUidsToFetch else folder.oldMessagesUidsToFetch
-        val (uidsToFetch, uidsRemaining) = if (allUids.count() > Utils.PAGE_SIZE) {
+        return if (allUids.count() > Utils.PAGE_SIZE) {
             allUids.subList(0, Utils.PAGE_SIZE) to allUids.subList(Utils.PAGE_SIZE, allUids.count())
         } else {
             allUids to emptyList<Int>().toRealmList()
         }
+    }
+
+    private suspend fun Realm.fetchOnePage(scope: CoroutineScope, folder: Folder, direction: Direction): Set<Thread> {
+        val (uidsToFetch, uidsRemaining) = computeUids(folder, direction)
 
         val impactedThreads = handleAddedUids(scope, folder, uidsToFetch)
 
@@ -346,24 +349,9 @@ class RefreshController @Inject constructor(
             val allThreads = ThreadController.getThreadsByFolderId(it.id, realm = mutableRealm)
             it.threads.replaceContent(list = allThreads)
 
-            val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
+            inboxUnreadCount = computeUnreadCount(allThreads, folder, mutableRealm)
 
-            inboxUnreadCount = updateFoldersUnreadCount(
-                foldersIds = (if (isConversationMode) allThreads.mapTo(mutableSetOf()) { it.folderId } else emptySet()) + folder.id,
-                realm = mutableRealm,
-            )
-
-            if (direction == Direction.TO_THE_FUTURE) {
-                it.newMessagesUidsToFetch.replaceContent(uidsRemaining)
-                it.lastUpdatedAt = Date().toRealmInstant()
-            } else {
-                it.oldMessagesUidsToFetch.replaceContent(uidsRemaining)
-                it.remainingOldMessagesToFetch = if (it.oldMessagesUidsToFetch.isEmpty()) {
-                    0
-                } else {
-                    max(it.remainingOldMessagesToFetch - uidsToFetch.count(), 0)
-                }
-            }
+            saveUidsTODO(direction, it, uidsRemaining, uidsToFetch)
 
             if (it.role == FolderRole.SCHEDULED_DRAFTS) it.isDisplayed = it.threads.isNotEmpty()
         }
@@ -373,6 +361,38 @@ class RefreshController @Inject constructor(
         sendOrphanMessages(folder)
 
         return impactedThreads
+    }
+
+    private fun saveUidsTODO(
+        direction: Direction,
+        it: Folder,
+        uidsRemaining: List<Int>,
+        uidsToFetch: List<Int>
+    ) {
+        if (direction == Direction.TO_THE_FUTURE) {
+            it.newMessagesUidsToFetch.replaceContent(uidsRemaining)
+            it.lastUpdatedAt = Date().toRealmInstant()
+        } else {
+            it.oldMessagesUidsToFetch.replaceContent(uidsRemaining)
+            it.remainingOldMessagesToFetch = if (it.oldMessagesUidsToFetch.isEmpty()) {
+                0
+            } else {
+                max(it.remainingOldMessagesToFetch - uidsToFetch.count(), 0)
+            }
+        }
+    }
+
+    private fun computeUnreadCount(
+        allThreads: RealmResults<Thread>,
+        folder: Folder,
+        mutableRealm: MutableRealm
+    ): Int? {
+        val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
+
+        return updateFoldersUnreadCount(
+            foldersIds = (if (isConversationMode) allThreads.mapTo(mutableSetOf()) { it.folderId } else emptySet()) + folder.id,
+            realm = mutableRealm,
+        )
     }
 
     private fun updateFoldersUnreadCount(foldersIds: Set<String>, realm: MutableRealm): Int? {
