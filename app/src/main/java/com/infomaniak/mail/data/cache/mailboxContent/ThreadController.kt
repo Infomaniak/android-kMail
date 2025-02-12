@@ -59,7 +59,7 @@ class ThreadController @Inject constructor(
 
     //region Get data
     fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL, sortOrder: Sort): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folder, filter, sortOrder).asFlow()
+        return getThreadsByMessageIdsQuery(folder, filter, sortOrder).asFlow()
     }
 
     fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
@@ -196,12 +196,12 @@ class ThreadController @Inject constructor(
             return realm.query("${Thread::uid.name} IN $0", threadsUids)
         }
 
-        private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
+        private fun getThreadsByMessageIdsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
             return realm.query("ANY ${Thread::messagesIds.name} IN $0", messageIds)
         }
 
         private fun getExistingThreadsFoldersCountQuery(messageIds: Set<String>, realm: TypedRealm): RealmScalarQuery<Long> {
-            return getThreadsQuery(messageIds, realm).distinct(Thread::folderId.name).count()
+            return getThreadsByMessageIdsQuery(messageIds, realm).distinct(Thread::folderId.name).count()
         }
 
         private fun getSearchThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
@@ -213,7 +213,7 @@ class ThreadController @Inject constructor(
             return folder.threads.query(unseen).count()
         }
 
-        private fun getThreadsQuery(
+        private fun getThreadsByMessageIdsQuery(
             folder: Folder,
             filter: ThreadFilter = ThreadFilter.ALL,
             sortOrder: Sort,
@@ -258,8 +258,8 @@ class ThreadController @Inject constructor(
             return getThreadsByUidsQuery(threadsUids, realm).find()
         }
 
-        fun getThreads(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
-            return getThreadsQuery(messageIds, realm).find()
+        fun getThreadsByMessageIds(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
+            return getThreadsByMessageIdsQuery(messageIds, realm).find()
         }
 
         fun getExistingThreadsFoldersCount(messageIds: Set<String>, realm: TypedRealm): Long {
