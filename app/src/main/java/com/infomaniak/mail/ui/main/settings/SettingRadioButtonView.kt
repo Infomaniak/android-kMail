@@ -68,6 +68,7 @@ class SettingRadioButtonView @JvmOverloads constructor(
     override fun check() = with(binding) {
         root.isEnabled = false
         checkMark.isVisible = true
+        myKSuitePlusChip.isGone = true
     }
 
     override fun uncheck() = with(binding) {
@@ -88,6 +89,10 @@ class SettingRadioButtonView @JvmOverloads constructor(
             isVisible = iconDrawable != null
             setImageDrawable(iconDrawable)
         }
+    }
+
+    fun setMyKSuiteChipVisibility(isVisible: Boolean) {
+        binding.myKSuitePlusChip.isVisible = isVisible
     }
 
     override fun setOnClickListener(listener: OnClickListener?) {

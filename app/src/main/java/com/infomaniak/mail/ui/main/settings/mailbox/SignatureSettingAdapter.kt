@@ -26,10 +26,11 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSettingsSignatureBinding
 import com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingAdapter.SettingsSignatureViewHolder
+import com.infomaniak.mail.utils.MyKSuiteDataUtils
 
 class SignatureSettingAdapter(
     private val canManageSignature: Boolean,
-    private val onSignatureSelected: (Signature) -> Unit,
+    private val onSignatureSelected: (Signature, Boolean) -> Unit,
 ) : Adapter<SettingsSignatureViewHolder>() {
 
     private var signatures: List<Signature> = emptyList()
@@ -44,8 +45,12 @@ class SignatureSettingAdapter(
         val signature = signatures[position]
         setText(signature.name)
         if (signature.isDefault) check() else uncheck()
-        setOnClickListener { onSignatureSelected(signature) }
         isEnabled = canManageSignature
+
+        val shouldBlockSignature = signature.isDummy && !signature.isDefault && MyKSuiteDataUtils.myKSuite?.isMyKSuite == true
+        setMyKSuiteChipVisibility(shouldBlockSignature)
+
+        setOnClickListener { onSignatureSelected(signature, shouldBlockSignature) }
     }
 
     override fun getItemCount(): Int = signatures.count()

@@ -703,4 +703,13 @@
             app:argType="string" />
     </fragment>
 
+    <dialog
+        android:id="@+id/myKSuiteUpgradeBottomSheet"
+        android:name="com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialog"
+        android:label="MyKSuiteUpgradeBottomSheet">
+        <argument
+            android:name="kSuiteApp"
+            app:argType="com.infomaniak.core.myksuite.ui.screens.KSuiteApp" />
+    </dialog>
+
 </navigation>
