@@ -361,14 +361,19 @@ class RefreshController @Inject constructor(
     }
 
     private fun updateFoldersUnreadCount(foldersIds: Set<String>, realm: MutableRealm): Int? {
-        return foldersIds.firstNotNullOfOrNull {
+
+        var inboxUnreadCount: Int? = null
+
+        foldersIds.forEach {
             val folder = realm.getUpToDateFolder(it)
 
             val unreadCount = ThreadController.getUnreadThreadsCount(folder)
             folder.unreadCountLocal = unreadCount
 
-            return@firstNotNullOfOrNull if (folder.role == FolderRole.INBOX) unreadCount else null
+            if (folder.role == FolderRole.INBOX) inboxUnreadCount = unreadCount
         }
+
+        return inboxUnreadCount
     }
 
     private suspend fun updateMailboxUnreadCount(unreadCount: Int?) {
