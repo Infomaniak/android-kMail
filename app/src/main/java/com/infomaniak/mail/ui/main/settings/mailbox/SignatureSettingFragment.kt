@@ -23,17 +23,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
-import com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialogArgs
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
+import com.infomaniak.mail.utils.MyKSuiteDataUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
@@ -70,6 +67,7 @@ class SignatureSettingFragment : Fragment() {
         binding.signatureList.adapter = SignatureSettingAdapter(
             canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
             onSignatureSelected = ::onSignatureClicked,
+            isFreeMailbox = mailbox.isFreeMailbox,
         )
     }
 
@@ -87,8 +85,7 @@ class SignatureSettingFragment : Fragment() {
 
     private fun onSignatureClicked(signature: Signature, shouldBlockDummySignature: Boolean) = with(signatureSettingViewModel) {
         if (signature.isDummy && shouldBlockDummySignature) {
-            val args = MyKSuiteUpgradeBottomSheetDialogArgs(kSuiteApp = KSuiteApp.Mail)
-            safeNavigate(R.id.myKSuiteUpgradeBottomSheet, args = args.toBundle())
+            openMyKSuiteUpgradeBottomSheet()
             return@with
         }
 
