@@ -265,22 +265,6 @@
         <item name="layout_constraintWidth_max">120dp</item>
     </style>
 
-    <style name="DetailedContactButton" parent="Widget.Material3.Button.TextButton">
-        <item name="android:gravity">start|center_vertical</item>
-        <item name="android:insetBottom">0dp</item>
-        <item name="android:insetTop">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_margin">0dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:minHeight">0dp</item>
-        <item name="android:padding">@dimen/marginStandardMedium</item>
-        <item name="android:textColor">@color/primaryTextColor</item>
-        <item name="android:textSize">16sp</item>
-        <item name="cornerRadius">0dp</item>
-        <item name="iconPadding">@dimen/marginStandardMedium</item>
-        <item name="iconSize">@dimen/marginStandard</item>
-    </style>
-
     <style name="CalendarParticipationButton" parent="BodyMedium">
         <item name="android:checkable">true</item>
         <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>

@@ -23,7 +23,6 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleableRes
@@ -32,6 +31,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
 import com.infomaniak.mail.utils.AccountUtils
@@ -43,6 +43,8 @@ class ActionItemView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    private var isInIconMode: Boolean = false
 
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
@@ -56,9 +58,8 @@ class ActionItemView @JvmOverloads constructor(
                 val iconHorizontalPadding = getDimenOrNull(R.styleable.ActionItemView_iconPaddingHorizontal)
                 val iconPaddingStart = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingStart)
                 val iconPaddingEnd = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingEnd)
-
-                icon.setMarginsRelative(start = iconPaddingStart)
-                description.setMarginsRelative(end = iconPaddingEnd)
+                container.setPaddingRelative(start = iconPaddingStart)
+                icon.setMarginsRelative(end = iconPaddingEnd)
 
                 divider.apply {
                     isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
@@ -76,15 +77,17 @@ class ActionItemView @JvmOverloads constructor(
 
                 if (getBoolean(R.styleable.ActionItemView_keepIconTint, false)) icon.imageTintList = null
 
-                description.isVisible = true
-
-                if (getBoolean(R.styleable.ActionItemView_showActionIcon, false)) actionIcon.isVisible = true
+                isInIconMode = getBoolean(R.styleable.ActionItemView_showActionIcon, isInIconMode)
+                if (isInIconMode) {
+                    description.isGone = true
+                    actionIcon.isVisible = true
+                }
             }
         }
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
-        findViewById<LinearLayout>(R.id.itemBottomSheetAction).setOnClickListener(onClickListener)
+        binding.root.setOnClickListener(onClickListener)
     }
 
     fun setIconResource(@DrawableRes iconResourceId: Int) = binding.icon.setImageResource(iconResourceId)
@@ -97,9 +100,11 @@ class ActionItemView @JvmOverloads constructor(
 
     private fun setTitleColor(color: ColorStateList) = binding.title.setTextColor(color)
 
-    fun setDescription(text: String) = with(binding.description) {
-        this.text = text
-        isVisible = true
+    fun setDescription(text: String) = with(binding) {
+        description.text = text
+        if (isInIconMode) return@with
+        actionIcon.isGone = true
+        description.isVisible = true
     }
 
     fun setDividerVisibility(isVisible: Boolean) {
