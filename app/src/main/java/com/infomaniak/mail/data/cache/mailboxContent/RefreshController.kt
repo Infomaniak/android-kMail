@@ -186,13 +186,6 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private val FOLDER_ROLES_TO_REFRESH_TOGETHER = setOf(
-        FolderRole.INBOX,
-        FolderRole.SENT,
-        FolderRole.DRAFT,
-        FolderRole.SCHEDULED_DRAFTS,
-    )
-
     private suspend fun Realm.refreshWithRoleConsideration(scope: CoroutineScope): Set<Thread> {
 
         val impactedThreads = refresh(scope, initialFolder)
@@ -328,9 +321,9 @@ class RefreshController @Inject constructor(
     }
 
     private suspend fun Realm.fetchOnePage(scope: CoroutineScope, folder: Folder, direction: Direction): Set<Thread> {
-        val (uidsToFetch, uidsRemaining) = computeUids(folder, direction)
+        val (addedUids, remainingUids) = computeUids(folder, direction)
 
-        val impactedThreads = handleAddedUids(scope, folder, uidsToFetch)
+        val impactedThreads = handleAddedUids(scope, folder, addedUids)
 
         var inboxUnreadCount: Int? = null
         FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
@@ -344,7 +337,7 @@ class RefreshController @Inject constructor(
                 realm = mutableRealm,
             )
 
-            it.updateDirectionDependentData(direction = direction, remainingUids = uidsRemaining, fetchedUids = uidsToFetch)
+            it.updateDirectionDependentData(direction, remainingUids, addedUids)
 
             if (it.role == FolderRole.SCHEDULED_DRAFTS) it.isDisplayed = it.threads.isNotEmpty()
         }
@@ -365,7 +358,7 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun Folder.updateDirectionDependentData(direction: Direction, remainingUids: List<Int>, fetchedUids: List<Int>) {
+    private fun Folder.updateDirectionDependentData(direction: Direction, remainingUids: List<Int>, addedUids: List<Int>) {
         if (direction == Direction.TO_THE_FUTURE) {
             newMessagesUidsToFetch.replaceContent(remainingUids)
             lastUpdatedAt = Date().toRealmInstant()
@@ -374,7 +367,7 @@ class RefreshController @Inject constructor(
             remainingOldMessagesToFetch = if (oldMessagesUidsToFetch.isEmpty()) {
                 0
             } else {
-                (remainingOldMessagesToFetch - fetchedUids.count()).coerceAtLeast(0)
+                (remainingOldMessagesToFetch - addedUids.count()).coerceAtLeast(0)
             }
         }
     }
@@ -438,7 +431,7 @@ class RefreshController @Inject constructor(
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
                 val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode)
 
-                // TODO: This count will be false for INBOX & SNOOZED
+                // TODO: This count will be false for INBOX & SNOOZED when the snooze feature will be implemented
                 val messagesCount = MessageController.getMessagesCountByFolderId(upToDateFolder.id, realm = this)
                 SentryLog.d(
                     "Realm",
@@ -553,7 +546,7 @@ class RefreshController @Inject constructor(
                 remoteMessage.toThread()
             }
 
-            newThread?.let { putNewThreadInRealm(it, impactedThreadsManaged) }
+            newThread?.let { impactedThreadsManaged += putNewThreadInRealm(it) }
 
             folderMessages[remoteMessage.uid] = remoteMessage
         }
@@ -680,8 +673,8 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun MutableRealm.putNewThreadInRealm(newThread: Thread, impactedThreadsManaged: MutableSet<Thread>) {
-        impactedThreadsManaged += ThreadController.upsertThread(newThread, realm = this)
+    private fun MutableRealm.putNewThreadInRealm(newThread: Thread): Thread {
+        return ThreadController.upsertThread(newThread, realm = this)
     }
 
     private fun getExistingMessages(existingThreads: List<Thread>): Set<Message> {
@@ -792,6 +785,13 @@ class RefreshController @Inject constructor(
         )
     }
     //endregion
+
+    private val FOLDER_ROLES_TO_REFRESH_TOGETHER = setOf(
+        FolderRole.INBOX,
+        FolderRole.SENT,
+        FolderRole.DRAFT,
+        FolderRole.SCHEDULED_DRAFTS,
+    )
 
     enum class RefreshMode {
         REFRESH_FOLDER, /* Fetch activities, and also get old Messages until `NUMBER_OF_OLD_MESSAGES_TO_FETCH` is reached */
