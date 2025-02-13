@@ -26,10 +26,10 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.ItemSettingsSignatureBinding
 import com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingAdapter.SettingsSignatureViewHolder
-import com.infomaniak.mail.utils.MyKSuiteDataUtils
 
 class SignatureSettingAdapter(
     private val canManageSignature: Boolean,
+    private val isFreeMailbox: Boolean,
     private val onSignatureSelected: (Signature, Boolean) -> Unit,
 ) : Adapter<SettingsSignatureViewHolder>() {
 
@@ -47,7 +47,7 @@ class SignatureSettingAdapter(
         if (signature.isDefault) check() else uncheck()
         isEnabled = canManageSignature
 
-        val shouldBlockSignature = signature.isDummy && !signature.isDefault && MyKSuiteDataUtils.myKSuite?.isMyKSuite == true
+        val shouldBlockSignature = signature.isDummy && !signature.isDefault && isFreeMailbox
         setMyKSuiteChipVisibility(shouldBlockSignature)
 
         setOnClickListener { onSignatureSelected(signature, shouldBlockSignature) }
