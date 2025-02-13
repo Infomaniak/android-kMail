@@ -44,7 +44,11 @@ class ActionItemView @JvmOverloads constructor(
 
     private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private var isInIconMode: Boolean = false
+    var trailingContent = TrailingContent.None
+        set(value) {
+            field = value
+            setTrailingContentUi(value)
+        }
 
     init {
         attrs?.getAttributes(context, R.styleable.ActionItemView) {
@@ -76,14 +80,6 @@ class ActionItemView @JvmOverloads constructor(
                 }
 
                 if (getBoolean(R.styleable.ActionItemView_keepIconTint, false)) icon.imageTintList = null
-
-                isInIconMode = getBoolean(R.styleable.ActionItemView_showActionIcon, isInIconMode)
-                if (isInIconMode) {
-                    description.isGone = true
-                    actionIcon.isVisible = true
-                }
-
-                getString(R.styleable.ActionItemView_description)?.let { setDescription(it) }
             }
         }
     }
@@ -102,15 +98,44 @@ class ActionItemView @JvmOverloads constructor(
 
     private fun setTitleColor(color: ColorStateList) = binding.title.setTextColor(color)
 
-    fun setDescription(text: String) = with(binding) {
-        description.text = text
-        if (isInIconMode) return@with
-        actionIcon.isGone = true
-        description.isVisible = true
+    fun setDescription(text: String) {
+        trailingContent = if (text.isEmpty()) TrailingContent.None else TrailingContent.Description
+        binding.description.text = text
     }
 
     fun setDividerVisibility(isVisible: Boolean) {
         binding.divider.isVisible = isVisible
+    }
+
+    private fun setTrailingContentUi(trailingContent: TrailingContent) = with(binding) {
+        trailingContentLayout.isVisible = true
+
+        when (trailingContent) {
+            TrailingContent.None -> trailingContentLayout.isGone = true
+            TrailingContent.Chevron -> {
+                actionIcon.isVisible = true
+
+                myKSuitePlusChip.isGone = true
+                description.isGone = true
+            }
+            TrailingContent.Description -> {
+                description.isVisible = true
+
+                myKSuitePlusChip.isGone = true
+                actionIcon.isGone = true
+            }
+            TrailingContent.MyKSuiteChip -> {
+                myKSuitePlusChip.isVisible = true
+
+                actionIcon.isGone = true
+                description.isGone = true
+            }
+        }
+    }
+
+    /** Keep the entries order, it's used by the attribute (or change also the attributes order in attrs.xml) */
+    enum class TrailingContent {
+        None, Chevron, Description, MyKSuiteChip
     }
 
     private fun TypedArray.getDimenOrNull(@StyleableRes index: Int): Int? {
