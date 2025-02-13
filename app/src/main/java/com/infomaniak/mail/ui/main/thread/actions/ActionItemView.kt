@@ -30,6 +30,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
@@ -57,7 +58,8 @@ class ActionItemView @JvmOverloads constructor(
                 val iconHorizontalPadding = getDimenOrNull(R.styleable.ActionItemView_iconPaddingHorizontal)
                 val iconPaddingStart = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingStart)
                 val iconPaddingEnd = iconHorizontalPadding ?: getDimenOrNull(R.styleable.ActionItemView_iconPaddingEnd)
-                container.setPaddingRelative(start = iconPaddingStart, end = iconPaddingEnd)
+                container.setPaddingRelative(start = iconPaddingStart)
+                icon.setMarginsRelative(end = iconPaddingEnd)
 
                 divider.apply {
                     isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
@@ -99,11 +101,9 @@ class ActionItemView @JvmOverloads constructor(
     private fun setTitleColor(color: ColorStateList) = binding.title.setTextColor(color)
 
     fun setDescription(text: String) = with(binding) {
-        if (isInIconMode) return@with
-
-        actionIcon.isGone = true
-
         description.text = text
+        if (isInIconMode) return@with
+        actionIcon.isGone = true
         description.isVisible = true
     }
 
