@@ -83,6 +83,7 @@ android {
 }
 
 dependencies {
+    implementation project(':Core')
     implementation project(path: ':Core:Legacy')
     implementation project(path: ':Core:Legacy:AppLock')
     implementation project(path: ':Core:Legacy:BugTracker')
