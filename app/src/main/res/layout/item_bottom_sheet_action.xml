@@ -61,6 +61,7 @@
             tools:text="@string/restoreEmailsTitle" />
 
         <FrameLayout
+            android:id="@+id/trailingContentLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -83,6 +84,13 @@
                 android:contentDescription="@string/contentDescriptionActionIcon"
                 android:src="@drawable/ic_chevron_right"
                 android:visibility="gone" />
+
+            <com.infomaniak.core.myksuite.ui.views.MyKSuitePlusChipView
+                android:id="@+id/myKSuitePlusChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
         </FrameLayout>
     </LinearLayout>
 

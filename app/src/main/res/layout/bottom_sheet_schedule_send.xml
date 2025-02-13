@@ -54,7 +54,6 @@
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_pen"
         app:iconTint="?attr/colorPrimary"
-        app:showActionIcon="true"
         app:title="@string/buttonCustomSchedule" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>
