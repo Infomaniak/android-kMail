@@ -18,18 +18,19 @@
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottomSheet() {
 
     private val navigationArgs: ScheduleSendBottomSheetDialogArgs by navArgs()
+
+    override val isCurrentMailboxFree: Boolean by lazy { navigationArgs.isCurrentMailboxFree }
 
     // Navigation args does not support nullable primitive types, so we use 0L
     // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
@@ -51,10 +52,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
 
     override fun onCustomScheduleOptionClicked() {
         if (navigationArgs.isCurrentMailboxFree) {
-            safeNavigate(
-                resId = R.id.upgradeProductBottomSheetDialog,
-                currentClassName = ScheduleSendBottomSheetDialog::class.java.name,
-            )
+            openMyKSuiteUpgradeBottomSheet(ScheduleSendBottomSheetDialog::class.java.name)
         } else {
             setBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG, true)
         }

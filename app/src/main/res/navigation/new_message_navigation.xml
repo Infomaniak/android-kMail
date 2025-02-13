@@ -96,9 +96,11 @@
     </dialog>
 
     <dialog
-        android:id="@+id/upgradeProductBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.UpgradeProductBottomSheetDialog"
-        android:label="UpgradeProductBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_upgrade_product" />
-
+        android:id="@+id/myKSuiteUpgradeBottomSheet"
+        android:name="com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialog"
+        android:label="MyKSuiteUpgradeBottomSheet">
+        <argument
+            android:name="kSuiteApp"
+            app:argType="com.infomaniak.core.myksuite.ui.screens.KSuiteApp" />
+    </dialog>
 </navigation>
