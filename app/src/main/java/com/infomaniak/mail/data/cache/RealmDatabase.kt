@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 2L
         const val MAILBOX_INFO_SCHEMA_VERSION = 8L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 20L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 21L
         //endregion
 
         //region Configurations names
