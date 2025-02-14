@@ -19,11 +19,12 @@
 
 package com.infomaniak.mail.data.models.thread
 
-import android.content.Context
 import android.os.Build
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
+import com.infomaniak.lib.core.utils.FormatData
+import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.formatWithLocal
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Bimi
@@ -32,8 +33,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.extensions.isSmallerThanDays
-import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -219,25 +218,6 @@ class Thread : RealmObject {
 
         date = messages.last { it.folderId == folderId }.date
         subject = messages.first().subject
-    }
-
-    fun formatDate(context: Context): String = with(date.toDate()) {
-        when {
-            isInTheFuture() -> formatNumericalDayMonthYear()
-            isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
-            isYesterday() -> context.getString(R.string.messageDetailsYesterday)
-            isSmallerThanDays(6) -> format(FORMAT_DAY_OF_THE_WEEK)
-            isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
-            else -> formatNumericalDayMonthYear()
-        }
-    }
-
-    private fun Date.formatNumericalDayMonthYear(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            formatWithLocal(FormatData.DATE, FormatStyle.SHORT)
-        } else {
-            format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on unambiguous date format for any local
-        }
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
