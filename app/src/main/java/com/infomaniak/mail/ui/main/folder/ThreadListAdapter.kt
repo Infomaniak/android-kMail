@@ -233,7 +233,9 @@ class ThreadListAdapter @Inject constructor(
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
             mailDate.text = formatDate(context)
 
-            scheduleSendIcon.isVisible = numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS
+            val scheduleSnoozeMode = computeScheduleSnoozeMode(folderRole)
+            scheduleSendIcon.isVisible = scheduleSnoozeMode == ScheduleSnoozeMode.Schedule
+            snoozeIcon.isVisible = scheduleSnoozeMode == ScheduleSnoozeMode.Snooze
             draftPrefix.isVisible = hasDrafts
 
             val (isIconReplyVisible, isIconForwardVisible) = computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded)

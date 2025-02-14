@@ -199,7 +199,7 @@
                     app:cardBackgroundColor="@color/backgroundColor"
                     app:cardCornerRadius="2dp"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                    app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
+                    app:layout_constraintEnd_toStartOf="@id/scheduleSnoozeIconLayout"
                     app:layout_constraintStart_toEndOf="@id/expeditor"
                     app:layout_constraintTop_toTopOf="@id/expeditor"
                     app:strokeColor="@color/progressbarTrackColor"
@@ -216,19 +216,37 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:id="@+id/scheduleSendIcon"
-                    android:layout_width="@dimen/smallIconSize"
-                    android:layout_height="@dimen/smallIconSize"
-                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-                    android:contentDescription="@string/contentDescriptionScheduleSend"
-                    android:src="@drawable/ic_scheduled_messages"
-                    android:visibility="gone"
+                <FrameLayout
+                    android:id="@+id/scheduleSnoozeIconLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="@id/mailDate"
                     app:layout_constraintEnd_toStartOf="@id/mailDate"
-                    app:layout_constraintTop_toTopOf="@id/mailDate"
-                    app:tint="@color/scheduledIconColor"
-                    tools:visibility="visible" />
+                    app:layout_constraintTop_toTopOf="@id/mailDate">
+
+                    <ImageView
+                        android:id="@+id/scheduleSendIcon"
+                        android:layout_width="@dimen/smallIconSize"
+                        android:layout_height="@dimen/smallIconSize"
+                        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                        android:contentDescription="@string/contentDescriptionScheduleSend"
+                        android:src="@drawable/ic_scheduled_messages"
+                        android:visibility="gone"
+                        app:tint="@color/scheduledIconColor"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/snoozeIcon"
+                        android:layout_width="@dimen/smallIconSize"
+                        android:layout_height="@dimen/smallIconSize"
+                        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                        android:contentDescription="@string/contentDescriptionScheduleSend"
+                        android:src="@drawable/ic_alarm_clock"
+                        android:visibility="gone"
+                        app:tint="@color/snoozeColor"
+                        tools:visibility="visible" />
+
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/mailDate"
