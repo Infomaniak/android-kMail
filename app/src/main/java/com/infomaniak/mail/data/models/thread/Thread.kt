@@ -21,6 +21,7 @@ package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
 import android.os.Build
+import com.infomaniak.core.apiEnumValueOfOrNull
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.R
@@ -29,6 +30,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
@@ -97,6 +99,12 @@ class Thread : RealmObject {
     var isLocallyMovedOut: Boolean = false
     @Transient
     var numberOfScheduledDrafts: Int = 0
+    @Transient
+    private var _snoozeState: String? = null
+    @Transient
+    var snoozeEndDate: RealmInstant? = null
+    @Transient
+    var snoozeAction: String? = null
     //endregion
 
     private val _folders by backlinks(Folder::threads)
@@ -132,6 +140,8 @@ class Thread : RealmObject {
         }
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
+
+    val snoozeState get() = apiEnumValueOfOrNull<SnoozeState>(_snoozeState)
 
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
 
@@ -192,6 +202,9 @@ class Thread : RealmObject {
         isForwarded = false
         hasAttachable = false
         numberOfScheduledDrafts = 0
+        _snoozeState = null
+        snoozeEndDate = null
+        snoozeAction = null
     }
 
     private fun updateThread() {
@@ -215,6 +228,12 @@ class Thread : RealmObject {
             }
             if (message.hasAttachable) hasAttachable = true
             if (message.isScheduledDraft) numberOfScheduledDrafts++
+
+            message.snoozeState?.let {
+                _snoozeState = it.apiValue
+                snoozeEndDate = message.snoozeEndDate
+                snoozeAction = message.snoozeAction
+            }
         }
 
         date = messages.last { it.folderId == folderId }.date
