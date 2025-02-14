@@ -145,6 +145,7 @@
     <string name="buttonDownloadAll">Download all</string>
     <string name="buttonFeedback">Feedback</string>
     <string name="buttonFolders">Folders</string>
+    <string name="buttonFreeTrial">Try for free</string>
     <string name="buttonHelp">Help</string>
     <string name="buttonHyperlink">Add a hyperlink</string>
     <string name="buttonImportEmails">Import emails</string>
@@ -364,6 +365,10 @@
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
     </plurals>
+    <string name="myKSuiteQuotasAlertDescription">Once you have reached this limit, you will no longer be able to send or receive messages. Free up space or upgrade to my kSuite+.</string>
+    <string name="myKSuiteQuotasAlertFullDescription">Free up space or upgrade to my kSuite+.</string>
+    <string name="myKSuiteQuotasAlertFullTitle">Receiving and sending messages blocked</string>
+    <string name="myKSuiteQuotasAlertTitle">Storage limit almost reached</string>
     <string name="newAccountDescription">Communicate and store your documents and photos in an ad-free ecosystem that respects your privacy</string>
     <string name="newAccountStorageDrive">15 GB of kDrive storage</string>
     <string name="newAccountStorageMail">20 GB of free mail storage</string>
