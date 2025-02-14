@@ -139,6 +139,7 @@
     <string name="buttonDownloadAll">Alle herunterladen</string>
     <string name="buttonFeedback">Rückmeldung</string>
     <string name="buttonFolders">Ordner</string>
+    <string name="buttonFreeTrial">Kostenlos ausprobieren</string>
     <string name="buttonHelp">Hilfe</string>
     <string name="buttonHyperlink">Einen Hyperlink hinzufügen</string>
     <string name="buttonImportEmails">E-Mails importieren</string>
@@ -358,6 +359,10 @@
         <item quantity="one">%d ausgewählt</item>
         <item quantity="other">%d ausgewählt</item>
     </plurals>
+    <string name="myKSuiteQuotasAlertDescription">Wenn Sie dieses Limit erreicht haben, können Sie keine Nachrichten mehr senden oder empfangen. Geben Sie Speicherplatz frei oder wechseln Sie zu my kSuite+.</string>
+    <string name="myKSuiteQuotasAlertFullDescription">Geben Sie Speicherplatz frei oder wechseln Sie zu my kSuite+.</string>
+    <string name="myKSuiteQuotasAlertFullTitle">Empfang und Versand von Nachrichten blockiert</string>
+    <string name="myKSuiteQuotasAlertTitle">Speichergrenze fast erreicht</string>
     <string name="newAccountDescription">Kommunizieren und speichern Sie Ihre Dokumente und Fotos in einem werbefreien Ökosystem, das Ihre Privatsphäre respektiert</string>
     <string name="newAccountStorageDrive">15 GB kDrive-Speicher</string>
     <string name="newAccountStorageMail">20 GB Mail-Speicher</string>
