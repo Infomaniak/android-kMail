@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/marginStandardSmall"
     android:visibility="gone"
     tools:background="@color/warningBannerBackgroundColor"
     tools:visibility="visible">
@@ -42,7 +43,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/alternativeMargin"
-        android:layout_marginTop="@dimen/marginStandardSmall"
         android:layout_marginEnd="@dimen/marginStandardVerySmall"
         app:layout_constraintEnd_toStartOf="@id/closeButton"
         app:layout_constraintStart_toEndOf="@id/alertIcon"
@@ -66,18 +66,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandardVerySmall"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/title"
         app:layout_constraintStart_toStartOf="@id/title"
         app:layout_constraintTop_toBottomOf="@id/title"
         tools:text="@string/myKSuiteQuotasAlertDescription" />
-
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        app:dividerColor="@color/divider"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/description" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
