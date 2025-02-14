@@ -248,11 +248,11 @@ class Thread : RealmObject {
         subject = messages.first().subject
     }
 
-    fun formatDate(context: Context): String = with(date.toDate()) {
+    fun Context.formatDate(date: RealmInstant): String = with(date.toDate()) {
         when {
             isInTheFuture() -> formatNumericalDayMonthYear()
             isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
-            isYesterday() -> context.getString(R.string.messageDetailsYesterday)
+            isYesterday() -> getString(R.string.messageDetailsYesterday)
             isSmallerThanDays(6) -> format(FORMAT_DAY_OF_THE_WEEK)
             isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
             else -> formatNumericalDayMonthYear()

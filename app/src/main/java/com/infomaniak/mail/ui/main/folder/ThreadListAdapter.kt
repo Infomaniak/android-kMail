@@ -51,6 +51,7 @@ import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
@@ -231,9 +232,14 @@ class ThreadListAdapter @Inject constructor(
             expeditor.text = formatRecipientNames(computeDisplayedRecipients())
             mailSubject.text = context.formatSubject(subject)
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
-            mailDate.text = formatDate(context)
 
             val scheduleSnoozeMode = computeScheduleSnoozeMode(folderRole)
+            val dateToDisplay = if (scheduleSnoozeMode == ScheduleSnoozeMode.Snooze && snoozeState!! == SnoozeState.Snoozed) {
+                snoozeEndDate!! // TODO: Wait for confirmation on if we always have a snoozeEndDate when snoozeState is Snoozed
+            } else {
+                date
+            }
+            mailDate.text = context.formatDate(dateToDisplay)
             scheduleSendIcon.isVisible = scheduleSnoozeMode == ScheduleSnoozeMode.Schedule
             snoozeIcon.isVisible = scheduleSnoozeMode == ScheduleSnoozeMode.Snooze
             draftPrefix.isVisible = hasDrafts
