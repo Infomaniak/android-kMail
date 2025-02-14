@@ -242,6 +242,21 @@ class ThreadController @Inject constructor(
             return realm.query<Thread>("${Thread::folderId.name} == $0", folderId)
         }
 
+        private fun getThreadsWithSnoozeFilterQuery(
+            withSnooze: Boolean,
+            folderId: String,
+            realm: TypedRealm,
+        ): RealmQuery<Thread> {
+            val snoozeState = Message.SnoozeState.Snoozed.apiValue
+            val collectionOperator = if (withSnooze) "ANY" else "NONE"
+
+            return realm.query<Thread>(
+                "${Thread::folderId.name} == $0 AND $collectionOperator messages._snoozeState == $1",
+                folderId,
+                snoozeState,
+            )
+        }
+
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
             return realm.query<Thread>("${Thread::uid.name} == $0", uid).first()
         }
@@ -276,6 +291,11 @@ class ThreadController @Inject constructor(
 
         fun getThreadsByFolderId(folderId: String, realm: TypedRealm): RealmResults<Thread> {
             return getThreadsByFolderIdQuery(folderId, realm).find()
+        }
+
+        fun getInboxThreadsWithSnoozeFilter(withSnooze: Boolean, realm: TypedRealm): List<Thread> {
+            val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return emptyList()
+            return getThreadsWithSnoozeFilterQuery(withSnooze, folderId = inboxId, realm).find()
         }
         //endregion
 
