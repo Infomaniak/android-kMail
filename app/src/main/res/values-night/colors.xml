@@ -161,14 +161,6 @@
     <color name="commonColor10">#E4E4E4</color>
     <color name="commonColor11">#626262</color>
 
-    <!-- MyKSuiteStorageBanner -->
-    <color name="warningBannerTitleColor">@color/orange_ultra_light</color>
-    <color name="warningBannerBackgroundColor">@color/orange_ultra_dark</color>
-    <color name="warningBannerIconColor">@color/orange_dark</color>
-    <color name="errorBannerTitleColor">@color/red_ultra_light</color>
-    <color name="errorBannerBackgroundColor">@color/red_ultra_dark</color>
-    <color name="errorBannerIconColor">@color/red_dark</color>
-
     <!-- Other -->
     <color name="textInputStrokeColor">@color/shark</color>
     <color name="toggleableTextFormatterBackgroundColor">@color/mouse</color>

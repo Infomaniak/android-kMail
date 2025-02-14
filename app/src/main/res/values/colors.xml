@@ -59,16 +59,12 @@
     <color name="yellow_dark">#FFDF9E</color>
     <color name="mango_light">#FF9802</color>
     <color name="mango_dark">#FFC166</color>
-    <color name="orange_ultra_light">#FFE7A5</color>
     <color name="orange_light">#FF8500</color>
     <color name="orange_dark">#FFAA4C</color>
-    <color name="orange_ultra_dark">#823F0C</color>
     <color name="coral_light">#FF540B</color>
     <color name="coral_dark">#FD9459</color>
-    <color name="red_ultra_light">#FFCCC8</color>
     <color name="red_light">#F44336</color>
     <color name="red_dark">#FC8878</color>
-    <color name="red_ultra_dark">#82211A</color>
     <color name="grass_light">#3EBF4D</color>
     <color name="grass_dark">#78D383</color>
     <color name="fougere_light">#009688</color>
@@ -276,14 +272,6 @@
 
     <!-- Shortcut -->
     <color name="backgroundShortcut">#F5F5F5</color>
-
-    <!-- MyKSuiteStorageBanner -->
-    <color name="warningBannerTitleColor">@color/orange_ultra_dark</color>
-    <color name="warningBannerBackgroundColor">@color/orange_ultra_light</color>
-    <color name="warningBannerIconColor">#B25D00</color>
-    <color name="errorBannerTitleColor">@color/red_ultra_dark</color>
-    <color name="errorBannerBackgroundColor">@color/red_ultra_light</color>
-    <color name="errorBannerIconColor">#D71E04</color>
 
     <!-- Other -->
     <color name="textInputStrokeColor">@color/mouse</color>
