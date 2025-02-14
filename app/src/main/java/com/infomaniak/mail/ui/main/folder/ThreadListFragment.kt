@@ -82,6 +82,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -146,6 +147,7 @@ class ThreadListFragment : TwoPaneFragment() {
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
+        setupMyKSuiteStorageBanner()
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
@@ -524,6 +526,20 @@ class ThreadListFragment : TwoPaneFragment() {
                 isCloseIconVisible = isChecked
                 mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
             }
+        }
+    }
+
+    private fun setupMyKSuiteStorageBanner() = with(binding.myKSuiteStorageBanner) {
+        mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
+            val mailboxFullness = quotas?.getProgress() ?: return@observe
+
+            storageLevel = when {
+                mailboxFullness >= 100 -> StorageLevel.Full
+                mailboxFullness > 85 -> StorageLevel.Warning
+                else -> StorageLevel.Normal
+            }
+
+            setupListener(onCloseButtonClicked = { isGone = true })
         }
     }
 
