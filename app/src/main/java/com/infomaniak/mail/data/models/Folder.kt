@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.SentryDebug
@@ -146,6 +147,16 @@ class Folder : RealmObject, Cloneable {
 
     fun messages(realm: TypedRealm): List<Message> = MessageController.getMessagesByFolderId(id, realm)
 
+    fun threadQueryStrategy(folderRole: FolderRole?, folderId: String): ThreadQueryStrategy {
+        return ThreadQueryStrategy { realm ->
+            when (folderRole) {
+                FolderRole.INBOX -> ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
+                FolderRole.SNOOZED -> ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
+                else -> ThreadController.getThreadsByFolderId(folderId, realm = realm)
+            }
+        }
+    }
+
     fun getLocalizedName(context: Context): String {
         return role?.folderNameRes?.let(context::getString) ?: name
     }
@@ -175,6 +186,10 @@ class Folder : RealmObject, Cloneable {
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, "spamFolder"),
         TRASH(R.string.trashFolder, R.drawable.ic_bin, 2, "trashFolder"),
         ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 1, "archiveFolder"),
+    }
+
+    class ThreadQueryStrategy(private val strategy: (TypedRealm) -> List<Thread>) {
+        fun applyStrategy(realm: TypedRealm): List<Thread> = strategy(realm)
     }
 
     companion object {
