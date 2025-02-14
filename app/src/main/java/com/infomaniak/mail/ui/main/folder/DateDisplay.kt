@@ -59,12 +59,14 @@ sealed interface DateDisplay {
 
     data object Scheduled : DateDisplay {
         override val icon: Int = R.drawable.ic_scheduled_messages
-        override fun formatDate(date: RealmInstant, context: Context): String = DateUtils.getRelativeDateTimeString(
-            context,
-            date.epochSeconds * 1000,
-            DateUtils.DAY_IN_MILLIS,
-            DateUtils.WEEK_IN_MILLIS,
-            DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
-        )!!.toString()
+        override fun formatDate(date: RealmInstant, context: Context): String = relativeFutureDate(context, date)
     }
 }
+
+private fun relativeFutureDate(context: Context, date: RealmInstant) = DateUtils.getRelativeDateTimeString(
+    context,
+    date.epochSeconds * 1000,
+    DateUtils.DAY_IN_MILLIS,
+    DateUtils.WEEK_IN_MILLIS,
+    DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
+)!!.toString()
