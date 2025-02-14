@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 package com.infomaniak.mail.data.models.message
 
+import com.infomaniak.core.ApiEnum
+import com.infomaniak.core.apiEnumValueOfOrNull
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
@@ -106,6 +108,12 @@ class Message : RealmObject {
     var bimi: Bimi? = null
     @SerialName("schedule_action")
     var unscheduleDraftUrl: String? = null
+    @SerialName("snooze_state")
+    private var _snoozeState: String? = null
+    @SerialName("snooze_end_date")
+    var snoozeEndDate: RealmInstant? = null
+    @SerialName("snooze_action")
+    var snoozeAction: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
@@ -218,6 +226,14 @@ class Message : RealmObject {
         NONE,
         PENDING,
         ACKNOWLEDGED,
+    }
+
+    val snoozeState: SnoozeState? get() = apiEnumValueOfOrNull<SnoozeState>(_snoozeState)
+
+    enum class SnoozeState(override val apiValue: String): ApiEnum {
+        Snoozed(apiValue = "snoozed"),
+        Unsnoozed(apiValue = "unsnoozed"),
+        WasSnoozed(apiValue = "was_snoozed"),
     }
 
     fun initLocalValues(
