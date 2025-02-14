@@ -339,17 +339,22 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun updateMyKSuiteData() {
-        MyKSuiteDataUtils.requestKSuiteData()
-        val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClient)
-        if (apiResponse.data != null) {
-            MyKSuiteDataUtils.upsertKSuiteData(apiResponse.data!!)
-        } else {
-            @OptIn(ExperimentalSerializationApi::class)
-            apiResponse.error?.exception?.let {
-                if (it is MissingFieldException || it.message?.contains("Unexpected JSON token") == true) {
-                    SentryLog.e(TAG, "Error decoding the api result MyKSuiteObject", it)
+        runCatching {
+            MyKSuiteDataUtils.requestKSuiteData()
+            val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClient)
+            if (apiResponse.data != null) {
+                MyKSuiteDataUtils.upsertKSuiteData(apiResponse.data!!)
+            } else {
+                @OptIn(ExperimentalSerializationApi::class)
+                apiResponse.error?.exception?.let {
+                    if (it is MissingFieldException || it.message?.contains("Unexpected JSON token") == true) {
+                        SentryLog.e(TAG, "Error decoding the api result MyKSuiteObject", it)
+                    }
                 }
             }
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+            SentryLog.d(TAG, "Exception during myKSuite data fetch", exception)
         }
     }
 
