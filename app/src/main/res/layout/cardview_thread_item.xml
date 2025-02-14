@@ -199,7 +199,7 @@
                     app:cardBackgroundColor="@color/backgroundColor"
                     app:cardCornerRadius="2dp"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                    app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
+                    app:layout_constraintEnd_toStartOf="@id/mailDateIcon"
                     app:layout_constraintStart_toEndOf="@id/expeditor"
                     app:layout_constraintTop_toTopOf="@id/expeditor"
                     app:strokeColor="@color/progressbarTrackColor"
@@ -217,17 +217,17 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <ImageView
-                    android:id="@+id/scheduleSendIcon"
+                    android:id="@+id/mailDateIcon"
                     android:layout_width="@dimen/smallIconSize"
                     android:layout_height="@dimen/smallIconSize"
                     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionScheduleSend"
-                    android:src="@drawable/ic_scheduled_messages"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/mailDate"
                     app:layout_constraintEnd_toStartOf="@id/mailDate"
                     app:layout_constraintTop_toTopOf="@id/mailDate"
                     app:tint="@color/scheduledIconColor"
+                    tools:src="@drawable/ic_scheduled_messages"
                     tools:visibility="visible" />
 
                 <TextView
