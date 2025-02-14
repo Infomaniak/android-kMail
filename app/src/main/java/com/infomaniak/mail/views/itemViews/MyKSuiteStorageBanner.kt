@@ -52,9 +52,7 @@ class MyKSuiteStorageBanner @JvmOverloads constructor(
     private fun setStorageLevelUi(newStorageLevel: StorageLevel) = with(binding) {
         if (newStorageLevel == storageLevel) return@with
 
-        root.setBackgroundColor(context.getColor(newStorageLevel.backgroundColorRes))
         title.text = context.getText(newStorageLevel.titleRes)
-        title.setTextColor(context.getColor(newStorageLevel.titleColorRes))
         description.text = context.getText(newStorageLevel.descriptionRes)
         alertIcon.setColorFilter(context.getColor(newStorageLevel.iconColorRes))
 
@@ -62,30 +60,22 @@ class MyKSuiteStorageBanner @JvmOverloads constructor(
     }
 
     enum class StorageLevel(
-        @ColorRes val titleColorRes: Int,
-        @ColorRes val backgroundColorRes: Int,
         @ColorRes val iconColorRes: Int,
         @StringRes val titleRes: Int,
         @StringRes val descriptionRes: Int,
     ) {
         Normal(
-            titleColorRes = ResourcesCompat.ID_NULL,
-            backgroundColorRes = ResourcesCompat.ID_NULL,
             iconColorRes = ResourcesCompat.ID_NULL,
             titleRes = ResourcesCompat.ID_NULL,
             descriptionRes = ResourcesCompat.ID_NULL,
         ),
         Warning(
-            titleColorRes = R.color.warningBannerTitleColor,
-            backgroundColorRes = R.color.warningBannerBackgroundColor,
-            iconColorRes = R.color.warningBannerIconColor,
+            iconColorRes = R.color.orangeWarning,
             titleRes = R.string.myKSuiteQuotasAlertTitle,
             descriptionRes = R.string.myKSuiteQuotasAlertDescription,
         ),
         Full(
-            titleColorRes = R.color.errorBannerTitleColor,
-            backgroundColorRes = R.color.errorBannerBackgroundColor,
-            iconColorRes = R.color.errorBannerIconColor,
+            iconColorRes = R.color.redDestructiveAction,
             titleRes = R.string.myKSuiteQuotasAlertFullTitle,
             descriptionRes = R.string.myKSuiteQuotasAlertFullDescription,
         ),
