@@ -130,6 +130,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         configureInfomaniakCore()
         notificationUtils.initNotificationChannel()
         configureHttpClient()
+
+        localSettings.storageBannerDisplayAppLaunches++
     }
 
     override fun onStart(owner: LifecycleOwner) {

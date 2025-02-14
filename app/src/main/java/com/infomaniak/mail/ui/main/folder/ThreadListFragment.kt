@@ -530,17 +530,29 @@ class ThreadListFragment : TwoPaneFragment() {
         }
     }
 
-    private fun setupMyKSuiteStorageBanner() = with(binding.myKSuiteStorageBanner) {
+    private fun setupMyKSuiteStorageBanner() = with(localSettings) {
         mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
             val mailboxFullness = quotas?.getProgress() ?: return@observe
 
-            storageLevel = when {
+            binding.myKSuiteStorageBanner.storageLevel = when {
                 mailboxFullness >= 100 -> StorageLevel.Full
-                mailboxFullness > 85 -> StorageLevel.Warning
+                mailboxFullness > 85 -> {
+                    if (!hasClosedStorageBanner || storageBannerDisplayAppLaunches % 10 == 0) {
+                        hasClosedStorageBanner = false
+                        StorageLevel.Warning
+                    } else {
+                        StorageLevel.Normal
+                    }
+                }
                 else -> StorageLevel.Normal
             }
 
-            setupListener(onCloseButtonClicked = { isGone = true })
+            binding.myKSuiteStorageBanner.setupListener(
+                onCloseButtonClicked = {
+                    binding.myKSuiteStorageBanner.isGone = true
+                    resetStorageBannerSettings()
+                }
+            )
         }
     }
 
