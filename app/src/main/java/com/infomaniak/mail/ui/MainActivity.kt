@@ -67,7 +67,6 @@ import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.MailDateFormatUtils.dayOfWeekDate
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
@@ -333,7 +332,7 @@ class MainActivity : BaseActivity() {
     private fun showScheduledDraftSnackbar(scheduleDate: Date, unscheduleDraftUrl: String) {
         showSendingSnackbarTimer.cancel()
 
-        val dateString = dayOfWeekDate(context = this, date = scheduleDate)
+        val dateString = dayOfWeekDate(date = scheduleDate)
 
         snackbarManager.setValue(
             title = String.format(getString(R.string.snackbarScheduleSaved), dateString),

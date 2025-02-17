@@ -33,7 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleSendBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-import com.infomaniak.mail.utils.MailDateFormatUtils.dayOfWeekDate
+import com.infomaniak.mail.utils.dayOfWeekDate
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
@@ -74,12 +74,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
     private fun computeLastScheduleItem() = with(binding) {
         if (Date(lastSelectedScheduleEpoch).isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)) {
             lastScheduleItem.isVisible = true
-            lastScheduleItem.setDescription(
-                dayOfWeekDate(
-                    context,
-                    date = Date(lastSelectedScheduleEpoch),
-                ),
-            )
+            lastScheduleItem.setDescription(context.dayOfWeekDate(date = Date(lastSelectedScheduleEpoch)))
         }
     }
 
@@ -107,7 +102,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
 
     private fun createScheduleItem(schedule: Schedule): ActionItemView = ActionItemView(requireContext()).apply {
         setTitle(schedule.scheduleTitleRes)
-        setDescription(dayOfWeekDate(context, date = schedule.date()))
+        setDescription(context.dayOfWeekDate(date = schedule.date()))
         setIconResource(schedule.scheduleIconRes)
         setOnClickListener {
             trackScheduleSendEvent(schedule.matomoValue)

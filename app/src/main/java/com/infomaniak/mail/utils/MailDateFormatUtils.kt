@@ -27,16 +27,6 @@ import java.util.Date
 
 object MailDateFormatUtils {
 
-    // Do not use the 12/24 hours format directly. Call localHourFormat() instead
-    private const val FORMAT_EMAIL_DATE_24HOUR = "HH:mm"
-    private const val FORMAT_EMAIL_DATE_12HOUR = "hh:mm a"
-    private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
-    private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
-
-    private fun Context.localHourFormat(): String {
-        return if (DateFormat.is24HourFormat(this)) FORMAT_EMAIL_DATE_24HOUR else FORMAT_EMAIL_DATE_12HOUR
-    }
-
     fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
         return when {
             isToday() -> format(localHourFormat())
@@ -45,28 +35,10 @@ object MailDateFormatUtils {
                 getString(R.string.messageDetailsYesterday),
                 format(localHourFormat()),
             )
-            isThisYear() -> getString(
-                R.string.messageDetailsDateAt,
-                format(FORMAT_EMAIL_DATE_SHORT_DATE),
-                format(localHourFormat()),
-            )
-            else -> mostDetailedDate(this@mailFormattedDate, date = this)
+            isThisYear() -> fullDateWithYear(this)
+            else -> fullDateWithoutYear(date = this)
         }
     }
-
-    fun mostDetailedDate(context: Context, date: Date): String {
-        return date.formatDateTime(context, FORMAT_EMAIL_DATE_LONG_DATE, context.localHourFormat())
-    }
-
-    fun dayOfWeekDate(context: Context, date: Date): String {
-        return date.formatDateTime(context, FORMAT_DATE_DAY_MONTH, context.localHourFormat())
-    }
-
-    private fun Date.formatDateTime(context: Context, dateFormat: String, timeFormat: String) = context.getString(
-        R.string.messageDetailsDateAt,
-        format(dateFormat),
-        format(timeFormat),
-    )
 
     fun Date.formatForHeader(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -75,4 +47,32 @@ object MailDateFormatUtils {
             format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
         }
     }
+}
+
+// Do not use the 12/24 hours format directly. Call localHourFormat() instead
+private const val FORMAT_DATE_24HOUR = "HH:mm"
+private const val FORMAT_DATE_12HOUR = "hh:mm a"
+private const val FORMAT_DATE_WITH_YEAR = "d MMM yyyy"
+private const val FORMAT_DATE_WITHOUT_YEAR = "d MMM"
+
+fun Context.fullDateWithYear(date: Date): String {
+    return date.formatDateTime(this, FORMAT_DATE_WITHOUT_YEAR, localHourFormat())
+}
+
+fun Context.fullDateWithoutYear(date: Date): String {
+    return date.formatDateTime(this, FORMAT_DATE_WITH_YEAR, localHourFormat())
+}
+
+fun Context.dayOfWeekDate(date: Date): String {
+    return date.formatDateTime(this, FORMAT_DATE_DAY_MONTH, localHourFormat())
+}
+
+private fun Date.formatDateTime(context: Context, dateFormat: String, timeFormat: String) = context.getString(
+    R.string.messageDetailsDateAt,
+    format(dateFormat),
+    format(timeFormat),
+)
+
+private fun Context.localHourFormat(): String {
+    return if (DateFormat.is24HourFormat(this)) FORMAT_DATE_24HOUR else FORMAT_DATE_12HOUR
 }

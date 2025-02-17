@@ -58,7 +58,7 @@ import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
-import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
+import com.infomaniak.mail.utils.fullDateWithoutYear
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -452,7 +452,7 @@ class ThreadAdapter(
         bccGroup.isVisible = bccIsNotEmpty
         if (bccIsNotEmpty) bccAdapter.updateList(message.bcc.toList())
 
-        detailedMessageDate.text = mostDetailedDate(context, messageDate)
+        detailedMessageDate.text = context.fullDateWithoutYear(messageDate)
     }
 
     private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
