@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,13 +47,19 @@ object MailDateFormatUtils {
         }
     }
 
-    fun mostDetailedDate(context: Context, date: Date, format: String = FORMAT_EMAIL_DATE_LONG_DATE): String = with(date) {
-        return@with context.getString(
-            R.string.messageDetailsDateAt,
-            format(format),
-            format(FORMAT_EMAIL_DATE_HOUR),
-        )
+    fun mostDetailedDate(context: Context, date: Date): String = with(date) {
+        return@with formatDateTime(context, FORMAT_EMAIL_DATE_LONG_DATE, FORMAT_EMAIL_DATE_HOUR)
     }
+
+    fun dayOfWeekDate(context: Context, date: Date): String = with(date) {
+        return@with formatDateTime(context, FORMAT_DATE_DAY_MONTH, FORMAT_EMAIL_DATE_HOUR)
+    }
+
+    private fun Date.formatDateTime(context: Context, dateFormat: String, timeFormat: String) = context.getString(
+        R.string.messageDetailsDateAt,
+        format(dateFormat),
+        format(timeFormat),
+    )
 
     fun Date.formatForHeader(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
