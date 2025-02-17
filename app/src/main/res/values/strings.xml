@@ -369,6 +369,7 @@
     <string name="myKSuiteQuotasAlertFullDescription">Free up space or upgrade to my kSuite+.</string>
     <string name="myKSuiteQuotasAlertFullTitle">Receiving and sending messages blocked</string>
     <string name="myKSuiteQuotasAlertTitle">Storage limit almost reached</string>
+    <string name="myKSuiteSpaceFullAlert">There is not enough storage space to carry out this action.</string>
     <string name="newAccountDescription">Communicate and store your documents and photos in an ad-free ecosystem that respects your privacy</string>
     <string name="newAccountStorageDrive">15 GB of kDrive storage</string>
     <string name="newAccountStorageMail">20 GB of free mail storage</string>
