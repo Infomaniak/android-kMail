@@ -532,11 +532,11 @@ class ThreadListFragment : TwoPaneFragment() {
 
     private fun setupMyKSuiteStorageBanner() = with(localSettings) {
         mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
-            val mailboxFullness = quotas?.getProgress() ?: return@observe
+            if (quotas == null) return@observe
 
             binding.myKSuiteStorageBanner.storageLevel = when {
-                mailboxFullness >= 100 -> StorageLevel.Full
-                mailboxFullness > 85 -> {
+                quotas.isFull -> StorageLevel.Full
+                quotas.getProgress() > 85 -> {
                     if (!hasClosedStorageBanner || storageBannerDisplayAppLaunches % 10 == 0) {
                         hasClosedStorageBanner = false
                         StorageLevel.Warning
