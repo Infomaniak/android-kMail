@@ -30,36 +30,30 @@ import io.realm.kotlin.types.RealmInstant
 import java.time.format.FormatStyle
 import java.util.Date
 
-sealed interface DateDisplay {
-    @get:DrawableRes
-    val icon: Int?
-
-    fun formatDate(date: RealmInstant, context: Context): String
-
-    data object Default : DateDisplay {
-        override val icon: Int? = null
-        override fun formatDate(date: RealmInstant, context: Context): String = formatPastDate(context, date)
-    }
-
-    data object Scheduled : DateDisplay {
-        override val icon: Int = R.drawable.ic_scheduled_messages
-        override fun formatDate(date: RealmInstant, context: Context): String = formatRelativeFutureDate(context, date)
-    }
+enum class DateDisplay(@DrawableRes val icon: Int?, val formatDate: Context.(RealmInstant) -> String) {
+    Default(
+        icon = null,
+        formatDate = { date -> formatPastDate(date) }
+    ),
+    Scheduled(
+        icon = R.drawable.ic_scheduled_messages,
+        formatDate = { date -> formatRelativeFutureDate(date) }
+    ),
 }
 
-private fun formatRelativeFutureDate(context: Context, date: RealmInstant) = DateUtils.getRelativeDateTimeString(
-    context,
+private fun Context.formatRelativeFutureDate(date: RealmInstant) = DateUtils.getRelativeDateTimeString(
+    this,
     date.epochSeconds * 1000,
     DateUtils.DAY_IN_MILLIS,
     DateUtils.WEEK_IN_MILLIS,
     DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
 )!!.toString()
 
-private fun formatPastDate(context: Context, date: RealmInstant) = with(date.toDate()) {
+private fun Context.formatPastDate(date: RealmInstant) = with(date.toDate()) {
     when {
         isInTheFuture() -> formatNumericalDayMonthYear()
         isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
-        isYesterday() -> context.getString(R.string.messageDetailsYesterday)
+        isYesterday() -> getString(R.string.messageDetailsYesterday)
         isSmallerThanDays(6) -> format(FORMAT_DAY_OF_THE_WEEK)
         isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
         else -> formatNumericalDayMonthYear()
