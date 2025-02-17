@@ -19,11 +19,6 @@
 
 package com.infomaniak.mail.data.models.thread
 
-import android.os.Build
-import com.infomaniak.lib.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
-import com.infomaniak.lib.core.utils.FormatData
-import com.infomaniak.lib.core.utils.format
-import com.infomaniak.lib.core.utils.formatWithLocal
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -50,7 +45,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
-import java.time.format.FormatStyle
 import java.util.Date
 
 @Serializable
