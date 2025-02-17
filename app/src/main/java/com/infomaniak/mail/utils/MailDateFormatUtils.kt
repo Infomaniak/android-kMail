@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.os.Build
+import android.text.format.DateFormat
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import java.time.format.FormatStyle
@@ -26,33 +27,38 @@ import java.util.Date
 
 object MailDateFormatUtils {
 
-    private const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
+    private const val FORMAT_EMAIL_DATE_24HOUR = "HH:mm"
+    private const val FORMAT_EMAIL_DATE_12HOUR = "hh:mm a"
     private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
     private const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
 
+    private fun Context.localHourFormat(): String {
+        return if (DateFormat.is24HourFormat(this)) FORMAT_EMAIL_DATE_24HOUR else FORMAT_EMAIL_DATE_12HOUR
+    }
+
     fun mailFormattedDate(context: Context, date: Date): CharSequence = with(date) {
         return@with when {
-            isToday() -> format(FORMAT_EMAIL_DATE_HOUR)
+            isToday() -> format(context.localHourFormat())
             isYesterday() -> context.getString(
                 R.string.messageDetailsDateAt,
                 context.getString(R.string.messageDetailsYesterday),
-                format(FORMAT_EMAIL_DATE_HOUR),
+                format(context.localHourFormat()),
             )
             isThisYear() -> context.getString(
                 R.string.messageDetailsDateAt,
                 format(FORMAT_EMAIL_DATE_SHORT_DATE),
-                format(FORMAT_EMAIL_DATE_HOUR),
+                format(context.localHourFormat()),
             )
             else -> mostDetailedDate(context, date = this@with)
         }
     }
 
     fun mostDetailedDate(context: Context, date: Date): String = with(date) {
-        return@with formatDateTime(context, FORMAT_EMAIL_DATE_LONG_DATE, FORMAT_EMAIL_DATE_HOUR)
+        return@with formatDateTime(context, FORMAT_EMAIL_DATE_LONG_DATE, context.localHourFormat())
     }
 
     fun dayOfWeekDate(context: Context, date: Date): String = with(date) {
-        return@with formatDateTime(context, FORMAT_DATE_DAY_MONTH, FORMAT_EMAIL_DATE_HOUR)
+        return@with formatDateTime(context, FORMAT_DATE_DAY_MONTH, context.localHourFormat())
     }
 
     private fun Date.formatDateTime(context: Context, dateFormat: String, timeFormat: String) = context.getString(
