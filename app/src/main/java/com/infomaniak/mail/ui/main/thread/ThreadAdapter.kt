@@ -65,7 +65,7 @@ import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
-import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithoutYear
+import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
 import io.sentry.Sentry
@@ -452,7 +452,7 @@ class ThreadAdapter(
         bccGroup.isVisible = bccIsNotEmpty
         if (bccIsNotEmpty) bccAdapter.updateList(message.bcc.toList())
 
-        detailedMessageDate.text = context.fullDateWithoutYear(messageDate)
+        detailedMessageDate.text = context.fullDateWithYear(messageDate)
     }
 
     private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {

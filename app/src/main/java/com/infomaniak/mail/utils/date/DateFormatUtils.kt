@@ -32,15 +32,13 @@ object DateFormatUtils {
     private const val FORMAT_DATE_WITH_YEAR = "d MMM yyyy"
     private const val FORMAT_DATE_WITHOUT_YEAR = "d MMM"
 
-    fun Context.formatTime(date: Date): String {
-        return date.format(localHourFormat())
-    }
+    fun Context.formatTime(date: Date): String = date.format(localHourFormat())
 
-    fun Context.fullDateWithYear(date: Date): String {
+    fun Context.fullDateWithoutYear(date: Date): String {
         return date.formatDateTime(this, FORMAT_DATE_WITHOUT_YEAR, localHourFormat())
     }
 
-    fun Context.fullDateWithoutYear(date: Date): String {
+    fun Context.fullDateWithYear(date: Date): String {
         return date.formatDateTime(this, FORMAT_DATE_WITH_YEAR, localHourFormat())
     }
 

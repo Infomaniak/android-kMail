@@ -37,8 +37,8 @@ object MailDateFormatUtils {
                 getString(R.string.messageDetailsYesterday),
                 formatTime(this),
             )
-            isThisYear() -> fullDateWithYear(this)
-            else -> fullDateWithoutYear(date = this)
+            isThisYear() -> fullDateWithoutYear(this)
+            else -> fullDateWithYear(this)
         }
     }
 
