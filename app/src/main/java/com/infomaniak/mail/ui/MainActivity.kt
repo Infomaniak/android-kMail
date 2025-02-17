@@ -269,12 +269,26 @@ class MainActivity : BaseActivity() {
                     with(workInfo.outputData) {
                         refreshDraftFolderIfNeeded()
                         val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
-                        if (errorRes > 0) {
-                            showSendingSnackbarTimer.cancel()
-                            snackbarManager.setValue(getString(errorRes))
-                        }
+                        displayError(errorRes)
                     }
                 }
+            }
+        }
+    }
+
+    private fun displayError(errorRes: Int) {
+        if (errorRes > 0) {
+            showSendingSnackbarTimer.cancel()
+
+            val hasLimitBeenReached = errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_LIMIT_EXCEEDED) ||
+                    errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_DAILY_LIMIT_REACHED)
+
+            if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
+                snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
+                    MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet(navController)
+                }
+            } else {
+                snackbarManager.setValue(getString(errorRes))
             }
         }
     }
