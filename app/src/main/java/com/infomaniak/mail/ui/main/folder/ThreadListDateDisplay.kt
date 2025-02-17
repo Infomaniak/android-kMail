@@ -39,7 +39,13 @@ enum class ThreadListDateDisplay(@DrawableRes val icon: Int?, val formatDate: Co
         icon = R.drawable.ic_scheduled_messages,
         formatDate = { date -> relativeFormatting(date) }
     ),
+    Snoozed(
+        icon = R.drawable.ic_alarm_clock,
+        formatDate = { date -> if (date.isInTheFuture()) relativeFormatting(date) else defaultFormatting(date) }
+    )
 }
+
+private fun RealmInstant.isInTheFuture() = epochSeconds * 1000 > System.currentTimeMillis()
 
 private fun Context.relativeFormatting(date: RealmInstant) = DateUtils.getRelativeDateTimeString(
     this,
