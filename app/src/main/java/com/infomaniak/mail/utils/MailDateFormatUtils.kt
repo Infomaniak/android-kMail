@@ -27,6 +27,7 @@ import java.util.Date
 
 object MailDateFormatUtils {
 
+    // Do not use the 12/24 hours format directly. Call localHourFormat() instead
     private const val FORMAT_EMAIL_DATE_24HOUR = "HH:mm"
     private const val FORMAT_EMAIL_DATE_12HOUR = "hh:mm a"
     private const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
