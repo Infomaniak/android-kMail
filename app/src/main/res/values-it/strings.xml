@@ -126,6 +126,7 @@
     <string name="buttonBold">In grassetto</string>
     <string name="buttonBulletPoint">Punto di riferimento</string>
     <string name="buttonCamera">Scattare una foto</string>
+    <string name="buttonCancelReminder">Annulla promemoria</string>
     <string name="buttonClose">Chiudi</string>
     <string name="buttonConfirm">Conferma</string>
     <string name="buttonConfirmRestoreEmails">Ripristino</string>
@@ -560,6 +561,7 @@
         <item quantity="one">Conversazione spostata in %s</item>
         <item quantity="other">Conversazioni spostate in %s</item>
     </plurals>
+    <string name="snoozeAlertTitle">In attesa fino al: %s</string>
     <string name="socialNetworksFolder">Social Network</string>
     <string name="spamFolder">Spam</string>
     <string name="startActivityCantHandleAction">Non è stata trovata alcuna applicazione in grado di gestire questa azione</string>

@@ -60,6 +60,7 @@ import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -83,6 +84,7 @@ import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArg
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
+import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,6 +96,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
+
 
 @AndroidEntryPoint
 class ThreadFragment : Fragment() {
@@ -433,6 +436,12 @@ class ThreadFragment : Fragment() {
 
             val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == thread.messages.size
             quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
+
+            threadAlertsLayout.isVisible = thread.snoozeState == SnoozeState.Snoozed
+            thread.snoozeEndDate?.let { snoozeEndDate ->
+                val formattedDate = context.formatDayOfWeekAdaptiveYear(snoozeEndDate.toDate())
+                snoozeAlert.setDescription(getString(R.string.snoozeAlertTitle, formattedDate))
+            }
         }
     }
 
