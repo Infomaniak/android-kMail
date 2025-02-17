@@ -82,6 +82,8 @@ class ActionItemView @JvmOverloads constructor(
                     description.isGone = true
                     actionIcon.isVisible = true
                 }
+
+                getString(R.styleable.ActionItemView_description)?.let { setDescription(it) }
             }
         }
     }
