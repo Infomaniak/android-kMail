@@ -36,29 +36,29 @@ object MailDateFormatUtils {
         return if (DateFormat.is24HourFormat(this)) FORMAT_EMAIL_DATE_24HOUR else FORMAT_EMAIL_DATE_12HOUR
     }
 
-    fun mailFormattedDate(context: Context, date: Date): CharSequence = with(date) {
-        return@with when {
-            isToday() -> format(context.localHourFormat())
-            isYesterday() -> context.getString(
+    fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
+        return when {
+            isToday() -> format(localHourFormat())
+            isYesterday() -> getString(
                 R.string.messageDetailsDateAt,
-                context.getString(R.string.messageDetailsYesterday),
-                format(context.localHourFormat()),
+                getString(R.string.messageDetailsYesterday),
+                format(localHourFormat()),
             )
-            isThisYear() -> context.getString(
+            isThisYear() -> getString(
                 R.string.messageDetailsDateAt,
                 format(FORMAT_EMAIL_DATE_SHORT_DATE),
-                format(context.localHourFormat()),
+                format(localHourFormat()),
             )
-            else -> mostDetailedDate(context, date = this@with)
+            else -> mostDetailedDate(this@mailFormattedDate, date = this)
         }
     }
 
-    fun mostDetailedDate(context: Context, date: Date): String = with(date) {
-        return@with formatDateTime(context, FORMAT_EMAIL_DATE_LONG_DATE, context.localHourFormat())
+    fun mostDetailedDate(context: Context, date: Date): String {
+        return date.formatDateTime(context, FORMAT_EMAIL_DATE_LONG_DATE, context.localHourFormat())
     }
 
-    fun dayOfWeekDate(context: Context, date: Date): String = with(date) {
-        return@with formatDateTime(context, FORMAT_DATE_DAY_MONTH, context.localHourFormat())
+    fun dayOfWeekDate(context: Context, date: Date): String {
+        return date.formatDateTime(context, FORMAT_DATE_DAY_MONTH, context.localHourFormat())
     }
 
     private fun Date.formatDateTime(context: Context, dateFormat: String, timeFormat: String) = context.getString(
