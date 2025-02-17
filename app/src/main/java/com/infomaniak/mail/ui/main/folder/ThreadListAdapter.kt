@@ -231,9 +231,13 @@ class ThreadListAdapter @Inject constructor(
             expeditor.text = formatRecipientNames(computeDisplayedRecipients())
             mailSubject.text = context.formatSubject(subject)
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
-            mailDate.text = formatDate(context)
 
-            scheduleSendIcon.isVisible = numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS
+            val dateDisplay = computeDateDisplay()
+            mailDate.text = dateDisplay.formatDate(context, date)
+            mailDateIcon.apply {
+                isVisible = dateDisplay.icon != null
+                dateDisplay.icon?.let { setImageResource(it) }
+            }
             draftPrefix.isVisible = hasDrafts
 
             val (isIconReplyVisible, isIconForwardVisible) = computeReplyAndForwardIcon(thread.isAnswered, thread.isForwarded)
@@ -482,6 +486,11 @@ class ThreadListAdapter @Inject constructor(
             1 -> recipients.single().displayedName(context)
             else -> everyone()
         }
+    }
+
+    private fun Thread.computeDateDisplay() = when {
+        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
+        else -> ThreadListDateDisplay.Default
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
