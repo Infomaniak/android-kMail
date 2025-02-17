@@ -46,7 +46,7 @@ private fun Context.relativeFormatting(date: RealmInstant) = DateUtils.getRelati
     date.epochSeconds * 1000,
     DateUtils.DAY_IN_MILLIS,
     DateUtils.WEEK_IN_MILLIS,
-    DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
+    0,
 )?.toString() ?: ""
 
 private fun Context.defaultFormatting(date: RealmInstant) = with(date.toDate()) {
