@@ -718,9 +718,9 @@ class NewMessageFragment : Fragment() {
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener { navigateToScheduleSendBottomSheet() }
+        scheduleButton.setOnClickListener { if (checkMailboxStorage()) navigateToScheduleSendBottomSheet() }
 
-        sendButton.setOnClickListener { tryToSendEmail() }
+        sendButton.setOnClickListener { if (checkMailboxStorage()) tryToSendEmail() }
     }
 
     private fun navigateToScheduleSendBottomSheet() {
@@ -766,6 +766,16 @@ class NewMessageFragment : Fragment() {
         } else {
             sendEmail()
         }
+    }
+
+    private fun checkMailboxStorage(): Boolean {
+        val isMailboxFull = newMessageViewModel.currentMailbox.quotas?.isFull == true
+        if (isMailboxFull) {
+            trackNewMessageEvent("trySendingWithMailboxFull")
+            showSnackbar(R.string.myKSuiteSpaceFullAlert)
+        }
+
+        return !isMailboxFull
     }
 
     private fun Activity.finishAppAndRemoveTaskIfNeeded() {
