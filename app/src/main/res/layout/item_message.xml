@@ -369,9 +369,7 @@
 
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/alertsTopDivider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            app:dividerColor="@color/dividerColor"
+            style="@style/AlertDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/messageDetails" />
@@ -422,9 +420,7 @@
 
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/alertsBottomDivider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            app:dividerColor="@color/dividerColor"
+            style="@style/AlertDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/alerts" />

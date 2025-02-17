@@ -126,6 +126,7 @@
     <string name="buttonBold">Kühn</string>
     <string name="buttonBulletPoint">Aufzählungspunkt</string>
     <string name="buttonCamera">Machen Sie ein Foto</string>
+    <string name="buttonCancelReminder">Erinnerung abbrechen</string>
     <string name="buttonClose">Schliessen</string>
     <string name="buttonConfirm">Bestätigen</string>
     <string name="buttonConfirmRestoreEmails">Wiederherstellen</string>
@@ -574,6 +575,7 @@
         <item quantity="one">Unterhaltung in %s verschoben</item>
         <item quantity="other">Unterhaltungen in %s verschoben</item>
     </plurals>
+    <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
     <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>
