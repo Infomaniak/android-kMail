@@ -33,15 +33,15 @@ import java.util.Date
 enum class DateDisplay(@DrawableRes val icon: Int?, val formatDate: Context.(RealmInstant) -> String) {
     Default(
         icon = null,
-        formatDate = { date -> formatPastDate(date) }
+        formatDate = { date -> defaultFormatting(date) }
     ),
     Scheduled(
         icon = R.drawable.ic_scheduled_messages,
-        formatDate = { date -> formatRelativeFutureDate(date) }
+        formatDate = { date -> relativeFormatting(date) }
     ),
 }
 
-private fun Context.formatRelativeFutureDate(date: RealmInstant) = DateUtils.getRelativeDateTimeString(
+private fun Context.relativeFormatting(date: RealmInstant) = DateUtils.getRelativeDateTimeString(
     this,
     date.epochSeconds * 1000,
     DateUtils.DAY_IN_MILLIS,
@@ -49,7 +49,7 @@ private fun Context.formatRelativeFutureDate(date: RealmInstant) = DateUtils.get
     DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
 )?.toString() ?: ""
 
-private fun Context.formatPastDate(date: RealmInstant) = with(date.toDate()) {
+private fun Context.defaultFormatting(date: RealmInstant) = with(date.toDate()) {
     when {
         isInTheFuture() -> formatNumericalDayMonthYear()
         isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
