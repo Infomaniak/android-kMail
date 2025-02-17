@@ -47,7 +47,7 @@ private fun Context.formatRelativeFutureDate(date: RealmInstant) = DateUtils.get
     DateUtils.DAY_IN_MILLIS,
     DateUtils.WEEK_IN_MILLIS,
     DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
-)!!.toString()
+)?.toString() ?: ""
 
 private fun Context.formatPastDate(date: RealmInstant) = with(date.toDate()) {
     when {
