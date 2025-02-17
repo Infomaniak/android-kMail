@@ -34,16 +34,16 @@ object DateFormatUtils {
 
     fun Context.formatTime(date: Date): String = date.format(localHourFormat())
 
-    fun Context.fullDateWithoutYear(date: Date) = date.formatDateTime(this, FORMAT_DATE_WITHOUT_YEAR, localHourFormat())
+    fun Context.fullDateWithoutYear(date: Date): String = formatDateTime(date, FORMAT_DATE_WITHOUT_YEAR, localHourFormat())
 
-    fun Context.fullDateWithYear(date: Date) = date.formatDateTime(this, FORMAT_DATE_WITH_YEAR, localHourFormat())
+    fun Context.fullDateWithYear(date: Date): String = formatDateTime(date, FORMAT_DATE_WITH_YEAR, localHourFormat())
 
-    fun Context.dayOfWeekDate(date: Date) = date.formatDateTime(this, FORMAT_DATE_DAY_MONTH, localHourFormat())
+    fun Context.dayOfWeekDate(date: Date): String = formatDateTime(date, FORMAT_DATE_DAY_MONTH, localHourFormat())
 
-    private fun Date.formatDateTime(context: Context, dateFormat: String, timeFormat: String) = context.getString(
+    private fun Context.formatDateTime(date: Date, dateFormat: String, timeFormat: String) = getString(
         R.string.messageDetailsDateAt,
-        format(dateFormat),
-        format(timeFormat),
+        date.format(dateFormat),
+        date.format(timeFormat),
     )
 
     private fun Context.localHourFormat() = if (DateFormat.is24HourFormat(this)) FORMAT_DATE_24HOUR else FORMAT_DATE_12HOUR
