@@ -44,7 +44,6 @@ class MyKSuiteStorageBanner @JvmOverloads constructor(
             field = value
         }
 
-
     fun setupListener(onCloseButtonClicked: () -> Unit) {
         binding.closeButton.setOnClickListener { onCloseButtonClicked() }
     }

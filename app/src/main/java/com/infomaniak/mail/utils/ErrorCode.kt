@@ -69,6 +69,7 @@ object ErrorCode {
     const val SEND_FROM_REFUSED = "send__server_refused_from"
     const val SEND_RECIPIENTS_REFUSED = "send__server_refused_all_recipients"
     const val SEND_LIMIT_EXCEEDED = "send__server_rate_limit_exceeded"
+    const val SEND_DAILY_LIMIT_REACHED = "send__server_daily_limit_reached"
     //endregion
 
     //region Attachments
@@ -123,6 +124,7 @@ object ErrorCode {
         ApiErrorCode(SEND_FROM_REFUSED, R.string.errorRefusedSender), // Useless until we handle local drafts
         ApiErrorCode(SEND_RECIPIENTS_REFUSED, R.string.errorRefusedRecipients), // Useless until we handle local drafts
         ApiErrorCode(SEND_LIMIT_EXCEEDED, R.string.errorSendLimitExceeded),
+        ApiErrorCode(SEND_DAILY_LIMIT_REACHED, R.string.errorSendLimitExceeded),
 
         // Attachments
         ApiErrorCode(ATTACHMENT_NOT_VALID, R.string.errorInvalidAttachment),
