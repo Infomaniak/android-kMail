@@ -489,8 +489,8 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun Thread.computeDateDisplay() = when {
-        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> DateDisplay.Scheduled
-        else -> DateDisplay.Default
+        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
+        else -> ThreadListDateDisplay.Default
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {

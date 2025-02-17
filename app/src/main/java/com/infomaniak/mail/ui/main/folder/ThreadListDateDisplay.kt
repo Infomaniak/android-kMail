@@ -30,7 +30,7 @@ import io.realm.kotlin.types.RealmInstant
 import java.time.format.FormatStyle
 import java.util.Date
 
-enum class DateDisplay(@DrawableRes val icon: Int?, val formatDate: Context.(RealmInstant) -> String) {
+enum class ThreadListDateDisplay(@DrawableRes val icon: Int?, val formatDate: Context.(RealmInstant) -> String) {
     Default(
         icon = null,
         formatDate = { date -> defaultFormatting(date) }
