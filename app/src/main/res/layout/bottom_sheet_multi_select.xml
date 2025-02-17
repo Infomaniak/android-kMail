@@ -58,6 +58,6 @@
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_kdrive"
         app:keepIconTint="true"
-        app:text="@string/saveToDriveItem" />
+        app:title="@string/saveToDriveItem" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>
