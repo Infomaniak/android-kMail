@@ -23,6 +23,7 @@ import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.thread.Thread.Companion.FORMAT_DAY_OF_THE_WEEK
 import com.infomaniak.mail.utils.extensions.isSmallerThanDays
 import com.infomaniak.mail.utils.extensions.toDate
 import io.realm.kotlin.types.RealmInstant
@@ -37,36 +38,38 @@ sealed interface DateDisplay {
 
     data object Default : DateDisplay {
         override val icon: Int? = null
-        override fun formatDate(date: RealmInstant, context: Context): String = with(date.toDate()) {
-            when {
-                isInTheFuture() -> formatNumericalDayMonthYear()
-                isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
-                isYesterday() -> context.getString(com.infomaniak.mail.R.string.messageDetailsYesterday)
-                isSmallerThanDays(6) -> format(com.infomaniak.mail.data.models.thread.Thread.FORMAT_DAY_OF_THE_WEEK)
-                isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
-                else -> formatNumericalDayMonthYear()
-            }
-        }
-
-        private fun Date.formatNumericalDayMonthYear(): String {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                formatWithLocal(FormatData.DATE, FormatStyle.SHORT)
-            } else {
-                format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on unambiguous date format for any local
-            }
-        }
+        override fun formatDate(date: RealmInstant, context: Context): String = formatPastDate(context, date)
     }
 
     data object Scheduled : DateDisplay {
         override val icon: Int = R.drawable.ic_scheduled_messages
-        override fun formatDate(date: RealmInstant, context: Context): String = relativeFutureDate(context, date)
+        override fun formatDate(date: RealmInstant, context: Context): String = formatRelativeFutureDate(context, date)
     }
 }
 
-private fun relativeFutureDate(context: Context, date: RealmInstant) = DateUtils.getRelativeDateTimeString(
+private fun formatRelativeFutureDate(context: Context, date: RealmInstant) = DateUtils.getRelativeDateTimeString(
     context,
     date.epochSeconds * 1000,
     DateUtils.DAY_IN_MILLIS,
     DateUtils.WEEK_IN_MILLIS,
     DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_ABBREV_MONTH,
 )!!.toString()
+
+private fun formatPastDate(context: Context, date: RealmInstant) = with(date.toDate()) {
+    when {
+        isInTheFuture() -> formatNumericalDayMonthYear()
+        isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
+        isYesterday() -> context.getString(R.string.messageDetailsYesterday)
+        isSmallerThanDays(6) -> format(FORMAT_DAY_OF_THE_WEEK)
+        isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
+        else -> formatNumericalDayMonthYear()
+    }
+}
+
+private fun Date.formatNumericalDayMonthYear(): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        formatWithLocal(FormatData.DATE, FormatStyle.SHORT)
+    } else {
+        format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on unambiguous date format for any local
+    }
+}
