@@ -53,68 +53,88 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:src="@tools:sample/avatars" />
 
-                <TextView
-                    android:id="@+id/expeditorName"
-                    style="@style/BodyMedium"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/expeditorLayout"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardMedium"
-                    android:ellipsize="end"
-                    android:lines="1"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@id/certifiedIcon"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toEndOf="@id/userAvatar"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="@tools:sample/full_names" />
-
-                <ImageView
-                    android:id="@+id/certifiedIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardVerySmall"
-                    android:src="@drawable/ic_certified"
-                    app:layout_constraintBottom_toBottomOf="@id/expeditorName"
-                    app:layout_constraintEnd_toStartOf="@id/iconsSpace"
-                    app:layout_constraintStart_toEndOf="@id/expeditorName"
-                    app:layout_constraintTop_toTopOf="@id/expeditorName"
-                    tools:ignore="ContentDescription" />
-
-                <Space
-                    android:id="@+id/iconsSpace"
-                    android:layout_width="@dimen/marginStandardSmall"
-                    android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="@id/certifiedIcon"
-                    app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
-                    app:layout_constraintStart_toEndOf="@id/certifiedIcon"
-                    app:layout_constraintTop_toTopOf="@id/certifiedIcon" />
-
-                <ImageView
-                    android:id="@+id/scheduleSendIcon"
-                    android:layout_width="@dimen/smallIconSize"
-                    android:layout_height="@dimen/smallIconSize"
-                    android:layout_marginEnd="@dimen/marginStandardVerySmall"
-                    android:contentDescription="@string/contentDescriptionScheduleSend"
-                    android:src="@drawable/ic_scheduled_messages"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/shortMessageDate"
-                    app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
-                    app:layout_constraintStart_toEndOf="@id/iconsSpace"
-                    app:layout_constraintTop_toTopOf="@id/shortMessageDate"
-                    app:tint="@color/scheduledIconColor"
-                    tools:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/shortMessageDate"
-                    style="@style/Label.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_constraintBaseline_toBaselineOf="@id/expeditorName"
+                    android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/scheduleSendIcon"
-                    tools:text="9 déc 2021 à 11:00" />
+                    app:layout_constraintStart_toEndOf="@id/userAvatar"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:id="@+id/expeditorName"
+                            style="@style/BodyMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/marginStandardMedium"
+                            android:ellipsize="end"
+                            android:lines="1"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/iconCertified"
+                            app:layout_constraintHorizontal_bias="0"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="@tools:sample/full_names" />
+
+                        <ImageView
+                            android:id="@+id/iconCertified"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/marginStandardVerySmall"
+                            android:src="@drawable/ic_certified"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/iconsSpace"
+                            app:layout_constraintStart_toEndOf="@id/expeditorName"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="ContentDescription" />
+
+                        <Space
+                            android:id="@+id/iconsSpace"
+                            android:layout_width="@dimen/marginStandardVerySmall"
+                            android:layout_height="0dp"
+                            app:layout_constraintBottom_toBottomOf="@id/iconCertified"
+                            app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
+                            app:layout_constraintStart_toEndOf="@id/iconCertified"
+                            app:layout_constraintTop_toTopOf="@id/iconCertified" />
+
+                        <ImageView
+                            android:id="@+id/scheduleSendIcon"
+                            android:layout_width="@dimen/smallIconSize"
+                            android:layout_height="@dimen/smallIconSize"
+                            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                            android:contentDescription="@string/contentDescriptionScheduleSend"
+                            android:src="@drawable/ic_scheduled_messages"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
+                            app:layout_constraintStart_toEndOf="@id/iconsSpace"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/scheduledIconColor"
+                            tools:visibility="visible" />
+
+                        <TextView
+                            android:id="@+id/shortMessageDate"
+                            style="@style/Label.Secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/marginStandardSmall"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/scheduleSendIcon"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="9 déc 2021 à 11:00" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/recipientLayout"
@@ -128,7 +148,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toEndOf="@id/userAvatar"
-                    app:layout_constraintTop_toBottomOf="@id/expeditorName"
+                    app:layout_constraintTop_toBottomOf="@id/expeditorLayout"
                     tools:ignore="UseCompoundDrawables">
 
                     <TextView
