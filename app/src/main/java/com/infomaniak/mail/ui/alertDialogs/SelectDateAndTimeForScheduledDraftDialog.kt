@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
+import android.text.format.DateFormat
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import com.google.android.material.datepicker.*
@@ -136,7 +137,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
     private fun showTimePicker(dateToDisplay: Date, onDateSelected: (Int, Int) -> Unit) {
         val timePicker = MaterialTimePicker.Builder()
             .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setTimeFormat(if (DateFormat.is24HourFormat(activityContext)) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H)
             .setHour(dateToDisplay.hours())
             .setMinute(dateToDisplay.minutes())
             .setTitleText(binding.context.getString(R.string.selectTimeDialogTitle))
