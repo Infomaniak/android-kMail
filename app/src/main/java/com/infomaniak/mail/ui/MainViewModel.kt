@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.networking.NetworkAvailability
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
@@ -76,8 +75,6 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.MissingFieldException
 import okhttp3.Request
 import java.util.Date
 import java.util.UUID
@@ -322,7 +319,7 @@ class MainViewModel @Inject constructor(
             AccountUtils.updateCurrentUser()
 
             // Refresh My kSuite asynchronously, because it's not required for the threads list display
-            launch { updateMyKSuiteData() }
+            launch { MyKSuiteDataUtils.fetchMyKSuiteData() }
 
             // Refresh Mailboxes
             SentryLog.d(TAG, "Refresh mailboxes from remote")
@@ -356,26 +353,6 @@ class MainViewModel @Inject constructor(
                         refreshThreads(mailbox, folder.id)
                     }
                 }
-        }
-    }
-
-    private suspend fun updateMyKSuiteData() {
-        runCatching {
-            MyKSuiteDataUtils.requestKSuiteData()
-            val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClient)
-            if (apiResponse.data != null) {
-                MyKSuiteDataUtils.upsertKSuiteData(apiResponse.data!!)
-            } else {
-                @OptIn(ExperimentalSerializationApi::class)
-                apiResponse.error?.exception?.let {
-                    if (it is MissingFieldException || it.message?.contains("Unexpected JSON token") == true) {
-                        SentryLog.e(TAG, "Error decoding the api result MyKSuiteObject", it)
-                    }
-                }
-            }
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
-            SentryLog.d(TAG, "Exception during myKSuite data fetch", exception)
         }
     }
 

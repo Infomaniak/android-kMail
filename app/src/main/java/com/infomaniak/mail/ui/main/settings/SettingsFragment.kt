@@ -26,13 +26,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.infomaniak.core.myksuite.ui.components.MyKSuiteTier
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
-import com.infomaniak.core.myksuite.ui.screens.components.KSuiteProductsWithQuotas
-import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
-import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showToast
@@ -44,8 +40,8 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
+import com.infomaniak.mail.utils.MyKSuiteUiUtils.openMyKSuiteDashboard
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
@@ -53,14 +49,13 @@ import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import com.infomaniak.core.myksuite.R as RMyKSuite
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
     private var binding: FragmentSettingsBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val settingsViewModel: SettingsViewModel by viewModels()
+    private val myKSuiteViewModel: MykSuiteViewModel by viewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -84,38 +79,26 @@ class SettingsFragment : Fragment() {
         setupMyKSuite()
 
         observeFeatureFlag()
+        observeMyKSuiteData()
     }
 
     private fun setupMyKSuite() {
         binding.myKSuiteLayout.isGone = MyKSuiteDataUtils.myKSuite == null
-        MyKSuiteDataUtils.myKSuite?.let { setupMyKSuiteLayout(it) } ?: fetchMyKSuite()
+        MyKSuiteDataUtils.myKSuite?.let { setupMyKSuiteLayout(it) } ?: myKSuiteViewModel.refreshMyKSuite()
     }
-
-    // TODO Manage when My KSuite is null but user has at least one mailbox free (V2 ?)
-    private fun fetchMyKSuite() {}
 
     private fun setupMyKSuiteLayout(myKSuiteData: MyKSuiteData) = with(binding) {
         observeMyKSuiteMailbox()
 
         myKSuiteData.kSuitePack.type?.displayNameRes?.let(myKSuiteSettingsTitle::setText)
 
-        settingsViewModel.getMyKSuiteMailbox(myKSuiteData.mail.mailboxId)
+        myKSuiteViewModel.getMyKSuiteMailbox(myKSuiteData.mail.mailboxId)
 
-        myKSuiteSubscription.setOnClickListener {
-            val args = MyKSuiteDashboardFragmentArgs(
-                myKSuiteTier = if (myKSuiteData.isMyKSuitePlus) MyKSuiteTier.Plus else MyKSuiteTier.Free,
-                email = myKSuiteData.mail.email,
-                avatarUri = AccountUtils.currentUser?.avatar ?: "",
-                dailySendLimit = myKSuiteData.mail.dailyLimitSent.toString(),
-                kSuiteAppsWithQuotas = getKSuiteQuotasApp(myKSuiteData),
-                trialExpiryDate = myKSuiteData.trialExpiryDate,
-            )
-            animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
-        }
+        myKSuiteSubscription.setOnClickListener { openMyKSuiteDashboard(myKSuiteData) }
     }
 
     private fun observeMyKSuiteMailbox() {
-        settingsViewModel.myKSuiteMailboxResult.observe(viewLifecycleOwner) { mailbox ->
+        myKSuiteViewModel.myKSuiteMailboxResult.observe(viewLifecycleOwner) { mailbox ->
             binding.myKSuiteMailAddress.apply {
                 isVisible = mailbox != null
 
@@ -131,25 +114,8 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun getKSuiteQuotasApp(myKSuite: MyKSuiteData): Array<KSuiteProductsWithQuotas> {
-
-        val mailProduct = with(myKSuite.mail) {
-            KSuiteProductsWithQuotas.Mail(
-                usedSize = requireContext().formatShortFileSize(usedSize),
-                maxSize = requireContext().formatShortFileSize(storageSizeLimit),
-                progress = (usedSize.toDouble() / storageSizeLimit.toDouble()).toFloat(),
-            )
-        }
-
-        val driveProduct = with(myKSuite.drive) {
-            KSuiteProductsWithQuotas.Drive(
-                usedSize = requireContext().formatShortFileSize(usedSize),
-                maxSize = requireContext().formatShortFileSize(size),
-                progress = (usedSize.toDouble() / size.toDouble()).toFloat(),
-            )
-        }
-
-        return arrayOf(mailProduct, driveProduct)
+    private fun observeMyKSuiteData() {
+        myKSuiteViewModel.myKSuiteDataResult.observe(viewLifecycleOwner) { data -> data?.let(::setupMyKSuiteLayout) }
     }
 
     override fun onResume() {
