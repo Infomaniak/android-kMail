@@ -26,6 +26,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.infomaniak.core.myksuite.ui.components.MyKSuiteTier
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.screens.components.KSuiteProductsWithQuotas
@@ -101,10 +102,12 @@ class SettingsFragment : Fragment() {
 
         myKSuiteSubscription.setOnClickListener {
             val args = MyKSuiteDashboardFragmentArgs(
+                myKSuiteTier = if (myKSuiteData.isMyKSuitePlus) MyKSuiteTier.Plus else MyKSuiteTier.Free,
                 email = myKSuiteData.mail.email,
                 avatarUri = AccountUtils.currentUser?.avatar ?: "",
                 dailySendLimit = myKSuiteData.mail.dailyLimitSent.toString(),
                 kSuiteAppsWithQuotas = getKSuiteQuotasApp(myKSuiteData),
+                trialExpiryDate = myKSuiteData.trialExpiryDate,
             )
             animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
         }
@@ -128,17 +131,13 @@ class SettingsFragment : Fragment() {
     }
 
     private fun getKSuiteQuotasApp(myKSuite: MyKSuiteData): Array<KSuiteProductsWithQuotas> {
-        val mailProduct = if (myKSuite.isMyKSuitePlus) {
-            // TODO: Management for My kSuite Plus (and pack check name like in kDrive)
-            null
-        } else {
-            with(myKSuite.mail) {
-                KSuiteProductsWithQuotas.Mail(
-                    usedSize = requireContext().formatShortFileSize(usedSize),
-                    maxSize = requireContext().formatShortFileSize(storageSizeLimit),
-                    progress = (usedSize.toDouble() / storageSizeLimit.toDouble()).toFloat(),
-                )
-            }
+
+        val mailProduct = with(myKSuite.mail) {
+            KSuiteProductsWithQuotas.Mail(
+                usedSize = requireContext().formatShortFileSize(usedSize),
+                maxSize = requireContext().formatShortFileSize(storageSizeLimit),
+                progress = (usedSize.toDouble() / storageSizeLimit.toDouble()).toFloat(),
+            )
         }
 
         val driveProduct = with(myKSuite.drive) {
@@ -149,7 +148,7 @@ class SettingsFragment : Fragment() {
             )
         }
 
-        return if (mailProduct == null) arrayOf(driveProduct) else arrayOf(mailProduct, driveProduct)
+        return arrayOf(mailProduct, driveProduct)
     }
 
     override fun onResume() {
