@@ -24,6 +24,7 @@ import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.myksuite.ui.components.MyKSuiteTier
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
+import com.infomaniak.core.myksuite.ui.screens.MyKSuiteDashboardScreenData
 import com.infomaniak.core.myksuite.ui.screens.components.KSuiteProductsWithQuotas
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialogArgs
@@ -44,18 +45,22 @@ object MyKSuiteUiUtils {
     }
 
     fun Fragment.openMyKSuiteDashboard(myKSuiteData: MyKSuiteData) {
-        val args = MyKSuiteDashboardFragmentArgs(
-            myKSuiteTier = if (myKSuiteData.isMyKSuitePlus) MyKSuiteTier.Plus else MyKSuiteTier.Free,
-            email = myKSuiteData.mail.email,
-            avatarUri = AccountUtils.currentUser?.avatar ?: "",
-            dailySendLimit = myKSuiteData.mail.dailyLimitSent.toString(),
-            kSuiteAppsWithQuotas = requireContext().getKSuiteQuotasApp(myKSuiteData),
-            trialExpiryDate = myKSuiteData.trialExpiryDate,
-        )
+        val args = MyKSuiteDashboardFragmentArgs(dashboardData = getDashboardData(requireContext(), myKSuiteData))
         animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
     }
 
-    fun Context.getKSuiteQuotasApp(myKSuite: MyKSuiteData): Array<KSuiteProductsWithQuotas> {
+    fun getDashboardData(context: Context, myKSuiteData: MyKSuiteData): MyKSuiteDashboardScreenData {
+        return MyKSuiteDashboardScreenData(
+            myKSuiteTier = if (myKSuiteData.isMyKSuitePlus) MyKSuiteTier.Plus else MyKSuiteTier.Free,
+            email = myKSuiteData.mail.email,
+            avatarUri = AccountUtils.currentUser?.avatar ?: "",
+            dailySendingLimit = myKSuiteData.mail.dailyLimitSent.toString(),
+            kSuiteProductsWithQuotas = context.getKSuiteQuotasApp(myKSuiteData).toList(),
+            trialExpiryDate = myKSuiteData.trialExpiryDate,
+        )
+    }
+
+    private fun Context.getKSuiteQuotasApp(myKSuite: MyKSuiteData): Array<KSuiteProductsWithQuotas> {
 
         val mailProduct = with(myKSuite.mail) {
             KSuiteProductsWithQuotas.Mail(
