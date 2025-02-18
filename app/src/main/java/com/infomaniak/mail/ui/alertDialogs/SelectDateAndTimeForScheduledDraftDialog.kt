@@ -32,6 +32,7 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
@@ -153,9 +154,12 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         )
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(CompositeDateValidator.allOf(dateValidators))
 
+        // MaterialDatePicker expects the `setSelection()` time to be defined as UTC time and not local time
+        val utcTime = dateToDisplay.time + TimeZone.getDefault().getOffset(dateToDisplay.time)
+
         val datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText(binding.context.getString(R.string.selectDateDialogTitle))
-            .setSelection(dateToDisplay.time)
+            .setSelection(utcTime)
             .setCalendarConstraints(constraintsBuilder.build())
             .build()
 
