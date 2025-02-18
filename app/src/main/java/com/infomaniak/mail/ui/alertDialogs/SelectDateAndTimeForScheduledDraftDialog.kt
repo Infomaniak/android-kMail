@@ -55,11 +55,6 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
     lateinit var localSettings: LocalSettings
 
     private fun initDialog() = with(binding) {
-
-        selectedDate = Date().roundUpToNextTenMinutes()
-
-        setDate()
-
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm, null)
@@ -77,39 +72,23 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         setupListeners(onSchedule, onAbort)
     }
 
-    private fun getScheduleDateErrorText(): String = if (selectedDate.isInTheFuture().not()) {
-        activityContext.resources.getString(R.string.errorChooseUpcomingDate)
-    } else {
-        activityContext.resources.getQuantityString(
-            R.plurals.errorScheduleDelayTooShort,
-            MIN_SCHEDULE_DELAY_MINUTES,
-            MIN_SCHEDULE_DELAY_MINUTES,
-        )
-    }
-
     private fun setupListeners(onSchedule: (Long) -> Unit, onAbort: (() -> Unit)?) = with(alertDialog) {
 
         binding.dateField.setOnClickListener {
             showDatePicker(selectedDate) { time ->
-                val date = Date().also { it.time = time }
+                val date = Date(time).let { newDate ->
+                    Calendar.getInstance().apply {
+                        set(newDate.year(), newDate.month(), newDate.day(), selectedDate.hours(), selectedDate.minutes(), 0)
+                    }.time
+                }
 
-                selectedDate = Calendar.getInstance().apply {
-                    set(date.year(), date.month(), date.day(), selectedDate.hours(), selectedDate.minutes(), 0)
-                }.time
-
-                setDate()
+                selectDate(date)
             }
         }
 
         binding.timeField.setOnClickListener {
             showTimePicker(selectedDate) { hour, minute ->
-                selectedDate = selectedDate.setHour(hour).setMinute(minute)
-
-                binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
-
-                binding.scheduleDateError.text = getScheduleDateErrorText()
-                binding.scheduleDateError.isVisible = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES).not()
-                positiveButton.isEnabled = selectedDate.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)
+                selectDate(selectedDate.setHour(hour).setMinute(minute))
             }
         }
 
@@ -124,6 +103,33 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         negativeButton.setOnClickListener { cancel() }
 
         setOnCancelListener { onAbort?.invoke() }
+    }
+
+    private fun selectDate(date: Date) {
+        updateErrorMessage(date)
+        selectedDate = date
+        with(binding) {
+            dateField.setText(date.format(FORMAT_DATE_DAY_MONTH_YEAR))
+            timeField.setText(date.format(FORMAT_DATE_HOUR_MINUTE))
+        }
+    }
+
+    private fun updateErrorMessage(date: Date) {
+        val isValid = date.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)
+
+        if (isValid.not()) binding.scheduleDateError.text = getScheduleDateErrorText(date)
+        binding.scheduleDateError.isVisible = isValid.not()
+        positiveButton.isEnabled = isValid
+    }
+
+    private fun getScheduleDateErrorText(date: Date): String = if (date.isInTheFuture()) {
+        activityContext.resources.getQuantityString(
+            R.plurals.errorScheduleDelayTooShort,
+            MIN_SCHEDULE_DELAY_MINUTES,
+            MIN_SCHEDULE_DELAY_MINUTES,
+        )
+    } else {
+        activityContext.resources.getString(R.string.errorChooseUpcomingDate)
     }
 
     private fun showTimePicker(dateToDisplay: Date, onDateSelected: (Int, Int) -> Unit) {
@@ -158,23 +164,16 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         datePicker.show(super.activity.supportFragmentManager, null)
     }
 
-    private fun setDate() {
-        binding.dateField.setText(selectedDate.format(FORMAT_DATE_DAY_MONTH_YEAR))
-    }
-
     private fun showDialogWithBasicInfo(
         title: String? = null,
         @StringRes positiveButtonText: Int? = null,
         @StringRes negativeButtonText: Int? = null,
-    ) = with(binding) {
-
+    ) {
         alertDialog.show()
 
-        selectedDate = Date().roundUpToNextTenMinutes()
+        selectDate(Date().roundUpToNextTenMinutes())
 
-        binding.timeField.setText(selectedDate.format(FORMAT_DATE_HOUR_MINUTE))
-
-        title?.let(dialogTitle::setText)
+        title?.let(binding.dialogTitle::setText)
 
         positiveButtonText?.let(positiveButton::setText)
         negativeButtonText?.let(negativeButton::setText)
