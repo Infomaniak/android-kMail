@@ -237,7 +237,7 @@ class ThreadListAdapter @Inject constructor(
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
 
             val dateDisplay = computeDateDisplay()
-            mailDate.text = dateDisplay.formatDate(context, displayDate)
+            mailDate.text = dateDisplay.formatThreadDate(context, this)
             mailDateIcon.apply {
                 isVisible = dateDisplay.icon != null
                 dateDisplay.icon?.let { setImageResource(it) }

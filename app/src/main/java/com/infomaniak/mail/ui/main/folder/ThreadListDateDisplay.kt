@@ -23,6 +23,8 @@ import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
 import com.infomaniak.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.SnoozeState
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.Companion.FORMAT_DAY_OF_THE_WEEK
 import com.infomaniak.mail.utils.extensions.isSmallerThanDays
 import com.infomaniak.mail.utils.extensions.toDate
@@ -30,18 +32,26 @@ import io.realm.kotlin.types.RealmInstant
 import java.time.format.FormatStyle
 import java.util.Date
 
-enum class ThreadListDateDisplay(@DrawableRes val icon: Int?, val formatDate: Context.(RealmInstant) -> String) {
+enum class ThreadListDateDisplay(@DrawableRes val icon: Int?, val formatThreadDate: Context.(Thread) -> String) {
     Default(
         icon = null,
-        formatDate = { date -> defaultFormatting(date) }
+        formatThreadDate = { thread -> defaultFormatting(thread.displayDate) }
     ),
     Scheduled(
         icon = R.drawable.ic_scheduled_messages,
-        formatDate = { date -> relativeFormatting(date) }
+        formatThreadDate = { thread -> relativeFormatting(thread.displayDate) }
     ),
     Snoozed(
         icon = R.drawable.ic_alarm_clock,
-        formatDate = { date -> if (date.isInTheFuture()) relativeFormatting(date) else defaultFormatting(date) }
+        formatThreadDate = { thread ->
+            // If the thread is in SnoozeState.Snoozed then we necessarily have a snoozeEndDate
+            val date = if (thread.snoozeState == SnoozeState.Snoozed) {
+                thread.snoozeEndDate ?: RealmInstant.MIN
+            } else {
+                thread.displayDate
+            }
+            if (date.isInTheFuture()) relativeFormatting(date) else defaultFormatting(date)
+        }
     )
 }
 
