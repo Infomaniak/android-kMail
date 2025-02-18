@@ -21,6 +21,8 @@ import android.content.Context
 import android.os.Build
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithYear
+import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithoutYear
@@ -48,5 +50,10 @@ object MailDateFormatUtils {
         } else {
             format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
         }
+    }
+
+    fun Context.formatDayOfWeekAdaptiveYear(date: Date): String = when {
+        date.isThisYear() -> dayOfWeekDateWithoutYear(date)
+        else -> dayOfWeekDateWithYear(date)
     }
 }
