@@ -18,33 +18,34 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import androidx.lifecycle.lifecycleScope
-import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
+import androidx.fragment.app.viewModels
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
-import com.infomaniak.mail.utils.MyKSuiteDataUtils
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.MyKSuiteUiUtils.getKSuiteQuotasApp
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.core.myksuite.R as RMyKSuite
 
+@AndroidEntryPoint
 class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
 
-    private var kSuiteData: MyKSuiteData? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            if (kSuiteData == null) MyKSuiteDataUtils.requestKSuiteData(MyKSuiteDataUtils.myKSuiteId)
-            Log.e("TOTO", "onCreate: $kSuiteData")
-        }
-    }
+    private val myKSuiteViewModel: MykSuiteViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setSystemBarsColors(statusBarColor = RMyKSuite.color.dashboardBackground)
+
+        myKSuiteViewModel.refreshMyKSuite()
+        myKSuiteViewModel.myKSuiteDataResult.observe(viewLifecycleOwner) { myKSuiteData ->
+            myKSuiteData?.let { data ->
+                resetContent(
+                    myKSuiteData = data,
+                    avatarUri = AccountUtils.currentUser?.avatar ?: "",
+                    products = requireContext().getKSuiteQuotasApp(myKSuiteData).toList(),
+                )
+            }
+        }
     }
 }

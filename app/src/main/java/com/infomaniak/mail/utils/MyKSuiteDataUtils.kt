@@ -19,10 +19,18 @@ package com.infomaniak.mail.utils
 
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteDataManager
+import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
+import kotlin.coroutines.cancellation.CancellationException
 
 object MyKSuiteDataUtils : MyKSuiteDataManager() {
+
+    private val TAG = MyKSuiteDataUtils::class.simpleName.toString()
 
     override val userId get() = AccountUtils.currentUserId
 
@@ -37,4 +45,25 @@ object MyKSuiteDataUtils : MyKSuiteDataManager() {
             field = myKSuiteData
             myKSuiteId = myKSuiteData?.id ?: AppSettings.DEFAULT_ID
         }
+
+    suspend fun fetchMyKSuiteData(): MyKSuiteData? = runCatching {
+        MyKSuiteDataUtils.requestKSuiteData()
+        val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClient)
+        if (apiResponse.data != null) {
+            MyKSuiteDataUtils.upsertKSuiteData(apiResponse.data!!)
+        } else {
+            @OptIn(ExperimentalSerializationApi::class)
+            apiResponse.error?.exception?.let {
+                if (it is MissingFieldException || it.message?.contains("Unexpected JSON token") == true) {
+                    SentryLog.e(TAG, "Error decoding the api result MyKSuiteObject", it)
+                }
+            }
+        }
+
+        return@runCatching apiResponse.data
+    }.getOrElse { exception ->
+        if (exception is CancellationException) throw exception
+        SentryLog.d(TAG, "Exception during myKSuite data fetch", exception)
+        null
+    }
 }
