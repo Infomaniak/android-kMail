@@ -32,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
-        tools:text="@string/datePickerTitle" />
+        android:text="@string/datePickerTitle" />
 
     <com.infomaniak.lib.core.views.EndIconTextInputLayout
         android:layout_width="match_parent"

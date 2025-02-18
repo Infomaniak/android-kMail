@@ -224,7 +224,6 @@ class NewMessageFragment : Fragment() {
 
         getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
-                title = getString(R.string.datePickerTitle),
                 onSchedule = { timestamp ->
                     localSettings.lastSelectedScheduleEpoch = timestamp
                     scheduleDraft(timestamp)

@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
 import android.text.format.DateFormat
-import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import com.google.android.material.datepicker.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -27,7 +26,6 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeForScheduledDraftBinding
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -54,9 +52,6 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
 
     private lateinit var selectedDate: Date
 
-    @Inject
-    lateinit var localSettings: LocalSettings
-
     private fun initDialog() = with(binding) {
         MaterialAlertDialogBuilder(context)
             .setView(root)
@@ -70,9 +65,16 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         onAbort = null
     }
 
-    fun show(title: String, onSchedule: (Long) -> Unit, onAbort: (() -> Unit)? = null) {
-        showDialogWithBasicInfo(title, R.string.buttonScheduleTitle)
+    fun show(onSchedule: (Long) -> Unit, onAbort: (() -> Unit)? = null) {
+        showDialogWithBasicInfo()
         setupListeners(onSchedule, onAbort)
+    }
+
+    private fun showDialogWithBasicInfo() {
+        alertDialog.show()
+
+        selectDate(Date().roundUpToNextTenMinutes())
+        positiveButton.setText(R.string.buttonScheduleTitle)
     }
 
     private fun setupListeners(onSchedule: (Long) -> Unit, onAbort: (() -> Unit)?) = with(alertDialog) {
@@ -168,21 +170,6 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         datePicker.addOnPositiveButtonClickListener(onDateSelected)
 
         datePicker.show(super.activity.supportFragmentManager, null)
-    }
-
-    private fun showDialogWithBasicInfo(
-        title: String? = null,
-        @StringRes positiveButtonText: Int? = null,
-        @StringRes negativeButtonText: Int? = null,
-    ) {
-        alertDialog.show()
-
-        selectDate(Date().roundUpToNextTenMinutes())
-
-        title?.let(binding.dialogTitle::setText)
-
-        positiveButtonText?.let(positiveButton::setText)
-        negativeButtonText?.let(negativeButton::setText)
     }
 
     companion object {
