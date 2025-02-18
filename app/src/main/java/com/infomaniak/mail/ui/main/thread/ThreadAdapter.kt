@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,8 +57,7 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.MailDateFormatUtils.mailFormattedDate
-import com.infomaniak.mail.utils.MailDateFormatUtils.mostDetailedDate
+import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -66,6 +65,7 @@ import com.infomaniak.mail.utils.Utils.TEXT_PLAIN
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
+import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
 import io.sentry.Sentry
@@ -387,7 +387,7 @@ class ThreadAdapter(
             userAvatar.loadAvatar(firstSender, message.bimi)
             iconCertified.isVisible = message.bimi?.isCertified ?: false
 
-            shortMessageDate.text = mailFormattedDate(context, messageDate)
+            shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
 
         val listener: OnClickListener? = message.sender?.let { recipient ->
@@ -452,7 +452,7 @@ class ThreadAdapter(
         bccGroup.isVisible = bccIsNotEmpty
         if (bccIsNotEmpty) bccAdapter.updateList(message.bcc.toList())
 
-        detailedMessageDate.text = mostDetailedDate(context, messageDate)
+        detailedMessageDate.text = context.fullDateWithYear(messageDate)
     }
 
     private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
