@@ -20,9 +20,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:divider="@drawable/spacer_standard_medium"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/marginStandard"
-    android:paddingVertical="@dimen/marginStandardSmall">
+    android:paddingVertical="@dimen/marginStandardSmall"
+    android:showDividers="middle">
 
     <TextView
         android:id="@+id/dialogTitle"
@@ -32,48 +34,44 @@
         android:layout_marginTop="@dimen/marginStandard"
         tools:text="@string/datePickerTitle" />
 
-    <LinearLayout
+    <com.infomaniak.lib.core.views.EndIconTextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginVertical="@dimen/marginStandard"
-        android:baselineAligned="false">
+        android:layout_height="wrap_content"
+        app:endIconDrawable="@drawable/ic_chevron_down"
+        app:endIconMode="custom"
+        app:hintEnabled="false">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/marginStandard"
-            android:layout_weight="1"
-            app:hintEnabled="false">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/dateField"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="date"
+            tools:text="mer. 27 nov. 2024" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/dateField"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:cursorVisible="false"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:inputType="date"
-                tools:text="mer. 27 nov. 2024" />
+    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:hintEnabled="false">
+    <com.infomaniak.lib.core.views.EndIconTextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:endIconDrawable="@drawable/ic_chevron_down"
+        app:endIconMode="custom"
+        app:hintEnabled="false">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/timeField"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:cursorVisible="false"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:inputType="date"
-                tools:text="08:00" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/timeField"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="date"
+            tools:text="08:00" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
 
     <TextView
         android:id="@+id/scheduleDateError"

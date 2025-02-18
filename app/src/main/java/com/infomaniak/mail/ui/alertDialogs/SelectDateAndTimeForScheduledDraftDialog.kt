@@ -29,6 +29,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeForScheduledDraftBinding
+import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import java.util.Calendar
@@ -112,7 +113,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         selectedDate = date
         with(binding) {
             dateField.setText(date.format(FORMAT_DATE_DAY_MONTH_YEAR))
-            timeField.setText(date.format(FORMAT_DATE_HOUR_MINUTE))
+            timeField.setText(context.formatTime(date))
         }
     }
 
