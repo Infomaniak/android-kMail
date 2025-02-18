@@ -27,8 +27,8 @@ import java.util.Date
 object DateFormatUtils {
 
     // Do not use the 12/24 hours format directly. Call localHourFormat() instead
-    private const val FORMAT_DATE_24HOUR = "HH:mm"
-    private const val FORMAT_DATE_12HOUR = "hh:mm a"
+    private const val FORMAT_DATE_24_HOUR = "HH:mm"
+    private const val FORMAT_DATE_12_HOUR = "hh:mm a"
     private const val FORMAT_DATE_WITH_YEAR = "d MMM yyyy"
     private const val FORMAT_DATE_WITHOUT_YEAR = "d MMM"
 
@@ -46,5 +46,5 @@ object DateFormatUtils {
         date.format(timeFormat),
     )
 
-    private fun Context.localHourFormat() = if (DateFormat.is24HourFormat(this)) FORMAT_DATE_24HOUR else FORMAT_DATE_12HOUR
+    private fun Context.localHourFormat() = if (DateFormat.is24HourFormat(this)) FORMAT_DATE_24_HOUR else FORMAT_DATE_12_HOUR
 }
