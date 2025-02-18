@@ -696,6 +696,9 @@
         android:name="com.infomaniak.mail.ui.main.settings.KSuiteDashboardFragment"
         android:label="MyKSuiteDashboardFragment">
         <argument
+            android:name="myKSuiteTier"
+            app:argType="com.infomaniak.core.myksuite.ui.components.MyKSuiteTier" />
+        <argument
             android:name="email"
             app:argType="string" />
         <argument
@@ -707,5 +710,9 @@
         <argument
             android:name="kSuiteAppsWithQuotas"
             app:argType="com.infomaniak.core.myksuite.ui.screens.components.KSuiteProductsWithQuotas[]" />
+        <argument
+            android:name="trialExpiryDate"
+            app:argType="java.util.Date"
+            app:nullable="true" />
     </fragment>
 </navigation>
