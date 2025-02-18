@@ -21,8 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.MyKSuiteUiUtils.getKSuiteQuotasApp
+import com.infomaniak.mail.utils.MyKSuiteUiUtils.getDashboardData
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.core.myksuite.R as RMyKSuite
@@ -39,13 +38,7 @@ class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
 
         myKSuiteViewModel.refreshMyKSuite()
         myKSuiteViewModel.myKSuiteDataResult.observe(viewLifecycleOwner) { myKSuiteData ->
-            myKSuiteData?.let { data ->
-                resetContent(
-                    myKSuiteData = data,
-                    avatarUri = AccountUtils.currentUser?.avatar ?: "",
-                    products = requireContext().getKSuiteQuotasApp(myKSuiteData).toList(),
-                )
-            }
+            myKSuiteData?.let { data -> resetContent(dashboardData = getDashboardData(requireContext(), data)) }
         }
     }
 }
