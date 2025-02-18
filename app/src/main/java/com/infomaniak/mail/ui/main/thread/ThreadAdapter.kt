@@ -39,7 +39,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
-import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME
+import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.format
@@ -57,7 +57,6 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.SharedUtils.Companion.createHtmlForPlainText
 import com.infomaniak.mail.utils.UiUtils.getPrettyNameAndEmail
 import com.infomaniak.mail.utils.Utils.TEXT_HTML
@@ -66,6 +65,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupThreadWebViewSettings
 import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
+import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
 import io.sentry.Sentry
@@ -356,7 +356,7 @@ class ThreadAdapter(
             scheduleAlert.setDescription(
                 context.getString(
                     R.string.scheduledEmailHeader,
-                    message.date.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_WITH_TIME),
+                    message.date.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
                 ),
             )
             scheduleSendIcon.isVisible = true

@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils.date
 import android.content.Context
 import android.text.format.DateFormat
 import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_MONTH
+import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_MONTH_YEAR
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.R
 import java.util.Date
@@ -38,7 +39,9 @@ object DateFormatUtils {
 
     fun Context.fullDateWithYear(date: Date): String = formatDateTime(date, FORMAT_DATE_WITH_YEAR, localHourFormat())
 
-    fun Context.dayOfWeekDate(date: Date): String = formatDateTime(date, FORMAT_DATE_DAY_MONTH, localHourFormat())
+    fun Context.dayOfWeekDateWithoutYear(date: Date): String = formatDateTime(date, FORMAT_DATE_DAY_MONTH, localHourFormat())
+
+    fun Context.dayOfWeekDateWithYear(date: Date): String = formatDateTime(date, FORMAT_DATE_DAY_MONTH_YEAR, localHourFormat())
 
     private fun Context.formatDateTime(date: Date, dateFormat: String, timeFormat: String) = getString(
         R.string.messageDetailsDateAt,
