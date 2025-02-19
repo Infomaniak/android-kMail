@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
     <attr name="customGradientColor" format="color" />
 
     <declare-styleable name="CommonAttributes">
+        <attr name="description" format="string" />
         <attr name="icon" format="reference" />
+        <attr name="iconColor" format="color" />
         <attr name="padding" format="dimension" />
         <attr name="strokeColor" format="color" />
         <attr name="strokeWidth" format="dimension" />
@@ -134,7 +136,7 @@
         <attr name="android:contentDescription" format="string" />
         <attr name="backgroundColor" format="color" />
         <attr name="icon" />
-        <attr name="iconColor" format="color" />
+        <attr name="iconColor" />
         <attr name="selectedBackgroundColor" format="color" />
         <attr name="selectedIconColor" format="color" />
     </declare-styleable>
@@ -147,7 +149,7 @@
     </declare-styleable>
 
     <declare-styleable name="EmptyStateView">
-        <attr name="description" format="string" />
+        <attr name="description" />
         <attr name="icon" />
         <attr name="title" />
     </declare-styleable>
