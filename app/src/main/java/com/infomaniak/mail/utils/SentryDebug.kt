@@ -251,15 +251,6 @@ object SentryDebug {
         }
     }
 
-    fun sendOverScrolledMessage(clientWidth: Int, scrollWidth: Int, messageUid: String) {
-        Sentry.captureMessage("When resizing the mail with js, after zooming, it can still scroll.", SentryLevel.ERROR) { scope ->
-            scope.setTag("messageUid", messageUid)
-            scope.setTag("isClientWidthEmpty", (clientWidth <= 0).toString())
-            scope.setExtra("clientWidth", "$clientWidth")
-            scope.setExtra("scrollWidth", "$scrollWidth")
-        }
-    }
-
     fun sendJavaScriptError(errorName: String, errorMessage: String, errorStack: String, messageUid: String) {
         Sentry.captureMessage("JavaScript returned an error when displaying an email.", SentryLevel.ERROR) { scope ->
             scope.setTag("messageUid", messageUid)

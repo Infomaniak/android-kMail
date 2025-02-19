@@ -79,7 +79,6 @@ function normalizeElementWidths(elements, webViewWidth, messageUid) {
 
         if (document.documentElement.scrollWidth > document.documentElement.clientWidth) {
             logInfo(`After zooming the mail it can still scroll: found clientWidth / scrollWidth -> ${document.documentElement.clientWidth} / ${document.documentElement.scrollWidth}`);
-            reportOverScroll(document.documentElement.clientWidth, document.documentElement.scrollWidth, messageUid);
         }
     }
     webviewFinishedLoading();

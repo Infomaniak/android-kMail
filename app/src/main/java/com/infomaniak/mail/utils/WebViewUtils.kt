@@ -88,11 +88,6 @@ class WebViewUtils(context: Context) {
     class JavascriptBridge(private val onWebViewFinishedLoading: (() -> Unit)? = null) {
 
         @JavascriptInterface
-        fun reportOverScroll(clientWidth: Int, scrollWidth: Int, messageUid: String) {
-            SentryDebug.sendOverScrolledMessage(clientWidth, scrollWidth, messageUid)
-        }
-
-        @JavascriptInterface
         fun reportError(
             errorName: String,
             errorMessage: String,
