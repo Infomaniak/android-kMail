@@ -24,10 +24,6 @@ import io.realm.kotlin.dynamic.getValue
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 
-val APP_SETTINGS_MIGRATION = AutomaticSchemaMigration { migrationContext ->
-    SentryDebug.addMigrationBreadcrumb(migrationContext)
-}
-
 val USER_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
