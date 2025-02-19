@@ -28,7 +28,7 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.DialogSelectDateAndTimeForScheduledDraftBinding
+import com.infomaniak.mail.databinding.DialogSelectDateAndTimeBinding
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
 import java.util.Calendar
 import java.util.Date
@@ -42,9 +42,7 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
 
     abstract fun defineCalendarConstraint(): CalendarConstraints.Builder
 
-    val binding: DialogSelectDateAndTimeForScheduledDraftBinding by lazy {
-        DialogSelectDateAndTimeForScheduledDraftBinding.inflate(activity.layoutInflater)
-    }
+    val binding: DialogSelectDateAndTimeBinding by lazy { DialogSelectDateAndTimeBinding.inflate(activity.layoutInflater) }
 
     override val alertDialog = initDialog()
 
