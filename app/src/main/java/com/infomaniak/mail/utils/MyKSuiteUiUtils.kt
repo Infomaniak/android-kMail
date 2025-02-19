@@ -63,9 +63,9 @@ object MyKSuiteUiUtils {
 
         val mailProduct = with(myKSuite.mail) {
             KSuiteProductsWithQuotas.Mail(
-                usedSize = formatShortFileSize(usedSize),
+                usedSize = formatShortFileSize(usedSizeInBytes),
                 maxSize = formatShortFileSize(storageSizeLimit),
-                progress = (usedSize.toDouble() / storageSizeLimit.toDouble()).toFloat(),
+                progress = (usedSizeInBytes.toDouble() / storageSizeLimit.toDouble()).toFloat(),
             )
         }
 
