@@ -50,6 +50,7 @@ import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.infomaniak.core.myksuite.R as RMyKSuite
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
@@ -83,7 +84,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupMyKSuite() {
-        binding.myKSuitelayout.isGone = MyKSuiteDataUtils.myKSuite == null
+        binding.myKSuiteLayout.isGone = MyKSuiteDataUtils.myKSuite == null
         MyKSuiteDataUtils.myKSuite?.let { setupMyKSuiteLayout(it) } ?: fetchMyKSuite()
     }
 
@@ -104,7 +105,7 @@ class SettingsFragment : Fragment() {
                     avatarUri = user.avatar ?: "",
                     dailySendLimit = "500",
                 )
-                animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
+                animatedNavigation(resId = RMyKSuite.id.myKSuiteDashboardFragment, args = args.toBundle())
             }
         }
     }
@@ -114,14 +115,13 @@ class SettingsFragment : Fragment() {
             binding.myKSuiteMailAddress.apply {
                 isVisible = mailbox != null
 
-                setTitle(mailbox?.email ?: "")
+                if (mailbox == null) return@observe
 
-                if (mailbox != null) {
-                    setOnClickListener {
-                        animatedNavigation(
-                            SettingsFragmentDirections.actionSettingsToMailboxSettings(mailbox.objectId, mailbox.email)
-                        )
-                    }
+                setTitle(mailbox.email)
+                setOnClickListener {
+                    animatedNavigation(
+                        SettingsFragmentDirections.actionSettingsToMailboxSettings(mailbox.objectId, mailbox.email)
+                    )
                 }
             }
         }
