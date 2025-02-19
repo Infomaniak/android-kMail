@@ -22,8 +22,6 @@ import com.infomaniak.core.myksuite.ui.data.MyKSuiteDataManager
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
-import com.infomaniak.mail.data.models.AppSettings
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlin.coroutines.cancellation.CancellationException
@@ -32,19 +30,9 @@ object MyKSuiteDataUtils : MyKSuiteDataManager() {
 
     private val TAG = MyKSuiteDataUtils::class.simpleName.toString()
 
-    override val userId get() = AccountUtils.currentUserId
-
-    override var myKSuiteId: Int = AppSettingsController.getAppSettings().myKSuiteId
-        set(myKSuiteId) {
-            field = myKSuiteId
-            AppSettingsController.updateAppSettings { appSettings -> appSettings.myKSuiteId = myKSuiteId }
-        }
+    override val currentUserId get() = AccountUtils.currentUserId
 
     override var myKSuite: MyKSuiteData? = null
-        set(myKSuiteData) {
-            field = myKSuiteData
-            myKSuiteId = myKSuiteData?.id ?: AppSettings.DEFAULT_ID
-        }
 
     suspend fun fetchMyKSuiteData(): MyKSuiteData? = runCatching {
         MyKSuiteDataUtils.requestKSuiteData()

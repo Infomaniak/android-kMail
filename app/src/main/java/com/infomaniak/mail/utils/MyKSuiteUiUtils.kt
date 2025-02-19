@@ -21,7 +21,6 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
-import com.infomaniak.core.myksuite.ui.components.MyKSuiteTier
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
 import com.infomaniak.core.myksuite.ui.screens.MyKSuiteDashboardScreenData
@@ -51,7 +50,7 @@ object MyKSuiteUiUtils {
 
     fun getDashboardData(context: Context, myKSuiteData: MyKSuiteData): MyKSuiteDashboardScreenData {
         return MyKSuiteDashboardScreenData(
-            myKSuiteTier = if (myKSuiteData.isMyKSuitePlus) MyKSuiteTier.Plus else MyKSuiteTier.Free,
+            myKSuiteTier = myKSuiteData.tier,
             email = myKSuiteData.mail.email,
             avatarUri = AccountUtils.currentUser?.avatar ?: "",
             dailySendingLimit = myKSuiteData.mail.dailyLimitSent.toString(),
