@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.7.2"
+androidGradlePlugin = "8.8.1"
 coilSvg = "2.7.0"
 compose = "1.7.8"
 dotsindicator = "5.1.0"
