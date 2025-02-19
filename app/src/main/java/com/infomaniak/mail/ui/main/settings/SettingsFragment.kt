@@ -90,7 +90,7 @@ class SettingsFragment : Fragment() {
     private fun setupMyKSuiteLayout(myKSuiteData: MyKSuiteData) = with(binding) {
         observeMyKSuiteMailbox()
 
-        myKSuiteData.kSuitePack.type?.displayNameRes?.let(myKSuiteSettingsTitle::setText)
+        myKSuiteSettingsTitle.setText(myKSuiteData.name)
 
         myKSuiteViewModel.getMyKSuiteMailbox(myKSuiteData.mail.mailboxId)
 
