@@ -83,6 +83,7 @@ import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArg
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
@@ -143,7 +144,8 @@ class ThreadFragment : Fragment() {
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
-    private val isNotInSpam by lazy { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }
+    private val isNotInSpam: Boolean
+        get() = runCatchingRealm { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }.getOrDefault(false)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -769,7 +771,8 @@ class ThreadFragment : Fragment() {
         return (isMessageSpecificallyAllowed && isNotInSpam) || shouldLoadDistantResources()
     }
 
-    private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
+    private fun shouldLoadDistantResources(): Boolean =
+        localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
 
     fun getAnchor(): View? = _binding?.quickActionBar
 
