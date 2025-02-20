@@ -65,8 +65,6 @@
         <attr name="iconPaddingEnd" format="dimension" />
         <attr name="title" />
         <attr name="titleColor" format="color" />
-        <attr name="description" />
-        <attr name="showActionIcon" format="boolean" />
         <attr name="visibleDivider" format="boolean" />
         <attr name="dividerColor" format="color" />
         <attr name="staffOnly" format="boolean" />

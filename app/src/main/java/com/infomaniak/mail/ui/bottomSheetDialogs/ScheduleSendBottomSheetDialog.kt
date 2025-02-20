@@ -33,11 +33,12 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleSendBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
+import com.infomaniak.mail.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFragment() {
@@ -87,13 +88,12 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
         }
     }
 
-    private fun setCustomScheduleClickListener() {
-        binding.customScheduleItem.setOnClickListener {
+    private fun setCustomScheduleClickListener() = with(binding.customScheduleItem) {
+        trailingContent = if (navigationArgs.isCurrentMailboxFree) TrailingContent.MyKSuiteChip else TrailingContent.Chevron
+
+        setOnClickListener {
             if (navigationArgs.isCurrentMailboxFree) {
-                safeNavigate(
-                    resId = R.id.upgradeProductBottomSheetDialog,
-                    currentClassName = ScheduleSendBottomSheetDialog::class.java.name,
-                )
+                openMyKSuiteUpgradeBottomSheet(ScheduleSendBottomSheetDialog::class.java.name)
             } else {
                 setBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG, true)
             }
