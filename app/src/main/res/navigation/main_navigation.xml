@@ -21,6 +21,8 @@
     android:id="@+id/main_navigation"
     app:startDestination="@id/threadListFragment">
 
+    <include app:graph="@navigation/my_ksuite_navigation" />
+
     <fragment
         android:id="@+id/threadListFragment"
         android:name="com.infomaniak.mail.ui.main.folder.ThreadListFragment"
@@ -681,15 +683,6 @@
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialog"
         android:label="AccountBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_account" />
-
-    <dialog
-        android:id="@+id/myKSuiteUpgradeBottomSheet"
-        android:name="com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialog"
-        android:label="MyKSuiteUpgradeBottomSheet">
-        <argument
-            android:name="kSuiteApp"
-            app:argType="com.infomaniak.core.myksuite.ui.screens.KSuiteApp" />
-    </dialog>
 
     <fragment
         android:id="@+id/myKSuiteDashboardFragment"
