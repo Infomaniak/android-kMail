@@ -159,7 +159,6 @@ object RealmDatabase {
     private object RealmConfig {
 
         //region Configurations versions
-        const val APP_SETTINGS_SCHEMA_VERSION = 2L
         const val USER_INFO_SCHEMA_VERSION = 2L
         const val MAILBOX_INFO_SCHEMA_VERSION = 8L
         const val MAILBOX_CONTENT_SCHEMA_VERSION = 21L
@@ -209,8 +208,6 @@ object RealmDatabase {
         val appSettings = RealmConfiguration
             .Builder(appSettingsSet)
             .name(appSettingsDbName)
-            .schemaVersion(APP_SETTINGS_SCHEMA_VERSION)
-            .migration(APP_SETTINGS_MIGRATION)
             .build()
 
         val userInfo

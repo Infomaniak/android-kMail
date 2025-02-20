@@ -23,7 +23,6 @@ class AppSettings : RealmObject {
 
     var currentUserId: Int = DEFAULT_ID
     var currentMailboxId: Int = DEFAULT_ID
-    var myKSuiteId: Int = DEFAULT_ID
 
     companion object {
         const val DEFAULT_ID = -1
