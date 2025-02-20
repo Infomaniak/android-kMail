@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -172,8 +172,12 @@ class SharedUtils @Inject constructor(
                     customRealm.write {
                         MailboxController.getMailbox(mailbox.objectId, realm = this)?.let { mailbox ->
                             mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
-                                firstOrNull { it.id == signaturesResult.defaultSignatureId }?.isDefault = true
-                                firstOrNull { it.id == signaturesResult.defaultReplySignatureId }?.isDefaultReply = true
+                                val defaultSignature = firstOrNull { it.id == signaturesResult.defaultSignatureId }
+                                val defaultReplySignature = firstOrNull { it.id == signaturesResult.defaultReplySignatureId }
+                                    ?: defaultSignature
+
+                                defaultSignature?.isDefault = true
+                                defaultReplySignature?.isDefaultReply = true
                             }.toRealmList()
                         }
                     }
