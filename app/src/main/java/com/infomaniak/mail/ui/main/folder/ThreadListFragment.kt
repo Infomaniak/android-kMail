@@ -536,7 +536,7 @@ class ThreadListFragment : TwoPaneFragment() {
                 setupListener(
                     onCloseButtonClicked = {
                         binding.myKSuiteStorageBanner.isGone = true
-                        resetStorageBannerSettings()
+                        resetStorageBannerAppLaunches()
                     }
                 )
             }

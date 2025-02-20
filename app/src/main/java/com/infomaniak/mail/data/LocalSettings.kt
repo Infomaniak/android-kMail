@@ -95,7 +95,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         firebaseRegisteredUsers = mutableSetOf()
     }
 
-    fun resetStorageBannerSettings() {
+    fun resetStorageBannerAppLaunches() {
         hasClosedStorageBanner = true
         storageBannerDisplayAppLaunches = 0
     }
