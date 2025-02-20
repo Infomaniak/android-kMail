@@ -83,7 +83,7 @@
 
                 <Space
                     android:id="@+id/iconsSpace"
-                    android:layout_width="@dimen/marginStandardVerySmall"
+                    android:layout_width="@dimen/marginStandardSmall"
                     android:layout_height="0dp"
                     app:layout_constraintBottom_toBottomOf="@id/certifiedIcon"
                     app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
@@ -94,7 +94,7 @@
                     android:id="@+id/scheduleSendIcon"
                     android:layout_width="@dimen/smallIconSize"
                     android:layout_height="@dimen/smallIconSize"
-                    android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+                    android:layout_marginEnd="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionScheduleSend"
                     android:src="@drawable/ic_scheduled_messages"
                     android:visibility="gone"
