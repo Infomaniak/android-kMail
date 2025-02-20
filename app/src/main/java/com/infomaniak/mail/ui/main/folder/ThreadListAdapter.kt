@@ -259,15 +259,15 @@ class ThreadListAdapter @Inject constructor(
 
         multiSelection?.let { listener ->
             selectionCardView.setOnLongClickListener {
-                onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.LONG_PRESS)
+                onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
                 true
             }
             expeditorAvatar.apply {
                 setOnClickListener {
-                    onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.CLICK)
+                    onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.CLICK)
                 }
                 setOnLongClickListener {
-                    onThreadClickWithAbilityToOpenMultiSelection(thread, position, listener, TrackerAction.LONG_PRESS)
+                    onThreadClickWithAbilityToOpenMultiSelection(thread, listener, TrackerAction.LONG_PRESS)
                     true
                 }
             }
@@ -319,14 +319,10 @@ class ThreadListAdapter @Inject constructor(
 
     private fun CardviewThreadItemBinding.onThreadClickWithAbilityToOpenMultiSelection(
         thread: Thread,
-        position: Int,
         listener: MultiSelectionListener<Thread>,
         action: TrackerAction,
     ) {
-        if (isMultiselectDisabledInThisFolder) {
-            onThreadClicked(thread, position)
-            return
-        }
+        if (isMultiselectDisabledInThisFolder) return
 
         val hasOpened = openMultiSelectionIfClosed(listener, action)
         toggleMultiSelectedThread(thread, shouldUpdateSelectedUi = !hasOpened)
