@@ -22,6 +22,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
 import com.infomaniak.mail.utils.MyKSuiteUiUtils.getDashboardData
+import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.core.myksuite.R as RMyKSuite
@@ -37,8 +38,8 @@ class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
         setSystemBarsColors(statusBarColor = RMyKSuite.color.dashboardBackground)
 
         myKSuiteViewModel.refreshMyKSuite()
-        myKSuiteViewModel.myKSuiteDataResult.observe(viewLifecycleOwner) { myKSuiteData ->
-            myKSuiteData?.let { data -> resetContent(dashboardData = getDashboardData(requireContext(), data)) }
+        myKSuiteViewModel.myKSuiteDataResult.observeNotNull(viewLifecycleOwner) { myKSuiteData ->
+            resetContent(dashboardData = getDashboardData(requireContext(), myKSuiteData))
         }
     }
 }

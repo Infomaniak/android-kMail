@@ -115,7 +115,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun observeMyKSuiteData() {
-        myKSuiteViewModel.myKSuiteDataResult.observe(viewLifecycleOwner) { data -> data?.let(::setupMyKSuiteLayout) }
+        myKSuiteViewModel.myKSuiteDataResult.observeNotNull(viewLifecycleOwner) { data -> setupMyKSuiteLayout(data) }
     }
 
     override fun onResume() {
