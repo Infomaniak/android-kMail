@@ -70,6 +70,8 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showWebViewOutdated by sharedValue("showWebViewOutdatedKey", true)
     var accessTokenApiCallRecord by sharedValue<ApiCallRecord>("accessTokenApiCallRecordKey", null)
     var lastSelectedScheduleEpoch by sharedValue<Long>("lastSelectedScheduleEpochKey", null)
+    var storageBannerDisplayAppLaunches by sharedValue("storageBannerDisplayAppLaunchesKey", 0)
+    var hasClosedStorageBanner by sharedValue("hasClosedStorageBannerKey", false)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 
@@ -91,6 +93,11 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     fun clearRegisteredFirebaseUsers() {
         SentryLog.i(TAG, "clearRegisteredFirebaseUsers: called")
         firebaseRegisteredUsers = mutableSetOf()
+    }
+
+    fun resetStorageBannerAppLaunches() {
+        hasClosedStorageBanner = true
+        storageBannerDisplayAppLaunches = 0
     }
 
     enum class EmailForwarding(@StringRes val localisedNameRes: Int) {

@@ -33,6 +33,8 @@ class Quotas : EmbeddedRealmObject {
 
     val size: Long get() = _size * 1_000L // Convert from KiloOctets to Octets
 
+    val isFull get() = getProgress() >= 100
+
     fun getText(context: Context): String {
 
         val usedSize = context.formatShortFileSize(size)

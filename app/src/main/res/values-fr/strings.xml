@@ -141,6 +141,7 @@
     <string name="buttonDownloadAll">Tout télécharger</string>
     <string name="buttonFeedback">Feedback</string>
     <string name="buttonFolders">Dossiers</string>
+    <string name="buttonFreeTrial">Essayer gratuitement</string>
     <string name="buttonHelp">Aide</string>
     <string name="buttonHyperlink">Ajouter un lien hypertexte</string>
     <string name="buttonImportEmails">Importer des e-mails</string>
@@ -366,6 +367,11 @@
         <item quantity="other">%d sélectionnés</item>
         <item quantity="many">%d de sélectionnés</item>
     </plurals>
+    <string name="myKSuiteQuotasAlertDescription">Une fois atteinte, vous ne pourrez plus recevoir ou envoyer de messages. Libérez de l’espace ou faites évoluer votre offre vers my kSuite+.</string>
+    <string name="myKSuiteQuotasAlertFullDescription">Libérer de l’espace ou faites évoluer votre offre vers my kSuite+.</string>
+    <string name="myKSuiteQuotasAlertFullTitle">Réception et envoi de messages bloqués</string>
+    <string name="myKSuiteQuotasAlertTitle">Limite de stockage presque atteinte</string>
+    <string name="myKSuiteSpaceFullAlert">L’espace de stockage n’est pas suffisant pour effectuer cette action.</string>
     <string name="newAccountDescription">Communiquez et stockez vos documents et photos dans un écosystème sans publicité qui respecte votre vie privée</string>
     <string name="newAccountStorageDrive">15 Go de stockage kDrive</string>
     <string name="newAccountStorageMail">20 Go de stockage Mail</string>
