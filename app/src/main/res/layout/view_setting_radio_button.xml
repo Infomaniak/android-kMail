@@ -40,25 +40,20 @@
         android:layout_weight="1"
         tools:text="Simple messages" />
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/checkMark"
+        android:layout_width="@dimen/mediumIconSize"
+        android:layout_height="@dimen/mediumIconSize"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:contentDescription="@string/contentDescriptionSelectedItem"
+        android:src="@drawable/ic_check"
+        android:visibility="invisible"
+        app:tint="?android:attr/colorPrimary" />
+
+    <com.infomaniak.core.myksuite.ui.views.MyKSuitePlusChipView
+        android:id="@+id/myKSuitePlusChip"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/checkMark"
-            android:layout_width="@dimen/mediumIconSize"
-            android:layout_height="@dimen/mediumIconSize"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:contentDescription="@string/contentDescriptionSelectedItem"
-            android:src="@drawable/ic_check"
-            android:visibility="invisible"
-            app:tint="?android:attr/colorPrimary" />
-
-        <com.infomaniak.core.myksuite.ui.views.MyKSuitePlusChipView
-            android:id="@+id/myKSuitePlusChip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible" />
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </LinearLayout>
