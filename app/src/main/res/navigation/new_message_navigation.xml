@@ -84,7 +84,7 @@
         android:id="@+id/scheduleSendBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog"
         android:label="ScheduleSendBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_schedule_send">
+        tools:layout="@layout/bottom_sheet_schedule_options">
         <argument
             android:name="lastSelectedScheduleEpoch"
             android:defaultValue="0L"
