@@ -385,7 +385,7 @@ class ThreadAdapter(
             }
 
             userAvatar.loadAvatar(firstSender, message.bimi)
-            iconCertified.isVisible = message.bimi?.isCertified ?: false
+            certifiedIcon.isVisible = message.bimi?.isCertified ?: false
 
             shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
