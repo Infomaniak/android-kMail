@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@ interface Correspondent : Parcelable {
 
     val initials: String
 
-    fun isMe(): Boolean = AccountUtils.currentMailboxEmail == email
+    fun isMe(): Boolean = AccountUtils.currentMailboxEmail?.lowercase() == email.lowercase()
 
-    fun shouldDisplayUserAvatar(): Boolean = isMe() && email == AccountUtils.currentUser?.email
+    fun shouldDisplayUserAvatar(): Boolean = isMe() && email.lowercase() == AccountUtils.currentUser?.email?.lowercase()
 
     fun getNameOrEmail(): String = name.ifBlank { email }
 
