@@ -83,7 +83,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -531,28 +530,16 @@ class ThreadListFragment : TwoPaneFragment() {
     }
 
     private fun setupMyKSuiteStorageBanner() = with(localSettings) {
-        mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
-            if (quotas == null) return@observe
-
-            binding.myKSuiteStorageBanner.storageLevel = when {
-                quotas.isFull -> StorageLevel.Full
-                quotas.getProgress() > 85 -> {
-                    if (!hasClosedStorageBanner || storageBannerDisplayAppLaunches % 10 == 0) {
-                        hasClosedStorageBanner = false
-                        StorageLevel.Warning
-                    } else {
-                        StorageLevel.Normal
+        mainViewModel.storageBannerStatus.observeNotNull(viewLifecycleOwner) { storageBannerStatus ->
+            binding.myKSuiteStorageBanner.apply {
+                storageLevel = storageBannerStatus
+                setupListener(
+                    onCloseButtonClicked = {
+                        binding.myKSuiteStorageBanner.isGone = true
+                        resetStorageBannerSettings()
                     }
-                }
-                else -> StorageLevel.Normal
+                )
             }
-
-            binding.myKSuiteStorageBanner.setupListener(
-                onCloseButtonClicked = {
-                    binding.myKSuiteStorageBanner.isGone = true
-                    resetStorageBannerSettings()
-                }
-            )
         }
     }
 

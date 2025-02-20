@@ -78,6 +78,10 @@ class MyKSuiteStorageBanner @JvmOverloads constructor(
             iconColorRes = R.color.redDestructiveAction,
             titleRes = R.string.myKSuiteQuotasAlertFullTitle,
             descriptionRes = R.string.myKSuiteQuotasAlertFullDescription,
-        ),
+        );
+
+        companion object {
+            const val WARNING_THRESHOLD = 85
+        }
     }
 }
