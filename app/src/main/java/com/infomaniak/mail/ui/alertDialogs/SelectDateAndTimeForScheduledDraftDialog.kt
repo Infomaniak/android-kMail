@@ -44,8 +44,13 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
         return CalendarConstraints.Builder().setValidator(CompositeDateValidator.allOf(dateValidators))
     }
 
+    override fun getDelayTooShortErrorMessage(): String = activityContext.resources.getQuantityString(
+        R.plurals.errorScheduleDelayTooShort,
+        MIN_SELECTABLE_DATE_MINUTES,
+        MIN_SELECTABLE_DATE_MINUTES,
+    )
+
     companion object {
-        const val MIN_SCHEDULE_DELAY_MINUTES = 5
         const val MAX_SCHEDULE_DELAY_YEARS = 10
     }
 }

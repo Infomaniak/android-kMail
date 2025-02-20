@@ -42,6 +42,8 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
 
     abstract fun defineCalendarConstraint(): CalendarConstraints.Builder
 
+    abstract fun getDelayTooShortErrorMessage(): String
+
     val binding: DialogSelectDateAndTimeBinding by lazy { DialogSelectDateAndTimeBinding.inflate(activity.layoutInflater) }
 
     override val alertDialog = initDialog()
@@ -119,19 +121,15 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     }
 
     private fun updateErrorMessage(date: Date) {
-        val isValid = date.isAtLeastXMinutesInTheFuture(MIN_SCHEDULE_DELAY_MINUTES)
+        val isValid = date.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES)
 
-        if (isValid.not()) binding.errorMessage.text = getScheduleDateErrorText(date)
+        if (isValid.not()) binding.errorMessage.text = getErrorText(date)
         binding.errorMessage.isVisible = isValid.not()
         positiveButton.isEnabled = isValid
     }
 
-    private fun getScheduleDateErrorText(date: Date): String = if (date.isInTheFuture()) {
-        activityContext.resources.getQuantityString(
-            R.plurals.errorScheduleDelayTooShort,
-            MIN_SCHEDULE_DELAY_MINUTES,
-            MIN_SCHEDULE_DELAY_MINUTES,
-        )
+    private fun getErrorText(date: Date): String = if (date.isInTheFuture()) {
+        getDelayTooShortErrorMessage()
     } else {
         activityContext.resources.getString(R.string.errorChooseUpcomingDate)
     }
@@ -166,6 +164,6 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
     }
 
     companion object {
-        const val MIN_SCHEDULE_DELAY_MINUTES = 5
+        const val MIN_SELECTABLE_DATE_MINUTES = 5
     }
 }
