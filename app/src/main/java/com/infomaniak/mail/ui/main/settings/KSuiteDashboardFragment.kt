@@ -18,17 +18,28 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
+import com.infomaniak.mail.utils.MyKSuiteUiUtils.getDashboardData
+import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.core.myksuite.R as RMyKSuite
 
+@AndroidEntryPoint
 class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    private val myKSuiteViewModel: MykSuiteViewModel by viewModels()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         setSystemBarsColors(statusBarColor = RMyKSuite.color.dashboardBackground)
-        return super.onCreateView(inflater, container, savedInstanceState)
+
+        myKSuiteViewModel.refreshMyKSuite()
+        myKSuiteViewModel.myKSuiteDataResult.observeNotNull(viewLifecycleOwner) { myKSuiteData ->
+            resetContent(dashboardData = getDashboardData(requireContext(), myKSuiteData))
+        }
     }
 }

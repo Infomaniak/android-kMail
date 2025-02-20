@@ -453,7 +453,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
         return ApiController.callApi(
-            url = MyKSuiteApiRoutes.myKSuiteData,
+            url = MyKSuiteApiRoutes.myKSuiteData(),
             method = ApiController.ApiMethod.GET,
             okHttpClient = okHttpClient,
             useKotlinxSerialization = true,
