@@ -25,6 +25,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.*
@@ -93,7 +94,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
 
         setOnClickListener {
             if (navigationArgs.isCurrentMailboxFree) {
-                openMyKSuiteUpgradeBottomSheet(ScheduleSendBottomSheetDialog::class.java.name)
+                openMyKSuiteUpgradeBottomSheet(findNavController())
             } else {
                 setBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG, true)
             }
