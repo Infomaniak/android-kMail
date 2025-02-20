@@ -17,13 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
-import androidx.fragment.app.Fragment
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteDataManager
-import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
-import com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialogArgs
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
 
@@ -42,9 +37,4 @@ object MyKSuiteDataUtils : MyKSuiteDataManager() {
             field = myKSuiteData
             myKSuiteId = myKSuiteData?.id ?: AppSettings.DEFAULT_ID
         }
-
-    fun Fragment.openMyKSuiteUpgradeBottomSheet(currentClassName: String? = null) {
-        val args = MyKSuiteUpgradeBottomSheetDialogArgs(kSuiteApp = KSuiteApp.Mail)
-        safeNavigate(R.id.myKSuiteUpgradeBottomSheet, args.toBundle(), currentClassName = currentClassName)
-    }
 }

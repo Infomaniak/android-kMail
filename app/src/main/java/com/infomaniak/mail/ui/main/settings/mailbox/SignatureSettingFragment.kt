@@ -30,7 +30,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
-import com.infomaniak.mail.utils.MyKSuiteDataUtils.openMyKSuiteUpgradeBottomSheet
+import com.infomaniak.mail.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
