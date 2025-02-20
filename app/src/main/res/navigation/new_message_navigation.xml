@@ -21,6 +21,8 @@
     android:id="@+id/new_message_navigation"
     app:startDestination="@id/newMessageFragment">
 
+    <include app:graph="@navigation/my_ksuite_navigation" />
+
     <fragment
         android:id="@+id/newMessageFragment"
         android:name="com.infomaniak.mail.ui.newMessage.NewMessageFragment"
@@ -93,14 +95,5 @@
             android:name="isCurrentMailboxFree"
             android:defaultValue="true"
             app:argType="boolean" />
-    </dialog>
-
-    <dialog
-        android:id="@+id/myKSuiteUpgradeBottomSheet"
-        android:name="com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialog"
-        android:label="MyKSuiteUpgradeBottomSheet">
-        <argument
-            android:name="kSuiteApp"
-            app:argType="com.infomaniak.core.myksuite.ui.screens.KSuiteApp" />
     </dialog>
 </navigation>

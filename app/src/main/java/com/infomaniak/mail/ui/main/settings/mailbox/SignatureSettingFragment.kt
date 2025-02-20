@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
@@ -85,7 +86,7 @@ class SignatureSettingFragment : Fragment() {
 
     private fun onSignatureClicked(signature: Signature, shouldBlockDummySignature: Boolean) = with(signatureSettingViewModel) {
         if (signature.isDummy && shouldBlockDummySignature) {
-            openMyKSuiteUpgradeBottomSheet()
+            openMyKSuiteUpgradeBottomSheet(findNavController())
             return@with
         }
 

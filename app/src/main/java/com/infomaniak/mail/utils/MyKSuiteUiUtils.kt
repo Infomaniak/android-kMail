@@ -18,29 +18,27 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkRequest
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
 import com.infomaniak.core.myksuite.ui.screens.MyKSuiteDashboardScreenData
 import com.infomaniak.core.myksuite.ui.screens.components.KSuiteProductsWithQuotas
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
-import com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialogArgs
-import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 
 object MyKSuiteUiUtils {
 
-    fun Fragment.openMyKSuiteUpgradeBottomSheet(currentClassName: String? = null) {
-        val args = MyKSuiteUpgradeBottomSheetDialogArgs(kSuiteApp = KSuiteApp.Mail)
-        safeNavigate(R.id.myKSuiteUpgradeBottomSheet, args.toBundle(), currentClassName = currentClassName)
-    }
-
     fun openMyKSuiteUpgradeBottomSheet(navController: NavController) {
-        val args = MyKSuiteUpgradeBottomSheetDialogArgs(kSuiteApp = KSuiteApp.Mail)
-        navController.navigate(R.id.myKSuiteUpgradeBottomSheet, args.toBundle())
+        NavDeepLinkRequest.Builder
+            .fromUri(MyKSuiteUpgradeBottomSheetDialog.getDeeplink(KSuiteApp.Mail).toUri())
+            .build()
+            .also(navController::navigate)
     }
 
     fun Fragment.openMyKSuiteDashboard(myKSuiteData: MyKSuiteData) {
