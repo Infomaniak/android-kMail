@@ -539,7 +539,7 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
-                onSchedule = { timestamp ->
+                onDateSelected = { timestamp ->
                     localSettings.lastSelectedScheduleEpoch = timestamp
                     mainViewModel.rescheduleDraft(Date(timestamp))
                 },
