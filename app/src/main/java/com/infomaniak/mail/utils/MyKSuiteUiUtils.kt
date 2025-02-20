@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteUpgradeBottomSheetDialogArgs
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -28,5 +29,10 @@ object MyKSuiteUiUtils {
     fun Fragment.openMyKSuiteUpgradeBottomSheet(currentClassName: String? = null) {
         val args = MyKSuiteUpgradeBottomSheetDialogArgs(kSuiteApp = KSuiteApp.Mail)
         safeNavigate(R.id.myKSuiteUpgradeBottomSheet, args.toBundle(), currentClassName = currentClassName)
+    }
+
+    fun openMyKSuiteUpgradeBottomSheet(navController: NavController) {
+        val args = MyKSuiteUpgradeBottomSheetDialogArgs(kSuiteApp = KSuiteApp.Mail)
+        navController.navigate(R.id.myKSuiteUpgradeBottomSheet, args.toBundle())
     }
 }

@@ -32,8 +32,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
@@ -52,6 +50,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
@@ -72,8 +71,6 @@ class DraftsActionsWorker @AssistedInject constructor(
     private val mainApplication: MainApplication,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
-    private val folderController: FolderController,
-    private val refreshController: RefreshController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseCoroutineWorker(appContext, params) {
 
@@ -180,6 +177,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                         if (isTargetDraft) {
                             isTrackedDraftSuccess = false
                             trackedDraftErrorMessageResId = if (exception is ApiErrorException) {
+                                saveDraftAfterRateLimitError(exception.errorCode, draft)
                                 ErrorCode.getTranslateResForDrafts(exception.errorCode)
                             } else {
                                 (exception as UploadMissingLocalFileException).errorRes
@@ -225,6 +223,20 @@ class DraftsActionsWorker @AssistedInject constructor(
             trackedUnscheduledDraftUrl,
         )
     }
+
+    /** This function save the draft if the target draft failed to send due to a rate-limit exception
+     *  As it's a side effect, it should fail silently to keep the original error flow */
+    private suspend fun saveDraftAfterRateLimitError(errorCode: String?, draft: Draft) = runCatching {
+        if (errorCode == ErrorCode.SEND_LIMIT_EXCEEDED || errorCode == ErrorCode.SEND_DAILY_LIMIT_REACHED) {
+            SentryLog.d(TAG, "Trying to save draft after a rate-limit error")
+            mailboxContentRealm.write {
+                draftController.updateDraft(draft.localUuid, realm = this) {
+                    it.action = DraftAction.SAVE
+                }
+            }
+            executeDraftAction(draftController.getDraft(draft.localUuid)!!, mailbox.uuid)
+        }
+    }.onFailure { if (it is CancellationException) throw it }
 
     private suspend fun Realm.executeRealmCallbacks(realmActionsOnDraft: List<(MutableRealm) -> Unit>) {
         write {
