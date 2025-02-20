@@ -30,6 +30,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
+import com.infomaniak.mail.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
@@ -66,6 +67,7 @@ class SignatureSettingFragment : Fragment() {
         binding.signatureList.adapter = SignatureSettingAdapter(
             canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
             onSignatureSelected = ::onSignatureClicked,
+            isFreeMailbox = mailbox.isFreeMailbox,
         )
     }
 
@@ -81,7 +83,12 @@ class SignatureSettingFragment : Fragment() {
         }
     }
 
-    private fun onSignatureClicked(signature: Signature) = with(signatureSettingViewModel) {
+    private fun onSignatureClicked(signature: Signature, shouldBlockDummySignature: Boolean) = with(signatureSettingViewModel) {
+        if (signature.isDummy && shouldBlockDummySignature) {
+            openMyKSuiteUpgradeBottomSheet()
+            return@with
+        }
+
         val newDefaultSignature = if (signature.isDummy) {
             null
         } else {
