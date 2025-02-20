@@ -62,7 +62,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@id/iconCertified"
+                    app:layout_constraintEnd_toStartOf="@id/certifiedIcon"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toEndOf="@id/userAvatar"
@@ -70,7 +70,7 @@
                     tools:text="@tools:sample/full_names" />
 
                 <ImageView
-                    android:id="@+id/iconCertified"
+                    android:id="@+id/certifiedIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardVerySmall"
@@ -85,10 +85,10 @@
                     android:id="@+id/iconsSpace"
                     android:layout_width="@dimen/marginStandardVerySmall"
                     android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="@id/iconCertified"
+                    app:layout_constraintBottom_toBottomOf="@id/certifiedIcon"
                     app:layout_constraintEnd_toStartOf="@id/scheduleSendIcon"
-                    app:layout_constraintStart_toEndOf="@id/iconCertified"
-                    app:layout_constraintTop_toTopOf="@id/iconCertified" />
+                    app:layout_constraintStart_toEndOf="@id/certifiedIcon"
+                    app:layout_constraintTop_toTopOf="@id/certifiedIcon" />
 
                 <ImageView
                     android:id="@+id/scheduleSendIcon"

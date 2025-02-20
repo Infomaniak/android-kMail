@@ -81,13 +81,13 @@
                 android:maxLines="1"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/iconCertified"
+                app:layout_constraintEnd_toStartOf="@id/certifiedIcon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/full_names" />
 
             <ImageView
-                android:id="@+id/iconCertified"
+                android:id="@+id/certifiedIcon"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_marginStart="@dimen/marginStandardSmall"

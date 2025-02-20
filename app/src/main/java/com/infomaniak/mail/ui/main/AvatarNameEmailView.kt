@@ -99,7 +99,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
         }
         userName.setTextAppearance(textAppearance)
 
-        iconCertified.isVisible = isCorrespondentCertified
+        certifiedIcon.isVisible = isCorrespondentCertified
     }
 
     fun setAutocompleteUnknownContact(searchQuery: String) = with(binding) {
