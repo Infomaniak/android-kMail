@@ -45,9 +45,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
     private val navigationArgs: ScheduleSendBottomSheetDialogArgs by navArgs()
     private var binding: BottomSheetScheduleSendBinding by safeBinding()
 
-    // Navigation args does not support nullable primitive types, so we use 0L
-    // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
-    private var lastSelectedScheduleEpoch: Long = 0L
+    private var lastSelectedScheduleEpoch: Long? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetScheduleSendBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -56,7 +54,9 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        lastSelectedScheduleEpoch = navigationArgs.lastSelectedScheduleEpoch
+        // Navigation args does not support nullable primitive types, so we use 0L
+        // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
+        lastSelectedScheduleEpoch = navigationArgs.lastSelectedScheduleEpoch.takeIf { it != 0L }
 
         computeLastScheduleItem()
         setLastScheduleClickListener()
@@ -72,15 +72,17 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
     }
 
     private fun computeLastScheduleItem() = with(binding) {
-        if (Date(lastSelectedScheduleEpoch).isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES)) {
+        val lastSelectedDate = lastSelectedScheduleEpoch?.let { Date(it) }
+
+        if (lastSelectedDate?.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES) == true) {
             lastScheduleItem.isVisible = true
-            lastScheduleItem.setDescription(context.dayOfWeekDateWithoutYear(date = Date(lastSelectedScheduleEpoch)))
+            lastScheduleItem.setDescription(context.dayOfWeekDateWithoutYear(date = lastSelectedDate))
         }
     }
 
     private fun setLastScheduleClickListener() {
         binding.lastScheduleItem.setOnClickListener {
-            if (lastSelectedScheduleEpoch != 0L) {
+            if (lastSelectedScheduleEpoch != null) {
                 trackScheduleSendEvent("lastSelectedSchedule")
                 setBackNavigationResult(SCHEDULE_DRAFT_RESULT, lastSelectedScheduleEpoch)
             }
