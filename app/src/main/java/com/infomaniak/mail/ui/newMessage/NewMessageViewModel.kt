@@ -542,7 +542,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature? {
 
-        val signatureEmailsMap = signatures.groupBy { it.senderEmail }
+        val signatureEmailsMap = signatures.groupBy { it.senderEmail.lowercase() }
 
         return findSignatureInRecipients(message.to, signatureEmailsMap)
             ?: findSignatureInRecipients(message.from, signatureEmailsMap)
@@ -554,13 +554,13 @@ class NewMessageViewModel @Inject constructor(
         signatureEmailsMap: Map<String, List<Signature>>,
     ): Signature? {
 
-        val matchingEmailRecipients = recipients.filter { it.email in signatureEmailsMap }
+        val matchingEmailRecipients = recipients.filter { it.email.lowercase() in signatureEmailsMap }
         if (matchingEmailRecipients.isEmpty()) return null // If no Recipient represents us, go to next Recipients
 
         var bestScore = NO_MATCH
         var bestSignature: Signature? = null
         matchingEmailRecipients.forEach { recipient ->
-            val signatures = signatureEmailsMap[recipient.email] ?: return@forEach
+            val signatures = signatureEmailsMap[recipient.email.lowercase()] ?: return@forEach
             val (score, signature) = computeScore(recipient, signatures)
             when (score) {
                 EXACT_MATCH_AND_IS_DEFAULT -> return signature
