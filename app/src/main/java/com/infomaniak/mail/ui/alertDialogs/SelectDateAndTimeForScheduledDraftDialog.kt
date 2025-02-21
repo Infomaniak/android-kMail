@@ -22,7 +22,7 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CompositeDateValidator
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
-import com.infomaniak.lib.core.utils.addYears
+import com.infomaniak.core.utils.addYears
 import com.infomaniak.mail.R
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped

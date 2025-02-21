@@ -26,7 +26,8 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.core.utils.*
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeBinding
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime

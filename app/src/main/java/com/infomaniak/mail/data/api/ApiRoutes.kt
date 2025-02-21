@@ -17,9 +17,9 @@
  */
 package com.infomaniak.mail.data.api
 
+import com.infomaniak.core.utils.FORMAT_SCHEDULE_MAIL
+import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.BuildConfig.INFOMANIAK_API_V1
-import com.infomaniak.lib.core.utils.FORMAT_SCHEDULE_MAIL
-import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.BuildConfig.MAIL_API
 import com.infomaniak.mail.utils.Utils
 import java.net.URLEncoder

@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.api
 
-import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.types.RealmInstant

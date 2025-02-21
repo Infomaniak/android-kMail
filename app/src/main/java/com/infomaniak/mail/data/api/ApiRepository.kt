@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.data.api
 
+import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
+import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.api.ApiController
@@ -26,8 +28,6 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
-import com.infomaniak.lib.core.utils.FORMAT_FULL_DATE_WITH_HOUR
-import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.LocalSettings.AiEngine
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult

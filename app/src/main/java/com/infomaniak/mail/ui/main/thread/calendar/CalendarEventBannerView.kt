@@ -25,7 +25,8 @@ import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.core.utils.*
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackCalendarEventEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -242,7 +243,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             formatWithLocal(FormatData.BOTH, FormatStyle.MEDIUM, FormatStyle.SHORT)
         } else {
-            format("$FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR $FORMAT_DATE_HOUR_MINUTE") // Fallback on unambiguous format
+            format("$FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR $FORMAT_HOUR_MINUTES") // Fallback on unambiguous format
         }
     }
 
@@ -266,7 +267,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             formatWithLocal(FormatData.HOUR, FormatStyle.SHORT)
         } else {
-            format(FORMAT_DATE_HOUR_MINUTE) // Fallback on 24 hours separated by colon format for everyone
+            format(FORMAT_HOUR_MINUTES) // Fallback on 24 hours separated by colon format for everyone
         }
     }
 }
