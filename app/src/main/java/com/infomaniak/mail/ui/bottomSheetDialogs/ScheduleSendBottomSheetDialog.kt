@@ -28,6 +28,8 @@ import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
+import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
@@ -35,7 +37,6 @@ import com.infomaniak.mail.databinding.BottomSheetScheduleSendBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeForScheduledDraftDialog.Companion.MIN_SCHEDULE_DELAY_MINUTES
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
-import com.infomaniak.mail.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -94,7 +95,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : BottomSheetDialogFra
 
         setOnClickListener {
             if (navigationArgs.isCurrentMailboxFree) {
-                openMyKSuiteUpgradeBottomSheet(findNavController())
+                findNavController().openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
             } else {
                 setBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG, true)
             }
