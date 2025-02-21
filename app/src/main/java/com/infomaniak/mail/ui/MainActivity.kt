@@ -37,6 +37,8 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
+import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.Utils
@@ -282,7 +284,7 @@ class MainActivity : BaseActivity() {
 
             if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
                 snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                    MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet(navController)
+                    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
                 }
             } else {
                 snackbarManager.setValue(getString(errorRes))
