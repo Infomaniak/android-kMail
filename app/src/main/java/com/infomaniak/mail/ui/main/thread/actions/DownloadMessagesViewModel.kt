@@ -102,46 +102,51 @@ class DownloadMessagesViewModel @Inject constructor(
             val mailbox = currentMailbox ?: return@launch
 
             runCatching {
-                coroutineScope {
-                    val listFileName = HashMap<String, Int>()
+                val listFileName = HashMap<String, Int>()
 
-                    val deferredResponses = getAllMessages().map { message ->
-                        async {
-                            val response = ApiRepository.getDownloadedMessage(
-                                mailboxUuid = mailbox.uuid,
-                                folderId = message.folderId,
-                                shortUid = message.shortUid,
-                            )
+                val deferredResponses = getAllMessages().map { message ->
+                    async {
+                        val response = ApiRepository.getDownloadedMessage(
+                            mailboxUuid = mailbox.uuid,
+                            folderId = message.folderId,
+                            shortUid = message.shortUid,
+                        )
 
-                            if (!response.isSuccessful || response.body == null) return@async null
+                        if (!response.isSuccessful || response.body == null) return@async null
 
-                            val messageSubject = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
-                            val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
-                            val fileName = createUniqueFileName(listFileName, truncatedSubject)
+                        val messageSubject = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
+                        val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
+                        val fileName = createUniqueFileName(listFileName, truncatedSubject)
 
-                            saveEmlToFile(appContext, response.body!!.bytes(), fileName)
-                        }
+                        saveEmlToFile(appContext, response.body!!.bytes(), fileName)
                     }
-
-                    deferredResponses.awaitAll().filterNotNull()
                 }
+
+                deferredResponses.awaitAll().filterNotNull()
             }.onSuccess { downloadedThreadUris ->
                 if (downloadedThreadUris.size != numberOfMessagesToDownloads()) downloadMessagesLiveData.postValue(null)
 
                 downloadMessagesLiveData.postValue(downloadedThreadUris)
-            }.onFailure { _ ->
-                downloadMessagesLiveData.postValue(null)
             }
         }
     }
 
-    fun getFirstMessageSubject(): String? {
-        val messages = getAllMessages()
-        return messages.firstOrNull()?.subject
-    }
+    fun getFirstMessageSubject(): String? = getAllMessages().firstOrNull()?.subject
 
-    fun numberOfMessagesToDownloads(): Int {
-        return (messageLocalUids?.size ?: 0) + (threadLocalUids?.size ?: 0)
+    private fun numberOfMessagesToDownloads(): Int = (messageLocalUids?.size ?: 0) + (threadLocalUids?.size ?: 0)
+
+    fun getDialogName(): String {
+        val numberOfMessagesToDownload = numberOfMessagesToDownloads()
+
+        return if (numberOfMessagesToDownload == 1) {
+            getFirstMessageSubject() ?: appContext.getString(R.string.noSubjectTitle)
+        } else {
+            appContext.resources.getQuantityString(
+                R.plurals.downloadingEmailsTitle,
+                numberOfMessagesToDownload,
+                numberOfMessagesToDownload,
+            )
+        }
     }
 
     private fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")

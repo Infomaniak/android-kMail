@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="accentColorBlueTitle">Blu</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Colore del sistema</string>
@@ -248,8 +248,7 @@
     <string name="disabledFeatureFlagTitle">Hai bisogno di più spazio di archiviazione e funzionalità?</string>
     <string name="displayMailIssueDescription">Per risolvere i problemi di visualizzazione, aggiornare l’applicazione Android System Webview.</string>
     <string name="displayMailIssueTitle">Problema di visualizzazione delle email</string>
-    <plurals name="downloadingEmailsTitle">
-        <item quantity="one">Download di %d e-mail</item>
+    <plurals name="downloadingEmailsTitle" tools:ignore="MissingQuantity">
         <item quantity="other">Download di %d email</item>
     </plurals>
     <string name="draftFolder">Bozze</string>

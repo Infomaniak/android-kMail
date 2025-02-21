@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
@@ -46,7 +45,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.LocalStorageUtils.getEmlCacheDir
 import com.infomaniak.mail.utils.extensions.*
-import java.io.File
 import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment() {
@@ -123,11 +121,8 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
-    private val resultActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val fileDir: File = getEmlCacheDir(requireContext())
-            fileDir.deleteRecursively()
-        }
+    private val resultActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { _ ->
+        getEmlCacheDir(requireContext()).deleteRecursively()
     }
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
