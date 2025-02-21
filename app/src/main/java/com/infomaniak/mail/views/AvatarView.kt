@@ -173,7 +173,7 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
-    private fun loadBimiAvatar(bimi: Bimi, correspondent: Correspondent) = with(binding.avatarImage) {
+    private fun loadBimiAvatar(correspondent: Correspondent, bimi: Bimi) = with(binding.avatarImage) {
         state.update(correspondent, bimi)
         contentDescription = correspondent.email
         loadAvatar(
@@ -199,7 +199,7 @@ class AvatarView @JvmOverloads constructor(
             AvatarDisplayType.USER_AVATAR -> loadUserAvatar(correspondent!!, bimi)
             AvatarDisplayType.CUSTOM_AVATAR,
             AvatarDisplayType.INITIALS -> loadAvatarUsingDictionary(correspondent!!, contacts, bimi)
-            AvatarDisplayType.BIMI -> loadBimiAvatar(bimi!!, correspondent!!)
+            AvatarDisplayType.BIMI -> loadBimiAvatar(correspondent!!, bimi!!)
         }
     }
 
