@@ -206,7 +206,7 @@ class AvatarView @JvmOverloads constructor(
     private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?, isBimiEnabled: Boolean): AvatarDisplayType {
         return when {
             correspondent == null -> AvatarDisplayType.UNKNOWN_CORRESPONDENT
-            correspondent.isMe() -> AvatarDisplayType.USER_AVATAR
+            correspondent.shouldDisplayUserAvatar() -> AvatarDisplayType.USER_AVATAR
             correspondent.hasMergedContactAvatar(contactsFromViewModel) -> AvatarDisplayType.CUSTOM_AVATAR
             bimi?.isDisplayable(isBimiEnabled) == true -> AvatarDisplayType.BIMI
             else -> AvatarDisplayType.INITIALS
