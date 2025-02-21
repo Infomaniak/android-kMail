@@ -764,11 +764,14 @@ class RefreshController @Inject constructor(
     }
     //endregion
 
+    // SCHEDULED_DRAFTS and SNOOZED need to be refreshed often because the folders only appear in the menu folder when there is at
+    // least one email in it.
     private val FOLDER_ROLES_TO_REFRESH_TOGETHER = setOf(
         FolderRole.INBOX,
         FolderRole.SENT,
         FolderRole.DRAFT,
         FolderRole.SCHEDULED_DRAFTS,
+        FolderRole.SNOOZED,
     )
 
     enum class RefreshMode {
