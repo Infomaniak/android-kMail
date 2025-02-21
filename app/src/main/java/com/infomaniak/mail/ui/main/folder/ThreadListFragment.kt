@@ -652,11 +652,13 @@ class ThreadListFragment : TwoPaneFragment() {
 
     private fun observeLoadMoreTriggers() = with(mainViewModel) {
         Utils.waitInitMediator(currentFilter, currentFolderLive).observe(viewLifecycleOwner) { (filter, folder) ->
-            val shouldDisplayLoadMore = filter == ThreadFilter.ALL
-                    && folder.cursor != null
-                    && folder.oldMessagesUidsToFetch.isNotEmpty()
-                    && folder.threads.isNotEmpty()
-            threadListAdapter.updateLoadMore(shouldDisplayLoadMore)
+            runCatchingRealm {
+                val shouldDisplayLoadMore = filter == ThreadFilter.ALL
+                        && folder.cursor != null
+                        && folder.oldMessagesUidsToFetch.isNotEmpty()
+                        && folder.threads.isNotEmpty()
+                threadListAdapter.updateLoadMore(shouldDisplayLoadMore)
+            }
         }
     }
 
@@ -727,7 +729,10 @@ class ThreadListFragment : TwoPaneFragment() {
         val isBooting = !isCursorNull && currentThreadsCount == null
 
         // We know that there is existing threads in this folder, so if we wait long enough, they'll be there.
-        val areThereThreadsSoon = mainViewModel.currentFolderLive.value?.oldMessagesUidsToFetch?.isNotEmpty() == true
+        val areThereThreadsSoon = runCatchingRealm {
+            val folder = mainViewModel.currentFolderLive.value
+            folder?.oldMessagesUidsToFetch?.isNotEmpty() == true
+        }.getOrDefault(false)
 
         // If there is network connectivity, but we either don't have a cursor yet
         // or don't have threads yet (but we know that they are coming), it means
