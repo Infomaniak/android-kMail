@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -173,7 +173,7 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
-    private fun loadBimiAvatar(bimi: Bimi, correspondent: Correspondent) = with(binding.avatarImage) {
+    private fun loadBimiAvatar(correspondent: Correspondent, bimi: Bimi) = with(binding.avatarImage) {
         state.update(correspondent, bimi)
         contentDescription = correspondent.email
         loadAvatar(
@@ -196,15 +196,17 @@ class AvatarView @JvmOverloads constructor(
     ) {
         when (avatarDisplayType) {
             AvatarDisplayType.UNKNOWN_CORRESPONDENT -> loadUnknownUserAvatar()
+            AvatarDisplayType.USER_AVATAR -> AccountUtils.currentUser?.let { loadAvatar(user = it) }
             AvatarDisplayType.CUSTOM_AVATAR,
             AvatarDisplayType.INITIALS -> loadAvatarUsingDictionary(correspondent!!, contacts, bimi)
-            AvatarDisplayType.BIMI -> loadBimiAvatar(bimi!!, correspondent!!)
+            AvatarDisplayType.BIMI -> loadBimiAvatar(correspondent!!, bimi!!)
         }
     }
 
     private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?, isBimiEnabled: Boolean): AvatarDisplayType {
         return when {
             correspondent == null -> AvatarDisplayType.UNKNOWN_CORRESPONDENT
+            correspondent.shouldDisplayUserAvatar() -> AvatarDisplayType.USER_AVATAR
             correspondent.hasMergedContactAvatar(contactsFromViewModel) -> AvatarDisplayType.CUSTOM_AVATAR
             bimi?.isDisplayable(isBimiEnabled) == true -> AvatarDisplayType.BIMI
             else -> AvatarDisplayType.INITIALS
@@ -255,6 +257,7 @@ class AvatarView @JvmOverloads constructor(
     enum class AvatarDisplayType {
         UNKNOWN_CORRESPONDENT,
         CUSTOM_AVATAR,
+        USER_AVATAR,
         BIMI,
         INITIALS,
     }
