@@ -255,7 +255,6 @@
     <string name="displayMailIssueDescription">To fix display problems, please update the Android System Webview application.</string>
     <string name="displayMailIssueTitle">Problem displaying your emails</string>
     <plurals name="downloadingEmailsTitle">
-        <item quantity="one">Downloading %d emails</item>
         <item quantity="other">Downloading %d emails</item>
     </plurals>
     <string name="draftFolder">Drafts</string>

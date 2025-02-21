@@ -26,13 +26,13 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.setBackNavigationResult
-import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
 
 class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
+
     override val dialogTitle: String? by lazy { getDialogName() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,19 +56,7 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
         }
     }
 
-    private fun getDialogName(): String {
-        val numberOfMessagesToDownload = downloadThreadsViewModel.numberOfMessagesToDownloads()
-
-        return if (numberOfMessagesToDownload == 1) {
-            downloadThreadsViewModel.getFirstMessageSubject() ?: requireContext().getString(R.string.noSubjectTitle)
-        } else {
-            requireContext().resources.getQuantityString(
-                R.plurals.downloadingEmailsTitle,
-                numberOfMessagesToDownload,
-                numberOfMessagesToDownload,
-            )
-        }
-    }
+    private fun getDialogName(): String = downloadThreadsViewModel.getDialogName()
 
     private fun List<Uri>.openKDriveOrPlayStore(context: Context): Intent? {
         return if (canSaveOnKDrive(context)) {
