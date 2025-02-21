@@ -19,9 +19,9 @@ package com.infomaniak.mail.utils.date
 
 import android.content.Context
 import android.text.format.DateFormat
-import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_MONTH
-import com.infomaniak.lib.core.utils.FORMAT_DATE_DAY_MONTH_YEAR
-import com.infomaniak.lib.core.utils.format
+import com.infomaniak.core.utils.FORMAT_DATE_DAY_MONTH
+import com.infomaniak.core.utils.FORMAT_DATE_DAY_MONTH_YEAR
+import com.infomaniak.core.utils.format
 import com.infomaniak.mail.R
 import java.util.Date
 

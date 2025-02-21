@@ -19,7 +19,7 @@ package com.infomaniak.mail.utils.date
 
 import android.content.Context
 import android.os.Build
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithYear
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear

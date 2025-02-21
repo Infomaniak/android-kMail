@@ -21,7 +21,7 @@ import android.content.Context
 import android.os.Build
 import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread.Companion.FORMAT_DAY_OF_THE_WEEK
 import com.infomaniak.mail.utils.extensions.isSmallerThanDays
@@ -52,7 +52,7 @@ private fun Context.relativeFormatting(date: RealmInstant) = DateUtils.getRelati
 private fun Context.defaultFormatting(date: RealmInstant) = with(date.toDate()) {
     when {
         isInTheFuture() -> formatNumericalDayMonthYear()
-        isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
+        isToday() -> format(FORMAT_HOUR_MINUTES)
         isYesterday() -> getString(R.string.messageDetailsYesterday)
         isSmallerThanDays(6) -> format(FORMAT_DAY_OF_THE_WEEK)
         isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)

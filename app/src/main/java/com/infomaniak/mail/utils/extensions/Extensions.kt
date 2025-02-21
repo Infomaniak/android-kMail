@@ -63,10 +63,15 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.infomaniak.core.utils.endOfTheWeek
+import com.infomaniak.core.utils.startOfTheDay
+import com.infomaniak.core.utils.startOfTheWeek
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.hideKeyboard
+import com.infomaniak.lib.core.utils.removeAccents
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MainApplication

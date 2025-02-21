@@ -84,12 +84,12 @@ android {
 
 dependencies {
     implementation project(':Core')
-    implementation project(path: ':Core:Legacy')
-    implementation project(path: ':Core:Legacy:AppLock')
-    implementation project(path: ':Core:Legacy:BugTracker')
-    implementation project(path: ':Core:Legacy:Confetti')
-    implementation project(path: ':Core:Legacy:Stores')
-    implementation project(path: ':HtmlCleaner')
+    implementation project(':Core:Legacy')
+    implementation project(':Core:Legacy:AppLock')
+    implementation project(':Core:Legacy:BugTracker')
+    implementation project(':Core:Legacy:Confetti')
+    implementation project(':Core:Legacy:Stores')
+    implementation project(':HtmlCleaner')
 
     implementation libs.rich.html.editor
 

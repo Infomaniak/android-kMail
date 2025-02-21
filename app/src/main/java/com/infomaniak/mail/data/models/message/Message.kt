@@ -19,8 +19,8 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.core.ApiEnum
-import com.infomaniak.core.apiEnumValueOfOrNull
+import com.infomaniak.core.utils.ApiEnum
+import com.infomaniak.core.utils.apiEnumValueOfOrNull
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
