@@ -196,7 +196,7 @@ class AvatarView @JvmOverloads constructor(
     ) {
         when (avatarDisplayType) {
             AvatarDisplayType.UNKNOWN_CORRESPONDENT -> loadUnknownUserAvatar()
-            AvatarDisplayType.USER_AVATAR -> loadUserAvatar(correspondent!!, bimi)
+            AvatarDisplayType.USER_AVATAR -> AccountUtils.currentUser?.let { loadAvatar(user = it) }
             AvatarDisplayType.CUSTOM_AVATAR,
             AvatarDisplayType.INITIALS -> loadAvatarUsingDictionary(correspondent!!, contacts, bimi)
             AvatarDisplayType.BIMI -> loadBimiAvatar(correspondent!!, bimi!!)
@@ -228,11 +228,6 @@ class AvatarView @JvmOverloads constructor(
         state.update(correspondent, bimi)
         val mergedContact = searchInMergedContact(correspondent, contacts)
         binding.avatarImage.baseLoadAvatar(correspondent = mergedContact ?: correspondent)
-    }
-
-    private fun loadUserAvatar(correspondent: Correspondent, bimi: Bimi?) {
-        state.update(correspondent, bimi)
-        binding.avatarImage.baseLoadAvatar(correspondent)
     }
 
     private fun ImageView.baseLoadAvatar(correspondent: Correspondent) {
