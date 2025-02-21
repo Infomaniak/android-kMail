@@ -145,7 +145,7 @@ class ThreadFragment : Fragment() {
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
     private val isNotInSpam: Boolean
-        get() = runCatchingRealm { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }.getOrDefault(false)
+        get() = runCatchingRealm { mainViewModel.currentFolder.value?.role != FolderRole.SPAM }.getOrDefault(true)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also { _binding = it }.root
@@ -771,8 +771,7 @@ class ThreadFragment : Fragment() {
         return (isMessageSpecificallyAllowed && isNotInSpam) || shouldLoadDistantResources()
     }
 
-    private fun shouldLoadDistantResources(): Boolean =
-        localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
+    private fun shouldLoadDistantResources(): Boolean = localSettings.externalContent == ExternalContent.ALWAYS && isNotInSpam
 
     fun getAnchor(): View? = _binding?.quickActionBar
 
