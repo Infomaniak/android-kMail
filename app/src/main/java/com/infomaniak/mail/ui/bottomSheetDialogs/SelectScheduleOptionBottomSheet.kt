@@ -43,6 +43,9 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
 
     abstract val lastSelectedEpoch: Long?
 
+    @get:StringRes
+    abstract val titleRes: Int
+
     abstract fun onLastScheduleOptionClicked()
     abstract fun onScheduleOptionClicked(dateItem: ScheduleOption)
     abstract fun onCustomScheduleOptionClicked()
@@ -53,6 +56,8 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        title.text = getString(titleRes)
 
         computeLastScheduleOption()
 

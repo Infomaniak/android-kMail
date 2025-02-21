@@ -35,6 +35,8 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
     // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
     override val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpoch.takeIf { it != 0L } }
 
+    override val titleRes: Int = R.string.scheduleSendingTitle
+
     override fun onLastScheduleOptionClicked() {
         if (lastSelectedEpoch != null) {
             trackScheduleSendEvent("lastSelectedSchedule")
