@@ -329,7 +329,7 @@ class RefreshController @Inject constructor(
         var inboxUnreadCount: Int? = null
         FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
 
-            val allCurrentFolderThreads = folder.threadQueryStrategy(folder.role, folder.id).applyStrategy(mutableRealm)
+            val allCurrentFolderThreads = folder.refreshStrategy().queryFolderThreads(folder.id, mutableRealm)
             it.threads.replaceContent(list = allCurrentFolderThreads)
 
             inboxUnreadCount = updateFoldersUnreadCount(
