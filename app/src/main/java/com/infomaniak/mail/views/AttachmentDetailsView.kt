@@ -24,7 +24,7 @@ import android.widget.LinearLayout
 import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
 import coil.load
-import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
+import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
