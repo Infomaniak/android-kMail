@@ -30,4 +30,6 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
+
+    override fun shouldForceUpdateMessagesWhenAdded(): Boolean = true
 }

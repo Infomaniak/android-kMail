@@ -29,4 +29,6 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getThreadsByFolderId(folderId, realm)
     }
+
+    override fun shouldForceUpdateMessagesWhenAdded(): Boolean = false
 }
