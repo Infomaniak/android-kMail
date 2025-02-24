@@ -329,7 +329,7 @@ class RefreshController @Inject constructor(
         var inboxUnreadCount: Int? = null
         FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
 
-            val allThreads = folder.refreshStrategy().queryFolderThread(folder.id, mutableRealm)
+            val allThreads = folder.refreshStrategy().queryFolderThreads(folder.id, mutableRealm)
             Log.e("gibran", "fetchOnePage - allThreads.map { it.uid }: ${allThreads.map { it.uid }}")
             it.threads.replaceContent(list = allThreads)
 

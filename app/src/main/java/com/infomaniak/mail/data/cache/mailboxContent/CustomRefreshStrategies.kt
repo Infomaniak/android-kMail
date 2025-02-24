@@ -21,14 +21,14 @@ import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.TypedRealm
 
 val inboxRefreshStrategy = object : DefaultRefreshStrategy {
-    override fun queryFolderThread(folderId: String, realm: TypedRealm): List<Thread> {
-        return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
+    override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
+        return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
     }
 }
 
 val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
-    override fun queryFolderThread(folderId: String, realm: TypedRealm): List<Thread> {
-        return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
+    override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
+        return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = true
