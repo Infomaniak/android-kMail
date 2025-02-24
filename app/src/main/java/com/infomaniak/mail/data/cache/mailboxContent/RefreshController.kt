@@ -512,6 +512,7 @@ class RefreshController @Inject constructor(
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
         val addedMessagesUids = mutableListOf<Int>()
+        val shouldForceUpdateMessages = folder.refreshStrategy().shouldForceUpdateMessagesWhenAdded()
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
@@ -519,6 +520,8 @@ class RefreshController @Inject constructor(
             initMessageLocalValues(remoteMessage, folder)
 
             addedMessagesUids.add(remoteMessage.shortUid)
+
+            if (shouldForceUpdateMessages) updateExistingMessage(remoteMessage)
 
             val newThread = if (isConversationMode) {
                 handleAddedMessage(scope, remoteMessage, impactedThreadsManaged)
@@ -540,6 +543,11 @@ class RefreshController @Inject constructor(
         }
 
         return impactedThreadsUnmanaged
+    }
+
+    private fun MutableRealm.updateExistingMessage(remoteMessage: Message) {
+        val isMessageAlreadyInRealm = MessageController.getMessage(remoteMessage.uid, realm = this) != null
+        if (isMessageAlreadyInRealm) MessageController.upsertMessage(remoteMessage, realm = this)
     }
 
     private fun initMessageLocalValues(remoteMessage: Message, folder: Folder) {
