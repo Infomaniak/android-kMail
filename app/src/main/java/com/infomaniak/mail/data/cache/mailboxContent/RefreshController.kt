@@ -530,7 +530,6 @@ class RefreshController @Inject constructor(
     ): Set<Thread> {
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
-        val folderMessages = folder.messages(realm = this).associateByTo(mutableMapOf()) { it.uid }
         val addedMessagesUids = mutableListOf<Int>()
 
         remoteMessages.forEach { remoteMessage ->
@@ -547,8 +546,6 @@ class RefreshController @Inject constructor(
             }
 
             newThread?.let { impactedThreadsManaged += putNewThreadInRealm(it) }
-
-            folderMessages[remoteMessage.uid] = remoteMessage
         }
 
         addSentryBreadcrumbForAddedUidsInFolder(addedMessagesUids)
