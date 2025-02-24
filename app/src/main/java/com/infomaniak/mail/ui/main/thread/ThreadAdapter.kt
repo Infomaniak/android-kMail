@@ -369,7 +369,7 @@ class ThreadAdapter(
         }
 
         if (message.isDraft) {
-            userAvatar.loadAvatar(AccountUtils.currentUser!!)
+            userAvatar.loadUserAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
                 text = context.getString(R.string.messageIsDraftOption)
                 setTextAppearance(R.style.BodyMedium_Error)
