@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.FormatterFileSize.formatShortFileSize
+import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
