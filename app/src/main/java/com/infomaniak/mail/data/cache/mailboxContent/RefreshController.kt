@@ -538,6 +538,7 @@ class RefreshController @Inject constructor(
         val impactedThreadsManaged = mutableSetOf<Thread>()
         val folderMessages = folder.messages(realm = this).associateByTo(mutableMapOf()) { it.uid }
         val addedMessagesUids = mutableListOf<Int>()
+        val shouldForceUpdateMessages = folder.refreshStrategy().shouldForceUpdateMessagesWhenAdded()
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
@@ -546,8 +547,10 @@ class RefreshController @Inject constructor(
 
             addedMessagesUids.add(remoteMessage.shortUid)
 
+            if (shouldForceUpdateMessages) updateExistingMessage(remoteMessage)
+
             val newThread = if (isConversationMode) {
-                createNewThread(scope, remoteMessage, impactedThreadsManaged, folder.refreshStrategy())
+                createNewThread(scope, remoteMessage, impactedThreadsManaged)
             } else {
                 remoteMessage.toThread()
             }
@@ -570,11 +573,15 @@ class RefreshController @Inject constructor(
         return impactedThreadsUnmanaged
     }
 
+    private fun MutableRealm.updateExistingMessage(remoteMessage: Message) {
+        val isMessageAlreadyInRealm = MessageController.getMessage(remoteMessage.uid, realm = this) != null
+        if (isMessageAlreadyInRealm) MessageController.upsertMessage(remoteMessage, realm = this)
+    }
+
     private fun MutableRealm.createNewThread(
         scope: CoroutineScope,
         remoteMessage: Message,
         impactedThreadsManaged: MutableSet<Thread>,
-        refreshStrategy: RefreshStrategy,
     ): Thread? {
         // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
         val existingThreads = ThreadController.getThreadsByMessageIds(remoteMessage.messageIds, realm = this)
@@ -586,7 +593,7 @@ class RefreshController @Inject constructor(
         val isThereDuplicatedThreads = isThereDuplicatedThreads(remoteMessage.messageIds, existingThreads.count())
 
         // Create Thread in this Folder
-        val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages, refreshStrategy)
+        val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages)
         // Update Threads in other Folders
         updateOtherExistingThreads(scope, remoteMessage, existingThreads, existingMessages, impactedThreadsManaged)
 
@@ -637,11 +644,10 @@ class RefreshController @Inject constructor(
         newMessage: Message,
         existingThreads: List<Thread>,
         existingMessages: Set<Message>,
-        refreshStrategy: RefreshStrategy,
     ): Thread? {
         var newThread: Thread? = null
 
-        if (refreshStrategy.shouldForceUpdateMessagesWhenAdded() || existingThreads.none { it.folderId == newMessage.folderId }) {
+        if (existingThreads.none { it.folderId == newMessage.folderId }) {
 
             newThread = newMessage.toThread()
 
