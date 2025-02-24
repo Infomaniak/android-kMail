@@ -265,8 +265,8 @@ class ThreadController @Inject constructor(
         }
 
         private fun getThreadsWithSnoozeFilterQuery(
-            withSnooze: Boolean,
             folderId: String,
+            withSnooze: Boolean,
             realm: TypedRealm,
         ): RealmQuery<Thread> {
             val snoozeState = SnoozeState.Snoozed.apiValue
@@ -317,7 +317,7 @@ class ThreadController @Inject constructor(
 
         fun getInboxThreadsWithSnoozeFilter(withSnooze: Boolean, realm: TypedRealm): List<Thread> {
             val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return emptyList()
-            return getThreadsWithSnoozeFilterQuery(withSnooze, folderId = inboxId, realm).find()
+            return getThreadsWithSnoozeFilterQuery(inboxId, withSnooze, realm).find()
         }
         //endregion
 
