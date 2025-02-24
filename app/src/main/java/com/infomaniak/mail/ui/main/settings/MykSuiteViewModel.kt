@@ -56,6 +56,6 @@ class MykSuiteViewModel @Inject constructor(
     }
 
     fun refreshMyKSuite() = viewModelScope.launch(ioCoroutineContext) {
-        myKSuiteDataResult.postValue(MyKSuiteDataUtils.fetchMyKSuiteData())
+        myKSuiteDataResult.postValue(MyKSuiteDataUtils.fetchData())
     }
 }
