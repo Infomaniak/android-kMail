@@ -31,5 +31,5 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
 
-    override fun shouldForceUpdateMessagesWhenAdded(): Boolean = true
+    override fun shouldForceUpdateMessages(): Boolean = true
 }

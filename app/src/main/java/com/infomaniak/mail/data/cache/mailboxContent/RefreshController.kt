@@ -538,7 +538,7 @@ class RefreshController @Inject constructor(
         val impactedThreadsManaged = mutableSetOf<Thread>()
         val folderMessages = folder.messages(realm = this).associateByTo(mutableMapOf()) { it.uid }
         val addedMessagesUids = mutableListOf<Int>()
-        val shouldForceUpdateMessages = folder.refreshStrategy().shouldForceUpdateMessagesWhenAdded()
+        val shouldForceUpdateMessages = folder.refreshStrategy().shouldForceUpdateMessages()
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
