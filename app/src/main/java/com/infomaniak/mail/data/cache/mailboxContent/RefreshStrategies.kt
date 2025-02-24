@@ -22,10 +22,13 @@ import io.realm.kotlin.TypedRealm
 
 interface RefreshStrategy {
     fun queryFolderThread(folderId: String, realm: TypedRealm): List<Thread>
+    fun shouldForceUpdateMessagesWhenAdded(): Boolean
 }
 
 interface DefaultRefreshStrategy : RefreshStrategy {
     override fun queryFolderThread(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getThreadsByFolderId(folderId, realm = realm)
     }
+
+    override fun shouldForceUpdateMessagesWhenAdded(): Boolean = false
 }

@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import android.util.Log
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -329,6 +330,7 @@ class RefreshController @Inject constructor(
         FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
 
             val allThreads = folder.refreshStrategy().queryFolderThread(folder.id, mutableRealm)
+            Log.e("gibran", "fetchOnePage - allThreads.map { it.uid }: ${allThreads.map { it.uid }}")
             it.threads.replaceContent(list = allThreads)
 
             val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
@@ -426,10 +428,14 @@ class RefreshController @Inject constructor(
 
         apiResponse.data?.messages?.let { messages ->
 
+            Log.e("gibran", "handleAddedUids - fetched messages.map { it.uid }: ${messages.map { it.uid }}")
+
             write {
                 val upToDateFolder = getUpToDateFolder(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
                 val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode)
+
+                Log.e("gibran", "handleAddedUids - allImpactedThreads.map { it.uid }: ${allImpactedThreads.map { it.uid }}")
 
                 // TODO: This count will be false for INBOX & SNOOZED when the snooze feature will be implemented
                 val messagesCount = MessageController.getMessagesCountByFolderId(upToDateFolder.id, realm = this)
@@ -541,7 +547,7 @@ class RefreshController @Inject constructor(
             addedMessagesUids.add(remoteMessage.shortUid)
 
             val newThread = if (isConversationMode) {
-                createNewThread(scope, remoteMessage, impactedThreadsManaged)
+                createNewThread(scope, remoteMessage, impactedThreadsManaged, folder.refreshStrategy())
             } else {
                 remoteMessage.toThread()
             }
@@ -568,6 +574,7 @@ class RefreshController @Inject constructor(
         scope: CoroutineScope,
         remoteMessage: Message,
         impactedThreadsManaged: MutableSet<Thread>,
+        refreshStrategy: RefreshStrategy,
     ): Thread? {
         // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
         val existingThreads = ThreadController.getThreadsByMessageIds(remoteMessage.messageIds, realm = this)
@@ -579,7 +586,7 @@ class RefreshController @Inject constructor(
         val isThereDuplicatedThreads = isThereDuplicatedThreads(remoteMessage.messageIds, existingThreads.count())
 
         // Create Thread in this Folder
-        val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages)
+        val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages, refreshStrategy)
         // Update Threads in other Folders
         updateOtherExistingThreads(scope, remoteMessage, existingThreads, existingMessages, impactedThreadsManaged)
 
@@ -630,10 +637,11 @@ class RefreshController @Inject constructor(
         newMessage: Message,
         existingThreads: List<Thread>,
         existingMessages: Set<Message>,
+        refreshStrategy: RefreshStrategy,
     ): Thread? {
         var newThread: Thread? = null
 
-        if (existingThreads.none { it.folderId == newMessage.folderId }) {
+        if (refreshStrategy.shouldForceUpdateMessagesWhenAdded() || existingThreads.none { it.folderId == newMessage.folderId }) {
 
             newThread = newMessage.toThread()
 
