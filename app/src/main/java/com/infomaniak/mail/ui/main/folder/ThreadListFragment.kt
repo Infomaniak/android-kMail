@@ -147,6 +147,7 @@ class ThreadListFragment : TwoPaneFragment() {
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
+        setupMyKSuiteStorageBanner()
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
@@ -524,6 +525,20 @@ class ThreadListFragment : TwoPaneFragment() {
                 trackThreadListEvent("unreadFilter")
                 isCloseIconVisible = isChecked
                 mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
+            }
+        }
+    }
+
+    private fun setupMyKSuiteStorageBanner() = with(localSettings) {
+        mainViewModel.storageBannerStatus.observeNotNull(viewLifecycleOwner) { storageBannerStatus ->
+            binding.myKSuiteStorageBanner.apply {
+                storageLevel = storageBannerStatus
+                setupListener(
+                    onCloseButtonClicked = {
+                        binding.myKSuiteStorageBanner.isGone = true
+                        resetStorageBannerAppLaunches()
+                    }
+                )
             }
         }
     }

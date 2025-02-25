@@ -33,6 +33,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.MIN_SELECTABLE_DATE_MINUTES
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import java.util.Date
 
@@ -42,6 +43,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     private var binding: BottomSheetScheduleOptionsBinding by safeBinding()
 
     abstract val lastSelectedEpoch: Long?
+    abstract val isCurrentMailboxFree: Boolean
 
     @get:StringRes
     abstract val titleRes: Int
@@ -67,6 +69,8 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
 
         val shouldDisplayDivider = lastScheduleOption.isVisible
         (scheduleOptions.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
+
+        customScheduleOption.trailingContent = if (isCurrentMailboxFree) TrailingContent.MyKSuiteChip else TrailingContent.Chevron
     }
 
     private fun computeLastScheduleOption() = with(binding) {

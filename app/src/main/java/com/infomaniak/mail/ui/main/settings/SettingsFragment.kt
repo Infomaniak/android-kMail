@@ -21,9 +21,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
+import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils
+import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
@@ -37,6 +42,8 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
@@ -50,6 +57,7 @@ class SettingsFragment : Fragment() {
 
     private var binding: FragmentSettingsBinding by safeBinding()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val myKSuiteViewModel: MykSuiteViewModel by viewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -70,7 +78,53 @@ class SettingsFragment : Fragment() {
         setupMailboxesAdapter()
         setupListeners()
         setSubtitlesInitialState()
+        setupMyKSuite()
+
         observeFeatureFlag()
+        observeMyKSuiteData()
+    }
+
+    private fun setupMyKSuite() {
+        binding.myKSuiteLayout.isGone = MyKSuiteDataUtils.myKSuite == null
+        MyKSuiteDataUtils.myKSuite?.let { setupMyKSuiteLayout(it) } ?: myKSuiteViewModel.refreshMyKSuite()
+    }
+
+    private fun setupMyKSuiteLayout(myKSuiteData: MyKSuiteData) = with(binding) {
+        observeMyKSuiteMailbox()
+
+        myKSuiteSettingsTitle.setText(myKSuiteData.name)
+
+        myKSuiteViewModel.getMyKSuiteMailbox(myKSuiteData.mail.mailboxId)
+
+        myKSuiteSubscription.setOnClickListener { openMyKSuiteDashboard(myKSuiteData) }
+    }
+
+    private fun observeMyKSuiteMailbox() {
+        myKSuiteViewModel.myKSuiteMailboxResult.observe(viewLifecycleOwner) { mailbox ->
+            binding.myKSuiteMailAddress.apply {
+                isVisible = mailbox != null
+
+                if (mailbox == null) return@observe
+
+                setTitle(mailbox.email)
+                setOnClickListener {
+                    animatedNavigation(
+                        SettingsFragmentDirections.actionSettingsToMailboxSettings(mailbox.objectId, mailbox.email)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun observeMyKSuiteData() {
+        myKSuiteViewModel.myKSuiteDataResult.observeNotNull(viewLifecycleOwner) { data -> setupMyKSuiteLayout(data) }
+    }
+
+    private fun openMyKSuiteDashboard(myKSuiteData: MyKSuiteData) {
+        val args = MyKSuiteDashboardFragmentArgs(
+            dashboardData = MyKSuiteUiUtils.getDashboardData(requireContext(), myKSuiteData, AccountUtils.currentUser?.avatar)
+        )
+        animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
     }
 
     override fun onResume() {
@@ -90,7 +144,9 @@ class SettingsFragment : Fragment() {
         }
 
         binding.mailboxesList.adapter = mailboxesAdapter
-        mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
+        mainViewModel.mailboxesLive.observe(viewLifecycleOwner) { mailboxes ->
+            mailboxesAdapter.setMailboxes(mailboxes.filterNot { it.mailboxId == MyKSuiteDataUtils.myKSuite?.mail?.mailboxId })
+        }
     }
 
     private fun setSubtitlesInitialState() = with(binding) {

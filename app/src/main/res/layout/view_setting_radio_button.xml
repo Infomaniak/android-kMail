@@ -50,4 +50,10 @@
         android:visibility="invisible"
         app:tint="?android:attr/colorPrimary" />
 
+    <com.infomaniak.core.myksuite.ui.views.MyKSuitePlusChipView
+        android:id="@+id/myKSuitePlusChip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </LinearLayout>

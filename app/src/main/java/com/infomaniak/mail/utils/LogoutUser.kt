@@ -52,6 +52,7 @@ class LogoutUser @Inject constructor(
 
         user.logoutToken()
         AccountUtils.removeUser(user)
+        MyKSuiteDataUtils.deleteData(user.id)
         RealmDatabase.removeUserData(appContext, user.id)
         mailboxController.deleteUserMailboxes(user.id)
         localSettings.removeRegisteredFirebaseUser(userId = user.id)

@@ -139,6 +139,7 @@
     <string name="buttonDownloadAll">Scarica tutti</string>
     <string name="buttonFeedback">Feedback</string>
     <string name="buttonFolders">Cartelle</string>
+    <string name="buttonFreeTrial">Prova gratis</string>
     <string name="buttonHelp">Aiuto</string>
     <string name="buttonHyperlink">Aggiungi un collegamento ipertestuale</string>
     <string name="buttonImportEmails">Importazione di e-mail</string>
@@ -172,6 +173,7 @@
     <string name="buttonUnderline">Sottolineatura</string>
     <string name="buttonUnorderedList">Elenco non ordinato</string>
     <string name="buttonUnselectAll">Nessuno</string>
+    <string name="buttonUpgrade">Aggiornamento</string>
     <string name="buttonValid">Convalidare</string>
     <string name="buttonYes">Sì</string>
     <string name="calendarAllDayLong">Tutta la giornata</string>
@@ -358,6 +360,11 @@
         <item quantity="one">%d selezionato</item>
         <item quantity="other">%d selezionati</item>
     </plurals>
+    <string name="myKSuiteQuotasAlertDescription">Una volta raggiunto questo limite, non sarà più possibile inviare o ricevere messaggi. Liberate spazio o passate a my kSuite+.</string>
+    <string name="myKSuiteQuotasAlertFullDescription">Liberate spazio o passate alla my kSuite+.</string>
+    <string name="myKSuiteQuotasAlertFullTitle">Blocco della ricezione e dell’invio di messaggi</string>
+    <string name="myKSuiteQuotasAlertTitle">Limite di memoria quasi raggiunto</string>
+    <string name="myKSuiteSpaceFullAlert">Non c’è spazio sufficiente per eseguire questa azione.</string>
     <string name="newAccountDescription">Comunicare e archiviare documenti e foto in un ecosistema privo di pubblicità che rispetta la vostra privacy</string>
     <string name="newAccountStorageDrive">15 GB di memoria kDrive</string>
     <string name="newAccountStorageMail">20 GB di memoria per la posta</string>

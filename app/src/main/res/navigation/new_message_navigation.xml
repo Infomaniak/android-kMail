@@ -21,6 +21,8 @@
     android:id="@+id/new_message_navigation"
     app:startDestination="@id/newMessageFragment">
 
+    <include app:graph="@navigation/my_ksuite_navigation" />
+
     <fragment
         android:id="@+id/newMessageFragment"
         android:name="com.infomaniak.mail.ui.newMessage.NewMessageFragment"
@@ -94,11 +96,4 @@
             android:defaultValue="true"
             app:argType="boolean" />
     </dialog>
-
-    <dialog
-        android:id="@+id/upgradeProductBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.UpgradeProductBottomSheetDialog"
-        android:label="UpgradeProductBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_upgrade_product" />
-
 </navigation>

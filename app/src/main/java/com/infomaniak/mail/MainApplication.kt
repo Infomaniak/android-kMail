@@ -125,11 +125,13 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         if (BuildConfig.DEBUG) configureDebugMode()
         configureSentry()
         enforceAppTheme()
-        configureAccountUtils()
+        configureRoomDatabases()
         configureAppReloading()
         configureInfomaniakCore()
         notificationUtils.initNotificationChannel()
         configureHttpClient()
+
+        localSettings.storageBannerDisplayAppLaunches++
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -217,8 +219,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         AppCompatDelegate.setDefaultNightMode(localSettings.theme.mode)
     }
 
-    private fun configureAccountUtils() {
+    private fun configureRoomDatabases() {
         AccountUtils.init(this)
+        MyKSuiteDataUtils.initDatabase(this)
     }
 
     private fun configureAppReloading() {

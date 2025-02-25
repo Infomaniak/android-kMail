@@ -37,6 +37,8 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
+import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.core.utils.FORMAT_SCHEDULE_MAIL
 import com.infomaniak.core.utils.year
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
@@ -269,12 +271,26 @@ class MainActivity : BaseActivity() {
                     with(workInfo.outputData) {
                         refreshDraftFolderIfNeeded()
                         val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
-                        if (errorRes > 0) {
-                            showSendingSnackbarTimer.cancel()
-                            snackbarManager.setValue(getString(errorRes))
-                        }
+                        displayError(errorRes)
                     }
                 }
+            }
+        }
+    }
+
+    private fun displayError(errorRes: Int) {
+        if (errorRes > 0) {
+            showSendingSnackbarTimer.cancel()
+
+            val hasLimitBeenReached = errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_LIMIT_EXCEEDED) ||
+                    errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_DAILY_LIMIT_REACHED)
+
+            if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
+                snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
+                    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
+                }
+            } else {
+                snackbarManager.setValue(getString(errorRes))
             }
         }
     }

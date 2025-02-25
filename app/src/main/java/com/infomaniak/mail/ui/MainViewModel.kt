@@ -28,6 +28,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -54,18 +55,16 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
-import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
+import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
@@ -108,6 +107,9 @@ class MainViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var refreshEverythingJob: Job? = null
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
@@ -161,6 +163,22 @@ class MainViewModel @Inject constructor(
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(quotasController::getQuotasAsync) ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
+
+    val storageBannerStatus = currentQuotasLive.map { quotas ->
+        when {
+            quotas == null -> null
+            quotas.isFull -> StorageLevel.Full
+            quotas.getProgress() > StorageLevel.WARNING_THRESHOLD -> {
+                if (!localSettings.hasClosedStorageBanner || localSettings.storageBannerDisplayAppLaunches % 10 == 0) {
+                    localSettings.hasClosedStorageBanner = false
+                    StorageLevel.Warning
+                } else {
+                    StorageLevel.Normal
+                }
+            }
+            else -> StorageLevel.Normal
+        }
+    }
 
     val currentPermissionsLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(permissionsController::getPermissionsAsync) ?: emptyFlow()
@@ -299,6 +317,9 @@ class MainViewModel @Inject constructor(
 
             // Refresh User
             AccountUtils.updateCurrentUser()
+
+            // Refresh My kSuite asynchronously, because it's not required for the threads list display
+            launch { MyKSuiteDataUtils.fetchData() }
 
             // Refresh Mailboxes
             SentryLog.d(TAG, "Refresh mailboxes from remote")

@@ -1,6 +1,7 @@
 [versions]
 androidGradlePlugin = "8.7.2"
 coilSvg = "2.7.0"
+compose = "1.7.8"
 dotsindicator = "5.1.0"
 dragdropswipeRecyclerview = "1.2.0"
 firebaseMessagingKtx = "24.1.0"
@@ -28,6 +29,7 @@ workRuntimeKtx = "2.9.1" # Doesn't build when bumped (waiting for Android SDK 35
 
 [libraries]
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilSvg" }
+compose-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "compose" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 dragdropswipe-recyclerview = { module = "com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview", version.ref = "dragdropswipeRecyclerview" }
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
