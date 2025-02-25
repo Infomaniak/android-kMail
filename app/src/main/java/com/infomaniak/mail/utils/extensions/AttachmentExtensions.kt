@@ -38,6 +38,9 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialogArgs
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
+import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
+import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
@@ -55,18 +58,7 @@ object AttachmentExtensions {
     const val ATTACHMENT_TAG = "attachmentUpload"
     const val DOWNLOAD_ATTACHMENT_RESULT = "download_attachment_result"
 
-    private const val DRIVE_PACKAGE = "com.infomaniak.drive"
-    private const val SAVE_EXTERNAL_ACTIVITY_CLASS = "com.infomaniak.drive.ui.SaveExternalFilesActivity"
-
     //region Intent
-    private fun canSaveOnKDrive(context: Context) = runCatching {
-        val packageInfo = context.packageManager.getPackageInfo(DRIVE_PACKAGE, PackageManager.GET_ACTIVITIES)
-        packageInfo.activities!!.any { it.name == SAVE_EXTERNAL_ACTIVITY_CLASS }
-    }.getOrElse {
-        Sentry.captureException(it)
-        false
-    }
-
     private fun Attachment.saveToDriveIntent(context: Context): Intent {
         val fileFromCache = getCacheFile(context)
         val lastModifiedDate = fileFromCache.lastModified()

@@ -119,6 +119,15 @@
             app:visibleDivider="false" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            android:id="@+id/saveKDrive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_kdrive"
+            app:keepIconTint="true"
+            app:title="@string/saveToDriveItem"
+            app:visibleDivider="false" />
+
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/reportDisplayProblem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
