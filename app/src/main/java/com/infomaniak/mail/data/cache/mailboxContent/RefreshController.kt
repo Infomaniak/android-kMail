@@ -440,7 +440,12 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region Deleted Messages
-    private fun MutableRealm.handleDeletedUids(scope: CoroutineScope, shortUids: List<String>, folderId: String): Set<String> {
+    private fun MutableRealm.handleDeletedUids(
+        scope: CoroutineScope,
+        shortUids: List<String>,
+        folderId: String,
+        refreshStrategy: RefreshStrategy,
+    ): Set<String> {
 
         val impactedFolders = mutableSetOf<String>()
         val threads = mutableSetOf<Thread>()
@@ -448,6 +453,24 @@ class RefreshController @Inject constructor(
         shortUids.forEach { shortUid ->
             scope.ensureActive()
             val message = MessageController.getMessage(uid = shortUid.toLongUid(folderId), realm = this) ?: return@forEach
+
+            // TODO: Put below code blocks inside this doOnMessageDelete method
+            val ids = with(refreshStrategy) {
+                processDeletedMessage(scope, message)
+            }
+
+            ids.forEach { (thread, impactedFolder) ->
+                threads += thread
+                impactedFolders += impactedFolder
+            }
+
+            // // message.threads.forEach { thread ->
+            // //     threads += thread
+            // //     impactedFolders += thread.folderId
+            // // }
+            // MessageController.updateSnoozeState(appContext, mailbox, message, realm = this)
+
+
             threads += message.threads
             MessageController.deleteMessage(appContext, mailbox, message, realm = this)
         }
