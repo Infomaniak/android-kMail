@@ -33,12 +33,16 @@ val inboxRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
     }
+
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.SNOOZED)
 }
 
 val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
+
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.INBOX)
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
         val inboxId = FolderController.getFolder(Folder.FolderRole.INBOX, realm)?.id ?: return null
