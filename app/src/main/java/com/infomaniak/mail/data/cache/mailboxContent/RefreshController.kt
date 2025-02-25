@@ -467,8 +467,7 @@ class RefreshController @Inject constructor(
 
             impactedFolders.add(thread.folderId)
 
-            val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
-            if (numberOfMessagesInFolder == 0) {
+            if (thread.getNumberOfMessagesInFolder() == 0) {
                 delete(thread)
             } else {
                 thread.recomputeThread(realm = this)
@@ -477,6 +476,8 @@ class RefreshController @Inject constructor(
 
         return impactedFolders
     }
+
+    private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
     //endregion
 
     //region Updated Messages
