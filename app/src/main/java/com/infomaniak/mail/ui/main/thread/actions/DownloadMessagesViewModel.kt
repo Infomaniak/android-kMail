@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
+import android.accounts.NetworkErrorException
 import android.app.Application
 import android.content.Context
 import android.net.Uri
@@ -63,12 +64,10 @@ class DownloadMessagesViewModel @Inject constructor(
 
     private fun getAllMessages(): Set<Message> {
         val messages = mutableSetOf<Message>()
-        messageLocalUids?.mapNotNull { messageController.getMessage(it) }?.let { messages.addAll(it) }
+        messageLocalUids?.mapNotNull(messageController::getMessage)?.let(messages::addAll)
 
         threadLocalUids?.forEach { threadUid ->
-            threadController.getThread(threadUid)?.let { thread ->
-                messages.addAll(thread.messages)
-            }
+            threadController.getThread(threadUid)?.let { thread -> messages.addAll(thread.messages) }
         }
         return messages
     }
@@ -84,18 +83,20 @@ class DownloadMessagesViewModel @Inject constructor(
         return fileName
     }
 
-    private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri? {
+    private fun saveEmlToFile(context: Context, emlByteArray: ByteArray, fileName: String): Uri {
         val fileNameWithExtension = "${fileName.removeIllegalFileNameCharacter()}.eml"
         val fileDir = getEmlCacheDir(context)
 
         if (!fileDir.exists()) fileDir.mkdirs()
 
-        return runCatching {
-            val file = File(fileDir, fileNameWithExtension)
-            file.outputStream().use { it.write(emlByteArray) }
-            return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
-        }.getOrNull()
+        val file = File(fileDir, fileNameWithExtension)
+        file.outputStream().use { it.write(emlByteArray) }
+        return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
     }
+
+    private fun getFirstMessageSubject(): String? = getAllMessages().firstOrNull()?.subject
+
+    private fun numberOfMessagesToDownloads(): Int = (messageLocalUids?.size ?: 0) + (threadLocalUids?.size ?: 0)
 
     fun downloadMessages(currentMailbox: Mailbox?) {
         viewModelScope.launch(ioCoroutineContext) {
@@ -106,34 +107,32 @@ class DownloadMessagesViewModel @Inject constructor(
 
                 val deferredResponses = getAllMessages().map { message ->
                     async {
-                        val response = ApiRepository.getDownloadedMessage(
+                        val apiResponse = ApiRepository.getDownloadedMessage(
                             mailboxUuid = mailbox.uuid,
                             folderId = message.folderId,
                             shortUid = message.shortUid,
                         )
 
-                        if (!response.isSuccessful || response.body == null) return@async null
+                        if (!apiResponse.isSuccessful || apiResponse.body == null) throw NetworkErrorException()
 
-                        val messageSubject = message.subject?.removeIllegalFileNameCharacter() ?: NO_SUBJECT_FILE
+                        val messageSubject = message.subject ?: NO_SUBJECT_FILE
                         val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
                         val fileName = createUniqueFileName(listFileName, truncatedSubject)
 
-                        saveEmlToFile(appContext, response.body!!.bytes(), fileName)
+                        saveEmlToFile(appContext, apiResponse.body!!.bytes(), fileName)
                     }
                 }
 
-                deferredResponses.awaitAll().filterNotNull()
+                deferredResponses.awaitAll()
             }.onSuccess { downloadedThreadUris ->
-                if (downloadedThreadUris.size != numberOfMessagesToDownloads()) downloadMessagesLiveData.postValue(null)
-
                 downloadMessagesLiveData.postValue(downloadedThreadUris)
+            }.onFailure {
+                // Maybe log sentry
+                clearEmlDir()
+                downloadMessagesLiveData.postValue(null)
             }
         }
     }
-
-    fun getFirstMessageSubject(): String? = getAllMessages().firstOrNull()?.subject
-
-    private fun numberOfMessagesToDownloads(): Int = (messageLocalUids?.size ?: 0) + (threadLocalUids?.size ?: 0)
 
     fun getDialogName(): String {
         val numberOfMessagesToDownload = numberOfMessagesToDownloads()
@@ -141,15 +140,15 @@ class DownloadMessagesViewModel @Inject constructor(
         return if (numberOfMessagesToDownload == 1) {
             getFirstMessageSubject() ?: appContext.getString(R.string.noSubjectTitle)
         } else {
-            appContext.resources.getQuantityString(
-                R.plurals.downloadingEmailsTitle,
-                numberOfMessagesToDownload,
-                numberOfMessagesToDownload,
-            )
+            appContext.resources.getString(R.string.downloadingEmailsTitle, numberOfMessagesToDownload)
         }
     }
 
-    private fun String.removeIllegalFileNameCharacter(): String = this.replace(DownloadManagerUtils.regexInvalidSystemChar, "")
+    fun clearEmlDir() {
+        getEmlCacheDir(appContext).deleteRecursively()
+    }
+
+    private fun String.removeIllegalFileNameCharacter(): String = replace(DownloadManagerUtils.regexInvalidSystemChar, "")
 
     companion object {
         private const val NO_SUBJECT_FILE = "message"

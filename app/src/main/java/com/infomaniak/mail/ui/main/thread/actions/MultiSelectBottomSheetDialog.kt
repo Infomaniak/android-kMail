@@ -22,14 +22,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_SAVE_KDRIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SAVE_TO_KDRIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
@@ -123,15 +122,11 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
-            trackMultiSelectActionEvent(ACTION_SAVE_KDRIVE_NAME, threadsCount, isFromBottomSheet = true)
-            runCatching {
-                navigateToDownloadMessagesProgressDialog(
-                    threadUids = threadsUids,
-                    currentClassName = MultiSelectBottomSheetDialog::class.java.name,
-                )
-            }.onFailure {
-                SentryLog.e(TAG, "SelectedThreadUids is empty, it should not happened")
-            }
+            trackMultiSelectActionEvent(ACTION_SAVE_TO_KDRIVE_NAME, threadsCount, isFromBottomSheet = true)
+            navigateToDownloadMessagesProgressDialog(
+                threadUids = threadsUids,
+                currentClassName = MultiSelectBottomSheetDialog::class.java.name,
+            )
             isMultiSelectOn = false
         }
     }

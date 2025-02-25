@@ -58,6 +58,7 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
+import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
@@ -1018,9 +1019,9 @@ class MainViewModel @Inject constructor(
         val message = messageController.getMessage(messageUid) ?: return@launch
         val mailbox = currentMailbox.value ?: return@launch
 
-        val response = ApiRepository.getDownloadedMessage(mailbox.uuid, message.folderId, message.shortUid)
+        val apiResponse = ApiRepository.getDownloadedMessage(mailbox.uuid, message.folderId, message.shortUid)
 
-        if (!response.isSuccessful || response.body == null) {
+        if (!apiResponse.isSuccessful || apiResponse.body == null) {
             reportDisplayProblemTrigger.postValue(Unit)
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
 
@@ -1028,7 +1029,7 @@ class MainViewModel @Inject constructor(
         }
 
         val filename = UUID.randomUUID().toString()
-        val emlAttachment = Attachment(response.body?.bytes(), filename, EML_CONTENT_TYPE)
+        val emlAttachment = Attachment(apiResponse.body?.bytes(), filename, EML_CONTENT_TYPE)
         Sentry.captureMessage("Message display problem reported", SentryLevel.ERROR) { scope ->
             scope.addAttachment(emlAttachment)
         }
@@ -1299,6 +1300,5 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
-        private const val EML_CONTENT_TYPE = "message/rfc822"
     }
 }

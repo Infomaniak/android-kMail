@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.KeyEvent
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -54,12 +53,6 @@ abstract class DownloadProgressDialog : DialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(dialogTitle)
             .setView(binding.root)
-            .setOnKeyListener { _, keyCode, event ->
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-                    findNavController().popBackStack()
-                    true
-                } else false
-            }
             .create()
     }
 
