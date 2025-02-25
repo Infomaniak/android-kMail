@@ -516,7 +516,7 @@ class ThreadListFragment : TwoPaneFragment() {
     }
 
     private fun setupUserAvatar() {
-        AccountUtils.currentUser?.let(binding.userAvatar::loadAvatar)
+        AccountUtils.currentUser?.let(binding.userAvatar::loadUserAvatar)
     }
 
     private fun setupUnreadCountChip() = with(binding) {
