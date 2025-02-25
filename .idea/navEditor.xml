@@ -494,7 +494,7 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="myKSuiteUpgradeBottomSheet">
+                  <entry key="my_ksuite_navigation">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
@@ -893,18 +893,6 @@
                           <Point>
                             <option name="x" value="1974" />
                             <option name="y" value="12" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="upgradeProductBottomSheetDialog">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="230" />
-                            <option name="y" value="368" />
                           </Point>
                         </option>
                       </LayoutPositions>
