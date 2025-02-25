@@ -17,12 +17,24 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
+import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
 
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
     fun shouldForceUpdateMessagesWhenAdded(): Boolean
+    fun MutableRealm.processDeletedMessage(
+        scope: CoroutineScope,
+        message: Message,
+        context: Context,
+        mailbox: Mailbox,
+    ): List<Pair<Thread, String>>
 }
 
 interface DefaultRefreshStrategy : RefreshStrategy {
@@ -31,4 +43,34 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     }
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = false
+
+    override fun MutableRealm.processDeletedMessage(
+        scope: CoroutineScope,
+        message: Message,
+        context: Context,
+        mailbox: Mailbox,
+    ): List<Pair<Thread, String>> {
+        for (thread in message.threads.asReversed()) {
+            scope.ensureActive()
+
+            val isSuccess = thread.messages.remove(message)
+            val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
+
+            // We need to save this value because the Thread could be deleted before we use this `folderId`.
+            val threadFolderId = thread.folderId
+
+            if (numberOfMessagesInFolder == 0) {
+                threads.removeIf { it.uid == thread.uid }
+                delete(thread)
+            } else if (isSuccess) {
+                threads += thread
+            } else {
+                continue
+            }
+
+            impactedFolders.add(threadFolderId)
+        }
+
+        MessageController.deleteMessage(context, mailbox, message, realm = this)
+    }
 }
