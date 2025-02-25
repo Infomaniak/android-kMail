@@ -45,13 +45,16 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     }
 
     private fun observeDownload() {
-        downloadThreadsViewModel.downloadMessagesLiveData.observe(this) { threadUris ->
-            if (threadUris == null) {
+        downloadThreadsViewModel.downloadMessagesLiveData.observe(this) { messageUris ->
+            if (messageUris == null) {
                 popBackStackWithError()
             } else {
-                threadUris.openKDriveOrPlayStore(requireContext())?.let { openKDriveIntent ->
+                messageUris.openKDriveOrPlayStore(requireContext())?.let { openKDriveIntent ->
                     setBackNavigationResult(DOWNLOAD_MESSAGES_RESULT, openKDriveIntent)
-                } ?: run { findNavController().popBackStack() }
+                } ?: run {
+                    downloadThreadsViewModel.clearEmlDir()
+                    findNavController().popBackStack()
+                }
             }
         }
     }
