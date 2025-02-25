@@ -1,0 +1,7 @@
+- Correction des mises à jour du nombre d'emails non lus dans les dossiers
+- Correction du format "24 heures"
+- Affichage correct de la date lorsqu'elle provient d'une année antérieure
+- Meilleur alignement des composants d'un message
+- Meilleur gestion des signatures identiques pour les nouveaux messages
+- Correction de signature et action de réponse erronées en raison de la sensibilité à la casse des e-mails
+- Ajout du tableau de bord myKSuite

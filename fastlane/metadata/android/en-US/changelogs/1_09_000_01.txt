@@ -1,0 +1,7 @@
+- Fix folders unread count updates
+- Fix "24 hour" format
+- Correctly display date when it's from a previous year
+- Better align message components UI
+- Correctly handle identical signature to new messages
+- Fix wrong signature and reply action used due to case-sensitive emails
+- Add myKSuite dashboard
