@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.TypedRealm
 
@@ -24,6 +25,8 @@ val inboxRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
     }
+
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.SNOOZED)
 }
 
 val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
@@ -32,4 +35,6 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     }
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = true
+
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.INBOX)
 }

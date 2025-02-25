@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -217,6 +217,10 @@ class FolderController @Inject constructor(
         //region Edit data
         suspend fun updateFolder(id: String, realm: Realm, onUpdate: (MutableRealm, Folder) -> Unit) {
             realm.write { getFolder(id, realm = this)?.let { onUpdate(this, it) } }
+        }
+
+        suspend fun updateFolder(folderRole: FolderRole, realm: Realm, onUpdate: (MutableRealm, Folder) -> Unit) {
+            realm.write { getFolder(folderRole, realm = this)?.let { onUpdate(this, it) } }
         }
 
         suspend fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {

@@ -325,10 +325,11 @@ class RefreshController @Inject constructor(
 
         val impactedThreads = handleAddedUids(scope, folder, addedUids)
 
+        val refreshStrategy = folder.refreshStrategy()
         var inboxUnreadCount: Int? = null
         FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
 
-            val allThreads = folder.refreshStrategy().queryFolderThreads(folder.id, mutableRealm)
+            val allThreads = refreshStrategy.queryFolderThreads(folder.id, mutableRealm)
             it.threads.replaceContent(list = allThreads)
 
             val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
@@ -340,6 +341,14 @@ class RefreshController @Inject constructor(
             it.updateDirectionDependentData(direction, remainingUids, addedUids)
 
             if (it.role == FolderRole.SCHEDULED_DRAFTS) it.isDisplayed = it.threads.isNotEmpty()
+        }
+
+        // Some folders such as inbox and snooze require to query again the other folder's threads as well
+        refreshStrategy.otherFolderRolesToQueryThreads().forEach { folderRole ->
+            FolderController.updateFolder(folderRole, realm = this) { mutableRealm, it ->
+                val allThreads = refreshStrategy.queryFolderThreads(folder.id, mutableRealm)
+                it.threads.replaceContent(list = allThreads)
+            }
         }
 
         updateMailboxUnreadCount(inboxUnreadCount)

@@ -17,12 +17,14 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.TypedRealm
 
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
     fun shouldForceUpdateMessagesWhenAdded(): Boolean
+    fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole>
 }
 
 interface DefaultRefreshStrategy : RefreshStrategy {
@@ -31,4 +33,5 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     }
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = false
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = emptyList()
 }
