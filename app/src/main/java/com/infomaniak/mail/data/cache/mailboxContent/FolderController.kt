@@ -224,10 +224,6 @@ class FolderController @Inject constructor(
             realm.write { getFolder(id, realm = this)?.let { onUpdate(this, it) } }
         }
 
-        fun updateFolder(id: String, realm: MutableRealm, onUpdate: (Folder) -> Unit) {
-            getFolder(id, realm = realm)?.let { onUpdate(it) }
-        }
-
         suspend fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
 
             tailrec fun updateChildrenRecursively(inputList: MutableList<Folder>) {

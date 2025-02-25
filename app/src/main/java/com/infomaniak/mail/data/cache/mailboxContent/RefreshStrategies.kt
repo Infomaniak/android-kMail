@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -30,6 +31,7 @@ import kotlinx.coroutines.ensureActive
 
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
+    fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> // TODO: Couple it tighter with queryFolderThreads()?
 
     fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
 
@@ -70,6 +72,8 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getThreadsByFolderId(folderId, realm)
     }
+
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = emptyList()
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
         return MessageController.getMessage(shortUid.toLongUid(folderId), realm)
