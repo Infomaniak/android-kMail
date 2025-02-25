@@ -456,30 +456,23 @@ class RefreshController @Inject constructor(
                 scope.ensureActive()
 
                 val isSuccess = thread.messages.remove(message)
-                val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
-
-                // We need to save this value because the Thread could be deleted before we use this `folderId`.
-                val threadFolderId = thread.folderId
-
-                if (numberOfMessagesInFolder == 0) {
-                    threads.removeIf { it.uid == thread.uid }
-                    delete(thread)
-                } else if (isSuccess) {
-                    threads += thread
-                } else {
-                    continue
-                }
-
-                impactedFolders.add(threadFolderId)
+                if (isSuccess) threads += thread
             }
 
             MessageController.deleteMessage(appContext, mailbox, message, realm = this)
         }
 
-        threads.forEach {
+        threads.forEach { thread ->
             scope.ensureActive()
 
-            it.recomputeThread(realm = this)
+            impactedFolders.add(thread.folderId)
+
+            val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
+            if (numberOfMessagesInFolder == 0) {
+                delete(thread)
+            } else {
+                thread.recomputeThread(realm = this)
+            }
         }
 
         return impactedFolders
