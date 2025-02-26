@@ -1,0 +1,1 @@
+- Fix notifications retrieval on Android 11 and prior
