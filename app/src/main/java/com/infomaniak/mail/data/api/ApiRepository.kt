@@ -58,7 +58,6 @@ import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.json.Json
 import okhttp3.MultipartBody
@@ -457,11 +456,10 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
-        return ApiController.callApi(
+        return callApi(
             url = MyKSuiteApiRoutes.myKSuiteData(),
             method = GET,
             okHttpClient = okHttpClient,
-            useKotlinxSerialization = true,
         )
     }
 

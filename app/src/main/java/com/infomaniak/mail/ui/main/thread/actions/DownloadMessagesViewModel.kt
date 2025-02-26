@@ -105,13 +105,13 @@ class DownloadMessagesViewModel @Inject constructor(
                             shortUid = message.shortUid,
                         )
 
-                        if (!apiResponse.isSuccessful || apiResponse.body == null) throw NetworkErrorException()
+                        if (apiResponse.data == null || !apiResponse.isSuccess()) throw NetworkErrorException()
 
                         val messageSubject = message.subject ?: NO_SUBJECT_FILE
                         val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
                         val fileName = createUniqueFileName(listFileName, truncatedSubject)
 
-                        saveEmlToFile(appContext, apiResponse.body!!.bytes(), fileName)
+                        saveEmlToFile(appContext, apiResponse.data!!, fileName)
                     }
                 }
 
