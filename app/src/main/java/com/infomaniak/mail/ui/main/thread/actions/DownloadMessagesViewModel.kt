@@ -26,7 +26,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -105,7 +107,7 @@ class DownloadMessagesViewModel @Inject constructor(
                             shortUid = message.shortUid,
                         )
 
-                        if (apiResponse.data == null || !apiResponse.isSuccess()) throw NetworkErrorException()
+                        if (apiResponse.data == null || !apiResponse.isSuccess()) throw apiResponse.error?.exception!!
 
                         val messageSubject = message.subject ?: NO_SUBJECT_FILE
                         val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
@@ -119,7 +121,9 @@ class DownloadMessagesViewModel @Inject constructor(
             }.onSuccess { downloadedThreadUris ->
                 downloadMessagesLiveData.postValue(downloadedThreadUris)
             }.onFailure {
-                // Maybe log sentry
+                if (it is ApiController.ByteArrayException){
+                    SentryLog.e(TAG, "Error while sharing messages to kDrive:", it)
+                }
                 clearEmlDir()
                 downloadMessagesLiveData.postValue(null)
             }
@@ -145,5 +149,6 @@ class DownloadMessagesViewModel @Inject constructor(
     companion object {
         private const val NO_SUBJECT_FILE = "message"
         private const val MAX_FILE_NAME_LENGTH = 256
+        private val TAG = DownloadMessagesViewModel::class.simpleName.toString()
     }
 }

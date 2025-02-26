@@ -456,11 +456,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
-        return callApi(
-            url = MyKSuiteApiRoutes.myKSuiteData(),
-            method = GET,
-            okHttpClient = okHttpClient,
-        )
+        return callApi(url = MyKSuiteApiRoutes.myKSuiteData(), method = GET, okHttpClient = okHttpClient)
     }
 
     /**
