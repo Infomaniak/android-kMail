@@ -101,8 +101,8 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val builder = notificationUtils.buildSyncMessagesServiceNotification()
-        return ForegroundInfo(NotificationUtils.SYNC_MESSAGES_ID, builder.build())
+        val notification = notificationUtils.buildSyncMessagesServiceNotification()
+        return ForegroundInfo(NotificationUtils.SYNC_MESSAGES_ID, notification)
     }
 
     @Singleton

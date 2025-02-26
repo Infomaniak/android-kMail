@@ -123,18 +123,18 @@ class NotificationUtils @Inject constructor(
         )
     }
 
-    fun buildDraftActionsNotification(): NotificationCompat.Builder {
-        return appContext.buildUndeterminedProgressMessageNotification(
+    fun buildDraftActionsNotification(): Notification {
+        return appContext.undeterminedProgressMessageNotificationBuilder(
             channelIdRes = R.string.notification_channel_id_draft_service,
             titleRes = R.string.notificationSyncDraftChannelName,
-        )
+        ).build()
     }
 
-    fun buildSyncMessagesServiceNotification(): NotificationCompat.Builder {
-        return appContext.buildUndeterminedProgressMessageNotification(
+    fun buildSyncMessagesServiceNotification(): Notification {
+        return appContext.undeterminedProgressMessageNotificationBuilder(
             channelIdRes = R.string.notification_channel_id_sync_messages_service,
             titleRes = R.string.notificationSyncMessagesChannelName,
-        )
+        ).build()
     }
 
     fun buildDraftErrorNotification(
@@ -207,13 +207,15 @@ class NotificationUtils @Inject constructor(
         ).setCategory(Notification.CATEGORY_EMAIL)
     }
 
-    private fun Context.buildUndeterminedProgressMessageNotification(
+    private fun Context.undeterminedProgressMessageNotificationBuilder(
         @StringRes channelIdRes: Int,
         @StringRes titleRes: Int,
+        priority: Int = NotificationCompat.PRIORITY_MIN,
     ) = NotificationCompat.Builder(this, getString(channelIdRes))
         .setContentTitle(getString(titleRes))
         .setSmallIcon(defaultSmallIcon)
         .setProgress(100, 0, true)
+        .setPriority(priority)
 
     private fun initMessageNotificationContent(
         mailbox: Mailbox,
