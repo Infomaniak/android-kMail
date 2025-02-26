@@ -402,15 +402,14 @@ class ThreadController @Inject constructor(
 
         suspend fun deleteEmptyThreadsInFolder(folderId: String, realm: Realm) {
             realm.write {
-                val emptyThreadsQuery = getEmptyThreadsInFolderQuery(folderId, realm = this)
-                val emptyThreads = emptyThreadsQuery.find()
+                val emptyThreads = getEmptyThreadsInFolderQuery(folderId, realm = this).find()
                 // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
                 //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
                 if (emptyThreads.isNotEmpty()) {
                     emptyThreads.forEach {
                         SentryDebug.sendEmptyThread(it, "No Message in a Thread when refreshing a Folder", realm = this)
                     }
-                    delete(emptyThreadsQuery)
+                    delete(emptyThreads)
                 }
             }
         }
