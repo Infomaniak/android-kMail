@@ -114,8 +114,8 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val builder = notificationUtils.buildDraftActionsNotification()
-        return ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, builder.build())
+        val notification = notificationUtils.buildDraftActionsNotification()
+        return ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, notification)
     }
 
     private suspend fun handleDraftsActions(): Result {

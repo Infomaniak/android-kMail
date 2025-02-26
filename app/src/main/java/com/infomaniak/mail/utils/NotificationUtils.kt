@@ -123,12 +123,18 @@ class NotificationUtils @Inject constructor(
         )
     }
 
-    fun buildDraftActionsNotification(): NotificationCompat.Builder = with(appContext) {
-        val channelId = getString(R.string.notification_channel_id_draft_service)
-        return NotificationCompat.Builder(this, channelId)
-            .setContentTitle(getString(R.string.notificationSyncDraftChannelName))
-            .setSmallIcon(defaultSmallIcon)
-            .setProgress(100, 0, true)
+    fun buildDraftActionsNotification(): Notification {
+        return appContext.undeterminedProgressMessageNotificationBuilder(
+            channelIdRes = R.string.notification_channel_id_draft_service,
+            titleRes = R.string.notificationSyncDraftChannelName,
+        ).build()
+    }
+
+    fun buildSyncMessagesServiceNotification(): Notification {
+        return appContext.undeterminedProgressMessageNotificationBuilder(
+            channelIdRes = R.string.notification_channel_id_sync_messages_service,
+            titleRes = R.string.notificationSyncMessagesChannelName,
+        ).build()
     }
 
     fun buildDraftErrorNotification(
@@ -200,6 +206,16 @@ class NotificationUtils @Inject constructor(
             description,
         ).setCategory(Notification.CATEGORY_EMAIL)
     }
+
+    private fun Context.undeterminedProgressMessageNotificationBuilder(
+        @StringRes channelIdRes: Int,
+        @StringRes titleRes: Int,
+        priority: Int = NotificationCompat.PRIORITY_MIN,
+    ) = NotificationCompat.Builder(this, getString(channelIdRes))
+        .setContentTitle(getString(titleRes))
+        .setSmallIcon(defaultSmallIcon)
+        .setProgress(100, 0, true)
+        .setPriority(priority)
 
     private fun initMessageNotificationContent(
         mailbox: Mailbox,
@@ -328,6 +344,7 @@ class NotificationUtils @Inject constructor(
         private val defaultSmallIcon = R.drawable.ic_logo_notification
 
         const val DRAFT_ACTIONS_ID = 1
+        const val SYNC_MESSAGES_ID = 2
         const val EXTRA_MESSAGE_UID = "messageUid"
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
