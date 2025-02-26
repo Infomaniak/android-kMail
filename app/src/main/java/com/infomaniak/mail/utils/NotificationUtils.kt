@@ -123,20 +123,18 @@ class NotificationUtils @Inject constructor(
         )
     }
 
-    fun buildDraftActionsNotification(): NotificationCompat.Builder = with(appContext) {
-        val channelId = getString(R.string.notification_channel_id_draft_service)
-        return NotificationCompat.Builder(this, channelId)
-            .setContentTitle(getString(R.string.notificationSyncDraftChannelName))
-            .setSmallIcon(defaultSmallIcon)
-            .setProgress(100, 0, true)
+    fun buildDraftActionsNotification(): NotificationCompat.Builder {
+        return appContext.buildUndeterminedProgressMessageNotification(
+            channelIdRes = R.string.notification_channel_id_draft_service,
+            titleRes = R.string.notificationSyncDraftChannelName,
+        )
     }
 
-    fun buildSyncMessagesServiceNotification(): NotificationCompat.Builder = with(appContext) {
-        val channelId = getString(R.string.notification_channel_id_sync_messages_service)
-        return NotificationCompat.Builder(this, channelId)
-            .setContentTitle(getString(R.string.notificationSyncMessagesChannelName))
-            .setSmallIcon(defaultSmallIcon)
-            .setProgress(100, 0, true)
+    fun buildSyncMessagesServiceNotification(): NotificationCompat.Builder {
+        return appContext.buildUndeterminedProgressMessageNotification(
+            channelIdRes = R.string.notification_channel_id_sync_messages_service,
+            titleRes = R.string.notificationSyncMessagesChannelName,
+        )
     }
 
     fun buildDraftErrorNotification(
@@ -208,6 +206,14 @@ class NotificationUtils @Inject constructor(
             description,
         ).setCategory(Notification.CATEGORY_EMAIL)
     }
+
+    private fun Context.buildUndeterminedProgressMessageNotification(
+        @StringRes channelIdRes: Int,
+        @StringRes titleRes: Int,
+    ) = NotificationCompat.Builder(this, getString(channelIdRes))
+        .setContentTitle(getString(titleRes))
+        .setSmallIcon(defaultSmallIcon)
+        .setProgress(100, 0, true)
 
     private fun initMessageNotificationContent(
         mailbox: Mailbox,
