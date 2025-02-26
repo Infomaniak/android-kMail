@@ -131,6 +131,14 @@ class NotificationUtils @Inject constructor(
             .setProgress(100, 0, true)
     }
 
+    fun buildSyncMessagesServiceNotification(): NotificationCompat.Builder = with(appContext) {
+        val channelId = getString(R.string.notification_channel_id_sync_messages_service)
+        return NotificationCompat.Builder(this, channelId)
+            .setContentTitle(getString(R.string.notificationSyncMessagesChannelName))
+            .setSmallIcon(defaultSmallIcon)
+            .setProgress(100, 0, true)
+    }
+
     fun buildDraftErrorNotification(
         @StringRes errorMessageRes: Int,
         action: DraftAction,
@@ -328,6 +336,7 @@ class NotificationUtils @Inject constructor(
         private val defaultSmallIcon = R.drawable.ic_logo_notification
 
         const val DRAFT_ACTIONS_ID = 1
+        const val SYNC_MESSAGES_ID = 2
         const val EXTRA_MESSAGE_UID = "messageUid"
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
