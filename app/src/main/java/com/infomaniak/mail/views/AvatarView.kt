@@ -171,7 +171,7 @@ class AvatarView @JvmOverloads constructor(
 
     fun loadRawMergedContactAvatar(mergedContact: MergedContact) {
         if (mergedContact.shouldDisplayUserAvatar()) {
-            this@AvatarView.loadUserAvatar(AccountUtils.currentUser!!)
+            loadUserAvatar(AccountUtils.currentUser!!)
         } else {
             binding.avatarImage.baseLoadAvatar(mergedContact)
         }
