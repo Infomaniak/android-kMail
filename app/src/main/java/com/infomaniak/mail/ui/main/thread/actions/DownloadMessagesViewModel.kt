@@ -48,7 +48,6 @@ class DownloadMessagesViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val messageController: MessageController,
-    private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -57,18 +56,11 @@ class DownloadMessagesViewModel @Inject constructor(
     private val messageLocalUids: Array<String>?
         inline get() = savedStateHandle[DownloadMessagesProgressDialogArgs::messageUids.name]
 
-    private val threadLocalUids: Array<String>?
-        inline get() = savedStateHandle[DownloadMessagesProgressDialogArgs::threadUids.name]
-
     val downloadMessagesLiveData = MutableLiveData<List<Uri>?>()
 
     private fun getAllMessages(): Set<Message> {
         val messages = mutableSetOf<Message>()
         messageLocalUids?.mapNotNull(messageController::getMessage)?.let(messages::addAll)
-
-        threadLocalUids?.forEach { threadUid ->
-            threadController.getThread(threadUid)?.let { thread -> messages.addAll(thread.messages) }
-        }
         return messages
     }
 
@@ -96,7 +88,7 @@ class DownloadMessagesViewModel @Inject constructor(
 
     private fun getFirstMessageSubject(): String? = getAllMessages().firstOrNull()?.subject
 
-    private fun numberOfMessagesToDownloads(): Int = (messageLocalUids?.size ?: 0) + (threadLocalUids?.size ?: 0)
+    private fun numberOfMessagesToDownloads(): Int = messageLocalUids?.size ?: 0
 
     fun downloadMessages(currentMailbox: Mailbox?) {
         viewModelScope.launch(ioCoroutineContext) {

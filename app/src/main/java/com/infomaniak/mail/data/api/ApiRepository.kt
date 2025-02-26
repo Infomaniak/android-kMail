@@ -452,13 +452,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
     }
 
-    fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): Response {
-        val request = Request.Builder().url(ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid))
-            .headers(HttpUtils.getHeaders(EML_CONTENT_TYPE))
-            .get()
-            .build()
-
-        return HttpClient.okHttpClient.newCall(request).execute()
+    fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<ByteArray> {
+        return ApiController.callApi(url = ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid), method = GET)
     }
 
     fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
