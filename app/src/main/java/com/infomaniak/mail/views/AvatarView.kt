@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ class AvatarView @JvmOverloads constructor(
         binding.root.isFocusable = focusable
     }
 
-    fun loadAvatar(user: User) = with(binding.avatarImage) {
+    fun loadUserAvatar(user: User) = with(binding.avatarImage) {
         contentDescription = user.email
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(user.id, R.array.AvatarColors),
@@ -164,8 +164,17 @@ class AvatarView @JvmOverloads constructor(
         loadAvatarByDisplayType(avatarDisplayType, correspondent, bimi, contactsFromViewModel)
     }
 
-    fun loadAvatar(mergedContact: MergedContact) {
-        binding.avatarImage.baseLoadAvatar(mergedContact)
+    private fun updateStateAndLoadUserAvatar(user: User, correspondent: Correspondent, bimi: Bimi) {
+        state.update(correspondent, bimi)
+        loadUserAvatar(user)
+    }
+
+    fun loadRawMergedContactAvatar(mergedContact: MergedContact) {
+        if (mergedContact.shouldDisplayUserAvatar()) {
+            loadUserAvatar(AccountUtils.currentUser!!)
+        } else {
+            binding.avatarImage.baseLoadAvatar(mergedContact)
+        }
     }
 
     fun loadUnknownUserAvatar() {
@@ -173,7 +182,7 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
-    private fun loadBimiAvatar(bimi: Bimi, correspondent: Correspondent) = with(binding.avatarImage) {
+    private fun loadBimiAvatar(correspondent: Correspondent, bimi: Bimi) = with(binding.avatarImage) {
         state.update(correspondent, bimi)
         contentDescription = correspondent.email
         loadAvatar(
@@ -196,15 +205,18 @@ class AvatarView @JvmOverloads constructor(
     ) {
         when (avatarDisplayType) {
             AvatarDisplayType.UNKNOWN_CORRESPONDENT -> loadUnknownUserAvatar()
+            AvatarDisplayType.USER_AVATAR ->
+                AccountUtils.currentUser?.let { updateStateAndLoadUserAvatar(user = it, correspondent!!, bimi!!) }
             AvatarDisplayType.CUSTOM_AVATAR,
             AvatarDisplayType.INITIALS -> loadAvatarUsingDictionary(correspondent!!, contacts, bimi)
-            AvatarDisplayType.BIMI -> loadBimiAvatar(bimi!!, correspondent!!)
+            AvatarDisplayType.BIMI -> loadBimiAvatar(correspondent!!, bimi!!)
         }
     }
 
     private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?, isBimiEnabled: Boolean): AvatarDisplayType {
         return when {
             correspondent == null -> AvatarDisplayType.UNKNOWN_CORRESPONDENT
+            correspondent.shouldDisplayUserAvatar() -> AvatarDisplayType.USER_AVATAR
             correspondent.hasMergedContactAvatar(contactsFromViewModel) -> AvatarDisplayType.CUSTOM_AVATAR
             bimi?.isDisplayable(isBimiEnabled) == true -> AvatarDisplayType.BIMI
             else -> AvatarDisplayType.INITIALS
@@ -229,17 +241,13 @@ class AvatarView @JvmOverloads constructor(
     }
 
     private fun ImageView.baseLoadAvatar(correspondent: Correspondent) {
-        if (correspondent.shouldDisplayUserAvatar()) {
-            this@AvatarView.loadAvatar(AccountUtils.currentUser!!)
-        } else {
-            loadAvatar(
-                backgroundColor = context.getBackgroundColorBasedOnId(correspondent.email.hashCode(), R.array.AvatarColors),
-                avatarUrl = (correspondent as? MergedContact)?.avatar,
-                initials = correspondent.initials,
-                imageLoader = context.imageLoader,
-                initialsColor = context.getColor(R.color.onColorfulBackground),
-            )
-        }
+        loadAvatar(
+            backgroundColor = context.getBackgroundColorBasedOnId(correspondent.email.hashCode(), R.array.AvatarColors),
+            avatarUrl = (correspondent as? MergedContact)?.avatar,
+            initials = correspondent.initials,
+            imageLoader = context.imageLoader,
+            initialsColor = context.getColor(R.color.onColorfulBackground),
+        )
     }
 
     private data class State(
@@ -255,6 +263,7 @@ class AvatarView @JvmOverloads constructor(
     enum class AvatarDisplayType {
         UNKNOWN_CORRESPONDENT,
         CUSTOM_AVATAR,
+        USER_AVATAR,
         BIMI,
         INITIALS,
     }
