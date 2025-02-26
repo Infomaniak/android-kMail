@@ -58,6 +58,7 @@ import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.json.Json
 import okhttp3.MultipartBody
@@ -451,8 +452,13 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
     }
 
-    fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<ByteArray> {
-        return ApiController.callApi(url = ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid), method = GET)
+    fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): Response {
+        val request = Request.Builder().url(ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid))
+            .headers(HttpUtils.getHeaders(EML_CONTENT_TYPE))
+            .get()
+            .build()
+
+        return HttpClient.okHttpClient.newCall(request).execute()
     }
 
     fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {

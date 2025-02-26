@@ -1021,7 +1021,7 @@ class MainViewModel @Inject constructor(
 
         val apiResponse = ApiRepository.getDownloadedMessage(mailbox.uuid, message.folderId, message.shortUid)
 
-        if (apiResponse.data == null || !apiResponse.isSuccess()) {
+        if (apiResponse.body == null || !apiResponse.isSuccessful) {
             reportDisplayProblemTrigger.postValue(Unit)
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
 
@@ -1029,7 +1029,7 @@ class MainViewModel @Inject constructor(
         }
 
         val filename = UUID.randomUUID().toString()
-        val emlAttachment = Attachment(apiResponse.data, filename, EML_CONTENT_TYPE)
+        val emlAttachment = Attachment(apiResponse.body?.bytes(), filename, EML_CONTENT_TYPE)
         Sentry.captureMessage("Message display problem reported", SentryLevel.ERROR) { scope ->
             scope.addAttachment(emlAttachment)
         }

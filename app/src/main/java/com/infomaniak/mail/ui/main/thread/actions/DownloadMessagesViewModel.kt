@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.accounts.NetworkErrorException
 import android.app.Application
 import android.content.Context
 import android.net.Uri
@@ -26,13 +25,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.di.IoDispatcher
@@ -107,13 +104,15 @@ class DownloadMessagesViewModel @Inject constructor(
                             shortUid = message.shortUid,
                         )
 
-                        if (apiResponse.data == null || !apiResponse.isSuccess()) throw apiResponse.error?.exception!!
+                        if (apiResponse.body == null || !apiResponse.isSuccessful) {
+                            throw ByteArrayNetworkException(apiResponse.body.toString(), apiResponse.code)
+                        }
 
                         val messageSubject = message.subject ?: NO_SUBJECT_FILE
                         val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
                         val fileName = createUniqueFileName(listFileName, truncatedSubject)
 
-                        saveEmlToFile(appContext, apiResponse.data!!, fileName)
+                        saveEmlToFile(appContext, apiResponse.body?.bytes()!!, fileName)
                     }
                 }
 
@@ -121,7 +120,7 @@ class DownloadMessagesViewModel @Inject constructor(
             }.onSuccess { downloadedThreadUris ->
                 downloadMessagesLiveData.postValue(downloadedThreadUris)
             }.onFailure {
-                if (it is ApiController.ByteArrayException){
+                if (it is ByteArrayNetworkException) {
                     SentryLog.e(TAG, "Error while sharing messages to kDrive:", it)
                 }
                 clearEmlDir()
@@ -150,5 +149,8 @@ class DownloadMessagesViewModel @Inject constructor(
         private const val NO_SUBJECT_FILE = "message"
         private const val MAX_FILE_NAME_LENGTH = 256
         private val TAG = DownloadMessagesViewModel::class.simpleName.toString()
+
+        private data class ByteArrayNetworkException(val responseBody: String, val responseCode: Int) :
+            Exception("Failed to get EML $responseCode: $responseBody")
     }
 }
