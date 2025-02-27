@@ -447,50 +447,26 @@ class RefreshController @Inject constructor(
         refreshStrategy: RefreshStrategy,
     ): Set<String> {
 
-        val impactedFolders = mutableSetOf<String>()
         val threads = mutableSetOf<Thread>()
 
         shortUids.forEach { shortUid ->
             scope.ensureActive()
             val message = MessageController.getMessage(uid = shortUid.toLongUid(folderId), realm = this) ?: return@forEach
-
-            // TODO: Put below code blocks inside this doOnMessageDelete method
-            val ids = with(refreshStrategy) {
-                processDeletedMessage(scope, message)
-            }
-
-            ids.forEach { (thread, impactedFolder) ->
-                threads += thread
-                impactedFolders += impactedFolder
-            }
-
-            // // message.threads.forEach { thread ->
-            // //     threads += thread
-            // //     impactedFolders += thread.folderId
-            // // }
-            // MessageController.updateSnoozeState(appContext, mailbox, message, realm = this)
-
-
-            threads += message.threads
-            MessageController.deleteMessage(appContext, mailbox, message, realm = this)
+            threads += refreshStrategy.processDeletedMessage(scope, message, appContext, mailbox, realm = this)
         }
+
+        val impactedFolders = mutableSetOf<String>()
+        impactedFolders += refreshStrategy.extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm = this)
 
         threads.forEach { thread ->
             scope.ensureActive()
 
             impactedFolders.add(thread.folderId)
-
-            if (thread.getNumberOfMessagesInFolder() == 0) {
-                delete(thread)
-            } else {
-                thread.recomputeThread(realm = this)
-            }
+            refreshStrategy.processDeletedThread(thread, realm = this)
         }
 
         return impactedFolders
     }
-
-    private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
     //endregion
 
     //region Updated Messages
