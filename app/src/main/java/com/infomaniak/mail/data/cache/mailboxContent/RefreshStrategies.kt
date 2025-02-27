@@ -29,12 +29,21 @@ import kotlinx.coroutines.ensureActive
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
     fun shouldForceUpdateMessagesWhenAdded(): Boolean
-    fun MutableRealm.processDeletedMessage(
+
+    /**
+     * @return The list of impacted threads that have changed and need to be recomputed
+     */
+    fun processDeletedMessage(
         scope: CoroutineScope,
         message: Message,
         context: Context,
         mailbox: Mailbox,
-    ): List<Pair<Thread, String>>
+        realm: MutableRealm,
+    ): Collection<Thread>
+
+    fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String>
+
+    fun processDeletedThread(thread: Thread, realm: MutableRealm)
 }
 
 interface DefaultRefreshStrategy : RefreshStrategy {
@@ -44,33 +53,32 @@ interface DefaultRefreshStrategy : RefreshStrategy {
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = false
 
-    override fun MutableRealm.processDeletedMessage(
+    override fun processDeletedMessage(
         scope: CoroutineScope,
         message: Message,
         context: Context,
         mailbox: Mailbox,
-    ): List<Pair<Thread, String>> {
-        for (thread in message.threads.asReversed()) {
+        realm: MutableRealm,
+    ): Collection<Thread> = buildSet {
+        message.threads.forEach { thread ->
             scope.ensureActive()
 
             val isSuccess = thread.messages.remove(message)
-            val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
-
-            // We need to save this value because the Thread could be deleted before we use this `folderId`.
-            val threadFolderId = thread.folderId
-
-            if (numberOfMessagesInFolder == 0) {
-                threads.removeIf { it.uid == thread.uid }
-                delete(thread)
-            } else if (isSuccess) {
-                threads += thread
-            } else {
-                continue
-            }
-
-            impactedFolders.add(threadFolderId)
+            if (isSuccess) add(thread)
         }
 
-        MessageController.deleteMessage(context, mailbox, message, realm = this)
+        MessageController.deleteMessage(context, mailbox, message, realm)
     }
+
+    override fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String> = emptyList()
+
+    override fun processDeletedThread(thread: Thread, realm: MutableRealm) {
+        if (thread.getNumberOfMessagesInFolder() == 0) {
+            realm.delete(thread)
+        } else {
+            thread.recomputeThread(realm)
+        }
+    }
+
+    private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
 }
