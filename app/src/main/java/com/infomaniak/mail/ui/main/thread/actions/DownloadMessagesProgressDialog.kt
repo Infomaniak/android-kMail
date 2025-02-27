@@ -26,6 +26,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
@@ -33,7 +34,7 @@ import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
 class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
 
-    override val dialogTitle: String? by lazy { getDialogName() }
+    override val dialogTitle: String? by lazy { downloadThreadsViewModel.getDialogName() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         observeDownload()
@@ -46,20 +47,14 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
 
     private fun observeDownload() {
         downloadThreadsViewModel.downloadMessagesLiveData.observe(this) { messageUris ->
-            if (messageUris == null) {
-                popBackStackWithError()
-            } else {
-                messageUris.openKDriveOrPlayStore(requireContext())?.let { openKDriveIntent ->
-                    setBackNavigationResult(DOWNLOAD_MESSAGES_RESULT, openKDriveIntent)
-                } ?: run {
-                    downloadThreadsViewModel.clearEmlDir()
-                    findNavController().popBackStack()
-                }
+            messageUris?.openKDriveOrPlayStore(requireContext())?.let { openKDriveIntent ->
+                setBackNavigationResult(DOWNLOAD_MESSAGES_RESULT, openKDriveIntent)
+            } ?: run {
+                clearEmlCacheDir(requireContext())
+                if (messageUris == null) popBackStackWithError() else findNavController().popBackStack()
             }
         }
     }
-
-    private fun getDialogName(): String = downloadThreadsViewModel.getDialogName()
 
     private fun List<Uri>.openKDriveOrPlayStore(context: Context): Intent? {
         return if (canSaveOnKDrive(context)) {

@@ -44,6 +44,10 @@ object LocalStorageUtils {
     //region Cache
     fun getEmlCacheDir(context: Context): File = File(context.cacheDir, EML_CACHE_DIR)
 
+    fun clearEmlCacheDir(context: Context) {
+        getEmlCacheDir(context).deleteRecursively()
+    }
+
     fun getAttachmentsCacheDir(
         context: Context,
         attachmentPath: String,

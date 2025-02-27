@@ -156,8 +156,4 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
         return if (isFromSpam) R.drawable.ic_non_spam to R.string.actionNonSpam else R.drawable.ic_spam to R.string.actionSpam
     }
-
-    companion object {
-        private val TAG = this::class.java.simpleName
-    }
 }

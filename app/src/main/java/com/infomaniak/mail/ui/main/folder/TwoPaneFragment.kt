@@ -43,7 +43,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
-import com.infomaniak.mail.utils.LocalStorageUtils.getEmlCacheDir
+import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.extensions.*
 import javax.inject.Inject
 
@@ -122,7 +122,7 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private val resultActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { _ ->
-        getEmlCacheDir(requireContext()).deleteRecursively()
+        clearEmlCacheDir(requireContext())
     }
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {

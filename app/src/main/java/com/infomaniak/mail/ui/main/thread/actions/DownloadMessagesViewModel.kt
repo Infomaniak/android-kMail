@@ -37,7 +37,10 @@ import com.infomaniak.mail.utils.LocalStorageUtils.getEmlCacheDir
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 import kotlin.collections.set
@@ -89,44 +92,39 @@ class DownloadMessagesViewModel @Inject constructor(
 
     private fun numberOfMessagesToDownloads(): Int = messageLocalUids?.size ?: 0
 
-    fun downloadMessages(currentMailbox: Mailbox?) {
-        viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = currentMailbox ?: return@launch
+    fun downloadMessages(currentMailbox: Mailbox?) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox ?: return@launch
 
-            runCatching {
-                val listFileName = HashMap<String, Int>()
+        val downloadedThreadUris = runCatching {
+            val listFileName = HashMap<String, Int>()
 
-                val deferredResponses = getAllMessages().map { message ->
-                    async {
-                        val apiResponse = ApiRepository.getDownloadedMessage(
-                            mailboxUuid = mailbox.uuid,
-                            folderId = message.folderId,
-                            shortUid = message.shortUid,
-                        )
+            val deferredResponses = getAllMessages().map { message ->
+                async {
+                    val apiResponse = ApiRepository.getDownloadedMessage(
+                        mailboxUuid = mailbox.uuid,
+                        folderId = message.folderId,
+                        shortUid = message.shortUid,
+                    )
 
-                        if (apiResponse.body == null || !apiResponse.isSuccessful) {
-                            throw ByteArrayNetworkException(apiResponse.body.toString(), apiResponse.code)
-                        }
-
-                        val messageSubject = message.subject ?: NO_SUBJECT_FILE
-                        val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
-                        val fileName = createUniqueFileName(listFileName, truncatedSubject)
-
-                        saveEmlToFile(appContext, apiResponse.body?.bytes()!!, fileName)
+                    if (apiResponse.body == null || !apiResponse.isSuccessful) {
+                        throw ByteArrayNetworkException(apiResponse.body.toString(), apiResponse.code)
                     }
-                }
 
-                deferredResponses.awaitAll()
-            }.onSuccess { downloadedThreadUris ->
-                downloadMessagesLiveData.postValue(downloadedThreadUris)
-            }.onFailure {
-                if (it is ByteArrayNetworkException) {
-                    SentryLog.e(TAG, "Error while sharing messages to kDrive:", it)
+                    val messageSubject = message.subject ?: NO_SUBJECT_FILE
+                    val truncatedSubject = messageSubject.take(MAX_FILE_NAME_LENGTH)
+                    val fileName = createUniqueFileName(listFileName, truncatedSubject)
+
+                    saveEmlToFile(appContext, apiResponse.body?.bytes()!!, fileName)
                 }
-                clearEmlDir()
-                downloadMessagesLiveData.postValue(null)
             }
+
+            deferredResponses.awaitAll()
+        }.getOrElse {
+            if (it is ByteArrayNetworkException) SentryLog.e(TAG, "Error while sharing messages to kDrive:", it)
+            null
         }
+
+        downloadMessagesLiveData.postValue(downloadedThreadUris)
     }
 
     fun getDialogName(): String {
@@ -137,10 +135,6 @@ class DownloadMessagesViewModel @Inject constructor(
         } else {
             appContext.resources.getString(R.string.downloadingEmailsTitle, numberOfMessagesToDownload)
         }
-    }
-
-    fun clearEmlDir() {
-        getEmlCacheDir(appContext).deleteRecursively()
     }
 
     private fun String.removeIllegalFileNameCharacter(): String = replace(DownloadManagerUtils.regexInvalidSystemChar, "")
