@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
@@ -35,6 +38,39 @@ val inboxRefreshStrategy = object : DefaultRefreshStrategy {
 val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
+    }
+
+    override fun processDeletedMessage(
+        scope: CoroutineScope,
+        message: Message,
+        context: Context,
+        mailbox: Mailbox,
+        realm: MutableRealm,
+    ): Collection<Thread> {
+        var successfullyUpdated = true
+
+        MessageController.updateMessage(message.uid, realm) {
+            if (it == null) {
+                successfullyUpdated = false
+                return@updateMessage
+            }
+
+            it.apply {
+                snoozeState = null
+                snoozeEndDate = null
+                snoozeAction = null
+            }
+        }
+
+        return if (successfullyUpdated) message.threads else emptyList()
+    }
+
+    override fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String> {
+        return FolderController.getFolder(Folder.FolderRole.SNOOZED, realm)?.let { listOf(it.id) } ?: emptyList()
+    }
+
+    override fun processDeletedThread(thread: Thread, realm: MutableRealm) {
+        thread.recomputeThread()
     }
 
     /**
