@@ -121,7 +121,7 @@ class FetchMessagesManager @Inject constructor(
                 return
             }
 
-            return@let threads.toList()
+            return@let threads.filter { it.folderId == folder.id }.toList()
         }
 
         SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${threadsWithNewMessages.count()} Threads with new Messages")

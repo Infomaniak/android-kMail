@@ -239,7 +239,8 @@ class RefreshController @Inject constructor(
             upToDateFolder.oldMessagesUidsToFetch.isNotEmpty() &&
             maxPagesToFetch > 0
         ) {
-            totalNewThreads += fetchOnePage(scope, upToDateFolder, Direction.IN_THE_PAST).count()
+            val impactedThreads = fetchOnePage(scope, upToDateFolder, Direction.IN_THE_PAST)
+            totalNewThreads += impactedThreads.count { it.folderId == upToDateFolder.id }
             upToDateFolder = getUpToDateFolder(folderId)
             maxPagesToFetch--
         }
@@ -328,12 +329,12 @@ class RefreshController @Inject constructor(
         var inboxUnreadCount: Int? = null
         FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
 
-            val allThreads = ThreadController.getThreadsByFolderId(it.id, realm = mutableRealm)
-            it.threads.replaceContent(list = allThreads)
+            val allCurrentFolderThreads = ThreadController.getThreadsByFolderId(it.id, realm = mutableRealm)
+            it.threads.replaceContent(list = allCurrentFolderThreads)
 
-            val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
             inboxUnreadCount = updateFoldersUnreadCount(
-                foldersIds = (if (isConversationMode) allThreads.mapTo(mutableSetOf()) { it.folderId } else emptySet()) + folder.id,
+                // `impactedThreads` may not contain `folder.id` in special folders cases (i.e. snooze)
+                foldersIds = impactedThreads.mapTo(mutableSetOf(folder.id)) { it.folderId },
                 realm = mutableRealm,
             )
 
@@ -418,31 +419,25 @@ class RefreshController @Inject constructor(
 
         if (uids.isEmpty()) return emptySet()
 
-        val impactedThreads = mutableSetOf<Thread>()
-
         val apiResponse = delayApiCallManager.getMessagesByUids(scope, mailbox.uuid, folder.id, uids, okHttpClient)
         if (!apiResponse.isSuccess()) apiResponse.throwErrorAsException()
         scope.ensureActive()
 
-        apiResponse.data?.messages?.let { messages ->
+        return apiResponse.data?.messages?.let { messages ->
 
-            write {
+            return@let write {
+
                 val upToDateFolder = getUpToDateFolder(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
-                val allImpactedThreads = createThreads(scope, upToDateFolder, messages, isConversationMode)
 
-                // TODO: This count will be false for INBOX & SNOOZED when the snooze feature will be implemented
-                val messagesCount = MessageController.getMessagesCountByFolderId(upToDateFolder.id, realm = this)
-                SentryLog.d(
-                    "Realm",
-                    "Saved Messages: ${upToDateFolder.displayForSentry()} | ($messagesCount)",
-                )
+                return@write createThreads(scope, upToDateFolder, messages, isConversationMode).also {
 
-                impactedThreads += allImpactedThreads.filter { it.folderId == upToDateFolder.id }
+                    // TODO: This count will be false for INBOX & SNOOZED when the snooze feature will be implemented
+                    val messagesCount = MessageController.getMessagesCountByFolderId(upToDateFolder.id, realm = this)
+                    SentryLog.d("Realm", "Saved Messages: ${upToDateFolder.displayForSentry()} | ($messagesCount)")
+                }
             }
-        }
-
-        return impactedThreads
+        } ?: emptySet()
     }
     //endregion
 
