@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.networking.NetworkAvailability
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -30,7 +29,6 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -60,6 +58,7 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
+import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
@@ -75,7 +74,6 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import okhttp3.Request
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -1019,21 +1017,11 @@ class MainViewModel @Inject constructor(
     fun reportDisplayProblem(messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
 
         val message = messageController.getMessage(messageUid) ?: return@launch
-
         val mailbox = currentMailbox.value ?: return@launch
 
-        val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return@launch
-        val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
-            .set("Authorization", "Bearer $userApiToken")
-            .build()
-        val request = Request.Builder().url(ApiRoutes.downloadMessage(mailbox.uuid, message.folderId, message.shortUid))
-            .headers(headers)
-            .get()
-            .build()
+        val apiResponse = ApiRepository.getDownloadedMessage(mailbox.uuid, message.folderId, message.shortUid)
 
-        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
-
-        if (!response.isSuccessful || response.body == null) {
+        if (apiResponse.body == null || !apiResponse.isSuccessful) {
             reportDisplayProblemTrigger.postValue(Unit)
             snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
 
@@ -1041,7 +1029,7 @@ class MainViewModel @Inject constructor(
         }
 
         val filename = UUID.randomUUID().toString()
-        val emlAttachment = Attachment(response.body?.bytes(), filename, EML_CONTENT_TYPE)
+        val emlAttachment = Attachment(apiResponse.body?.bytes(), filename, EML_CONTENT_TYPE)
         Sentry.captureMessage("Message display problem reported", SentryLevel.ERROR) { scope ->
             scope.addAttachment(emlAttachment)
         }
@@ -1191,7 +1179,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun hasOtherExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
-        val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } ?: false
+        val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } == true
         emit(hasOtherExpeditors)
     }
 
@@ -1312,6 +1300,5 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
-        private const val EML_CONTENT_TYPE = "message/rfc822"
     }
 }

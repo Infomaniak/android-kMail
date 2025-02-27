@@ -28,6 +28,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SAVE_TO_KDRIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
@@ -40,6 +41,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -116,6 +118,15 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, threadsCount, isFromBottomSheet = true)
             toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
+            isMultiSelectOn = false
+        }
+
+        binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
+            trackMultiSelectActionEvent(ACTION_SAVE_TO_KDRIVE_NAME, threadsCount, isFromBottomSheet = true)
+            navigateToDownloadMessagesProgressDialog(
+                messageUids = threads.flatMap { it.messages }.map { it.uid },
+                currentClassName = MultiSelectBottomSheetDialog::class.java.name,
+            )
             isMultiSelectOn = false
         }
     }

@@ -248,6 +248,7 @@
     <string name="disabledFeatureFlagTitle">¿Necesita más almacenamiento y funciones?</string>
     <string name="displayMailIssueDescription">Para solucionar los problemas de visualización, actualice la aplicación Android System Webview.</string>
     <string name="displayMailIssueTitle">Problema de visualización de sus emails</string>
+    <string name="downloadingEmailsTitle">Descargando %d correos electrónicos</string>
     <string name="draftFolder">Borradores</string>
     <string name="draftPrefix">(Borrador)</string>
     <string name="editSendDescription">Este mensaje se moverá a tus borradores para que puedas enviarlo cuando lo desees.</string>

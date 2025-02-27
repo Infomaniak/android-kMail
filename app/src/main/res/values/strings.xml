@@ -254,6 +254,7 @@
     <string name="disabledFeatureFlagTitle">Need more storage and features?</string>
     <string name="displayMailIssueDescription">To fix display problems, please update the Android System Webview application.</string>
     <string name="displayMailIssueTitle">Problem displaying your emails</string>
+    <string name="downloadingEmailsTitle">Downloading %d emails</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
     <string name="editSendDescription">This message will be moved to your drafts to be sent whenever you want.</string>

@@ -248,6 +248,7 @@
     <string name="disabledFeatureFlagTitle">Hai bisogno di più spazio di archiviazione e funzionalità?</string>
     <string name="displayMailIssueDescription">Per risolvere i problemi di visualizzazione, aggiornare l’applicazione Android System Webview.</string>
     <string name="displayMailIssueTitle">Problema di visualizzazione delle email</string>
+    <string name="downloadingEmailsTitle">Download di %d e-mail</string>
     <string name="draftFolder">Bozze</string>
     <string name="draftPrefix">(Bozza)</string>
     <string name="editSendDescription">Questo messaggio verrà spostato nelle tue bozze per essere inviato quando vuoi.</string>

@@ -34,6 +34,7 @@ object LocalStorageUtils {
 
     private const val ATTACHMENTS_CACHE_DIR = "attachments_cache"
     private const val ATTACHMENTS_UPLOAD_DIR = "attachments_upload"
+    private const val EML_CACHE_DIR = "eml_export"
     private const val HIDDEN_FILE_NAME = "HIDDEN_FILE_NAME"
     private const val NAME_TOO_LONG_EXCEPTION = "ENAMETOOLONG"
 
@@ -41,6 +42,12 @@ object LocalStorageUtils {
     private inline val Context.attachmentsUploadRootDir get() = File(filesDir, ATTACHMENTS_UPLOAD_DIR)
 
     //region Cache
+    fun getEmlCacheDir(context: Context): File = File(context.cacheDir, EML_CACHE_DIR)
+
+    fun clearEmlCacheDir(context: Context) {
+        getEmlCacheDir(context).deleteRecursively()
+    }
+
     fun getAttachmentsCacheDir(
         context: Context,
         attachmentPath: String,

@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.folder
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.ColorRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
@@ -41,6 +42,8 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
+import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.extensions.*
 import javax.inject.Inject
 
@@ -118,8 +121,13 @@ abstract class TwoPaneFragment : Fragment() {
         }
     }
 
+    private val resultActivityResultLauncher = registerForActivityResult(StartActivityForResult()) { _ ->
+        clearEmlCacheDir(requireContext())
+    }
+
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
         getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
+        getBackNavigationResult(DownloadMessagesProgressDialog.DOWNLOAD_MESSAGES_RESULT, resultActivityResultLauncher::launch)
 
         newMessageArgs.observe(viewLifecycleOwner) {
             safeNavigateToNewMessageActivity(args = it.toBundle())

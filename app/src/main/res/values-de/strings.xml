@@ -248,6 +248,7 @@
     <string name="disabledFeatureFlagTitle">Benötigen Sie mehr Speicherplatz und Funktionen?</string>
     <string name="displayMailIssueDescription">Um Anzeigeprobleme zu beheben, aktualisieren Sie bitte die Anwendung Android System Webview.</string>
     <string name="displayMailIssueTitle">Problem mit der Anzeige Ihrer E-Mails</string>
+    <string name="downloadingEmailsTitle">Herunterladen von %d-E-Mails</string>
     <string name="draftFolder">Entwürfe</string>
     <string name="draftPrefix">(Entwurf)</string>
     <string name="editSendDescription">Diese Nachricht wird in Ihre Entwürfe verschoben, damit Sie sie senden können, wann immer Sie möchten.</string>

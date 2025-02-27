@@ -57,6 +57,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onReportJunk() = Unit
         override fun onPrint() = Unit
         override fun onShare() = Unit
+        override fun onSaveToKDrive() = Unit
         override fun onReportDisplayProblem() = Unit
         //endregion
     }
@@ -78,6 +79,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         reportJunk.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportJunk() }
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
         share.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onShare() }
+        saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
 
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
@@ -142,6 +144,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onReportJunk()
         fun onPrint()
         fun onShare()
+        fun onSaveToKDrive()
         fun onReportDisplayProblem()
     }
 }

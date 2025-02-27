@@ -22,4 +22,7 @@
     <files-path
         name="uploaded attachments"
         path="attachments_upload" />
+    <cache-path
+        name="eml"
+        path="eml_export" />
 </paths>
