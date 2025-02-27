@@ -164,7 +164,7 @@ class AvatarView @JvmOverloads constructor(
         loadAvatarByDisplayType(avatarDisplayType, correspondent, bimi, contactsFromViewModel)
     }
 
-    private fun updateStateAndLoadUserAvatar(user: User, correspondent: Correspondent, bimi: Bimi) {
+    private fun updateStateAndLoadUserAvatar(user: User, correspondent: Correspondent?, bimi: Bimi?) {
         state.update(correspondent, bimi)
         loadUserAvatar(user)
     }
@@ -206,7 +206,7 @@ class AvatarView @JvmOverloads constructor(
         when (avatarDisplayType) {
             AvatarDisplayType.UNKNOWN_CORRESPONDENT -> loadUnknownUserAvatar()
             AvatarDisplayType.USER_AVATAR ->
-                AccountUtils.currentUser?.let { updateStateAndLoadUserAvatar(user = it, correspondent!!, bimi!!) }
+                AccountUtils.currentUser?.let { updateStateAndLoadUserAvatar(user = it, correspondent, bimi) }
             AvatarDisplayType.CUSTOM_AVATAR,
             AvatarDisplayType.INITIALS -> loadAvatarUsingDictionary(correspondent!!, contacts, bimi)
             AvatarDisplayType.BIMI -> loadBimiAvatar(correspondent!!, bimi!!)
