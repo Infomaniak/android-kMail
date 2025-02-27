@@ -170,7 +170,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
                 val shouldLog = mutableListOf<Boolean>()
 
-                // Sentry events are discarded is the app is in Debug mode
+                // Sentry events are discarded if the app is in Debug mode
                 val isInReleaseMode = !BuildConfig.DEBUG
                 shouldLog.add(isInReleaseMode)
 
