@@ -20,7 +20,7 @@
 package com.infomaniak.mail.data.models.message
 
 import com.infomaniak.core.utils.ApiEnum
-import com.infomaniak.core.utils.apiEnumValueOfOrNull
+import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
@@ -167,6 +167,8 @@ class Message : RealmObject {
     @Transient
     @Ignore
     var shouldHideDivider: Boolean = false
+    @Ignore
+    var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
     //endregion
 
     val threads by backlinks(Thread::messages)
@@ -228,9 +230,7 @@ class Message : RealmObject {
         ACKNOWLEDGED,
     }
 
-    val snoozeState: SnoozeState? get() = apiEnumValueOfOrNull<SnoozeState>(_snoozeState)
-
-    enum class SnoozeState(override val apiValue: String): ApiEnum {
+    enum class SnoozeState(override val apiValue: String) : ApiEnum {
         Snoozed(apiValue = "snoozed"),
         Unsnoozed(apiValue = "unsnoozed"),
         WasSnoozed(apiValue = "was_snoozed"),
