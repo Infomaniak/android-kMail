@@ -149,7 +149,7 @@ class Folder : RealmObject, Cloneable {
     fun refreshStrategy(): RefreshStrategy = when (role) {
         FolderRole.INBOX -> inboxRefreshStrategy
         FolderRole.SNOOZED -> snoozeRefreshStrategy
-        else -> object : DefaultRefreshStrategy {}
+        else -> defaultRefreshStrategy
     }
 
     fun getLocalizedName(context: Context): String {
