@@ -66,7 +66,6 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         return FolderController.getFolder(Folder.FolderRole.SNOOZED, realm)?.let { listOf(it.id) } ?: emptyList()
     }
 
-    override fun processDeletedThread(thread: Thread, realm: MutableRealm) {
-        thread.recomputeThread()
-    }
+    override fun processDeletedThread(thread: Thread, realm: MutableRealm) = thread.recomputeThread()
+    override fun queryFolderThreadsOnDeletedUid(): Boolean = true
 }
