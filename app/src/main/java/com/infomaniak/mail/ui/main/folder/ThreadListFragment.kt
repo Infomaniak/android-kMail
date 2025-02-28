@@ -60,6 +60,7 @@ import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
+import com.infomaniak.mail.MatomoMail.trackMyKSuiteEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
@@ -539,6 +540,7 @@ class ThreadListFragment : TwoPaneFragment() {
                 storageLevel = storageBannerStatus
                 setupListener(
                     onCloseButtonClicked = {
+                        trackMyKSuiteEvent("closeStorageWarningBanner")
                         binding.myKSuiteStorageBanner.isGone = true
                         resetStorageBannerAppLaunches()
                     }

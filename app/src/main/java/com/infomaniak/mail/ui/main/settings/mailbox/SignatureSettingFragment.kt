@@ -30,6 +30,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
@@ -87,6 +88,7 @@ class SignatureSettingFragment : Fragment() {
 
     private fun onSignatureClicked(signature: Signature, shouldBlockDummySignature: Boolean) = with(signatureSettingViewModel) {
         if (signature.isDummy && shouldBlockDummySignature) {
+            trackMyKSuiteUpgradeBottomSheetEvent("emptySignature")
             findNavController().openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
             return@with
         }

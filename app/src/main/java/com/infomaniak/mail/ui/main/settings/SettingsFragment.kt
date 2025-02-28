@@ -36,6 +36,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackMyKSuiteEvent
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -121,6 +122,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun openMyKSuiteDashboard(myKSuiteData: MyKSuiteData) {
+        trackMyKSuiteEvent("openDashboard")
+
         val args = MyKSuiteDashboardFragmentArgs(
             dashboardData = MyKSuiteUiUtils.getDashboardData(requireContext(), myKSuiteData, AccountUtils.currentUser?.avatar)
         )
