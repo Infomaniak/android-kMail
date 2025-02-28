@@ -292,10 +292,6 @@ inline fun <reified T> ApiResponse<T>.getApiException(): Exception {
 fun List<ApiResponse<*>>.atLeastOneSucceeded(): Boolean = any { it.isSuccess() }
 
 fun List<ApiResponse<*>>.allFailed(): Boolean = none { it.isSuccess() }
-
-fun String.toLongUid(folderId: String) = "${this}@${folderId}"
-
-fun String.toShortUid(): Int = substringBefore('@').toInt()
 //endregion
 
 //region Realm

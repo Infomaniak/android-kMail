@@ -41,6 +41,11 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = true
 
+    override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
+        val inboxId = FolderController.getFolder(Folder.FolderRole.INBOX, realm)?.id ?: return null
+        return super.getMessageFromShortUid(shortUid, inboxId, realm)
+    }
+
     override fun processDeletedMessage(
         scope: CoroutineScope,
         managedMessage: Message,
