@@ -465,6 +465,13 @@ class RefreshController @Inject constructor(
             refreshStrategy.processDeletedThread(thread, realm = this)
         }
 
+        if (shortUids.isNotEmpty() && refreshStrategy.queryFolderThreadsOnDeletedUid()) {
+            FolderController.updateFolder(folderId, realm = this) {
+                val allCurrentFolderThreads = refreshStrategy.queryFolderThreads(folderId, realm = this)
+                it.threads.replaceContent(list = allCurrentFolderThreads)
+            }
+        }
+
         return impactedFolders
     }
     //endregion
