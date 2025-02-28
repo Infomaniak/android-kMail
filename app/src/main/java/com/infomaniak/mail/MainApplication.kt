@@ -179,6 +179,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                 shouldLog.add(isSentryTrackingEnabled)
 
                 // Network exceptions are discarded
+                // TODO: It doesn't work anymore :(
                 val isNetworkException = event.exceptions?.any { it.type == "ApiController\$NetworkException" } ?: false
                 shouldLog.add(!isNetworkException)
 
