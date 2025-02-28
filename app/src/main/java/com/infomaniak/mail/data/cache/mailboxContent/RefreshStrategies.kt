@@ -35,14 +35,13 @@ interface RefreshStrategy {
      */
     fun processDeletedMessage(
         scope: CoroutineScope,
-        message: Message,
+        managedMessage: Message,
         context: Context,
         mailbox: Mailbox,
         realm: MutableRealm,
     ): Collection<Thread>
 
     fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String>
-
     fun processDeletedThread(thread: Thread, realm: MutableRealm)
 }
 
@@ -55,19 +54,19 @@ interface DefaultRefreshStrategy : RefreshStrategy {
 
     override fun processDeletedMessage(
         scope: CoroutineScope,
-        message: Message,
+        managedMessage: Message,
         context: Context,
         mailbox: Mailbox,
         realm: MutableRealm,
     ): Collection<Thread> = buildSet {
-        message.threads.forEach { thread ->
+        managedMessage.threads.forEach { thread ->
             scope.ensureActive()
 
-            val isSuccess = thread.messages.remove(message)
+            val isSuccess = thread.messages.remove(managedMessage)
             if (isSuccess) add(thread)
         }
 
-        MessageController.deleteMessage(context, mailbox, message, realm)
+        MessageController.deleteMessage(context, mailbox, managedMessage, realm)
     }
 
     override fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String> = emptyList()
