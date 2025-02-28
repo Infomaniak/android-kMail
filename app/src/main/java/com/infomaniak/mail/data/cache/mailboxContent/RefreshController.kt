@@ -456,7 +456,7 @@ class RefreshController @Inject constructor(
         }
 
         val impactedFolders = mutableSetOf<String>()
-        impactedFolders += refreshStrategy.extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm = this)
+        impactedFolders += refreshStrategy.extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid(realm = this)
 
         threads.forEach { thread ->
             scope.ensureActive()
@@ -465,7 +465,7 @@ class RefreshController @Inject constructor(
             refreshStrategy.processDeletedThread(thread, realm = this)
         }
 
-        if (shortUids.isNotEmpty() && refreshStrategy.queryFolderThreadsOnDeletedUid()) {
+        if (shortUids.isNotEmpty() && refreshStrategy.shouldQueryFolderThreadsOnDeletedUid()) {
             FolderController.updateFolder(folderId, realm = this) {
                 val allCurrentFolderThreads = refreshStrategy.queryFolderThreads(folderId, realm = this)
                 it.threads.replaceContent(list = allCurrentFolderThreads)
