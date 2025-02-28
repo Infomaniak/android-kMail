@@ -42,9 +42,7 @@ object MyKSuiteDataUtils : MyKSuiteDataManager() {
         } else {
             @OptIn(ExperimentalSerializationApi::class)
             apiResponse.error?.exception?.let {
-                if (it is MissingFieldException || it.message?.contains("Unexpected JSON token") == true) {
-                    SentryLog.e(TAG, "Error decoding the api result MyKSuiteObject", it)
-                }
+                if (it is MissingFieldException) SentryLog.e(TAG, "Error decoding the api result MyKSuiteObject", it)
             }
         }
 
