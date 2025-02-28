@@ -77,6 +77,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun observeHasMoreThanOneExpeditor(threadUid: String) {
         mainViewModel.hasMoreThanOneExpeditor(threadUid).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
             binding.blockSender.setClosingOnClickListener {
+                trackBottomSheetThreadActionsEvent("blockUser")
                 if (hasMoreThanOneExpeditor) {
                     safeNavigate(
                         resId = R.id.userToBlockBottomSheetDialog,
