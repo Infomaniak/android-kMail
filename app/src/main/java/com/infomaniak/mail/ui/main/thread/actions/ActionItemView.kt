@@ -29,6 +29,7 @@ import androidx.annotation.StyleableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.infomaniak.core.myksuite.ui.views.MyKSuitePlusChipView
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.setPaddingRelative
@@ -43,6 +44,8 @@ class ActionItemView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    private val myKSuiteChipPlusChipView by lazy { MyKSuitePlusChipView(context) }
 
     var trailingContent = TrailingContent.None
         set(value) {
@@ -109,23 +112,23 @@ class ActionItemView @JvmOverloads constructor(
 
     private fun setTrailingContentUi(trailingContent: TrailingContent) = with(binding) {
         trailingContentLayout.isVisible = true
+        trailingContentLayout.removeView(myKSuiteChipPlusChipView)
 
         when (trailingContent) {
             TrailingContent.None -> trailingContentLayout.isGone = true
             TrailingContent.Chevron -> {
                 actionIcon.isVisible = true
-
-                myKSuitePlusChip.isGone = true
                 description.isGone = true
             }
             TrailingContent.Description -> {
                 description.isVisible = true
-
-                myKSuitePlusChip.isGone = true
                 actionIcon.isGone = true
             }
             TrailingContent.MyKSuiteChip -> {
-                myKSuitePlusChip.isVisible = true
+                // ComposeView are not compatible with view without lifecycles (ex: PopupWindow in RecipientFieldView)
+                // This is causing a crash so to avoid that, we have to programmatically add the Compose view only where it's
+                // needed.
+                trailingContentLayout.addView(myKSuiteChipPlusChipView)
 
                 actionIcon.isGone = true
                 description.isGone = true
