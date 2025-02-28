@@ -43,14 +43,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
-import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.richhtmleditor.StatusCommand.*
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
-import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -75,13 +72,11 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.HtmlUtils.processCids
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
-import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.*
@@ -776,8 +771,7 @@ class NewMessageFragment : Fragment() {
         if (isMailboxFull) {
             trackNewMessageEvent("trySendingWithMailboxFull")
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
-                trackMyKSuiteUpgradeBottomSheetEvent("notEnoughStorageUpgrade")
-                findNavController().openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
+                openMyKSuiteUpgradeBottomSheet("notEnoughStorageUpgrade")
             }
         }
 

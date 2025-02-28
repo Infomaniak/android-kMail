@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
+import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.lib.applock.LockActivity
@@ -122,7 +123,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun openMyKSuiteDashboard(myKSuiteData: MyKSuiteData) {
-        trackMyKSuiteEvent("openDashboard")
+        trackMyKSuiteEvent(MatomoMyKSuite.OPEN_DASHBOARD_NAME)
 
         val args = MyKSuiteDashboardFragmentArgs(
             dashboardData = MyKSuiteUiUtils.getDashboardData(requireContext(), myKSuiteData, AccountUtils.currentUser?.avatar)
