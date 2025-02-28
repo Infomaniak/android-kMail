@@ -37,7 +37,7 @@ interface RefreshStrategy {
      * @return The list of impacted threads that have changed and need to be recomputed. The list of impacted threads will also be
      * used to determine what folders need to have their unread count updated. If an extra folder needs its unread count updated
      * but no thread has that extra folder as [Thread.folderId], you can define the extra folder you want inside
-     * [extraFolderIdsThatNeedToRefreshUnreadOnDelete].
+     * [extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid].
      */
     fun processDeletedMessage(
         scope: CoroutineScope,
@@ -47,9 +47,9 @@ interface RefreshStrategy {
         realm: MutableRealm,
     ): Collection<Thread>
 
-    fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String>
+    fun extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid(realm: TypedRealm): List<String>
     fun processDeletedThread(thread: Thread, realm: MutableRealm)
-    fun queryFolderThreadsOnDeletedUid(): Boolean
+    fun shouldQueryFolderThreadsOnDeletedUid(): Boolean
 
     /**
      * About the [impactedThreadsManaged]:
@@ -97,7 +97,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         MessageController.deleteMessage(context, mailbox, managedMessage, realm)
     }
 
-    override fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String> = emptyList()
+    override fun extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid(realm: TypedRealm): List<String> = emptyList()
 
     override fun processDeletedThread(thread: Thread, realm: MutableRealm) {
         if (thread.getNumberOfMessagesInFolder() == 0) {
@@ -107,7 +107,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         }
     }
 
-    override fun queryFolderThreadsOnDeletedUid(): Boolean = false
+    override fun shouldQueryFolderThreadsOnDeletedUid(): Boolean = false
 
     private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
     private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
