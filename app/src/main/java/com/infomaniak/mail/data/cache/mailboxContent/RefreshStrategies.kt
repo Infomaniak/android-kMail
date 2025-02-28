@@ -30,6 +30,8 @@ interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
     fun shouldForceUpdateMessagesWhenAdded(): Boolean
 
+    fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
+
     /**
      * @return The list of impacted threads that have changed and need to be recomputed
      */
@@ -51,6 +53,10 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     }
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = false
+
+    override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
+        return MessageController.getMessage(shortUid.toLongUid(folderId), realm)
+    }
 
     override fun processDeletedMessage(
         scope: CoroutineScope,
@@ -84,5 +90,6 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         }
     }
 
+    private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
     private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
 }
