@@ -61,12 +61,12 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         return managedMessage.threads
     }
 
-    override fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String> {
+    override fun extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid(realm: TypedRealm): List<String> {
         return FolderController.getFolder(Folder.FolderRole.SNOOZED, realm)?.let { listOf(it.id) } ?: emptyList()
     }
 
     override fun processDeletedThread(thread: Thread, realm: MutableRealm) = thread.recomputeThread()
-    override fun queryFolderThreadsOnDeletedUid(): Boolean = true
+    override fun shouldQueryFolderThreadsOnDeletedUid(): Boolean = true
 
     /**
      * In the case of the Snooze refresh strategy, the Message could already exist (because it comes from the INBOX).
