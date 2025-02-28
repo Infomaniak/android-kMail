@@ -42,27 +42,18 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
 
     override fun processDeletedMessage(
         scope: CoroutineScope,
-        message: Message,
+        managedMessage: Message,
         context: Context,
         mailbox: Mailbox,
         realm: MutableRealm,
     ): Collection<Thread> {
-        var successfullyUpdated = true
-
-        MessageController.updateMessage(message.uid, realm) {
-            if (it == null) {
-                successfullyUpdated = false
-                return@updateMessage
-            }
-
-            it.apply {
-                snoozeState = null
-                snoozeEndDate = null
-                snoozeAction = null
-            }
+        managedMessage.apply {
+            snoozeState = null
+            snoozeEndDate = null
+            snoozeAction = null
         }
 
-        return if (successfullyUpdated) message.threads else emptyList()
+        return managedMessage.threads
     }
 
     override fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String> {
