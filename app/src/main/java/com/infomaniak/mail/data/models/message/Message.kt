@@ -35,7 +35,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import com.infomaniak.mail.utils.extensions.toRealmInstant
-import com.infomaniak.mail.utils.extensions.toShortUid
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.*
@@ -349,6 +348,10 @@ class Message : RealmObject {
     }
 
     fun isOrphan(): Boolean = threads.isEmpty() && threadsDuplicatedIn.isEmpty()
+
+    // Be careful when using this method because some folders might contain messages from other folders than itself. This
+    // operation should only happen in very specific situations like computing the shortUid of a Message from its uid.
+    private fun String.toShortUid(): Int = substringBefore('@').toInt()
 
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
