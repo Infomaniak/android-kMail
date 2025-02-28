@@ -279,10 +279,6 @@ object MatomoMail : MatomoCore {
         trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE, name)
     }
 
-    fun Fragment.trackMyKSuiteUpgradeBottomSheetEvent(name: String) {
-        context?.trackMyKSuiteUpgradeBottomSheetEvent(name)
-    }
-
     fun Context.trackMyKSuiteUpgradeBottomSheetEvent(name: String) {
         trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE_UPGRADE_BOTTOMSHEET, name)
     }
