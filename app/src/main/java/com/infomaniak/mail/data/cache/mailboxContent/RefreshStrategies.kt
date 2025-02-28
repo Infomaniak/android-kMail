@@ -34,7 +34,10 @@ interface RefreshStrategy {
     fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
 
     /**
-     * @return The list of impacted threads that have changed and need to be recomputed
+     * @return The list of impacted threads that have changed and need to be recomputed. The list of impacted threads will also be
+     * used to determine what folders need to have their unread count updated. If an extra folder needs its unread count updated
+     * but no thread has that extra folder as [Thread.folderId], you can define the extra folder you want inside
+     * [extraFolderIdsThatNeedToRefreshUnreadOnDelete].
      */
     fun processDeletedMessage(
         scope: CoroutineScope,
