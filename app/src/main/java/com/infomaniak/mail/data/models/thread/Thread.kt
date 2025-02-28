@@ -171,7 +171,8 @@ class Thread : RealmObject {
 
     fun recomputeThread(realm: MutableRealm? = null) {
 
-        // Delete Thread if empty
+        // Delete Thread if empty. Do not rely on this deletion code being part of the method's logic, it's a temporary fix. If
+        // threads should be deleted, then they need to be deleted outside this method.
         if (messages.none { it.folderId == folderId }) {
             if (isManaged()) realm?.delete(this)
             return
