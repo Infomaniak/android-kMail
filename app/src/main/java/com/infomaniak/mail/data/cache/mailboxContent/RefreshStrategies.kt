@@ -31,6 +31,8 @@ import kotlinx.coroutines.ensureActive
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
 
+    fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
+
     /**
      * @return The list of impacted threads that have changed and need to be recomputed
      */
@@ -65,6 +67,10 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         return ThreadController.getThreadsByFolderId(folderId, realm)
     }
 
+    override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
+        return MessageController.getMessage(shortUid.toLongUid(folderId), realm)
+    }
+
     override fun processDeletedMessage(
         scope: CoroutineScope,
         managedMessage: Message,
@@ -97,6 +103,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         }
     }
 
+    private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
     private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
 
     override fun handleAddedMessages(

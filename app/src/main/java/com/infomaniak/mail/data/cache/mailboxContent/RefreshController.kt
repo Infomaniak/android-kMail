@@ -39,7 +39,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
-import com.infomaniak.mail.utils.extensions.toLongUid
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -272,7 +271,7 @@ class RefreshController @Inject constructor(
         write {
             val impactedFoldersIds = mutableSetOf<String>().apply {
                 addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id, folder.refreshStrategy()))
-                addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
+                addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id, folder.refreshStrategy()))
             }
 
             inboxUnreadCount = updateFoldersUnreadCount(impactedFoldersIds, realm = this)
@@ -451,7 +450,8 @@ class RefreshController @Inject constructor(
 
         shortUids.forEach { shortUid ->
             scope.ensureActive()
-            val message = MessageController.getMessage(uid = shortUid.toLongUid(folderId), realm = this) ?: return@forEach
+
+            val message = refreshStrategy.getMessageFromShortUid(shortUid, folderId, realm = this) ?: return@forEach
             threads += refreshStrategy.processDeletedMessage(scope, message, appContext, mailbox, realm = this)
         }
 
@@ -474,6 +474,7 @@ class RefreshController @Inject constructor(
         scope: CoroutineScope,
         messageFlags: List<MessageFlags>,
         folderId: String,
+        refreshStrategy: RefreshStrategy,
     ): Set<String> {
         val impactedFolders = mutableSetOf<String>()
         val threads = mutableSetOf<Thread>()
@@ -481,8 +482,7 @@ class RefreshController @Inject constructor(
         messageFlags.forEach { flags ->
             scope.ensureActive()
 
-            val uid = flags.shortUid.toLongUid(folderId)
-            MessageController.getMessage(uid, realm = this)?.let { message ->
+            refreshStrategy.getMessageFromShortUid(flags.shortUid, folderId, realm = this)?.let { message ->
                 message.updateFlags(flags)
                 threads += message.threads
             }
