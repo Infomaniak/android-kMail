@@ -20,15 +20,14 @@ package com.infomaniak.mail.utils.extensions
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
+import com.infomaniak.core.extensions.goToPlayStore
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.SentryLog
-import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
@@ -46,7 +45,6 @@ import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
 import io.realm.kotlin.Realm
-import io.sentry.Sentry
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
