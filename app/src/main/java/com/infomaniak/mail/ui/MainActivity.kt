@@ -58,6 +58,8 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -286,7 +288,9 @@ class MainActivity : BaseActivity() {
                     errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_DAILY_LIMIT_REACHED)
 
             if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
+                trackNewMessageEvent("trySendingWithDailyLimitReached")
                 snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
+                    trackMyKSuiteUpgradeBottomSheetEvent("dailyLimitReachedUpgrade")
                     navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
                 }
             } else {

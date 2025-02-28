@@ -43,11 +43,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
+import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.richhtmleditor.StatusCommand.*
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
+import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -772,7 +775,10 @@ class NewMessageFragment : Fragment() {
         val isMailboxFull = newMessageViewModel.currentMailbox.quotas?.isFull == true
         if (isMailboxFull) {
             trackNewMessageEvent("trySendingWithMailboxFull")
-            showSnackbar(R.string.myKSuiteSpaceFullAlert)
+            showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
+                trackMyKSuiteUpgradeBottomSheetEvent("notEnoughStorageUpgrade")
+                findNavController().openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
+            }
         }
 
         return !isMailboxFull
