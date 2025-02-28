@@ -49,6 +49,7 @@ interface RefreshStrategy {
 
     fun extraFolderIdsThatNeedToRefreshUnreadOnDelete(realm: TypedRealm): List<String>
     fun processDeletedThread(thread: Thread, realm: MutableRealm)
+    fun queryFolderThreadsOnDeletedUid(): Boolean
 
     /**
      * About the [impactedThreadsManaged]:
@@ -105,6 +106,8 @@ interface DefaultRefreshStrategy : RefreshStrategy {
             thread.recomputeThread(realm)
         }
     }
+
+    override fun queryFolderThreadsOnDeletedUid(): Boolean = false
 
     private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
     private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
