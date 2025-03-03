@@ -22,6 +22,7 @@ import android.os.Parcelable
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.sentry.Sentry
 
 interface Correspondent : Parcelable {
@@ -36,9 +37,7 @@ interface Correspondent : Parcelable {
 
         val isRealMe = userEmail == correspondentEmail
 
-        val splittedEmail = userEmail?.split("@")
-        val start = splittedEmail?.first() + "+"
-        val end = "@" + splittedEmail?.last()
+        val (start, end) = userEmail.getStartAndEndOfPlusEmail()
         val isPlusMe = correspondentEmail.startsWith(start) && correspondentEmail.endsWith(end)
 
         return isRealMe || isPlusMe

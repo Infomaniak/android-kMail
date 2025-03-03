@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
+import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -63,9 +64,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         val isNotFromRealMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
                 "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
 
-        val splittedEmail = AccountUtils.currentMailboxEmail?.split("@")
-        val start = splittedEmail?.first() + "+"
-        val end = "@" + splittedEmail?.last()
+        val (start, end) = AccountUtils.currentMailboxEmail.getStartAndEndOfPlusEmail()
         val isNotFromPlusMe = "SUBQUERY(${Message::from.name}, \$recipient," +
                 " \$recipient.${Recipient::email.name} BEGINSWITH '${start}'" +
                 " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
