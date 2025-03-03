@@ -35,6 +35,11 @@ val inboxRefreshStrategy = object : DefaultRefreshStrategy {
     }
 
     override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.SNOOZED)
+
+    override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
+        impactedFolders += folderId
+        impactedFolders += Folder.FolderRole.SNOOZED
+    }
 }
 
 val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
@@ -65,8 +70,9 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         return managedMessage.threads
     }
 
-    override fun extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid(realm: TypedRealm): List<String> {
-        return FolderController.getFolder(Folder.FolderRole.SNOOZED, realm)?.let { listOf(it.id) } ?: emptyList()
+    override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
+        impactedFolders += folderId
+        impactedFolders += Folder.FolderRole.INBOX
     }
 
     override fun processDeletedThread(thread: Thread, realm: MutableRealm) = thread.recomputeThread()
