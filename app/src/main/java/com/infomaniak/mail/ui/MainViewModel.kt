@@ -1150,7 +1150,7 @@ class MainViewModel @Inject constructor(
             message != null -> {
                 message.folder.role
             }
-            threads?.firstOrNull()?.folder?.id == FolderController.SEARCH_FOLDER_ID -> {
+            threads?.firstOrNull()?.folderId == FolderController.SEARCH_FOLDER_ID -> {
                 folderController.getFolder(threads.first().folderId)?.role
             }
             else -> {

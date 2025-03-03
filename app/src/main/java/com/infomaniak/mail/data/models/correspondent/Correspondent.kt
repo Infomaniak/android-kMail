@@ -30,7 +30,19 @@ interface Correspondent : Parcelable {
 
     val initials: String
 
-    fun isMe(): Boolean = AccountUtils.currentMailboxEmail?.lowercase() == email.lowercase()
+    fun isMe(): Boolean {
+        val userEmail = AccountUtils.currentMailboxEmail?.lowercase()
+        val correspondentEmail = email.lowercase()
+
+        val isRealMe = userEmail == correspondentEmail
+
+        val splittedEmail = userEmail?.split("@")
+        val start = splittedEmail?.first() + "+"
+        val end = "@" + splittedEmail?.last()
+        val isPlusMe = correspondentEmail.startsWith(start) && correspondentEmail.endsWith(end)
+
+        return isRealMe || isPlusMe
+    }
 
     fun shouldDisplayUserAvatar(): Boolean = isMe() && email.lowercase() == AccountUtils.currentUser?.email?.lowercase()
 

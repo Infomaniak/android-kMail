@@ -59,10 +59,19 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     fun getLastMessageToExecuteAction(thread: Thread): Message = with(thread) {
 
         val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
-        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+
+        val isNotFromRealMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
                 "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
 
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromMe").find().lastOrNull()
+        val splittedEmail = AccountUtils.currentMailboxEmail?.split("@")
+        val start = splittedEmail?.first() + "+"
+        val end = "@" + splittedEmail?.last()
+        val isNotFromPlusMe = "SUBQUERY(${Message::from.name}, \$recipient," +
+                " \$recipient.${Recipient::email.name} BEGINSWITH '${start}'" +
+                " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
+                ").@count > 0"
+
+        return messages.query("$isNotDraft AND $isNotScheduledDraft AND ($isNotFromRealMe OR $isNotFromPlusMe)").find().lastOrNull()
             ?: messages.query("$isNotDraft AND $isNotScheduledDraft").find().lastOrNull()
             ?: messages.query(isNotScheduledDraft).find().lastOrNull()
             ?: messages.last()
