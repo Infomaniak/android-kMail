@@ -39,7 +39,7 @@ interface RefreshStrategy {
      * @return The list of impacted threads that have changed and need to be recomputed. The list of impacted threads will also be
      * used to determine what folders need to have their unread count updated. If an extra folder needs its unread count updated
      * but no thread has that extra folder as [Thread.folderId], you can define the extra folder you want inside
-     * [extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid].
+     * [addFolderToImpactedFolders] as you they are inserted inside the list of impacted folders.
      */
     fun processDeletedMessage(
         scope: CoroutineScope,
@@ -49,7 +49,7 @@ interface RefreshStrategy {
         realm: MutableRealm,
     ): Collection<Thread>
 
-    fun extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid(realm: TypedRealm): List<String>
+    fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders)
     fun processDeletedThread(thread: Thread, realm: MutableRealm)
     fun shouldQueryFolderThreadsOnDeletedUid(): Boolean
 
@@ -101,7 +101,9 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         MessageController.deleteMessage(context, mailbox, managedMessage, realm)
     }
 
-    override fun extraFolderIdsThatNeedToRefreshUnreadOnDeletedUid(realm: TypedRealm): List<String> = emptyList()
+    override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
+        impactedFolders += folderId
+    }
 
     override fun processDeletedThread(thread: Thread, realm: MutableRealm) {
         if (thread.getNumberOfMessagesInFolder() == 0) {
