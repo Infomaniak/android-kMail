@@ -24,7 +24,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.goToPlayStore
+import com.infomaniak.core.extensions.goToPlayStore
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE

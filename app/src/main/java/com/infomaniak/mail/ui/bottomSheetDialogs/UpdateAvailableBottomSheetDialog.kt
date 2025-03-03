@@ -21,9 +21,9 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.core.extensions.goToPlayStore
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAppName
-import com.infomaniak.lib.core.utils.goToPlayStore
 import com.infomaniak.lib.stores.StoresSettingsRepository
 import com.infomaniak.lib.stores.StoresViewModel
 import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
