@@ -269,9 +269,10 @@ class RefreshController @Inject constructor(
 
         var inboxUnreadCount: Int? = null
         write {
+            val refreshStrategy = folder.refreshStrategy()
             val impactedFoldersIds = mutableSetOf<String>().apply {
-                addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id, folder.refreshStrategy()))
-                addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id, folder.refreshStrategy()))
+                addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id, refreshStrategy))
+                addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id, refreshStrategy))
             }
 
             inboxUnreadCount = updateFoldersUnreadCount(impactedFoldersIds, realm = this)
