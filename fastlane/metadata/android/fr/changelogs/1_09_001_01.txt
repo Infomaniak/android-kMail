@@ -1,0 +1,4 @@
+- Ajout de la possibilité de sauvegarder un fil de discussion sur kDrive
+- Affiche le bon avatar de l'utilisateur après un changement de nom
+- Correction du nombre de messages non lus dans les dossiers qui ne se mettait pas à jour correctement
+- Correction d'un crash dans le tableau de bord myKSuite

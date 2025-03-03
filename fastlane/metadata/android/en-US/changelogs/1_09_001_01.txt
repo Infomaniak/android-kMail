@@ -1,0 +1,4 @@
+- Add the possibility to save a thread on kDrive
+- Display the correct user's avatar after changing name
+- Fix folders' unread count that wasn't updating correctly
+- Fix a crash in the myKSuite dashboard
