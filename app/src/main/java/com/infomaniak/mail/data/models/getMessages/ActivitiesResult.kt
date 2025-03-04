@@ -21,7 +21,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ActivitiesResult<T : CommonMessageFlags>(
+data class ActivitiesResult<T : MessageFlags>(
     @SerialName("deleted")
     val deletedShortUids: List<String>,
     @SerialName("updated")
