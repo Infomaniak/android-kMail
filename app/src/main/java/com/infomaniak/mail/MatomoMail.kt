@@ -132,6 +132,14 @@ object MatomoMail : MatomoCore {
         trackEvent("messageActions", name)
     }
 
+    fun Fragment.trackBlockUserAction(name: String) {
+        requireContext().trackBlockUserAction(name)
+    }
+
+    fun Context.trackBlockUserAction(name: String) {
+        trackEvent("blockUserAction", name)
+    }
+
     fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
         context?.trackSearchEvent(name, value)
     }
