@@ -271,17 +271,13 @@ class ThreadController @Inject constructor(
         ): RealmQuery<Thread> {
             val snoozeState = SnoozeState.Snoozed.apiValue
 
-            val collectionOperator = if (withSnooze) "ANY" else "NONE"
-            val nullOperator = if (withSnooze) "!=" else "=="
-
-            val isSnoozedState = "$collectionOperator messages._snoozeState == $1"
-
-            // TODO: Use the thread snooze state values instead of ANY/NONE on the messages
-            // This mimics the behavior on the web and help avoid displaying threads that are in an incoherent state on the API
-            val hasCorrectMetadata = "messages.snoozeEndDate $nullOperator null AND messages.snoozeAction $nullOperator null"
+            // Checking for snoozeEndDate and snoozeAction on top of _snoozeState mimics the behavior on the web and helps avoid
+            // displaying threads that are in an incoherent state on the API
+            val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeAction != null"
+            val snoozeQuery = if (withSnooze) isSnoozedState else "NOT($isSnoozedState)"
 
             return realm.query<Thread>(
-                "${Thread::folderId.name} == $0 AND $isSnoozedState AND $hasCorrectMetadata",
+                "${Thread::folderId.name} == $0 AND $snoozeQuery",
                 folderId,
                 snoozeState,
             )
