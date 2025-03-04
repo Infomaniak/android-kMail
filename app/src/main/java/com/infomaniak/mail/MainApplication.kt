@@ -164,6 +164,12 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun configureSentry() {
+
+        val networkException = "NetworkException"
+        val apiErrorException = "ApiErrorException"
+        val accessDenied = "access_denied"
+        val notAuthorized = "not_authorized"
+
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
@@ -178,22 +184,26 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                 val isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled
                 shouldLog.add(isSentryTrackingEnabled)
 
+                // TODO: Check if this works
                 // Network exceptions are discarded
-                // TODO: It doesn't work anymore :(
-                val isNetworkException = event.exceptions?.any { it.type == "ApiController\$NetworkException" } ?: false
+                val isNetworkException = event.exceptions?.any {
+                    it.type?.contains(networkException, true) == true || it.value?.contains(networkException, true) == true
+                } ?: false
                 shouldLog.add(!isNetworkException)
 
+                // TODO: Check if this works
                 // AccessDenied exceptions are discarded
                 val isAccessDeniedException = event.exceptions?.any {
-                    // TODO: Check in Sentry if this `value.contains()` is the correct way to find this exception.
-                    it.type == "ApiErrorException" && it.value?.contains("access_denied") == true
+                    (it.type?.contains(apiErrorException, true) == true || it.value?.contains(apiErrorException, true) == true)
+                            && (it.type?.contains(accessDenied, true) == true || it.value?.contains(accessDenied, true) == true)
                 } ?: false
                 shouldLog.add(!isAccessDeniedException)
 
+                // TODO: Check if this works
                 // NotAuthorized exceptions are discarded
                 val isNotAuthorizedException = event.exceptions?.any {
-                    // TODO: Check in Sentry if this `value.contains()` is the correct way to find this exception.
-                    it.type == "ApiErrorException" && it.value?.contains("not_authorized") == true
+                    (it.type?.contains(apiErrorException, true) == true || it.value?.contains(apiErrorException, true) == true)
+                            && (it.type?.contains(notAuthorized, true) == true || it.value?.contains(notAuthorized, true) == true)
                 } ?: false
                 shouldLog.add(!isNotAuthorizedException)
 
