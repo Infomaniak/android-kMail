@@ -68,9 +68,9 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         val isNotFromPlusMe = "SUBQUERY(${Message::from.name}, \$recipient," +
                 " \$recipient.${Recipient::email.name} BEGINSWITH '${start}'" +
                 " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
-                ").@count > 0"
+                ").@count < 1"
 
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND ($isNotFromRealMe OR $isNotFromPlusMe)").find().lastOrNull()
+        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").find().lastOrNull()
             ?: messages.query("$isNotDraft AND $isNotScheduledDraft").find().lastOrNull()
             ?: messages.query(isNotScheduledDraft).find().lastOrNull()
             ?: messages.last()
