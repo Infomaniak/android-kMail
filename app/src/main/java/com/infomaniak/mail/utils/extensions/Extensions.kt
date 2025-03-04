@@ -78,9 +78,11 @@ import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -416,7 +418,22 @@ fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> 
 //endregion
 
 //region Messages
-fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it.folderId == exception) null else it.folderId }
+fun List<Message>.getFoldersIds(exception: String? = null): ImpactedFolders {
+    val impactedFolders = ImpactedFolders()
+
+    forEach { message ->
+        when {
+            message.folderId == exception -> Unit
+            message.snoozeState == SnoozeState.Snoozed -> {
+                impactedFolders += message.folderId
+                impactedFolders += FolderRole.SNOOZED
+            }
+            else -> impactedFolders += message.folderId
+        }
+    }
+
+    return impactedFolders
+}
 
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
