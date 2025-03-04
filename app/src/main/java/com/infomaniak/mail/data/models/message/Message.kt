@@ -30,7 +30,8 @@ import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
+import com.infomaniak.mail.data.models.getMessages.MessageFlags
+import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
@@ -364,6 +365,10 @@ class Message : RealmObject {
         isAnswered = flags.isAnswered
         isForwarded = flags.isForwarded
         isScheduledMessage = flags.isScheduledMessage
+    }
+
+    fun updateSnoozeFlags(flags: SnoozeMessageFlags) {
+        snoozeEndDate = flags.snoozeEndDate.toRealmInstant()
     }
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
