@@ -24,6 +24,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
@@ -111,14 +112,15 @@ class SharedUtils @Inject constructor(
 
     suspend fun refreshFolders(
         mailbox: Mailbox,
-        messagesFoldersIds: List<String>,
+        messagesFoldersIds: ImpactedFolders,
         destinationFolderId: String? = null,
         currentFolderId: String? = null,
         callbacks: RefreshCallbacks? = null,
     ) {
+        val realm = mailboxContentRealm()
 
         // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
-        val foldersIds = messagesFoldersIds.toMutableSet()
+        val foldersIds = messagesFoldersIds.getFolderIds(realm).toMutableSet()
         destinationFolderId?.let(foldersIds::add)
 
         foldersIds.forEach { folderId ->
@@ -126,7 +128,7 @@ class SharedUtils @Inject constructor(
                 refreshMode = RefreshMode.REFRESH_FOLDER,
                 mailbox = mailbox,
                 folderId = folderId,
-                realm = mailboxContentRealm(),
+                realm = realm,
                 callbacks = if (folderId == currentFolderId) callbacks else null,
             )
         }
