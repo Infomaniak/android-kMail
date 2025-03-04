@@ -151,6 +151,7 @@ class Folder : RealmObject, Cloneable {
     fun refreshStrategy(): RefreshStrategy = when (role) {
         FolderRole.INBOX -> inboxRefreshStrategy
         FolderRole.SNOOZED -> snoozeRefreshStrategy
+        FolderRole.SCHEDULED_DRAFTS -> scheduledDraftRefreshStrategy
         else -> defaultRefreshStrategy
     }
 

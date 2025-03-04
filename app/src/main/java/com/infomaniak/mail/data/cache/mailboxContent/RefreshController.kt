@@ -555,7 +555,10 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private inline fun <reified T : MessageFlags> getMessagesUidsDelta(folderId: String, previousCursor: String): ActivitiesResult<T>? {
+    private inline fun <reified T : MessageFlags> getMessagesUidsDelta(
+        folderId: String,
+        previousCursor: String,
+    ): ActivitiesResult<T>? {
         return with(ApiRepository.getMessagesUidsDelta<T>(mailbox.uuid, folderId, previousCursor, okHttpClient)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
@@ -645,7 +648,9 @@ class RefreshController @Inject constructor(
 
         getUpToDateFolder(folderId).let { currentFolder ->
             currentFolder.threads.replaceContent(list = allCurrentFolderThreads)
-            if (currentFolder.role == FolderRole.SCHEDULED_DRAFTS) currentFolder.isDisplayed = currentFolder.threads.isNotEmpty()
+            if (currentFolderRefreshStrategy.shouldHideEmptyFolder()) {
+                currentFolder.isDisplayed = currentFolder.threads.isNotEmpty()
+            }
             extraFolderUpdates?.invoke(currentFolder)
         }
 
@@ -653,10 +658,13 @@ class RefreshController @Inject constructor(
         // message uid is returned as "added" or "deleted" in the snooze folder, it should disappear or appear from inbox as well.
         currentFolderRefreshStrategy.otherFolderRolesToQueryThreads().forEach { folderRole ->
             getUpToDateFolder(folderRole)?.let { otherFolder ->
-                val allOtherFolderThreads = otherFolder.refreshStrategy().queryFolderThreads(folderId, realm = this)
+                val otherFolderRefreshStrategy = otherFolder.refreshStrategy()
+                val allOtherFolderThreads = otherFolderRefreshStrategy.queryFolderThreads(folderId, realm = this)
                 otherFolder.threads.replaceContent(list = allOtherFolderThreads)
 
-                if (otherFolder.role == FolderRole.SCHEDULED_DRAFTS) otherFolder.isDisplayed = otherFolder.threads.isNotEmpty()
+                if (otherFolderRefreshStrategy.shouldHideEmptyFolder()) {
+                    otherFolder.isDisplayed = otherFolder.threads.isNotEmpty()
+                }
             }
         }
     }
