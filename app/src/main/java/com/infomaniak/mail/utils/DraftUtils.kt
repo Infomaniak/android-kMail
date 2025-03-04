@@ -51,8 +51,9 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
         it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING
     }
 
-    suspend fun setUploadStatus(attachment: Attachment, uploadStatus: AttachmentUploadStatus, step: String) {
-        realm.write {
+    fun setUploadStatus(attachment: Attachment, uploadStatus: AttachmentUploadStatus, step: String) {
+        // This `writeBlocking` is on purpose. A simple `write` here will fail silently.
+        realm.writeBlocking {
             draftController.updateDraft(localUuid, realm = this) {
                 it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it, step)
             }
