@@ -47,4 +47,4 @@ data class SnoozeMessageFlags(
     override val shortUid: String,
     @SerialName("snooze_end_date")
     val snoozeEndDate: Date,
-): CommonMessageFlags
+): MessageFlags
