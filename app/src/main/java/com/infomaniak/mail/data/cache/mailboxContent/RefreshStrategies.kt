@@ -31,6 +31,7 @@ interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
     fun shouldForceUpdateMessagesWhenAdded(): Boolean
     fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole>
+    fun shouldHideEmptyFolder(): Boolean
 
     fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
 
@@ -60,6 +61,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = false
     override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = emptyList()
+    override fun shouldHideEmptyFolder(): Boolean = false
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
         return MessageController.getMessage(shortUid.toLongUid(folderId), realm)
