@@ -30,7 +30,7 @@ import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.getMessages.MessageFlags
+import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
 import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -359,7 +359,7 @@ class Message : RealmObject {
         }
     }
 
-    fun updateFlags(flags: MessageFlags) {
+    fun updateFlags(flags: DefaultMessageFlags) {
         isSeen = flags.isSeen
         isFavorite = flags.isFavorite
         isAnswered = flags.isAnswered
