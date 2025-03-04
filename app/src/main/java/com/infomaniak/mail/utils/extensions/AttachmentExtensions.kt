@@ -169,13 +169,14 @@ object AttachmentExtensions {
         }
     }
 
-    private suspend fun Attachment.updateLocalAttachment(
+    private fun Attachment.updateLocalAttachment(
         draftLocalUuid: String,
         remoteAttachment: Attachment,
         draftController: DraftController,
         realm: Realm,
     ) {
-        realm.write {
+        // This `writeBlocking` is on purpose. A simple `write` here will fail silently.
+        realm.writeBlocking {
             draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
 
                 val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
