@@ -22,6 +22,7 @@ import android.os.Parcelable
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.sentry.Sentry
 
 interface Correspondent : Parcelable {
@@ -30,7 +31,17 @@ interface Correspondent : Parcelable {
 
     val initials: String
 
-    fun isMe(): Boolean = AccountUtils.currentMailboxEmail?.lowercase() == email.lowercase()
+    fun isMe(): Boolean {
+        val userEmail = AccountUtils.currentMailboxEmail?.lowercase()
+        val correspondentEmail = email.lowercase()
+
+        val isRealMe = userEmail == correspondentEmail
+
+        val (start, end) = userEmail.getStartAndEndOfPlusEmail()
+        val isPlusMe = correspondentEmail.startsWith(start) && correspondentEmail.endsWith(end)
+
+        return isRealMe || isPlusMe
+    }
 
     fun shouldDisplayUserAvatar(): Boolean = isMe() && email.lowercase() == AccountUtils.currentUser?.email?.lowercase()
 

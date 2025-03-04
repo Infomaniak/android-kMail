@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
+import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -59,10 +60,17 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     fun getLastMessageToExecuteAction(thread: Thread): Message = with(thread) {
 
         val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
-        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+
+        val isNotFromRealMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
                 "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
 
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromMe").find().lastOrNull()
+        val (start, end) = AccountUtils.currentMailboxEmail.getStartAndEndOfPlusEmail()
+        val isNotFromPlusMe = "SUBQUERY(${Message::from.name}, \$recipient," +
+                " \$recipient.${Recipient::email.name} BEGINSWITH '${start}'" +
+                " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
+                ").@count < 1"
+
+        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").find().lastOrNull()
             ?: messages.query("$isNotDraft AND $isNotScheduledDraft").find().lastOrNull()
             ?: messages.query(isNotScheduledDraft).find().lastOrNull()
             ?: messages.last()

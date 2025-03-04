@@ -143,6 +143,13 @@ fun String.removeLineBreaksFromHtml(): Document = jsoupParseWithLog(replace("\r"
 
 fun String.htmlToText(): String = removeLineBreaksFromHtml().wholeText()
 
+fun String?.getStartAndEndOfPlusEmail(): Pair<String, String> {
+    val splittedEmail = this?.split("@")
+    val fromStartToPlus = splittedEmail?.first() + "+"
+    val fromArobaseToEnd = "@" + splittedEmail?.last()
+    return fromStartToPlus to fromArobaseToEnd
+}
+
 //region Date
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
 
