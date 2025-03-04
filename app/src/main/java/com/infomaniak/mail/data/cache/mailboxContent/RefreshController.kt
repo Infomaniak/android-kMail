@@ -258,7 +258,7 @@ class RefreshController @Inject constructor(
     private suspend fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String) {
         val activities = when (folder.role) {
             FolderRole.SNOOZED -> getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
-            else -> getMessagesUidsDelta<MessageFlags>(folder.id, previousCursor)
+            else -> getMessagesUidsDelta<DefaultMessageFlags>(folder.id, previousCursor)
         } ?: return
 
         scope.ensureActive()
@@ -478,7 +478,7 @@ class RefreshController @Inject constructor(
     //region Updated Messages
     private fun MutableRealm.handleUpdatedUids(
         scope: CoroutineScope,
-        messageFlags: List<CommonMessageFlags>,
+        messageFlags: List<MessageFlags>,
         folderId: String,
         refreshStrategy: RefreshStrategy,
     ): ImpactedFolders {
@@ -488,7 +488,7 @@ class RefreshController @Inject constructor(
 
             refreshStrategy.getMessageFromShortUid(flags.shortUid, folderId, realm = this)?.let { message ->
                 when (flags) {
-                    is MessageFlags -> message.updateFlags(flags)
+                    is DefaultMessageFlags -> message.updateFlags(flags)
                     is SnoozeMessageFlags -> message.updateSnoozeFlags(flags)
                 }
                 threads += message.threads
@@ -696,7 +696,7 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private inline fun <reified T : CommonMessageFlags> getMessagesUidsDelta(folderId: String, previousCursor: String): ActivitiesResult<T>? {
+    private inline fun <reified T : MessageFlags> getMessagesUidsDelta(folderId: String, previousCursor: String): ActivitiesResult<T>? {
         return with(ApiRepository.getMessagesUidsDelta<T>(mailbox.uuid, folderId, previousCursor, okHttpClient)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
@@ -735,7 +735,7 @@ class RefreshController @Inject constructor(
         logMessage: String,
         email: String,
         folder: Folder,
-        activities: ActivitiesResult<out CommonMessageFlags>,
+        activities: ActivitiesResult<out MessageFlags>,
     ) {
         SentryDebug.addThreadsAlgoBreadcrumb(
             message = logMessage,

@@ -46,7 +46,7 @@ import com.infomaniak.mail.data.models.draft.SaveDraftResult
 import com.infomaniak.mail.data.models.draft.ScheduleDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
-import com.infomaniak.mail.data.models.getMessages.CommonMessageFlags
+import com.infomaniak.mail.data.models.getMessages.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -284,7 +284,7 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    inline fun <reified T: CommonMessageFlags> getMessagesUidsDelta(
+    inline fun <reified T: MessageFlags> getMessagesUidsDelta(
         mailboxUuid: String,
         folderId: String,
         cursor: String,
