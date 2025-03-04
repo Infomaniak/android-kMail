@@ -270,10 +270,9 @@ class RefreshController @Inject constructor(
         var inboxUnreadCount: Int? = null
         write {
             val refreshStrategy = folder.refreshStrategy()
-            val impactedFolders = ImpactedFolders().also {
-                it += handleDeletedUids(scope, activities.deletedShortUids, folder.id, refreshStrategy)
-                it += handleUpdatedUids(scope, activities.updatedMessages, folder.id, refreshStrategy)
-            }
+            val impactedFolders = ImpactedFolders()
+            impactedFolders += handleDeletedUids(scope, activities.deletedShortUids, folder.id, refreshStrategy)
+            impactedFolders += handleUpdatedUids(scope, activities.updatedMessages, folder.id, refreshStrategy)
 
             inboxUnreadCount = updateFoldersUnreadCount(impactedFolders, realm = this)
 
@@ -649,12 +648,14 @@ class RefreshController @Inject constructor(
             extraFolderUpdates?.invoke(currentFolder)
         }
 
-        // TODO: Explain better
-        // Some folders such as inbox and snooze require to query again the other folder's threads as well
+        // Some folders such as inbox and snooze require to query again the other folder's threads as well. For example, if a
+        // message uid is returned as "added" or "deleted" in the snooze folder, it should disappear or appear from inbox as well.
         currentFolderRefreshStrategy.otherFolderRolesToQueryThreads().forEach { folderRole ->
             getUpToDateFolder(folderRole)?.let { otherFolder ->
-                val allThreads = otherFolder.refreshStrategy().queryFolderThreads(folderId, realm = this)
-                otherFolder.threads.replaceContent(list = allThreads)
+                val allOtherFolderThreads = otherFolder.refreshStrategy().queryFolderThreads(folderId, realm = this)
+                otherFolder.threads.replaceContent(list = allOtherFolderThreads)
+
+                if (otherFolder.role == FolderRole.SCHEDULED_DRAFTS) otherFolder.isDisplayed = otherFolder.threads.isNotEmpty()
             }
         }
     }
