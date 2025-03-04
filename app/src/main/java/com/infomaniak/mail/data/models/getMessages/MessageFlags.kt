@@ -17,21 +17,6 @@
  */
 package com.infomaniak.mail.data.models.getMessages
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class MessageFlags(
-    @SerialName("uid")
-    override val shortUid: String,
-    @SerialName("answered")
-    val isAnswered: Boolean,
-    @SerialName("flagged")
-    val isFavorite: Boolean,
-    @SerialName("forwarded")
-    val isForwarded: Boolean,
-    @SerialName("scheduled")
-    val isScheduledMessage: Boolean,
-    @SerialName("seen")
-    val isSeen: Boolean,
-) : CommonMessageFlags
+sealed interface MessageFlags {
+    val shortUid: String
+}
