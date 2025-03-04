@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,6 @@
  */
 package com.infomaniak.mail.data.models.getMessages
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class ActivitiesResult<T : CommonMessageFlags>(
-    @SerialName("deleted")
-    val deletedShortUids: List<String>,
-    @SerialName("updated")
-    val updatedMessages: List<T>,
-    @SerialName("added")
-    val addedShortUids: List<Int>,
-    @SerialName("unread_count")
-    val unreadCountRemote: Int,
-    @SerialName("signature")
-    val cursor: String,
-)
+sealed interface CommonMessageFlags {
+    val shortUid: String
+}
