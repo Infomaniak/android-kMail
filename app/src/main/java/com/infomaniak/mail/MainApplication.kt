@@ -36,6 +36,7 @@ import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
 import com.facebook.stetho.Stetho
 import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor
@@ -164,50 +165,18 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun configureSentry() {
-
-        val networkException = "NetworkException"
-        val apiErrorException = "ApiErrorException"
-        val accessDenied = "access_denied"
-        val notAuthorized = "not_authorized"
-
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
-
-                val shouldLog = mutableListOf<Boolean>()
-
-                // Sentry events are discarded if the app is in Debug mode
-                val isInReleaseMode = !BuildConfig.DEBUG
-                shouldLog.add(isInReleaseMode)
-
-                // Sentry events are discarded if the user deactivated Sentry tracking in DataManagement settings
-                val isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled
-                shouldLog.add(isSentryTrackingEnabled)
-
-                // TODO: Check if this works
-                // Network exceptions are discarded
-                val isNetworkException = event.exceptions?.any {
-                    it.type?.contains(networkException, true) == true || it.value?.contains(networkException, true) == true
-                } ?: false
-                shouldLog.add(!isNetworkException)
-
-                // TODO: Check if this works
-                // AccessDenied exceptions are discarded
-                val isAccessDeniedException = event.exceptions?.any {
-                    (it.type?.contains(apiErrorException, true) == true || it.value?.contains(apiErrorException, true) == true)
-                            && (it.type?.contains(accessDenied, true) == true || it.value?.contains(accessDenied, true) == true)
-                } ?: false
-                shouldLog.add(!isAccessDeniedException)
-
-                // TODO: Check if this works
-                // NotAuthorized exceptions are discarded
-                val isNotAuthorizedException = event.exceptions?.any {
-                    (it.type?.contains(apiErrorException, true) == true || it.value?.contains(apiErrorException, true) == true)
-                            && (it.type?.contains(notAuthorized, true) == true || it.value?.contains(notAuthorized, true) == true)
-                } ?: false
-                shouldLog.add(!isNotAuthorizedException)
-
-                if (shouldLog.all { true }) event else null
+                val exception = event.throwable
+                return@BeforeSendCallback when {
+                    BuildConfig.DEBUG -> null // Sentry events are discarded if the app is in Debug mode
+                    !localSettings.isSentryTrackingEnabled -> null // Sentry events are discarded if the user deactivated Sentry tracking in DataManagement settings
+                    exception is ApiController.NetworkException -> null // Network exceptions are discarded
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> null // AccessDenied exceptions are discarded
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> null // NotAuthorized exceptions are discarded
+                    else -> event
+                }
             }
             options.addIntegration(
                 FragmentLifecycleIntegration(
