@@ -169,12 +169,20 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
                 val exception = event.throwable
-                return@BeforeSendCallback when {
-                    BuildConfig.DEBUG -> null // Sentry events are discarded if the app is in Debug mode
-                    !localSettings.isSentryTrackingEnabled -> null // Sentry events are discarded if the user deactivated Sentry tracking in DataManagement settings
-                    exception is ApiController.NetworkException -> null // Network exceptions are discarded
-                    exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> null // AccessDenied exceptions are discarded
-                    exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> null // NotAuthorized exceptions are discarded
+                /**
+                 * Reasons to discard Sentry events :
+                 * - Application is in Debug mode
+                 * - User deactivated Sentry tracking in DataManagement settings
+                 * - The exception was an [ApiController.NetworkException], and we don't want to send them to Sentry
+                 * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
+                 *   [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
+                 */
+                when {
+                    BuildConfig.DEBUG -> null
+                    !localSettings.isSentryTrackingEnabled -> null
+                    exception is ApiController.NetworkException -> null
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> null
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> null
                     else -> event
                 }
             }
