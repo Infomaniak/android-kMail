@@ -1,0 +1,1 @@
+- Correction de problème lors du déplacement d'une conversation
