@@ -329,7 +329,7 @@ class RefreshController @Inject constructor(
         var inboxUnreadCount: Int? = null
         FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
 
-            val allCurrentFolderThreads = ThreadController.getThreadsByFolderId(it.id, realm = mutableRealm)
+            val allCurrentFolderThreads = folder.refreshStrategy().queryFolderThreads(folder.id, mutableRealm)
             it.threads.replaceContent(list = allCurrentFolderThreads)
 
             inboxUnreadCount = updateFoldersUnreadCount(
@@ -512,6 +512,7 @@ class RefreshController @Inject constructor(
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
         val addedMessagesUids = mutableListOf<Int>()
+        val shouldForceUpdateMessages = folder.refreshStrategy().shouldForceUpdateMessagesWhenAdded()
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
@@ -519,6 +520,8 @@ class RefreshController @Inject constructor(
             initMessageLocalValues(remoteMessage, folder)
 
             addedMessagesUids.add(remoteMessage.shortUid)
+
+            if (shouldForceUpdateMessages) updateExistingMessage(remoteMessage)
 
             val newThread = if (isConversationMode) {
                 createNewThread(scope, remoteMessage, impactedThreadsManaged)
@@ -540,6 +543,11 @@ class RefreshController @Inject constructor(
         }
 
         return impactedThreadsUnmanaged
+    }
+
+    private fun MutableRealm.updateExistingMessage(remoteMessage: Message) {
+        val isMessageAlreadyInRealm = MessageController.getMessage(remoteMessage.uid, realm = this) != null
+        if (isMessageAlreadyInRealm) MessageController.upsertMessage(remoteMessage, realm = this)
     }
 
     private fun MutableRealm.createNewThread(
@@ -764,11 +772,14 @@ class RefreshController @Inject constructor(
     }
     //endregion
 
+    // SCHEDULED_DRAFTS and SNOOZED need to be refreshed often because the folders only appear in the menu folder when there is at
+    // least one email in it.
     private val FOLDER_ROLES_TO_REFRESH_TOGETHER = setOf(
         FolderRole.INBOX,
         FolderRole.SENT,
         FolderRole.DRAFT,
         FolderRole.SCHEDULED_DRAFTS,
+        FolderRole.SNOOZED,
     )
 
     enum class RefreshMode {

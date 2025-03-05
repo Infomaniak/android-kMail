@@ -25,7 +25,7 @@ import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.SentryDebug
@@ -145,6 +145,12 @@ class Folder : RealmObject, Cloneable {
     }
 
     fun messages(realm: TypedRealm): List<Message> = MessageController.getMessagesByFolderId(id, realm)
+
+    fun refreshStrategy(): RefreshStrategy = when (role) {
+        FolderRole.INBOX -> inboxRefreshStrategy
+        FolderRole.SNOOZED -> snoozeRefreshStrategy
+        else -> defaultRefreshStrategy
+    }
 
     fun getLocalizedName(context: Context): String {
         return role?.folderNameRes?.let(context::getString) ?: name
