@@ -26,9 +26,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
-import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
-import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
+import com.infomaniak.mail.data.models.getMessages.*
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.MessageInitialState
@@ -258,8 +256,11 @@ class RefreshController @Inject constructor(
     }
 
     private suspend fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String) {
+        val activities = when (folder.role) {
+            FolderRole.SNOOZED -> getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
+            else -> getMessagesUidsDelta<DefaultMessageFlags>(folder.id, previousCursor)
+        } ?: return
 
-        val activities = getMessagesUidsDelta(folder.id, previousCursor) ?: return
         scope.ensureActive()
 
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | " +
@@ -486,7 +487,10 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             refreshStrategy.getMessageFromShortUid(flags.shortUid, folderId, realm = this)?.let { message ->
-                message.updateFlags(flags)
+                when (flags) {
+                    is DefaultMessageFlags -> message.updateFlags(flags)
+                    is SnoozeMessageFlags -> message.updateSnoozeFlags(flags)
+                }
                 threads += message.threads
             }
         }
@@ -692,8 +696,8 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun getMessagesUidsDelta(folderId: String, previousCursor: String): ActivitiesResult? {
-        return with(ApiRepository.getMessagesUidsDelta(mailbox.uuid, folderId, previousCursor, okHttpClient)) {
+    private inline fun <reified T : MessageFlags> getMessagesUidsDelta(folderId: String, previousCursor: String): ActivitiesResult<T>? {
+        return with(ApiRepository.getMessagesUidsDelta<T>(mailbox.uuid, folderId, previousCursor, okHttpClient)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
         }
@@ -731,7 +735,7 @@ class RefreshController @Inject constructor(
         logMessage: String,
         email: String,
         folder: Folder,
-        activities: ActivitiesResult,
+        activities: ActivitiesResult<out MessageFlags>,
     ) {
         SentryDebug.addThreadsAlgoBreadcrumb(
             message = logMessage,
