@@ -105,6 +105,11 @@ class FolderController @Inject constructor(
     }
 
     private fun MutableRealm.deleteOutdatedFolders(mailbox: Mailbox, remoteFolders: List<Folder>) {
+        /**
+         * This list is reversed because we'll delete items while looping over it.
+         * Doing so for managed Realm objects will lively update the list we're iterating through, making us skip the next item.
+         * Looping in reverse enables us to not skip any item.
+         */
         getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).asReversed().forEach { folder ->
             deleteLocalFolder(mailbox, folder)
         }
