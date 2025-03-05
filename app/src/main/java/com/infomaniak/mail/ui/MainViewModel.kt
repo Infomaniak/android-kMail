@@ -30,12 +30,9 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
+import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCallbacks
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
@@ -552,7 +549,8 @@ class MainViewModel @Inject constructor(
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
-        val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
+        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId)
+        if (trashId != null) undoFoldersIds += trashId
         showDeleteSnackbar(
             apiResponses,
             shouldPermanentlyDelete,
@@ -569,7 +567,7 @@ class MainViewModel @Inject constructor(
         shouldPermanentlyDelete: Boolean,
         message: Message?,
         undoResources: List<String>,
-        undoFoldersIds: List<String>,
+        undoFoldersIds: ImpactedFolders,
         undoDestinationId: String?,
         numberOfImpactedThreads: Int,
     ) {
@@ -608,7 +606,7 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
             val draftFolderId = folderController.getFolder(FolderRole.DRAFT)!!.id
-            refreshFoldersAsync(mailbox, listOf(draftFolderId))
+            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolderId)))
         }
 
         showDeletedDraftSnackbar(apiResponse)
@@ -626,7 +624,7 @@ class MainViewModel @Inject constructor(
             with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
                 if (isSuccess()) {
                     val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-                    refreshFoldersAsync(currentMailbox.value!!, listOf(scheduledDraftsFolderId))
+                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
                 } else {
                     snackbarManager.postValue(title = appContext.getString(translatedError))
                 }
@@ -645,7 +643,7 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess()) {
             val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-            refreshFoldersAsync(mailbox, listOf(scheduledDraftsFolderId))
+            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
             onSuccess()
         } else {
             snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
@@ -658,7 +656,7 @@ class MainViewModel @Inject constructor(
 
         if (apiResponse.isSuccess()) {
             val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-            refreshFoldersAsync(mailbox, listOf(scheduledDraftsFolderId))
+            refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
         }
 
         showUnscheduledDraftSnackbar(apiResponse)
@@ -734,9 +732,11 @@ class MainViewModel @Inject constructor(
             null
         } else {
             val undoDestinationId = message?.folderId ?: threads.first().folderId
+            val foldersIds = messages.getFoldersIds(exception = undoDestinationId)
+            foldersIds += destinationFolder.id
             UndoData(
                 resources = apiResponses.mapNotNull { it.data?.undoResource },
-                foldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolder.id,
+                foldersIds = foldersIds,
                 destinationFolderId = undoDestinationId,
             )
         }
@@ -1114,7 +1114,7 @@ class MainViewModel @Inject constructor(
 
     private fun refreshFoldersAsync(
         mailbox: Mailbox,
-        messagesFoldersIds: List<String>,
+        messagesFoldersIds: ImpactedFolders,
         destinationFolderId: String? = null,
         callbacks: RefreshCallbacks? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
