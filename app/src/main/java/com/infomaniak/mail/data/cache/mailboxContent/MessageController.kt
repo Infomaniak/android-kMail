@@ -229,6 +229,11 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         }
 
         fun deleteMessages(context: Context, mailbox: Mailbox, messages: List<Message>, realm: MutableRealm) {
+            /**
+             * This list is reversed because we'll delete items while looping over it.
+             * Doing so for managed Realm objects will lively update the list we're iterating through, making us skip the next item.
+             * Looping in reverse enables us to not skip any item.
+             */
             messages.asReversed().forEach { message ->
                 deleteMessage(context, mailbox, message, realm)
             }

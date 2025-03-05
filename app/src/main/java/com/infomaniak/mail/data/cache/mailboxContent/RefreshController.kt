@@ -452,6 +452,11 @@ class RefreshController @Inject constructor(
 
             val message = MessageController.getMessage(uid = shortUid.toLongUid(folderId), realm = this) ?: return@forEach
 
+            /**
+             * This list is reversed because we'll delete items while looping over it.
+             * Doing so for managed Realm objects will lively update the list we're iterating through, making us skip the next item.
+             * Looping in reverse enables us to not skip any item.
+             */
             message.threads.asReversed().forEach { thread ->
                 scope.ensureActive()
 

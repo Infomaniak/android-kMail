@@ -139,6 +139,11 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         var haveAllDraftsSucceeded = true
 
+        /**
+         * This list is reversed because we'll delete items while looping over it.
+         * Doing so for managed Realm objects will lively update the list we're iterating through, making us skip the next item.
+         * Looping in reverse enables us to not skip any item.
+         */
         drafts.asReversed().forEach { draft ->
 
             val isTargetDraft = draft.localUuid == draftLocalUuid
