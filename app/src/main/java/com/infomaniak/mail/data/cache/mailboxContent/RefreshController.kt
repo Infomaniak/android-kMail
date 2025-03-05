@@ -452,32 +452,38 @@ class RefreshController @Inject constructor(
 
             val message = MessageController.getMessage(uid = shortUid.toLongUid(folderId), realm = this) ?: return@forEach
 
-            message.threads.forEach { thread ->
+            for (thread in message.threads.asReversed()) {
                 scope.ensureActive()
 
                 val isSuccess = thread.messages.remove(message)
-                if (isSuccess) threads += thread
+                val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
+
+                // We need to save this value because the Thread could be deleted before we use this `folderId`.
+                val threadFolderId = thread.folderId
+
+                if (numberOfMessagesInFolder == 0) {
+                    threads.removeIf { it.uid == thread.uid }
+                    delete(thread)
+                } else if (isSuccess) {
+                    threads += thread
+                } else {
+                    continue
+                }
+
+                impactedFolders.add(threadFolderId)
             }
 
             MessageController.deleteMessage(appContext, mailbox, message, realm = this)
         }
 
-        threads.forEach { thread ->
+        threads.forEach {
             scope.ensureActive()
 
-            impactedFolders.add(thread.folderId)
-
-            if (thread.getNumberOfMessagesInFolder() == 0) {
-                delete(thread)
-            } else {
-                thread.recomputeThread(realm = this)
-            }
+            it.recomputeThread(realm = this)
         }
 
         return impactedFolders
     }
-
-    private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
     //endregion
 
     //region Updated Messages
