@@ -72,13 +72,11 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.HtmlUtils.processCids
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
-import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.*
@@ -772,7 +770,9 @@ class NewMessageFragment : Fragment() {
         val isMailboxFull = newMessageViewModel.currentMailbox.quotas?.isFull == true
         if (isMailboxFull) {
             trackNewMessageEvent("trySendingWithMailboxFull")
-            showSnackbar(R.string.myKSuiteSpaceFullAlert)
+            showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
+                openMyKSuiteUpgradeBottomSheet("notEnoughStorageUpgrade")
+            }
         }
 
         return !isMailboxFull

@@ -23,6 +23,7 @@ import android.content.Context
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
+import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.lib.core.MatomoCore
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
@@ -280,6 +281,14 @@ object MatomoMail : MatomoCore {
 
     fun Fragment.trackScheduleSendEvent(name: String) {
         trackEvent("scheduleSend", name)
+    }
+
+    fun Fragment.trackMyKSuiteEvent(name: String) {
+        trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE, name)
+    }
+
+    fun Context.trackMyKSuiteUpgradeBottomSheetEvent(name: String) {
+        trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE_UPGRADE_BOTTOMSHEET, name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions

@@ -37,8 +37,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
-import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
-import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.core.utils.FORMAT_SCHEDULE_MAIL
 import com.infomaniak.core.utils.year
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
@@ -58,6 +56,7 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackInAppReviewEvent
 import com.infomaniak.mail.MatomoMail.trackInAppUpdateEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -286,8 +285,9 @@ class MainActivity : BaseActivity() {
                     errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_DAILY_LIMIT_REACHED)
 
             if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
+                trackNewMessageEvent("trySendingWithDailyLimitReached")
                 snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                    navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
+                    openMyKSuiteUpgradeBottomSheet(navController, "dailyLimitReachedUpgrade")
                 }
             } else {
                 snackbarManager.setValue(getString(errorRes))
