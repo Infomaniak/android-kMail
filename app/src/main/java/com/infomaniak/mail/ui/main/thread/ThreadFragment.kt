@@ -48,7 +48,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
-import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
+import com.infomaniak.mail.MatomoMail.trackBlockUserAction
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
@@ -186,7 +186,7 @@ class ThreadFragment : Fragment() {
         mainViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) {
             setPositiveButtonCallback { messageOfUserToBlock ->
                 messageOfUserToBlock?.let {
-                    trackBottomSheetThreadActionsEvent("blockUser")
+                    trackBlockUserAction("confirmSelectedUser")
                     mainViewModel.blockUser(messageOfUserToBlock)
                 }
             }
