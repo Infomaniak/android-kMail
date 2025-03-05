@@ -60,14 +60,12 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         context: Context,
         mailbox: Mailbox,
         realm: MutableRealm,
-    ): Collection<Thread> {
+    ) {
         managedMessage.apply {
             snoozeState = null
             snoozeEndDate = null
             snoozeAction = null
         }
-
-        return managedMessage.threads
     }
 
     override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {

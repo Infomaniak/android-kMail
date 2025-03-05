@@ -451,7 +451,9 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             val message = currentFolderRefreshStrategy.getMessageFromShortUid(shortUid, folderId, realm = this) ?: return@forEach
-            threads += currentFolderRefreshStrategy.processDeletedMessage(scope, message, appContext, mailbox, realm = this)
+            threads += message.threads
+
+            currentFolderRefreshStrategy.processDeletedMessage(scope, message, appContext, mailbox, realm = this)
         }
 
         val impactedFolders = ImpactedFolders()

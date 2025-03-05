@@ -35,20 +35,18 @@ interface RefreshStrategy {
 
     fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
 
-    /**
-     * @return The list of impacted threads that have changed and need to be recomputed. The list of impacted threads will also be
-     * used to determine what folders need to have their unread count updated. If an extra folder needs its unread count updated
-     * but no thread has that extra folder as [Thread.folderId], you can define the extra folder you want inside
-     * [addFolderToImpactedFolders] as they will be inserted inside the list of impacted folders.
-     */
     fun processDeletedMessage(
         scope: CoroutineScope,
         managedMessage: Message,
         context: Context,
         mailbox: Mailbox,
         realm: MutableRealm,
-    ): Collection<Thread>
+    )
 
+    /**
+     * If an extra folder needs its unread count updated but no thread has that extra folder as [Thread.folderId], you can add the
+     * extra folder inside this method as they will be inserted inside the list of impacted folders.
+     */
     fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders)
     fun processDeletedThread(thread: Thread, realm: MutableRealm)
     fun shouldQueryFolderThreadsOnDeletedUid(): Boolean
@@ -85,19 +83,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         context: Context,
         mailbox: Mailbox,
         realm: MutableRealm,
-    ): Collection<Thread> = buildSet {
-        /**
-         * This list is reversed because we'll delete items while looping over it.
-         * Doing so for managed Realm objects will lively update the list we're iterating through, making us skip the next item.
-         * Looping in reverse enables us to not skip any item.
-         */
-        managedMessage.threads.asReversed().forEach { thread ->
-            scope.ensureActive()
-
-            val isSuccess = thread.messages.remove(managedMessage)
-            if (isSuccess) add(thread)
-        }
-
+    ) {
         MessageController.deleteMessage(context, mailbox, managedMessage, realm)
     }
 
