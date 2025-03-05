@@ -36,6 +36,7 @@ import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
 import com.facebook.stetho.Stetho
 import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor
@@ -167,37 +168,23 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         SentryAndroid.init(this) { options: SentryAndroidOptions ->
             // Register the callback as an option
             options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
-
-                val shouldLog = mutableListOf<Boolean>()
-
-                // Sentry events are discarded if the app is in Debug mode
-                val isInReleaseMode = !BuildConfig.DEBUG
-                shouldLog.add(isInReleaseMode)
-
-                // Sentry events are discarded if the user deactivated Sentry tracking in DataManagement settings
-                val isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled
-                shouldLog.add(isSentryTrackingEnabled)
-
-                // Network exceptions are discarded
-                // TODO: It doesn't work anymore :(
-                val isNetworkException = event.exceptions?.any { it.type == "ApiController\$NetworkException" } ?: false
-                shouldLog.add(!isNetworkException)
-
-                // AccessDenied exceptions are discarded
-                val isAccessDeniedException = event.exceptions?.any {
-                    // TODO: Check in Sentry if this `value.contains()` is the correct way to find this exception.
-                    it.type == "ApiErrorException" && it.value?.contains("access_denied") == true
-                } ?: false
-                shouldLog.add(!isAccessDeniedException)
-
-                // NotAuthorized exceptions are discarded
-                val isNotAuthorizedException = event.exceptions?.any {
-                    // TODO: Check in Sentry if this `value.contains()` is the correct way to find this exception.
-                    it.type == "ApiErrorException" && it.value?.contains("not_authorized") == true
-                } ?: false
-                shouldLog.add(!isNotAuthorizedException)
-
-                if (shouldLog.all { true }) event else null
+                val exception = event.throwable
+                /**
+                 * Reasons to discard Sentry events :
+                 * - Application is in Debug mode
+                 * - User deactivated Sentry tracking in DataManagement settings
+                 * - The exception was an [ApiController.NetworkException], and we don't want to send them to Sentry
+                 * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
+                 *   [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
+                 */
+                when {
+                    BuildConfig.DEBUG -> null
+                    !localSettings.isSentryTrackingEnabled -> null
+                    exception is ApiController.NetworkException -> null
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> null
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> null
+                    else -> event
+                }
             }
             options.addIntegration(
                 FragmentLifecycleIntegration(
