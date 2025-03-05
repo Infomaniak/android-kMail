@@ -17,14 +17,27 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
+import kotlinx.coroutines.CoroutineScope
 
 val defaultRefreshStrategy = object : DefaultRefreshStrategy {}
 
 val inboxRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
+    }
+
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.SNOOZED)
+
+    override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
+        impactedFolders += folderId
+        impactedFolders += Folder.FolderRole.SNOOZED
     }
 }
 
@@ -34,4 +47,32 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     }
 
     override fun shouldForceUpdateMessagesWhenAdded(): Boolean = true
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.INBOX)
+
+    override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
+        val inboxId = FolderController.getFolder(Folder.FolderRole.INBOX, realm)?.id ?: return null
+        return super.getMessageFromShortUid(shortUid, inboxId, realm)
+    }
+
+    override fun processDeletedMessage(
+        scope: CoroutineScope,
+        managedMessage: Message,
+        context: Context,
+        mailbox: Mailbox,
+        realm: MutableRealm,
+    ) {
+        managedMessage.apply {
+            snoozeState = null
+            snoozeEndDate = null
+            snoozeAction = null
+        }
+    }
+
+    override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
+        impactedFolders += folderId
+        impactedFolders += Folder.FolderRole.INBOX
+    }
+
+    override fun processDeletedThread(thread: Thread, realm: MutableRealm) = thread.recomputeThread()
+    override fun shouldQueryFolderThreadsOnDeletedUid(): Boolean = true
 }
