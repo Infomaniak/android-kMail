@@ -64,7 +64,6 @@ interface RefreshStrategy {
         scope: CoroutineScope,
         remoteMessage: Message,
         isConversationMode: Boolean,
-        impactedThreadsManaged: MutableSet<Thread>,
         realm: MutableRealm,
-    )
+    ): Set<Thread>
 }
