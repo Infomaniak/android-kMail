@@ -20,6 +20,6 @@ package com.infomaniak.mail.data.models
 import com.infomaniak.core.utils.ApiEnum
 
 enum class SnoozeState(override val apiValue: String) : ApiEnum {
-    Snoozed(apiValue = "snoozed"),
-    Unsnoozed(apiValue = "unsnoozed"),
+    Snoozed(apiValue = "snoozed"), // Has been snoozed and the snooze end time has not been reached yet
+    Unsnoozed(apiValue = "unsnoozed"), // Used to be snoozed but the snooze end time has been reached and the message came back
 }
