@@ -36,6 +36,7 @@ import javax.inject.Inject
 class MykSuiteViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val mailboxController: MailboxController,
+    private val myKSuiteDataUtils: MyKSuiteDataUtils,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
@@ -48,6 +49,6 @@ class MykSuiteViewModel @Inject constructor(
     }
 
     fun refreshMyKSuite() = viewModelScope.launch(ioCoroutineContext) {
-        myKSuiteDataResult.postValue(MyKSuiteDataUtils.fetchDataIfMyKSuite(mailboxController))
+        myKSuiteDataResult.postValue(myKSuiteDataUtils.fetchData())
     }
 }

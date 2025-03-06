@@ -39,6 +39,7 @@ import javax.inject.Inject
 class SwitchUserViewModel @Inject constructor(
     application: Application,
     private val mailboxController: MailboxController,
+    private val myKSuiteDataUtils: MyKSuiteDataUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -52,7 +53,7 @@ class SwitchUserViewModel @Inject constructor(
         if (user.id != AccountUtils.currentUserId) {
             appContext.trackAccountEvent("switch")
             RealmDatabase.backupPreviousRealms()
-            MyKSuiteDataUtils.myKSuite = null
+            myKSuiteDataUtils.myKSuite = null
             AccountUtils.currentUser = user
             AccountUtils.currentMailboxId = mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()

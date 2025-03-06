@@ -25,23 +25,25 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 
-object MyKSuiteDataUtils : MyKSuiteDataManager() {
-
-    private val TAG = MyKSuiteDataUtils::class.simpleName.toString()
+@Singleton
+class MyKSuiteDataUtils @Inject constructor(private val mailboxController: MailboxController) : MyKSuiteDataManager() {
 
     override val currentUserId get() = AccountUtils.currentUserId
 
     override var myKSuite: MyKSuiteData? = null
 
-    /** Only call this if you are sure that you want to do the call without checking if it's necessary or not
-     * To avoid useless call for account that does not have a my kSuite offer, use [fetchDataIfMyKSuite] */
     override suspend fun fetchData(): MyKSuiteData? = runCatching {
-        MyKSuiteDataUtils.requestKSuiteData()
+        requestKSuiteData()
+        // Only fetch the Data if the current user has a my kSuite mailbox
+        if (mailboxController.getMyKSuiteMailboxCount(userId = AccountUtils.currentUserId) == 0L) return@runCatching null
+
         val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClient)
         if (apiResponse.data != null) {
-            MyKSuiteDataUtils.upsertKSuiteData(apiResponse.data!!)
+            upsertKSuiteData(apiResponse.data!!)
         } else {
             @OptIn(ExperimentalSerializationApi::class)
             apiResponse.error?.exception?.let {
@@ -56,8 +58,8 @@ object MyKSuiteDataUtils : MyKSuiteDataManager() {
         null
     }
 
-    suspend fun fetchDataIfMyKSuite(mailboxController: MailboxController): MyKSuiteData? {
-        // Only fetch the my kSuite Data if the current account has a my kSuite
-        return if (mailboxController.getMyKSuiteMailboxCount(userId = AccountUtils.currentUserId) != 0L) fetchData() else null
+    companion object {
+
+        private val TAG = MyKSuiteDataUtils::class.simpleName.toString()
     }
 }

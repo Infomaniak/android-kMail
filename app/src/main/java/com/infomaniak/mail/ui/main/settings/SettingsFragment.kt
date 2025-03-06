@@ -64,6 +64,9 @@ class SettingsFragment : Fragment() {
     @Inject
     lateinit var localSettings: LocalSettings
 
+    @Inject
+    lateinit var myKSuiteDataUtils: MyKSuiteDataUtils
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         saveFocusWhenNavigatingBack(getLayout = { binding.linearLayoutContainer }, lifecycle)
@@ -87,8 +90,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupMyKSuite() {
-        binding.myKSuiteLayout.isGone = MyKSuiteDataUtils.myKSuite == null
-        MyKSuiteDataUtils.myKSuite?.let { setupMyKSuiteLayout(it) } ?: myKSuiteViewModel.refreshMyKSuite()
+        binding.myKSuiteLayout.isGone = myKSuiteDataUtils.myKSuite == null
+        myKSuiteDataUtils.myKSuite?.let { setupMyKSuiteLayout(it) } ?: myKSuiteViewModel.refreshMyKSuite()
     }
 
     private fun setupMyKSuiteLayout(myKSuiteData: MyKSuiteData) = with(binding) {
@@ -149,7 +152,7 @@ class SettingsFragment : Fragment() {
 
         binding.mailboxesList.adapter = mailboxesAdapter
         mainViewModel.mailboxesLive.observe(viewLifecycleOwner) { mailboxes ->
-            mailboxesAdapter.setMailboxes(mailboxes.filterNot { it.mailboxId == MyKSuiteDataUtils.myKSuite?.mail?.mailboxId })
+            mailboxesAdapter.setMailboxes(mailboxes.filterNot { it.mailboxId == myKSuiteDataUtils.myKSuite?.mail?.mailboxId })
         }
     }
 
