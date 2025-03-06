@@ -17,7 +17,9 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 
 val defaultRefreshStrategy = object : DefaultRefreshStrategy {}
@@ -33,5 +35,11 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
 
-    override fun shouldForceUpdateMessagesWhenAdded(): Boolean = true
+    override fun updateExistingMessageWhenAdded(remoteMessage: Message, realm: MutableRealm) {
+        MessageController.updateMessage(remoteMessage.uid, realm = realm) { localMessage ->
+            localMessage?.snoozeState = remoteMessage.snoozeState
+            localMessage?.snoozeEndDate = remoteMessage.snoozeEndDate
+            localMessage?.snoozeAction = remoteMessage.snoozeAction
+        }
+    }
 }
