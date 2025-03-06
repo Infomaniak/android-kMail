@@ -545,11 +545,6 @@ class RefreshController @Inject constructor(
         return impactedThreadsUnmanaged
     }
 
-    private fun MutableRealm.updateExistingMessage(remoteMessage: Message) {
-        val isMessageAlreadyInRealm = MessageController.getMessage(remoteMessage.uid, realm = this) != null
-        if (isMessageAlreadyInRealm) MessageController.upsertMessage(remoteMessage, realm = this)
-    }
-
     private fun initMessageLocalValues(remoteMessage: Message, folder: Folder) {
         remoteMessage.initLocalValues(
             MessageInitialState(
@@ -772,8 +767,8 @@ class RefreshController @Inject constructor(
     }
     //endregion
 
-    // SCHEDULED_DRAFTS and SNOOZED need to be refreshed often because the folders only appear in the menu folder when there is at
-    // least one email in it.
+    // SCHEDULED_DRAFTS and SNOOZED need to be refreshed often because these folders
+    // only appear in the MenuDrawer when there is at least 1 email in it.
     private val FOLDER_ROLES_TO_REFRESH_TOGETHER = setOf(
         FolderRole.INBOX,
         FolderRole.SENT,
