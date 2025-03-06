@@ -19,7 +19,7 @@
 
 package com.infomaniak.mail.data.models.thread
 
-import com.infomaniak.core.utils.apiEnumValueOfOrNull
+import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -40,6 +40,7 @@ import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -100,6 +101,12 @@ class Thread : RealmObject {
     var snoozeAction: String? = null
     //endregion
 
+    //region UI data (Ignore)
+    @Ignore
+    var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
+        private set
+    //endregion
+
     private val _folders by backlinks(Folder::threads)
     val folder
         get() = runCatching {
@@ -133,8 +140,6 @@ class Thread : RealmObject {
         }
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
-
-    val snoozeState get() = apiEnumValueOfOrNull<SnoozeState>(_snoozeState)
 
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
 
@@ -195,7 +200,7 @@ class Thread : RealmObject {
         isForwarded = false
         hasAttachable = false
         numberOfScheduledDrafts = 0
-        _snoozeState = null
+        snoozeState = null
         snoozeEndDate = null
         snoozeAction = null
     }
@@ -204,7 +209,7 @@ class Thread : RealmObject {
 
         fun Thread.updateSnoozeStatesBasedOn(message: Message) {
             message.snoozeState?.let {
-                _snoozeState = it.apiValue
+                snoozeState = it
                 snoozeEndDate = message.snoozeEndDate
                 snoozeAction = message.snoozeAction
             }
