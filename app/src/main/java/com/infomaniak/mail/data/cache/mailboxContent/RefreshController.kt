@@ -562,28 +562,11 @@ class RefreshController @Inject constructor(
         // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
         val existingThreads = ThreadController.getThreadsByMessageIds(remoteMessage.messageIds, realm = this)
         val existingMessages = getExistingMessages(existingThreads)
-        // Some Messages don't have references to all previous Messages of the Thread (ex: these from the iOS Mail app).
-        // Because we are missing the links between Messages, it will create multiple Threads for the same Folder.
-        // Hence, we need to find these duplicates.
-        // TODO: Find a way to compute this boolean in `updateExistingThreads()` if possible
-        val isThereDuplicatedThreads = isThereDuplicatedThreads(remoteMessage.messageIds, existingThreads.count())
 
         val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages)
-
-        val impactedThreads = updateExistingThreads(
-            scope = scope,
-            remoteMessage = remoteMessage,
-            existingThreads = existingThreads,
-            existingMessages = existingMessages,
-            isThereDuplicatedThreads = isThereDuplicatedThreads,
-        )
+        val impactedThreads = updateExistingThreads(scope, remoteMessage, existingThreads, existingMessages)
 
         return thread to impactedThreads
-    }
-
-    private fun MutableRealm.isThereDuplicatedThreads(messageIds: RealmSet<String>, threadsCount: Int): Boolean {
-        val foldersCount = ThreadController.getExistingThreadsFoldersCount(messageIds, realm = this)
-        return foldersCount != threadsCount.toLong()
     }
 
     private fun TypedRealm.createNewThreadIfRequired(
@@ -609,7 +592,6 @@ class RefreshController @Inject constructor(
         remoteMessage: Message,
         existingThreads: RealmResults<Thread>,
         existingMessages: Set<Message>,
-        isThereDuplicatedThreads: Boolean,
     ): Set<Thread> {
 
         val impactedThreads = mutableSetOf<Thread>()
@@ -617,12 +599,12 @@ class RefreshController @Inject constructor(
         // Update already existing Threads (i.e. in other Folders, or specific cases like Snoozed)
         impactedThreads += addAllMessagesToAllThreads(scope, remoteMessage, existingThreads, existingMessages)
 
-        // Now that all existing Threads are updated, we need to remove the duplicated Threads.
-        if (isThereDuplicatedThreads) {
-            val duplicatedThreads = identifyExtraDuplicatedThreads(remoteMessage.messageIds)
-            impactedThreads -= duplicatedThreads
-            duplicatedThreads.forEach(::delete) // Delete the other Threads. Sorry bro, you won't be missed.
-        }
+        // Some Messages don't have references to all previous Messages of the Thread (ex: these from the iOS Mail app).
+        // Because we are missing the links between Messages, it will create multiple Threads for the same Folder.
+        // Hence, we need to find these duplicates, and remove them.
+        val duplicatedThreads = identifyExtraDuplicatedThreads(remoteMessage.messageIds)
+        impactedThreads -= duplicatedThreads
+        duplicatedThreads.forEach(::delete) // Delete the other Threads. Sorry bro, you won't be missed.
 
         return impactedThreads
     }

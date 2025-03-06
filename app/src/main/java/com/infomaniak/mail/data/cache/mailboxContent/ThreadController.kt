@@ -200,10 +200,6 @@ class ThreadController @Inject constructor(
             return realm.query("ANY ${Thread::messagesIds.name} IN $0", messageIds)
         }
 
-        private fun getExistingThreadsFoldersCountQuery(messageIds: Set<String>, realm: TypedRealm): RealmScalarQuery<Long> {
-            return getThreadsByMessageIdsQuery(messageIds, realm).distinct(Thread::folderId.name).count()
-        }
-
         private fun getSearchThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
             return realm.query<Thread>("${Thread::isFromSearch.name} == true").sort(Thread::date.name, Sort.DESCENDING)
         }
@@ -264,10 +260,6 @@ class ThreadController @Inject constructor(
 
         fun getThreadsByMessageIds(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
             return getThreadsByMessageIdsQuery(messageIds, realm).find()
-        }
-
-        fun getExistingThreadsFoldersCount(messageIds: Set<String>, realm: TypedRealm): Long {
-            return getExistingThreadsFoldersCountQuery(messageIds, realm).find()
         }
 
         fun getUnreadThreadsCount(folder: Folder): Int {
