@@ -238,9 +238,7 @@ class Thread : RealmObject {
             updateSnoozeStatesBasedOn(message)
         }
 
-        duplicates.forEach { duplicate ->
-            updateSnoozeStatesBasedOn(duplicate)
-        }
+        duplicates.forEach(::updateSnoozeStatesBasedOn)
 
         date = messages.last { it.folderId == folderId }.date
         subject = messages.first().subject
