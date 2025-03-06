@@ -22,5 +22,4 @@ import com.infomaniak.core.utils.ApiEnum
 enum class SnoozeState(override val apiValue: String) : ApiEnum {
     Snoozed(apiValue = "snoozed"),
     Unsnoozed(apiValue = "unsnoozed"),
-    WasSnoozed(apiValue = "was_snoozed"),
 }
