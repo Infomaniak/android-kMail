@@ -34,7 +34,8 @@ android {
         buildConfigField 'String', 'CREATE_ACCOUNT_SUCCESS_HOST', '"ksuite.infomaniak.com"'
         buildConfigField 'String', 'CREATE_ACCOUNT_CANCEL_HOST', '"welcome.infomaniak.com"'
         buildConfigField 'String', 'IMPORT_EMAILS_URL', '"https://import-email.infomaniak.com"'
-        buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
+        // buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
+        buildConfigField 'String', 'MAIL_API', '"https://mail-mr-6237.preprod.dev.infomaniak.ch"'
         // buildConfigField 'String', 'MAIL_API', '"https://mail.preprod.dev.infomaniak.ch"' // Pre-production environment
         buildConfigField 'String', 'SHOP_URL', '"https://ik.me"'
         buildConfigField 'String', 'CHATBOT_URL', '"https://www.infomaniak.com/chatbot"'
