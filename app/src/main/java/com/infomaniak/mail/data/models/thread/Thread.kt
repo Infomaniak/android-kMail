@@ -202,7 +202,7 @@ class Thread : RealmObject {
 
     private fun updateThread() {
 
-        fun Thread.updateSnoozeSatesBasedOn(message: Message) {
+        fun Thread.updateSnoozeStatesBasedOn(message: Message) {
             message.snoozeState?.let {
                 _snoozeState = it.apiValue
                 snoozeEndDate = message.snoozeEndDate
@@ -230,11 +230,11 @@ class Thread : RealmObject {
             if (message.hasAttachable) hasAttachable = true
             if (message.isScheduledDraft) numberOfScheduledDrafts++
 
-            updateSnoozeSatesBasedOn(message)
+            updateSnoozeStatesBasedOn(message)
         }
 
         duplicates.forEach { duplicate ->
-            updateSnoozeSatesBasedOn(duplicate)
+            updateSnoozeStatesBasedOn(duplicate)
         }
 
         date = messages.last { it.folderId == folderId }.date
