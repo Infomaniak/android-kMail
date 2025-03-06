@@ -317,7 +317,7 @@ class MainViewModel @Inject constructor(
             AccountUtils.updateCurrentUser()
 
             // Refresh My kSuite asynchronously, because it's not required for the threads list display
-            launch { MyKSuiteDataUtils.fetchData() }
+            launch { MyKSuiteDataUtils.fetchDataIfMyKSuite(mailboxController) }
 
             // Refresh Mailboxes
             SentryLog.d(TAG, "Refresh mailboxes from remote")

@@ -22,6 +22,7 @@ import com.infomaniak.core.myksuite.ui.data.MyKSuiteDataManager
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlin.coroutines.cancellation.CancellationException
@@ -34,6 +35,8 @@ object MyKSuiteDataUtils : MyKSuiteDataManager() {
 
     override var myKSuite: MyKSuiteData? = null
 
+    /** Only call this if you are sure that you want to do the call without checking if it's necessary or not
+     * To avoid useless call for account that does not have a my kSuite offer, use [fetchDataIfMyKSuite] */
     override suspend fun fetchData(): MyKSuiteData? = runCatching {
         MyKSuiteDataUtils.requestKSuiteData()
         val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClient)
@@ -51,5 +54,10 @@ object MyKSuiteDataUtils : MyKSuiteDataManager() {
         if (exception is CancellationException) throw exception
         SentryLog.d(TAG, "Exception during myKSuite data fetch", exception)
         null
+    }
+
+    suspend fun fetchDataIfMyKSuite(mailboxController: MailboxController): MyKSuiteData? {
+        // Only fetch the my kSuite Data if the current account has a my kSuite
+        return if (mailboxController.getMyKSuiteMailboxCount(userId = AccountUtils.currentUserId) != 0L) fetchData() else null
     }
 }

@@ -24,20 +24,18 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MykSuiteViewModel @Inject constructor(
-    @MailboxInfoRealm private val mailboxInfoRealm: Realm,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val mailboxController: MailboxController,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
@@ -46,16 +44,10 @@ class MykSuiteViewModel @Inject constructor(
     val myKSuiteDataResult = SingleLiveEvent<MyKSuiteData?>()
 
     fun getMyKSuiteMailbox(mailboxId: Int) = viewModelScope.launch {
-        myKSuiteMailboxResult.postValue(
-            MailboxController.getMailbox(
-                userId = AccountUtils.currentUserId,
-                mailboxId = mailboxId,
-                realm = mailboxInfoRealm,
-            )
-        )
+        myKSuiteMailboxResult.postValue(mailboxController.getMailbox(userId = AccountUtils.currentUserId, mailboxId = mailboxId))
     }
 
     fun refreshMyKSuite() = viewModelScope.launch(ioCoroutineContext) {
-        myKSuiteDataResult.postValue(MyKSuiteDataUtils.fetchData())
+        myKSuiteDataResult.postValue(MyKSuiteDataUtils.fetchDataIfMyKSuite(mailboxController))
     }
 }
