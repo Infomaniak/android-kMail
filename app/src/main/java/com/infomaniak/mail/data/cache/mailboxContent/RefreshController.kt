@@ -329,7 +329,7 @@ class RefreshController @Inject constructor(
         var inboxUnreadCount: Int? = null
         FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
 
-            val allCurrentFolderThreads = ThreadController.getThreadsByFolderId(it.id, realm = mutableRealm)
+            val allCurrentFolderThreads = folder.refreshStrategy().queryFolderThreads(folder.id, mutableRealm)
             it.threads.replaceContent(list = allCurrentFolderThreads)
 
             inboxUnreadCount = updateFoldersUnreadCount(
@@ -512,6 +512,7 @@ class RefreshController @Inject constructor(
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
         val addedMessagesUids = mutableListOf<Int>()
+        val refreshStrategy = folder.refreshStrategy()
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
@@ -519,6 +520,8 @@ class RefreshController @Inject constructor(
             initMessageLocalValues(remoteMessage, folder)
 
             addedMessagesUids.add(remoteMessage.shortUid)
+
+            refreshStrategy.updateExistingMessageWhenAdded(remoteMessage, realm = this)
 
             val newThread = if (isConversationMode) {
                 handleAddedMessage(scope, remoteMessage, impactedThreadsManaged)
@@ -764,11 +767,14 @@ class RefreshController @Inject constructor(
     }
     //endregion
 
+    // SCHEDULED_DRAFTS and SNOOZED need to be refreshed often because these folders
+    // only appear in the MenuDrawer when there is at least 1 email in it.
     private val FOLDER_ROLES_TO_REFRESH_TOGETHER = setOf(
         FolderRole.INBOX,
         FolderRole.SENT,
         FolderRole.DRAFT,
         FolderRole.SCHEDULED_DRAFTS,
+        FolderRole.SNOOZED,
     )
 
     enum class RefreshMode {

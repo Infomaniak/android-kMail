@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.MessageInitialState
@@ -242,6 +243,19 @@ class ThreadController @Inject constructor(
             return realm.query<Thread>("${Thread::folderId.name} == $0", folderId)
         }
 
+        private fun getThreadsWithSnoozeFilterQuery(
+            folderId: String,
+            withSnooze: Boolean,
+            realm: TypedRealm,
+        ): RealmQuery<Thread> {
+            // Checking for snoozeEndDate and snoozeAction on top of _snoozeState mimics the webmail's behavior
+            // and helps to avoid displaying threads that are in an incoherent state on the API
+            val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeAction != null"
+            val snoozeQuery = if (withSnooze) isSnoozedState else "NOT($isSnoozedState)"
+
+            return realm.query<Thread>("${Thread::folderId.name} == $0 AND $snoozeQuery", folderId, SnoozeState.Snoozed.apiValue)
+        }
+
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
             return realm.query<Thread>("${Thread::uid.name} == $0", uid).first()
         }
@@ -276,6 +290,11 @@ class ThreadController @Inject constructor(
 
         fun getThreadsByFolderId(folderId: String, realm: TypedRealm): RealmResults<Thread> {
             return getThreadsByFolderIdQuery(folderId, realm).find()
+        }
+
+        fun getInboxThreadsWithSnoozeFilter(withSnooze: Boolean, realm: TypedRealm): List<Thread> {
+            val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return emptyList()
+            return getThreadsWithSnoozeFilterQuery(inboxId, withSnooze, realm).find()
         }
         //endregion
 
