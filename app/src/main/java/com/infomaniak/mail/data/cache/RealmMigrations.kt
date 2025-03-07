@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import io.realm.kotlin.dynamic.DynamicRealmObject
 import io.realm.kotlin.dynamic.getValue
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
+import io.realm.kotlin.types.RealmInstant
 
 val USER_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
@@ -39,6 +40,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
     migrationContext.keepDefaultValuesAfterNineteenthMigration()
+    migrationContext.initializedInternalDateAsDateAfterTwentyThirdMigration()
 }
 
 // Migrate to version #1
@@ -95,6 +97,33 @@ private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
             }
         }
 
+    }
+}
+//endregion
+
+// Migrate from version #23
+private fun MigrationContext.initializedInternalDateAsDateAfterTwentyThirdMigration() {
+
+    if (oldRealm.schemaVersion() <= 23L) {
+        enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Initialize new property with old property value
+                set(propertyName = "internalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+
+                // Initialize new property with old property value
+                set(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+            }
+        }
+
+        enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Initialize new property with old property value
+                set(propertyName = "internalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+
+                // Initialize new property with old property value
+                set(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+            }
+        }
     }
 }
 //endregion
