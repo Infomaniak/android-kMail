@@ -19,12 +19,14 @@
 
 package com.infomaniak.mail.data.models.thread
 
+import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
@@ -38,6 +40,7 @@ import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -90,7 +93,17 @@ class Thread : RealmObject {
     var isLocallyMovedOut: Boolean = false
     @Transient
     var numberOfScheduledDrafts: Int = 0
+    @Transient
+    private var _snoozeState: String? = null
+    @Transient
+    var snoozeEndDate: RealmInstant? = null
+    @Transient
+    var snoozeAction: String? = null
     //endregion
+
+    @Ignore
+    var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
+        private set
 
     private val _folders by backlinks(Folder::threads)
     val folder
@@ -185,9 +198,20 @@ class Thread : RealmObject {
         isForwarded = false
         hasAttachable = false
         numberOfScheduledDrafts = 0
+        snoozeState = null
+        snoozeEndDate = null
+        snoozeAction = null
     }
 
     private fun updateThread() {
+
+        fun Thread.updateSnoozeStatesBasedOn(message: Message) {
+            message.snoozeState?.let {
+                snoozeState = it
+                snoozeEndDate = message.snoozeEndDate
+                snoozeAction = message.snoozeAction
+            }
+        }
 
         messages.sortBy { it.date }
 
@@ -208,7 +232,11 @@ class Thread : RealmObject {
             }
             if (message.hasAttachable) hasAttachable = true
             if (message.isScheduledDraft) numberOfScheduledDrafts++
+
+            updateSnoozeStatesBasedOn(message)
         }
+
+        duplicates.forEach(::updateSnoozeStatesBasedOn)
 
         date = messages.last { it.folderId == folderId }.date
         subject = messages.first().subject

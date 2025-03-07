@@ -19,7 +19,6 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.core.utils.ApiEnum
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -27,6 +26,7 @@ import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -167,9 +167,10 @@ class Message : RealmObject {
     @Transient
     @Ignore
     var shouldHideDivider: Boolean = false
+    //endregion
+
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
-    //endregion
 
     val threads by backlinks(Thread::messages)
 
@@ -228,12 +229,6 @@ class Message : RealmObject {
         NONE,
         PENDING,
         ACKNOWLEDGED,
-    }
-
-    enum class SnoozeState(override val apiValue: String) : ApiEnum {
-        Snoozed(apiValue = "snoozed"),
-        Unsnoozed(apiValue = "unsnoozed"),
-        WasSnoozed(apiValue = "was_snoozed"),
     }
 
     fun initLocalValues(
