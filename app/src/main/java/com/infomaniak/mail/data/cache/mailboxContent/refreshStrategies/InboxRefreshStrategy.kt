@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.TypedRealm
 
@@ -28,10 +28,10 @@ val inboxRefreshStrategy = object : DefaultRefreshStrategy {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
     }
 
-    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.SNOOZED)
+    override fun otherFolderRolesToQueryThreads(): List<FolderRole> = listOf(FolderRole.SNOOZED)
 
     override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
         impactedFolders += folderId
-        impactedFolders += Folder.FolderRole.SNOOZED
+        impactedFolders += FolderRole.SNOOZED
     }
 }
