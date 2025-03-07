@@ -276,11 +276,7 @@ class ThreadController @Inject constructor(
             val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeAction != null"
             val snoozeQuery = if (withSnooze) isSnoozedState else "NOT($isSnoozedState)"
 
-            return realm.query<Thread>(
-                "${Thread::folderId.name} == $0 AND $snoozeQuery",
-                folderId,
-                snoozeState,
-            )
+            return realm.query<Thread>("${Thread::folderId.name} == $0 AND $snoozeQuery", folderId, snoozeState)
         }
 
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
