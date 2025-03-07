@@ -15,9 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.cache.mailboxContent
+package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import android.content.Context
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -26,31 +30,13 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import kotlinx.coroutines.CoroutineScope
 
-val defaultRefreshStrategy = object : DefaultRefreshStrategy {}
-
-val inboxRefreshStrategy = object : DefaultRefreshStrategy {
-    override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
-        return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
-    }
-
-    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.SNOOZED)
-
-    override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
-        impactedFolders += folderId
-        impactedFolders += Folder.FolderRole.SNOOZED
-    }
-}
-
-val scheduledDraftRefreshStrategy = object : DefaultRefreshStrategy {
-    override fun shouldHideEmptyFolder(): Boolean = true
-}
-
 val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
 
     override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.INBOX)
+
     override fun shouldHideEmptyFolder(): Boolean = true
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
@@ -78,6 +64,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     }
 
     override fun processDeletedThread(thread: Thread, realm: MutableRealm) = thread.recomputeThread()
+
     override fun shouldQueryFolderThreadsOnDeletedUid(): Boolean = true
 
     /**
