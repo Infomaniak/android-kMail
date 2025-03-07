@@ -93,7 +93,6 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         MessageController.getMessage(remoteMessage.uid, realm)?.let { localMessage ->
             remoteMessage.initLocalValues(
                 messageInitialState = MessageInitialState(
-                    date = localMessage.date,
                     isFullyDownloaded = localMessage.isFullyDownloaded(),
                     isTrashed = localMessage.isTrashed,
                     isFromSearch = localMessage.isFromSearch,

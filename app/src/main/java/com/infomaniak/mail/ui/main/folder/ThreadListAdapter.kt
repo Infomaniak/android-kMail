@@ -715,7 +715,7 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    private fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
+    private fun Thread.getSectionTitle(context: Context): String = with(internalDate.toDate()) {
         return when {
             isInTheFuture() -> context.getString(R.string.comingSoon)
             isToday() -> context.getString(R.string.threadListSectionToday)
