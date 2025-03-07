@@ -233,7 +233,7 @@ class Message : RealmObject {
 
     fun initLocalValues(
         messageInitialState: MessageInitialState,
-        latestCalendarEventResponse: CalendarEventResponse?,
+        latestCalendarEventResponse: CalendarEventResponse? = null,
         messageIds: RealmSet<String>? = null,
         swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
     ) {

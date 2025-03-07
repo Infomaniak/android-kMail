@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -36,6 +37,12 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
 
+    /**
+     * In the case of the Snooze refresh strategy, the Message could already exist (because it comes from the INBOX).
+     * In this situation, we don't want to loose its data (for example the body).
+     * So we take the [remoteMessage] (because it contains the up-to-date data about the snooze state),
+     * we give it the localMessage local values, then we upsert it into Realm.
+     */
     override fun handleAddedMessages(
         scope: CoroutineScope,
         remoteMessage: Message,
@@ -43,13 +50,23 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         impactedThreadsManaged: MutableSet<Thread>,
         realm: MutableRealm,
     ) {
-        impactedThreadsManaged += buildSet {
-            MessageController.updateMessage(remoteMessage.uid, realm) { localMessage ->
-                localMessage?.snoozeState = remoteMessage.snoozeState
-                localMessage?.snoozeEndDate = remoteMessage.snoozeEndDate
-                localMessage?.snoozeAction = remoteMessage.snoozeAction
-                localMessage?.threads?.let(::addAll)
-            }
+
+        MessageController.getMessage(remoteMessage.uid, realm)?.let { localMessage ->
+            remoteMessage.initLocalValues(
+                messageInitialState = MessageInitialState(
+                    date = localMessage.date,
+                    isFullyDownloaded = localMessage.isFullyDownloaded(),
+                    isTrashed = localMessage.isTrashed,
+                    isFromSearch = localMessage.isFromSearch,
+                    draftLocalUuid = localMessage.draftLocalUuid,
+                ),
+                messageIds = localMessage.messageIds,
+            )
+            remoteMessage.keepHeavyData(localMessage)
         }
+
+        val updatedMessage = MessageController.upsertMessage(remoteMessage, realm)
+
+        impactedThreadsManaged += updatedMessage.threads
     }
 }
