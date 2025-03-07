@@ -60,7 +60,7 @@ interface RefreshStrategy {
      *  It represents all the Threads that will need to be recomputed to reflect the changes of the newly added Messages.
      *  We need to pass down a reference to the MutableSet to enable both addition and removal of Threads in it.
      */
-    fun handleAddedMessages(
+    fun handleAddedMessage(
         scope: CoroutineScope,
         remoteMessage: Message,
         isConversationMode: Boolean,

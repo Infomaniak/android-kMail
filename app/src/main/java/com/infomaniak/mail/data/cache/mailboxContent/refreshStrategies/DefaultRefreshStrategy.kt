@@ -75,7 +75,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
 
     private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
 
-    override fun handleAddedMessages(
+    override fun handleAddedMessage(
         scope: CoroutineScope,
         remoteMessage: Message,
         isConversationMode: Boolean,

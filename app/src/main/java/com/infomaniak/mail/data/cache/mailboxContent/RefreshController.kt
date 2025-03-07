@@ -518,7 +518,7 @@ class RefreshController @Inject constructor(
 
             initMessageLocalValues(remoteMessage, folder)
             addedMessagesUids.add(remoteMessage.shortUid)
-            refreshStrategy.handleAddedMessages(scope, remoteMessage, isConversationMode, impactedThreadsManaged, realm = this)
+            refreshStrategy.handleAddedMessage(scope, remoteMessage, isConversationMode, impactedThreadsManaged, realm = this)
         }
 
         addSentryBreadcrumbForAddedUidsInFolder(addedMessagesUids)
@@ -655,7 +655,7 @@ class RefreshController @Inject constructor(
             extraFolderUpdates?.invoke(currentFolder)
         }
 
-        // Some folders such as inbox and snooze require to query again the other folder's threads as well. For example, if a
+        // Some folders such as INBOX and Snooze require to query again the other folder's threads as well. For example, if a
         // message uid is returned as "added" or "deleted" in the snooze folder, it should disappear or appear from inbox as well.
         currentFolderRefreshStrategy.otherFolderRolesToQueryThreads().forEach { folderRole ->
             getUpToDateFolder(folderRole)?.let { otherFolder ->
