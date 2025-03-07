@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
+import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.serializers.RealmListKSerializer
@@ -255,15 +256,15 @@ class Message : RealmObject {
         this.isFromSearch = messageInitialState.isFromSearch
         this.messageIds = messageIds ?: computeMessageIds()
         this.latestCalendarEventResponse = latestCalendarEventResponse
-        this.swissTransferFiles = swissTransferFiles
+        this.swissTransferFiles.replaceContent(swissTransferFiles)
 
         shortUid = uid.toShortUid()
         hasAttachable = hasAttachments || swissTransferUuid != null
     }
 
     fun keepHeavyData(message: Message) {
-        attachments = message.attachments.copyFromRealm().toRealmList()
-        swissTransferFiles = message.swissTransferFiles.copyFromRealm().toRealmList()
+        attachments.replaceContent(message.attachments.copyFromRealm())
+        swissTransferFiles.replaceContent(message.swissTransferFiles.copyFromRealm())
         latestCalendarEventResponse = message.latestCalendarEventResponse?.copyFromRealm()
         body = message.body?.copyFromRealm()
 
