@@ -57,8 +57,9 @@ class Thread : RealmObject {
     @PrimaryKey
     var uid: String = ""
     var messages = realmListOf<Message>()
-    // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
-    var date: RealmInstant = Date().toRealmInstant()
+    private var originalDate: RealmInstant? = null
+    // This value should always be provided because messages always have a least an internalDate. Because of this, the initial value is meaningless
+    var internalDate: RealmInstant = Date().toRealmInstant()
     @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
     var from = realmListOf<Recipient>()
@@ -104,6 +105,8 @@ class Thread : RealmObject {
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
         private set
+
+    val date: RealmInstant get() = originalDate ?: internalDate
 
     // TODO: Put this back in `private` when the Threads parental issues are fixed
     val _folders by backlinks(Folder::threads)
@@ -218,7 +221,7 @@ class Thread : RealmObject {
             }
         }
 
-        messages.sortBy { it.date }
+        messages.sortBy { it.internalDate }
 
         messages.forEach { message ->
             messagesIds += message.messageIds
@@ -243,7 +246,9 @@ class Thread : RealmObject {
 
         duplicates.forEach(::updateSnoozeStatesBasedOn)
 
-        date = messages.last { it.folderId == folderId }.date
+        val lastMessage = messages.last { it.folderId == folderId }
+        originalDate = lastMessage.originalDate
+        internalDate = lastMessage.internalDate
         subject = messages.first().subject
     }
 
