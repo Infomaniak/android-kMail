@@ -57,8 +57,12 @@ class Message : RealmObject {
     var uid: String = ""
     @SerialName("msg_id")
     var messageId: String? = null
-    // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
-    var date: RealmInstant = Date().toRealmInstant()
+    @SerialName("date")
+    var originalDate: RealmInstant? = null
+        private set
+    @SerialName("internal_date")
+    var internalDate: RealmInstant = Date().toRealmInstant() // This date is always defined, so the default value is meaningless
+        private set
     var subject: String? = null
     var from = realmListOf<Recipient>()
     var to = realmListOf<Recipient>()
@@ -171,6 +175,14 @@ class Message : RealmObject {
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
 
+
+    /**
+     * [date] is different than [internalDate] because it must be used when displaying the date of an email but it can't be used
+     * to sort messages chronologically.
+     * A message's [originalDate] is not always defined. When this happens, we want to display the [internalDate] in its place.
+     */
+    val date: RealmInstant get() = originalDate ?: internalDate
+
     val threads by backlinks(Thread::messages)
 
     private val threadsDuplicatedIn by backlinks(Thread::duplicates)
@@ -237,7 +249,6 @@ class Message : RealmObject {
         swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
     ) {
 
-        this.date = messageInitialState.date
         this._isFullyDownloaded = messageInitialState.isFullyDownloaded
         this.isTrashed = messageInitialState.isTrashed
         messageInitialState.draftLocalUuid?.let { this.draftLocalUuid = it }
@@ -358,7 +369,6 @@ class Message : RealmObject {
     override fun hashCode(): Int = uid.hashCode()
 
     data class MessageInitialState(
-        val date: RealmInstant,
         val isFullyDownloaded: Boolean,
         val isTrashed: Boolean,
         val isFromSearch: Boolean,

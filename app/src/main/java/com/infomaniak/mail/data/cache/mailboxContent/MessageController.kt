@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     private fun getSortedAndNotDeletedMessagesQuery(threadUid: String): RealmQuery<Message>? {
         return ThreadController.getThread(threadUid, mailboxContentRealm())
             ?.messages?.query("${Message::isDeletedOnApi.name} == false")
-            ?.sort(Message::date.name, Sort.ASCENDING)
+            ?.sort(Message::internalDate.name, Sort.ASCENDING)
     }
     //endregion
 
