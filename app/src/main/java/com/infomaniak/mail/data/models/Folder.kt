@@ -25,7 +25,8 @@ import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.*
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.*
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.SentryDebug
