@@ -22,7 +22,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -35,12 +35,12 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
 
-    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = listOf(Folder.FolderRole.INBOX)
+    override fun otherFolderRolesToQueryThreads(): List<FolderRole> = listOf(FolderRole.INBOX)
 
     override fun shouldHideEmptyFolder(): Boolean = true
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
-        val inboxId = FolderController.getFolder(Folder.FolderRole.INBOX, realm)?.id ?: return null
+        val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return null
         return super.getMessageFromShortUid(shortUid, inboxId, realm)
     }
 
@@ -60,7 +60,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
 
     override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
         impactedFolders += folderId
-        impactedFolders += Folder.FolderRole.INBOX
+        impactedFolders += FolderRole.INBOX
     }
 
     override fun processDeletedThread(thread: Thread, realm: MutableRealm) = thread.recomputeThread()
