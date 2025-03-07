@@ -99,6 +99,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
                     draftLocalUuid = localMessage.draftLocalUuid,
                 ),
                 messageIds = localMessage.messageIds,
+                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
             )
             remoteMessage.keepHeavyData(localMessage)
         }
