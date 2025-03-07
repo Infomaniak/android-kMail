@@ -248,8 +248,8 @@ class ThreadController @Inject constructor(
             withSnooze: Boolean,
             realm: TypedRealm,
         ): RealmQuery<Thread> {
-            // Checking for snoozeEndDate and snoozeAction on top of _snoozeState mimics the behavior on the web and helps avoid
-            // displaying threads that are in an incoherent state on the API
+            // Checking for snoozeEndDate and snoozeAction on top of _snoozeState mimics the webmail's behavior
+            // and helps to avoid displaying threads that are in an incoherent state on the API
             val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeAction != null"
             val snoozeQuery = if (withSnooze) isSnoozedState else "NOT($isSnoozedState)"
 
