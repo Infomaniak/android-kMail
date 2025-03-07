@@ -108,7 +108,6 @@ class ThreadController @Inject constructor(
                 // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
                     MessageInitialState(
-                        date = localMessage?.date ?: remoteMessage.date,
                         isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
                         isTrashed = filterFolder?.role == FolderRole.TRASH,
                         isFromSearch = localMessage == null,
@@ -206,7 +205,7 @@ class ThreadController @Inject constructor(
         }
 
         private fun getSearchThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
-            return realm.query<Thread>("${Thread::isFromSearch.name} == true").sort(Thread::date.name, Sort.DESCENDING)
+            return realm.query<Thread>("${Thread::isFromSearch.name} == true").sort(Thread::internalDate.name, Sort.DESCENDING)
         }
 
         private fun getUnreadThreadsCountQuery(folder: Folder): RealmScalarQuery<Long> {
@@ -222,7 +221,7 @@ class ThreadController @Inject constructor(
 
             val notFromSearch = "${Thread::isFromSearch.name} == false"
             val notLocallyMovedOut = " AND ${Thread::isLocallyMovedOut.name} == false"
-            val realmQuery = folder.threads.query(notFromSearch + notLocallyMovedOut).sort(Thread::date.name, sortOrder)
+            val realmQuery = folder.threads.query(notFromSearch + notLocallyMovedOut).sort(Thread::internalDate.name, sortOrder)
 
             return if (filter == ThreadFilter.ALL) {
                 realmQuery
@@ -345,7 +344,6 @@ class ThreadController @Inject constructor(
 
                             remoteMessage.initLocalValues(
                                 MessageInitialState(
-                                    date = localMessage.date,
                                     isFullyDownloaded = true,
                                     isTrashed = localMessage.isTrashed,
                                     isFromSearch = localMessage.isFromSearch,
