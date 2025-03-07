@@ -248,14 +248,12 @@ class ThreadController @Inject constructor(
             withSnooze: Boolean,
             realm: TypedRealm,
         ): RealmQuery<Thread> {
-            val snoozeState = SnoozeState.Snoozed.apiValue
-
             // Checking for snoozeEndDate and snoozeAction on top of _snoozeState mimics the behavior on the web and helps avoid
             // displaying threads that are in an incoherent state on the API
             val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeAction != null"
             val snoozeQuery = if (withSnooze) isSnoozedState else "NOT($isSnoozedState)"
 
-            return realm.query<Thread>("${Thread::folderId.name} == $0 AND $snoozeQuery", folderId, snoozeState)
+            return realm.query<Thread>("${Thread::folderId.name} == $0 AND $snoozeQuery", folderId, SnoozeState.Snoozed.apiValue)
         }
 
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
