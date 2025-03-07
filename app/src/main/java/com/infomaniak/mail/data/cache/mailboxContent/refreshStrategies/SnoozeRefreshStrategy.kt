@@ -77,10 +77,11 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         scope: CoroutineScope,
         remoteMessage: Message,
         isConversationMode: Boolean,
+        impactedThreadsManaged: MutableSet<Thread>,
         realm: MutableRealm,
-    ): Set<Thread> {
+    ) {
         MessageController.getMessage(remoteMessage.uid, realm)?.let(remoteMessage::keepLocalValues)
         val updatedMessage = MessageController.upsertMessage(remoteMessage, realm)
-        return updatedMessage.threads.toSet()
+        impactedThreadsManaged += updatedMessage.threads
     }
 }
