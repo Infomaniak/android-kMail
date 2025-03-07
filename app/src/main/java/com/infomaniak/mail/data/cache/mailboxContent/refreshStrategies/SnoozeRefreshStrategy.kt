@@ -73,7 +73,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
      * So we take the [remoteMessage] (because it contains the up-to-date data about the snooze state),
      * we give it the localMessage local values, then we upsert it into Realm.
      */
-    override fun handleAddedMessages(
+    override fun handleAddedMessage(
         scope: CoroutineScope,
         remoteMessage: Message,
         isConversationMode: Boolean,
