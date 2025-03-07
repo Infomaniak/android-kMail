@@ -108,12 +108,13 @@ class ThreadController @Inject constructor(
                 // The Search only returns Messages from TRASH if we explicitly selected this folder,
                 // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
-                    MessageInitialState(
+                    messageInitialState = MessageInitialState(
                         isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
                         isTrashed = filterFolder?.role == FolderRole.TRASH,
                         isFromSearch = localMessage == null,
                         draftLocalUuid = localMessage?.draftLocalUuid,
                     ),
+                    latestCalendarEventResponse = localMessage?.latestCalendarEventResponse,
                 )
 
                 localMessage?.let(remoteMessage::keepHeavyData)
