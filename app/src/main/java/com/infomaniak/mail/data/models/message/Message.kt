@@ -167,9 +167,10 @@ class Message : RealmObject {
     @Transient
     @Ignore
     var shouldHideDivider: Boolean = false
+    //endregion
+
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
-    //endregion
 
     val threads by backlinks(Thread::messages)
 
