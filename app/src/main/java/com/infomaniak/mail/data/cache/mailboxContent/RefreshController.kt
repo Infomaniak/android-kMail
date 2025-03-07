@@ -430,7 +430,7 @@ class RefreshController @Inject constructor(
                 val upToDateFolder = getUpToDateFolder(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
 
-                return@write createThreads(scope, upToDateFolder, messages, isConversationMode).also {
+                return@write handleAddedMessages(scope, upToDateFolder, messages, isConversationMode).also {
 
                     // TODO: This count will be false for INBOX & SNOOZED when the snooze feature will be implemented
                     val messagesCount = MessageController.getMessagesCountByFolderId(upToDateFolder.id, realm = this)
@@ -503,7 +503,7 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region Create Threads
-    private fun MutableRealm.createThreads(
+    private fun MutableRealm.handleAddedMessages(
         scope: CoroutineScope,
         folder: Folder,
         remoteMessages: List<Message>,
@@ -521,7 +521,7 @@ class RefreshController @Inject constructor(
             addedMessagesUids.add(remoteMessage.shortUid)
 
             val newThread = if (isConversationMode) {
-                createNewThread(scope, remoteMessage, impactedThreadsManaged)
+                handleAddedMessage(scope, remoteMessage, impactedThreadsManaged)
             } else {
                 remoteMessage.toThread()
             }
@@ -542,7 +542,20 @@ class RefreshController @Inject constructor(
         return impactedThreadsUnmanaged
     }
 
-    private fun MutableRealm.createNewThread(
+    private fun initMessageLocalValues(remoteMessage: Message, folder: Folder) {
+        remoteMessage.initLocalValues(
+            MessageInitialState(
+                date = remoteMessage.date,
+                isFullyDownloaded = false,
+                isTrashed = folder.role == FolderRole.TRASH,
+                isFromSearch = false,
+                draftLocalUuid = null,
+            ),
+            latestCalendarEventResponse = null,
+        )
+    }
+
+    private fun MutableRealm.handleAddedMessage(
         scope: CoroutineScope,
         remoteMessage: Message,
         impactedThreadsManaged: MutableSet<Thread>,
@@ -559,7 +572,7 @@ class RefreshController @Inject constructor(
         // Create Thread in this Folder
         val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages)
         // Update Threads in other Folders
-        updateOtherExistingThreads(scope, remoteMessage, existingThreads, existingMessages, impactedThreadsManaged)
+        addAllMessagesToAllThreads(scope, remoteMessage, existingThreads, existingMessages, impactedThreadsManaged)
 
         // Now that all other existing Threads are updated, we need to remove the duplicated Threads.
         if (isThereDuplicatedThreads) removeDuplicatedThreads(remoteMessage.messageIds, impactedThreadsManaged)
@@ -567,40 +580,9 @@ class RefreshController @Inject constructor(
         return thread
     }
 
-    private fun initMessageLocalValues(remoteMessage: Message, folder: Folder) {
-        remoteMessage.initLocalValues(
-            MessageInitialState(
-                date = remoteMessage.date,
-                isFullyDownloaded = false,
-                isTrashed = folder.role == FolderRole.TRASH,
-                isFromSearch = false,
-                draftLocalUuid = null,
-            ),
-            latestCalendarEventResponse = null,
-        )
-    }
-
     private fun MutableRealm.isThereDuplicatedThreads(messageIds: RealmSet<String>, threadsCount: Int): Boolean {
         val foldersCount = ThreadController.getExistingThreadsFoldersCount(messageIds, realm = this)
         return foldersCount != threadsCount.toLong()
-    }
-
-    private fun MutableRealm.removeDuplicatedThreads(messageIds: RealmSet<String>, impactedThreadsManaged: MutableSet<Thread>) {
-
-        // Create a map with all duplicated Threads of the same Thread in a list.
-        val map = mutableMapOf<String, MutableList<Thread>>()
-        ThreadController.getThreadsByMessageIds(messageIds, realm = this).forEach {
-            map.getOrPut(it.folderId) { mutableListOf() }.add(it)
-        }
-
-        map.values.forEach { threads ->
-            threads.forEachIndexed { index, thread ->
-                if (index > 0) { // We want to keep only 1 duplicated Thread, so we skip the 1st one. (He's the chosen one!)
-                    impactedThreadsManaged.remove(thread)
-                    delete(thread) // Delete the other Threads. Sorry bro, you won't be missed.
-                }
-            }
-        }
     }
 
     private fun TypedRealm.createNewThreadIfRequired(
@@ -621,7 +603,7 @@ class RefreshController @Inject constructor(
         return newThread
     }
 
-    private fun MutableRealm.updateOtherExistingThreads(
+    private fun MutableRealm.addAllMessagesToAllThreads(
         scope: CoroutineScope,
         remoteMessage: Message,
         existingThreads: RealmResults<Thread>,
@@ -648,6 +630,24 @@ class RefreshController @Inject constructor(
             }
 
             impactedThreadsManaged += thread
+        }
+    }
+
+    private fun MutableRealm.removeDuplicatedThreads(messageIds: RealmSet<String>, impactedThreadsManaged: MutableSet<Thread>) {
+
+        // Create a map with all duplicated Threads of the same Thread in a list.
+        val map = mutableMapOf<String, MutableList<Thread>>()
+        ThreadController.getThreadsByMessageIds(messageIds, realm = this).forEach {
+            map.getOrPut(it.folderId) { mutableListOf() }.add(it)
+        }
+
+        map.values.forEach { threads ->
+            threads.forEachIndexed { index, thread ->
+                if (index > 0) { // We want to keep only 1 duplicated Thread, so we skip the 1st one. (He's the chosen one!)
+                    impactedThreadsManaged.remove(thread)
+                    delete(thread) // Delete the other Threads. Sorry bro, you won't be missed.
+                }
+            }
         }
     }
 
