@@ -38,6 +38,7 @@ import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
@@ -45,7 +46,6 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -395,11 +395,6 @@ class RefreshController @Inject constructor(
     private fun TypedRealm.getUpToDateFolder(id: String) = FolderController.getFolder(id, realm = this)!!
 
     private fun TypedRealm.getUpToDateFolder(folderRole: FolderRole) = FolderController.getFolder(folderRole, realm = this)
-
-    private inline fun <reified T> RealmList<T>.replaceContent(list: List<T>) {
-        clear()
-        addAll(list.toRealmList())
-    }
     //endregion
 
     //region Added Messages
@@ -542,7 +537,6 @@ class RefreshController @Inject constructor(
                 isFromSearch = false,
                 draftLocalUuid = null,
             ),
-            latestCalendarEventResponse = null,
         )
     }
     //endregion

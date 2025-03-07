@@ -114,7 +114,6 @@ class ThreadController @Inject constructor(
                         isFromSearch = localMessage == null,
                         draftLocalUuid = localMessage?.draftLocalUuid,
                     ),
-                    latestCalendarEventResponse = null,
                 )
 
                 localMessage?.let(remoteMessage::keepHeavyData)
