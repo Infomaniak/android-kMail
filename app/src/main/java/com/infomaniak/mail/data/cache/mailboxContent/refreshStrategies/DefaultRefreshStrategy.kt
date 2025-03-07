@@ -79,30 +79,31 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         scope: CoroutineScope,
         remoteMessage: Message,
         isConversationMode: Boolean,
+        impactedThreadsManaged: MutableSet<Thread>,
         realm: MutableRealm,
-    ): Set<Thread> {
-        val impactedThreads = mutableSetOf<Thread>()
+    ) {
         val newThread = if (isConversationMode) {
-            val (thread, otherThreads) = realm.handleAddedMessage(scope, remoteMessage)
-            impactedThreads += otherThreads
-            thread
+            realm.handleAddedMessage(scope, remoteMessage, impactedThreadsManaged)
         } else {
             remoteMessage.toThread()
         }
-        newThread?.let { impactedThreads += realm.putNewThreadInRealm(it) }
-        return impactedThreads
+        newThread?.let { impactedThreadsManaged += realm.putNewThreadInRealm(it) }
     }
 
-    private fun MutableRealm.handleAddedMessage(scope: CoroutineScope, remoteMessage: Message): Pair<Thread?, Set<Thread>> {
+    private fun MutableRealm.handleAddedMessage(
+        scope: CoroutineScope,
+        remoteMessage: Message,
+        impactedThreadsManaged: MutableSet<Thread>,
+    ): Thread? {
 
         // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
         val existingThreads = ThreadController.getThreadsByMessageIds(remoteMessage.messageIds, realm = this)
         val existingMessages = getExistingMessages(existingThreads)
 
         val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages)
-        val impactedThreads = updateExistingThreads(scope, remoteMessage, existingThreads, existingMessages)
+        updateExistingThreads(scope, remoteMessage, existingThreads, existingMessages, impactedThreadsManaged)
 
-        return thread to impactedThreads
+        return thread
     }
 
     private fun TypedRealm.createNewThreadIfRequired(
@@ -128,21 +129,17 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         remoteMessage: Message,
         existingThreads: RealmResults<Thread>,
         existingMessages: Set<Message>,
-    ): Set<Thread> {
-
-        val impactedThreads = mutableSetOf<Thread>()
-
+        impactedThreadsManaged: MutableSet<Thread>,
+    ) {
         // Update already existing Threads (i.e. in other Folders, or specific cases like Snoozed)
-        impactedThreads += addAllMessagesToAllThreads(scope, remoteMessage, existingThreads, existingMessages)
+        impactedThreadsManaged += addAllMessagesToAllThreads(scope, remoteMessage, existingThreads, existingMessages)
 
         // Some Messages don't have references to all previous Messages of the Thread (ex: these from the iOS Mail app).
         // Because we are missing the links between Messages, it will create multiple Threads for the same Folder.
         // Hence, we need to find these duplicates, and remove them.
         val duplicatedThreads = identifyExtraDuplicatedThreads(remoteMessage.messageIds)
-        impactedThreads -= duplicatedThreads
+        impactedThreadsManaged -= duplicatedThreads
         duplicatedThreads.forEach(::delete) // Delete the other Threads. Sorry bro, you won't be missed.
-
-        return impactedThreads
     }
 
     private fun MutableRealm.addAllMessagesToAllThreads(

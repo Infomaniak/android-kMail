@@ -518,7 +518,7 @@ class RefreshController @Inject constructor(
 
             initMessageLocalValues(remoteMessage, folder)
             addedMessagesUids.add(remoteMessage.shortUid)
-            impactedThreadsManaged += refreshStrategy.handleAddedMessages(scope, remoteMessage, isConversationMode, realm = this)
+            refreshStrategy.handleAddedMessages(scope, remoteMessage, isConversationMode, impactedThreadsManaged, realm = this)
         }
 
         addSentryBreadcrumbForAddedUidsInFolder(addedMessagesUids)
