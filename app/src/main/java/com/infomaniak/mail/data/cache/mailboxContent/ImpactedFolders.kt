@@ -42,7 +42,7 @@ data class ImpactedFolders(
      */
     fun getFolderIds(realm: TypedRealm): Set<String> {
         folderRoles.forEach { folderRole ->
-            FolderController.getFolder(folderRole, realm)?.let { folderIds.add(it.id) }
+            FolderController.getFolder(folderRole, realm)?.id?.let(folderIds::add)
         }
 
         return folderIds
