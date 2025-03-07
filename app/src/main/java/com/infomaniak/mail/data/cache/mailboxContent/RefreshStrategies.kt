@@ -30,7 +30,10 @@ interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
 
     /**
-     * The returned Threads should be managed by Realm
+     * About the [impactedThreadsManaged]:
+     *  This set will be updated throughout the whole process of handling added Messages.
+     *  It represents all the Threads that will need to be recomputed to reflect the changes of the newly added Messages.
+     *  We need to pass down a reference to the MutableSet to enable both addition and removal of Threads in it.
      */
     fun handleAddedMessages(
         scope: CoroutineScope,
