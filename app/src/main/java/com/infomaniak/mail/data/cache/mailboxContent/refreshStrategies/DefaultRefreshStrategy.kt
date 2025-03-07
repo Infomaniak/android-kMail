@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.cache.mailboxContent
+package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import android.content.Context
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -29,43 +32,7 @@ import io.realm.kotlin.types.RealmSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 
-interface RefreshStrategy {
-    fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
-    fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole>
-    fun shouldHideEmptyFolder(): Boolean
-
-    fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
-
-    fun processDeletedMessage(
-        scope: CoroutineScope,
-        managedMessage: Message,
-        context: Context,
-        mailbox: Mailbox,
-        realm: MutableRealm,
-    )
-
-    /**
-     * If an extra folder needs its unread count updated but no thread has that extra folder as [Thread.folderId], you can add the
-     * extra folder inside this method as they will be inserted inside the list of impacted folders.
-     */
-    fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders)
-    fun processDeletedThread(thread: Thread, realm: MutableRealm)
-    fun shouldQueryFolderThreadsOnDeletedUid(): Boolean
-
-    /**
-     * About the [impactedThreadsManaged]:
-     *  This set will be updated throughout the whole process of handling added Messages.
-     *  It represents all the Threads that will need to be recomputed to reflect the changes of the newly added Messages.
-     *  We need to pass down a reference to the MutableSet to enable both addition and removal of Threads in it.
-     */
-    fun handleAddedMessages(
-        scope: CoroutineScope,
-        remoteMessage: Message,
-        isConversationMode: Boolean,
-        impactedThreadsManaged: MutableSet<Thread>,
-        realm: MutableRealm,
-    )
-}
+val defaultRefreshStrategy = object : DefaultRefreshStrategy {}
 
 interface DefaultRefreshStrategy : RefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
@@ -73,6 +40,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     }
 
     override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = emptyList()
+
     override fun shouldHideEmptyFolder(): Boolean = false
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
@@ -104,6 +72,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     override fun shouldQueryFolderThreadsOnDeletedUid(): Boolean = false
 
     private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
+
     private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
 
     override fun handleAddedMessages(
