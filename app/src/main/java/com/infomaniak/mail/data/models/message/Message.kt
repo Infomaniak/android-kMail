@@ -266,7 +266,6 @@ class Message : RealmObject {
     fun keepHeavyData(message: Message) {
         attachments.replaceContent(message.attachments.copyFromRealm())
         swissTransferFiles.replaceContent(message.swissTransferFiles.copyFromRealm())
-        latestCalendarEventResponse = message.latestCalendarEventResponse?.copyFromRealm()
         body = message.body?.copyFromRealm()
 
         // TODO: Those are unused for now, but if we ever want to use them, we need to save them here.
