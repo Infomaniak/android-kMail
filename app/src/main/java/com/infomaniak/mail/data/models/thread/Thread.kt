@@ -101,11 +101,9 @@ class Thread : RealmObject {
     var snoozeAction: String? = null
     //endregion
 
-    //region UI data (Ignore)
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
         private set
-    //endregion
 
     private val _folders by backlinks(Folder::threads)
     val folder
