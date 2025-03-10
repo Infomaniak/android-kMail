@@ -245,27 +245,29 @@ class Message : RealmObject {
     }
 
     fun initLocalValues(
-        messageInitialState: MessageInitialState,
-        latestCalendarEventResponse: CalendarEventResponse? = null,
-        messageIds: RealmSet<String>? = null,
-        swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
+        isFullyDownloaded: Boolean,
+        isTrashed: Boolean,
+        messageIds: RealmSet<String>,
+        draftLocalUuid: String?,
+        isFromSearch: Boolean,
+        isDeletedOnApi: Boolean,
+        latestCalendarEventResponse: CalendarEventResponse?,
+        swissTransferFiles: RealmList<SwissTransferFile>,
     ) {
-
-        this._isFullyDownloaded = messageInitialState.isFullyDownloaded
-        this.isTrashed = messageInitialState.isTrashed
-        messageInitialState.draftLocalUuid?.let { this.draftLocalUuid = it }
-        this.isFromSearch = messageInitialState.isFromSearch
-        this.messageIds = messageIds ?: computeMessageIds()
+        this._isFullyDownloaded = isFullyDownloaded
+        this.isTrashed = isTrashed
+        this.messageIds = messageIds
+        this.draftLocalUuid = draftLocalUuid
+        this.isFromSearch = isFromSearch
+        this.shortUid = uid.toShortUid()
+        this.isDeletedOnApi = isDeletedOnApi
         this.latestCalendarEventResponse = latestCalendarEventResponse
         this.swissTransferFiles.replaceContent(swissTransferFiles)
-
-        shortUid = uid.toShortUid()
-        hasAttachable = hasAttachments || swissTransferUuid != null
+        this.hasAttachable = hasAttachments || swissTransferUuid != null
     }
 
     fun keepHeavyData(message: Message) {
         attachments.replaceContent(message.attachments.copyFromRealm())
-        swissTransferFiles.replaceContent(message.swissTransferFiles.copyFromRealm())
         body = message.body?.copyFromRealm()
 
         // TODO: Those are unused for now, but if we ever want to use them, we need to save them here.
@@ -368,13 +370,6 @@ class Message : RealmObject {
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
-
-    data class MessageInitialState(
-        val isFullyDownloaded: Boolean,
-        val isTrashed: Boolean,
-        val isFromSearch: Boolean,
-        val draftLocalUuid: String?,
-    )
 
     companion object
 }

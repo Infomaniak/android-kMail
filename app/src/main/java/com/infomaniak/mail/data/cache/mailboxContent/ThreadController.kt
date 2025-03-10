@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.models.Folder.FolderSort
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -108,13 +107,14 @@ class ThreadController @Inject constructor(
                 // The Search only returns Messages from TRASH if we explicitly selected this folder,
                 // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
-                    messageInitialState = MessageInitialState(
-                        isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
-                        isTrashed = filterFolder?.role == FolderRole.TRASH,
-                        isFromSearch = localMessage == null,
-                        draftLocalUuid = localMessage?.draftLocalUuid,
-                    ),
+                    isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
+                    isTrashed = filterFolder?.role == FolderRole.TRASH,
+                    messageIds = localMessage?.messageIds ?: remoteMessage.computeMessageIds(),
+                    draftLocalUuid = localMessage?.draftLocalUuid,
+                    isFromSearch = localMessage == null,
+                    isDeletedOnApi = false,
                     latestCalendarEventResponse = localMessage?.latestCalendarEventResponse,
+                    swissTransferFiles = localMessage?.swissTransferFiles ?: realmListOf(),
                 )
 
                 localMessage?.let(remoteMessage::keepHeavyData)
@@ -367,14 +367,13 @@ class ThreadController @Inject constructor(
                             } ?: realmListOf()
 
                             remoteMessage.initLocalValues(
-                                MessageInitialState(
-                                    isFullyDownloaded = true,
-                                    isTrashed = localMessage.isTrashed,
-                                    isFromSearch = localMessage.isFromSearch,
-                                    draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
-                                ),
-                                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
+                                isFullyDownloaded = true,
+                                isTrashed = localMessage.isTrashed,
                                 messageIds = localMessage.messageIds,
+                                draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                isFromSearch = localMessage.isFromSearch,
+                                isDeletedOnApi = false,
+                                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                 swissTransferFiles = swissTransferFiles,
                             )
 
