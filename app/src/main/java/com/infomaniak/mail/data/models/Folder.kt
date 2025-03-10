@@ -34,6 +34,7 @@ import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.query.Sort
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
@@ -43,6 +44,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import kotlin.reflect.KProperty1
 
 @Serializable
 class Folder : RealmObject, Cloneable {
@@ -170,17 +172,33 @@ class Folder : RealmObject, Cloneable {
         @DrawableRes val folderIconRes: Int,
         val order: Int,
         val matomoValue: String,
+        val folderSort: FolderSort = FolderSort.Default,
     ) {
         INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 10, "inboxFolder"),
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 9, "commercialFolder"),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 8, "socialNetworksFolder"),
         SENT(R.string.sentFolder, R.drawable.ic_send, 7, "sentFolder"),
-        SNOOZED(R.string.snoozedFolder, R.drawable.ic_alarm_clock, 6, "snoozedFolder"),
-        SCHEDULED_DRAFTS(R.string.scheduledMessagesFolder, R.drawable.ic_schedule_send, 5, "scheduledDraftsFolder"),
+        SNOOZED(R.string.snoozedFolder, R.drawable.ic_alarm_clock, 6, "snoozedFolder", FolderSort.Snooze),
+        SCHEDULED_DRAFTS(
+            R.string.scheduledMessagesFolder, R.drawable.ic_schedule_send, 5, "scheduledDraftsFolder", FolderSort.Scheduled
+        ),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftFolder"),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, "spamFolder"),
         TRASH(R.string.trashFolder, R.drawable.ic_bin, 2, "trashFolder"),
         ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 1, "archiveFolder"),
+    }
+
+    class FolderSort private constructor(
+        val sortOrder: Sort = Sort.DESCENDING,
+        sortBy: KProperty1<*, *> = Thread::internalDate,
+    ) {
+        val sortBy = sortBy.name
+
+        companion object {
+            val Default = FolderSort()
+            val Snooze = FolderSort(Sort.ASCENDING, Thread::snoozeEndDate)
+            val Scheduled = FolderSort(Sort.ASCENDING)
+        }
     }
 
     companion object {
