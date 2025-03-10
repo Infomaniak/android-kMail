@@ -62,7 +62,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
     }
 
     fun createReplyFooter(message: Message): String {
-        val date = message.date.toDate().formatForHeader()
+        val date = message.displayDate.toDate().formatForHeader()
         val from = message.fromName()
         val messageReplyHeader = appContext.getString(R.string.messageReplyHeader, date, from)
 
@@ -117,7 +117,7 @@ class ReplyForwardFooterManager @Inject constructor(private val appContext: Cont
             addAndEscapeTextLine("")
             addAndEscapeTextLine("---------- $messageForwardHeader ---------")
             addAndEscapeTextLine("$fromTitle ${message.fromName()}")
-            addAndEscapeTextLine("$dateTitle ${message.date.toDate().formatForHeader()}")
+            addAndEscapeTextLine("$dateTitle ${message.displayDate.toDate().formatForHeader()}")
             addAndEscapeTextLine("$subjectTitle ${message.subject}")
             addAndEscapeRecipientLine(toTitle, message.to)
             addAndEscapeRecipientLine(ccTitle, message.cc)
