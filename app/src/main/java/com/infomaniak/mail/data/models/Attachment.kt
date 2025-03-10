@@ -58,7 +58,7 @@ class Attachment : EmbeddedRealmObject, Attachable {
     @Transient
     var uploadLocalUri: String? = null
     @Transient
-    private var _uploadStatus: String = AttachmentUploadStatus.AWAITING.name
+    private var _uploadStatus: String = AttachmentUploadStatus.NOT_UPLOADED.name
     //endregion
 
     val attachmentUploadStatus: AttachmentUploadStatus?
@@ -85,7 +85,7 @@ class Attachment : EmbeddedRealmObject, Attachable {
     fun backupLocalData(oldAttachment: Attachment, draft: Draft) {
         localUuid = oldAttachment.localUuid
         uploadLocalUri = oldAttachment.uploadLocalUri
-        setUploadStatus(AttachmentUploadStatus.FINISHED, draft, "backupLocalData -> setUploadStatus")
+        setUploadStatus(AttachmentUploadStatus.UPLOADED, draft, "backupLocalData -> setUploadStatus")
     }
 
     fun setUploadStatus(attachmentUploadStatus: AttachmentUploadStatus, draft: Draft? = null, step: String = "") {

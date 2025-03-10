@@ -47,7 +47,7 @@ suspend fun uploadAttachmentsWithMutex(
 private suspend fun Draft.uploadAttachments(mailbox: Mailbox, realm: Realm) {
 
     fun getAwaitingAttachments(): List<Attachment> = attachments.filter {
-        it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING
+        it.attachmentUploadStatus == AttachmentUploadStatus.NOT_UPLOADED
     }
 
     val attachmentsToUpload = getAwaitingAttachments()
