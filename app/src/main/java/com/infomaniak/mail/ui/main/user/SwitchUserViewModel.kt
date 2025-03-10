@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -38,6 +39,7 @@ import javax.inject.Inject
 class SwitchUserViewModel @Inject constructor(
     application: Application,
     private val mailboxController: MailboxController,
+    private val myKSuiteDataUtils: MyKSuiteDataUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -51,6 +53,7 @@ class SwitchUserViewModel @Inject constructor(
         if (user.id != AccountUtils.currentUserId) {
             appContext.trackAccountEvent("switch")
             RealmDatabase.backupPreviousRealms()
+            myKSuiteDataUtils.myKSuite = null
             AccountUtils.currentUser = user
             AccountUtils.currentMailboxId = mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()

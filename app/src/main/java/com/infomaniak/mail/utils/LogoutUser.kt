@@ -43,6 +43,7 @@ class LogoutUser @Inject constructor(
     private val globalCoroutineScope: CoroutineScope,
     private val localSettings: LocalSettings,
     private val mailboxController: MailboxController,
+    private val myKSuiteDataUtils: MyKSuiteDataUtils,
     private val playServicesUtils: PlayServicesUtils,
     private val storesSettingsRepository: StoresSettingsRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -52,7 +53,7 @@ class LogoutUser @Inject constructor(
 
         user.logoutToken()
         AccountUtils.removeUser(user)
-        MyKSuiteDataUtils.deleteData(user.id)
+        myKSuiteDataUtils.deleteData(user.id)
         RealmDatabase.removeUserData(appContext, user.id)
         mailboxController.deleteUserMailboxes(user.id)
         localSettings.removeRegisteredFirebaseUser(userId = user.id)

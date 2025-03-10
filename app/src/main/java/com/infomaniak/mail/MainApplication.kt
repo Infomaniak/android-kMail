@@ -106,6 +106,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     lateinit var appUpdateWorkerScheduler: AppUpdateScheduler
 
     @Inject
+    lateinit var myKSuiteDataUtils: MyKSuiteDataUtils
+
+    @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
@@ -209,7 +212,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun configureRoomDatabases() {
         AccountUtils.init(this)
-        MyKSuiteDataUtils.initDatabase(this)
+        myKSuiteDataUtils.initDatabase(this)
     }
 
     private fun configureAppReloading() {

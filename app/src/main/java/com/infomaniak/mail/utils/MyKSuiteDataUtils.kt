@@ -22,23 +22,28 @@ import com.infomaniak.core.myksuite.ui.data.MyKSuiteDataManager
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 
-object MyKSuiteDataUtils : MyKSuiteDataManager() {
-
-    private val TAG = MyKSuiteDataUtils::class.simpleName.toString()
+@Singleton
+class MyKSuiteDataUtils @Inject constructor(private val mailboxController: MailboxController) : MyKSuiteDataManager() {
 
     override val currentUserId get() = AccountUtils.currentUserId
 
     override var myKSuite: MyKSuiteData? = null
 
     override suspend fun fetchData(): MyKSuiteData? = runCatching {
-        MyKSuiteDataUtils.requestKSuiteData()
+        requestKSuiteData()
+        // Only fetch the Data if the current user has a my kSuite mailbox
+        if (mailboxController.getMyKSuiteMailboxCount(userId = AccountUtils.currentUserId) == 0L) return@runCatching null
+
         val apiResponse = ApiRepository.getMyKSuiteData(HttpClient.okHttpClient)
         if (apiResponse.data != null) {
-            MyKSuiteDataUtils.upsertKSuiteData(apiResponse.data!!)
+            upsertKSuiteData(apiResponse.data!!)
         } else {
             @OptIn(ExperimentalSerializationApi::class)
             apiResponse.error?.exception?.let {
@@ -51,5 +56,10 @@ object MyKSuiteDataUtils : MyKSuiteDataManager() {
         if (exception is CancellationException) throw exception
         SentryLog.d(TAG, "Exception during myKSuite data fetch", exception)
         null
+    }
+
+    companion object {
+
+        private val TAG = MyKSuiteDataUtils::class.simpleName.toString()
     }
 }

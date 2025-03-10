@@ -90,6 +90,10 @@ class MailboxController @Inject constructor(
         return getLockedMailboxesQuery(userId, mailboxInfoRealm).toMailboxesFlow()
     }
 
+    fun getMyKSuiteMailboxCount(userId: Int): Long {
+        return getMyKSuiteMailboxesQuery(userId, mailboxInfoRealm).count().find()
+    }
+
     private fun RealmQuery<Mailbox>.toMailboxesFlow() = asFlow().map { it.list }
     //endregion
 
@@ -155,6 +159,7 @@ class MailboxController @Inject constructor(
         private val isValidInLdap = "${Mailbox.isValidInLdapPropertyName} == true"
         private val isLocked = "${Mailbox.isLockedPropertyName} == true"
         private val hasValidPassword = "${Mailbox::hasValidPassword.name} == true"
+        private val isMyKSuite = "${Mailbox::isFree.name} == true"
 
         private fun getMailboxesQuery(
             userId: Int? = null,
@@ -202,6 +207,10 @@ class MailboxController @Inject constructor(
 
         private fun getLockedMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
             return realm.query("${checkHasUserId(userId)} AND ($isLocked OR NOT $isValidInLdap)")
+        }
+
+        private fun getMyKSuiteMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+            return realm.query<Mailbox>("${checkHasUserId(userId)} AND $isMyKSuite")
         }
         //endregion
 

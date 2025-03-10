@@ -92,6 +92,7 @@ class MainViewModel @Inject constructor(
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
     private val messageController: MessageController,
+    private val myKSuiteDataUtils: MyKSuiteDataUtils,
     private val notificationUtils: NotificationUtils,
     private val permissionsController: PermissionsController,
     private val quotasController: QuotasController,
@@ -317,7 +318,7 @@ class MainViewModel @Inject constructor(
             AccountUtils.updateCurrentUser()
 
             // Refresh My kSuite asynchronously, because it's not required for the threads list display
-            launch { MyKSuiteDataUtils.fetchData() }
+            launch { myKSuiteDataUtils.fetchData() }
 
             // Refresh Mailboxes
             SentryLog.d(TAG, "Refresh mailboxes from remote")
