@@ -507,8 +507,8 @@ class NewMessageViewModel @Inject constructor(
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
 
             /**
-             * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail),
-             * we need to set all of its Attachments to `FINISHED`, so we don't try to upload them again.
+             * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail), we need to
+             * set all of its Attachments to [AttachmentUploadStatus.FINISHED], so we don't try to upload them again.
              */
             draft.attachments.forEach {
                 it.setUploadStatus(AttachmentUploadStatus.FINISHED, draft, "fetchDraft at NewMessage opening")
