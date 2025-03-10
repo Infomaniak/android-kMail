@@ -21,7 +21,6 @@ import android.content.Context
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -92,14 +91,14 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
 
         MessageController.getMessage(remoteMessage.uid, realm)?.let { localMessage ->
             remoteMessage.initLocalValues(
-                messageInitialState = MessageInitialState(
-                    isFullyDownloaded = localMessage.isFullyDownloaded(),
-                    isTrashed = localMessage.isTrashed,
-                    isFromSearch = localMessage.isFromSearch,
-                    draftLocalUuid = localMessage.draftLocalUuid,
-                ),
+                isFullyDownloaded = localMessage.isFullyDownloaded(),
+                isTrashed = localMessage.isTrashed,
                 messageIds = localMessage.messageIds,
+                draftLocalUuid = localMessage.draftLocalUuid,
+                isFromSearch = localMessage.isFromSearch,
+                isDeletedOnApi = localMessage.isDeletedOnApi,
                 latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
+                swissTransferFiles = localMessage.swissTransferFiles,
             )
             remoteMessage.keepHeavyData(localMessage)
         }
