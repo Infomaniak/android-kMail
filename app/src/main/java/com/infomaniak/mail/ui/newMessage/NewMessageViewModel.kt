@@ -1002,7 +1002,7 @@ class NewMessageViewModel @Inject constructor(
              * be some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of the
              * Attachment, this data will be lost forever and we won't be able to save/send the Draft.
              */
-            return@map if (localAttachment != null && localAttachment.attachmentUploadStatus != AttachmentUploadStatus.AWAITING) {
+            return@map if (localAttachment != null && localAttachment.attachmentUploadStatus == AttachmentUploadStatus.FINISHED) {
                 localAttachment.copyFromRealm()
             } else {
                 uiAttachment
