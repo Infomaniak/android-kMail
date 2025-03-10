@@ -424,12 +424,7 @@ class RefreshController @Inject constructor(
                 val upToDateFolder = getUpToDateFolder(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
 
-                return@write handleAddedMessages(scope, upToDateFolder, messages, isConversationMode).also {
-
-                    // TODO: This count will be false for INBOX & SNOOZED when the snooze feature will be implemented
-                    val messagesCount = MessageController.getMessagesCountByFolderId(upToDateFolder.id, realm = this)
-                    SentryLog.d("Realm", "Saved Messages: ${upToDateFolder.displayForSentry()} | ($messagesCount)")
-                }
+                return@write handleAddedMessages(scope, upToDateFolder, messages, isConversationMode)
             }
         } ?: emptySet()
     }
