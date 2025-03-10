@@ -200,9 +200,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         //endregion
 
         //region Edit data
-        fun upsertMessage(message: Message, realm: MutableRealm) {
-            realm.copyToRealm(message, UpdatePolicy.ALL)
-        }
+        fun upsertMessage(message: Message, realm: MutableRealm): Message = realm.copyToRealm(message, UpdatePolicy.ALL)
 
         fun updateMessage(messageUid: String, realm: MutableRealm, onUpdate: (Message?) -> Unit) {
             onUpdate(getMessage(messageUid, realm))
