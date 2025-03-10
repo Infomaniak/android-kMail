@@ -52,7 +52,7 @@ object PrintHeaderUtils {
         messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.toTitle), *message.to.toTypedArray())
         message.sender?.let { messageDetailsDiv.insertPrintRecipientField(context.getString(R.string.fromTitle), it) }
 
-        messageDetailsDiv.insertPrintDateField(context.getString(R.string.dateTitle), message.date.toDate())
+        messageDetailsDiv.insertPrintDateField(context.getString(R.string.dateTitle), message.displayDate.toDate())
 
         elementsToInsert.add(messageDetailsDiv)
 

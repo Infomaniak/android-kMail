@@ -350,13 +350,13 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
-        val messageDate = message.date.toDate()
+        val messageDate = message.displayDate.toDate()
 
         if (message.isScheduledDraft) {
             scheduleAlert.setDescription(
                 context.getString(
                     R.string.scheduledEmailHeader,
-                    message.date.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
+                    message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
                 ),
             )
             scheduleSendIcon.isVisible = true
