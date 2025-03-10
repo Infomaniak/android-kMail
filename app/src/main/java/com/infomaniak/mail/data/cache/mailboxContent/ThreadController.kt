@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.Folder.FolderSort
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
@@ -59,8 +60,8 @@ class ThreadController @Inject constructor(
 ) {
 
     //region Get data
-    fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL, sortOrder: Sort): Flow<ResultsChange<Thread>> {
-        return getThreadsByMessageIdsQuery(folder, filter, sortOrder).asFlow()
+    fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
+        return getThreadsByMessageIdsQuery(folder, filter).asFlow()
     }
 
     fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
@@ -237,12 +238,14 @@ class ThreadController @Inject constructor(
         private fun getThreadsByMessageIdsQuery(
             folder: Folder,
             filter: ThreadFilter = ThreadFilter.ALL,
-            sortOrder: Sort,
         ): RealmQuery<Thread> {
 
             val notFromSearch = "${Thread::isFromSearch.name} == false"
             val notLocallyMovedOut = " AND ${Thread::isLocallyMovedOut.name} == false"
-            val realmQuery = folder.threads.query(notFromSearch + notLocallyMovedOut).sort(Thread::internalDate.name, sortOrder)
+            val folderSort = folder.role?.folderSort ?: FolderSort.Default
+            val realmQuery = folder.threads
+                .query(notFromSearch + notLocallyMovedOut)
+                .sort(folderSort.sortBy, folderSort.sortOrder)
 
             return if (filter == ThreadFilter.ALL) {
                 realmQuery

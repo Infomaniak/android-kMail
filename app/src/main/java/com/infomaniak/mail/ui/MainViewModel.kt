@@ -68,7 +68,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.query.Sort
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -220,10 +219,7 @@ class MainViewModel @Inject constructor(
         currentThreadsLiveJob = viewModelScope.launch(ioCoroutineContext) {
             observeFolderAndFilter()
                 .flatMapLatest { (folder, filter) ->
-                    folder?.let {
-                        val sortOrder = if (folder.role == FolderRole.SCHEDULED_DRAFTS) Sort.ASCENDING else Sort.DESCENDING
-                        threadController.getThreadsAsync(it, filter, sortOrder)
-                    } ?: emptyFlow()
+                    folder?.let { threadController.getThreadsAsync(it, filter) } ?: emptyFlow()
                 }
                 .collect(currentThreadsLive::postValue)
         }
