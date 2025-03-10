@@ -177,11 +177,11 @@ class Message : RealmObject {
 
 
     /**
-     * [date] is different than [internalDate] because it must be used when displaying the date of an email but it can't be used
+     * [displayDate] is different than [internalDate] because it must be used when displaying the date of an email but it can't be used
      * to sort messages chronologically.
      * A message's [originalDate] is not always defined. When this happens, we want to display the [internalDate] in its place.
      */
-    val date: RealmInstant get() = originalDate ?: internalDate
+    val displayDate: RealmInstant get() = originalDate ?: internalDate
 
     val threads by backlinks(Thread::messages)
 

@@ -106,7 +106,7 @@ class Thread : RealmObject {
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
         private set
 
-    val date: RealmInstant get() = originalDate ?: internalDate
+    val displayDate: RealmInstant get() = originalDate ?: internalDate
 
     // TODO: Put this back in `private` when the Threads parental issues are fixed
     val _folders by backlinks(Folder::threads)
