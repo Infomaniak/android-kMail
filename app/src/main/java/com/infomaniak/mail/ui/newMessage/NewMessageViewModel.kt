@@ -844,7 +844,9 @@ class NewMessageViewModel @Inject constructor(
 
     fun uploadAttachmentsToServer(uiAttachments: List<Attachment>) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
-        val localDraft = mailboxContentRealm().write {
+        val realm = mailboxContentRealm()
+
+        realm.write {
             DraftController.getDraft(localUuid, realm = this)?.also {
                 it.updateDraftAttachmentsWithLiveData(
                     uiAttachments = uiAttachments,
@@ -854,7 +856,7 @@ class NewMessageViewModel @Inject constructor(
         } ?: return@launch
 
         runCatching {
-            uploadAttachmentsWithMutex(localDraft, currentMailbox, draftController, mailboxContentRealm())
+            uploadAttachmentsWithMutex(localUuid, currentMailbox, draftController, realm)
         }.onFailure(Sentry::captureException)
     }
 

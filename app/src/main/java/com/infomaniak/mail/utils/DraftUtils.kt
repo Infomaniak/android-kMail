@@ -35,13 +35,14 @@ import kotlinx.coroutines.sync.withLock
 val attachmentsUploadMutex = Mutex()
 
 suspend fun uploadAttachmentsWithMutex(
-    draft: Draft,
+    localUuid: String,
     mailbox: Mailbox,
     draftController: DraftController,
     realm: Realm,
 ): Draft = attachmentsUploadMutex.withLock {
+    val draft = DraftController.getDraft(localUuid, realm)!!
     draft.uploadAttachments(mailbox, draftController, realm)
-    val updatedDraft = DraftController.getDraft(draft.localUuid, realm)!!
+    val updatedDraft = DraftController.getDraft(localUuid, realm)!!
     return@withLock updatedDraft
 }
 
@@ -51,9 +52,8 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
         it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING
     }
 
-    fun setUploadStatus(attachment: Attachment, uploadStatus: AttachmentUploadStatus, step: String) {
-        // This `writeBlocking` is on purpose. A simple `write` here will fail silently.
-        realm.writeBlocking {
+    suspend fun setUploadStatus(attachment: Attachment, uploadStatus: AttachmentUploadStatus, step: String) {
+        realm.write {
             draftController.updateDraft(localUuid, realm = this) {
                 it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it, step)
             }
@@ -72,10 +72,8 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
 
     attachmentsToUpload.forEach { attachment ->
         runCatching {
-            setUploadStatus(attachment, AttachmentUploadStatus.ONGOING, step = "before starting upload")
             attachment.startUpload(localUuid, mailbox, draftController, realm)
         }.onFailure { exception ->
-            setUploadStatus(attachment, AttachmentUploadStatus.AWAITING, step = "after failing upload")
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
             if ((exception as Exception).isNetworkException()) throw NetworkException()
             throw exception

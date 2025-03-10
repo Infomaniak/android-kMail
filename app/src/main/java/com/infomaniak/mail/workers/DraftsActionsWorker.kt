@@ -153,7 +153,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
 
             runCatching {
-                val updatedDraft = uploadAttachmentsWithMutex(draft, mailbox, draftController, mailboxContentRealm)
+                val updatedDraft = uploadAttachmentsWithMutex(draft.localUuid, mailbox, draftController, mailboxContentRealm)
                 with(executeDraftAction(updatedDraft, mailbox.uuid)) {
                     if (isSuccess) {
                         if (isTargetDraft) {
