@@ -31,7 +31,6 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.ErrorCode
@@ -45,6 +44,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.*
@@ -531,12 +531,14 @@ class RefreshController @Inject constructor(
 
     private fun initMessageLocalValues(remoteMessage: Message, folder: Folder) {
         remoteMessage.initLocalValues(
-            MessageInitialState(
-                isFullyDownloaded = false,
-                isTrashed = folder.role == FolderRole.TRASH,
-                isFromSearch = false,
-                draftLocalUuid = null,
-            ),
+            isFullyDownloaded = false,
+            isTrashed = folder.role == FolderRole.TRASH,
+            messageIds = remoteMessage.computeMessageIds(),
+            draftLocalUuid = null,
+            isFromSearch = false,
+            isDeletedOnApi = false,
+            latestCalendarEventResponse = null,
+            swissTransferFiles = realmListOf(),
         )
     }
     //endregion
