@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
@@ -28,6 +31,25 @@ import kotlinx.coroutines.ensureActive
 
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
+    fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole>
+
+    fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
+
+    fun processDeletedMessage(
+        scope: CoroutineScope,
+        managedMessage: Message,
+        context: Context,
+        mailbox: Mailbox,
+        realm: MutableRealm,
+    )
+
+    /**
+     * If an extra folder needs its unread count updated but no thread has that extra folder as [Thread.folderId], you can add the
+     * extra folder inside this method as they will be inserted inside the list of impacted folders.
+     */
+    fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders)
+    fun processDeletedThread(thread: Thread, realm: MutableRealm)
+    fun shouldQueryFolderThreadsOnDeletedUid(): Boolean
 
     /**
      * About the [impactedThreadsManaged]:
@@ -48,6 +70,39 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
         return ThreadController.getThreadsByFolderId(folderId, realm)
     }
+
+    override fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole> = emptyList()
+
+    override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
+        return MessageController.getMessage(shortUid.toLongUid(folderId), realm)
+    }
+
+    override fun processDeletedMessage(
+        scope: CoroutineScope,
+        managedMessage: Message,
+        context: Context,
+        mailbox: Mailbox,
+        realm: MutableRealm,
+    ) {
+        MessageController.deleteMessage(context, mailbox, managedMessage, realm)
+    }
+
+    override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
+        impactedFolders += folderId
+    }
+
+    override fun processDeletedThread(thread: Thread, realm: MutableRealm) {
+        if (thread.getNumberOfMessagesInFolder() == 0) {
+            realm.delete(thread)
+        } else {
+            thread.recomputeThread(realm)
+        }
+    }
+
+    override fun shouldQueryFolderThreadsOnDeletedUid(): Boolean = false
+
+    private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
+    private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
 
     override fun handleAddedMessages(
         scope: CoroutineScope,

@@ -39,7 +39,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
-import com.infomaniak.mail.utils.extensions.toLongUid
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -270,12 +269,12 @@ class RefreshController @Inject constructor(
 
         var inboxUnreadCount: Int? = null
         write {
-            val impactedFoldersIds = mutableSetOf<String>().apply {
-                addAll(handleDeletedUids(scope, activities.deletedShortUids, folder.id))
-                addAll(handleUpdatedUids(scope, activities.updatedMessages, folder.id))
-            }
+            val refreshStrategy = folder.refreshStrategy()
+            val impactedFolders = ImpactedFolders()
+            impactedFolders += handleDeletedUids(scope, activities.deletedShortUids, folder.id, refreshStrategy)
+            impactedFolders += handleUpdatedUids(scope, activities.updatedMessages, folder.id, refreshStrategy)
 
-            inboxUnreadCount = updateFoldersUnreadCount(impactedFoldersIds, realm = this)
+            inboxUnreadCount = updateFoldersUnreadCount(impactedFolders, realm = this)
 
             getUpToDateFolder(folder.id).let {
                 it.newMessagesUidsToFetch.addAll(activities.addedShortUids)
@@ -325,20 +324,18 @@ class RefreshController @Inject constructor(
         val impactedThreads = handleAddedUids(scope, folder, addedUids)
 
         var inboxUnreadCount: Int? = null
-        FolderController.updateFolder(folder.id, realm = this) { mutableRealm, it ->
-
-            val allCurrentFolderThreads = folder.refreshStrategy().queryFolderThreads(folder.id, mutableRealm)
-            it.threads.replaceContent(list = allCurrentFolderThreads)
+        write {
+            updateFolderAfterAddingOrDeletingMessagesUids(
+                folderId = folder.id,
+                currentFolderRefreshStrategy = folder.refreshStrategy(),
+                extraFolderUpdates = { updateDirectionDependentData(direction, remainingUids, addedUids) },
+            )
 
             inboxUnreadCount = updateFoldersUnreadCount(
                 // `impactedThreads` may not contain `folder.id` in special folders cases (i.e. snooze)
-                foldersIds = impactedThreads.mapTo(mutableSetOf(folder.id)) { it.folderId },
-                realm = mutableRealm,
+                folders = ImpactedFolders(folderIds = impactedThreads.mapTo(mutableSetOf(folder.id)) { it.folderId }),
+                realm = this,
             )
-
-            it.updateDirectionDependentData(direction, remainingUids, addedUids)
-
-            if (it.role == FolderRole.SCHEDULED_DRAFTS) it.isDisplayed = it.threads.isNotEmpty()
         }
 
         updateMailboxUnreadCount(inboxUnreadCount)
@@ -371,11 +368,11 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun updateFoldersUnreadCount(foldersIds: Set<String>, realm: MutableRealm): Int? {
+    private fun updateFoldersUnreadCount(folders: ImpactedFolders, realm: MutableRealm): Int? {
 
         var inboxUnreadCount: Int? = null
 
-        foldersIds.forEach {
+        folders.getFolderIds(realm).forEach {
             val folder = realm.getUpToDateFolder(it)
 
             val unreadCount = ThreadController.getUnreadThreadsCount(folder)
@@ -396,6 +393,8 @@ class RefreshController @Inject constructor(
     }
 
     private fun TypedRealm.getUpToDateFolder(id: String) = FolderController.getFolder(id, realm = this)!!
+
+    private fun TypedRealm.getUpToDateFolder(folderRole: FolderRole) = FolderController.getFolder(folderRole, realm = this)
 
     private inline fun <reified T> RealmList<T>.replaceContent(list: List<T>) {
         clear()
@@ -440,34 +439,37 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region Deleted Messages
-    private fun MutableRealm.handleDeletedUids(scope: CoroutineScope, shortUids: List<String>, folderId: String): Set<String> {
+    private fun MutableRealm.handleDeletedUids(
+        scope: CoroutineScope,
+        shortUids: List<String>,
+        folderId: String,
+        currentFolderRefreshStrategy: RefreshStrategy,
+    ): ImpactedFolders {
 
-        val impactedFolders = mutableSetOf<String>()
         val threads = mutableSetOf<Thread>()
-
         shortUids.forEach { shortUid ->
             scope.ensureActive()
-            val message = MessageController.getMessage(uid = shortUid.toLongUid(folderId), realm = this) ?: return@forEach
+
+            val message = currentFolderRefreshStrategy.getMessageFromShortUid(shortUid, folderId, realm = this) ?: return@forEach
             threads += message.threads
-            MessageController.deleteMessage(appContext, mailbox, message, realm = this)
+
+            currentFolderRefreshStrategy.processDeletedMessage(scope, message, appContext, mailbox, realm = this)
         }
 
+        val impactedFolders = ImpactedFolders()
         threads.forEach { thread ->
             scope.ensureActive()
 
-            impactedFolders.add(thread.folderId)
+            currentFolderRefreshStrategy.addFolderToImpactedFolders(thread.folderId, impactedFolders)
+            currentFolderRefreshStrategy.processDeletedThread(thread, realm = this)
+        }
 
-            if (thread.getNumberOfMessagesInFolder() == 0) {
-                delete(thread)
-            } else {
-                thread.recomputeThread(realm = this)
-            }
+        if (currentFolderRefreshStrategy.shouldQueryFolderThreadsOnDeletedUid()) {
+            updateFolderAfterAddingOrDeletingMessagesUids(folderId, currentFolderRefreshStrategy)
         }
 
         return impactedFolders
     }
-
-    private fun Thread.getNumberOfMessagesInFolder() = messages.count { message -> message.folderId == folderId }
     //endregion
 
     //region Updated Messages
@@ -475,24 +477,23 @@ class RefreshController @Inject constructor(
         scope: CoroutineScope,
         messageFlags: List<MessageFlags>,
         folderId: String,
-    ): Set<String> {
-        val impactedFolders = mutableSetOf<String>()
+        refreshStrategy: RefreshStrategy,
+    ): ImpactedFolders {
         val threads = mutableSetOf<Thread>()
-
         messageFlags.forEach { flags ->
             scope.ensureActive()
 
-            val uid = flags.shortUid.toLongUid(folderId)
-            MessageController.getMessage(uid, realm = this)?.let { message ->
+            refreshStrategy.getMessageFromShortUid(flags.shortUid, folderId, realm = this)?.let { message ->
                 message.updateFlags(flags)
                 threads += message.threads
             }
         }
 
+        val impactedFolders = ImpactedFolders()
         threads.forEach { thread ->
             scope.ensureActive()
 
-            impactedFolders.add(thread.folderId)
+            refreshStrategy.addFolderToImpactedFolders(thread.folderId, impactedFolders)
             thread.recomputeThread(realm = this)
         }
 
@@ -635,6 +636,31 @@ class RefreshController @Inject constructor(
         )
     }
     //endregion
+
+    private fun MutableRealm.updateFolderAfterAddingOrDeletingMessagesUids(
+        folderId: String,
+        currentFolderRefreshStrategy: RefreshStrategy,
+        extraFolderUpdates: (Folder.() -> Unit)? = null,
+    ) {
+        val allCurrentFolderThreads = currentFolderRefreshStrategy.queryFolderThreads(folderId, this)
+
+        getUpToDateFolder(folderId).let { currentFolder ->
+            currentFolder.threads.replaceContent(list = allCurrentFolderThreads)
+            if (currentFolder.role == FolderRole.SCHEDULED_DRAFTS) currentFolder.isDisplayed = currentFolder.threads.isNotEmpty()
+            extraFolderUpdates?.invoke(currentFolder)
+        }
+
+        // Some folders such as inbox and snooze require to query again the other folder's threads as well. For example, if a
+        // message uid is returned as "added" or "deleted" in the snooze folder, it should disappear or appear from inbox as well.
+        currentFolderRefreshStrategy.otherFolderRolesToQueryThreads().forEach { folderRole ->
+            getUpToDateFolder(folderRole)?.let { otherFolder ->
+                val allOtherFolderThreads = otherFolder.refreshStrategy().queryFolderThreads(folderId, realm = this)
+                otherFolder.threads.replaceContent(list = allOtherFolderThreads)
+
+                if (otherFolder.role == FolderRole.SCHEDULED_DRAFTS) otherFolder.isDisplayed = otherFolder.threads.isNotEmpty()
+            }
+        }
+    }
 
     // SCHEDULED_DRAFTS and SNOOZED need to be refreshed often because these folders
     // only appear in the MenuDrawer when there is at least 1 email in it.
