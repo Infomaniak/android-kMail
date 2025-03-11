@@ -43,6 +43,8 @@ interface DefaultRefreshStrategy : RefreshStrategy {
 
     override fun shouldHideEmptyFolder(): Boolean = false
 
+    override fun alsoRecomputeDuplicatedThreads(): Boolean = false
+
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
         return MessageController.getMessage(shortUid.toLongUid(folderId), realm)
     }

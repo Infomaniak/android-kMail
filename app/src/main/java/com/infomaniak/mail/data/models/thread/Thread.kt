@@ -24,6 +24,7 @@ import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshStrategy
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -242,6 +243,10 @@ class Thread : RealmObject {
             updateSnoozeStatesBasedOn(message)
         }
 
+        /**
+         * Only needed for snooze because they rely on duplicates to compute the correct state of every thread. Tightly linked
+         * with [RefreshStrategy.alsoRecomputeDuplicatedThreads].
+         */
         duplicates.forEach(::updateSnoozeStatesBasedOn)
 
         val lastMessage = messages.last { it.folderId == folderId }
