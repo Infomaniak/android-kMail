@@ -325,7 +325,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         SentryDebug.addDraftBreadcrumbs(draft, step = "executeDraftAction (action = ${draft.action?.name.toString()})")
 
         // TODO: Remove this whole `draft.attachments.any { … }` + `addDraftBreadcrumbs()` when the Attachments issue is fixed.
-        if (draft.attachments.any { it.attachmentUploadStatus != AttachmentUploadStatus.FINISHED }) {
+        if (draft.attachments.any { it.attachmentUploadStatus != AttachmentUploadStatus.UPLOADED }) {
 
             Sentry.captureMessage(
                 "We tried to [${draft.action?.name}] a Draft, but an Attachment wasn't uploaded.",

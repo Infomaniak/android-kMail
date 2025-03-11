@@ -323,7 +323,7 @@ class NewMessageViewModel @Inject constructor(
                 ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
                     draft.attachments += attachment.apply {
                         resource = previousMessage.attachments.find { it.name == name }?.resource
-                        setUploadStatus(AttachmentUploadStatus.FINISHED)
+                        setUploadStatus(AttachmentUploadStatus.UPLOADED)
                     }
                     SentryDebug.addDraftBreadcrumbs(draft, step = "set previousMessage when reply/replyAll/Forward")
                 }
@@ -508,10 +508,10 @@ class NewMessageViewModel @Inject constructor(
 
             /**
              * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail), we need to
-             * set all of its Attachments to [AttachmentUploadStatus.FINISHED], so we don't try to upload them again.
+             * set all of its Attachments to [AttachmentUploadStatus.UPLOADED], so we don't try to upload them again.
              */
             draft.attachments.forEach {
-                it.setUploadStatus(AttachmentUploadStatus.FINISHED, draft, "fetchDraft at NewMessage opening")
+                it.setUploadStatus(AttachmentUploadStatus.UPLOADED, draft, "fetchDraft at NewMessage opening")
             }
 
             /**
@@ -989,7 +989,7 @@ class NewMessageViewModel @Inject constructor(
          * Then it means the Attachments list hasn't been edited by the user, so we have nothing to do here.
          */
         val isForwardingUneditedAttachmentsList = draftMode == DraftMode.FORWARD &&
-                uiAttachments.all { it.attachmentUploadStatus == AttachmentUploadStatus.FINISHED } &&
+                uiAttachments.all { it.attachmentUploadStatus == AttachmentUploadStatus.UPLOADED } &&
                 uiAttachments.count() == attachments.count()
         if (isForwardingUneditedAttachmentsList) return
 
@@ -1002,7 +1002,7 @@ class NewMessageViewModel @Inject constructor(
              * be some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of the
              * Attachment, this data will be lost forever and we won't be able to save/send the Draft.
              */
-            return@map if (localAttachment != null && localAttachment.attachmentUploadStatus == AttachmentUploadStatus.FINISHED) {
+            return@map if (localAttachment != null && localAttachment.attachmentUploadStatus == AttachmentUploadStatus.UPLOADED) {
                 localAttachment.copyFromRealm()
             } else {
                 uiAttachment
