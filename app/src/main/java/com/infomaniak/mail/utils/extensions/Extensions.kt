@@ -421,15 +421,11 @@ fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> 
 fun List<Message>.getFoldersIds(exception: String? = null): ImpactedFolders {
     val impactedFolders = ImpactedFolders()
 
-    forEach { message ->
-        when {
-            message.folderId == exception -> Unit
-            message.snoozeState == SnoozeState.Snoozed -> {
-                impactedFolders += message.folderId
-                impactedFolders += FolderRole.SNOOZED
-            }
-            else -> impactedFolders += message.folderId
-        }
+    for (message in this) {
+        if (message.folderId == exception) continue
+
+        impactedFolders += message.folderId
+        if (message.snoozeState == SnoozeState.Snoozed) impactedFolders += FolderRole.SNOOZED
     }
 
     return impactedFolders
