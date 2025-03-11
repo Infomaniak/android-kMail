@@ -88,23 +88,8 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         impactedThreadsManaged: MutableSet<Thread>,
         realm: MutableRealm,
     ) {
-
-        MessageController.getMessage(remoteMessage.uid, realm)?.let { localMessage ->
-            remoteMessage.initLocalValues(
-                areHeavyDataFetched = localMessage.areHeavyDataFetched,
-                isTrashed = localMessage.isTrashed,
-                messageIds = localMessage.messageIds,
-                draftLocalUuid = localMessage.draftLocalUuid,
-                isFromSearch = localMessage.isFromSearch,
-                isDeletedOnApi = localMessage.isDeletedOnApi,
-                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
-                swissTransferFiles = localMessage.swissTransferFiles,
-            )
-            remoteMessage.keepHeavyData(localMessage)
-        }
-
+        MessageController.getMessage(remoteMessage.uid, realm)?.let(remoteMessage::keepLocalValues)
         val updatedMessage = MessageController.upsertMessage(remoteMessage, realm)
-
         impactedThreadsManaged += updatedMessage.threads
     }
 }
