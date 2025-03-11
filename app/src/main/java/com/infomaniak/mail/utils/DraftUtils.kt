@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.ATTACHMENT_TAG
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.startUpload
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.sync.Mutex
@@ -35,28 +34,20 @@ import kotlinx.coroutines.sync.withLock
 val attachmentsUploadMutex = Mutex()
 
 suspend fun uploadAttachmentsWithMutex(
-    draft: Draft,
+    localUuid: String,
     mailbox: Mailbox,
-    draftController: DraftController,
     realm: Realm,
 ): Draft = attachmentsUploadMutex.withLock {
-    draft.uploadAttachments(mailbox, draftController, realm)
-    val updatedDraft = DraftController.getDraft(draft.localUuid, realm)!!
+    val draft = DraftController.getDraft(localUuid, realm)!!
+    draft.uploadAttachments(mailbox, realm)
+    val updatedDraft = DraftController.getDraft(localUuid, realm)!!
     return@withLock updatedDraft
 }
 
-private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: DraftController, realm: Realm) {
+private suspend fun Draft.uploadAttachments(mailbox: Mailbox, realm: Realm) {
 
     fun getAwaitingAttachments(): List<Attachment> = attachments.filter {
         it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING
-    }
-
-    suspend fun setUploadStatus(attachment: Attachment, uploadStatus: AttachmentUploadStatus, step: String) {
-        realm.write {
-            draftController.updateDraft(localUuid, realm = this) {
-                it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it, step)
-            }
-        }
     }
 
     val attachmentsToUpload = getAwaitingAttachments()
@@ -71,10 +62,8 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
 
     attachmentsToUpload.forEach { attachment ->
         runCatching {
-            setUploadStatus(attachment, AttachmentUploadStatus.ONGOING, step = "before starting upload")
-            attachment.startUpload(localUuid, mailbox, draftController, realm)
+            attachment.startUpload(localUuid, mailbox, realm)
         }.onFailure { exception ->
-            setUploadStatus(attachment, AttachmentUploadStatus.AWAITING, step = "after failing upload")
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
             if ((exception as Exception).isNetworkException()) throw NetworkException()
             throw exception

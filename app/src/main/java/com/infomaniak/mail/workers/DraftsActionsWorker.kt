@@ -153,7 +153,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
 
             runCatching {
-                val updatedDraft = uploadAttachmentsWithMutex(draft, mailbox, draftController, mailboxContentRealm)
+                val updatedDraft = uploadAttachmentsWithMutex(draft.localUuid, mailbox, mailboxContentRealm)
                 with(executeDraftAction(updatedDraft, mailbox.uuid)) {
                     if (isSuccess) {
                         if (isTargetDraft) {
@@ -235,7 +235,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         if (errorCode == ErrorCode.SEND_LIMIT_EXCEEDED || errorCode == ErrorCode.SEND_DAILY_LIMIT_REACHED) {
             SentryLog.d(TAG, "Trying to save draft after a rate-limit error")
             mailboxContentRealm.write {
-                draftController.updateDraft(draft.localUuid, realm = this) {
+                DraftController.updateDraft(draft.localUuid, realm = this) {
                     it.action = DraftAction.SAVE
                 }
             }
@@ -439,7 +439,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         val signature = mailbox.getDefaultSignatureWithFallback()
 
         mailboxContentRealm.write {
-            draftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
+            DraftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
         }
 
         return executeDraftAction(

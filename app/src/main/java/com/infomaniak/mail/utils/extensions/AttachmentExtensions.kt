@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
 import io.realm.kotlin.Realm
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -126,12 +128,7 @@ object AttachmentExtensions {
     }
     //endregion
 
-    suspend fun Attachment.startUpload(
-        draftLocalUuid: String,
-        mailbox: Mailbox,
-        draftController: DraftController,
-        realm: Realm,
-    ) {
+    suspend fun Attachment.startUpload(draftLocalUuid: String, mailbox: Mailbox, realm: Realm) {
         val attachmentFile = getUploadLocalFile().also {
             if (it?.exists() != true) {
                 SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
@@ -155,7 +152,9 @@ object AttachmentExtensions {
 
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
-            updateLocalAttachment(draftLocalUuid, apiResponse.data!!, draftController, realm)
+            withContext(NonCancellable) {
+                updateLocalAttachment(draftLocalUuid, apiResponse.data!!, realm)
+            }
         } else {
             val baseMessage = "Upload failed for attachment $localUuid"
             val errorMessage = "error : ${apiResponse.translatedError}"
@@ -169,14 +168,9 @@ object AttachmentExtensions {
         }
     }
 
-    private suspend fun Attachment.updateLocalAttachment(
-        draftLocalUuid: String,
-        remoteAttachment: Attachment,
-        draftController: DraftController,
-        realm: Realm,
-    ) {
+    private suspend fun Attachment.updateLocalAttachment(draftLocalUuid: String, remoteAttachment: Attachment, realm: Realm) {
         realm.write {
-            draftController.updateDraft(draftLocalUuid, realm = this) { draft ->
+            DraftController.updateDraft(draftLocalUuid, realm = this) { draft ->
 
                 val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
                 SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (uuids to localUris): $uuidToLocalUri")

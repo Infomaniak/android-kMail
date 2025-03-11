@@ -507,8 +507,8 @@ class NewMessageViewModel @Inject constructor(
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
 
             /**
-             * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail),
-             * we need to set all of its Attachments to `FINISHED`, so we don't try to upload them again.
+             * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail), we need to
+             * set all of its Attachments to [AttachmentUploadStatus.FINISHED], so we don't try to upload them again.
              */
             draft.attachments.forEach {
                 it.setUploadStatus(AttachmentUploadStatus.FINISHED, draft, "fetchDraft at NewMessage opening")
@@ -791,7 +791,7 @@ class NewMessageViewModel @Inject constructor(
             LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
 
             mailboxContentRealm().write {
-                draftController.updateDraft(draftLocalUuid!!, realm = this) {
+                DraftController.updateDraft(draftLocalUuid!!, realm = this) {
                     it.attachments.findSpecificAttachment(attachment)?.let(::delete)
                 }
             }
@@ -844,7 +844,9 @@ class NewMessageViewModel @Inject constructor(
 
     fun uploadAttachmentsToServer(uiAttachments: List<Attachment>) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
-        val localDraft = mailboxContentRealm().write {
+        val realm = mailboxContentRealm()
+
+        realm.write {
             DraftController.getDraft(localUuid, realm = this)?.also {
                 it.updateDraftAttachmentsWithLiveData(
                     uiAttachments = uiAttachments,
@@ -854,7 +856,7 @@ class NewMessageViewModel @Inject constructor(
         } ?: return@launch
 
         runCatching {
-            uploadAttachmentsWithMutex(localDraft, currentMailbox, draftController, mailboxContentRealm())
+            uploadAttachmentsWithMutex(localUuid, currentMailbox, realm)
         }.onFailure(Sentry::captureException)
     }
 
@@ -1000,7 +1002,7 @@ class NewMessageViewModel @Inject constructor(
              * be some data for Attachments in Realm (for example, the `uuid`). If we don't take back the Realm version of the
              * Attachment, this data will be lost forever and we won't be able to save/send the Draft.
              */
-            return@map if (localAttachment != null && localAttachment.attachmentUploadStatus != AttachmentUploadStatus.AWAITING) {
+            return@map if (localAttachment != null && localAttachment.attachmentUploadStatus == AttachmentUploadStatus.FINISHED) {
                 localAttachment.copyFromRealm()
             } else {
                 uiAttachment
