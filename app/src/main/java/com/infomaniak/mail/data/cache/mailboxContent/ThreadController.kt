@@ -104,20 +104,22 @@ class ThreadController @Inject constructor(
 
                 val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
 
-                // The Search only returns Messages from TRASH if we explicitly selected this folder,
-                // which is the reason why we can compute the `isTrashed` value so loosely.
-                remoteMessage.initLocalValues(
-                    areHeavyDataFetched = localMessage?.areHeavyDataFetched ?: false,
-                    isTrashed = filterFolder?.role == FolderRole.TRASH,
-                    messageIds = localMessage?.messageIds ?: remoteMessage.computeMessageIds(),
-                    draftLocalUuid = localMessage?.draftLocalUuid,
-                    isFromSearch = localMessage == null,
-                    isDeletedOnApi = false,
-                    latestCalendarEventResponse = localMessage?.latestCalendarEventResponse,
-                    swissTransferFiles = localMessage?.swissTransferFiles ?: realmListOf(),
-                )
-
-                localMessage?.let(remoteMessage::keepHeavyData)
+                if (localMessage == null) {
+                    // The Search only returns Messages from TRASH if we explicitly selected this folder,
+                    // which is the reason why we can compute the `isTrashed` value so loosely.
+                    remoteMessage.initLocalValues(
+                        areHeavyDataFetched = false,
+                        isTrashed = filterFolder?.role == FolderRole.TRASH,
+                        messageIds = remoteMessage.computeMessageIds(),
+                        draftLocalUuid = null,
+                        isFromSearch = true,
+                        isDeletedOnApi = false,
+                        latestCalendarEventResponse = null,
+                        swissTransferFiles = realmListOf(),
+                    )
+                } else {
+                    remoteMessage.keepLocalValues(localMessage)
+                }
 
                 remoteThread.messagesIds += remoteMessage.messageIds
 
