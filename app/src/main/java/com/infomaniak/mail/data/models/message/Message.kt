@@ -130,8 +130,8 @@ class Message : RealmObject {
     //region Local data (Transient)
 
     // ------------- !IMPORTANT! -------------
-    // Every field that is added in this Transient region should be declared in 'initLocalValue()' too
-    // to avoid loosing data when updating from API.
+    // Every field that is added in this Transient region should be declared in
+    // `initLocalValue()` too to avoid loosing data when updating from the API.
     // If the Field is a "heavy data" (i.e. an embedded object), it should also be added in 'keepHeavyData()'.
 
     @Transient
