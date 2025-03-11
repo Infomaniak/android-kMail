@@ -36,16 +36,15 @@ val attachmentsUploadMutex = Mutex()
 suspend fun uploadAttachmentsWithMutex(
     localUuid: String,
     mailbox: Mailbox,
-    draftController: DraftController,
     realm: Realm,
 ): Draft = attachmentsUploadMutex.withLock {
     val draft = DraftController.getDraft(localUuid, realm)!!
-    draft.uploadAttachments(mailbox, draftController, realm)
+    draft.uploadAttachments(mailbox, realm)
     val updatedDraft = DraftController.getDraft(localUuid, realm)!!
     return@withLock updatedDraft
 }
 
-private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: DraftController, realm: Realm) {
+private suspend fun Draft.uploadAttachments(mailbox: Mailbox, realm: Realm) {
 
     fun getAwaitingAttachments(): List<Attachment> = attachments.filter {
         it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING
@@ -63,7 +62,7 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
 
     attachmentsToUpload.forEach { attachment ->
         runCatching {
-            attachment.startUpload(localUuid, mailbox, draftController, realm)
+            attachment.startUpload(localUuid, mailbox, realm)
         }.onFailure { exception ->
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
             if ((exception as Exception).isNetworkException()) throw NetworkException()

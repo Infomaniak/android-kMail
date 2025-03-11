@@ -61,10 +61,6 @@ class DraftController @Inject constructor(
         realm.copyToRealm(draft, UpdatePolicy.ALL)
     }
 
-    fun updateDraft(localUuid: String, realm: MutableRealm, onUpdate: (Draft) -> Unit) {
-        getDraft(localUuid, realm)?.let(onUpdate)
-    }
-
     suspend fun deleteDraft(draft: Draft) {
         mailboxContentRealm().write {
             delete(getDraftQuery(Draft::localUuid.name, draft.localUuid, realm = this))
@@ -117,6 +113,12 @@ class DraftController @Inject constructor(
 
         fun getDraftByMessageUid(messageUid: String, realm: TypedRealm): Draft? {
             return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
+        }
+        //endregion
+
+        //region Edit data
+        fun updateDraft(localUuid: String, realm: MutableRealm, onUpdate: (Draft) -> Unit) {
+            getDraft(localUuid, realm)?.let(onUpdate)
         }
         //endregion
     }

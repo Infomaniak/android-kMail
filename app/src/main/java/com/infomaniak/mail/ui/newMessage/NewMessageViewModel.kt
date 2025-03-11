@@ -791,7 +791,7 @@ class NewMessageViewModel @Inject constructor(
             LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
 
             mailboxContentRealm().write {
-                draftController.updateDraft(draftLocalUuid!!, realm = this) {
+                DraftController.updateDraft(draftLocalUuid!!, realm = this) {
                     it.attachments.findSpecificAttachment(attachment)?.let(::delete)
                 }
             }
@@ -856,7 +856,7 @@ class NewMessageViewModel @Inject constructor(
         } ?: return@launch
 
         runCatching {
-            uploadAttachmentsWithMutex(localUuid, currentMailbox, draftController, realm)
+            uploadAttachmentsWithMutex(localUuid, currentMailbox, realm)
         }.onFailure(Sentry::captureException)
     }
 
