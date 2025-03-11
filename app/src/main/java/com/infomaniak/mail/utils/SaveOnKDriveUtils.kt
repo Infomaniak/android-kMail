@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.content.pm.PackageManager
-import io.sentry.Sentry
 
 object SaveOnKDriveUtils {
     const val DRIVE_PACKAGE = "com.infomaniak.drive"
@@ -29,7 +28,6 @@ object SaveOnKDriveUtils {
         val packageInfo = context.packageManager.getPackageInfo(DRIVE_PACKAGE, PackageManager.GET_ACTIVITIES)
         packageInfo.activities.any { it.name == SAVE_EXTERNAL_ACTIVITY_CLASS }
     }.getOrElse {
-        Sentry.captureException(it)
         false
     }
 }
