@@ -138,6 +138,8 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         // Because we are missing the links between Messages, it will create multiple Threads for the same Folder.
         // Hence, we need to find these duplicates, and remove them.
         val duplicatedThreads = identifyExtraDuplicatedThreads(remoteMessage.messageIds)
+        // We need to make sure to remove the duplicated Threads even if they were previously added to `impactedThreadsManaged`.
+        // Later on, this set will be used to recompute Threads, and Threads that are deleted from Realm will crash Realm if we try to access them.
         impactedThreadsManaged -= duplicatedThreads
         duplicatedThreads.forEach(::delete) // Delete the other Threads. Sorry bro, you won't be missed.
     }
