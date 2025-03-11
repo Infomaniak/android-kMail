@@ -244,6 +244,20 @@ class Message : RealmObject {
         ACKNOWLEDGED,
     }
 
+    fun keepLocalValues(localMessage: Message) {
+        initLocalValues(
+            areHeavyDataFetched = localMessage.areHeavyDataFetched,
+            isTrashed = localMessage.isTrashed,
+            messageIds = localMessage.messageIds,
+            draftLocalUuid = localMessage.draftLocalUuid,
+            isFromSearch = localMessage.isFromSearch,
+            isDeletedOnApi = localMessage.isDeletedOnApi,
+            latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
+            swissTransferFiles = localMessage.swissTransferFiles,
+        )
+        keepHeavyData(localMessage)
+    }
+
     fun initLocalValues(
         areHeavyDataFetched: Boolean,
         isTrashed: Boolean,
@@ -267,7 +281,7 @@ class Message : RealmObject {
         this.hasAttachable = hasAttachments || swissTransferUuid != null
     }
 
-    fun keepHeavyData(message: Message) {
+    private fun keepHeavyData(message: Message) {
         attachments.replaceContent(message.attachments.copyFromRealm())
         body = message.body?.copyFromRealm()
 
