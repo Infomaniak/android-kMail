@@ -136,7 +136,7 @@ class Message : RealmObject {
 
     @Transient
     @PersistedName("isFullyDownloaded")
-    private var _isFullyDownloaded: Boolean = false
+    var areHeavyDataFetched: Boolean = false
     @Transient
     var isTrashed: Boolean = false
     @Transient
@@ -245,7 +245,7 @@ class Message : RealmObject {
     }
 
     fun initLocalValues(
-        isFullyDownloaded: Boolean,
+        areHeavyDataFetched: Boolean,
         isTrashed: Boolean,
         messageIds: RealmSet<String>,
         draftLocalUuid: String?,
@@ -254,7 +254,7 @@ class Message : RealmObject {
         latestCalendarEventResponse: CalendarEventResponse?,
         swissTransferFiles: RealmList<SwissTransferFile>,
     ) {
-        this._isFullyDownloaded = isFullyDownloaded
+        this.areHeavyDataFetched = areHeavyDataFetched
         this.isTrashed = isTrashed
         this.messageIds = messageIds
         this.draftLocalUuid = draftLocalUuid
@@ -286,7 +286,7 @@ class Message : RealmObject {
         ) {
             false
         } else {
-            _isFullyDownloaded
+            areHeavyDataFetched
         }
     }
 
