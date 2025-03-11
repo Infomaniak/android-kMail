@@ -236,7 +236,7 @@ class ThreadListAdapter @Inject constructor(
             mailSubject.text = context.formatSubject(subject)
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
 
-            val dateDisplay = computeDateDisplay()
+            val dateDisplay = computeThreadListDateDisplay(folderRole)
             mailDate.text = dateDisplay.formatThreadDate(context, this)
             mailDateIcon.apply {
                 isVisible = dateDisplay.icon != null
@@ -486,12 +486,6 @@ class ThreadListAdapter @Inject constructor(
             1 -> recipients.single().displayedName(context)
             else -> everyone()
         }
-    }
-
-    private fun Thread.computeDateDisplay() = when {
-        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
-        snoozeState != null -> ThreadListDateDisplay.Snoozed
-        else -> ThreadListDateDisplay.Default
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
