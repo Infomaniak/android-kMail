@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.ATTACHMENT_TAG
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.AttachmentExtensions.startUpload
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.sync.Mutex
@@ -50,14 +49,6 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, draftController: D
 
     fun getAwaitingAttachments(): List<Attachment> = attachments.filter {
         it.attachmentUploadStatus == AttachmentUploadStatus.AWAITING
-    }
-
-    suspend fun setUploadStatus(attachment: Attachment, uploadStatus: AttachmentUploadStatus, step: String) {
-        realm.write {
-            draftController.updateDraft(localUuid, realm = this) {
-                it.attachments.findSpecificAttachment(attachment)?.setUploadStatus(uploadStatus, draft = it, step)
-            }
-        }
     }
 
     val attachmentsToUpload = getAwaitingAttachments()
