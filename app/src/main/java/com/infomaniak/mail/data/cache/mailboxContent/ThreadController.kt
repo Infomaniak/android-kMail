@@ -97,7 +97,7 @@ class ThreadController @Inject constructor(
         filterFolder: Folder?,
     ): List<Thread> = withContext(ioDispatcher) {
 
-        fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread) {
+        fun MutableRealm.keepOldMessagesData(remoteThread: Thread) {
 
             remoteThread.messages.forEach { remoteMessage: Message ->
                 ensureActive()
@@ -147,7 +147,7 @@ class ThreadController @Inject constructor(
                 }
                 remoteThread.folderId = folderId
 
-                keepOldMessagesAndAddToSearchFolder(remoteThread)
+                keepOldMessagesData(remoteThread)
 
                 return@map remoteThread
             }.also(searchFolder.threads::addAll)
