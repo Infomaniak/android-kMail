@@ -39,6 +39,8 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
 
     override fun shouldHideEmptyFolder(): Boolean = true
 
+    override fun alsoRecomputeDuplicatedThreads(): Boolean = true
+
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
         val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return null
         return super.getMessageFromShortUid(shortUid, inboxId, realm)
