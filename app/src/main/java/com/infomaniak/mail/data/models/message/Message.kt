@@ -162,10 +162,12 @@ class Message : RealmObject {
     @Transient
     @Ignore
     var detailsAreExpanded = false
-    // Although it might seem more logical to place the `splitBody` within the `body` of
-    // the Message, this approach is not feasible. The reason is that we must mark it as
-    // `@Ignore` in Realm. Placing it inside the `body` would result in data not updating
-    // correctly, as the relationship between Body and Message relies on a Realm query.
+    /**
+     * Although it might seem more logical to place the [splitBody] within the [body] of
+     * the [Message], this approach is not feasible. The reason is that we must mark it as
+     * `@Ignore` in Realm. Placing it inside the [body] would result in data not updating
+     * correctly, as the relationship between [body] and [Message] relies on a Realm query.
+     */
     @Transient
     @Ignore
     var splitBody: SplitBody? = null
@@ -177,10 +179,9 @@ class Message : RealmObject {
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
 
-
     /**
-     * [displayDate] is different than [internalDate] because it must be used when displaying the date of an email but it can't be used
-     * to sort messages chronologically.
+     * [displayDate] is different than [internalDate] because it must be used when displaying
+     * the date of an email but it can't be used to sort messages chronologically.
      * A message's [originalDate] is not always defined. When this happens, we want to display the [internalDate] in its place.
      */
     val displayDate: RealmInstant get() = originalDate ?: internalDate
