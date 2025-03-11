@@ -21,7 +21,6 @@ import android.content.Context
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -89,22 +88,8 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         impactedThreadsManaged: MutableSet<Thread>,
         realm: MutableRealm,
     ) {
-
-        MessageController.getMessage(remoteMessage.uid, realm)?.let { localMessage ->
-            remoteMessage.initLocalValues(
-                messageInitialState = MessageInitialState(
-                    isFullyDownloaded = localMessage.isFullyDownloaded(),
-                    isTrashed = localMessage.isTrashed,
-                    isFromSearch = localMessage.isFromSearch,
-                    draftLocalUuid = localMessage.draftLocalUuid,
-                ),
-                messageIds = localMessage.messageIds,
-            )
-            remoteMessage.keepHeavyData(localMessage)
-        }
-
+        MessageController.getMessage(remoteMessage.uid, realm)?.let(remoteMessage::keepLocalValues)
         val updatedMessage = MessageController.upsertMessage(remoteMessage, realm)
-
         impactedThreadsManaged += updatedMessage.threads
     }
 }

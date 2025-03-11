@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
+import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.serializers.RealmListKSerializer
@@ -129,13 +130,13 @@ class Message : RealmObject {
     //region Local data (Transient)
 
     // ------------- !IMPORTANT! -------------
-    // Every field that is added in this Transient region should be declared in 'initLocalValue()' too
-    // to avoid loosing data when updating from API.
+    // Every field that is added in this Transient region should be declared in
+    // `initLocalValue()` too to avoid loosing data when updating from the API.
     // If the Field is a "heavy data" (i.e. an embedded object), it should also be added in 'keepHeavyData()'.
 
     @Transient
     @PersistedName("isFullyDownloaded")
-    private var _isFullyDownloaded: Boolean = false
+    var areHeavyDataFetched: Boolean = false
     @Transient
     var isTrashed: Boolean = false
     @Transient
@@ -242,29 +243,45 @@ class Message : RealmObject {
         ACKNOWLEDGED,
     }
 
-    fun initLocalValues(
-        messageInitialState: MessageInitialState,
-        latestCalendarEventResponse: CalendarEventResponse? = null,
-        messageIds: RealmSet<String>? = null,
-        swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
-    ) {
-
-        this._isFullyDownloaded = messageInitialState.isFullyDownloaded
-        this.isTrashed = messageInitialState.isTrashed
-        messageInitialState.draftLocalUuid?.let { this.draftLocalUuid = it }
-        this.isFromSearch = messageInitialState.isFromSearch
-        this.messageIds = messageIds ?: computeMessageIds()
-        this.latestCalendarEventResponse = latestCalendarEventResponse
-        this.swissTransferFiles = swissTransferFiles
-
-        shortUid = uid.toShortUid()
-        hasAttachable = hasAttachments || swissTransferUuid != null
+    fun keepLocalValues(localMessage: Message) {
+        initLocalValues(
+            areHeavyDataFetched = localMessage.areHeavyDataFetched,
+            isTrashed = localMessage.isTrashed,
+            messageIds = localMessage.messageIds,
+            draftLocalUuid = localMessage.draftLocalUuid,
+            isFromSearch = localMessage.isFromSearch,
+            isDeletedOnApi = localMessage.isDeletedOnApi,
+            latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
+            swissTransferFiles = localMessage.swissTransferFiles,
+        )
+        keepHeavyData(localMessage)
     }
 
-    fun keepHeavyData(message: Message) {
-        attachments = message.attachments.copyFromRealm().toRealmList()
-        swissTransferFiles = message.swissTransferFiles.copyFromRealm().toRealmList()
-        latestCalendarEventResponse = message.latestCalendarEventResponse?.copyFromRealm()
+    fun initLocalValues(
+        areHeavyDataFetched: Boolean,
+        isTrashed: Boolean,
+        messageIds: RealmSet<String>,
+        draftLocalUuid: String?,
+        isFromSearch: Boolean,
+        isDeletedOnApi: Boolean,
+        latestCalendarEventResponse: CalendarEventResponse?,
+        swissTransferFiles: RealmList<SwissTransferFile>,
+    ) {
+        this.areHeavyDataFetched = areHeavyDataFetched
+        this.isTrashed = isTrashed
+        this.messageIds = messageIds
+        this.draftLocalUuid = draftLocalUuid
+        this.isFromSearch = isFromSearch
+        this.isDeletedOnApi = isDeletedOnApi
+        this.latestCalendarEventResponse = latestCalendarEventResponse
+        this.swissTransferFiles.replaceContent(swissTransferFiles)
+
+        this.shortUid = uid.toShortUid()
+        this.hasAttachable = hasAttachments || swissTransferUuid != null
+    }
+
+    private fun keepHeavyData(message: Message) {
+        attachments.replaceContent(message.attachments.copyFromRealm())
         body = message.body?.copyFromRealm()
 
         // TODO: Those are unused for now, but if we ever want to use them, we need to save them here.
@@ -282,7 +299,7 @@ class Message : RealmObject {
         ) {
             false
         } else {
-            _isFullyDownloaded
+            areHeavyDataFetched
         }
     }
 
@@ -367,13 +384,6 @@ class Message : RealmObject {
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
-
-    data class MessageInitialState(
-        val isFullyDownloaded: Boolean,
-        val isTrashed: Boolean,
-        val isFromSearch: Boolean,
-        val draftLocalUuid: String?,
-    )
 
     companion object
 }
