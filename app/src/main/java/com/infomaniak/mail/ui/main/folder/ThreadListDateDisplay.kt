@@ -23,7 +23,6 @@ import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
 import com.infomaniak.core.utils.*
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.Companion.FORMAT_DAY_OF_THE_WEEK
 import com.infomaniak.mail.utils.extensions.isSmallerThanDays
@@ -45,11 +44,7 @@ enum class ThreadListDateDisplay(@DrawableRes val icon: Int?, val formatThreadDa
         icon = R.drawable.ic_alarm_clock,
         formatThreadDate = { thread ->
             // If the thread is in SnoozeState.Snoozed then we necessarily have a snoozeEndDate
-            val date = if (thread.snoozeState == SnoozeState.Snoozed) {
-                thread.snoozeEndDate ?: RealmInstant.MIN
-            } else {
-                thread.displayDate
-            }
+            val date = thread.snoozeEndDate ?: RealmInstant.MIN
             if (date.isInTheFuture()) relativeFormatting(date) else defaultFormatting(date)
         }
     )
