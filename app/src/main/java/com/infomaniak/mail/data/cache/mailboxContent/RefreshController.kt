@@ -531,7 +531,7 @@ class RefreshController @Inject constructor(
 
     private fun initMessageLocalValues(remoteMessage: Message, folder: Folder) {
         remoteMessage.initLocalValues(
-            isFullyDownloaded = false,
+            areHeavyDataFetched = false,
             isTrashed = folder.role == FolderRole.TRASH,
             messageIds = remoteMessage.computeMessageIds(),
             draftLocalUuid = null,

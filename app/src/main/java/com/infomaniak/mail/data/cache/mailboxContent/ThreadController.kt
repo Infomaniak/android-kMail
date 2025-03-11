@@ -107,7 +107,7 @@ class ThreadController @Inject constructor(
                 // The Search only returns Messages from TRASH if we explicitly selected this folder,
                 // which is the reason why we can compute the `isTrashed` value so loosely.
                 remoteMessage.initLocalValues(
-                    isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
+                    areHeavyDataFetched = localMessage?.areHeavyDataFetched ?: false,
                     isTrashed = filterFolder?.role == FolderRole.TRASH,
                     messageIds = localMessage?.messageIds ?: remoteMessage.computeMessageIds(),
                     draftLocalUuid = localMessage?.draftLocalUuid,
@@ -367,7 +367,7 @@ class ThreadController @Inject constructor(
                             } ?: realmListOf()
 
                             remoteMessage.initLocalValues(
-                                isFullyDownloaded = true,
+                                areHeavyDataFetched = true,
                                 isTrashed = localMessage.isTrashed,
                                 messageIds = localMessage.messageIds,
                                 draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
