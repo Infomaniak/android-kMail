@@ -258,10 +258,11 @@ class Message : RealmObject {
         this.messageIds = messageIds
         this.draftLocalUuid = draftLocalUuid
         this.isFromSearch = isFromSearch
-        this.shortUid = uid.toShortUid()
         this.isDeletedOnApi = isDeletedOnApi
         this.latestCalendarEventResponse = latestCalendarEventResponse
         this.swissTransferFiles.replaceContent(swissTransferFiles)
+
+        this.shortUid = uid.toShortUid()
         this.hasAttachable = hasAttachments || swissTransferUuid != null
     }
 
