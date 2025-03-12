@@ -149,12 +149,7 @@ class Folder : RealmObject, Cloneable {
 
     fun messages(realm: TypedRealm): List<Message> = MessageController.getMessagesByFolderId(id, realm)
 
-    fun refreshStrategy(): RefreshStrategy = when (role) {
-        FolderRole.INBOX -> inboxRefreshStrategy
-        FolderRole.SNOOZED -> snoozeRefreshStrategy
-        FolderRole.SCHEDULED_DRAFTS -> scheduledDraftRefreshStrategy
-        else -> defaultRefreshStrategy
-    }
+    fun refreshStrategy(): RefreshStrategy = role?.refreshStrategy ?: defaultRefreshStrategy
 
     fun getFolderSort() = role?.folderSort ?: FolderSort.Default
 
@@ -176,16 +171,31 @@ class Folder : RealmObject, Cloneable {
         @DrawableRes val folderIconRes: Int,
         val order: Int,
         val matomoValue: String,
+        val refreshStrategy: RefreshStrategy = defaultRefreshStrategy,
         val folderSort: FolderSort = FolderSort.Default,
         val groupMessagesBySection: Boolean = true,
     ) {
-        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 10, "inboxFolder"),
+        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 10, "inboxFolder", inboxRefreshStrategy),
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 9, "commercialFolder"),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 8, "socialNetworksFolder"),
         SENT(R.string.sentFolder, R.drawable.ic_send, 7, "sentFolder"),
-        SNOOZED(R.string.snoozedFolder, R.drawable.ic_alarm_clock, 6, "snoozedFolder", FolderSort.Snooze, false),
+        SNOOZED(
+            folderNameRes = R.string.snoozedFolder,
+            folderIconRes = R.drawable.ic_alarm_clock,
+            order = 6,
+            matomoValue = "snoozedFolder",
+            refreshStrategy = snoozeRefreshStrategy,
+            folderSort = FolderSort.Snooze,
+            groupMessagesBySection = false,
+        ),
         SCHEDULED_DRAFTS(
-            R.string.scheduledMessagesFolder, R.drawable.ic_schedule_send, 5, "scheduledDraftsFolder", FolderSort.Scheduled, false
+            folderNameRes = R.string.scheduledMessagesFolder,
+            folderIconRes = R.drawable.ic_schedule_send,
+            order = 5,
+            matomoValue = "scheduledDraftsFolder",
+            refreshStrategy = scheduledDraftRefreshStrategy,
+            folderSort = FolderSort.Scheduled,
+            groupMessagesBySection = false,
         ),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftFolder"),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, "spamFolder"),
