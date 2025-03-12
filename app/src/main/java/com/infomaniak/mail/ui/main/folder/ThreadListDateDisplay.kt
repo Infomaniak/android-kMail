@@ -50,11 +50,11 @@ enum class ThreadListDateDisplay(@DrawableRes val icon: Int?, val formatThreadDa
     )
 }
 
-private fun RealmInstant.isInTheFuture() = epochSeconds * 1000 > System.currentTimeMillis()
+private fun RealmInstant.isInTheFuture() = epochSeconds * 1_000L > System.currentTimeMillis()
 
 private fun Context.relativeFormatting(date: RealmInstant) = DateUtils.getRelativeDateTimeString(
     this,
-    date.epochSeconds * 1000,
+    date.epochSeconds * 1_000L,
     DateUtils.DAY_IN_MILLIS,
     DateUtils.WEEK_IN_MILLIS,
     0,
