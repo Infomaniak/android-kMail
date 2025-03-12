@@ -239,8 +239,9 @@ class ThreadListAdapter @Inject constructor(
             val dateDisplay = computeThreadListDateDisplay(folderRole)
             mailDate.text = dateDisplay.formatThreadDate(context, this)
             mailDateIcon.apply {
-                isVisible = dateDisplay.icon != null
-                dateDisplay.icon?.let { setImageResource(it) }
+                isVisible = dateDisplay.iconRes != null
+                dateDisplay.iconRes?.let { setImageResource(it) }
+                dateDisplay.iconColorRes?.let { imageTintList = ColorStateList.valueOf(context.getColor(it)) }
             }
             draftPrefix.isVisible = hasDrafts
 

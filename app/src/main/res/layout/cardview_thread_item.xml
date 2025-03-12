@@ -226,8 +226,8 @@
                     app:layout_constraintBottom_toBottomOf="@id/mailDate"
                     app:layout_constraintEnd_toStartOf="@id/mailDate"
                     app:layout_constraintTop_toTopOf="@id/mailDate"
-                    app:tint="@color/scheduledIconColor"
                     tools:src="@drawable/ic_editor_clock_thick"
+                    tools:tint="@color/scheduledIconColor"
                     tools:visibility="visible" />
 
                 <TextView
