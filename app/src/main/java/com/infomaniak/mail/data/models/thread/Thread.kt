@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -49,9 +50,15 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 import java.util.Date
+import javax.inject.Inject
 
 @Serializable
 class Thread : RealmObject {
+
+    @Transient
+    @Ignore
+    @Inject
+    lateinit var folderController: FolderController
 
     //region Remote data
     @PrimaryKey
@@ -106,6 +113,8 @@ class Thread : RealmObject {
         private set
 
     private val _folders by backlinks(Folder::threads)
+
+    // TODO: Remove this `runCatching / getOrElse` when the issue is fixed
     val folder
         get() = runCatching {
             _folders.single()
@@ -134,7 +143,17 @@ class Thread : RealmObject {
                 scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                 scope.setExtra("exception", exception.message.toString())
             }
-            _folders.first()
+
+            val correctFolder = _folders.firstOrNull { uid.contains(it.id) } ?: _folders.first()
+
+            _folders.forEach { wrongFolder ->
+                if (wrongFolder.id != correctFolder.id) {
+                    SentryDebug.addThreadParentsBreadcrumb(folder = wrongFolder, thread = this, reason)
+                    folderController.removeThreadFromFolder(folderId = wrongFolder.id, thread = this)
+                }
+            }
+
+            return@getOrElse correctFolder
         }
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts

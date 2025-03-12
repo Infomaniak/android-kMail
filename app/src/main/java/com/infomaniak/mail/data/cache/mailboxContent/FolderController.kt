@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.copyListToRealm
 import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.sortFolders
@@ -35,8 +36,11 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class FolderController @Inject constructor(
@@ -150,6 +154,15 @@ class FolderController @Inject constructor(
         }
 
         copyListToRealm(remoteFolders)
+    }
+
+    // TODO: Remove this function when the issue is fixed in the calling location
+    fun removeThreadFromFolder(folderId: String, thread: Thread) {
+        CoroutineScope(Dispatchers.Default).launch {
+            updateFolder(folderId, realm = mailboxContentRealm()) { _, folder ->
+                folder.threads.remove(thread)
+            }
+        }
     }
     //endregion
 
