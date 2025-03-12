@@ -678,25 +678,29 @@ class ThreadListAdapter @Inject constructor(
             add(folderRole)
         }
 
-        if (threadDensity == ThreadDensity.COMPACT) {
-            cleanMultiSelectionItems(threads, scope)
-            addAll(threads)
-        } else if (folderRole?.groupMessagesBySection == false) {
-            addAll(threads)
-        } else {
-            var previousSectionTitle = ""
-            threads.forEach { thread ->
-                scope.ensureActive()
+        when {
+            threadDensity == ThreadDensity.COMPACT -> {
+                cleanMultiSelectionItems(threads, scope)
+                addAll(threads)
+            }
+            folderRole?.groupMessagesBySection == false -> {
+                addAll(threads)
+            }
+            else -> {
+                var previousSectionTitle = ""
+                threads.forEach { thread ->
+                    scope.ensureActive()
 
-                val sectionTitle = thread.getSectionTitle(context)
-                when {
-                    sectionTitle != previousSectionTitle -> {
-                        add(sectionTitle)
-                        previousSectionTitle = sectionTitle
+                    val sectionTitle = thread.getSectionTitle(context)
+                    when {
+                        sectionTitle != previousSectionTitle -> {
+                            add(sectionTitle)
+                            previousSectionTitle = sectionTitle
+                        }
                     }
-                }
 
-                add(thread)
+                    add(thread)
+                }
             }
         }
     }
