@@ -461,10 +461,11 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private fun Draft.initLiveData(signatures: List<Signature>) {
+        val draftSignature = signatures.singleOrNull { it.id == identityId?.toInt() }
 
         fromLiveData.postValue(
             UiFrom(
-                signature = signatures.single { it.id == identityId?.toInt() },
+                signature = draftSignature ?: currentMailbox.getDefaultSignatureWithFallback(),
                 shouldUpdateBodySignature = false,
             ),
         )

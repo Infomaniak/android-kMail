@@ -23,7 +23,6 @@ import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
-import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.utils.extensions.getDefault
@@ -137,8 +136,8 @@ class Mailbox : RealmObject {
         trustedDomains?.let(this.trustedDomains::addAll)
     }
 
-    fun getDefaultSignatureWithFallback(draftMode: DraftMode? = null): Signature {
-        return signatures.getDefault(draftMode) ?: signatures.first()
+    fun getDefaultSignatureWithFallback(): Signature {
+        return signatures.getDefault() ?: signatures.first()
     }
 
     fun notificationsIsDisabled(notificationManagerCompat: NotificationManagerCompat): Boolean = with(notificationManagerCompat) {
