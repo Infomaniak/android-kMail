@@ -120,7 +120,7 @@ class ThreadController @Inject constructor(
 
                 remoteThread.messagesIds += remoteMessage.messageIds
 
-                // TODO: Remove this when the API returns the good value for `has_attachments`.
+                // TODO: Remove this when the API returns the good value for [Message.hasAttachments]
                 if (remoteMessage.hasAttachable) remoteThread.hasAttachable = true
             }
         }
@@ -350,7 +350,7 @@ class ThreadController @Inject constructor(
                         }
                     }
 
-                    // TODO: Remove this when the API returns the good value for `has_attachments`.
+                    // TODO: Remove this when the API returns the good value for [Message.hasAttachments]
                     verifyAttachmentsValues(hasAttachableInThread, messages, this@write)
                 }
             }
