@@ -156,6 +156,8 @@ class Folder : RealmObject, Cloneable {
         else -> defaultRefreshStrategy
     }
 
+    fun getFolderSort() = role?.folderSort ?: FolderSort.Default
+
     fun getLocalizedName(context: Context): String {
         return role?.folderNameRes?.let(context::getString) ?: name
     }

@@ -24,7 +24,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.Folder.FolderSort
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
@@ -240,7 +239,7 @@ class ThreadController @Inject constructor(
 
             val notFromSearch = "${Thread::isFromSearch.name} == false"
             val notLocallyMovedOut = " AND ${Thread::isLocallyMovedOut.name} == false"
-            val folderSort = folder.role?.folderSort ?: FolderSort.Default
+            val folderSort = folder.getFolderSort()
             val realmQuery = folder.threads
                 .query(notFromSearch + notLocallyMovedOut)
                 .sort(folderSort.sortBy, folderSort.sortOrder)
