@@ -37,11 +37,11 @@ enum class ThreadListDateDisplay(@DrawableRes val icon: Int?, val formatThreadDa
         formatThreadDate = { thread -> defaultFormatting(thread.displayDate) }
     ),
     Scheduled(
-        icon = R.drawable.ic_scheduled_messages,
+        icon = R.drawable.ic_editor_clock_thick,
         formatThreadDate = { thread -> relativeFormatting(thread.displayDate) }
     ),
     Snoozed(
-        icon = R.drawable.ic_alarm_clock,
+        icon = R.drawable.ic_alarm_clock_thick,
         formatThreadDate = { thread ->
             // If the thread is in SnoozeState.Snoozed then we necessarily have a snoozeEndDate
             val date = thread.snoozeEndDate ?: RealmInstant.MIN
