@@ -236,11 +236,12 @@ class ThreadListAdapter @Inject constructor(
             mailSubject.text = context.formatSubject(subject)
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
 
-            val dateDisplay = computeDateDisplay()
-            mailDate.text = dateDisplay.formatDate(context, displayDate)
+            val dateDisplay = computeThreadListDateDisplay(folderRole)
+            mailDate.text = dateDisplay.formatThreadDate(context, this)
             mailDateIcon.apply {
-                isVisible = dateDisplay.icon != null
-                dateDisplay.icon?.let { setImageResource(it) }
+                isVisible = dateDisplay.iconRes != null
+                dateDisplay.iconRes?.let { setImageResource(it) }
+                dateDisplay.iconColorRes?.let { imageTintList = ColorStateList.valueOf(context.getColor(it)) }
             }
             draftPrefix.isVisible = hasDrafts
 
@@ -488,11 +489,6 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    private fun Thread.computeDateDisplay() = when {
-        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
-        else -> ThreadListDateDisplay.Default
-    }
-
     private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isInvisible = true
 
@@ -683,15 +679,19 @@ class ThreadListAdapter @Inject constructor(
             add(folderRole)
         }
 
-        if (threadDensity == ThreadDensity.COMPACT) {
-            cleanMultiSelectionItems(threads, scope)
-            addAll(threads)
-        } else {
-            var previousSectionTitle = ""
-            threads.forEach { thread ->
-                scope.ensureActive()
+        when {
+            threadDensity == ThreadDensity.COMPACT -> {
+                cleanMultiSelectionItems(threads, scope)
+                addAll(threads)
+            }
+            folderRole?.groupMessagesBySection == false -> {
+                addAll(threads)
+            }
+            else -> {
+                var previousSectionTitle = ""
+                threads.forEach { thread ->
+                    scope.ensureActive()
 
-                if (folderRole != FolderRole.SCHEDULED_DRAFTS) {
                     val sectionTitle = thread.getSectionTitle(context)
                     when {
                         sectionTitle != previousSectionTitle -> {
@@ -699,9 +699,9 @@ class ThreadListAdapter @Inject constructor(
                             previousSectionTitle = sectionTitle
                         }
                     }
-                }
 
-                add(thread)
+                    add(thread)
+                }
             }
         }
     }

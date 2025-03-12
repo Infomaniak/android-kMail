@@ -23,12 +23,14 @@ import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
@@ -291,6 +293,17 @@ class Thread : RealmObject {
         }
 
         return message.preview
+    }
+
+    /**
+     * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
+     * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
+     * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
+     */
+    fun computeThreadListDateDisplay(folderRole: FolderRole?) = when {
+        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
+        snoozeState != null && snoozeEndDate != null && snoozeAction != null -> ThreadListDateDisplay.Snoozed
+        else -> ThreadListDateDisplay.Default
     }
 
     override fun equals(other: Any?) = other === this || (other is Thread && other.uid == uid)

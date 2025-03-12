@@ -243,6 +243,11 @@ class ThreadController @Inject constructor(
             return realm.query<Thread>("${Thread::folderId.name} == $0", folderId)
         }
 
+        /**
+         * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
+         * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
+         * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
+         */
         private fun getThreadsWithSnoozeFilterQuery(
             folderId: String,
             withSnooze: Boolean,

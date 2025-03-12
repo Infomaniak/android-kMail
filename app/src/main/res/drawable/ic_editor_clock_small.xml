@@ -19,5 +19,5 @@
     <item
         android:width="12dp"
         android:height="12dp"
-        android:drawable="@drawable/ic_scheduled_messages" />
+        android:drawable="@drawable/ic_editor_clock_thick" />
 </layer-list>
