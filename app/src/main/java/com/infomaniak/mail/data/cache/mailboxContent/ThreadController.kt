@@ -244,9 +244,9 @@ class ThreadController @Inject constructor(
         }
 
         /**
-         * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as the condition used in
-         * [com.infomaniak.mail.data.cache.mailboxContent.ThreadController.getThreadsWithSnoozeFilterQuery]. As in, check that
-         * [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
+         * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
+         * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
+         * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
          */
         private fun getThreadsWithSnoozeFilterQuery(
             folderId: String,
