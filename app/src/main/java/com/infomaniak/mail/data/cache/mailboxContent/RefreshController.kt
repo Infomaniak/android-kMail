@@ -444,6 +444,7 @@ class RefreshController @Inject constructor(
 
             val message = currentFolderRefreshStrategy.getMessageFromShortUid(shortUid, folderId, realm = this) ?: return@forEach
             threads += message.threads
+            if (currentFolderRefreshStrategy.alsoRecomputeDuplicatedThreads()) threads += message.threadsDuplicatedIn
 
             currentFolderRefreshStrategy.processDeletedMessage(scope, message, appContext, mailbox, realm = this)
         }
@@ -481,6 +482,7 @@ class RefreshController @Inject constructor(
                     is SnoozeMessageFlags -> message.updateSnoozeFlags(flags)
                 }
                 threads += message.threads
+                if (refreshStrategy.alsoRecomputeDuplicatedThreads()) threads += message.threadsDuplicatedIn
             }
         }
 
@@ -514,6 +516,12 @@ class RefreshController @Inject constructor(
             initMessageLocalValues(remoteMessage, folder)
             addedMessagesUids.add(remoteMessage.shortUid)
             refreshStrategy.handleAddedMessage(scope, remoteMessage, isConversationMode, impactedThreadsManaged, realm = this)
+
+            if (refreshStrategy.alsoRecomputeDuplicatedThreads()) {
+                MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
+                    impactedThreadsManaged.addAll(localMessage.threadsDuplicatedIn)
+                }
+            }
         }
 
         addSentryBreadcrumbForAddedUidsInFolder(addedMessagesUids)

@@ -188,7 +188,7 @@ class Message : RealmObject {
 
     val threads by backlinks(Thread::messages)
 
-    private val threadsDuplicatedIn by backlinks(Thread::duplicates)
+    val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
     // TODO: Remove this `runCatching / getOrElse` when the issue is fixed
     inline val folder
