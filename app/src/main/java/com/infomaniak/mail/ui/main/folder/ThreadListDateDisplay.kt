@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.folder
 import android.content.Context
 import android.os.Build
 import android.text.format.DateUtils
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.infomaniak.core.utils.*
 import com.infomaniak.mail.R
@@ -31,17 +32,24 @@ import io.realm.kotlin.types.RealmInstant
 import java.time.format.FormatStyle
 import java.util.Date
 
-enum class ThreadListDateDisplay(@DrawableRes val icon: Int?, val formatThreadDate: Context.(Thread) -> String) {
+enum class ThreadListDateDisplay(
+    @DrawableRes val iconRes: Int?,
+    @ColorRes val iconColorRes: Int?,
+    val formatThreadDate: Context.(Thread) -> String,
+) {
     Default(
-        icon = null,
+        iconRes = null,
+        iconColorRes = null,
         formatThreadDate = { thread -> defaultFormatting(thread.displayDate) }
     ),
     Scheduled(
-        icon = R.drawable.ic_editor_clock_thick,
+        iconRes = R.drawable.ic_editor_clock_thick,
+        iconColorRes = R.color.scheduledIconColor,
         formatThreadDate = { thread -> relativeFormatting(thread.displayDate) }
     ),
     Snoozed(
-        icon = R.drawable.ic_alarm_clock_thick,
+        iconRes = R.drawable.ic_alarm_clock_thick,
+        iconColorRes = R.color.snoozeColor,
         formatThreadDate = { thread ->
             // If the thread is in SnoozeState.Snoozed then we necessarily have a snoozeEndDate
             val date = thread.snoozeEndDate ?: RealmInstant.MIN
