@@ -179,8 +179,8 @@ class Message : RealmObject {
     // TODO: Remove this `runCatching / getOrElse` when the issue is fixed
     inline val folder
         get() = runCatching {
-            (threads.singleOrNull { it.folder.id == folderId }
-                ?: threads.single { it.folder.id == FolderController.SEARCH_FOLDER_ID }).folder
+            (threads.singleOrNull { it.folderId == folderId }
+                ?: threads.single { it.folderId == FolderController.SEARCH_FOLDER_ID }).folder
         }.getOrElse { exception ->
 
             val reason = when {
