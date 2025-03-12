@@ -1,0 +1,72 @@
+<!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2025 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M1.746,8.195C1.746,9.875 2.413,11.486 3.601,12.673C4.789,13.861 6.4,14.528 8.079,14.528C9.759,14.528 11.37,13.861 12.558,12.673C13.745,11.486 14.413,9.875 14.413,8.195C14.413,6.515 13.745,4.904 12.558,3.717C11.37,2.529 9.759,1.862 8.079,1.862C6.4,1.862 4.789,2.529 3.601,3.717C2.413,4.904 1.746,6.515 1.746,8.195Z"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M4.021,0.941C3.774,0.785 3.497,0.684 3.207,0.645C2.918,0.606 2.623,0.629 2.344,0.714C2.064,0.798 1.806,0.941 1.587,1.134C1.368,1.327 1.192,1.564 1.073,1.83C0.953,2.097 0.892,2.385 0.894,2.677C0.896,2.969 0.96,3.257 1.083,3.522"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M11.979,0.941C12.226,0.785 12.503,0.684 12.793,0.645C13.082,0.606 13.377,0.629 13.656,0.714C13.936,0.798 14.194,0.941 14.413,1.134C14.632,1.327 14.808,1.564 14.927,1.83C15.047,2.097 15.108,2.385 15.106,2.677C15.104,2.969 15.04,3.257 14.917,3.522"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M8.079,8.195V5.933"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M4.67,13.683L2.978,15.373"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M11.488,13.682L13.181,15.373"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M8.079,8.195L10.906,11.023"
+        android:strokeWidth="1"
+        android:strokeColor="#9F9F9F"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
