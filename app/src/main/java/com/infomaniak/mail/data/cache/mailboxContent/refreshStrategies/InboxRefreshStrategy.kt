@@ -28,7 +28,7 @@ val inboxRefreshStrategy = object : DefaultRefreshStrategy {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
     }
 
-    override fun otherFolderRolesToQueryThreads(): List<FolderRole> = listOf(FolderRole.SNOOZED)
+    override fun twinFolderRoles(): List<FolderRole> = listOf(FolderRole.SNOOZED)
 
     override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
         impactedFolders += folderId

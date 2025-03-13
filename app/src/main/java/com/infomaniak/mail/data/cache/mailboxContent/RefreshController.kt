@@ -327,9 +327,8 @@ class RefreshController @Inject constructor(
 
         var inboxUnreadCount: Int? = null
         write {
-            updateFolderAfterAddingOrDeletingMessagesUids(
+            recomputeTwinFoldersThreadsDependantProperties(
                 folderId = folder.id,
-                currentFolderRefreshStrategy = folder.refreshStrategy(),
                 extraFolderUpdates = { updateDirectionDependentData(direction, remainingUids, addedUids) },
             )
 
@@ -458,7 +457,7 @@ class RefreshController @Inject constructor(
         }
 
         if (currentFolderRefreshStrategy.shouldQueryFolderThreadsOnDeletedUid()) {
-            updateFolderAfterAddingOrDeletingMessagesUids(folderId, currentFolderRefreshStrategy)
+            recomputeTwinFoldersThreadsDependantProperties(folderId)
         }
 
         return impactedFolders
@@ -643,33 +642,32 @@ class RefreshController @Inject constructor(
     }
     //endregion
 
-    private fun MutableRealm.updateFolderAfterAddingOrDeletingMessagesUids(
+    private fun MutableRealm.recomputeTwinFoldersThreadsDependantProperties(
         folderId: String,
-        currentFolderRefreshStrategy: RefreshStrategy,
         extraFolderUpdates: (Folder.() -> Unit)? = null,
     ) {
-        val allCurrentFolderThreads = currentFolderRefreshStrategy.queryFolderThreads(folderId, this)
+        val currentFolderRefreshStrategy: RefreshStrategy
 
         getUpToDateFolder(folderId).let { currentFolder ->
-            currentFolder.threads.replaceContent(list = allCurrentFolderThreads)
-            if (currentFolderRefreshStrategy.shouldHideEmptyFolder()) {
-                currentFolder.isDisplayed = currentFolder.threads.isNotEmpty()
-            }
+            recomputeThreadsDependantProperties(currentFolder, folderId)
             extraFolderUpdates?.invoke(currentFolder)
+            currentFolderRefreshStrategy = currentFolder.refreshStrategy()
         }
 
-        // Some folders such as INBOX and Snooze require to query again the other folder's threads as well. For example, if a
-        // message uid is returned as "added" or "deleted" in the snooze folder, it should disappear or appear from inbox as well.
-        currentFolderRefreshStrategy.otherFolderRolesToQueryThreads().forEach { otherFolderRole ->
+        currentFolderRefreshStrategy.twinFolderRoles().forEach { otherFolderRole ->
             getUpToDateFolder(otherFolderRole)?.let { otherFolder ->
-                val otherFolderRefreshStrategy = otherFolder.refreshStrategy()
-                val allOtherFolderThreads = otherFolderRefreshStrategy.queryFolderThreads(folderId, realm = this)
-                otherFolder.threads.replaceContent(list = allOtherFolderThreads)
-
-                if (otherFolderRefreshStrategy.shouldHideEmptyFolder()) {
-                    otherFolder.isDisplayed = otherFolder.threads.isNotEmpty()
-                }
+                recomputeThreadsDependantProperties(otherFolder, folderId)
             }
+        }
+    }
+
+    private fun MutableRealm.recomputeThreadsDependantProperties(folder: Folder, folderIdToQueryOn: String) {
+        val refreshStrategy = folder.refreshStrategy()
+        val allThreads = refreshStrategy.queryFolderThreads(folderIdToQueryOn, realm = this)
+        folder.threads.replaceContent(list = allThreads)
+
+        if (refreshStrategy.shouldHideEmptyFolder()) {
+            folder.isDisplayed = allThreads.isNotEmpty()
         }
     }
 

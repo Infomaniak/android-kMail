@@ -39,7 +39,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         return ThreadController.getThreadsByFolderId(folderId, realm)
     }
 
-    override fun otherFolderRolesToQueryThreads(): List<FolderRole> = emptyList()
+    override fun twinFolderRoles(): List<FolderRole> = emptyList()
 
     override fun shouldHideEmptyFolder(): Boolean = false
 

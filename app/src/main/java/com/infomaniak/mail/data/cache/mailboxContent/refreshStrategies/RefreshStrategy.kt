@@ -30,7 +30,14 @@ import kotlinx.coroutines.CoroutineScope
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
 
-    fun otherFolderRolesToQueryThreads(): List<FolderRole>
+
+    /**
+     * The list of other folder roles that need to query their threads again when the current folder has its threads queried.
+     *
+     * Some folders such as INBOX and Snooze require to query again the other folder's threads as well. For example, if a
+     * message uid is returned as "added" or "deleted" in the snooze folder, it should disappear or appear from inbox as well.
+     */
+    fun twinFolderRoles(): List<FolderRole>
 
     fun shouldHideEmptyFolder(): Boolean
 
