@@ -271,7 +271,7 @@ class RefreshController @Inject constructor(
 
         var inboxUnreadCount: Int? = null
         write {
-            val refreshStrategy = folder.refreshStrategy()
+            val refreshStrategy = folder.refreshStrategy
             val impactedFolders = ImpactedFolders()
             impactedFolders += handleDeletedUids(scope, activities.deletedShortUids, folder.id, refreshStrategy)
             impactedFolders += handleUpdatedUids(scope, activities.updatedMessages, folder.id, refreshStrategy)
@@ -507,7 +507,7 @@ class RefreshController @Inject constructor(
 
         val impactedThreadsManaged = mutableSetOf<Thread>()
         val addedMessagesUids = mutableListOf<Int>()
-        val refreshStrategy = folder.refreshStrategy()
+        val refreshStrategy = folder.refreshStrategy
 
         remoteMessages.forEach { remoteMessage ->
             scope.ensureActive()
@@ -651,7 +651,7 @@ class RefreshController @Inject constructor(
         getUpToDateFolder(folderId).let { currentFolder ->
             recomputeThreadsDependantProperties(currentFolder, folderId)
             extraFolderUpdates?.invoke(currentFolder)
-            currentFolderRefreshStrategy = currentFolder.refreshStrategy()
+            currentFolderRefreshStrategy = currentFolder.refreshStrategy
         }
 
         currentFolderRefreshStrategy.twinFolderRoles().forEach { otherFolderRole ->
@@ -662,7 +662,7 @@ class RefreshController @Inject constructor(
     }
 
     private fun MutableRealm.recomputeThreadsDependantProperties(folder: Folder, folderIdToQueryOn: String) {
-        val refreshStrategy = folder.refreshStrategy()
+        val refreshStrategy = folder.refreshStrategy
         val allThreads = refreshStrategy.queryFolderThreads(folderIdToQueryOn, realm = this)
         folder.threads.replaceContent(list = allThreads)
 

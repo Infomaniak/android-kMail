@@ -120,6 +120,10 @@ class Folder : RealmObject, Cloneable {
     val isRootAndCustom: Boolean
         inline get() = role == null && isRoot
 
+    val refreshStrategy: RefreshStrategy get() = role?.refreshStrategy ?: defaultRefreshStrategy
+
+    val folderSort get() = role?.folderSort ?: FolderSort.Default
+
     fun initLocalValues(
         lastUpdatedAt: RealmInstant?,
         cursor: String?,
@@ -148,10 +152,6 @@ class Folder : RealmObject, Cloneable {
     }
 
     fun messages(realm: TypedRealm): List<Message> = MessageController.getMessagesByFolderId(id, realm)
-
-    fun refreshStrategy(): RefreshStrategy = role?.refreshStrategy ?: defaultRefreshStrategy
-
-    fun getFolderSort() = role?.folderSort ?: FolderSort.Default
 
     fun getLocalizedName(context: Context): String {
         return role?.folderNameRes?.let(context::getString) ?: name
