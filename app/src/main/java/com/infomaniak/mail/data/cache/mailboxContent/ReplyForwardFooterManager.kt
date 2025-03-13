@@ -27,10 +27,10 @@ import com.infomaniak.mail.utils.HtmlUtils.SRC_ATTRIBUTE
 import com.infomaniak.mail.utils.HtmlUtils.processCids
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseBodyFragmentWithLog
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
-import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatForHeader
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatForHeader
 import com.infomaniak.mail.utils.extensions.toDate
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
