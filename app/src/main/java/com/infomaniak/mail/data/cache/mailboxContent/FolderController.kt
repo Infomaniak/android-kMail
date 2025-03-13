@@ -68,7 +68,7 @@ class FolderController @Inject constructor(
     fun getMoveFolders(): RealmResults<Folder> {
         return getFoldersQuery(
             realm = mailboxContentRealm(),
-            withoutTypes = listOf(FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
+            withoutTypes = listOf(FoldersType.SNOOZED, FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
             withoutChildren = true,
         ).find()
     }
@@ -156,6 +156,7 @@ class FolderController @Inject constructor(
     enum class FoldersType {
         DEFAULT,
         CUSTOM,
+        SNOOZED,
         SCHEDULED_DRAFTS,
         DRAFT,
     }
@@ -177,6 +178,7 @@ class FolderController @Inject constructor(
                 when (it) {
                     FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
                     FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != nil"
+                    FoldersType.SNOOZED -> " AND ${Folder.rolePropertyName} != '${FolderRole.SNOOZED.name}'"
                     FoldersType.SCHEDULED_DRAFTS -> " AND ${Folder.rolePropertyName} != '${FolderRole.SCHEDULED_DRAFTS.name}'"
                     FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
                 }
