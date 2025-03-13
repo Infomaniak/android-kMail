@@ -212,7 +212,7 @@ class Folder : RealmObject, Cloneable {
         companion object {
             val Default = FolderSort()
             val Snooze = FolderSort(Sort.ASCENDING, Thread::snoozeEndDate)
-            val Scheduled = FolderSort(Sort.ASCENDING)
+            val Scheduled = FolderSort(Sort.ASCENDING, Thread::displayDate)
         }
     }
 
