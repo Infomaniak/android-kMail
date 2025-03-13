@@ -38,20 +38,12 @@ import kotlin.math.min
 
 class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>(FolderDiffCallback()) {
 
-    var shouldDisplayIndent: Boolean = false
-
+    private var shouldDisplayIndent: Boolean = false
     private var selectedFolderId: String? = null
-
     private lateinit var onFolderClicked: (folderId: String) -> Unit
-    private var onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null
 
-    operator fun invoke(
-        onFolderClicked: (folderId: String) -> Unit,
-        onCollapseClicked: ((folderId: String, shouldCollapse: Boolean) -> Unit)? = null,
-    ): MoveAdapter {
+    operator fun invoke(onFolderClicked: (folderId: String) -> Unit): MoveAdapter {
         this.onFolderClicked = onFolderClicked
-        this.onCollapseClicked = onCollapseClicked
-
         return this
     }
 
@@ -117,7 +109,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
         }
         setIndent(indent = folderIndent, hasCollapsableFolder = false, canBeCollapsed = false)
 
-        setOnClickListener { onFolderClicked.invoke(folder.id) }
+        setOnClickListener { if (folder.id != selectedFolderId) onFolderClicked.invoke(folder.id) }
     }
 
     class MoveFolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)

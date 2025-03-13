@@ -40,7 +40,7 @@ import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.ui.noValidMailboxes.NoValidMailboxesActivity
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.createDownloadDialogNavArgs
+import com.infomaniak.mail.utils.extensions.AttachmentExt.createDownloadDialogNavArgs
 
 fun getAnimatedNavOptions() = NavOptions
     .Builder()
@@ -81,7 +81,7 @@ fun Fragment.safeNavigateToNewMessageActivity(args: Bundle? = null, currentClass
 
 fun Fragment.navigateToDownloadProgressDialog(
     attachment: Attachment,
-    attachmentIntentType: AttachmentExtensions.AttachmentIntentType,
+    attachmentIntentType: AttachmentExt.AttachmentIntentType,
     currentClassName: String = AttachmentActionsBottomSheetDialog::class.java.name,
 ) {
     safeNavigate(

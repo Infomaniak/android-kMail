@@ -126,7 +126,7 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     private fun observeThreadNavigation() = with(twoPaneViewModel) {
-        getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
+        getBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
         getBackNavigationResult(DownloadMessagesProgressDialog.DOWNLOAD_MESSAGES_RESULT, resultActivityResultLauncher::launch)
 
         newMessageArgs.observe(viewLifecycleOwner) {

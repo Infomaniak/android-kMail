@@ -80,7 +80,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
+import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -232,7 +232,7 @@ class NewMessageFragment : Fragment() {
 
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT, ::scheduleDraft)
 
-        getBackNavigationResult(AttachmentExtensions.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
+        getBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
     }
 
     private fun setShimmerVisibility(isShimmering: Boolean) = with(binding) {

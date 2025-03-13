@@ -23,12 +23,15 @@ import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshStrategy
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
@@ -57,8 +60,9 @@ class Thread : RealmObject {
     @PrimaryKey
     var uid: String = ""
     var messages = realmListOf<Message>()
-    // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
-    var date: RealmInstant = Date().toRealmInstant()
+    private var originalDate: RealmInstant? = null
+    // This value should always be provided because messages always have a least an internalDate. Because of this, the initial value is meaningless
+    var internalDate: RealmInstant = Date().toRealmInstant()
     @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
     var from = realmListOf<Recipient>()
@@ -104,6 +108,8 @@ class Thread : RealmObject {
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
         private set
+
+    val displayDate: RealmInstant get() = originalDate ?: internalDate
 
     // TODO: Put this back in `private` when the Threads parental issues are fixed
     val _folders by backlinks(Folder::threads)
@@ -175,7 +181,8 @@ class Thread : RealmObject {
 
     fun recomputeThread(realm: MutableRealm? = null) {
 
-        // Delete Thread if empty
+        // Delete Thread if empty. Do not rely on this deletion code being part of the method's logic, it's a temporary fix. If
+        // threads should be deleted, then they need to be deleted outside this method.
         if (messages.none { it.folderId == folderId }) {
             if (isManaged()) realm?.delete(this)
             return
@@ -217,7 +224,7 @@ class Thread : RealmObject {
             }
         }
 
-        messages.sortBy { it.date }
+        messages.sortBy { it.internalDate }
 
         messages.forEach { message ->
             messagesIds += message.messageIds
@@ -240,9 +247,15 @@ class Thread : RealmObject {
             updateSnoozeStatesBasedOn(message)
         }
 
+        /**
+         * Only needed for snooze because they rely on duplicates to compute the correct state of every thread. Tightly linked
+         * with [RefreshStrategy.alsoRecomputeDuplicatedThreads].
+         */
         duplicates.forEach(::updateSnoozeStatesBasedOn)
 
-        date = messages.last { it.folderId == folderId }.date
+        val lastMessage = messages.last { it.folderId == folderId }
+        originalDate = lastMessage.originalDate
+        internalDate = lastMessage.internalDate
         subject = messages.first().subject
     }
 
@@ -289,6 +302,17 @@ class Thread : RealmObject {
         }
 
         return message.preview
+    }
+
+    /**
+     * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
+     * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
+     * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
+     */
+    fun computeThreadListDateDisplay(folderRole: FolderRole?) = when {
+        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
+        snoozeState != null && snoozeEndDate != null && snoozeAction != null -> ThreadListDateDisplay.Snoozed
+        else -> ThreadListDateDisplay.Default
     }
 
     override fun equals(other: Any?) = other === this || (other is Thread && other.uid == uid)

@@ -78,9 +78,11 @@ import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -110,16 +112,12 @@ import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
-import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmObject
 import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
@@ -299,26 +297,6 @@ inline fun <reified T> ApiResponse<T>.getApiException(): Exception {
 fun List<ApiResponse<*>>.atLeastOneSucceeded(): Boolean = any { it.isSuccess() }
 
 fun List<ApiResponse<*>>.allFailed(): Boolean = none { it.isSuccess() }
-
-fun String.toLongUid(folderId: String) = "${this}@${folderId}"
-
-fun String.toShortUid(): Int = substringBefore('@').toInt()
-//endregion
-
-//region Realm
-suspend inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
-    write { update<T>(items) }
-}
-
-inline fun <reified T : RealmObject> MutableRealm.update(items: List<RealmObject>) {
-    delete(query<T>())
-    copyListToRealm(items)
-}
-
-// There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
-fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
-    items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
-}
 //endregion
 
 //region LiveData
@@ -413,7 +391,18 @@ fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> 
 //endregion
 
 //region Messages
-fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it.folderId == exception) null else it.folderId }
+fun List<Message>.getFoldersIds(exception: String? = null): ImpactedFolders {
+    val impactedFolders = ImpactedFolders()
+
+    for (message in this) {
+        if (message.folderId == exception) continue
+
+        impactedFolders += message.folderId
+        if (message.snoozeState == SnoozeState.Snoozed) impactedFolders += FolderRole.SNOOZED
+    }
+
+    return impactedFolders
+}
 
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion

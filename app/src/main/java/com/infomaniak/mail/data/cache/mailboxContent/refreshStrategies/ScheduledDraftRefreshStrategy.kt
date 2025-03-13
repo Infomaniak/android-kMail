@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,21 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.getMessages
+package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class ActivitiesResult<T : MessageFlags>(
-    @SerialName("deleted")
-    val deletedShortUids: List<String>,
-    @SerialName("updated")
-    val updatedMessages: List<T>,
-    @SerialName("added")
-    val addedShortUids: List<Int>,
-    @SerialName("unread_count")
-    val unreadCountRemote: Int,
-    @SerialName("signature")
-    val cursor: String,
-)
+val scheduledDraftRefreshStrategy = object : DefaultRefreshStrategy {
+    override fun shouldHideEmptyFolder(): Boolean = true
+}

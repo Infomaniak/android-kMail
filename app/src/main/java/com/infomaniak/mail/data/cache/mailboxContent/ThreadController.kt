@@ -24,9 +24,9 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.message.Message.MessageInitialState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -58,8 +58,8 @@ class ThreadController @Inject constructor(
 ) {
 
     //region Get data
-    fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL, sortOrder: Sort): Flow<ResultsChange<Thread>> {
-        return getThreadsByMessageIdsQuery(folder, filter, sortOrder).asFlow()
+    fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
+        return getThreadsByMessageIdsQuery(folder, filter).asFlow()
     }
 
     fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
@@ -96,27 +96,29 @@ class ThreadController @Inject constructor(
         filterFolder: Folder?,
     ): List<Thread> = withContext(ioDispatcher) {
 
-        fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
+        fun MutableRealm.keepOldMessagesData(remoteThread: Thread) {
 
             remoteThread.messages.forEach { remoteMessage: Message ->
                 ensureActive()
 
                 val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
 
-                // The Search only returns Messages from TRASH if we explicitly selected this folder,
-                // which is the reason why we can compute the `isTrashed` value so loosely.
-                remoteMessage.initLocalValues(
-                    MessageInitialState(
-                        date = localMessage?.date ?: remoteMessage.date,
-                        isFullyDownloaded = localMessage?.isFullyDownloaded() ?: false,
+                if (localMessage == null) {
+                    // The Search only returns Messages from TRASH if we explicitly selected this folder,
+                    // which is the reason why we can compute the `isTrashed` value so loosely.
+                    remoteMessage.initLocalValues(
+                        areHeavyDataFetched = false,
                         isTrashed = filterFolder?.role == FolderRole.TRASH,
-                        isFromSearch = localMessage == null,
-                        draftLocalUuid = localMessage?.draftLocalUuid,
-                    ),
-                    latestCalendarEventResponse = null,
-                )
-
-                localMessage?.let(remoteMessage::keepHeavyData)
+                        messageIds = remoteMessage.computeMessageIds(),
+                        draftLocalUuid = null,
+                        isFromSearch = true,
+                        isDeletedOnApi = false,
+                        latestCalendarEventResponse = null,
+                        swissTransferFiles = realmListOf(),
+                    )
+                } else {
+                    remoteMessage.keepLocalValues(localMessage)
+                }
 
                 remoteThread.messagesIds += remoteMessage.messageIds
 
@@ -144,7 +146,7 @@ class ThreadController @Inject constructor(
                 }
                 remoteThread.folderId = folderId
 
-                keepOldMessagesAndAddToSearchFolder(remoteThread, searchFolder)
+                keepOldMessagesData(remoteThread)
 
                 return@map remoteThread
             }.also(searchFolder.threads::addAll)
@@ -221,12 +223,8 @@ class ThreadController @Inject constructor(
             return realm.query("ANY ${Thread::messagesIds.name} IN $0", messageIds)
         }
 
-        private fun getExistingThreadsFoldersCountQuery(messageIds: Set<String>, realm: TypedRealm): RealmScalarQuery<Long> {
-            return getThreadsByMessageIdsQuery(messageIds, realm).distinct(Thread::folderId.name).count()
-        }
-
         private fun getSearchThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
-            return realm.query<Thread>("${Thread::isFromSearch.name} == true").sort(Thread::date.name, Sort.DESCENDING)
+            return realm.query<Thread>("${Thread::isFromSearch.name} == true").sort(Thread::internalDate.name, Sort.DESCENDING)
         }
 
         private fun getUnreadThreadsCountQuery(folder: Folder): RealmScalarQuery<Long> {
@@ -237,12 +235,14 @@ class ThreadController @Inject constructor(
         private fun getThreadsByMessageIdsQuery(
             folder: Folder,
             filter: ThreadFilter = ThreadFilter.ALL,
-            sortOrder: Sort,
         ): RealmQuery<Thread> {
 
             val notFromSearch = "${Thread::isFromSearch.name} == false"
             val notLocallyMovedOut = " AND ${Thread::isLocallyMovedOut.name} == false"
-            val realmQuery = folder.threads.query(notFromSearch + notLocallyMovedOut).sort(Thread::date.name, sortOrder)
+            val folderSort = folder.getFolderSort()
+            val realmQuery = folder.threads
+                .query(notFromSearch + notLocallyMovedOut)
+                .sort(folderSort.sortBy, folderSort.sortOrder)
 
             return if (filter == ThreadFilter.ALL) {
                 realmQuery
@@ -261,6 +261,24 @@ class ThreadController @Inject constructor(
 
         private fun getThreadsByFolderIdQuery(folderId: String, realm: TypedRealm): RealmQuery<Thread> {
             return realm.query<Thread>("${Thread::folderId.name} == $0", folderId)
+        }
+
+        /**
+         * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
+         * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
+         * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
+         */
+        private fun getThreadsWithSnoozeFilterQuery(
+            folderId: String,
+            withSnooze: Boolean,
+            realm: TypedRealm,
+        ): RealmQuery<Thread> {
+            // Checking for snoozeEndDate and snoozeAction on top of _snoozeState mimics the webmail's behavior
+            // and helps to avoid displaying threads that are in an incoherent state on the API
+            val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeAction != null"
+            val snoozeQuery = if (withSnooze) isSnoozedState else "NOT($isSnoozedState)"
+
+            return realm.query<Thread>("${Thread::folderId.name} == $0 AND $snoozeQuery", folderId, SnoozeState.Snoozed.apiValue)
         }
 
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
@@ -287,16 +305,17 @@ class ThreadController @Inject constructor(
             return getThreadsByMessageIdsQuery(messageIds, realm).find()
         }
 
-        fun getExistingThreadsFoldersCount(messageIds: Set<String>, realm: TypedRealm): Long {
-            return getExistingThreadsFoldersCountQuery(messageIds, realm).find()
-        }
-
         fun getUnreadThreadsCount(folder: Folder): Int {
             return getUnreadThreadsCountQuery(folder).find().toInt()
         }
 
         fun getThreadsByFolderId(folderId: String, realm: TypedRealm): RealmResults<Thread> {
             return getThreadsByFolderIdQuery(folderId, realm).find()
+        }
+
+        fun getInboxThreadsWithSnoozeFilter(withSnooze: Boolean, realm: TypedRealm): List<Thread> {
+            val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return emptyList()
+            return getThreadsWithSnoozeFilterQuery(inboxId, withSnooze, realm).find()
         }
         //endregion
 
@@ -346,15 +365,13 @@ class ThreadController @Inject constructor(
                             } ?: realmListOf()
 
                             remoteMessage.initLocalValues(
-                                MessageInitialState(
-                                    date = localMessage.date,
-                                    isFullyDownloaded = true,
-                                    isTrashed = localMessage.isTrashed,
-                                    isFromSearch = localMessage.isFromSearch,
-                                    draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
-                                ),
-                                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
+                                areHeavyDataFetched = true,
+                                isTrashed = localMessage.isTrashed,
                                 messageIds = localMessage.messageIds,
+                                draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                isFromSearch = localMessage.isFromSearch,
+                                isDeletedOnApi = false,
+                                latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                 swissTransferFiles = swissTransferFiles,
                             )
 

@@ -79,7 +79,7 @@
             app:argType="com.infomaniak.mail.data.models.Attachable$AttachmentType" />
         <argument
             android:name="intentType"
-            app:argType="com.infomaniak.mail.utils.extensions.AttachmentExtensions$AttachmentIntentType" />
+            app:argType="com.infomaniak.mail.utils.extensions.AttachmentExt$AttachmentIntentType" />
     </dialog>
 
     <dialog

@@ -30,12 +30,13 @@ import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.getMessages.ActivitiesResult.MessageFlags
+import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
+import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
+import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.toRealmInstant
-import com.infomaniak.mail.utils.extensions.toShortUid
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.*
@@ -58,8 +59,12 @@ class Message : RealmObject {
     var uid: String = ""
     @SerialName("msg_id")
     var messageId: String? = null
-    // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
-    var date: RealmInstant = Date().toRealmInstant()
+    @SerialName("date")
+    var originalDate: RealmInstant? = null
+        private set
+    @SerialName("internal_date")
+    var internalDate: RealmInstant = Date().toRealmInstant() // This date is always defined, so the default value is meaningless
+        private set
     var subject: String? = null
     var from = realmListOf<Recipient>()
     var to = realmListOf<Recipient>()
@@ -126,13 +131,13 @@ class Message : RealmObject {
     //region Local data (Transient)
 
     // ------------- !IMPORTANT! -------------
-    // Every field that is added in this Transient region should be declared in 'initLocalValue()' too
-    // to avoid loosing data when updating from API.
+    // Every field that is added in this Transient region should be declared in
+    // `initLocalValue()` too to avoid loosing data when updating from the API.
     // If the Field is a "heavy data" (i.e. an embedded object), it should also be added in 'keepHeavyData()'.
 
     @Transient
     @PersistedName("isFullyDownloaded")
-    private var _isFullyDownloaded: Boolean = false
+    var areHeavyDataFetched: Boolean = false
     @Transient
     var isTrashed: Boolean = false
     @Transient
@@ -157,10 +162,12 @@ class Message : RealmObject {
     @Transient
     @Ignore
     var detailsAreExpanded = false
-    // Although it might seem more logical to place the `splitBody` within the `body` of
-    // the Message, this approach is not feasible. The reason is that we must mark it as
-    // `@Ignore` in Realm. Placing it inside the `body` would result in data not updating
-    // correctly, as the relationship between Body and Message relies on a Realm query.
+    /**
+     * Although it might seem more logical to place the [splitBody] within the [body] of
+     * the [Message], this approach is not feasible. The reason is that we must mark it as
+     * `@Ignore` in Realm. Placing it inside the [body] would result in data not updating
+     * correctly, as the relationship between [body] and [Message] relies on a Realm query.
+     */
     @Transient
     @Ignore
     var splitBody: SplitBody? = null
@@ -172,9 +179,16 @@ class Message : RealmObject {
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
 
+    /**
+     * [displayDate] is different than [internalDate] because it must be used when displaying
+     * the date of an email but it can't be used to sort messages chronologically.
+     * A message's [originalDate] is not always defined. When this happens, we want to display the [internalDate] in its place.
+     */
+    val displayDate: RealmInstant get() = originalDate ?: internalDate
+
     val threads by backlinks(Thread::messages)
 
-    private val threadsDuplicatedIn by backlinks(Thread::duplicates)
+    val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
     // TODO: Remove this `runCatching / getOrElse` when the issue is fixed
     inline val folder
@@ -232,30 +246,45 @@ class Message : RealmObject {
         ACKNOWLEDGED,
     }
 
-    fun initLocalValues(
-        messageInitialState: MessageInitialState,
-        latestCalendarEventResponse: CalendarEventResponse?,
-        messageIds: RealmSet<String>? = null,
-        swissTransferFiles: RealmList<SwissTransferFile> = realmListOf(),
-    ) {
-
-        this.date = messageInitialState.date
-        this._isFullyDownloaded = messageInitialState.isFullyDownloaded
-        this.isTrashed = messageInitialState.isTrashed
-        messageInitialState.draftLocalUuid?.let { this.draftLocalUuid = it }
-        this.isFromSearch = messageInitialState.isFromSearch
-        this.messageIds = messageIds ?: computeMessageIds()
-        this.latestCalendarEventResponse = latestCalendarEventResponse
-        this.swissTransferFiles = swissTransferFiles
-
-        shortUid = uid.toShortUid()
-        hasAttachable = hasAttachments || swissTransferUuid != null
+    fun keepLocalValues(localMessage: Message) {
+        initLocalValues(
+            areHeavyDataFetched = localMessage.areHeavyDataFetched,
+            isTrashed = localMessage.isTrashed,
+            messageIds = localMessage.messageIds,
+            draftLocalUuid = localMessage.draftLocalUuid,
+            isFromSearch = localMessage.isFromSearch,
+            isDeletedOnApi = localMessage.isDeletedOnApi,
+            latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
+            swissTransferFiles = localMessage.swissTransferFiles,
+        )
+        keepHeavyData(localMessage)
     }
 
-    fun keepHeavyData(message: Message) {
-        attachments = message.attachments.copyFromRealm().toRealmList()
-        swissTransferFiles = message.swissTransferFiles.copyFromRealm().toRealmList()
-        latestCalendarEventResponse = message.latestCalendarEventResponse?.copyFromRealm()
+    fun initLocalValues(
+        areHeavyDataFetched: Boolean,
+        isTrashed: Boolean,
+        messageIds: RealmSet<String>,
+        draftLocalUuid: String?,
+        isFromSearch: Boolean,
+        isDeletedOnApi: Boolean,
+        latestCalendarEventResponse: CalendarEventResponse?,
+        swissTransferFiles: RealmList<SwissTransferFile>,
+    ) {
+        this.areHeavyDataFetched = areHeavyDataFetched
+        this.isTrashed = isTrashed
+        this.messageIds = messageIds
+        this.draftLocalUuid = draftLocalUuid
+        this.isFromSearch = isFromSearch
+        this.isDeletedOnApi = isDeletedOnApi
+        this.latestCalendarEventResponse = latestCalendarEventResponse
+        this.swissTransferFiles.replaceContent(swissTransferFiles)
+
+        this.shortUid = uid.toShortUid()
+        this.hasAttachable = hasAttachments || swissTransferUuid != null
+    }
+
+    private fun keepHeavyData(message: Message) {
+        attachments.replaceContent(message.attachments.copyFromRealm())
         body = message.body?.copyFromRealm()
 
         // TODO: Those are unused for now, but if we ever want to use them, we need to save them here.
@@ -273,7 +302,7 @@ class Message : RealmObject {
         ) {
             false
         } else {
-            _isFullyDownloaded
+            areHeavyDataFetched
         }
     }
 
@@ -332,12 +361,16 @@ class Message : RealmObject {
         }
     }
 
-    fun updateFlags(flags: MessageFlags) {
+    fun updateFlags(flags: DefaultMessageFlags) {
         isSeen = flags.isSeen
         isFavorite = flags.isFavorite
         isAnswered = flags.isAnswered
         isForwarded = flags.isForwarded
         isScheduledMessage = flags.isScheduledMessage
+    }
+
+    fun updateSnoozeFlags(flags: SnoozeMessageFlags) {
+        snoozeEndDate = flags.snoozeEndDate.toRealmInstant()
     }
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
@@ -351,17 +384,13 @@ class Message : RealmObject {
 
     fun isOrphan(): Boolean = threads.isEmpty() && threadsDuplicatedIn.isEmpty()
 
+    // Be careful when using this method because some folders might contain messages from other folders than itself. This
+    // operation should only happen in very specific situations like computing the shortUid of a Message from its uid.
+    private fun String.toShortUid(): Int = substringBefore('@').toInt()
+
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
-
-    data class MessageInitialState(
-        val date: RealmInstant,
-        val isFullyDownloaded: Boolean,
-        val isTrashed: Boolean,
-        val isFromSearch: Boolean,
-        val draftLocalUuid: String?,
-    )
 
     companion object
 }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.infomaniak.lib.core.R as RCore
@@ -91,7 +92,7 @@ class SnackbarManager @Inject constructor() {
 
     data class UndoData(
         val resources: List<String>,
-        val foldersIds: List<String>,
+        val foldersIds: ImpactedFolders,
         val destinationFolderId: String?,
     )
 }

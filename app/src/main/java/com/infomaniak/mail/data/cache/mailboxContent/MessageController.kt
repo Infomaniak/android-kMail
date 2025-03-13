@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     private fun getSortedAndNotDeletedMessagesQuery(threadUid: String): RealmQuery<Message>? {
         return ThreadController.getThread(threadUid, mailboxContentRealm())
             ?.messages?.query("${Message::isDeletedOnApi.name} == false")
-            ?.sort(Message::date.name, Sort.ASCENDING)
+            ?.sort(Message::internalDate.name, Sort.ASCENDING)
     }
     //endregion
 
@@ -58,6 +58,8 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     fun getLastMessageToExecuteAction(thread: Thread): Message = with(thread) {
+
+        fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().find()
 
         val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
 
@@ -70,9 +72,9 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                 " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
                 ").@count < 1"
 
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").find().lastOrNull()
-            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").find().lastOrNull()
-            ?: messages.query(isNotScheduledDraft).find().lastOrNull()
+        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").last()
+            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").last()
+            ?: messages.query(isNotScheduledDraft).last()
             ?: messages.last()
     }
 
@@ -189,10 +191,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             return getMessagesByFolderIdQuery(folderId, realm).find()
         }
 
-        fun getMessagesCountByFolderId(folderId: String, realm: TypedRealm): Long {
-            return getMessagesByFolderIdQuery(folderId, realm).count().find()
-        }
-
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
             return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
@@ -200,9 +198,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         //endregion
 
         //region Edit data
-        fun upsertMessage(message: Message, realm: MutableRealm) {
-            realm.copyToRealm(message, UpdatePolicy.ALL)
-        }
+        fun upsertMessage(message: Message, realm: MutableRealm): Message = realm.copyToRealm(message, UpdatePolicy.ALL)
 
         fun updateMessage(messageUid: String, realm: MutableRealm, onUpdate: (Message?) -> Unit) {
             onUpdate(getMessage(messageUid, realm))

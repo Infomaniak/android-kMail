@@ -67,7 +67,7 @@ import com.infomaniak.mail.utils.WebViewUtils.Companion.toggleWebViewTheme
 import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -350,13 +350,13 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
-        val messageDate = message.date.toDate()
+        val messageDate = message.displayDate.toDate()
 
         if (message.isScheduledDraft) {
             scheduleAlert.setDescription(
                 context.getString(
                     R.string.scheduledEmailHeader,
-                    message.date.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
+                    message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
                 ),
             )
             scheduleSendIcon.isVisible = true

@@ -25,8 +25,8 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.ATTACHMENT_TAG
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.startUpload
+import com.infomaniak.mail.utils.extensions.AttachmentExt.ATTACHMENT_TAG
+import com.infomaniak.mail.utils.extensions.AttachmentExt.startUpload
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

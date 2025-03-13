@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2025 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,21 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(DateSerializer::class)
+
 package com.infomaniak.mail.data.models.getMessages
 
+import com.infomaniak.mail.data.api.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import java.util.Date
 
 @Serializable
-data class ActivitiesResult<T : MessageFlags>(
-    @SerialName("deleted")
-    val deletedShortUids: List<String>,
-    @SerialName("updated")
-    val updatedMessages: List<T>,
-    @SerialName("added")
-    val addedShortUids: List<Int>,
-    @SerialName("unread_count")
-    val unreadCountRemote: Int,
-    @SerialName("signature")
-    val cursor: String,
-)
+data class SnoozeMessageFlags(
+    @SerialName("uid")
+    override val shortUid: String,
+    @SerialName("snooze_end_date")
+    val snoozeEndDate: Date,
+) : MessageFlags

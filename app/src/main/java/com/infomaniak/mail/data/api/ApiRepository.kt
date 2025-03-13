@@ -47,6 +47,7 @@ import com.infomaniak.mail.data.models.draft.ScheduleDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
+import com.infomaniak.mail.data.models.getMessages.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxExternalMailInfo
@@ -283,12 +284,12 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    fun getMessagesUidsDelta(
+    inline fun <reified T : MessageFlags> getMessagesUidsDelta(
         mailboxUuid: String,
         folderId: String,
         cursor: String,
         okHttpClient: OkHttpClient?,
-    ): ApiResponse<ActivitiesResult> {
+    ): ApiResponse<ActivitiesResult<T>> {
         return callApi(
             url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor),
             method = GET,
