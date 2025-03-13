@@ -42,8 +42,8 @@ import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.WorkerUtils.UploadMissingLocalFileException
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.OPEN_WITH
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.AttachmentIntentType.SAVE_TO_DRIVE
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.OPEN_WITH
+import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.SAVE_TO_DRIVE
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -52,7 +52,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import com.infomaniak.lib.core.R as RCore
 
-object AttachmentExtensions {
+object AttachmentExt {
 
     // TODO: Delete logs with this tag when Attachments' `uuid` problem will be resolved
     const val ATTACHMENT_TAG = "attachmentUpload"
