@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
   ~ Copyright (C) 2025 Infomaniak Network SA
   ~
@@ -21,14 +21,12 @@
     android:viewportWidth="16"
     android:viewportHeight="16">
     <path
-        android:fillColor="#00000000"
         android:pathData="M1,8C1,9.857 1.737,11.637 3.05,12.95C4.363,14.262 6.143,15 8,15C9.857,15 11.637,14.262 12.95,12.95C14.262,11.637 15,9.857 15,8C15,6.143 14.262,4.363 12.95,3.05C11.637,1.737 9.857,1 8,1C6.143,1 4.363,1.737 3.05,3.05C1.737,4.363 1,6.143 1,8Z"
         android:strokeWidth="1.5"
         android:strokeColor="#9F9F9F"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
-        android:fillColor="#00000000"
         android:pathData="M8,5.321V8L11.348,11.349"
         android:strokeWidth="1.5"
         android:strokeColor="#9F9F9F"
