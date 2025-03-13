@@ -112,18 +112,12 @@ import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
-import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmObject
 import org.jsoup.nodes.Document
 import java.util.Calendar
 import java.util.Date
@@ -303,27 +297,6 @@ inline fun <reified T> ApiResponse<T>.getApiException(): Exception {
 fun List<ApiResponse<*>>.atLeastOneSucceeded(): Boolean = any { it.isSuccess() }
 
 fun List<ApiResponse<*>>.allFailed(): Boolean = none { it.isSuccess() }
-//endregion
-
-//region Realm
-suspend inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
-    write { update<T>(items) }
-}
-
-inline fun <reified T : RealmObject> MutableRealm.update(items: List<RealmObject>) {
-    delete(query<T>())
-    copyListToRealm(items)
-}
-
-// There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
-fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
-    items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
-}
-
-inline fun <reified T> RealmList<T>.replaceContent(list: List<T>) {
-    clear()
-    addAll(list.toRealmList())
-}
 //endregion
 
 //region LiveData

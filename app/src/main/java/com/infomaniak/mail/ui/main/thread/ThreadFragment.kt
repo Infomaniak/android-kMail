@@ -85,7 +85,7 @@ import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
-import com.infomaniak.mail.utils.extensions.AttachmentExtensions.openAttachment
+import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
