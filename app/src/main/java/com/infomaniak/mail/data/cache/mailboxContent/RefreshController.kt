@@ -660,8 +660,8 @@ class RefreshController @Inject constructor(
 
         // Some folders such as INBOX and Snooze require to query again the other folder's threads as well. For example, if a
         // message uid is returned as "added" or "deleted" in the snooze folder, it should disappear or appear from inbox as well.
-        currentFolderRefreshStrategy.otherFolderRolesToQueryThreads().forEach { folderRole ->
-            getUpToDateFolder(folderRole)?.let { otherFolder ->
+        currentFolderRefreshStrategy.otherFolderRolesToQueryThreads().forEach { otherFolderRole ->
+            getUpToDateFolder(otherFolderRole)?.let { otherFolder ->
                 val otherFolderRefreshStrategy = otherFolder.refreshStrategy()
                 val allOtherFolderThreads = otherFolderRefreshStrategy.queryFolderThreads(folderId, realm = this)
                 otherFolder.threads.replaceContent(list = allOtherFolderThreads)
