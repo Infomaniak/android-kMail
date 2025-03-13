@@ -59,6 +59,8 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
     fun getLastMessageToExecuteAction(thread: Thread): Message = with(thread) {
 
+        fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().find()
+
         val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
 
         val isNotFromRealMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
@@ -70,9 +72,9 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                 " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
                 ").@count < 1"
 
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").find().lastOrNull()
-            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").find().lastOrNull()
-            ?: messages.query(isNotScheduledDraft).find().lastOrNull()
+        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").last()
+            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").last()
+            ?: messages.query(isNotScheduledDraft).last()
             ?: messages.last()
     }
 
