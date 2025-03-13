@@ -1,0 +1,3 @@
+- Ajout de la possibilité de voir les courriels mis en attente
+- Gestion des signatures contenant `+xxx` dans l'e-mail de réponse
+- Correction d'un crash dans les brouillons lorsqu'une signature est supprimée

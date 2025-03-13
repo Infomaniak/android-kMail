@@ -1,0 +1,3 @@
+- Add the possibility to see snoozed emails
+- Handle signatures containing `+xxx` in the answering email
+- Fix a crash in drafts when a signature is removed
