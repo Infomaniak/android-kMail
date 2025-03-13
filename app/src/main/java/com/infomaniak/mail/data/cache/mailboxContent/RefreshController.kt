@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import android.util.Log
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -476,12 +477,19 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             refreshStrategy.getMessageFromShortUid(flags.shortUid, folderId, realm = this)?.let { message ->
-                when (flags) {
+                val shouldRecomputeDuplicatedThreadsBecauseOfUpdate = when (flags) {
                     is DefaultMessageFlags -> message.updateFlags(flags)
                     is SnoozeMessageFlags -> message.updateSnoozeFlags(flags)
                 }
                 threads += message.threads
-                if (refreshStrategy.alsoRecomputeDuplicatedThreads()) threads += message.threadsDuplicatedIn
+                Log.v("gibran", "handleUpdatedUids - shouldRecomputeDuplicatedThreadsBecauseOfUpdate: ${shouldRecomputeDuplicatedThreadsBecauseOfUpdate}")
+                Log.v("gibran", "handleUpdatedUids - refreshStrategy.alsoRecomputeDuplicatedThreads(): ${refreshStrategy.alsoRecomputeDuplicatedThreads()}")
+                Log.v("gibran", "handleUpdatedUids - shouldRecomputeDuplicatedThreadsBecauseOfUpdate || refreshStrategy.alsoRecomputeDuplicatedThreads(): ${shouldRecomputeDuplicatedThreadsBecauseOfUpdate || refreshStrategy.alsoRecomputeDuplicatedThreads()}")
+                if (shouldRecomputeDuplicatedThreadsBecauseOfUpdate || refreshStrategy.alsoRecomputeDuplicatedThreads()) {
+                    Log.w("gibran", "handleUpdatedUids - threads.joinToString { it.uid }: ${threads.joinToString { it.uid }}")
+                    threads += message.threadsDuplicatedIn
+                    Log.w("gibran", "handleUpdatedUids - threads.joinToString { it.uid }: ${threads.joinToString { it.uid }}")
+                }
             }
         }
 

@@ -306,16 +306,18 @@ class Thread : RealmObject {
         return message.preview
     }
 
+    fun computeThreadListDateDisplay(folderRole: FolderRole?) = when {
+        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
+        isSnoozed() || snoozeState == SnoozeState.Unsnoozed -> ThreadListDateDisplay.Snoozed
+        else -> ThreadListDateDisplay.Default
+    }
+
     /**
-     * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
+     * Keep the snooze state condition of [Thread.isSnoozed] the same as
      * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
      * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
      */
-    fun computeThreadListDateDisplay(folderRole: FolderRole?) = when {
-        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
-        snoozeState != null && snoozeEndDate != null && snoozeAction != null -> ThreadListDateDisplay.Snoozed
-        else -> ThreadListDateDisplay.Default
-    }
+    private fun isSnoozed() = snoozeState == SnoozeState.Snoozed && snoozeEndDate != null && snoozeAction != null
 
     override fun equals(other: Any?) = other === this || (other is Thread && other.uid == uid)
 

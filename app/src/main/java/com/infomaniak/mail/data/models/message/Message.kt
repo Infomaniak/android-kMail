@@ -19,11 +19,13 @@
 
 package com.infomaniak.mail.data.models.message
 
+import android.util.Log
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshStrategy
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -390,16 +392,35 @@ class Message : RealmObject {
         }
     }
 
-    fun updateFlags(flags: DefaultMessageFlags) {
+    // Returns whether the update should trigger an exceptional recomputation of duplicated threads
+    fun updateFlags(flags: DefaultMessageFlags): Boolean {
         isSeen = flags.isSeen
         isFavorite = flags.isFavorite
         isAnswered = flags.isAnswered
         isForwarded = flags.isForwarded
         isScheduledMessage = flags.isScheduledMessage
+
+        val shouldRecomputeDuplicatedThreads = flags.isSeen && snoozeState == SnoozeState.Unsnoozed
+        Log.e("gibran", "updateFlags - flags.shortUid: ${flags.shortUid}")
+        Log.e("gibran", "updateFlags - flags.isSeen: ${flags.isSeen}")
+        Log.e("gibran", "updateFlags - snoozeState: ${snoozeState}")
+        Log.e("gibran", "updateFlags - shouldRecomputeDuplicatedThreads: ${shouldRecomputeDuplicatedThreads}")
+        if (shouldRecomputeDuplicatedThreads) {
+            snoozeState = null
+            snoozeEndDate = null
+            snoozeAction = null
+        }
+        return shouldRecomputeDuplicatedThreads
     }
 
-    fun updateSnoozeFlags(flags: SnoozeMessageFlags) {
+    /**
+     * Returns whether the update should trigger an exceptional computation of duplicated threads. Here it's not important
+     * because [RefreshStrategy.alsoRecomputeDuplicatedThreads] for the snooze folder already handles the recomputation of
+     * duplicated threads anyway. But in essence, this method does modify the snooze state so it requires a recomputation.
+     */
+    fun updateSnoozeFlags(flags: SnoozeMessageFlags): Boolean {
         snoozeEndDate = flags.snoozeEndDate.toRealmInstant()
+        return true
     }
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
