@@ -117,7 +117,7 @@ class MoveAdapter @Inject constructor() : ListAdapter<Any, MoveFolderViewHolder>
         }
         setIndent(indent = folderIndent, hasCollapsableFolder = false, canBeCollapsed = false)
 
-        setOnClickListener { onFolderClicked.invoke(folder.id) }
+        setOnClickListener { if (folder.id != selectedFolderId) onFolderClicked.invoke(folder.id) }
     }
 
     class MoveFolderViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
