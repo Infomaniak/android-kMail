@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies
 
 import android.content.Context
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -30,7 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
 
-    fun otherFolderRolesToQueryThreads(): List<Folder.FolderRole>
+    fun otherFolderRolesToQueryThreads(): List<FolderRole>
 
     fun shouldHideEmptyFolder(): Boolean
 

@@ -17,18 +17,18 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.realm.kotlin.TypedRealm
 
 data class ImpactedFolders(
     private val folderIds: MutableSet<String> = mutableSetOf(),
-    private val folderRoles: MutableSet<Folder.FolderRole> = mutableSetOf(),
+    private val folderRoles: MutableSet<FolderRole> = mutableSetOf(),
 ) {
     operator fun plusAssign(folderId: String) {
         folderIds += folderId
     }
 
-    operator fun plusAssign(folderRole: Folder.FolderRole) {
+    operator fun plusAssign(folderRole: FolderRole) {
         folderRoles += folderRole
     }
 
