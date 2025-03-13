@@ -97,7 +97,7 @@
                     android:contentDescription="@string/contentDescriptionScheduleSend"
                     android:visibility="gone"
                     app:drawableStartCompat="@drawable/ic_editor_clock_small"
-                    app:drawableTint="@color/scheduledIconColor"
+                    app:drawableTint="@color/scheduledColor"
                     app:layout_constraintBaseline_toBaselineOf="@id/expeditorName"
                     app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
                     app:layout_constraintStart_toEndOf="@id/iconsSpace"

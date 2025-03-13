@@ -44,7 +44,7 @@ enum class ThreadListDateDisplay(
     ),
     Scheduled(
         iconRes = R.drawable.ic_editor_clock_thick,
-        iconColorRes = R.color.scheduledIconColor,
+        iconColorRes = R.color.scheduledColor,
         formatThreadDate = { thread -> relativeFormatting(thread.displayDate) }
     ),
     Snoozed(
