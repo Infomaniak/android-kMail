@@ -693,11 +693,9 @@ class ThreadListAdapter @Inject constructor(
                     scope.ensureActive()
 
                     val sectionTitle = thread.getSectionTitle(context)
-                    when {
-                        sectionTitle != previousSectionTitle -> {
-                            add(sectionTitle)
-                            previousSectionTitle = sectionTitle
-                        }
+                    if (sectionTitle != previousSectionTitle) {
+                        add(sectionTitle)
+                        previousSectionTitle = sectionTitle
                     }
 
                     add(thread)
