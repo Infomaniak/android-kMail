@@ -36,11 +36,8 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class FolderController @Inject constructor(
@@ -155,15 +152,6 @@ class FolderController @Inject constructor(
 
         copyListToRealm(remoteFolders)
     }
-
-    // TODO: Remove this function when the issue is fixed in the calling location
-    fun removeThreadFromFolder(folderId: String, thread: Thread) {
-        CoroutineScope(Dispatchers.Default).launch {
-            updateFolder(folderId, realm = mailboxContentRealm()) { _, folder ->
-                folder.threads.remove(thread)
-            }
-        }
-    }
     //endregion
 
     enum class FoldersType {
@@ -254,6 +242,13 @@ class FolderController @Inject constructor(
 
         fun deleteSearchFolderData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
             threads = realmListOf()
+        }
+
+        // TODO: Remove this function when the Threads parental issues are fixed
+        suspend fun removeThreadFromFolder(folderId: String, thread: Thread, realm: Realm) {
+            updateFolder(folderId, realm) { _, folder ->
+                folder.threads.remove(thread)
+            }
         }
         //endregion
     }

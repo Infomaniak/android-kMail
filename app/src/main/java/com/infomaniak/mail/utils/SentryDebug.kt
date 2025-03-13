@@ -164,10 +164,11 @@ object SentryDebug {
         addInfoBreadcrumb(category = category, data = data)
     }
 
-    fun addThreadParentsBreadcrumb(folder: Folder, thread: Thread, reason: String) {
+    // TODO: Remove this function when the Threads parental issues are fixed
+    fun addThreadParentsBreadcrumb(folderId: String, threadUid: String) {
         addInfoBreadcrumb(
             category = "ThreadParentsIssue",
-            message = "For this reason [${reason}], we removed the thread [${thread.uid}] from folder [${folder.id}]",
+            message = "We removed the thread [${threadUid}] from folder [${folderId}]",
         )
     }
 
