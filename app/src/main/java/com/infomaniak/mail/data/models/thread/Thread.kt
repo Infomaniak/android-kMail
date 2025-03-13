@@ -105,7 +105,10 @@ class Thread : RealmObject {
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
         private set
 
-    private val _folders by backlinks(Folder::threads)
+    // TODO: Put this back in `private` when the Threads parental issues are fixed
+    val _folders by backlinks(Folder::threads)
+
+    // TODO: Remove this `runCatching / getOrElse` when the Threads parental issues are fixed
     val folder
         get() = runCatching {
             _folders.single()
@@ -134,7 +137,8 @@ class Thread : RealmObject {
                 scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                 scope.setExtra("exception", exception.message.toString())
             }
-            _folders.first()
+
+            return@getOrElse _folders.firstOrNull { uid.contains(it.id) } ?: _folders.first()
         }
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts

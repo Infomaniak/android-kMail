@@ -341,6 +341,8 @@ class MainViewModel @Inject constructor(
             updateFeatureFlag(mailbox)
             updateExternalMailInfo(mailbox)
 
+            removeThreadsWithParentalIssues()
+
             // This update is blocking because we need it for the rest of the flow : `selectFolder()` needs the Folders.
             updateFolders(mailbox)
 
@@ -1294,6 +1296,12 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    // TODO: Remove this function when the Threads parental issues are fixed
+    private fun removeThreadsWithParentalIssues() = viewModelScope.launch(ioCoroutineContext) {
+        SentryLog.d(TAG, "Remove Threads with parental issues")
+        threadController.removeThreadsWithParentalIssues()
     }
 
     companion object {

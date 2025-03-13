@@ -164,6 +164,14 @@ object SentryDebug {
         addInfoBreadcrumb(category = category, data = data)
     }
 
+    // TODO: Remove this function when the Threads parental issues are fixed
+    fun addThreadParentsBreadcrumb(folderId: String, threadUid: String) {
+        addInfoBreadcrumb(
+            category = "ThreadParentsIssue",
+            message = "We removed the thread [${threadUid}] from folder [${folderId}]",
+        )
+    }
+
     private fun addInfoBreadcrumb(category: String, message: String? = null, data: Map<String, Any>? = null) {
         Breadcrumb().apply {
             this.category = category

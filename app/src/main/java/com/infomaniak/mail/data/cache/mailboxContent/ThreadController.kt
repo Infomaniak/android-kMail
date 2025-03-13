@@ -187,6 +187,27 @@ class ThreadController @Inject constructor(
             }
         }
     }
+
+    // TODO: Remove this function when the Threads parental issues are fixed
+    suspend fun removeThreadsWithParentalIssues() {
+        val realm = mailboxContentRealm()
+        val threads = realm.query<Thread>("${Thread::_folders.name}.@count > 1").find()
+
+        threads.forEach { thread ->
+
+            var isFirstTime = true
+            val wrongFolders = thread._folders.toMutableList().apply {
+                removeIf { folder ->
+                    (folder.id == thread.folderId && isFirstTime).also { isFirstTime = false }
+                }
+            }
+
+            wrongFolders.forEach { wrongFolder ->
+                SentryDebug.addThreadParentsBreadcrumb(wrongFolder.id, thread.uid)
+                FolderController.removeThreadFromFolder(wrongFolder.id, thread, realm)
+            }
+        }
+    }
     //endregion
 
     companion object {

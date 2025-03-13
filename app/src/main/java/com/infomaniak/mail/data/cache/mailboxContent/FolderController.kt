@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.copyListToRealm
 import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.sortFolders
@@ -241,6 +242,13 @@ class FolderController @Inject constructor(
 
         fun deleteSearchFolderData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
             threads = realmListOf()
+        }
+
+        // TODO: Remove this function when the Threads parental issues are fixed
+        suspend fun removeThreadFromFolder(folderId: String, thread: Thread, realm: Realm) {
+            updateFolder(folderId, realm) { _, folder ->
+                folder.threads.remove(thread)
+            }
         }
         //endregion
     }
