@@ -81,7 +81,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
         if (viewId == checkedId) return
 
         (findViewById(checkedId) as? RadioCheckable)?.uncheck()
-        with(findViewById(viewId) as RadioCheckable) {
+        with(findViewById<SettingRadioButtonView>(viewId)!!) {
             check()
             checkedValue = associatedValue
         }
