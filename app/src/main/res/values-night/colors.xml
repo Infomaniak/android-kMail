@@ -69,7 +69,6 @@
     <color name="disabledIconColor">@color/elephant</color>
     <color name="favoriteYellow">@color/yellow_dark</color>
     <color name="swipeActionIconColor">@color/bat</color>
-    <color name="scheduledIconColor">@color/coral_dark</color>
 
     <!-- CardView -->
     <color name="cardViewStrokeColor">@color/orca</color>
@@ -90,6 +89,9 @@
 
     <!-- Snooze -->
     <color name="snoozeColor">@color/coral_dark</color>
+
+    <!-- Scheduled drafts -->
+    <color name="scheduledColor">@color/coral_dark</color>
 
     <!-- Thread -->
     <color name="folderTagTextColor">@color/shark</color>
