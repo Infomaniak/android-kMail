@@ -189,10 +189,6 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             return getMessagesByFolderIdQuery(folderId, realm).find()
         }
 
-        fun getMessagesCountByFolderId(folderId: String, realm: TypedRealm): Long {
-            return getMessagesByFolderIdQuery(folderId, realm).count().find()
-        }
-
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
             return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
