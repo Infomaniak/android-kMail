@@ -60,9 +60,10 @@ class Thread : RealmObject {
     @PrimaryKey
     var uid: String = ""
     var messages = realmListOf<Message>()
-    private var originalDate: RealmInstant? = null
-    // This value should always be provided because messages always have a least an internalDate. Because of this, the initial value is meaningless
     @SerialName("date")
+    private var originalDate: RealmInstant? = null
+    // This value should always be provided because messages always have at least an internalDate. Because of this, the initial value is meaningless
+    @SerialName("internal_date")
     var internalDate: RealmInstant = Date().toRealmInstant()
     @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
