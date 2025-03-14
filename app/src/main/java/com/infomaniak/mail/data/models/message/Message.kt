@@ -194,7 +194,7 @@ class Message : RealmObject {
     inline val folder
         get() = runCatching {
             val sameFolderThread = threads.singleOrNull { it.folderId == folderId }
-            val searchFolderThread = threads.single { it.folderId == FolderController.SEARCH_FOLDER_ID }
+            val searchFolderThread = threads.first { it.folderId == FolderController.SEARCH_FOLDER_ID }
             (sameFolderThread ?: searchFolderThread).folder
         }.getOrElse { exception ->
 
