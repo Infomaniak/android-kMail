@@ -24,10 +24,7 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Bimi
-import com.infomaniak.mail.data.models.SnoozeState
-import com.infomaniak.mail.data.models.SwissTransferFile
+import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
@@ -190,37 +187,69 @@ class Message : RealmObject {
 
     val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
-    // TODO: Remove this `runCatching / getOrElse` when the issue is fixed
-    inline val folder
-        get() = runCatching {
-            val sameFolderThread = threads.singleOrNull { it.folderId == folderId }
-            val searchFolderThread = threads.first { it.folderId == FolderController.SEARCH_FOLDER_ID }
-            (sameFolderThread ?: searchFolderThread).folder
-        }.getOrElse { exception ->
+    inline val folder: Folder
+        get() = run {
 
-            val reason = when {
-                threads.isEmpty() -> "no parent Threads" // Message has 0 parent threads
-                exception is NoSuchElementException -> "no parent Thread from correct Folder" // Message has parent threads, but none from the correct folder
-                exception is IllegalArgumentException -> "multiple same parent Threads" // Message has multiple parent Threads from the correct Folder
-                else -> "null" // Impossibru
+            // TODO: Remove the whole content of this `run` and replace it with this commented code when the parental issue is fixed
+            // val sameFolderThread = threads.singleOrNull { it.folderId == folderId }
+            // val searchFolderThread = threads.first { it.folderId == FolderController.SEARCH_FOLDER_ID }
+            // return@run (sameFolderThread ?: searchFolderThread).folder
+
+            var correctFolder: Folder?
+            var reason: String?
+
+            computeFolderAndReason(folderId).let {
+                correctFolder = it.first
+                reason = it.second
             }
 
-            Sentry.captureMessage(
-                "Message doesn't have a parent Thread from its own Folder, it should not be possible",
-                SentryLevel.ERROR,
-            ) { scope ->
-                scope.setTag("issueType", reason)
-                scope.setExtra("threadsUid", threads.joinToString { it.uid })
-                scope.setExtra("threadsCount", "${threads.count()}")
-                scope.setExtra("threadsFolder", "${threads.map { "role:[${it.folder.role?.name}] (id:[${it.folder.id}])" }}")
-                scope.setExtra("messageUid", uid)
-                scope.setExtra("folderId", folderId)
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                scope.setExtra("exception", exception.message.toString())
+            if (correctFolder == null) {
+                computeFolderAndReason(FolderController.SEARCH_FOLDER_ID).let {
+                    correctFolder = it.first
+                    reason = it.second
+                }
             }
 
-            return@getOrElse (threads.firstOrNull { it.folder.id == folderId } ?: threads.first()).folder
+            if (correctFolder == null) {
+
+                Sentry.captureMessage(
+                    "Message doesn't have a parent Thread from its own Folder, it should not be possible",
+                    SentryLevel.ERROR,
+                ) { scope ->
+                    scope.setTag("issueType", reason ?: "null") // The `null` value is supposedly impossible
+                    scope.setExtra("threadsUid", threads.joinToString { it.uid })
+                    scope.setExtra("threadsCount", "${threads.count()}")
+                    scope.setExtra(
+                        "threadsFolder",
+                        "${threads.map { "role:[${it.folder.role?.name}] (folderId:[${it.folderId}] | folder.id:[${it.folder.id}])" }}",
+                    )
+                    scope.setExtra("messageUid", uid)
+                    scope.setExtra("folderId", folderId)
+                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                }
+
+                correctFolder = (threads.firstOrNull { it.folderId == folderId } ?: threads.first()).folder
+            }
+
+            return@run correctFolder!!
         }
+
+    fun computeFolderAndReason(filterFolderId: String): Pair<Folder?, String?> {
+
+        var correctFolder: Folder? = null
+        var reason: String? = null
+
+        val list = threads.filter { it.folderId == filterFolderId }
+        val count = list.count()
+
+        when {
+            count < 1 -> reason = "no parent Thread from correct Folder"
+            count > 1 -> reason = "multiple same parent Threads"
+            else -> correctFolder = list.first().folder
+        }
+
+        return correctFolder to reason
+    }
 
     inline val sender get() = from.firstOrNull()
 
