@@ -38,10 +38,9 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.google.android.material.card.MaterialCardView
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.core.utils.*
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
@@ -648,8 +647,6 @@ class ThreadListAdapter @Inject constructor(
     override fun canBeSwiped(item: Any, viewHolder: ThreadListViewHolder, position: Int): Boolean {
         return getItemViewType(position) == DisplayType.THREAD.layout && swipingIsAuthorized
     }
-
-    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>, lifecycleScope: LifecycleCoroutineScope) {
 
