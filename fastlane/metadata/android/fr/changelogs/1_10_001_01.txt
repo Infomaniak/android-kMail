@@ -1,0 +1,2 @@
+- Corrige le tri des messages programmés
+- Corrige le tri des résultats de la recherche
