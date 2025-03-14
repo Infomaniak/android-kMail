@@ -239,7 +239,7 @@ class ThreadController @Inject constructor(
 
             val notFromSearch = "${Thread::isFromSearch.name} == false"
             val notLocallyMovedOut = " AND ${Thread::isLocallyMovedOut.name} == false"
-            val folderSort = folder.getFolderSort()
+            val folderSort = folder.folderSort
             val realmQuery = folder.threads
                 .query(notFromSearch + notLocallyMovedOut)
                 .sort(folderSort.sortBy, folderSort.sortOrder)
