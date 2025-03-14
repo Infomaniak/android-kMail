@@ -35,7 +35,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
     }
 
-    override fun otherFolderRolesToQueryThreads(): List<FolderRole> = listOf(FolderRole.INBOX)
+    override fun twinFolderRoles(): List<FolderRole> = listOf(FolderRole.INBOX)
 
     override fun shouldHideEmptyFolder(): Boolean = true
 
