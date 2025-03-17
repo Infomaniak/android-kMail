@@ -23,12 +23,9 @@ import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshStrategy
-import com.infomaniak.mail.data.models.Bimi
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
@@ -54,7 +51,7 @@ import kotlinx.serialization.UseSerializers
 import java.util.Date
 
 @Serializable
-class Thread : RealmObject {
+class Thread : RealmObject, Snoozable {
 
     //region Remote data
     @PrimaryKey
@@ -81,9 +78,9 @@ class Thread : RealmObject {
     @SerialName("snooze_state")
     private var _snoozeState: String? = null
     @SerialName("snooze_end_date")
-    var snoozeEndDate: RealmInstant? = null
+    override var snoozeEndDate: RealmInstant? = null
     @SerialName("snooze_action")
-    var snoozeAction: String? = null
+    override var snoozeAction: String? = null
     //endregion
 
     //region Local data (Transient)
@@ -108,7 +105,7 @@ class Thread : RealmObject {
     //endregion
 
     @Ignore
-    var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
+    override var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
         private set
 
     // TODO: Put this back in `private` when the Threads parental issues are fixed
@@ -312,14 +309,9 @@ class Thread : RealmObject {
         return message.preview
     }
 
-    /**
-     * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
-     * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
-     * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
-     */
     fun computeThreadListDateDisplay(folderRole: FolderRole?) = when {
         numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
-        snoozeState != null && snoozeEndDate != null && snoozeAction != null -> ThreadListDateDisplay.Snoozed
+        isSnoozed() -> ThreadListDateDisplay.Snoozed
         else -> ThreadListDateDisplay.Default
     }
 

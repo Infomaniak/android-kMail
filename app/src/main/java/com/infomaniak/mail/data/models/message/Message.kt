@@ -49,7 +49,7 @@ import kotlinx.serialization.UseSerializers
 import java.util.Date
 
 @Serializable
-class Message : RealmObject {
+class Message : RealmObject, Snoozable {
 
     //region Remote data
     @PrimaryKey
@@ -118,9 +118,9 @@ class Message : RealmObject {
     @SerialName("snooze_state")
     private var _snoozeState: String? = null
     @SerialName("snooze_end_date")
-    var snoozeEndDate: RealmInstant? = null
+    override var snoozeEndDate: RealmInstant? = null
     @SerialName("snooze_action")
-    var snoozeAction: String? = null
+    override var snoozeAction: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
@@ -179,7 +179,7 @@ class Message : RealmObject {
     //endregion
 
     @Ignore
-    var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
+    override var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
 
     val threads by backlinks(Thread::messages)
 
