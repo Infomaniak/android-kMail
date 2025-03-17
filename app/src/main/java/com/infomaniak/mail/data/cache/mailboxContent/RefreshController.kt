@@ -111,6 +111,13 @@ class RefreshController @Inject constructor(
 
             ThreadController.deleteEmptyThreadsInFolder(folder.id, realm)
 
+            if (folder.role == FolderRole.INBOX) {
+                val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
+                snoozedThreadsWithNewMessage.forEach { thread ->
+                    // TODO: Send api call to remove the snooze status of each thread that received a new message
+                }
+            }
+
             if (threads != null) {
                 onStop?.invoke()
                 SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.displayForSentry()})")
