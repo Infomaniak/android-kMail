@@ -101,10 +101,10 @@ private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
 }
 //endregion
 
-// Migrate from version #23
+// Migrate from version #22
 private fun MigrationContext.initializedInternalDateAsDateAfterTwentyThirdMigration() {
 
-    if (oldRealm.schemaVersion() <= 23L) {
+    if (oldRealm.schemaVersion() <= 22L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
