@@ -264,7 +264,7 @@ class ThreadController @Inject constructor(
         }
 
         /**
-         * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
+         * Keep the snooze state condition of [Snoozable.isSnoozed] the same as
          * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
          * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeUuid] are not null.
          */
