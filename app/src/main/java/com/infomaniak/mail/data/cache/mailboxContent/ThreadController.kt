@@ -22,10 +22,8 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.SnoozeState
-import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -214,6 +212,18 @@ class ThreadController @Inject constructor(
 
     companion object {
 
+        private const val TAG = "ThreadController"
+
+        /**
+         * Keep the snooze state condition of [Snoozable.isSnoozed] the same as
+         * the condition used in [ThreadController.Companion.isSnoozedState].
+         *
+         * Checking for [Snoozable.snoozeEndDate] and [Snoozable.snoozeUuid] on top of [Snoozable.snoozeState] mimics the
+         * webmail's behavior and helps to avoid displaying threads that are in an incoherent state on the API
+         */
+        private val isSnoozedState =
+            """_snoozeState == "${SnoozeState.Snoozed.apiValue}" AND snoozeEndDate != null AND snoozeUuid != null"""
+
         //region Queries
         private fun getThreadsByUidsQuery(threadsUids: List<String>, realm: TypedRealm): RealmQuery<Thread> {
             return realm.query("${Thread::uid.name} IN $0", threadsUids)
@@ -263,22 +273,13 @@ class ThreadController @Inject constructor(
             return realm.query<Thread>("${Thread::folderId.name} == $0", folderId)
         }
 
-        /**
-         * Keep the snooze state condition of [Snoozable.isSnoozed] the same as
-         * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
-         * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeUuid] are not null.
-         */
         private fun getThreadsWithSnoozeFilterQuery(
             folderId: String,
             withSnooze: Boolean,
             realm: TypedRealm,
         ): RealmQuery<Thread> {
-            // Checking for snoozeEndDate and snoozeUuid on top of _snoozeState mimics the webmail's behavior
-            // and helps to avoid displaying threads that are in an incoherent state on the API
-            val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeUuid != null"
             val snoozeQuery = if (withSnooze) isSnoozedState else "NOT($isSnoozedState)"
-
-            return realm.query<Thread>("${Thread::folderId.name} == $0 AND $snoozeQuery", folderId, SnoozeState.Snoozed.apiValue)
+            return realm.query<Thread>("${Thread::folderId.name} == $0 AND $snoozeQuery", folderId)
         }
 
         private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
@@ -316,6 +317,12 @@ class ThreadController @Inject constructor(
         fun getInboxThreadsWithSnoozeFilter(withSnooze: Boolean, realm: TypedRealm): List<Thread> {
             val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return emptyList()
             return getThreadsWithSnoozeFilterQuery(inboxId, withSnooze, realm).find()
+        }
+
+        fun getSnoozedThreadsWithNewMessage(inboxFolderId: String, realm: Realm): List<Thread> {
+            val isInFolder = "${Thread::folderId.name} == $0"
+            val hasNewMessage = "${Thread::isLastMessageSnoozed.name} == false"
+            return realm.query<Thread>("$isInFolder AND $hasNewMessage AND $isSnoozedState", inboxFolderId).find()
         }
         //endregion
 
@@ -489,7 +496,5 @@ class ThreadController @Inject constructor(
             val apiResponse: ApiResponse<Message>,
             val swissTransferContainer: SwissTransferContainer?,
         )
-
-        private const val TAG = "ThreadController"
     }
 }

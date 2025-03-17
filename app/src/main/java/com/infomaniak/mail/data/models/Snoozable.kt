@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.models
 
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.types.RealmInstant
 
 interface Snoozable {
@@ -29,7 +28,6 @@ interface Snoozable {
 
 /**
  * Keep the snooze state condition of [Snoozable.isSnoozed] the same as
- * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
- * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeUuid] are not null.
+ * the condition used in [ThreadController.Companion.isSnoozedState].
  */
 fun Snoozable.isSnoozed() = snoozeState == SnoozeState.Snoozed && snoozeEndDate != null && snoozeUuid != null
