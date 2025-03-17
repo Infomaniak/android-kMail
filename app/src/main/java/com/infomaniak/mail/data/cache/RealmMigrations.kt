@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache
 
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.DynamicRealmObject
@@ -43,6 +44,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.keepDefaultValuesAfterNineteenthMigration()
     migrationContext.initializedInternalDateAsDateAfterTwentySecondMigration()
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
+    migrationContext.initializedInternalDateAsDateAfterTwentyFifthMigration()
 }
 
 // Migrate to version #1
@@ -151,6 +153,30 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
                     ?: oldObject.getValue<RealmInstant>(fieldName = "internalDate")
 
                 set(propertyName = "displayDate", value = displayDate)
+            }
+        }
+    }
+}
+
+// Migrate from version #25
+private fun MigrationContext.initializedInternalDateAsDateAfterTwentyFifthMigration() {
+
+    if (oldRealm.schemaVersion() <= 25L) {
+        enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.let { newThread ->
+                // Initialize new property by computing it based on other fields
+                val threadFolderId = newObject.getValue<String>("folderId")
+
+                val messages = newThread.getObjectList(propertyName = "messages")
+                messages.sortBy { it.getValue<RealmInstant>("internalDate") }
+                val lastMessage = messages.last { it.getValue<String>("folderId") == threadFolderId } // TODO: Fix crash if message not found
+
+                val snoozeState = lastMessage.getNullableValue<String>("_snoozeState")
+                val snoozeEndDate = lastMessage.getNullableValue<RealmInstant>("snoozeEndDate")
+                val snoozeAction = lastMessage.getNullableValue<String>("snoozeAction")
+                val isSnoozed = snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeAction != null
+
+                newThread.set(propertyName = "isLastMessageSnoozed", value = isSnoozed)
             }
         }
     }

@@ -102,6 +102,8 @@ class Thread : RealmObject, Snoozable {
     var isLocallyMovedOut: Boolean = false
     @Transient
     var numberOfScheduledDrafts: Int = 0
+    @Transient
+    var isLastMessageSnoozed: Boolean = false
     //endregion
 
     @Ignore
@@ -218,6 +220,7 @@ class Thread : RealmObject, Snoozable {
         snoozeState = null
         snoozeEndDate = null
         snoozeAction = null
+        isLastMessageSnoozed = false
     }
 
     private fun updateThread(lastMessage: Message) {
@@ -262,6 +265,7 @@ class Thread : RealmObject, Snoozable {
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
         subject = messages.first().subject
+        isLastMessageSnoozed = lastMessage.isSnoozed()
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
