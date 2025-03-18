@@ -108,7 +108,7 @@ class ContactAdapter(
         fun performFiltering(constraint: CharSequence): List<MatchedContact> {
             val searchTerm = constraint.standardize()
 
-            var finalUserList = mutableListOf<MatchedContact>()
+            val finalUserList = mutableListOf<MatchedContact>()
             displayAddUnknownContactButton = true
             for (contact in allContacts) {
                 val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
@@ -124,13 +124,11 @@ class ContactAdapter(
                 if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
             }
 
-            finalUserList = finalUserList.sortedWith(
+            return finalUserList.sortedWith(
                 compareByDescending<MatchedContact> { it.contact.contactedTimes }
                     .thenBy { it.contact.other }
                     .thenBy { it.contact.name }
             ).toMutableList()
-
-            return finalUserList
         }
 
         searchQuery = text.toString()
