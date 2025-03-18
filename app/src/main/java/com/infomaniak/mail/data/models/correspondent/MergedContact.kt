@@ -55,7 +55,7 @@ class MergedContact() : RealmObject, Correspondent {
         val contactAvatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
         this.avatar = contactAvatar
 
-        this.contactedTimes =  apiContact.contactedTimes?.get(email)
+        this.contactedTimes = apiContact.contactedTimes?.get(email)
         this.other = apiContact.other
 
         this.comesFromApi = comesFromApi
