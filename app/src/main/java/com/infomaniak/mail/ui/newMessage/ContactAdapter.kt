@@ -126,7 +126,7 @@ class ContactAdapter(
 
             finalUserList = finalUserList.sortedWith(
                 compareByDescending<MatchedContact> { it.contact.contactedTimes }
-                    .thenByDescending { it.contact.other }
+                    .thenBy { it.contact.other }
                     .thenBy { it.contact.name }
             ).toMutableList()
 
