@@ -52,14 +52,12 @@ class MergedContact() : RealmObject, Correspondent {
         this.email = email
         this.name = apiContact.name
 
-        val contactAvatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
-        this.avatar = contactAvatar
+        this.avatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
 
         this.contactedTimes = apiContact.contactedTimes?.get(email)
         this.other = apiContact.other
 
         this.comesFromApi = comesFromApi
-
 
         // We need an ID which is unique for each pair of email/name. Therefore we stick
         // together the two 32 bits hashcodes to make one unique 64 bits hashcode.
