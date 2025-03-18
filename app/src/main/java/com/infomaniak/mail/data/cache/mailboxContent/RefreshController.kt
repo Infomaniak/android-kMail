@@ -111,13 +111,6 @@ class RefreshController @Inject constructor(
 
             ThreadController.deleteEmptyThreadsInFolder(folder.id, realm)
 
-            if (folder.role == FolderRole.INBOX) {
-                val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
-                snoozedThreadsWithNewMessage.forEach { thread ->
-                    // TODO: Send api call to remove the snooze status of each thread that received a new message
-                }
-            }
-
             if (threads != null) {
                 onStop?.invoke()
                 SentryLog.d("API", "End of refreshing threads with mode: $refreshMode | (${folder.displayForSentry()})")
@@ -228,7 +221,18 @@ class RefreshController @Inject constructor(
         impactedThreads += fetchAllNewPages(scope, folder.id)
         fetchAllOldPages(scope, folder.id)
 
+        removeSnoozeStateOfThreadsWithNewMessages(folder)
+
         return impactedThreads
+    }
+
+    private fun removeSnoozeStateOfThreadsWithNewMessages(folder: Folder) {
+        if (folder.role == FolderRole.INBOX) {
+            val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
+            snoozedThreadsWithNewMessage.forEach { thread ->
+                // TODO: Send api call to remove the snooze status of each thread that received a new message
+            }
+        }
     }
 
     private suspend fun Realm.fetchOnePageOfOldMessages(scope: CoroutineScope, folderId: String) {
