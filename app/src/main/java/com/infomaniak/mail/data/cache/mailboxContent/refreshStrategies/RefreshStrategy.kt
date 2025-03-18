@@ -44,6 +44,8 @@ interface RefreshStrategy {
     /**
      * When a [Message] is added, updated or deleted, we recompute threads that are impacted by this change. If this method
      * returns true, the impacted threads will also consider threads where the processed [Message] appears as a duplicate.
+     *
+     * For now, we need to refresh duplicated threads in every situations that can impact the snooze state of a message.
      */
     fun alsoRecomputeDuplicatedThreads(): Boolean
 
