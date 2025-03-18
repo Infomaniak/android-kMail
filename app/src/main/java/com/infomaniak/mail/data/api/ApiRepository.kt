@@ -345,6 +345,12 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
+    fun unsnoozeMessages(mailboxUuid: String, messageUids: List<String>): List<ApiResponse<Unit>> {
+        return batchOver(messageUids, limit = Utils.MAX_UIDS_PER_CALL_SNOOZE_DELETE) {
+            callApi(ApiRoutes.snooze(mailboxUuid), DELETE, mapOf("uids" to it))
+        }
+    }
+
     fun searchThreads(mailboxUuid: String, folderId: String, filters: String, resource: String?): ApiResponse<ThreadResult> {
 
         val url = if (resource.isNullOrBlank()) {

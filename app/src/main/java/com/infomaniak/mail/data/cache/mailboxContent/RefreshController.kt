@@ -31,11 +31,8 @@ import com.infomaniak.mail.data.models.getMessages.*
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.ApiErrorException
-import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.utils.extensions.toRealmInstant
@@ -58,6 +55,7 @@ class RefreshController @Inject constructor(
     private val localSettings: LocalSettings,
     private val mailboxController: MailboxController,
     private val delayApiCallManager: DelayApiCallManager,
+    private val sharedUtils: SharedUtils,
 ) {
 
     private var refreshThreadsJob: Job? = null
@@ -226,12 +224,10 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
-    private fun removeSnoozeStateOfThreadsWithNewMessages(folder: Folder) {
+    private suspend fun removeSnoozeStateOfThreadsWithNewMessages(folder: Folder) {
         if (folder.role == FolderRole.INBOX) {
             val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
-            snoozedThreadsWithNewMessage.forEach { thread ->
-                // TODO: Send api call to remove the snooze status of each thread that received a new message
-            }
+            sharedUtils.unsnoozeThreads(mailbox, snoozedThreadsWithNewMessage)
         }
     }
 
