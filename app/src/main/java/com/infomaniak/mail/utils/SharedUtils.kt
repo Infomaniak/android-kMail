@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -101,6 +102,24 @@ class SharedUtils @Inject constructor(
         mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
             ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+        }
+    }
+
+    suspend fun unsnoozeThreads(mailbox: Mailbox, threads: List<Thread>) {
+        val messagesUids: MutableList<String> = mutableListOf()
+        val messagesFolderIds: MutableSet<String> = mutableSetOf()
+
+        threads.forEach { thread ->
+            val targetMessage = thread.messages.last(Message::isSnoozed) // TODO: Fix crash if message not found
+            messagesUids += targetMessage.uid
+            messagesFolderIds += targetMessage.folderId
+        }
+
+        if (messagesUids.isEmpty()) return
+
+        val apiResponses = ApiRepository.unsnoozeMessages(mailbox.uuid, messagesUids)
+        if (apiResponses.atLeastOneSucceeded()) {
+            refreshFolders(mailbox = mailbox, messagesFoldersIds = ImpactedFolders(messagesFolderIds))
         }
     }
 
