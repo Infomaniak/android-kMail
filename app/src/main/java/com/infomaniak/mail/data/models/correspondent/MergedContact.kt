@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models.correspondent
 
+import com.infomaniak.mail.data.api.ApiRoutes
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -40,7 +41,37 @@ class MergedContact() : RealmObject, Correspondent {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    constructor(email: String, name: String?, avatar: String?, comesFromApi: Boolean) : this() {
+    override var contactedTimes: Int? = null
+    override var other: Boolean = false
+
+    constructor(
+        email: String,
+        apiContact: Contact,
+        comesFromApi: Boolean,
+    ) : this() {
+        this.email = email
+        this.name = apiContact.name
+
+        val contactAvatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
+        this.avatar = contactAvatar
+
+        this.contactedTimes =  apiContact.contactedTimes?.get(email)
+        this.other = apiContact.other
+
+        this.comesFromApi = comesFromApi
+
+
+        // We need an ID which is unique for each pair of email/name. Therefore we stick
+        // together the two 32 bits hashcodes to make one unique 64 bits hashcode.
+        this.id = (this.email.hashCode().toLong() shl Int.SIZE_BITS) + this.name.hashCode()
+    }
+
+    constructor(
+        email: String,
+        name: String?,
+        avatar: String?,
+        comesFromApi: Boolean,
+    ) : this() {
         this.email = email
         this.name = name ?: ""
         this.avatar = avatar

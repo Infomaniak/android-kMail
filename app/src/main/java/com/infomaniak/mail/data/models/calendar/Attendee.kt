@@ -22,7 +22,10 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
+import io.realm.kotlin.ext.realmDictionaryOf
 import io.realm.kotlin.types.EmbeddedRealmObject
+import io.realm.kotlin.types.RealmDictionary
+import io.realm.kotlin.types.RealmMap
 import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
@@ -41,6 +44,9 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
     var isOrganizer: Boolean = false
     @SerialName("state")
     private var _state: String = ""
+
+    override var contactedTimes: Int? = null
+    override var other: Boolean = false
     //endregion
 
     val state get() = AttendanceState.entries.firstOrNull { it.apiValue == _state } ?: AttendanceState.NEEDS_ACTION
