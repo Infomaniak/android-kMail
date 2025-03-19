@@ -40,7 +40,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
     migrationContext.keepDefaultValuesAfterNineteenthMigration()
-    migrationContext.initializedInternalDateAsDateAfterTwentyThirdMigration()
+    migrationContext.initializedInternalDateAsDateAfterTwentySecondMigration()
 }
 
 // Migrate to version #1
@@ -102,7 +102,7 @@ private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
 //endregion
 
 // Migrate from version #22
-private fun MigrationContext.initializedInternalDateAsDateAfterTwentyThirdMigration() {
+private fun MigrationContext.initializedInternalDateAsDateAfterTwentySecondMigration() {
 
     if (oldRealm.schemaVersion() <= 22L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
