@@ -124,7 +124,11 @@ class ContactAdapter(
                 if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
             }
 
-            return finalUserList
+            return finalUserList.sortedWith(
+                compareByDescending<MatchedContact> { it.contact.contactedTimes }
+                    .thenBy { it.contact.other }
+                    .thenBy { it.contact.name }
+            ).toMutableList()
         }
 
         searchQuery = text.toString()

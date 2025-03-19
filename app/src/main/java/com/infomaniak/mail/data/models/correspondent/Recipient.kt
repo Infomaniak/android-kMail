@@ -49,6 +49,9 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
+    override var contactedTimes: Int? = null
+    override var other: Boolean = false
+
     fun initLocalValues(email: String? = null, name: String? = null): Recipient {
 
         email?.let { this.email = it }

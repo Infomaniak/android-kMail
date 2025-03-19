@@ -22,7 +22,6 @@ import android.content.Context
 import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.provider.ContactsContract.CommonDataKinds.Email
 import com.infomaniak.lib.core.utils.hasPermissions
-import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -68,13 +67,13 @@ object ContactUtils {
 
         contentResolver.query(Contactables.CONTENT_URI, projection, null, null, null)?.use { cursor ->
             while (cursor.moveToNext()) {
-                val id = cursor.getLong(cursor.getColumnIndexOrThrow(Contactables.CONTACT_ID))
+                val contactId = cursor.getLong(cursor.getColumnIndexOrThrow(Contactables.CONTACT_ID))
 
-                if (emails.contains(id)) {
+                emails[contactId]?.let { emails ->
                     val name = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.DISPLAY_NAME))
                     val photoUri = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.PHOTO_THUMBNAIL_URI))
 
-                    emails[id]!!.forEach { email ->
+                    emails.forEach { email ->
                         val key = Recipient().initLocalValues(email, name)
                         contacts[key] = MergedContact(email, name, photoUri, comesFromApi = false)
                     }
@@ -90,11 +89,8 @@ object ContactUtils {
             apiContact.emails.forEach { email ->
                 val key = Recipient().initLocalValues(email, apiContact.name)
 
-                if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
-                    phoneMergedContacts[key]!!.updatePhoneContactWithApiContact(apiContact)
-                } else { // If we haven't yet encountered this user, add him
-                    val contactAvatar = apiContact.avatar?.let { avatar -> ApiRoutes.resource(avatar) }
-                    phoneMergedContacts[key] = MergedContact(email, apiContact.name, contactAvatar, comesFromApi = true)
+                phoneMergedContacts[key]?.updatePhoneContactWithApiContact(apiContact) ?: run {
+                    phoneMergedContacts[key] = MergedContact(email, apiContact, comesFromApi = true)
                 }
             }
         }
