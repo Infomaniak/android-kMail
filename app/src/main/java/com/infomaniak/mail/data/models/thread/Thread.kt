@@ -132,7 +132,8 @@ class Thread : RealmObject, Snoozable {
     // TODO: Remove this `runCatching / getOrElse` when the Threads parental issues are fixed
     val folder
         get() = runCatching {
-            _folders.single()
+            _folders.singleOrNull { it.id != FolderController.SEARCH_FOLDER_ID }
+                ?: _folders.single { it.id == FolderController.SEARCH_FOLDER_ID }
         }.getOrElse { exception ->
             val reason = if (_folders.isEmpty()) {
                 "no parents" // Thread has 0 parent folders
