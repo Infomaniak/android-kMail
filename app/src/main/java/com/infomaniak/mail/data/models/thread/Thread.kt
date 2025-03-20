@@ -78,6 +78,12 @@ class Thread : RealmObject {
     var isAnswered: Boolean = false
     @SerialName("forwarded")
     var isForwarded: Boolean = false
+    @SerialName("snooze_state")
+    private var _snoozeState: String? = null
+    @SerialName("snooze_end_date")
+    var snoozeEndDate: RealmInstant? = null
+    @SerialName("snooze_action")
+    var snoozeAction: String? = null
     //endregion
 
     //region Local data (Transient)
@@ -99,12 +105,6 @@ class Thread : RealmObject {
     var isLocallyMovedOut: Boolean = false
     @Transient
     var numberOfScheduledDrafts: Int = 0
-    @Transient
-    private var _snoozeState: String? = null
-    @Transient
-    var snoozeEndDate: RealmInstant? = null
-    @Transient
-    var snoozeAction: String? = null
     //endregion
 
     @Ignore
@@ -182,17 +182,26 @@ class Thread : RealmObject {
     }
 
     fun recomputeThread(realm: MutableRealm? = null) {
+        val lastCurrentFolderMessage = messages.lastOrNull { it.folderId == folderId }
+        val lastMessage = if (isFromSearch) {
+            // In the search, some threads (such as threads from the snooze folder) won't have any messages with the same folderId
+            // as the thread folderId. This is an expected behavior and we don't want to delete it in this case. We just need to
+            // fallback on the last message of the thread.
+            lastCurrentFolderMessage ?: messages.lastOrNull()
+        } else {
+            lastCurrentFolderMessage
+        }
 
-        // Delete Thread if empty. Do not rely on this deletion code being part of the method's logic, it's a temporary fix. If
-        // threads should be deleted, then they need to be deleted outside this method.
-        if (messages.none { it.folderId == folderId }) {
+        if (lastMessage == null) {
+            // Delete Thread if empty. Do not rely on this deletion code being part of the method's logic, it's a temporary fix. If
+            // threads should be deleted, then they need to be deleted outside this method.
             if (isManaged()) realm?.delete(this)
             return
         }
 
         resetThread()
 
-        updateThread()
+        updateThread(lastMessage)
 
         // Remove duplicates in Recipients lists
         val unmanagedFrom = if (from.getRealm<Realm>() == null) from else from.copyFromRealm()
@@ -216,7 +225,7 @@ class Thread : RealmObject {
         snoozeAction = null
     }
 
-    private fun updateThread() {
+    private fun updateThread(lastMessage: Message) {
 
         fun Thread.updateSnoozeStatesBasedOn(message: Message) {
             message.snoozeState?.let {
@@ -255,7 +264,6 @@ class Thread : RealmObject {
          */
         duplicates.forEach(::updateSnoozeStatesBasedOn)
 
-        val lastMessage = messages.last { it.folderId == folderId }
         originalDate = lastMessage.originalDate
         internalDate = lastMessage.internalDate
         subject = messages.first().subject
