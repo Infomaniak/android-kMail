@@ -33,6 +33,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SearchUtils.Companion.convertToSearchThreads
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.extensions.replaceContent
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -40,7 +41,6 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
@@ -171,7 +171,7 @@ class ThreadController @Inject constructor(
     suspend fun saveThreads(searchMessages: List<Message>) {
         mailboxContentRealm().write {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
-                threads = searchMessages.convertToSearchThreads().toRealmList()
+                threads.replaceContent(searchMessages.convertToSearchThreads())
             }
         }
     }
