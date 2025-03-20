@@ -114,26 +114,6 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
-        val messagesUids: MutableList<String> = mutableListOf()
-        val impactedFolderIds: MutableSet<String> = mutableSetOf()
-
-        threads.forEach { thread ->
-            scope.ensureActive()
-
-            val targetMessage = thread.messages.last(Message::isSnoozed) // TODO: Fix crash if message not found
-            messagesUids += targetMessage.uid
-            impactedFolderIds += targetMessage.folderId
-        }
-
-        if (messagesUids.isEmpty()) return emptySet()
-
-        val apiResponses = ApiRepository.unsnoozeMessages(mailbox.uuid, messagesUids)
-        scope.ensureActive()
-
-        return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
-    }
-
     fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap(messageController::getMovableMessages)
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
@@ -229,6 +209,26 @@ class SharedUtils @Inject constructor(
                 body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
                 return html()
             }
+        }
+
+        fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
+            val messagesUids: MutableList<String> = mutableListOf()
+            val impactedFolderIds: MutableSet<String> = mutableSetOf()
+
+            threads.forEach { thread ->
+                scope.ensureActive()
+
+                val targetMessage = thread.messages.last(Message::isSnoozed) // TODO: Fix crash if message not found
+                messagesUids += targetMessage.uid
+                impactedFolderIds += targetMessage.folderId
+            }
+
+            if (messagesUids.isEmpty()) return emptySet()
+
+            val apiResponses = ApiRepository.unsnoozeMessages(mailbox.uuid, messagesUids)
+            scope.ensureActive()
+
+            return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
         }
     }
 }

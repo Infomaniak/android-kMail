@@ -55,7 +55,6 @@ class RefreshController @Inject constructor(
     private val localSettings: LocalSettings,
     private val mailboxController: MailboxController,
     private val delayApiCallManager: DelayApiCallManager,
-    private val sharedUtils: SharedUtils,
 ) {
 
     private var refreshThreadsJob: Job? = null
@@ -236,7 +235,7 @@ class RefreshController @Inject constructor(
     private fun removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): Set<String> {
         return if (folder.role == FolderRole.INBOX) {
             val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
-            sharedUtils.unsnoozeThreadsWithoutRefresh(scope, mailbox, snoozedThreadsWithNewMessage)
+            SharedUtils.unsnoozeThreadsWithoutRefresh(scope, mailbox, snoozedThreadsWithNewMessage)
         } else {
             emptySet()
         }
