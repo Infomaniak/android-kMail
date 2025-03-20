@@ -107,16 +107,23 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun unsnoozeThreads(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
+    suspend fun unsnoozeThreads(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>) {
+        val impactedFolders = unsnoozeThreadsWithoutRefresh(scope, mailbox, threads)
+        if (impactedFolders.isNotEmpty()) {
+            refreshFolders(mailbox = mailbox, messagesFoldersIds = ImpactedFolders(impactedFolders.toMutableSet()))
+        }
+    }
+
+    fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
         val messagesUids: MutableList<String> = mutableListOf()
-        val messagesFolderIds: MutableSet<String> = mutableSetOf()
+        val impactedFolderIds: MutableSet<String> = mutableSetOf()
 
         threads.forEach { thread ->
             scope.ensureActive()
 
             val targetMessage = thread.messages.last(Message::isSnoozed) // TODO: Fix crash if message not found
             messagesUids += targetMessage.uid
-            messagesFolderIds += targetMessage.folderId
+            impactedFolderIds += targetMessage.folderId
         }
 
         if (messagesUids.isEmpty()) return emptySet()
@@ -124,7 +131,7 @@ class SharedUtils @Inject constructor(
         val apiResponses = ApiRepository.unsnoozeMessages(mailbox.uuid, messagesUids)
         scope.ensureActive()
 
-        return if (apiResponses.atLeastOneSucceeded()) messagesFolderIds else emptySet()
+        return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
     }
 
     fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
