@@ -115,6 +115,7 @@ class ThreadController @Inject constructor(
                         isDeletedOnApi = false,
                         latestCalendarEventResponse = null,
                         swissTransferFiles = realmListOf(),
+                        folderRoleName = filterFolder?.role?.name,
                     )
                 } else {
                     remoteMessage.keepLocalValues(localMessage)
@@ -373,6 +374,7 @@ class ThreadController @Inject constructor(
                                 isDeletedOnApi = false,
                                 latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                 swissTransferFiles = swissTransferFiles,
+                                folderRoleName = localMessage.folderRoleName,
                             )
 
                             if (remoteMessage.hasAttachable) hasAttachableInThread = true

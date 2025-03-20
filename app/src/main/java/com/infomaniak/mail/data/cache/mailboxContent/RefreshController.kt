@@ -546,6 +546,7 @@ class RefreshController @Inject constructor(
             isDeletedOnApi = false,
             latestCalendarEventResponse = null,
             swissTransferFiles = realmListOf(),
+            folderRoleName = folder.role?.name,
         )
     }
     //endregion

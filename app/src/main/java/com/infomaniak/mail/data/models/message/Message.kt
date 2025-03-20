@@ -162,6 +162,8 @@ class Message : RealmObject {
     var swissTransferFiles = realmListOf<SwissTransferFile>()
     @Transient
     var hasAttachable: Boolean = false
+    @Transient
+    var folderRoleName: String? = null
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -188,6 +190,9 @@ class Message : RealmObject {
     val threads by backlinks(Thread::messages)
 
     val threadsDuplicatedIn by backlinks(Thread::duplicates)
+
+    val folderRole: FolderRole?
+        get() = enumValueOfOrNull<FolderRole>(folderRoleName)
 
     inline val folder: Folder
         get() = run {
@@ -289,6 +294,7 @@ class Message : RealmObject {
             isDeletedOnApi = localMessage.isDeletedOnApi,
             latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
             swissTransferFiles = localMessage.swissTransferFiles,
+            folderRoleName = localMessage.folderRoleName,
         )
         keepHeavyData(localMessage)
     }
@@ -302,6 +308,7 @@ class Message : RealmObject {
         isDeletedOnApi: Boolean,
         latestCalendarEventResponse: CalendarEventResponse?,
         swissTransferFiles: RealmList<SwissTransferFile>,
+        folderRoleName: String?,
     ) {
         this.areHeavyDataFetched = areHeavyDataFetched
         this.isTrashed = isTrashed
@@ -311,6 +318,7 @@ class Message : RealmObject {
         this.isDeletedOnApi = isDeletedOnApi
         this.latestCalendarEventResponse = latestCalendarEventResponse
         this.swissTransferFiles.replaceContent(swissTransferFiles)
+        this.folderRoleName = folderRoleName
 
         this.shortUid = uid.toShortUid()
         this.hasAttachable = hasAttachments || swissTransferUuid != null
