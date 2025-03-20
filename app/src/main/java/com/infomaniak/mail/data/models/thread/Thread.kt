@@ -60,11 +60,11 @@ class Thread : RealmObject {
     @PrimaryKey
     var uid: String = ""
     var messages = realmListOf<Message>()
-    @SerialName("date")
-    private var originalDate: RealmInstant? = null
     // This value should always be provided because messages always have at least an internalDate. Because of this, the initial value is meaningless
     @SerialName("internal_date")
     var internalDate: RealmInstant = Date().toRealmInstant()
+    @SerialName("date")
+    var displayDate: RealmInstant = internalDate
     @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
     var from = realmListOf<Recipient>()
@@ -110,8 +110,6 @@ class Thread : RealmObject {
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
         private set
-
-    val displayDate: RealmInstant get() = originalDate ?: internalDate
 
     // TODO: Put this back in `private` when the Threads parental issues are fixed
     val _folders by backlinks(Folder::threads)
@@ -264,7 +262,7 @@ class Thread : RealmObject {
          */
         duplicates.forEach(::updateSnoozeStatesBasedOn)
 
-        originalDate = lastMessage.originalDate
+        displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
         subject = messages.first().subject
     }

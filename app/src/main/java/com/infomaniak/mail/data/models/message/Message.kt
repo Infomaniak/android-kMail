@@ -56,11 +56,16 @@ class Message : RealmObject {
     var uid: String = ""
     @SerialName("msg_id")
     var messageId: String? = null
-    @SerialName("date")
-    var originalDate: RealmInstant? = null
-        private set
     @SerialName("internal_date")
     var internalDate: RealmInstant = Date().toRealmInstant() // This date is always defined, so the default value is meaningless
+        private set
+
+    /**
+     * [displayDate] is different than [internalDate] because it must be used when displaying the date of an email but it can't be
+     * used to sort messages chronologically.
+     */
+    @SerialName("date")
+    var displayDate: RealmInstant = internalDate
         private set
     var subject: String? = null
     var from = realmListOf<Recipient>()
@@ -175,13 +180,6 @@ class Message : RealmObject {
 
     @Ignore
     var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
-
-    /**
-     * [displayDate] is different than [internalDate] because it must be used when displaying
-     * the date of an email but it can't be used to sort messages chronologically.
-     * A message's [originalDate] is not always defined. When this happens, we want to display the [internalDate] in its place.
-     */
-    val displayDate: RealmInstant get() = originalDate ?: internalDate
 
     val threads by backlinks(Thread::messages)
 

@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.cache
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.DynamicRealmObject
+import io.realm.kotlin.dynamic.getNullableValue
 import io.realm.kotlin.dynamic.getValue
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
@@ -41,6 +42,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.deleteRealmFromFirstMigration()
     migrationContext.keepDefaultValuesAfterNineteenthMigration()
     migrationContext.initializedInternalDateAsDateAfterTwentySecondMigration()
+    migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
 }
 
 // Migrate to version #1
@@ -122,6 +124,33 @@ private fun MigrationContext.initializedInternalDateAsDateAfterTwentySecondMigra
 
                 // Initialize new property with old property value
                 set(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+            }
+        }
+    }
+}
+//endregion
+
+// Migrate from version #24
+private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration() {
+
+    if (oldRealm.schemaVersion() <= 24L) {
+        enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Initialize new property with old property value
+                val displayDate = oldObject.getNullableValue<RealmInstant>(fieldName = "originalDate")
+                    ?: oldObject.getValue<RealmInstant>(fieldName = "internalDate")
+
+                set(propertyName = "displayDate", value = displayDate)
+            }
+        }
+
+        enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Initialize new property with old property value
+                val displayDate = oldObject.getNullableValue<RealmInstant>(fieldName = "originalDate")
+                    ?: oldObject.getValue<RealmInstant>(fieldName = "internalDate")
+
+                set(propertyName = "displayDate", value = displayDate)
             }
         }
     }
