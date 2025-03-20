@@ -219,9 +219,8 @@ class RefreshController @Inject constructor(
         impactedThreads += fetchAllNewPages(scope, folder.id)
         fetchAllOldPages(scope, folder.id)
 
-        val folderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
-
-        folderIds.forEach { folderId ->
+        val impactedFolderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
+        impactedFolderIds.forEach { folderId ->
             scope.ensureActive()
 
             runCatching {
@@ -237,8 +236,10 @@ class RefreshController @Inject constructor(
     private fun removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): Set<String> {
         return if (folder.role == FolderRole.INBOX) {
             val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
-            sharedUtils.unsnoozeThreads(scope, mailbox, snoozedThreadsWithNewMessage)
-        } else emptySet()
+            sharedUtils.unsnoozeThreadsWithoutRefresh(scope, mailbox, snoozedThreadsWithNewMessage)
+        } else {
+            emptySet()
+        }
     }
 
     private suspend fun Realm.fetchOnePageOfOldMessages(scope: CoroutineScope, folderId: String) {
