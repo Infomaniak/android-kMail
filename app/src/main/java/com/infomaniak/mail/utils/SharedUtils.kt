@@ -44,6 +44,8 @@ import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -105,22 +107,24 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    suspend fun unsnoozeThreads(mailbox: Mailbox, threads: List<Thread>) {
+    fun unsnoozeThreads(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
         val messagesUids: MutableList<String> = mutableListOf()
         val messagesFolderIds: MutableSet<String> = mutableSetOf()
 
         threads.forEach { thread ->
+            scope.ensureActive()
+
             val targetMessage = thread.messages.last(Message::isSnoozed) // TODO: Fix crash if message not found
             messagesUids += targetMessage.uid
             messagesFolderIds += targetMessage.folderId
         }
 
-        if (messagesUids.isEmpty()) return
+        if (messagesUids.isEmpty()) return emptySet()
 
         val apiResponses = ApiRepository.unsnoozeMessages(mailbox.uuid, messagesUids)
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFolders(mailbox = mailbox, messagesFoldersIds = ImpactedFolders(messagesFolderIds))
-        }
+        scope.ensureActive()
+
+        return if (apiResponses.atLeastOneSucceeded()) messagesFolderIds else emptySet()
     }
 
     fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
