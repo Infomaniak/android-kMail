@@ -26,7 +26,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
 import androidx.lifecycle.*
-import com.infomaniak.core.utils.FORMAT_SCHEDULE_MAIL
+import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
@@ -865,7 +865,7 @@ class NewMessageViewModel @Inject constructor(
         val localUuid = draftLocalUuid ?: return@launch
         mailboxContentRealm().write {
             DraftController.getDraft(localUuid, realm = this)?.also { draft ->
-                draft.scheduleDate = date?.format(FORMAT_SCHEDULE_MAIL)
+                draft.scheduleDate = date?.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
             }
         }
     }
