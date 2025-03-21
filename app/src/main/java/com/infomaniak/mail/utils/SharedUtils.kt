@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
@@ -48,7 +49,6 @@ import javax.inject.Inject
 class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
-    private val threadController: ThreadController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
 ) {
@@ -131,6 +131,40 @@ class SharedUtils @Inject constructor(
                 realm = realm,
                 callbacks = if (folderId == currentFolderId) callbacks else null,
             )
+        }
+    }
+
+    suspend fun unblockSender(mailbox: Mailbox, emailToUnblock: String) {
+        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) {
+                val updatedSendersRestrictions = SendersRestrictions().apply {
+                    authorizedSenders = data!!.authorizedSenders
+                    blockedSenders = data!!.blockedSenders.apply {
+                        removeIf { it.email == emailToUnblock }
+                    }
+                }
+                updateBlockedSenders(mailbox, updatedSendersRestrictions)
+            }
+        }
+    }
+
+    private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
+        with(ApiRepository.updateBlockedSenders(mailbox.hostingId, mailbox.mailboxName, updatedSendersRestrictions)) {
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.sendersRestrictions = updatedSendersRestrictions
+                }
+            }
+        }
+    }
+
+    suspend fun updateSendersRestrictions(mailbox: Mailbox) {
+        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.sendersRestrictions = data
+                }
+            }
         }
     }
 

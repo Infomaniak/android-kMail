@@ -108,6 +108,7 @@ class MainViewModel @Inject constructor(
 
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
+    val isMovedToSpamFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
     val deleteThreadOrMessageTrigger = SingleLiveEvent<Unit>()
@@ -331,6 +332,7 @@ class MainViewModel @Inject constructor(
             updateQuotas(mailbox)
             updatePermissions(mailbox)
             updateSignatures(mailbox)
+            updateSendersRestrictions(mailbox)
             updateFeatureFlag(mailbox)
             updateExternalMailInfo(mailbox)
 
@@ -392,6 +394,37 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Force refresh Signatures")
         updateSignatures(mailbox, mailboxInfoRealm)
     }
+
+    //region Spam
+    fun activateSpamFilter() {
+        viewModelScope.launch(ioCoroutineContext) {
+            currentMailbox.value?.let { currentMailbox ->
+                ApiRepository.setSpamFilter(
+                    mailboxHostingId = currentMailbox.hostingId,
+                    mailboxName = currentMailbox.mailboxName,
+                    activateSpamFilter = true,
+                )
+            }
+        }
+    }
+
+    fun unblockMail(email: String) {
+        viewModelScope.launch(ioCoroutineContext) {
+            currentMailbox.value?.let {
+                unblockSender(it, email)
+            }
+        }
+    }
+
+    private fun updateSendersRestrictions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        SentryLog.d(TAG, "Force refresh Senders Restrictions")
+        sharedUtils.updateSendersRestrictions(mailbox)
+    }
+
+    private fun unblockSender(mailbox: Mailbox, emailToUnblock: String) = viewModelScope.launch(ioCoroutineContext) {
+        sharedUtils.unblockSender(mailbox, emailToUnblock)
+    }
+    //endregion
 
     private fun updateFeatureFlag(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Features flags")
@@ -950,6 +983,16 @@ class MainViewModel @Inject constructor(
 
     fun toggleThreadsSpamStatus(threadsUids: List<String>) {
         toggleThreadsOrMessageSpamStatus(threadsUids = threadsUids)
+    }
+
+    fun moveToSpamFolder(
+        threadsUid: String,
+        messageUid: String?,
+    ) = viewModelScope.launch(ioCoroutineContext) {
+        folderController.getFolder(FolderRole.SPAM)?.id?.let { folderId ->
+            moveThreadsOrMessageTo(folderId, listOf(threadsUid), messageUid)
+            isMovedToSpamFolder.postValue(true)
+        }
     }
 
     private fun toggleThreadsOrMessageSpamStatus(
