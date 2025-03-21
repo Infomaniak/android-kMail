@@ -55,6 +55,14 @@ class MessageAlertView @JvmOverloads constructor(
         binding.description.text = text
     }
 
+    fun setAction1Text(text: String) {
+        binding.action1.text = text
+    }
+
+    fun setAction2Text(text: String) {
+        binding.action2.text = text
+    }
+
     fun onAction1(listener: OnClickListener) {
         binding.action1.setOnClickListener(listener)
     }

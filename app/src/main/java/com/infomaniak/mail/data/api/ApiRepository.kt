@@ -49,10 +49,7 @@ import com.infomaniak.mail.data.models.getMessages.ActivitiesResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
-import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.data.models.mailbox.MailboxExternalMailInfo
-import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
-import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
+import com.infomaniak.mail.data.models.mailbox.*
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
@@ -155,6 +152,28 @@ object ApiRepository : ApiRepositoryCore() {
     fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
         return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
     }
+
+    //region Spam
+    fun setSpamFilter(mailboxHostingId: Int, mailboxName: String, activateSpamFilter: Boolean): ApiResponse<Unit> {
+        return callApi(ApiRoutes.mailboxInfo(mailboxHostingId, mailboxName), PATCH, mapOf("has_move_spam" to activateSpamFilter))
+    }
+
+    fun getSendersRestrictions(mailboxHostingId: Int, mailboxName: String): ApiResponse<SendersRestrictions> {
+        return callApi(ApiRoutes.getSendersRestrictions(mailboxHostingId, mailboxName), GET)
+    }
+
+    fun updateBlockedSenders(
+        mailboxHostingId: Int,
+        mailboxName: String,
+        updatedSendersRestrictions: SendersRestrictions,
+    ): ApiResponse<Boolean> {
+        val body = mapOf(
+            "authorized_senders" to updatedSendersRestrictions.authorizedSenders.map { it.email },
+            "blocked_senders" to updatedSendersRestrictions.blockedSenders.map { it.email },
+        )
+        return callApi(ApiRoutes.getSendersRestrictions(mailboxHostingId, mailboxName), PATCH, body)
+    }
+    //endregion
 
     fun getExternalMailInfo(mailboxHostingId: Int, mailboxName: String): ApiResponse<MailboxExternalMailInfo> {
         return callApi(ApiRoutes.externalMailInfo(mailboxHostingId, mailboxName), GET)

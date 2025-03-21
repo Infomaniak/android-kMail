@@ -130,6 +130,7 @@ class Message : RealmObject {
     private var _acknowledge: String = Acknowledge.NONE.name.lowercase()
     @SerialName("drive_url")
     var driveUrl: String = ""
+    var headers: Headers? = null
     //endregion
 
     //region Local data (Transient)
@@ -233,6 +234,8 @@ class Message : RealmObject {
 
             return@run correctFolder!!
         }
+
+    fun isInSpamFolder() = folder.role == Folder.FolderRole.SPAM
 
     fun computeFolderAndReason(filterFolderId: String): Pair<Folder?, String?> {
 

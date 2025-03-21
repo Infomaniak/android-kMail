@@ -29,7 +29,10 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
+import com.infomaniak.mail.data.models.mailbox.SenderDetails
+import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.Headers
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.data.models.signature.Signature
@@ -160,7 +163,7 @@ object RealmDatabase {
 
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 3L
-        const val MAILBOX_INFO_SCHEMA_VERSION = 8L
+        const val MAILBOX_INFO_SCHEMA_VERSION = 9L
         const val MAILBOX_CONTENT_SCHEMA_VERSION = 26L
         //endregion
 
@@ -182,6 +185,8 @@ object RealmDatabase {
         )
         val mailboxInfoSet = setOf(
             Mailbox::class,
+            SendersRestrictions::class,
+            SenderDetails::class,
             MailboxPermissions::class,
             Quotas::class,
             Signature::class,
@@ -190,6 +195,7 @@ object RealmDatabase {
             Folder::class,
             Thread::class,
             Message::class,
+            Headers::class,
             Draft::class,
             Recipient::class,
             Body::class,

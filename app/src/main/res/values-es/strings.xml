@@ -266,6 +266,7 @@
     <string name="emptyStateSearchTitle">Sin resultados</string>
     <string name="emptyStateTrashDescription">Mueve los mensajes a la papelera. Se borrarán definitivamente pasados 30 días.</string>
     <string name="emptyStateTrashTitle">La papelera está vacía</string>
+    <string name="enableFilterButton">Activar filtro</string>
     <string name="enterPasswordDescription1">Su contraseña ha sido modificada. Si no es culpa suya, póngase en contacto con su administrador.</string>
     <string name="enterPasswordDescription2">Por favor, introduzca la nueva contraseña para la dirección de correo electrónico %s</string>
     <string name="enterPasswordOrDescription">o</string>
@@ -348,6 +349,9 @@
     <string name="messageForwardHeader">Mensaje reenviado</string>
     <string name="messageHideQuotedText">Ocultar la conversación</string>
     <string name="messageIsDraftOption">Borrador</string>
+    <string name="messageIsSpamBecauseSenderIsBlocked">Este mensaje aparece en la carpeta de spam porque %s está en la lista de remitentes bloqueados.</string>
+    <string name="messageIsSpamShouldActivateFilter">Este mensaje se considera spam. Para mayor seguridad, le recomendamos que active su filtro antispam.</string>
+    <string name="messageIsSpamShouldMoveToSpam">Este mensaje se considera spam. Le recomendamos que lo mueva a la carpeta \"Spam\".</string>
     <string name="messageReplyHeader">El %1$s, %2$s escribió:</string>
     <string name="messageShowQuotedText">Mostrar la conversación</string>
     <string name="mondayAfternoon">Lunes por la tarde</string>
@@ -355,6 +359,7 @@
     <string name="moreStorageText1">Tu buzón está lleno y no puedes recibir más mensajes 🥲</string>
     <string name="moreStorageText2">Pronto podrás desbloquear los límites de tu dirección de correo electrónico ik.me (límite de almacenamiento, envío, reenvío, …)</string>
     <string name="moreStorageTitle">¿Está llena su caja? ¡Consiga más espacio de almacenamiento!</string>
+    <string name="moveInSpamButton">Mover en Spam</string>
     <string name="moveSearchFieldPlaceholder">Buscar un fichero</string>
     <string name="moveTitle">¿A qué carpeta quieres mover tu correo electrónico?</string>
     <plurals name="multipleSelectionCount">
@@ -615,6 +620,7 @@
     <string name="tomorrowMorning">Mañana por la mañana</string>
     <string name="tooManyRecipients">No puede añadir esta dirección porque ha alcanzado el límite de destinatarios</string>
     <string name="trashFolder">Basura</string>
+    <string name="unblockButton">Desbloquear</string>
     <string name="unknownRecipientTitle">(desconocido)</string>
     <string name="urlEntryTitle">Crear un hiperenlace</string>
     <string name="urlPlaceholder">URL</string>
