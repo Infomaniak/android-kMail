@@ -69,9 +69,12 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_DATE_AND_TIME_SCHEDULE_DIALOG
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
@@ -446,7 +449,7 @@ class ThreadFragment : Fragment() {
             }
 
             snoozeAlert.apply {
-                onAction1 { /*TODO*/ }
+                onAction1 { navigateToSnoozeBottomSheet() }
                 onAction2 { mainViewModel.unsnoozeThreads(listOf(thread)) }
             }
         }
@@ -552,8 +555,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupBackActionHandler() {
-
-        getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
+        getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedScheduleEpoch = timestamp
@@ -565,6 +567,24 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT) { selectedScheduleEpoch: Long ->
             mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch))
+        }
+
+        getBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER) { _: Boolean ->
+            dateAndTimeScheduleDialog.show(
+                onDateSelected = { timestamp ->
+                    localSettings.lastSelectedSnoozeEpoch = timestamp
+                    threadViewModel.threadLive.value?.let { thread ->
+                        mainViewModel.rescheduleSnoozedThread(Date(timestamp), thread)
+                    }
+                },
+                onAbort = ::navigateToSnoozeBottomSheet,
+            )
+        }
+
+        getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
+            threadViewModel.threadLive.value?.let { thread ->
+                mainViewModel.rescheduleSnoozedThread(Date(selectedScheduleEpoch), thread)
+            }
         }
     }
 
@@ -749,6 +769,17 @@ class ThreadFragment : Fragment() {
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
+            ).toBundle(),
+            currentClassName = ThreadFragment::class.java.name,
+        )
+    }
+
+    private fun navigateToSnoozeBottomSheet() {
+        safeNavigate(
+            resId = R.id.snoozeBottomSheetDialog,
+            args = SnoozeBottomSheetDialogArgs(
+                lastSelectedScheduleEpoch = localSettings.lastSelectedSnoozeEpoch ?: 0L,
                 isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
             currentClassName = ThreadFragment::class.java.name,

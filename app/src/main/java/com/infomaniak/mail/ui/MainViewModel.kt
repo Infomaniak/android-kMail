@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -1052,6 +1053,14 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Snooze
+    fun rescheduleSnoozedThread(date: Date, thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
+        if (thread.isSnoozed().not()) return@launch
+
+        thread.snoozeAction?.let {
+            ApiRepository.rescheduleSnoozedThread(it, date)
+        }
+    }
+
     fun unsnoozeThreads(threads: List<Thread>) = viewModelScope.launch(ioCoroutineContext) {
         currentMailbox.value?.let { mailbox ->
             sharedUtils.unsnoozeThreads(mailbox, threads)
