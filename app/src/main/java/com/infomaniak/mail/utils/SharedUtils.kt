@@ -212,20 +212,22 @@ class SharedUtils @Inject constructor(
         }
 
         fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
-            val messagesUids: MutableList<String> = mutableListOf()
+            val snoozeUuids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()
 
             for (thread in threads) {
                 scope.ensureActive()
 
-                val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: continue
-                messagesUids += targetMessage.uid
+                val targetMessage = thread.messages.lastOrNull(Message::isSnoozed)
+                val targetMessageSnoozeUuid = targetMessage?.snoozeUuid ?: continue
+
+                snoozeUuids += targetMessageSnoozeUuid
                 impactedFolderIds += targetMessage.folderId
             }
 
-            if (messagesUids.isEmpty()) return emptySet()
+            if (snoozeUuids.isEmpty()) return emptySet()
 
-            val apiResponses = ApiRepository.unsnoozeMessages(mailbox.uuid, messagesUids)
+            val apiResponses = ApiRepository.unsnoozeMessages(mailbox.uuid, snoozeUuids)
             scope.ensureActive()
 
             return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
