@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -205,7 +206,13 @@ class RefreshController @Inject constructor(
     }
 
     private suspend fun Realm.refresh(scope: CoroutineScope, folder: Folder): Set<Thread> {
+        val impactedThreads = mainRefresh(scope, folder)
+        extraRefresh(scope, folder)
 
+        return impactedThreads
+    }
+
+    private suspend fun Realm.mainRefresh(scope: CoroutineScope, folder: Folder): MutableSet<Thread> {
         val previousCursor = folder.cursor
         val impactedThreads = mutableSetOf<Thread>()
 
@@ -218,18 +225,20 @@ class RefreshController @Inject constructor(
         impactedThreads += fetchAllNewPages(scope, folder.id)
         fetchAllOldPages(scope, folder.id)
 
+        return impactedThreads
+    }
+
+    private suspend fun Realm.extraRefresh(scope: CoroutineScope, folder: Folder) {
         val impactedFolderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
         impactedFolderIds.forEach { folderId ->
             scope.ensureActive()
 
             runCatching {
                 FolderController.getFolder(folderId, realm = this)?.let {
-                    refresh(scope, folder = it)
+                    mainRefresh(scope, folder = it)
                 }
             }
         }
-
-        return impactedThreads
     }
 
     private fun removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): Set<String> {
