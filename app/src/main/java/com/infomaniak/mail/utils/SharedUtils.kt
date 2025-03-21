@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -108,10 +109,16 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    suspend fun unsnoozeThreads(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>) {
-        val impactedFolders = unsnoozeThreadsWithoutRefresh(scope, mailbox, threads)
+    suspend fun unsnoozeThreads(mailbox: Mailbox, threads: List<Thread>) {
+        val impactedFolders = unsnoozeThreadsWithoutRefresh(scope = null, mailbox, threads)
         if (impactedFolders.isNotEmpty()) {
-            refreshFolders(mailbox = mailbox, messagesFoldersIds = ImpactedFolders(impactedFolders.toMutableSet()))
+            refreshFolders(
+                mailbox = mailbox,
+                // When removing the snooze state of a thread, we absolutely need to refresh the snooze folder. Refreshing the
+                // snooze folder is the only way of updating the snooze status of messages. The folder snooze will never be
+                // returned inside impactedFolders because no message ever mentions the snooze folder, we need to add it manually.
+                messagesFoldersIds = ImpactedFolders(impactedFolders.toMutableSet(), mutableSetOf(FolderRole.SNOOZED)),
+            )
         }
     }
 
@@ -234,12 +241,16 @@ class SharedUtils @Inject constructor(
             }
         }
 
-        fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
+        /**
+         * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone. Outside
+         * of this algorithm, the scope doesn't need to be defined and the method can be used like any other.
+         */
+        fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope?, mailbox: Mailbox, threads: List<Thread>): Set<String> {
             val snoozeUuids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()
 
             for (thread in threads) {
-                scope.ensureActive()
+                scope?.ensureActive()
 
                 val targetMessage = thread.messages.lastOrNull(Message::isSnoozed)
                 val targetMessageSnoozeUuid = targetMessage?.snoozeUuid ?: continue
@@ -251,7 +262,7 @@ class SharedUtils @Inject constructor(
             if (snoozeUuids.isEmpty()) return emptySet()
 
             val apiResponses = ApiRepository.unsnoozeThreads(mailbox.uuid, snoozeUuids)
-            scope.ensureActive()
+            scope?.ensureActive()
 
             return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
         }

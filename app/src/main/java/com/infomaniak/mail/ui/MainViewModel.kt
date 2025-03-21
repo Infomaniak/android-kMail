@@ -1105,6 +1105,14 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
+    //region Snooze
+    fun unsnoozeThreads(threads: List<Thread>) = viewModelScope.launch(ioCoroutineContext) {
+        currentMailbox.value?.let { mailbox ->
+            sharedUtils.unsnoozeThreads(mailbox, threads)
+        }
+    }
+    //endregion
+
     //region Undo action
     fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
 

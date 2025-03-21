@@ -451,6 +451,11 @@ class ThreadFragment : Fragment() {
                 val formattedDate = context.formatDayOfWeekAdaptiveYear(snoozeEndDate.toDate())
                 snoozeAlert.setDescription(getString(R.string.snoozeAlertTitle, formattedDate))
             }
+
+            snoozeAlert.apply {
+                onAction1 { /*TODO*/ }
+                onAction2 { mainViewModel.unsnoozeThreads(listOf(thread)) }
+            }
         }
     }
 
