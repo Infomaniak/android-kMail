@@ -237,7 +237,7 @@ class RefreshController @Inject constructor(
                 FolderController.getFolder(folderId, realm = this)?.let {
                     mainRefresh(scope, folder = it)
                 }
-            }
+            }.cancellable()
         }
     }
 
