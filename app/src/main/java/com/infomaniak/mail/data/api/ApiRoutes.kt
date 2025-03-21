@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.api
 
-import com.infomaniak.core.utils.FORMAT_SCHEDULE_MAIL
+import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.BuildConfig.INFOMANIAK_API_V1
 import com.infomaniak.mail.BuildConfig.MAIL_API
@@ -228,7 +228,7 @@ object ApiRoutes {
     }
 
     fun rescheduleDraft(draftResource: String, scheduleDate: Date): String {
-        val formatedDate = scheduleDate.format(FORMAT_SCHEDULE_MAIL)
+        val formatedDate = scheduleDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
         return "${MAIL_API}${draftResource}/schedule?schedule_date=${URLEncoder.encode(formatedDate, "UTF-8")}"
     }
 
