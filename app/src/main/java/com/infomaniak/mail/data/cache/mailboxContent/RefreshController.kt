@@ -229,6 +229,7 @@ class RefreshController @Inject constructor(
     }
 
     private suspend fun Realm.extraRefresh(scope: CoroutineScope, folder: Folder) {
+        // TODO: This will never return the folder "snooze". Do we need to add it manually?
         val impactedFolderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
         impactedFolderIds.forEach { folderId ->
             scope.ensureActive()
