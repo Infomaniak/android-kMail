@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
+import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.R
@@ -343,6 +344,16 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun blockUser(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
+    }
+
+    fun rescheduleSnoozedThread(snoozeActions: List<String>, newDate: Date): List<ApiResponse<Boolean>> {
+        return batchOver(snoozeActions, limit = 1) { snoozeAction ->
+            callApi(
+                url = ApiRoutes.resource(snoozeAction.single()),
+                method = PUT,
+                body = mapOf("end_date" to newDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR))
+            )
+        }
     }
 
     fun unsnoozeThread(mailboxUuid: String, snoozeUuid: String): ApiResponse<Boolean> {

@@ -583,6 +583,7 @@
         <item quantity="other">Conversations moved to %s</item>
     </plurals>
     <string name="snoozeAlertTitle">Snoozed until: %s</string>
+    <string name="snoozeBottomSheetTitle">Snooze</string>
     <string name="snoozedFolder">Snoozed</string>
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>

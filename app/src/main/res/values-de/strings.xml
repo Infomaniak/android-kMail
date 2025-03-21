@@ -577,6 +577,7 @@
         <item quantity="other">Unterhaltungen in %s verschoben</item>
     </plurals>
     <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
+    <string name="snoozeBottomSheetTitle">In die Warteschlange verschieben</string>
     <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>

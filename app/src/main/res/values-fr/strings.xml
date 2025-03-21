@@ -589,6 +589,7 @@
         <item quantity="many">Conversations déplacées vers %s</item>
     </plurals>
     <string name="snoozeAlertTitle">En attente jusqu’au : %s</string>
+    <string name="snoozeBottomSheetTitle">Mettre en attente</string>
     <string name="snoozedFolder">En attente</string>
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>

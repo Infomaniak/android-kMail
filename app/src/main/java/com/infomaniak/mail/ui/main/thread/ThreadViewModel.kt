@@ -97,6 +97,9 @@ class ThreadViewModel @Inject constructor(
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
 
+    // Save the current scheduled date of the message we're rescheduling to be able to pass it to the snooze bottom sheet
+    var reschedulingCurrentlySnoozedEpochMillis: Long? = null
+
     val isThreadSnoozeHeaderVisible = Utils.waitInitMediator(currentMailboxLive, threadLive).map { (mailbox, thread) ->
         mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
                 && thread?.isSnoozed() == true

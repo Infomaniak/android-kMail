@@ -267,6 +267,25 @@
             app:argType="boolean" />
     </dialog>
 
+    <dialog
+        android:id="@+id/snoozeBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog"
+        android:label="SnoozeBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_schedule_options">
+        <argument
+            android:name="lastSelectedScheduleEpochMillis"
+            android:defaultValue="0L"
+            app:argType="long" />
+        <argument
+            android:name="currentlyScheduledEpochMillis"
+            android:defaultValue="0L"
+            app:argType="long" />
+        <argument
+            android:name="isCurrentMailboxFree"
+            android:defaultValue="true"
+            app:argType="boolean" />
+    </dialog>
+
     <fragment
         android:id="@+id/moveFragment"
         android:name="com.infomaniak.mail.ui.main.move.MoveFragment"

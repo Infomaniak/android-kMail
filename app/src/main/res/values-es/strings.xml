@@ -577,6 +577,7 @@
         <item quantity="other">Conversaciones trasladadas a %s</item>
     </plurals>
     <string name="snoozeAlertTitle">En espera hasta: %s</string>
+    <string name="snoozeBottomSheetTitle">Poner en espera</string>
     <string name="snoozedFolder">En espera</string>
     <string name="socialNetworksFolder">Redes sociales</string>
     <string name="spamFolder">Spam</string>
