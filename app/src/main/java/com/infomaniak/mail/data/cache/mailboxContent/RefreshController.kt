@@ -232,6 +232,7 @@ class RefreshController @Inject constructor(
         // No need to check realm, there can't be any snoozed thread with a new message when there's a single message per thread
         if (localSettings.threadMode == ThreadMode.MESSAGE) return
 
+        // TODO: This will never return the folder "snooze". Do we need to add it manually?
         val impactedFolderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
         impactedFolderIds.forEach { folderId ->
             scope.ensureActive()
