@@ -66,6 +66,8 @@ class Mailbox : RealmObject {
     var aliases = realmListOf<String>()
     @SerialName("is_free")
     var isFree: Boolean = false
+    @SerialName("is_spam_filter")
+    var isSpamFiltered: Boolean = false
     //endregion
 
     //region Local data (Transient)
@@ -89,6 +91,8 @@ class Mailbox : RealmObject {
     var externalMailFlagEnabled: Boolean = false
     @Transient
     var trustedDomains = realmListOf<String>()
+    @Transient
+    var sendersRestrictions: SendersRestrictions? = null
     //endregion
 
     //region UI data (Transient & Ignore)

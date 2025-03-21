@@ -258,6 +258,8 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(threadViewModel) {
 
         binding.messagesList.adapter = ThreadAdapter(
+            isSpamFilterActivated = { mainViewModel.currentMailbox.value?.isSpamFiltered ?: false },
+            senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
             shouldLoadDistantResources = shouldLoadDistantResources(),
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
@@ -290,6 +292,13 @@ class ThreadFragment : Fragment() {
                 navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
                     navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
                 },
+                moveMessageToSpam = { messageUid ->
+                    twoPaneViewModel.currentThreadUid.value?.let {
+                        mainViewModel.moveToSpamFolder(it, messageUid)
+                    }
+                },
+                activateSpamFilter = { mainViewModel.activateSpamFilter() },
+                unblockMail = { mailToUnblock -> mainViewModel.unblockMail(mailToUnblock) },
                 replyToCalendarEvent = { attendanceState, message ->
                     replyToCalendarEvent(
                         attendanceState,

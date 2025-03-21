@@ -266,6 +266,7 @@
     <string name="emptyStateSearchTitle">Nessun risultato</string>
     <string name="emptyStateTrashDescription">Sposta i messaggi nel cestino. Verranno eliminati definitivamente dopo 30 giorni.</string>
     <string name="emptyStateTrashTitle">Il cestino è vuoto</string>
+    <string name="enableFilterButton">Abilita il filtro</string>
     <string name="enterPasswordDescription1">La password è stata modificata. Se non sei responsabile, contatta l’amministratore.</string>
     <string name="enterPasswordDescription2">Inserisci la nuova password per l’indirizzo e-mail %s</string>
     <string name="enterPasswordOrDescription">o</string>
@@ -348,6 +349,9 @@
     <string name="messageForwardHeader">Messaggio inoltrato</string>
     <string name="messageHideQuotedText">Nascondi la conversazione</string>
     <string name="messageIsDraftOption">Bozza</string>
+    <string name="messageIsSpamBecauseSenderIsBlocked">Questo messaggio appare nella cartella spam perché %s è nell’elenco dei mittenti bloccati.</string>
+    <string name="messageIsSpamShouldActivateFilter">Questo messaggio è considerato spam. Per sicurezza, si consiglia di attivare il filtro antispam.</string>
+    <string name="messageIsSpamShouldMoveToSpam">Questo messaggio è considerato spam. Si consiglia di spostarlo nella cartella \"Spam\".</string>
     <string name="messageReplyHeader">Il %1$s, %2$s ha scritto:</string>
     <string name="messageShowQuotedText">Visualizza la conversazione</string>
     <string name="mondayAfternoon">Lunedì pomeriggio</string>
@@ -355,6 +359,7 @@
     <string name="moreStorageText1">La casella di posta elettronica è piena e non è possibile ricevere altri messaggi 🥲</string>
     <string name="moreStorageText2">Presto potrete sbloccare i limiti del vostro indirizzo e-mail ik.me (limite di archiviazione, invio, inoltro, …).</string>
     <string name="moreStorageTitle">Lo spazio è esaurito? Ottieni più spazio!</string>
+    <string name="moveInSpamButton">Spostarsi in Spam</string>
     <string name="moveSearchFieldPlaceholder">Ricerca di un file</string>
     <string name="moveTitle">In quale cartella vuoi spostare la tua e-mail?</string>
     <plurals name="multipleSelectionCount">
@@ -615,6 +620,7 @@
     <string name="tomorrowMorning">Domani mattina</string>
     <string name="tooManyRecipients">Non è possibile aggiungere questo indirizzo perché è stato raggiunto il limite di destinatari</string>
     <string name="trashFolder">Cestino</string>
+    <string name="unblockButton">Sbloccare</string>
     <string name="unknownRecipientTitle">(sconosciuto)</string>
     <string name="urlEntryTitle">Crea un collegamento ipertestuale</string>
     <string name="urlPlaceholder">URL</string>

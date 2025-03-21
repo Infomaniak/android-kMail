@@ -272,6 +272,7 @@
     <string name="emptyStateSearchTitle">No results</string>
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
+    <string name="enableFilterButton">Enable filter</string>
     <string name="enterPasswordDescription1">Your password has been changed. If you are not the cause, please contact your administrator.</string>
     <string name="enterPasswordDescription2">Please enter the new password for the email address %s</string>
     <string name="enterPasswordOrDescription">or</string>
@@ -354,6 +355,9 @@
     <string name="messageForwardHeader">Forwarded message</string>
     <string name="messageHideQuotedText">Hide the conversation</string>
     <string name="messageIsDraftOption">Draft</string>
+    <string name="messageIsSpamBecauseSenderIsBlocked">This message appears in the spam folder because %s is on the list of blocked senders.</string>
+    <string name="messageIsSpamShouldActivateFilter">This message is considered to be spam. To be safe, we recommend you to activate your spam filter.</string>
+    <string name="messageIsSpamShouldMoveToSpam">This message is considered to be spam. We recommend you to move it to the \"Spam\" folder.</string>
     <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
     <string name="messageShowQuotedText">Display the conversation</string>
     <string name="mondayAfternoon">Monday afternoon</string>
@@ -361,6 +365,7 @@
     <string name="moreStorageText1">Your mailbox is full and you can‘t receive any more messages 🥲</string>
     <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, …)</string>
     <string name="moreStorageTitle">Is your box full? Get more storage!</string>
+    <string name="moveInSpamButton">Move in Spam</string>
     <string name="moveSearchFieldPlaceholder">Search a folder</string>
     <string name="moveTitle">Which folder do you want to move your email to?</string>
     <plurals name="multipleSelectionCount">
@@ -621,6 +626,7 @@
     <string name="tomorrowMorning">Tomorrow morning</string>
     <string name="tooManyRecipients">You can’t add this address because you have reached the limit of recipients</string>
     <string name="trashFolder">Trash</string>
+    <string name="unblockButton">Unblock</string>
     <string name="unknownRecipientTitle">(unknown)</string>
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
