@@ -215,10 +215,10 @@ class SharedUtils @Inject constructor(
             val messagesUids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()
 
-            threads.forEach { thread ->
+            for (thread in threads) {
                 scope.ensureActive()
 
-                val targetMessage = thread.messages.last(Message::isSnoozed) // TODO: Fix crash if message not found
+                val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: continue
                 messagesUids += targetMessage.uid
                 impactedFolderIds += targetMessage.folderId
             }
