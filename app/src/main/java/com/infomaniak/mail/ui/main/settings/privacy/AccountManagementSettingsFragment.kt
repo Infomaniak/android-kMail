@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.infomaniak.core.webview.ui.WebViewActivity
 import com.infomaniak.lib.core.BuildConfig.AUTOLOG_URL
 import com.infomaniak.lib.core.BuildConfig.TERMINATE_ACCOUNT_URL
 import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.ui.WebViewActivity
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.FragmentAccountManagementSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
