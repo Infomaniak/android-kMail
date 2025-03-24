@@ -678,8 +678,7 @@ class MainViewModel @Inject constructor(
         draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
             with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
                 if (isSuccess()) {
-                    val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
+                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
                 } else {
                     snackbarManager.postValue(title = appContext.getString(translatedError))
                 }
@@ -1112,7 +1111,14 @@ class MainViewModel @Inject constructor(
         if (thread.isSnoozed().not()) return@launch
 
         thread.snoozeAction?.let {
-            ApiRepository.rescheduleSnoozedThread(listOf(it), date)
+            val responses = ApiRepository.rescheduleSnoozedThread(listOf(it), date)
+            if (responses.atLeastOneSucceeded()) {
+                refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+            } else {
+                responses.getFirstTranslatedError()?.let { translatedError ->
+                    snackbarManager.postValue(title = appContext.getString(translatedError))
+                }
+            }
         }
     }
 
