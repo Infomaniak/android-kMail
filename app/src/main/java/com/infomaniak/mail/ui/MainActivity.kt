@@ -37,7 +37,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
-import com.infomaniak.core.utils.FORMAT_SCHEDULE_MAIL
+import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.SentryLog
@@ -312,8 +312,9 @@ class MainActivity : BaseActivity() {
                     val scheduleDate = getString(DraftsActionsWorker.SCHEDULED_DRAFT_DATE_KEY)
                     val unscheduleDraftUrl = getString(DraftsActionsWorker.UNSCHEDULE_DRAFT_URL_KEY)
                     if (scheduleDate != null && unscheduleDraftUrl != null) {
+                        val dateFormat = SimpleDateFormat(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR, Locale.getDefault())
                         showScheduledDraftSnackbar(
-                            scheduleDate = SimpleDateFormat(FORMAT_SCHEDULE_MAIL, Locale.getDefault()).parse(scheduleDate)!!,
+                            scheduleDate = dateFormat.parse(scheduleDate)!!,
                             unscheduleDraftUrl = unscheduleDraftUrl,
                         )
                     }
