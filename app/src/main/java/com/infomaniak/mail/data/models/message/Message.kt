@@ -22,6 +22,7 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.data.api.SnoozeUuidSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.*
@@ -120,7 +121,8 @@ class Message : RealmObject {
     @SerialName("snooze_end_date")
     var snoozeEndDate: RealmInstant? = null
     @SerialName("snooze_action")
-    var snoozeAction: String? = null
+    @Serializable(with = SnoozeUuidSerializer::class)
+    var snoozeUuid: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
