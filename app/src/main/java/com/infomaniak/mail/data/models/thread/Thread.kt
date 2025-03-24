@@ -267,7 +267,29 @@ class Thread : RealmObject, Snoozable {
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
         subject = messages.first().subject
-        isLastMessageSnoozed = lastMessage.isSnoozed()
+
+        isLastMessageSnoozed = messages.isLastInboxMessageSnoozed()
+    }
+
+    /**
+     * This method determines whether the last inbox message in the list is snoozed. If there are none, it returns false.
+     *
+     * Instead of querying Realm every time to retrieve the inbox folder ID, we rely on the fact that [Snoozable.isSnoozed] only
+     * returns `true` for messages whose [Message.folderId] matches the inbox folder ID.
+     *
+     * To illustrate the reasoning:
+     * | folderId == inbox | isSnoozed() | Comment                        | Result         |
+     * |-------------------|-------------|--------------------------------|----------------|
+     * | false             | false       | isSnoozed always returns false | false          |
+     * | false             | true        | This situation doesn't exist   | doesn't matter |
+     * |-------------------|-------------|--------------------------------|----------------|
+     * | true              | false       |                                | false          |
+     * | true              | true        |                                | true           |
+     *
+     * => Only returns true when the last message of inbox is snoozed
+     */
+    private fun List<Message>.isLastInboxMessageSnoozed(): Boolean {
+        return lastOrNull { it.folderId == folderId }?.isSnoozed() ?: false
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
