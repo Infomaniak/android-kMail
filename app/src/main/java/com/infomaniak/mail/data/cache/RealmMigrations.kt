@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache
 
+import com.infomaniak.mail.data.api.SnoozeUuidSerializer.lastUuidOrNull
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.DynamicRealmObject
@@ -43,6 +44,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.keepDefaultValuesAfterNineteenthMigration()
     migrationContext.initializedInternalDateAsDateAfterTwentySecondMigration()
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
+    migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthsMigration()
 }
 
 // Migrate to version #1
@@ -151,6 +153,31 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
                     ?: oldObject.getValue<RealmInstant>(fieldName = "internalDate")
 
                 set(propertyName = "displayDate", value = displayDate)
+            }
+        }
+    }
+}
+//endregion
+
+// Migrate from version #25
+private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthsMigration() {
+
+    if (oldRealm.schemaVersion() <= 25L) {
+        enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Initialize new property with old property value
+                val snoozeAction = oldObject.getNullableValue<String>(fieldName = "snoozeAction")
+                val snoozeUuid = snoozeAction?.lastUuidOrNull()
+                set(propertyName = "snoozeUuid", value = snoozeUuid)
+            }
+        }
+
+        enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+                // Initialize new property with old property value
+                val snoozeAction = oldObject.getNullableValue<String>(fieldName = "snoozeAction")
+                val snoozeUuid = snoozeAction?.lastUuidOrNull()
+                set(propertyName = "snoozeUuid", value = snoozeUuid)
             }
         }
     }

@@ -56,7 +56,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         managedMessage.apply {
             snoozeState = null
             snoozeEndDate = null
-            snoozeAction = null
+            snoozeUuid = null
         }
     }
 
