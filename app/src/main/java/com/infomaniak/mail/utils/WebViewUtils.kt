@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
+import android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
 import android.webkit.WebView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.HtmlFormatter.Companion.getCustomDarkMode
@@ -130,12 +131,18 @@ class WebViewUtils(context: Context) {
             jsBridge = JavascriptBridge(onWebViewFinishedLoading = onWebViewFinishedLoading)
         }
 
-        fun WebSettings.setupThreadWebViewSettings() {
+        private fun WebSettings.setupCommonWebViewSettings() {
             @SuppressLint("SetJavaScriptEnabled")
             javaScriptEnabled = true
 
             loadWithOverviewMode = true
             useWideViewPort = true
+
+            cacheMode = LOAD_CACHE_ELSE_NETWORK
+        }
+
+        fun WebSettings.setupThreadWebViewSettings() {
+            setupCommonWebViewSettings()
 
             setSupportZoom(true)
             builtInZoomControls = true
@@ -143,11 +150,7 @@ class WebViewUtils(context: Context) {
         }
 
         fun WebSettings.setupNewMessageWebViewSettings() {
-            @SuppressLint("SetJavaScriptEnabled")
-            javaScriptEnabled = true
-
-            loadWithOverviewMode = true
-            useWideViewPort = true
+            setupCommonWebViewSettings()
         }
 
         fun WebView.toggleWebViewTheme(isThemeTheSame: Boolean) {
