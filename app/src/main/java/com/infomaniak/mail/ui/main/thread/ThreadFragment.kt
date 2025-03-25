@@ -63,7 +63,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
-import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
@@ -170,6 +169,7 @@ class ThreadFragment : Fragment() {
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
+        observeSnoozeHeaderVisibility()
 
         observeThreadOpening()
         observeAutoAdvance()
@@ -446,7 +446,6 @@ class ThreadFragment : Fragment() {
             val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == thread.messages.size
             quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
 
-            threadAlertsLayout.isVisible = thread.isSnoozed()
             thread.snoozeEndDate?.let { snoozeEndDate ->
                 val formattedDate = context.formatDayOfWeekAdaptiveYear(snoozeEndDate.toDate())
                 snoozeAlert.setDescription(getString(R.string.snoozeAlertTitle, formattedDate))
@@ -551,6 +550,12 @@ class ThreadFragment : Fragment() {
     private fun observeCurrentFolderName() {
         twoPaneViewModel.rightPaneFolderName.observe(viewLifecycleOwner) {
             binding.emptyView.title = getString(R.string.noConversationSelected, it)
+        }
+    }
+
+    private fun observeSnoozeHeaderVisibility() {
+        threadViewModel.isThreadSnoozeHeaderVisible.observe(viewLifecycleOwner) {
+            binding.threadAlertsLayout.isVisible = it
         }
     }
 
