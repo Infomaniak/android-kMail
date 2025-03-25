@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,29 +19,34 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SAVE_TO_KDRIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SHARE_LINK_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
@@ -65,6 +70,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
+    @Inject
+    lateinit var localSettings: LocalSettings
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -78,15 +86,25 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setArchiveUi(isFromArchive)
             setFavoriteUi(thread.isFavorite)
             setJunkUi()
+            setSnoozeUi(thread.isSnoozed())
         }
-
-        binding.postpone.isGone = true
 
         getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { result ->
             result?.let { (thread, messageUidToReply) ->
                 setupListeners(thread, messageUidToReply)
             } ?: findNavController().popBackStack()
         }
+    }
+
+    private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
+        fun hasSnoozeFeatureFlag() = mainViewModel.currentMailbox.value?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
+        fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
+
+        val shouldDisplaySnoozeActions = hasSnoozeFeatureFlag() && isConversationMode()
+
+        snooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed.not()
+        modifySnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed
+        cancelSnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed
     }
 
     private fun setJunkUi() = binding.reportJunk.apply {
@@ -161,9 +179,19 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     animatedNavigation(R.id.moveFragment, MoveFragmentArgs(arrayOf(threadUid)).toBundle(), currentClassName)
                 }
 
-                override fun onPostpone() {
-                    trackBottomSheetThreadActionsEvent(ACTION_POSTPONE_NAME)
-                    notYetImplemented()
+                override fun onSnooze() {
+                    trackBottomSheetThreadActionsEvent(ACTION_SNOOZE_NAME)
+                    // TODO: Snooze actions
+                }
+
+                override fun onModifySnooze() {
+                    trackBottomSheetThreadActionsEvent(ACTION_MODIFY_SNOOZE_NAME)
+                    // TODO: Snooze actions
+                }
+
+                override fun onCancelSnooze() {
+                    trackBottomSheetThreadActionsEvent(ACTION_CANCEL_SNOOZE_NAME)
+                    // TODO: Snooze actions
                 }
 
                 override fun onFavorite() {

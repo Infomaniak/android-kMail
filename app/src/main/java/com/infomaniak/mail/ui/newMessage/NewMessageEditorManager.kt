@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         ATTACHMENT("importFile"),
         CAMERA("importFromCamera"),
         LINK("addLink"),
-        CLOCK(MatomoMail.ACTION_POSTPONE_NAME),
+        CLOCK(MatomoMail.ACTION_SNOOZE_NAME),
         AI("aiWriter"),
         BOLD("bold"),
         ITALIC("italic"),

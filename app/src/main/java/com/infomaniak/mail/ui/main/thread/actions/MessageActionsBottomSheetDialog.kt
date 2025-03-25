@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
@@ -44,7 +43,10 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.animatedNavigation
+import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
+import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -147,10 +149,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 )
             }
 
-            override fun onPostpone() {
-                trackBottomSheetMessageActionsEvent(ACTION_POSTPONE_NAME)
-                notYetImplemented()
-            }
+            override fun onSnooze() = Unit
+
+            override fun onModifySnooze() = Unit
+
+            override fun onCancelSnooze() = Unit
 
             override fun onFavorite() {
                 trackBottomSheetMessageActionsEvent(ACTION_FAVORITE_NAME, message.isFavorite)
