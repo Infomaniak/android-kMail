@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
-import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
-import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
-import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
+import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
+import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
+import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
