@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onArchive() = Unit
         override fun onReadUnread() = Unit
         override fun onMove() = Unit
-        override fun onPostpone() = Unit
+        override fun onSnooze() = Unit
+        override fun onModifySnooze() = Unit
+        override fun onCancelSnooze() = Unit
         override fun onFavorite() = Unit
         override fun onReportJunk() = Unit
         override fun onPrint() = Unit
@@ -74,7 +76,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         archive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReadUnread() }
         move.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onMove() }
-        postpone.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPostpone() }
+        snooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSnooze() }
+        modifySnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onModifySnooze() }
+        cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
         favorite.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onFavorite() }
         reportJunk.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportJunk() }
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
@@ -139,7 +143,9 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onArchive()
         fun onReadUnread()
         fun onMove()
-        fun onPostpone()
+        fun onSnooze()
+        fun onModifySnooze()
+        fun onCancelSnooze()
         fun onFavorite()
         fun onReportJunk()
         fun onPrint()

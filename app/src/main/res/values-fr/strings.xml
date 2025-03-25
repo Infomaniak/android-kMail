@@ -21,17 +21,18 @@
     <string name="accentColorSystemTitle">Couleur du système</string>
     <string name="actionArchive">Archiver</string>
     <string name="actionBlockSender">Bloquer l’expéditeur</string>
+    <string name="actionCancelSnooze">Annuler la mise en attente</string>
     <string name="actionDelete">Supprimer</string>
     <string name="actionEditMenu">Modifier le menu</string>
     <string name="actionForward">Transférer</string>
     <string name="actionMarkAsRead">Marquer comme lu</string>
     <string name="actionMarkAsUnread">Marquer comme non lu</string>
+    <string name="actionModifySnooze">Modifier la mise en attente</string>
     <string name="actionMove">Déplacer</string>
     <string name="actionMoveToInbox">Déplacer vers la boîte de réception</string>
     <string name="actionNonSpam">Signaler comme légitime</string>
     <string name="actionOpenIn">Ouvrir dans</string>
     <string name="actionPhishing">Signaler comme hameçonnage</string>
-    <string name="actionPostpone">Reporter</string>
     <string name="actionPrint">Imprimer</string>
     <string name="actionReply">Répondre</string>
     <string name="actionReplyAll">Répondre à tous</string>
@@ -41,6 +42,7 @@
     <string name="actionShortMarkAsUnread">Non lu</string>
     <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Favoris</string>
+    <string name="actionSnooze">Mettre en attente</string>
     <string name="actionSpam">Signaler comme spam</string>
     <string name="actionStar">Ajouter aux favoris</string>
     <string name="actionUnstar">Retirer des favoris</string>
@@ -586,7 +588,6 @@
         <item quantity="many">Conversations déplacées vers %s</item>
     </plurals>
     <string name="snoozeAlertTitle">En attente jusqu’au : %s</string>
-    <string name="snoozeBottomSheetTitle">Mettre en attente</string>
     <string name="snoozedFolder">En attente</string>
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>

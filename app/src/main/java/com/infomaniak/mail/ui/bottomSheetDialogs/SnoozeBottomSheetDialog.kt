@@ -39,7 +39,7 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
     override val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
     override val currentlyScheduledEpochMillis: Long? by lazy { navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L } }
 
-    override val titleRes: Int = R.string.snoozeBottomSheetTitle
+    override val titleRes: Int = R.string.actionSnooze
 
     override fun onLastScheduleOptionClicked() {
         if (lastSelectedEpoch != null) {

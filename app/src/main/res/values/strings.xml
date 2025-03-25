@@ -27,17 +27,18 @@
     <string name="accentColorSystemTitle">System color</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
+    <string name="actionCancelSnooze">Cancel snooze</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
     <string name="actionForward">Forward</string>
     <string name="actionMarkAsRead">Mark as read</string>
     <string name="actionMarkAsUnread">Mark as unread</string>
+    <string name="actionModifySnooze">Modify snooze</string>
     <string name="actionMove">Move</string>
     <string name="actionMoveToInbox">Move to inbox</string>
     <string name="actionNonSpam">Report as not spam</string>
     <string name="actionOpenIn">Open in</string>
     <string name="actionPhishing">Report phishing</string>
-    <string name="actionPostpone">Postpone</string>
     <string name="actionPrint">Print</string>
     <string name="actionReply">Reply</string>
     <string name="actionReplyAll">Reply all</string>
@@ -47,6 +48,7 @@
     <string name="actionShortMarkAsUnread">Unread</string>
     <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Favorites</string>
+    <string name="actionSnooze">Snooze</string>
     <string name="actionSpam">Report spam</string>
     <string name="actionStar">Add to favorites</string>
     <string name="actionUnstar">Delete from favorites</string>
@@ -581,7 +583,6 @@
         <item quantity="other">Conversations moved to %s</item>
     </plurals>
     <string name="snoozeAlertTitle">Snoozed until: %s</string>
-    <string name="snoozeBottomSheetTitle">Snooze</string>
     <string name="snoozedFolder">Snoozed</string>
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>
