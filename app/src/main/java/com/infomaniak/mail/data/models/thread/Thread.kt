@@ -105,7 +105,7 @@ class Thread : RealmObject, Snoozable {
     @Transient
     var numberOfScheduledDrafts: Int = 0
     @Transient
-    var isLastMessageSnoozed: Boolean = false
+    var isLastInboxMessageSnoozed: Boolean = false
     //endregion
 
     @Ignore
@@ -222,7 +222,7 @@ class Thread : RealmObject, Snoozable {
         snoozeState = null
         snoozeEndDate = null
         snoozeUuid = null
-        isLastMessageSnoozed = false
+        isLastInboxMessageSnoozed = false
     }
 
     private fun updateThread(lastMessage: Message) {
@@ -268,7 +268,7 @@ class Thread : RealmObject, Snoozable {
         internalDate = lastMessage.internalDate
         subject = messages.first().subject
 
-        isLastMessageSnoozed = messages.isLastInboxMessageSnoozed()
+        isLastInboxMessageSnoozed = messages.isLastInboxMessageSnoozed()
     }
 
     /**

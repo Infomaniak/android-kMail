@@ -46,7 +46,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.initializedInternalDateAsDateAfterTwentySecondMigration()
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
     migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthsMigration()
-    migrationContext.initIsLastMessageSnoozedAfterTwentySeventhMigration()
+    migrationContext.initisLastInboxMessageSnoozedAfterTwentySeventhMigration()
 }
 
 // Migrate to version #1
@@ -186,7 +186,7 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthsMigra
 //endregion
 
 // Migrate from version #27
-private fun MigrationContext.initIsLastMessageSnoozedAfterTwentySeventhMigration() {
+private fun MigrationContext.initisLastInboxMessageSnoozedAfterTwentySeventhMigration() {
 
     if (oldRealm.schemaVersion() <= 27L) {
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
@@ -203,7 +203,7 @@ private fun MigrationContext.initIsLastMessageSnoozedAfterTwentySeventhMigration
                 val snoozeUuid = lastMessage.getNullableValue<String>("snoozeUuid")
                 val isSnoozed = snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
 
-                newThread.set(propertyName = "isLastMessageSnoozed", value = isSnoozed)
+                newThread.set(propertyName = "isLastInboxMessageSnoozed", value = isSnoozed)
             }
         }
     }

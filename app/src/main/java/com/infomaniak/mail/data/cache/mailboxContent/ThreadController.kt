@@ -321,7 +321,7 @@ class ThreadController @Inject constructor(
 
         fun getSnoozedThreadsWithNewMessage(inboxFolderId: String, realm: Realm): List<Thread> {
             val isInFolder = "${Thread::folderId.name} == $0"
-            val hasNewMessage = "${Thread::isLastMessageSnoozed.name} == false"
+            val hasNewMessage = "${Thread::isLastInboxMessageSnoozed.name} == false"
             return realm.query<Thread>("$isInFolder AND $hasNewMessage AND $isSnoozedState", inboxFolderId).find()
         }
         //endregion
