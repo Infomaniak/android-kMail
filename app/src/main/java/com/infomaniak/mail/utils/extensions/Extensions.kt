@@ -296,6 +296,8 @@ inline fun <reified T> ApiResponse<T>.getApiException(): Exception {
 
 fun List<ApiResponse<*>>.atLeastOneSucceeded(): Boolean = any { it.isSuccess() }
 
+fun List<ApiResponse<*>>.getFirstTranslatedError(): Int? = firstOrNull { it.isSuccess().not() }?.translatedError
+
 fun List<ApiResponse<*>>.allFailed(): Boolean = none { it.isSuccess() }
 //endregion
 

@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
 import com.infomaniak.mail.utils.SharedUtils.Companion.AutomaticUnsnoozeResult
+import com.infomaniak.mail.utils.SharedUtils.Companion.UnsnoozeResult
 import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.utils.extensions.toRealmInstant

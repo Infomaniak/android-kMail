@@ -33,6 +33,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
@@ -81,6 +82,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.SharedUtils.Companion.UnsnoozeResult
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -90,12 +92,14 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
+import com.infomaniak.core.R as RCore
 
 
 @AndroidEntryPoint
@@ -453,7 +457,7 @@ class ThreadFragment : Fragment() {
 
             snoozeAlert.apply {
                 onAction1 { /*TODO*/ }
-                onAction2 { mainViewModel.unsnoozeThreads(listOf(thread)) }
+                onAction2 { unsnoozeThread(thread) }
             }
         }
     }
@@ -767,6 +771,28 @@ class ThreadFragment : Fragment() {
             ).toBundle(),
             currentClassName = ThreadFragment::class.java.name,
         )
+    }
+
+    private fun unsnoozeThread(thread: Thread): Unit = with(binding) {
+        lifecycleScope.launch {
+            snoozeAlert.showAction2Progress()
+
+            val result = mainViewModel.unsnoozeThreads(listOf(thread))
+            snoozeAlert.hideAction2Progress(R.string.buttonCancelReminder)
+
+            when (result) {
+                is UnsnoozeResult.Success -> twoPaneViewModel.closeThread()
+                is UnsnoozeResult.Error -> {
+                    val errorMessageRes = when (result) {
+                        UnsnoozeResult.Error.NoneSucceeded -> RCore.string.anErrorHasOccurred // TODO: Better string
+                        is UnsnoozeResult.Error.ApiError -> result.translatedError
+                        UnsnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
+                    }
+
+                    snackbarManager.postValue(getString(errorMessageRes))
+                }
+            }
+        }
     }
 
     private fun modifyScheduledDraft(message: Message) {
