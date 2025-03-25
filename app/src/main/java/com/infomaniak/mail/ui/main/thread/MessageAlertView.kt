@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.hideProgressCatching
+import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMessageAlertBinding
 
@@ -65,5 +69,21 @@ class MessageAlertView @JvmOverloads constructor(
 
     fun onAction2(listener: OnClickListener) {
         binding.action2.setOnClickListener(listener)
+    }
+
+    fun showAction1Progress() {
+        binding.action1.showProgressCatching(binding.context.getColor(R.color.alertViewButtonColor))
+    }
+
+    fun showAction2Progress() {
+        binding.action2.showProgressCatching(binding.context.getColor(R.color.alertViewButtonColor))
+    }
+
+    fun hideAction1Progress(@StringRes text: Int) {
+        binding.action1.hideProgressCatching(text)
+    }
+
+    fun hideAction2Progress(@StringRes text: Int) {
+        binding.action2.hideProgressCatching(text)
     }
 }
