@@ -229,6 +229,9 @@ class RefreshController @Inject constructor(
     }
 
     private suspend fun Realm.extraRefresh(scope: CoroutineScope, folder: Folder) {
+        // No need to check realm, there can't be any snoozed thread with a new message when there's a single message per thread
+        if (localSettings.threadMode == ThreadMode.MESSAGE) return
+
         val impactedFolderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
         impactedFolderIds.forEach { folderId ->
             scope.ensureActive()
