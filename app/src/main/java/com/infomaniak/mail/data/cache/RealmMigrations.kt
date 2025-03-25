@@ -46,7 +46,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.initializedInternalDateAsDateAfterTwentySecondMigration()
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
     migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthsMigration()
-    migrationContext.initisLastInboxMessageSnoozedAfterTwentySeventhMigration()
+    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration()
 }
 
 // Migrate to version #1
@@ -186,7 +186,7 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthsMigra
 //endregion
 
 // Migrate from version #27
-private fun MigrationContext.initisLastInboxMessageSnoozedAfterTwentySeventhMigration() {
+private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration() {
 
     if (oldRealm.schemaVersion() <= 27L) {
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
