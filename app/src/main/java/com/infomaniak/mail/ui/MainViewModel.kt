@@ -1110,8 +1110,8 @@ class MainViewModel @Inject constructor(
     fun rescheduleSnoozedThread(date: Date, thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
         if (thread.isSnoozed().not()) return@launch
 
-        thread.snoozeAction?.let {
-            val responses = ApiRepository.rescheduleSnoozedThread(listOf(it), date)
+        thread.snoozeUuid?.let {
+            val responses = ApiRepository.rescheduleSnoozedThread(listOf(it), date) // TODO: Use correct api call
             if (responses.atLeastOneSucceeded()) {
                 refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
             } else {
