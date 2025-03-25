@@ -22,6 +22,7 @@ package com.infomaniak.mail.data.models.thread
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.data.api.SnoozeUuidSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshStrategy
@@ -83,7 +84,8 @@ class Thread : RealmObject {
     @SerialName("snooze_end_date")
     var snoozeEndDate: RealmInstant? = null
     @SerialName("snooze_action")
-    var snoozeAction: String? = null
+    @Serializable(with = SnoozeUuidSerializer::class)
+    var snoozeUuid: String? = null
     //endregion
 
     //region Local data (Transient)
@@ -220,7 +222,7 @@ class Thread : RealmObject {
         numberOfScheduledDrafts = 0
         snoozeState = null
         snoozeEndDate = null
-        snoozeAction = null
+        snoozeUuid = null
     }
 
     private fun updateThread(lastMessage: Message) {
@@ -229,7 +231,7 @@ class Thread : RealmObject {
             message.snoozeState?.let {
                 snoozeState = it
                 snoozeEndDate = message.snoozeEndDate
-                snoozeAction = message.snoozeAction
+                snoozeUuid = message.snoozeUuid
             }
         }
 
@@ -315,11 +317,11 @@ class Thread : RealmObject {
     /**
      * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
      * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
-     * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
+     * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeUuid] are not null.
      */
     fun computeThreadListDateDisplay(folderRole: FolderRole?) = when {
         numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
-        snoozeState != null && snoozeEndDate != null && snoozeAction != null -> ThreadListDateDisplay.Snoozed
+        snoozeState != null && snoozeEndDate != null && snoozeUuid != null -> ThreadListDateDisplay.Snoozed
         else -> ThreadListDateDisplay.Default
     }
 

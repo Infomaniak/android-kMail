@@ -266,16 +266,16 @@ class ThreadController @Inject constructor(
         /**
          * Keep the snooze state condition of [Thread.computeThreadListDateDisplay] the same as
          * the condition used in [ThreadController.getThreadsWithSnoozeFilterQuery].
-         * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeAction] are not null.
+         * As in, check that [Thread.snoozeEndDate] and [Thread.snoozeUuid] are not null.
          */
         private fun getThreadsWithSnoozeFilterQuery(
             folderId: String,
             withSnooze: Boolean,
             realm: TypedRealm,
         ): RealmQuery<Thread> {
-            // Checking for snoozeEndDate and snoozeAction on top of _snoozeState mimics the webmail's behavior
+            // Checking for snoozeEndDate and snoozeUuid on top of _snoozeState mimics the webmail's behavior
             // and helps to avoid displaying threads that are in an incoherent state on the API
-            val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeAction != null"
+            val isSnoozedState = "_snoozeState == $1 AND snoozeEndDate != null AND snoozeUuid != null"
             val snoozeQuery = if (withSnooze) isSnoozedState else "NOT($isSnoozedState)"
 
             return realm.query<Thread>("${Thread::folderId.name} == $0 AND $snoozeQuery", folderId, SnoozeState.Snoozed.apiValue)
