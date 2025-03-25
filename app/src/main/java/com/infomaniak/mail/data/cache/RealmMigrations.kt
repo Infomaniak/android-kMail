@@ -196,12 +196,18 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigr
 
                 val messages = newThread.getObjectList(propertyName = "messages")
                 messages.sortBy { it.getValue<RealmInstant>("internalDate") }
-                val lastMessage = messages.last { it.getValue<String>("folderId") == threadFolderId } // TODO: Fix crash if message not found
+                val lastMessage = messages.lastOrNull { it.getValue<String>("folderId") == threadFolderId }
 
-                val snoozeState = lastMessage.getNullableValue<String>("_snoozeState")
-                val snoozeEndDate = lastMessage.getNullableValue<RealmInstant>("snoozeEndDate")
-                val snoozeUuid = lastMessage.getNullableValue<String>("snoozeUuid")
-                val isSnoozed = snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
+                val isSnoozed = if (lastMessage == null) {
+                    // Defaulting to `false` only means that this thread won't be automatically unsnoozed until it's recomputed
+                    false
+                } else {
+                    val snoozeState = lastMessage.getNullableValue<String>("_snoozeState")
+                    val snoozeEndDate = lastMessage.getNullableValue<RealmInstant>("snoozeEndDate")
+                    val snoozeUuid = lastMessage.getNullableValue<String>("snoozeUuid")
+
+                    snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
+                }
 
                 newThread.set(propertyName = "isLastInboxMessageSnoozed", value = isSnoozed)
             }
