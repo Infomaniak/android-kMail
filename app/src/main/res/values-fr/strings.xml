@@ -167,6 +167,7 @@
     <string name="buttonSee">Consulter</string>
     <string name="buttonSelectAll">Tout</string>
     <string name="buttonShare">Partager</string>
+    <string name="buttonSnooze">Rappeler</string>
     <string name="buttonStart">Commencer</string>
     <string name="buttonStartSync">Commencer la synchronisation</string>
     <string name="buttonStrikeThrough">Barrer</string>
@@ -300,11 +301,8 @@
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
     <string name="errorRefusedSender">Le serveur refuse l’expéditeur</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">Vous ne pouvez pas programmer un e-mail dans moins de %d minute</item>
-        <item quantity="other">Vous ne pouvez pas programmer un e-mail dans moins de %d minutes</item>
-        <item quantity="many">Vous ne pouvez pas programmer un e-mail dans moins de %d de minutes</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">Vous ne pouvez pas programmer un e-mail dans moins de %d minutes</string>
+    <string name="errorScheduledSnoozeDelayTooShort">Le délai minimum pour mettre un e-mail en attente est de %d minutes</string>
     <string name="errorSendLimitExceeded">Limite d’envoi atteinte</string>
     <string name="errorSnoozeFailedCancel">Échec de l’annulation</string>
     <string name="errorTooManyRecipients">Trop de destinataires</string>

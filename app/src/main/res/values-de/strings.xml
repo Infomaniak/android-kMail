@@ -165,6 +165,7 @@
     <string name="buttonSee">Siehe</string>
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonShare">Teilen Sie</string>
+    <string name="buttonSnooze">Erinnern</string>
     <string name="buttonStart">Anfangen</string>
     <string name="buttonStartSync">Start der Synchronisierung</string>
     <string name="buttonStrikeThrough">Durchstreichen</string>
@@ -298,10 +299,8 @@
     <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein.</string>
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorRefusedSender">Der Server lehnt den Absender ab</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">Sie können E-Mails frühestens in %d Minute senden</item>
-        <item quantity="other">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</string>
+    <string name="errorScheduledSnoozeDelayTooShort">Die Mindestzeit zum Schlummern einer E-Mail beträgt %d Minuten</string>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
     <string name="errorSnoozeFailedCancel">Abbruch fehlgeschlagen</string>
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>

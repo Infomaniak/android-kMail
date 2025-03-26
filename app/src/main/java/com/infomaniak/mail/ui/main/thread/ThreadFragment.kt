@@ -142,6 +142,9 @@ class ThreadFragment : Fragment() {
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
 
     @Inject
+    lateinit var dateAndTimeSnoozeDialog: SelectDateAndTimeForSnoozeDialog
+
+    @Inject
     lateinit var confirmScheduledDraftModificationDialog: ConfirmScheduledDraftModificationDialog
 
     private var _binding: FragmentThreadBinding? = null
@@ -589,7 +592,7 @@ class ThreadFragment : Fragment() {
         }
 
         getBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER) { _: Boolean ->
-            dateAndTimeScheduleDialog.show(
+            dateAndTimeSnoozeDialog.show(
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
                     threadViewModel.threadLive.value?.let { thread ->
