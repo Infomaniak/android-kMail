@@ -30,11 +30,11 @@ import java.util.Date
 import javax.inject.Inject
 
 @ActivityScoped
-open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
+open class SelectDateAndTimeForSnoozeDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : SelectDateAndTimeDialog(activityContext) {
 
-    override val positiveButtonText: Int = R.string.buttonScheduleTitle
+    override val positiveButtonText: Int = R.string.buttonSnooze
 
     override fun defineCalendarConstraint(): CalendarConstraints.Builder {
         val dateValidators = listOf(
@@ -45,11 +45,11 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
     }
 
     override fun getDelayTooShortErrorMessage(): String = activityContext.getString(
-        R.string.errorScheduleDelayTooShort,
+        R.string.errorScheduledSnoozeDelayTooShort,
         MIN_SELECTABLE_DATE_MINUTES,
     )
 
     companion object {
-        const val MAX_SCHEDULE_DELAY_YEARS = 10
+        const val MAX_SCHEDULE_DELAY_YEARS = 1
     }
 }
