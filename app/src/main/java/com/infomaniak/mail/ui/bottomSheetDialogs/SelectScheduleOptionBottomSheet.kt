@@ -35,14 +35,15 @@ import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.MIN
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
+import java.util.Calendar
 import java.util.Date
-
 
 abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
 
     private var binding: BottomSheetScheduleOptionsBinding by safeBinding()
 
     abstract val lastSelectedEpoch: Long?
+    abstract val currentlyScheduledEpoch: Long?
     abstract val isCurrentMailboxFree: Boolean
 
     @get:StringRes
@@ -76,7 +77,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     private fun computeLastScheduleOption() = with(binding) {
         val lastSelectedDate = lastSelectedEpoch?.let { Date(it) }
 
-        if (lastSelectedDate?.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES) == true) {
+        if (lastSelectedDate?.isAtLeastXMinutesInTheFuture(MIN_SELECTABLE_DATE_MINUTES) == true && lastSelectedDate.isNotAlreadySelected()) {
             lastScheduleOption.isVisible = true
             lastScheduleOption.setDescription(context.dayOfWeekDateWithoutYear(date = lastSelectedDate))
         }
@@ -89,7 +90,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     private fun createCommonScheduleOptions() {
         val currentTime = TimeToDisplay.getTimeToDisplayFromDate()
         ScheduleOption.entries.forEach { scheduleOption ->
-            if (scheduleOption.canBeDisplayedAt(currentTime)) {
+            if (scheduleOption.canBeDisplayedAt(currentTime) && scheduleOption.isNotAlreadySelected()) {
                 binding.scheduleOptions.addView(createScheduleOptionItem(scheduleOption))
             }
         }
@@ -105,6 +106,18 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     private fun setCustomScheduleOptionClickListener() {
         binding.customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
     }
+
+    private fun Date.isNotAlreadySelected(): Boolean = time.truncateToMinute() != currentlyScheduledEpoch?.truncateToMinute()
+
+    private fun Long.truncateToMinute(): Long {
+        return Calendar.getInstance().apply {
+            timeInMillis = this@truncateToMinute
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time.time
+    }
+
+    private fun ScheduleOption.isNotAlreadySelected() = date().isNotAlreadySelected()
 }
 
 enum class TimeToDisplay {

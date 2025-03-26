@@ -87,6 +87,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
+import io.realm.kotlin.types.RealmInstant
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import java.util.Date
@@ -725,8 +726,9 @@ class ThreadFragment : Fragment() {
         )
     }
 
-    private fun rescheduleDraft(draftResource: String) {
+    private fun rescheduleDraft(draftResource: String, currentScheduledDate: RealmInstant?) {
         mainViewModel.draftResource = draftResource
+        mainViewModel.reschedulingCurrentlyScheduledDate = currentScheduledDate
         navigateToScheduleSendBottomSheet()
     }
 
@@ -735,6 +737,7 @@ class ThreadFragment : Fragment() {
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                currentlyScheduledEpoch = mainViewModel.reschedulingCurrentlyScheduledDate?.epochSeconds?.times(1000) ?: 0L,
                 isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
             currentClassName = ThreadFragment::class.java.name,
