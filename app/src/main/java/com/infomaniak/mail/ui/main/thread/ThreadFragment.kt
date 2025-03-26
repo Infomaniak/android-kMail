@@ -725,9 +725,9 @@ class ThreadFragment : Fragment() {
         )
     }
 
-    private fun rescheduleDraft(draftResource: String, currentScheduledDate: Long?) {
+    private fun rescheduleDraft(draftResource: String, currentScheduledEpochMillis: Long?) {
         mainViewModel.draftResource = draftResource
-        threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledDate
+        threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledEpochMillis
         navigateToScheduleSendBottomSheet()
     }
 
