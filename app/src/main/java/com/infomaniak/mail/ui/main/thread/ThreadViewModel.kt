@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmInstant
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
@@ -89,6 +90,9 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
     ).map { it.obj }.asLiveData(ioCoroutineContext)
+
+    // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
+    var reschedulingCurrentlyScheduledDate: RealmInstant? = null
 
     fun reassignThreadLive(threadUid: String) {
         threadLiveJob?.cancel()

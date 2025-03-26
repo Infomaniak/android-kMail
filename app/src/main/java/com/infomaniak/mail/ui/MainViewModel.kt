@@ -250,8 +250,6 @@ class MainViewModel @Inject constructor(
 
     //region Scheduled Draft
     var draftResource: String? = null
-    // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
-    var reschedulingCurrentlyScheduledDate: RealmInstant? = null
     //endregion
 
     //region Share Thread URL
