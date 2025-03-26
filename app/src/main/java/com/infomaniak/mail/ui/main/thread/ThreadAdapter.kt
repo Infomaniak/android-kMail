@@ -68,7 +68,6 @@ import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
-import io.realm.kotlin.types.RealmInstant
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -461,7 +460,7 @@ class ThreadAdapter(
             scheduleAlert.onAction1 {
                 threadAdapterCallbacks?.onRescheduleClicked?.invoke(
                     draftResource,
-                    message.displayDate.takeIf { message.isScheduledDraft },
+                    message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1000),
                 )
             }
         }
@@ -775,7 +774,7 @@ class ThreadAdapter(
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
-        var onRescheduleClicked: ((String, RealmInstant?) -> Unit)? = null,
+        var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
     )
 

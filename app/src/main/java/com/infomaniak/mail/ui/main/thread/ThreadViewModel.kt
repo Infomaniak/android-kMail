@@ -41,7 +41,6 @@ import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.types.RealmInstant
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
@@ -92,7 +91,7 @@ class ThreadViewModel @Inject constructor(
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
-    var reschedulingCurrentlyScheduledDate: RealmInstant? = null
+    var reschedulingCurrentlyScheduledEpoch: Long? = null
 
     fun reassignThreadLive(threadUid: String) {
         threadLiveJob?.cancel()
