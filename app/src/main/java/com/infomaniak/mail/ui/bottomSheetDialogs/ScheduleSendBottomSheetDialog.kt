@@ -34,7 +34,8 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
 
     // Navigation args does not support nullable primitive types, so we use 0L
     // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
-    override val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpoch.takeIf { it != 0L } }
+    override val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
+    override val currentlyScheduledEpochMillis: Long? by lazy { navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L } }
 
     override val titleRes: Int = R.string.scheduleSendingTitle
 

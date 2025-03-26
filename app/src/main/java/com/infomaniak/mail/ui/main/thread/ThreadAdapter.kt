@@ -457,7 +457,12 @@ class ThreadAdapter(
 
     private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
         message.draftResource?.let { draftResource ->
-            scheduleAlert.onAction1 { threadAdapterCallbacks?.onRescheduleClicked?.invoke(draftResource) }
+            scheduleAlert.onAction1 {
+                threadAdapterCallbacks?.onRescheduleClicked?.invoke(
+                    draftResource,
+                    message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1000),
+                )
+            }
         }
 
         scheduleAlert.onAction2 { threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message) }
@@ -769,7 +774,7 @@ class ThreadAdapter(
         var navigateToDownloadProgressDialog: ((Attachment, AttachmentIntentType) -> Unit)? = null,
         var replyToCalendarEvent: ((AttendanceState, Message) -> Unit)? = null,
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
-        var onRescheduleClicked: ((String) -> Unit)? = null,
+        var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
     )
 
