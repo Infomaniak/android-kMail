@@ -43,7 +43,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     private var binding: BottomSheetScheduleOptionsBinding by safeBinding()
 
     abstract val lastSelectedEpoch: Long?
-    abstract val currentlyScheduledEpoch: Long?
+    abstract val currentlyScheduledEpochMillis: Long?
     abstract val isCurrentMailboxFree: Boolean
 
     @get:StringRes
@@ -107,7 +107,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
         binding.customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
     }
 
-    private fun Date.isNotAlreadySelected(): Boolean = time.truncateToMinute() != currentlyScheduledEpoch?.truncateToMinute()
+    private fun Date.isNotAlreadySelected(): Boolean = time.truncateToMinute() != currentlyScheduledEpochMillis?.truncateToMinute()
 
     private fun Long.truncateToMinute(): Long {
         return Calendar.getInstance().apply {

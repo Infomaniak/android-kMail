@@ -88,11 +88,11 @@
         android:label="ScheduleSendBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_schedule_options">
         <argument
-            android:name="lastSelectedScheduleEpoch"
+            android:name="lastSelectedScheduleEpochMillis"
             android:defaultValue="0L"
             app:argType="long" />
         <argument
-            android:name="currentlyScheduledEpoch"
+            android:name="currentlyScheduledEpochMillis"
             android:defaultValue="0L"
             app:argType="long" />
         <argument

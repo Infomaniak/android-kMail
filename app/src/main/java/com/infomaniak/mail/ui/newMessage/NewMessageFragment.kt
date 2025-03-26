@@ -223,7 +223,7 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
-                    localSettings.lastSelectedScheduleEpoch = timestamp
+                    localSettings.lastSelectedScheduleEpochMillis = timestamp
                     scheduleDraft(timestamp)
                 },
                 onAbort = ::navigateToScheduleSendBottomSheet,
@@ -725,7 +725,7 @@ class NewMessageFragment : Fragment() {
         safeNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
-                lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
+                lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
             ).toBundle(),
         )

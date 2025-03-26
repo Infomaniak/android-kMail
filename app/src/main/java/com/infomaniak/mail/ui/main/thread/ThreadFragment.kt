@@ -542,7 +542,7 @@ class ThreadFragment : Fragment() {
         getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
-                    localSettings.lastSelectedScheduleEpoch = timestamp
+                    localSettings.lastSelectedScheduleEpochMillis = timestamp
                     mainViewModel.rescheduleDraft(Date(timestamp))
                 },
                 onAbort = ::navigateToScheduleSendBottomSheet,
@@ -727,7 +727,7 @@ class ThreadFragment : Fragment() {
 
     private fun rescheduleDraft(draftResource: String, currentScheduledDate: Long?) {
         mainViewModel.draftResource = draftResource
-        threadViewModel.reschedulingCurrentlyScheduledEpoch = currentScheduledDate
+        threadViewModel.reschedulingCurrentlyScheduledEpochMillis = currentScheduledDate
         navigateToScheduleSendBottomSheet()
     }
 
@@ -735,8 +735,8 @@ class ThreadFragment : Fragment() {
         safeNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
-                lastSelectedScheduleEpoch = localSettings.lastSelectedScheduleEpoch ?: 0L,
-                currentlyScheduledEpoch = threadViewModel.reschedulingCurrentlyScheduledEpoch ?: 0L,
+                lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
+                currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
                 isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
             currentClassName = ThreadFragment::class.java.name,

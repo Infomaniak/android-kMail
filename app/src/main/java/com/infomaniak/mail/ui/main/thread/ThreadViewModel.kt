@@ -91,7 +91,7 @@ class ThreadViewModel @Inject constructor(
     ).map { it.obj }.asLiveData(ioCoroutineContext)
 
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
-    var reschedulingCurrentlyScheduledEpoch: Long? = null
+    var reschedulingCurrentlyScheduledEpochMillis: Long? = null
 
     fun reassignThreadLive(threadUid: String) {
         threadLiveJob?.cancel()
