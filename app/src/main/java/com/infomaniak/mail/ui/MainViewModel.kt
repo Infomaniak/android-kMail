@@ -65,7 +65,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.types.RealmInstant
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.SentryLevel
