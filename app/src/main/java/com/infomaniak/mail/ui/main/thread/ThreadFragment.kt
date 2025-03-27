@@ -68,6 +68,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.MainViewModel.SnoozeRescheduleResult
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
@@ -596,7 +597,7 @@ class ThreadFragment : Fragment() {
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
                     threadViewModel.threadLive.value?.let { thread ->
-                        mainViewModel.rescheduleSnoozedThread(Date(timestamp), listOf(thread))
+                        rescheduleThread(timestamp, thread)
                     }
                 },
                 onAbort = ::navigateToSnoozeBottomSheet,
@@ -605,7 +606,26 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             threadViewModel.threadLive.value?.let { thread ->
-                mainViewModel.rescheduleSnoozedThread(Date(selectedScheduleEpoch), listOf(thread))
+                rescheduleThread(selectedScheduleEpoch, thread)
+            }
+        }
+    }
+
+    private fun rescheduleThread(timestamp: Long, thread: Thread) {
+        lifecycleScope.launch {
+            binding.snoozeAlert.showAction1Progress()
+
+            val result = mainViewModel.rescheduleSnoozedThread(Date(timestamp), listOf(thread))
+            binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
+
+            if (result is SnoozeRescheduleResult.Error) {
+                val errorMessageRes = when (result) {
+                    SnoozeRescheduleResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
+                    is SnoozeRescheduleResult.Error.ApiError -> result.translatedError
+                    SnoozeRescheduleResult.Error.Unknown -> com.infomaniak.lib.core.R.string.anErrorHasOccurred
+                }
+
+                snackbarManager.postValue(requireContext().getString(errorMessageRes))
             }
         }
     }
