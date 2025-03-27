@@ -20,11 +20,10 @@ package com.infomaniak.mail.ui.main.settings
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.getDashboardData
 import dagger.hilt.android.AndroidEntryPoint
 import com.infomaniak.core.myksuite.R as RMyKSuite
 
@@ -40,13 +39,7 @@ class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
 
         myKSuiteViewModel.refreshMyKSuite()
         myKSuiteViewModel.myKSuiteDataResult.observeNotNull(viewLifecycleOwner) { myKSuiteData ->
-            resetContent(
-                dashboardData = MyKSuiteUiUtils.getDashboardData(
-                    context = requireContext(),
-                    myKSuiteData = myKSuiteData,
-                    avatarUri = AccountUtils.currentUser?.avatar ?: "",
-                ),
-            )
+            resetContent(dashboardData = getDashboardData(myKSuiteData))
         }
     }
 }
