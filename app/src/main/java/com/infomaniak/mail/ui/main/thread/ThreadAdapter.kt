@@ -559,12 +559,12 @@ class ThreadAdapter(
         val spamData = context.getSpamBannerData(spamAction = getSpamBannerAction(message), emailToUnblock = firstExpeditor.email)
 
         if (spamData.spamAction == SpamAction.None) {
-            spam.isVisible = false
+            spamAlert.isVisible = false
         } else {
-            spam.isVisible = true
-            spam.setDescription(spamData.description)
-            spam.setAction1Text(spamData.action)
-            spam.onAction1 { spamActionButton(spamData, message, firstExpeditor) }
+            spamAlert.isVisible = true
+            spamAlert.setDescription(spamData.description)
+            spamAlert.setAction1Text(spamData.action)
+            spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor) }
         }
 
         hideAlertGroupIfNoneDisplayed()
@@ -581,7 +581,7 @@ class ThreadAdapter(
             SpamAction.Unblock -> threadAdapterCallbacks?.unblockMail?.invoke(firstExpeditor.email)
             else -> Unit
         }
-        spam.isVisible = false
+        spamAlert.isVisible = false
     }
     //endregion
 

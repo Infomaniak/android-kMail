@@ -409,7 +409,7 @@
                 tools:visibility="visible" />
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
-                android:id="@+id/spam"
+                android:id="@+id/spamAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
