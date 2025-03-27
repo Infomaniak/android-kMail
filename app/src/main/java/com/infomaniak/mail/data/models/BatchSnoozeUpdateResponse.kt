@@ -20,6 +20,6 @@ package com.infomaniak.mail.data.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-class BatchSnoozeResponse {
-    val cancelled: List<String> = emptyList()
+class BatchSnoozeUpdateResponse {
+    val updated: List<String> = emptyList()
 }

@@ -303,6 +303,7 @@
     <string name="errorScheduledSnoozeDelayTooShort">Die Mindestzeit zum Schlummern einer E-Mail beträgt %d Minuten</string>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
     <string name="errorSnoozeFailedCancel">Abbruch fehlgeschlagen</string>
+    <string name="errorSnoozeFailedModify">Änderung fehlgeschlagen</string>
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>

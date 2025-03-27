@@ -303,6 +303,7 @@
     <string name="errorScheduledSnoozeDelayTooShort">El tiempo mínimo para aplazar un correo electrónico es de %d minutos</string>
     <string name="errorSendLimitExceeded">Límite de envío alcanzado</string>
     <string name="errorSnoozeFailedCancel">Cancelación fallida</string>
+    <string name="errorSnoozeFailedModify">Modificación fallida</string>
     <string name="errorTooManyRecipients">Demasiados destinatarios</string>
     <string name="errorUnableToCreateFolder">No se puede crear la carpeta</string>
     <string name="errorUnableToFlushFolder">Imposible vaciar la carpeta</string>

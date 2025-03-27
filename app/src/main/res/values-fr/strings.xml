@@ -305,6 +305,7 @@
     <string name="errorScheduledSnoozeDelayTooShort">Le délai minimum pour mettre un e-mail en attente est de %d minutes</string>
     <string name="errorSendLimitExceeded">Limite d’envoi atteinte</string>
     <string name="errorSnoozeFailedCancel">Échec de l’annulation</string>
+    <string name="errorSnoozeFailedModify">Échec de la modification</string>
     <string name="errorTooManyRecipients">Trop de destinataires</string>
     <string name="errorUnableToCreateFolder">Impossible de créer le dossier</string>
     <string name="errorUnableToFlushFolder">Impossible de vider le dossier</string>

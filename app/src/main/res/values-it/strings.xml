@@ -303,6 +303,7 @@
     <string name="errorScheduledSnoozeDelayTooShort">Il tempo minimo per posticipare un’email è di %d minuti</string>
     <string name="errorSendLimitExceeded">Limite d’invio raggiunto</string>
     <string name="errorSnoozeFailedCancel">Cancellazione non riuscita</string>
+    <string name="errorSnoozeFailedModify">Modifica non riuscita</string>
     <string name="errorTooManyRecipients">Troppi destinatari</string>
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
