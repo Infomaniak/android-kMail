@@ -309,6 +309,7 @@
     <string name="errorScheduledSnoozeDelayTooShort">The minimum time to snooze an email is %d minutes</string>
     <string name="errorSendLimitExceeded">Sending limit reached</string>
     <string name="errorSnoozeFailedCancel">Failed to cancel</string>
+    <string name="errorSnoozeFailedModify">Failed to modify</string>
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>

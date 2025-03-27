@@ -346,12 +346,16 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
-    fun rescheduleSnoozedThread(snoozeActions: List<String>, newDate: Date): List<ApiResponse<Boolean>> {
-        return batchOver(snoozeActions, limit = 1) { snoozeAction ->
+    fun rescheduleSnoozedThread(
+        mailboxUuid: String,
+        snoozeUuids: List<String>,
+        newDate: Date,
+    ): List<ApiResponse<BatchSnoozeUpdateResponse>> {
+        return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE) {
             callApi(
-                url = ApiRoutes.resource(snoozeAction.single()),
+                url = ApiRoutes.snooze(mailboxUuid),
                 method = PUT,
-                body = mapOf("end_date" to newDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR))
+                body = mapOf("uuids" to it, "end_date" to newDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR))
             )
         }
     }
@@ -360,8 +364,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.snoozeAction(mailboxUuid, snoozeUuid), DELETE)
     }
 
-    fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>): List<ApiResponse<BatchSnoozeResponse>> {
-        return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE_DELETE) {
+    fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>): List<ApiResponse<BatchSnoozeCancelResponse>> {
+        return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE) {
             callApi(ApiRoutes.snooze(mailboxUuid), DELETE, mapOf("uuids" to it))
         }
     }
