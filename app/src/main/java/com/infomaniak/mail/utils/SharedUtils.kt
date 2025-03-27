@@ -32,7 +32,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -244,7 +243,8 @@ class SharedUtils @Inject constructor(
 
             return when {
                 response.isSuccess() -> AutomaticUnsnoozeResult.Success(
-                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(Folder.FolderRole.SNOOZED))
+                    // targetMessage.folderId will never return the folder "snooze". We need to add it manually
+                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(FolderRole.SNOOZED))
                 )
                 response.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
                 else -> AutomaticUnsnoozeResult.OtherError
