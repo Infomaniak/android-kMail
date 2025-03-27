@@ -23,7 +23,8 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.context
+import com.google.android.material.button.MaterialButton
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideProgressCatching
 import com.infomaniak.lib.core.utils.showProgressCatching
@@ -37,6 +38,9 @@ class MessageAlertView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewMessageAlertBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    private val action1LoadingTimer = Utils.createRefreshTimer(onTimerFinish = { binding.action1.showProgress() })
+    private val action2LoadingTimer = Utils.createRefreshTimer(onTimerFinish = { binding.action2.showProgress() })
 
     init {
         attrs?.getAttributes(context, R.styleable.MessageAlertView) {
@@ -72,18 +76,32 @@ class MessageAlertView @JvmOverloads constructor(
     }
 
     fun showAction1Progress() {
-        binding.action1.showProgressCatching(binding.context.getColor(R.color.alertViewButtonColor))
+        binding.action1.isEnabled = false
+        action1LoadingTimer.start()
     }
 
     fun showAction2Progress() {
-        binding.action2.showProgressCatching(binding.context.getColor(R.color.alertViewButtonColor))
+        binding.action2.isEnabled = false
+        action2LoadingTimer.start()
     }
 
     fun hideAction1Progress(@StringRes text: Int) {
-        binding.action1.hideProgressCatching(text)
+        action1LoadingTimer.cancel()
+        binding.action1.apply {
+            hideProgressCatching(text)
+            isEnabled = true
+        }
     }
 
     fun hideAction2Progress(@StringRes text: Int) {
-        binding.action2.hideProgressCatching(text)
+        action2LoadingTimer.cancel()
+        binding.action2.apply {
+            hideProgressCatching(text)
+            isEnabled = true
+        }
     }
+}
+
+private fun MaterialButton.showProgress() {
+    showProgressCatching(context.getColor(R.color.alertViewButtonColor))
 }
