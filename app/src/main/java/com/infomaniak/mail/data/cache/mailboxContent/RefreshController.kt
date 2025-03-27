@@ -233,9 +233,8 @@ class RefreshController @Inject constructor(
         // No need to check realm, there can't be any snoozed thread with a new message when there's a single message per thread
         if (localSettings.threadMode == ThreadMode.MESSAGE) return
 
-        // TODO: This will never return the folder "snooze". Do we need to add it manually?
         val impactedFolderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
-        impactedFolderIds.forEach { folderId ->
+        impactedFolderIds.getFolderIds(realm = this).forEach { folderId ->
             scope.ensureActive()
 
             runCatching {
@@ -246,13 +245,18 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): Set<String> {
+    private fun removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): ImpactedFolders {
         return if (folder.role == FolderRole.INBOX) {
             val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
             val result = SharedUtils.unsnoozeThreadsWithoutRefresh(scope, mailbox, snoozedThreadsWithNewMessage)
-            if (result is UnsnoozeResult.Success) result.impactedFolderUids else emptySet()
+            if (result is UnsnoozeResult.Success) {
+                // result.impactedFolderUids will never return the folder "snooze". We need to add it manually
+                ImpactedFolders(result.impactedFolderUids.toMutableSet(), mutableSetOf(FolderRole.SNOOZED))
+            } else {
+                ImpactedFolders()
+            }
         } else {
-            emptySet()
+            ImpactedFolders()
         }
     }
 
