@@ -784,7 +784,7 @@ class ThreadFragment : Fragment() {
                 is UnsnoozeResult.Success -> twoPaneViewModel.closeThread()
                 is UnsnoozeResult.Error -> {
                     val errorMessageRes = when (result) {
-                        UnsnoozeResult.Error.NoneSucceeded -> RCore.string.anErrorHasOccurred // TODO: Better string
+                        UnsnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
                         is UnsnoozeResult.Error.ApiError -> result.translatedError
                         UnsnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
                     }
