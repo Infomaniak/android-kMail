@@ -397,11 +397,9 @@ class MainViewModel @Inject constructor(
     }
 
     //region Spam
-    fun moveToSpamFolder(threadUid: String, messageUid: String?) = viewModelScope.launch(ioCoroutineContext) {
-        val folderId = folderController.getFolder(FolderRole.SPAM)?.id ?: return@launch
-
-        moveThreadsOrMessageTo(folderId, listOf(threadUid), messageUid)
-        isMovedToSpamFolder.postValue(true)
+    fun moveToSpamFolder(threadUid: String, messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
+        val message = messageController.getMessage(messageUid) ?: return@launch
+        toggleMessageSpamStatus(threadUid, message)
     }
 
     fun activateSpamFilter() = viewModelScope.launch(ioCoroutineContext) {
