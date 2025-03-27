@@ -43,6 +43,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -396,33 +397,59 @@ class MainViewModel @Inject constructor(
     }
 
     //region Spam
-    fun activateSpamFilter() {
-        viewModelScope.launch(ioCoroutineContext) {
-            currentMailbox.value?.let { currentMailbox ->
-                ApiRepository.setSpamFilter(
-                    mailboxHostingId = currentMailbox.hostingId,
-                    mailboxName = currentMailbox.mailboxName,
-                    activateSpamFilter = true,
-                )
+    fun moveToSpamFolder(threadsUid: String, messageUid: String?) = viewModelScope.launch(ioCoroutineContext) {
+        val folderId = folderController.getFolder(FolderRole.SPAM)?.id ?: return@launch
+
+        moveThreadsOrMessageTo(folderId, listOf(threadsUid), messageUid)
+        isMovedToSpamFolder.postValue(true)
+    }
+
+    fun activateSpamFilter() = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value ?: return@launch
+
+        ApiRepository.setSpamFilter(
+            mailboxHostingId = mailbox.hostingId,
+            mailboxName = mailbox.mailboxName,
+            activateSpamFilter = true,
+        )
+    }
+
+    fun unblockMail(email: String) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value ?: return@launch
+
+        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) {
+                val updatedSendersRestrictions = SendersRestrictions().apply {
+                    authorizedSenders = data!!.authorizedSenders
+                    blockedSenders = data!!.blockedSenders.apply {
+                        removeIf { it.email == email }
+                    }
+                }
+                updateBlockedSenders(mailbox, updatedSendersRestrictions)
             }
         }
     }
 
-    fun unblockMail(email: String) {
-        viewModelScope.launch(ioCoroutineContext) {
-            currentMailbox.value?.let {
-                unblockSender(it, email)
+    private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
+        with(ApiRepository.updateBlockedSenders(mailbox.hostingId, mailbox.mailboxName, updatedSendersRestrictions)) {
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.sendersRestrictions = updatedSendersRestrictions
+                }
             }
         }
     }
 
     private fun updateSendersRestrictions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Senders Restrictions")
-        sharedUtils.updateSendersRestrictions(mailbox)
-    }
 
-    private fun unblockSender(mailbox: Mailbox, emailToUnblock: String) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.unblockSender(mailbox, emailToUnblock)
+        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.sendersRestrictions = data
+                }
+            }
+        }
     }
     //endregion
 
@@ -983,16 +1010,6 @@ class MainViewModel @Inject constructor(
 
     fun toggleThreadsSpamStatus(threadsUids: List<String>) {
         toggleThreadsOrMessageSpamStatus(threadsUids = threadsUids)
-    }
-
-    fun moveToSpamFolder(
-        threadsUid: String,
-        messageUid: String?,
-    ) = viewModelScope.launch(ioCoroutineContext) {
-        folderController.getFolder(FolderRole.SPAM)?.id?.let { folderId ->
-            moveThreadsOrMessageTo(folderId, listOf(threadsUid), messageUid)
-            isMovedToSpamFolder.postValue(true)
-        }
     }
 
     private fun toggleThreadsOrMessageSpamStatus(

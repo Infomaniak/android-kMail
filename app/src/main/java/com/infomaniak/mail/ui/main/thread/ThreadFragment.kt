@@ -293,9 +293,7 @@ class ThreadFragment : Fragment() {
                     navigateToDownloadProgressDialog(attachment, attachmentIntentType, ThreadFragment::class.java.name)
                 },
                 moveMessageToSpam = { messageUid ->
-                    twoPaneViewModel.currentThreadUid.value?.let {
-                        mainViewModel.moveToSpamFolder(it, messageUid)
-                    }
+                    twoPaneViewModel.currentThreadUid.value?.let { mainViewModel.moveToSpamFolder(it, messageUid) }
                 },
                 activateSpamFilter = { mainViewModel.activateSpamFilter() },
                 unblockMail = { mailToUnblock -> mainViewModel.unblockMail(mailToUnblock) },
