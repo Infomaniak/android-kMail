@@ -1108,25 +1108,21 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Snooze
-    fun rescheduleSnoozedThread(date: Date, threads: List<Thread>) = viewModelScope.launch(ioCoroutineContext) {
-        val snoozedThreadUuids = threads.mapNotNull { thread -> thread.snoozeUuid.takeIf { thread.isSnoozed() } }
-        if (snoozedThreadUuids.isEmpty()) return@launch
+    suspend fun rescheduleSnoozedThread(date: Date, threads: List<Thread>): SnoozeRescheduleResult {
+        var rescheduleResult: SnoozeRescheduleResult = SnoozeRescheduleResult.Error.Unknown
 
-        val currentMailbox = currentMailbox.value!!
-        val result = rescheduleSnoozedThread(currentMailbox, snoozedThreadUuids, date)
+        viewModelScope.launch(ioCoroutineContext) {
+            val snoozedThreadUuids = threads.mapNotNull { thread -> thread.snoozeUuid.takeIf { thread.isSnoozed() } }
+            if (snoozedThreadUuids.isEmpty()) return@launch
 
-        when (result) {
-            is SnoozeRescheduleResult.Success -> refreshFoldersAsync(currentMailbox, result.impactedFolders)
-            is SnoozeRescheduleResult.Error -> {
-                val errorMessageRes = when (result) {
-                    SnoozeRescheduleResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
-                    is SnoozeRescheduleResult.Error.ApiError -> result.translatedError
-                    SnoozeRescheduleResult.Error.Unknown -> RCore.string.anErrorHasOccurred
-                }
+            val currentMailbox = currentMailbox.value!!
+            val result = rescheduleSnoozedThread(currentMailbox, snoozedThreadUuids, date)
+            if (result is SnoozeRescheduleResult.Success) refreshFoldersAsync(currentMailbox, result.impactedFolders)
 
-                snackbarManager.postValue(appContext.getString(errorMessageRes))
-            }
-        }
+            rescheduleResult = result
+        }.join()
+
+        return rescheduleResult
     }
 
     private fun rescheduleSnoozedThread(currentMailbox: Mailbox, snoozeUuids: List<String>, date: Date): SnoozeRescheduleResult {
