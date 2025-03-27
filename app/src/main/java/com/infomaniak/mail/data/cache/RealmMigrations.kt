@@ -189,7 +189,7 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
 private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration() {
 
     if (oldRealm.schemaVersion() <= 27L) {
-        enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+        enumerate(className = "Thread") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.let { newThread ->
                 // Initialize new property by computing it based on other fields
                 val threadFolderId = newObject.getValue<String>("folderId")
