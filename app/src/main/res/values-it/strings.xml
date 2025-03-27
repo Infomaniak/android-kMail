@@ -303,6 +303,7 @@
         <item quantity="other">Non puoi programmare l’invio di una e-mail tra meno di %d minuti</item>
     </plurals>
     <string name="errorSendLimitExceeded">Limite d’invio raggiunto</string>
+    <string name="errorSnoozeFailedCancel">Cancellazione non riuscita</string>
     <string name="errorTooManyRecipients">Troppi destinatari</string>
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>

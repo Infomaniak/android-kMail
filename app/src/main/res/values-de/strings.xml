@@ -303,6 +303,7 @@
         <item quantity="other">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
     </plurals>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
+    <string name="errorSnoozeFailedCancel">Abbruch fehlgeschlagen</string>
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
