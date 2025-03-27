@@ -258,6 +258,10 @@
             android:defaultValue="0L"
             app:argType="long" />
         <argument
+            android:name="currentlyScheduledEpochMillis"
+            android:defaultValue="0L"
+            app:argType="long" />
+        <argument
             android:name="isCurrentMailboxFree"
             android:defaultValue="true"
             app:argType="boolean" />
