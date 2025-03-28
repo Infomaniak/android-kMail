@@ -344,7 +344,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
-    fun rescheduleSnoozedThread(
+    fun rescheduleSnoozedThreads(
         mailboxUuid: String,
         snoozeUuids: List<String>,
         newDate: Date,

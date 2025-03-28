@@ -621,7 +621,7 @@ class ThreadFragment : Fragment() {
         lifecycleScope.launch {
             binding.snoozeAlert.showAction1Progress()
 
-            val result = mainViewModel.rescheduleSnoozedThread(Date(timestamp), listOf(thread))
+            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), listOf(thread))
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
             when (result) {

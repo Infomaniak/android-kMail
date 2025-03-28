@@ -1108,7 +1108,7 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Snooze
-    suspend fun rescheduleSnoozedThread(date: Date, threads: List<Thread>): BatchSnoozeResult {
+    suspend fun rescheduleSnoozedThreads(date: Date, threads: List<Thread>): BatchSnoozeResult {
         var rescheduleResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
 
         viewModelScope.launch(ioCoroutineContext) {
@@ -1116,7 +1116,7 @@ class MainViewModel @Inject constructor(
             if (snoozedThreadUuids.isEmpty()) return@launch
 
             val currentMailbox = currentMailbox.value!!
-            val result = rescheduleSnoozedThread(currentMailbox, snoozedThreadUuids, date)
+            val result = rescheduleSnoozedThreads(currentMailbox, snoozedThreadUuids, date)
             if (result is BatchSnoozeResult.Success) refreshFoldersAsync(currentMailbox, result.impactedFolders)
 
             rescheduleResult = result
@@ -1125,8 +1125,8 @@ class MainViewModel @Inject constructor(
         return rescheduleResult
     }
 
-    private fun rescheduleSnoozedThread(currentMailbox: Mailbox, snoozeUuids: List<String>, date: Date): BatchSnoozeResult {
-        val responses = ApiRepository.rescheduleSnoozedThread(currentMailbox.uuid, snoozeUuids, date)
+    private fun rescheduleSnoozedThreads(currentMailbox: Mailbox, snoozeUuids: List<String>, date: Date): BatchSnoozeResult {
+        val responses = ApiRepository.rescheduleSnoozedThreads(currentMailbox.uuid, snoozeUuids, date)
         return responses.computeSnoozeResult(ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
     }
 
