@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ object Utils {
     const val MAX_OLD_PAGES_TO_FETCH_TO_GET_ENOUGH_THREADS = 5 // We don't want to spam the API, so we just get a few pages
 
     const val MAX_UIDS_PER_CALL = 1_000 // Beware: the API refuses a MAX_UIDS_PER_CALL bigger than 1000
+    const val MAX_UUIDS_PER_CALL_SNOOZE_DELETE = 100
 
     const val TAG_SEPARATOR = " "
 
