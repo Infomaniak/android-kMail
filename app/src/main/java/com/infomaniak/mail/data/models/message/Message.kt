@@ -124,6 +124,7 @@ class Message : RealmObject {
     @SerialName("snooze_action")
     @Serializable(with = SnoozeUuidSerializer::class)
     var snoozeUuid: String? = null
+    var headers: Headers? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
@@ -131,7 +132,6 @@ class Message : RealmObject {
     private var _acknowledge: String = Acknowledge.NONE.name.lowercase()
     @SerialName("drive_url")
     var driveUrl: String = ""
-    var headers: Headers? = null
     //endregion
 
     //region Local data (Transient)
