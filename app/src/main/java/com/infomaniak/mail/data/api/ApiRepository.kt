@@ -55,6 +55,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
@@ -488,26 +489,24 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = MyKSuiteApiRoutes.myKSuiteData(), method = GET, okHttpClient = okHttpClient)
     }
 
-    fun createAttachments(
+    suspend fun createAttachments(
         attachmentFile: File,
+        attachment: Attachment,
         mailbox: Mailbox,
-        name: String,
-        mimeType: String,
         userApiToken: String,
-        okHttpClient: OkHttpClient,
     ): ApiResponse<Attachment>? {
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
-            .addUnsafeNonAscii("x-ws-attachment-filename", name)
-            .add("x-ws-attachment-mime-type", mimeType)
+            .addUnsafeNonAscii("x-ws-attachment-filename", attachment.name)
+            .add("x-ws-attachment-mime-type", attachment.mimeType)
             .add("x-ws-attachment-disposition", "attachment")
             .build()
         val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
             .headers(headers)
-            .post(attachmentFile.asRequestBody(mimeType.toMediaType()))
+            .post(attachmentFile.asRequestBody(attachment.mimeType.toMediaType()))
             .build()
 
-        val response = okHttpClient.newCall(request).execute()
+        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
 
         return response.body?.string()?.let { ApiController.json.decodeFromString<ApiResponse<Attachment>>(it) }
     }

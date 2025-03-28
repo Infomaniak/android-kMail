@@ -44,7 +44,6 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.S
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
-import java.io.File
 import com.infomaniak.lib.core.R as RCore
 
 object AttachmentExt {
@@ -124,16 +123,18 @@ object AttachmentExt {
     //endregion
 
     suspend fun Attachment.startUpload(draftLocalUuid: String, mailbox: Mailbox, realm: Realm) {
-        val attachmentFile: File = getUploadLocalFile() ?: run {
-            SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
-            throw UploadMissingLocalFileException()
+        val attachmentFile = getUploadLocalFile().let { file ->
+            if (file?.exists() != true) {
+                SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
+                throw UploadMissingLocalFileException()
+            }
+            file
         }
 
         val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return
-        val okHttpClient = AccountUtils.getHttpClient(mailbox.userId)
-        val apiResponse = ApiRepository.createAttachments(attachmentFile, mailbox, name, mimeType, userApiToken, okHttpClient)
+        val apiResponse = ApiRepository.createAttachments(attachmentFile, attachment = this, mailbox, userApiToken)
 
-        if (apiResponse != null && apiResponse.isSuccess() && apiResponse.data != null) {
+        if (apiResponse?.isSuccess() == true && apiResponse.data != null) {
             withContext(NonCancellable) {
                 updateLocalAttachment(draftLocalUuid, apiResponse.data!!, realm)
             }
