@@ -161,11 +161,9 @@
     <string name="buttonReschedule">Reprogramar</string>
     <string name="buttonRestoreEmails">Restaurar correos electrónicos</string>
     <string name="buttonSchedule">Programar un correo electrónico para enviarlo más tarde</string>
-    <string name="buttonScheduleTitle">Programar</string>
     <string name="buttonSee">Véase</string>
     <string name="buttonSelectAll">Todos</string>
     <string name="buttonShare">Compartir</string>
-    <string name="buttonSnooze">Recordar</string>
     <string name="buttonStart">Empezar</string>
     <string name="buttonStartSync">Iniciar sincronización</string>
     <string name="buttonStrikeThrough">Huelga a través de</string>
