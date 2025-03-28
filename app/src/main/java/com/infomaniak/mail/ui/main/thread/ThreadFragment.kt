@@ -71,7 +71,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.MainViewModel.SnoozeRescheduleResult
 import com.infomaniak.mail.ui.alertDialogs.*
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
@@ -89,7 +88,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.PermissionUtils
-import com.infomaniak.mail.utils.SharedUtils.Companion.UnsnoozeResult
+import com.infomaniak.mail.utils.SharedUtils.Companion.BatchSnoozeResult
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -626,12 +625,12 @@ class ThreadFragment : Fragment() {
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
             when (result) {
-                is SnoozeRescheduleResult.Success -> twoPaneViewModel.closeThread()
-                is SnoozeRescheduleResult.Error -> {
+                is BatchSnoozeResult.Success -> twoPaneViewModel.closeThread()
+                is BatchSnoozeResult.Error -> {
                     val errorMessageRes = when (result) {
-                        SnoozeRescheduleResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
-                        is SnoozeRescheduleResult.Error.ApiError -> result.translatedError
-                        SnoozeRescheduleResult.Error.Unknown -> com.infomaniak.lib.core.R.string.anErrorHasOccurred
+                        BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
+                        is BatchSnoozeResult.Error.ApiError -> result.translatedError
+                        BatchSnoozeResult.Error.Unknown -> com.infomaniak.lib.core.R.string.anErrorHasOccurred
                     }
 
                     snackbarManager.postValue(requireContext().getString(errorMessageRes))
@@ -849,12 +848,12 @@ class ThreadFragment : Fragment() {
             snoozeAlert.hideAction2Progress(R.string.buttonCancelReminder)
 
             when (result) {
-                is UnsnoozeResult.Success -> twoPaneViewModel.closeThread()
-                is UnsnoozeResult.Error -> {
+                is BatchSnoozeResult.Success -> twoPaneViewModel.closeThread()
+                is BatchSnoozeResult.Error -> {
                     val errorMessageRes = when (result) {
-                        UnsnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
-                        is UnsnoozeResult.Error.ApiError -> result.translatedError
-                        UnsnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
+                        BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
+                        is BatchSnoozeResult.Error.ApiError -> result.translatedError
+                        BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
                     }
 
                     snackbarManager.postValue(getString(errorMessageRes))
