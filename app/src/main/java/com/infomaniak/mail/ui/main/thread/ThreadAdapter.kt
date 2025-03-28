@@ -512,7 +512,7 @@ class ThreadAdapter(
     private fun getSpamBannerAction(message: Message, firstExpeditor: Recipient?): SpamAction {
 
         fun shouldIgnoreForSpam(isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
-            return !message.isInSpamFolder() && isMessageSpam && isSpamFilterActivated() && isExpeditorAuthorized
+            return isMessageSpam && !message.isInSpamFolder() && isSpamFilterActivated() && isExpeditorAuthorized
         }
 
         fun shouldHideSpamBanner(isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
@@ -534,7 +534,7 @@ class ThreadAdapter(
             isMessageSpam && !message.isInSpamFolder() && isSpamFilterActivated() -> {
                 SpamAction.MoveToSpam
             }
-            isMessageSpam && !message.isInSpamFolder() && !isSpamFilterActivated() && isExpeditorAuthorized -> {
+            isMessageSpam && !message.isInSpamFolder() && !isSpamFilterActivated() && !isExpeditorAuthorized -> {
                 SpamAction.EnableFilter
             }
             !isMessageSpam && message.isInSpamFolder() && isExpeditorBlocked -> {
