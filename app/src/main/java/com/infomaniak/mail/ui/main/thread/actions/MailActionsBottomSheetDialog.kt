@@ -76,7 +76,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         archive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReadUnread() }
         move.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onMove() }
-        snooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSnooze() }
+        snooze.setOnClickListener { onClickListener.onSnooze() }
         modifySnooze.setOnClickListener { onClickListener.onModifySnooze() }
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
         favorite.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onFavorite() }

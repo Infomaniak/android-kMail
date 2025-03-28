@@ -52,6 +52,7 @@ import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -184,12 +185,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onSnooze() {
                     trackBottomSheetThreadActionsEvent(ACTION_SNOOZE_NAME)
-                    // TODO: Snooze actions
+                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze)
                 }
 
                 override fun onModifySnooze() {
                     trackBottomSheetThreadActionsEvent(ACTION_MODIFY_SNOOZE_NAME)
-                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, true)
+                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Modify)
                 }
 
                 override fun onCancelSnooze() {
