@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -188,7 +189,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onModifySnooze() {
                     trackBottomSheetThreadActionsEvent(ACTION_MODIFY_SNOOZE_NAME)
-                    // TODO: Snooze actions
+                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, true)
                 }
 
                 override fun onCancelSnooze() {
@@ -245,5 +246,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //endregion
             },
         )
+    }
+
+    companion object {
+        const val OPEN_SNOOZE_BOTTOM_SHEET = "openSnoozeBottomSheet"
     }
 }
