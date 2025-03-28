@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -52,6 +53,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -191,7 +193,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onCancelSnooze() {
                     trackBottomSheetThreadActionsEvent(ACTION_CANCEL_SNOOZE_NAME)
-                    // TODO: Snooze actions
+                    lifecycleScope.launch { mainViewModel.unsnoozeThreads(listOf(thread)) }
+                    twoPaneViewModel.closeThread()
                 }
 
                 override fun onFavorite() {
