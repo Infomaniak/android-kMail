@@ -43,6 +43,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -331,6 +332,7 @@ class MainViewModel @Inject constructor(
             updateQuotas(mailbox)
             updatePermissions(mailbox)
             updateSignatures(mailbox)
+            updateSendersRestrictions(mailbox)
             updateFeatureFlag(mailbox)
             updateExternalMailInfo(mailbox)
 
@@ -392,6 +394,58 @@ class MainViewModel @Inject constructor(
         SentryLog.d(TAG, "Force refresh Signatures")
         updateSignatures(mailbox, mailboxInfoRealm)
     }
+
+    //region Spam
+    fun moveToSpamFolder(threadUid: String, messageUid: String) = viewModelScope.launch(ioCoroutineContext) {
+        val message = messageController.getMessage(messageUid) ?: return@launch
+        toggleMessageSpamStatus(threadUid, message)
+    }
+
+    fun activateSpamFilter() = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value ?: return@launch
+
+        ApiRepository.setSpamFilter(
+            mailboxHostingId = mailbox.hostingId,
+            mailboxName = mailbox.mailboxName,
+            activateSpamFilter = true,
+        )
+    }
+
+    fun unblockMail(email: String) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value ?: return@launch
+
+        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) {
+                val updatedSendersRestrictions = data!!.apply {
+                    blockedSenders.removeIf { it.email == email }
+                }
+                updateBlockedSenders(mailbox, updatedSendersRestrictions)
+            }
+        }
+    }
+
+    private suspend fun updateBlockedSenders(mailbox: Mailbox, updatedSendersRestrictions: SendersRestrictions) {
+        with(ApiRepository.updateBlockedSenders(mailbox.hostingId, mailbox.mailboxName, updatedSendersRestrictions)) {
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.sendersRestrictions = updatedSendersRestrictions
+                }
+            }
+        }
+    }
+
+    private fun updateSendersRestrictions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+        SentryLog.d(TAG, "Force refresh Senders Restrictions")
+
+        with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.sendersRestrictions = data
+                }
+            }
+        }
+    }
+    //endregion
 
     private fun updateFeatureFlag(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Features flags")

@@ -408,6 +408,16 @@
                 app:icon="@drawable/ic_message_alert_distant_images"
                 tools:visibility="visible" />
 
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/spamAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:action1="@string/moveInSpamButton"
+                app:description="@string/messageIsSpamShouldMoveToSpam"
+                app:icon="@drawable/ic_warning"
+                tools:visibility="visible" />
+
         </LinearLayout>
 
         <com.google.android.material.divider.MaterialDivider

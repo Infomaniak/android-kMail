@@ -39,7 +39,7 @@ class MessageAlertView @JvmOverloads constructor(
             with(binding) {
                 description.text = getString(R.styleable.MessageAlertView_description)
                 icon.setImageDrawable(getDrawable(R.styleable.MessageAlertView_icon))
-                action1.text = getString(R.styleable.MessageAlertView_action1)
+                setAction1Text(getString(R.styleable.MessageAlertView_action1))
 
                 val hasAction2 = hasValue(R.styleable.MessageAlertView_action2)
                 action2.apply {
@@ -53,6 +53,10 @@ class MessageAlertView @JvmOverloads constructor(
 
     fun setDescription(text: String) {
         binding.description.text = text
+    }
+
+    fun setAction1Text(text: String?) {
+        binding.action1.text = text
     }
 
     fun onAction1(listener: OnClickListener) {

@@ -66,9 +66,16 @@ class Mailbox : RealmObject {
     var aliases = realmListOf<String>()
     @SerialName("is_free")
     var isFree: Boolean = false
+    @SerialName("is_spam_filter")
+    var isSpamFiltered: Boolean = false
     //endregion
 
     //region Local data (Transient)
+
+    // ------------- !IMPORTANT! -------------
+    // Every field that is added in this Transient region should be declared in
+    // `initLocalValue()` too to avoid loosing data when updating from the API.
+
     @Transient
     @PrimaryKey
     var objectId: String = ""
@@ -89,6 +96,8 @@ class Mailbox : RealmObject {
     var externalMailFlagEnabled: Boolean = false
     @Transient
     var trustedDomains = realmListOf<String>()
+    @Transient
+    var sendersRestrictions: SendersRestrictions? = null
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -124,6 +133,7 @@ class Mailbox : RealmObject {
         featureFlags: Set<String>?,
         externalMailFlagEnabled: Boolean?,
         trustedDomains: List<String>?,
+        sendersRestrictions: SendersRestrictions?,
     ) {
         this.objectId = createObjectId(userId)
         this.userId = userId
@@ -134,6 +144,7 @@ class Mailbox : RealmObject {
         featureFlags?.let(this._featureFlags::addAll)
         externalMailFlagEnabled?.let { this.externalMailFlagEnabled = it }
         trustedDomains?.let(this.trustedDomains::addAll)
+        sendersRestrictions?.let { this.sendersRestrictions = it }
     }
 
     fun getDefaultSignatureWithFallback(): Signature {

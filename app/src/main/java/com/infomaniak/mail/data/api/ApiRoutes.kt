@@ -90,6 +90,14 @@ object ApiRoutes {
         return "$MAIL_API/api/securedProxy"
     }
 
+    fun mailboxInfo(mailboxHostingId: Int, mailboxName: String): String {
+        return "${securedProxy()}/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName"
+    }
+
+    fun getSendersRestrictions(mailboxHostingId: Int, mailboxName: String): String {
+        return "${mailboxInfo(mailboxHostingId, mailboxName)}?with=authorized_senders,blocked_senders"
+    }
+
     fun externalMailInfo(mailboxHostingId: Int, mailboxName: String): String {
         return "${securedProxy()}/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName/external_mail_flag"
     }

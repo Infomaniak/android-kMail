@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.api.SnoozeUuidSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
@@ -123,6 +124,7 @@ class Message : RealmObject {
     @SerialName("snooze_action")
     @Serializable(with = SnoozeUuidSerializer::class)
     var snoozeUuid: String? = null
+    var headers: Headers? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
@@ -233,6 +235,8 @@ class Message : RealmObject {
 
             return@run correctFolder!!
         }
+
+    fun isInSpamFolder() = folder.role == FolderRole.SPAM
 
     fun computeFolderAndReason(filterFolderId: String): Pair<Folder?, String?> {
 

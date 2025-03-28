@@ -48,7 +48,6 @@ import javax.inject.Inject
 class SharedUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val refreshController: RefreshController,
-    private val threadController: ThreadController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
 ) {

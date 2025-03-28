@@ -266,6 +266,7 @@
     <string name="emptyStateSearchTitle">Keine Ergebnisse</string>
     <string name="emptyStateTrashDescription">Verschieben Sie die Nachrichten in den Papierkorb. Sie werden nach 30 Tagen endgültig gelöscht.</string>
     <string name="emptyStateTrashTitle">Der Papierkorb ist leer</string>
+    <string name="enableFilterButton">Filter einschalten</string>
     <string name="enterPasswordDescription1">Ihr Passwort wurde geändert. Wenn es nicht von Ihnen stammt, wenden Sie sich bitte an Ihren Administrator.</string>
     <string name="enterPasswordDescription2">Bitte geben Sie das neue Passwort für die E-Mail-Adresse %s ein</string>
     <string name="enterPasswordOrDescription">oder</string>
@@ -348,6 +349,9 @@
     <string name="messageForwardHeader">Weitergeleitete Nachricht</string>
     <string name="messageHideQuotedText">Unterhaltung verbergen</string>
     <string name="messageIsDraftOption">Entwurf</string>
+    <string name="messageIsSpamBecauseSenderIsBlocked">Diese Nachricht erscheint im Spam-Ordner, weil %s auf der Liste der blockierten Absender steht.</string>
+    <string name="messageIsSpamShouldActivateFilter">Diese Nachricht wird als Spam betrachtet. Um sicher zu gehen, empfehlen wir Ihnen, Ihren Spam-Filter zu aktivieren.</string>
+    <string name="messageIsSpamShouldMoveToSpam">Diese Nachricht wird als Spam betrachtet. Wir empfehlen Ihnen, sie in den Ordner \"Spam\" zu verschieben.</string>
     <string name="messageReplyHeader">Am %1$s, %2$s schrieb:</string>
     <string name="messageShowQuotedText">Anzeigen der Konversation</string>
     <string name="mondayAfternoon">Montagnachmittag</string>
@@ -355,6 +359,7 @@
     <string name="moreStorageText1">Ihre Mailbox ist voll und Sie können keine weiteren Nachrichten empfangen 🥲</string>
     <string name="moreStorageText2">Sie werden bald in der Lage sein, die Grenzen Ihrer ik.me-E-Mail-Adresse freizugeben (Speicherlimit, Senden, Weiterleiten, …)</string>
     <string name="moreStorageTitle">Ist Ihre Box voll? Holen Sie sich mehr Stauraum!</string>
+    <string name="moveInSpamButton">Einzug von Spam</string>
     <string name="moveSearchFieldPlaceholder">Einen Ordner suchen</string>
     <string name="moveTitle">In welchen Ordner möchten Sie Ihre E-Mails verschieben?</string>
     <plurals name="multipleSelectionCount">
@@ -615,6 +620,7 @@
     <string name="tomorrowMorning">Morgen früh</string>
     <string name="tooManyRecipients">Sie können diese Adresse nicht hinzufügen, da Sie die Höchstzahl an Empfängern erreicht haben</string>
     <string name="trashFolder">Papierkorb</string>
+    <string name="unblockButton">Entsperren</string>
     <string name="unknownRecipientTitle">(unbekannt)</string>
     <string name="urlEntryTitle">Einen Hyperlink erstellen</string>
     <string name="urlPlaceholder">URL</string>
