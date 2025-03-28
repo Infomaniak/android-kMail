@@ -30,7 +30,6 @@ import kotlinx.coroutines.CoroutineScope
 interface RefreshStrategy {
     fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread>
 
-
     /**
      * The list of other folder roles that need to query their threads again when the current folder has its threads queried.
      *

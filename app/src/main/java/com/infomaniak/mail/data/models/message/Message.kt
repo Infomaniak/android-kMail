@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.api.SnoozeUuidSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
@@ -235,7 +236,7 @@ class Message : RealmObject {
             return@run correctFolder!!
         }
 
-    fun isInSpamFolder() = folder.role == Folder.FolderRole.SPAM
+    fun isInSpamFolder() = folder.role == FolderRole.SPAM
 
     fun computeFolderAndReason(filterFolderId: String): Pair<Folder?, String?> {
 

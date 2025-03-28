@@ -296,7 +296,7 @@ class ThreadFragment : Fragment() {
                     twoPaneViewModel.currentThreadUid.value?.let { mainViewModel.moveToSpamFolder(it, messageUid) }
                 },
                 activateSpamFilter = { mainViewModel.activateSpamFilter() },
-                unblockMail = { mailToUnblock -> mainViewModel.unblockMail(mailToUnblock) },
+                unblockMail = mainViewModel::unblockMail,
                 replyToCalendarEvent = { attendanceState, message ->
                     replyToCalendarEvent(
                         attendanceState,

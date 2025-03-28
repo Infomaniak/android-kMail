@@ -159,7 +159,6 @@ object ConditionalIntSerializer : KSerializer<Int?> {
     private fun shouldSerialize(value: Int?): Boolean = value != null
 }
 
-
 object ConditionalStringSerializer : KSerializer<String?> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ConditionalStringField", PrimitiveKind.STRING)
 
