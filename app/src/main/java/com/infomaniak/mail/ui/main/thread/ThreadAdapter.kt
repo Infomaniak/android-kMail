@@ -481,6 +481,7 @@ class ThreadAdapter(
             reloadVisibleWebView()
 
             distantImagesAlert.isGone = true
+            hideAlertGroupIfNoneDisplayed()
         }
     }
 
@@ -582,6 +583,7 @@ class ThreadAdapter(
             else -> Unit
         }
         spamAlert.isVisible = false
+        hideAlertGroupIfNoneDisplayed()
     }
     //endregion
 
