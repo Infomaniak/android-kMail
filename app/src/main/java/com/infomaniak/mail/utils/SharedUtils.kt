@@ -227,7 +227,7 @@ class SharedUtils @Inject constructor(
 
             if (snoozeUuids.isEmpty()) return emptySet()
 
-            val apiResponses = ApiRepository.unsnoozeMessages(mailbox.uuid, snoozeUuids)
+            val apiResponses = ApiRepository.unsnoozeThreads(mailbox.uuid, snoozeUuids)
             scope.ensureActive()
 
             return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
