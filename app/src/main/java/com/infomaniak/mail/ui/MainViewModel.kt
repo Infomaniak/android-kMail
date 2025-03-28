@@ -109,7 +109,6 @@ class MainViewModel @Inject constructor(
 
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
-    val isMovedToSpamFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
     val deleteThreadOrMessageTrigger = SingleLiveEvent<Unit>()
