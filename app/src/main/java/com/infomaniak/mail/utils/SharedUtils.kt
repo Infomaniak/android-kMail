@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -32,11 +31,12 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.BatchSnoozeResponse.Companion.computeSnoozeResult
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.computeSnoozeResult
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
@@ -279,15 +279,6 @@ class SharedUtils @Inject constructor(
             scope?.ensureActive()
 
             return apiResponses.computeSnoozeResult(ImpactedFolders(impactedFolderIds))
-        }
-
-        sealed interface BatchSnoozeResult {
-            data class Success(val impactedFolders: ImpactedFolders) : BatchSnoozeResult
-            sealed interface Error : BatchSnoozeResult {
-                data object NoneSucceeded : Error
-                data class ApiError(@StringRes val translatedError: Int) : Error
-                data object Unknown : Error
-            }
         }
 
         sealed interface AutomaticUnsnoozeResult {
