@@ -416,11 +416,8 @@ class MainViewModel @Inject constructor(
 
         with(ApiRepository.getSendersRestrictions(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) {
-                val updatedSendersRestrictions = SendersRestrictions().apply {
-                    authorizedSenders = data!!.authorizedSenders
-                    blockedSenders = data!!.blockedSenders.apply {
-                        removeIf { it.email == email }
-                    }
+                val updatedSendersRestrictions = data!!.apply {
+                    blockedSenders.removeIf { it.email == email }
                 }
                 updateBlockedSenders(mailbox, updatedSendersRestrictions)
             }
