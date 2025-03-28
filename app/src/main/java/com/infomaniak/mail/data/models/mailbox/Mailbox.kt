@@ -128,6 +128,7 @@ class Mailbox : RealmObject {
         featureFlags: Set<String>?,
         externalMailFlagEnabled: Boolean?,
         trustedDomains: List<String>?,
+        sendersRestrictions: SendersRestrictions?,
     ) {
         this.objectId = createObjectId(userId)
         this.userId = userId
@@ -138,6 +139,7 @@ class Mailbox : RealmObject {
         featureFlags?.let(this._featureFlags::addAll)
         externalMailFlagEnabled?.let { this.externalMailFlagEnabled = it }
         trustedDomains?.let(this.trustedDomains::addAll)
+        sendersRestrictions?.let { this.sendersRestrictions = it }
     }
 
     fun getDefaultSignatureWithFallback(): Signature {

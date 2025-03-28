@@ -116,6 +116,7 @@ class MailboxController @Inject constructor(
                     featureFlags = localMailbox?._featureFlags,
                     externalMailFlagEnabled = localMailbox?.externalMailFlagEnabled,
                     trustedDomains = localMailbox?.trustedDomains,
+                    sendersRestrictions = localMailbox?.sendersRestrictions,
                 )
                 copyToRealm(remoteMailbox, UpdatePolicy.ALL)
 
