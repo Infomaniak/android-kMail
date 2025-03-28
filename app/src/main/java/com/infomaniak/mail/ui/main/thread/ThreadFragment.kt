@@ -604,7 +604,7 @@ class ThreadFragment : Fragment() {
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
                     threadViewModel.threadLive.value?.let { thread ->
-                        rescheduleThread(timestamp, thread)
+                        rescheduleSnoozedThread(timestamp, thread)
                     }
                 },
                 onAbort = ::navigateToSnoozeBottomSheet,
@@ -613,12 +613,12 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             threadViewModel.threadLive.value?.let { thread ->
-                rescheduleThread(selectedScheduleEpoch, thread)
+                rescheduleSnoozedThread(selectedScheduleEpoch, thread)
             }
         }
     }
 
-    private fun rescheduleThread(timestamp: Long, thread: Thread) {
+    private fun rescheduleSnoozedThread(timestamp: Long, thread: Thread) {
         lifecycleScope.launch {
             binding.snoozeAlert.showAction1Progress()
 
