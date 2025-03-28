@@ -17,9 +17,11 @@
  */
 package com.infomaniak.mail.data.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class BatchSnoozeCancelResponse {
-    val cancelled: List<String> = emptyList()
+class BatchSnoozeUpdateResponse : BatchSnoozeResponse {
+    @SerialName("updated")
+    override val processedUuids: List<String> = emptyList()
 }
