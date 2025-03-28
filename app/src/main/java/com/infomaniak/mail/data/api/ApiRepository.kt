@@ -59,10 +59,13 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.Response
+import java.io.File
 import java.util.Date
 import com.infomaniak.core.myksuite.ui.network.ApiRoutes as MyKSuiteApiRoutes
 
@@ -483,6 +486,30 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
         return callApi(url = MyKSuiteApiRoutes.myKSuiteData(), method = GET, okHttpClient = okHttpClient)
+    }
+
+    fun createAttachments(
+        attachmentFile: File,
+        mailbox: Mailbox,
+        name: String,
+        mimeType: String,
+        userApiToken: String,
+        okHttpClient: OkHttpClient,
+    ): ApiResponse<Attachment>? {
+        val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
+            .set("Authorization", "Bearer $userApiToken")
+            .addUnsafeNonAscii("x-ws-attachment-filename", name)
+            .add("x-ws-attachment-mime-type", mimeType)
+            .add("x-ws-attachment-disposition", "attachment")
+            .build()
+        val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
+            .headers(headers)
+            .post(attachmentFile.asRequestBody(mimeType.toMediaType()))
+            .build()
+
+        val response = okHttpClient.newCall(request).execute()
+
+        return response.body?.string()?.let { ApiController.json.decodeFromString<ApiResponse<Attachment>>(it) }
     }
 
     /**

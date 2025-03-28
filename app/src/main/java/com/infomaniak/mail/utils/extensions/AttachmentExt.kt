@@ -24,13 +24,10 @@ import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.core.extensions.goToPlayStore
-import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -47,9 +44,7 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.S
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 import com.infomaniak.lib.core.R as RCore
 
 object AttachmentExt {
@@ -129,42 +124,29 @@ object AttachmentExt {
     //endregion
 
     suspend fun Attachment.startUpload(draftLocalUuid: String, mailbox: Mailbox, realm: Realm) {
-        val attachmentFile = getUploadLocalFile().also {
-            if (it?.exists() != true) {
-                SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
-                throw UploadMissingLocalFileException()
-            }
+        val attachmentFile: File = getUploadLocalFile() ?: run {
+            SentryLog.d(ATTACHMENT_TAG, "No local file for attachment $name")
+            throw UploadMissingLocalFileException()
         }
 
         val userApiToken = AccountUtils.getUserById(mailbox.userId)?.apiToken?.accessToken ?: return
-        val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
-            .set("Authorization", "Bearer $userApiToken")
-            .addUnsafeNonAscii("x-ws-attachment-filename", name)
-            .add("x-ws-attachment-mime-type", mimeType)
-            .add("x-ws-attachment-disposition", "attachment")
-            .build()
-        val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
-            .headers(headers)
-            .post(attachmentFile!!.asRequestBody(mimeType.toMediaType()))
-            .build()
+        val okHttpClient = AccountUtils.getHttpClient(mailbox.userId)
+        val apiResponse = ApiRepository.createAttachments(attachmentFile, mailbox, name, mimeType, userApiToken, okHttpClient)
 
-        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
-
-        val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
-        if (apiResponse.isSuccess() && apiResponse.data != null) {
+        if (apiResponse != null && apiResponse.isSuccess() && apiResponse.data != null) {
             withContext(NonCancellable) {
                 updateLocalAttachment(draftLocalUuid, apiResponse.data!!, realm)
             }
         } else {
             val baseMessage = "Upload failed for attachment $localUuid"
-            val errorMessage = "error : ${apiResponse.translatedError}"
+            val errorMessage = "error : ${apiResponse?.translatedError}"
             SentryLog.i(
                 tag = ATTACHMENT_TAG,
-                msg = "$baseMessage - $errorMessage - data : ${apiResponse.data}",
-                throwable = apiResponse.getApiException(),
+                msg = "$baseMessage - $errorMessage - data : ${apiResponse?.data}",
+                throwable = apiResponse?.getApiException(),
             )
 
-            apiResponse.throwErrorAsException()
+            apiResponse?.throwErrorAsException()
         }
     }
 
