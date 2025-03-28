@@ -34,7 +34,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
-import com.infomaniak.mail.utils.SharedUtils.Companion.UnsnoozeResult
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.utils.extensions.toRealmInstant
@@ -249,9 +249,10 @@ class RefreshController @Inject constructor(
         return if (folder.role == FolderRole.INBOX) {
             val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
             val result = SharedUtils.unsnoozeThreadsWithoutRefresh(scope, mailbox, snoozedThreadsWithNewMessage)
-            if (result is UnsnoozeResult.Success) {
-                // result.impactedFolderUids will never return the folder "snooze". We need to add it manually
-                ImpactedFolders(result.impactedFolderUids.toMutableSet(), mutableSetOf(FolderRole.SNOOZED))
+            if (result is BatchSnoozeResult.Success) {
+                // result.impactedFolders will never return the folder "snooze". We need to add it manually
+                result.impactedFolders += FolderRole.SNOOZED
+                result.impactedFolders
             } else {
                 ImpactedFolders()
             }
