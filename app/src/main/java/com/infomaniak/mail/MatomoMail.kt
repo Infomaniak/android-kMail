@@ -68,6 +68,8 @@ object MatomoMail : MatomoCore {
     const val SWITCH_MAILBOX_NAME = "switchMailbox"
     const val LAST_SELECTED_SCHEDULE = "lastSelectedSchedule"
     const val SCHEDULED_CUSTOM_DATE = "scheduledCustomDate"
+    const val MODIFY_SCHEDULE_FROM_HEADER = "modifyScheduleFromHeader"
+    const val CANCEL_SCHEDULE_FROM_HEADER = "cancelScheduleFromHeader"
     //endregion
 
     @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build
@@ -282,6 +284,10 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackScheduleSendEvent(name: String) {
+        trackEvent("scheduleSend", name)
+    }
+
+    fun Context.trackScheduleSendEvent(name: String) {
         trackEvent("scheduleSend", name)
     }
 
