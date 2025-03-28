@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.snooze
 
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
-import com.infomaniak.mail.utils.SharedUtils.Companion.BatchSnoozeResult
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 
 interface BatchSnoozeResponse {
