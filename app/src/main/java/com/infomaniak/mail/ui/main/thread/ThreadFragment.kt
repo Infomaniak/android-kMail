@@ -68,6 +68,7 @@ import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -88,7 +89,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.PermissionUtils
-import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -467,7 +467,6 @@ class ThreadFragment : Fragment() {
             snoozeAlert.apply {
                 onAction1 {
                     trackSnoozeEvent(MODIFY_SCHEDULE_FROM_HEADER)
-                    threadViewModel.reschedulingCurrentlySnoozedEpochMillis = thread.snoozeEndDate?.epochSeconds?.times(1000)
                     navigateToSnoozeBottomSheet()
                 }
                 onAction2 {
@@ -833,7 +832,7 @@ class ThreadFragment : Fragment() {
             resId = R.id.snoozeBottomSheetDialog,
             args = SnoozeBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
-                currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlySnoozedEpochMillis ?: 0L,
+                currentlyScheduledEpochMillis = threadViewModel.threadLive.value?.snoozeEndDate?.epochSeconds?.times(1000) ?: 0L,
                 isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
             currentClassName = ThreadFragment::class.java.name,
