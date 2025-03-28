@@ -1109,6 +1109,25 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Snooze
+    fun snoozeThreads(date: Date, threads: List<Thread>) = viewModelScope.launch {
+        currentMailbox.value?.let { currentMailbox ->
+            val messageUids = threads.mapNotNull { thread ->
+                thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
+            }
+
+            val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
+
+            if (responses.atLeastOneSucceeded()) {
+                // Snoozing threads requires to refresh the snooze folder. It's the only folder that will update the snooze state
+                // of any message.
+                refreshFoldersAsync(currentMailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+            } else {
+                val errorMessageRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
+                snackbarManager.postValue(appContext.getString(errorMessageRes))
+            }
+        }
+    }
+
     suspend fun rescheduleSnoozedThreads(date: Date, threads: List<Thread>): BatchSnoozeResult {
         var rescheduleResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
 

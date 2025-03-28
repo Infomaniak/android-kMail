@@ -348,6 +348,16 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
+    fun snoozeMessages(mailboxUuid: String, messageUids: List<String>, date: Date): List<ApiResponse<Unit>> {
+        return batchOver(messageUids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE_POST) {
+            callApi(
+                url = ApiRoutes.snooze(mailboxUuid),
+                method = POST,
+                body = mapOf("uids" to it, "end_date" to date.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)),
+            )
+        }
+    }
+
     fun rescheduleSnoozedThreads(
         mailboxUuid: String,
         snoozeUuids: List<String>,
