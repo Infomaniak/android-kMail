@@ -493,9 +493,9 @@ class ThreadAdapter(
     private data class SpamData(val spamAction: SpamAction, val description: String = "", val action: String = "")
 
     private fun MessageViewHolder.bindSpam(message: Message) = with(binding) {
-        val firstExpeditor = message.from.first()
+        val firstExpeditor = message.from.firstOrNull()
         val spamAction = getSpamBannerAction(message, firstExpeditor)
-        val spamData = context.getSpamBannerData(spamAction = spamAction, emailToUnblock = firstExpeditor.email)
+        val spamData = context.getSpamBannerData(spamAction = spamAction, emailToUnblock = firstExpeditor?.email)
 
         if (spamData.spamAction == SpamAction.None) {
             spamAlert.isVisible = false
@@ -503,20 +503,20 @@ class ThreadAdapter(
             spamAlert.isVisible = true
             spamAlert.setDescription(spamData.description)
             spamAlert.setAction1Text(spamData.action)
-            spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor) }
+            spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor!!) }
         }
 
         hideAlertGroupIfNoneDisplayed()
     }
 
-    private fun getSpamBannerAction(message: Message, firstExpeditor: Recipient): SpamAction {
+    private fun getSpamBannerAction(message: Message, firstExpeditor: Recipient?): SpamAction {
 
-        fun Message.shouldIgnoreForSpam(isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
-            return !isInSpamFolder() && isMessageSpam && isSpamFilterActivated() && isExpeditorAuthorized
+        fun shouldIgnoreForSpam(isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
+            return !message.isInSpamFolder() && isMessageSpam && isSpamFilterActivated() && isExpeditorAuthorized
         }
 
-        fun shouldHideSpamBanner(message: Message, isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
-            return message.from.size > 1 || message.shouldIgnoreForSpam(isMessageSpam, isExpeditorAuthorized)
+        fun shouldHideSpamBanner(isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
+            return firstExpeditor == null || message.from.size > 1 || shouldIgnoreForSpam(isMessageSpam, isExpeditorAuthorized)
         }
 
         fun Recipient.getExpeditorIn(restrictedSenders: List<SenderDetails>?): String? {
@@ -524,11 +524,11 @@ class ThreadAdapter(
         }
 
         val isMessageSpam = message.headers?.isSpam ?: false
-        val isExpeditorBlocked = firstExpeditor.getExpeditorIn(senderRestrictions()?.blockedSenders) != null
-        val isExpeditorAuthorized = firstExpeditor.getExpeditorIn(senderRestrictions()?.authorizedSenders) != null
+        val isExpeditorBlocked = firstExpeditor?.getExpeditorIn(senderRestrictions()?.blockedSenders) != null
+        val isExpeditorAuthorized = firstExpeditor?.getExpeditorIn(senderRestrictions()?.authorizedSenders) != null
 
         return when {
-            shouldHideSpamBanner(message, isMessageSpam, isExpeditorAuthorized) -> {
+            shouldHideSpamBanner(isMessageSpam, isExpeditorAuthorized) -> {
                 SpamAction.None
             }
             isMessageSpam && !message.isInSpamFolder() && isSpamFilterActivated() -> {
