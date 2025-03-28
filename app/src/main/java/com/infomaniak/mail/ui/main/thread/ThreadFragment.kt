@@ -618,14 +618,17 @@ class ThreadFragment : Fragment() {
             val result = mainViewModel.rescheduleSnoozedThread(Date(timestamp), listOf(thread))
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
-            if (result is SnoozeRescheduleResult.Error) {
-                val errorMessageRes = when (result) {
-                    SnoozeRescheduleResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
-                    is SnoozeRescheduleResult.Error.ApiError -> result.translatedError
-                    SnoozeRescheduleResult.Error.Unknown -> com.infomaniak.lib.core.R.string.anErrorHasOccurred
-                }
+            when (result) {
+                is SnoozeRescheduleResult.Success -> twoPaneViewModel.closeThread()
+                is SnoozeRescheduleResult.Error -> {
+                    val errorMessageRes = when (result) {
+                        SnoozeRescheduleResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
+                        is SnoozeRescheduleResult.Error.ApiError -> result.translatedError
+                        SnoozeRescheduleResult.Error.Unknown -> com.infomaniak.lib.core.R.string.anErrorHasOccurred
+                    }
 
-                snackbarManager.postValue(requireContext().getString(errorMessageRes))
+                    snackbarManager.postValue(requireContext().getString(errorMessageRes))
+                }
             }
         }
     }
