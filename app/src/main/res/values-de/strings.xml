@@ -161,11 +161,9 @@
     <string name="buttonReschedule">Neu planen</string>
     <string name="buttonRestoreEmails">E-Mails wiederherstellen</string>
     <string name="buttonSchedule">Planen Sie den Versand von E-Mails für einen späteren Zeitpunkt</string>
-    <string name="buttonScheduleTitle">Programmieren</string>
     <string name="buttonSee">Siehe</string>
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonShare">Teilen Sie</string>
-    <string name="buttonSnooze">Erinnern</string>
     <string name="buttonStart">Anfangen</string>
     <string name="buttonStartSync">Start der Synchronisierung</string>
     <string name="buttonStrikeThrough">Durchstreichen</string>

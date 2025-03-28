@@ -167,11 +167,9 @@
     <string name="buttonReschedule">Reschedule</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
-    <string name="buttonScheduleTitle">Schedule</string>
     <string name="buttonSee">See</string>
     <string name="buttonSelectAll">All</string>
     <string name="buttonShare">Share</string>
-    <string name="buttonSnooze">Snooze</string>
     <string name="buttonStart">Start</string>
     <string name="buttonStartSync">Start synchronization</string>
     <string name="buttonStrikeThrough">Strike through</string>

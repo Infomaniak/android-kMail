@@ -34,7 +34,7 @@ open class SelectDateAndTimeForScheduledDraftDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : SelectDateAndTimeDialog(activityContext) {
 
-    override val positiveButtonText: Int = R.string.buttonScheduleTitle
+    override val positiveButtonText: Int = R.string.buttonConfirm
 
     override fun defineCalendarConstraint(): CalendarConstraints.Builder {
         val dateValidators = listOf(
