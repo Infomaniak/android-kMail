@@ -79,10 +79,10 @@ import java.util.Date
 import com.google.android.material.R as RMaterial
 
 class ThreadAdapter(
-    private val isSpamFilterActivated: () -> Boolean = { false },
-    private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
+    private val isSpamFilterActivated: () -> Boolean = { false },
+    private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
@@ -465,7 +465,7 @@ class ThreadAdapter(
             scheduleAlert.onAction1 {
                 threadAdapterCallbacks?.onRescheduleClicked?.invoke(
                     draftResource,
-                    message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1000),
+                    message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
                 )
             }
         }
@@ -486,41 +486,41 @@ class ThreadAdapter(
 
     //region Spam
     private enum class SpamAction {
-        MoveToSpam, EnableFilter, Unblock, None
+        MoveToSpam, EnableFilter, Unblock, None,
     }
 
     private data class SpamData(val spamAction: SpamAction, val description: String = "", val action: String = "")
 
-    private fun Context.getSpamBannerData(spamAction: SpamAction, emailToUnblock: String? = null): SpamData {
-        return when (spamAction) {
-            SpamAction.MoveToSpam -> {
-                SpamData(
-                    spamAction = spamAction,
-                    description = getString(R.string.messageIsSpamShouldMoveToSpam),
-                    action = getString(R.string.moveInSpamButton)
-                )
-            }
-            SpamAction.EnableFilter -> {
-                SpamData(
-                    spamAction = spamAction,
-                    description = getString(R.string.messageIsSpamShouldActivateFilter),
-                    action = getString(R.string.enableFilterButton)
-                )
-            }
-            SpamAction.Unblock -> {
-                SpamData(
-                    spamAction = spamAction,
-                    description = getString(R.string.messageIsSpamBecauseSenderIsBlocked, emailToUnblock),
-                    action = getString(R.string.unblockButton)
-                )
-            }
-            SpamAction.None -> {
-                SpamData(spamAction = spamAction)
-            }
+    private fun MessageViewHolder.bindSpam(message: Message) = with(binding) {
+        val firstExpeditor = message.from.first()
+        val spamData = context.getSpamBannerData(spamAction = getSpamBannerAction(message), emailToUnblock = firstExpeditor.email)
+
+        if (spamData.spamAction == SpamAction.None) {
+            spamAlert.isVisible = false
+        } else {
+            spamAlert.isVisible = true
+            spamAlert.setDescription(spamData.description)
+            spamAlert.setAction1Text(spamData.action)
+            spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor) }
         }
+
+        hideAlertGroupIfNoneDisplayed()
     }
 
     private fun getSpamBannerAction(message: Message): SpamAction {
+
+        fun Message.shouldIgnoreForSpam(isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
+            return !isInSpamFolder() && isMessageSpam && isSpamFilterActivated() && isExpeditorAuthorized
+        }
+
+        fun shouldHideSpamBanner(message: Message, isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
+            return message.from.size > 1 || message.shouldIgnoreForSpam(isMessageSpam, isExpeditorAuthorized)
+        }
+
+        fun Recipient.getExpeditorIn(restrictedSenders: List<SenderDetails>?): String? {
+            return restrictedSenders?.firstOrNull { email == it.email }?.email
+        }
+
         val isMessageSpam = message.headers?.isSpam ?: false
         val firstExpeditor = message.from.first()
         val isExpeditorBlocked = firstExpeditor.getExpeditorIn(senderRestrictions()?.blockedSenders) != null
@@ -539,42 +539,42 @@ class ThreadAdapter(
             !isMessageSpam && message.isInSpamFolder() && isExpeditorBlocked -> {
                 SpamAction.Unblock
             }
-            else -> SpamAction.None
+            else -> {
+                SpamAction.None
+            }
         }
     }
 
-    private fun shouldHideSpamBanner(message: Message, isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
-        return message.from.size > 1 || message.shouldIgnoreForSpam(isMessageSpam, isExpeditorAuthorized)
-    }
-
-    private fun Message.shouldIgnoreForSpam(
-        isMessageSpam: Boolean,
-        isExpeditorAuthorized: Boolean,
-    ): Boolean {
-        return !isInSpamFolder() && isMessageSpam && isSpamFilterActivated() && isExpeditorAuthorized
-    }
-
-    private fun MessageViewHolder.bindSpam(message: Message) = with(binding) {
-        val firstExpeditor = message.from.first()
-        val spamData = context.getSpamBannerData(spamAction = getSpamBannerAction(message), emailToUnblock = firstExpeditor.email)
-
-        if (spamData.spamAction == SpamAction.None) {
-            spamAlert.isVisible = false
-        } else {
-            spamAlert.isVisible = true
-            spamAlert.setDescription(spamData.description)
-            spamAlert.setAction1Text(spamData.action)
-            spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor) }
+    private fun Context.getSpamBannerData(spamAction: SpamAction, emailToUnblock: String? = null): SpamData {
+        return when (spamAction) {
+            SpamAction.MoveToSpam -> {
+                SpamData(
+                    spamAction = spamAction,
+                    description = getString(R.string.messageIsSpamShouldMoveToSpam),
+                    action = getString(R.string.moveInSpamButton),
+                )
+            }
+            SpamAction.EnableFilter -> {
+                SpamData(
+                    spamAction = spamAction,
+                    description = getString(R.string.messageIsSpamShouldActivateFilter),
+                    action = getString(R.string.enableFilterButton),
+                )
+            }
+            SpamAction.Unblock -> {
+                SpamData(
+                    spamAction = spamAction,
+                    description = getString(R.string.messageIsSpamBecauseSenderIsBlocked, emailToUnblock),
+                    action = getString(R.string.unblockButton),
+                )
+            }
+            SpamAction.None -> {
+                SpamData(spamAction = spamAction)
+            }
         }
-
-        hideAlertGroupIfNoneDisplayed()
     }
 
-    private fun ItemMessageBinding.spamActionButton(
-        spamData: SpamData,
-        message: Message,
-        firstExpeditor: Recipient,
-    ) {
+    private fun ItemMessageBinding.spamActionButton(spamData: SpamData, message: Message, firstExpeditor: Recipient) {
         when (spamData.spamAction) {
             SpamAction.MoveToSpam -> threadAdapterCallbacks?.moveMessageToSpam?.invoke(message.uid)
             SpamAction.EnableFilter -> threadAdapterCallbacks?.activateSpamFilter?.invoke()
@@ -584,10 +584,6 @@ class ThreadAdapter(
         spamAlert.isVisible = false
     }
     //endregion
-
-    private fun Recipient.getExpeditorIn(restrictedSenders: List<SenderDetails>?): String? {
-        return restrictedSenders?.firstOrNull { email == it.email }?.email
-    }
 
     private fun ItemMessageBinding.reloadVisibleWebView() {
         if (isQuoteCollapsed) bodyWebView.reload() else fullMessageWebView.reload()

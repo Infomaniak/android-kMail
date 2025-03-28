@@ -258,9 +258,9 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(threadViewModel) {
 
         binding.messagesList.adapter = ThreadAdapter(
+            shouldLoadDistantResources = shouldLoadDistantResources(),
             isSpamFilterActivated = { mainViewModel.currentMailbox.value?.isSpamFiltered ?: false },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
-            shouldLoadDistantResources = shouldLoadDistantResources(),
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
@@ -295,7 +295,7 @@ class ThreadFragment : Fragment() {
                 moveMessageToSpam = { messageUid ->
                     twoPaneViewModel.currentThreadUid.value?.let { mainViewModel.moveToSpamFolder(it, messageUid) }
                 },
-                activateSpamFilter = { mainViewModel.activateSpamFilter() },
+                activateSpamFilter = mainViewModel::activateSpamFilter,
                 unblockMail = mainViewModel::unblockMail,
                 replyToCalendarEvent = { attendanceState, message ->
                     replyToCalendarEvent(
