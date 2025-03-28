@@ -46,12 +46,15 @@ import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.CANCEL_SCHEDULE_FROM_HEADER
+import com.infomaniak.mail.MatomoMail.MODIFY_SCHEDULE_FROM_HEADER
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBlockUserAction
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
+import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -464,10 +467,14 @@ class ThreadFragment : Fragment() {
 
             snoozeAlert.apply {
                 onAction1 {
+                    trackSnoozeEvent(MODIFY_SCHEDULE_FROM_HEADER)
                     threadViewModel.reschedulingCurrentlySnoozedEpochMillis = thread.snoozeEndDate?.epochSeconds?.times(1000)
                     navigateToSnoozeBottomSheet()
                 }
-                onAction2 { unsnoozeThread(thread) }
+                onAction2 {
+                    trackSnoozeEvent(CANCEL_SCHEDULE_FROM_HEADER)
+                    unsnoozeThread(thread)
+                }
             }
         }
     }
