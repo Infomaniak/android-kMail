@@ -105,7 +105,6 @@ import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
-import com.infomaniak.core.R as RCore
 
 
 @AndroidEntryPoint
@@ -623,18 +622,7 @@ class ThreadFragment : Fragment() {
             val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), listOf(thread))
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
-            when (result) {
-                is BatchSnoozeResult.Success -> twoPaneViewModel.closeThread()
-                is BatchSnoozeResult.Error -> {
-                    val errorMessageRes = when (result) {
-                        BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
-                        is BatchSnoozeResult.Error.ApiError -> result.translatedError
-                        BatchSnoozeResult.Error.Unknown -> com.infomaniak.lib.core.R.string.anErrorHasOccurred
-                    }
-
-                    snackbarManager.postValue(requireContext().getString(errorMessageRes))
-                }
-            }
+            if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()
         }
     }
 
@@ -846,18 +834,7 @@ class ThreadFragment : Fragment() {
             val result = mainViewModel.unsnoozeThreads(listOf(thread))
             snoozeAlert.hideAction2Progress(R.string.buttonCancelReminder)
 
-            when (result) {
-                is BatchSnoozeResult.Success -> twoPaneViewModel.closeThread()
-                is BatchSnoozeResult.Error -> {
-                    val errorMessageRes = when (result) {
-                        BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
-                        is BatchSnoozeResult.Error.ApiError -> result.translatedError
-                        BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
-                    }
-
-                    snackbarManager.postValue(getString(errorMessageRes))
-                }
-            }
+            if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()
         }
     }
 

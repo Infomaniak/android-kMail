@@ -1117,7 +1117,18 @@ class MainViewModel @Inject constructor(
 
             val currentMailbox = currentMailbox.value!!
             val result = rescheduleSnoozedThreads(currentMailbox, snoozedThreadUuids, date)
-            if (result is BatchSnoozeResult.Success) refreshFoldersAsync(currentMailbox, result.impactedFolders)
+            when (result) {
+                is BatchSnoozeResult.Success -> refreshFoldersAsync(currentMailbox, result.impactedFolders)
+                is BatchSnoozeResult.Error -> {
+                    val errorMessageRes = when (result) {
+                        BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
+                        is BatchSnoozeResult.Error.ApiError -> result.translatedError
+                        BatchSnoozeResult.Error.Unknown -> com.infomaniak.lib.core.R.string.anErrorHasOccurred
+                    }
+
+                    snackbarManager.postValue(appContext.getString(errorMessageRes))
+                }
+            }
 
             rescheduleResult = result
         }.join()
@@ -1139,6 +1150,18 @@ class MainViewModel @Inject constructor(
                 BatchSnoozeResult.Error.Unknown
             } else {
                 sharedUtils.unsnoozeThreads(currentMailbox, threads)
+            }
+
+            unsnoozeResult.let {
+                if (it is BatchSnoozeResult.Error) {
+                    val errorMessageRes = when (it) {
+                        BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
+                        is BatchSnoozeResult.Error.ApiError -> it.translatedError
+                        BatchSnoozeResult.Error.Unknown -> com.infomaniak.core.R.string.anErrorHasOccurred
+                    }
+
+                    snackbarManager.postValue(appContext.getString(errorMessageRes))
+                }
             }
         }.join()
 
