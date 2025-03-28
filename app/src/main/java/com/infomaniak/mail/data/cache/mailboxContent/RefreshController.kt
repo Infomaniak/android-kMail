@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -31,11 +32,8 @@ import com.infomaniak.mail.data.models.getMessages.*
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.ApiErrorException
-import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
-import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.utils.extensions.toRealmInstant
@@ -208,7 +206,13 @@ class RefreshController @Inject constructor(
     }
 
     private suspend fun Realm.refresh(scope: CoroutineScope, folder: Folder): Set<Thread> {
+        val impactedThreads = mainRefresh(scope, folder)
+        extraRefresh(scope, folder)
 
+        return impactedThreads
+    }
+
+    private suspend fun Realm.mainRefresh(scope: CoroutineScope, folder: Folder): MutableSet<Thread> {
         val previousCursor = folder.cursor
         val impactedThreads = mutableSetOf<Thread>()
 
@@ -222,6 +226,31 @@ class RefreshController @Inject constructor(
         fetchAllOldPages(scope, folder.id)
 
         return impactedThreads
+    }
+
+    private suspend fun Realm.extraRefresh(scope: CoroutineScope, folder: Folder) {
+        // No need to check realm, there can't be any snoozed thread with a new message when there's a single message per thread
+        if (localSettings.threadMode == ThreadMode.MESSAGE) return
+
+        val impactedFolderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
+        impactedFolderIds.forEach { folderId ->
+            scope.ensureActive()
+
+            runCatching {
+                FolderController.getFolder(folderId, realm = this)?.let {
+                    mainRefresh(scope, folder = it)
+                }
+            }.cancellable()
+        }
+    }
+
+    private fun removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): Set<String> {
+        return if (folder.role == FolderRole.INBOX) {
+            val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
+            SharedUtils.unsnoozeThreadsWithoutRefresh(scope, mailbox, snoozedThreadsWithNewMessage)
+        } else {
+            emptySet()
+        }
     }
 
     private suspend fun Realm.fetchOnePageOfOldMessages(scope: CoroutineScope, folderId: String) {

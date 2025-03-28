@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -43,6 +44,8 @@ import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -101,6 +104,13 @@ class SharedUtils @Inject constructor(
         mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
             ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+        }
+    }
+
+    suspend fun unsnoozeThreads(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>) {
+        val impactedFolders = unsnoozeThreadsWithoutRefresh(scope, mailbox, threads)
+        if (impactedFolders.isNotEmpty()) {
+            refreshFolders(mailbox = mailbox, messagesFoldersIds = ImpactedFolders(impactedFolders.toMutableSet()))
         }
     }
 
@@ -199,6 +209,28 @@ class SharedUtils @Inject constructor(
                 body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
                 return html()
             }
+        }
+
+        fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
+            val snoozeUuids: MutableList<String> = mutableListOf()
+            val impactedFolderIds: MutableSet<String> = mutableSetOf()
+
+            for (thread in threads) {
+                scope.ensureActive()
+
+                val targetMessage = thread.messages.lastOrNull(Message::isSnoozed)
+                val targetMessageSnoozeUuid = targetMessage?.snoozeUuid ?: continue
+
+                snoozeUuids += targetMessageSnoozeUuid
+                impactedFolderIds += targetMessage.folderId
+            }
+
+            if (snoozeUuids.isEmpty()) return emptySet()
+
+            val apiResponses = ApiRepository.unsnoozeThreads(mailbox.uuid, snoozeUuids)
+            scope.ensureActive()
+
+            return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
         }
     }
 }
