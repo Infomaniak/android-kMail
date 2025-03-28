@@ -21,13 +21,13 @@ package com.infomaniak.mail.data.models.mailbox
 
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
-class SendersRestrictions : RealmObject {
+class SendersRestrictions : EmbeddedRealmObject {
 
     @SerialName("authorized_senders")
     var authorizedSenders = realmListOf<SenderDetails>()
