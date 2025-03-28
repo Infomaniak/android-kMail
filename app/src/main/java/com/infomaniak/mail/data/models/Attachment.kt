@@ -53,12 +53,17 @@ class Attachment : EmbeddedRealmObject, Attachable {
     //endregion
 
     //region Local data (Transient)
+
+    // ------------- !IMPORTANT! -------------
+    // Every field that is added in this Transient region should be declared in
+    // `initLocalValue()` too to avoid loosing data when updating from the API.
+
     @Transient
     override var localUuid: String = UUID.randomUUID().toString()
     @Transient
-    var uploadLocalUri: String? = null
-    @Transient
     private var _uploadStatus: String = AttachmentUploadStatus.NOT_UPLOADED.name
+    @Transient
+    var uploadLocalUri: String? = null
     //endregion
 
     val attachmentUploadStatus: AttachmentUploadStatus?

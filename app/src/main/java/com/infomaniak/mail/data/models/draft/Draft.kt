@@ -102,6 +102,11 @@ class Draft : RealmObject {
     //endregion
 
     //region Local data (Transient)
+
+    // ------------- !IMPORTANT! -------------
+    // Every field that is added in this Transient region should be declared in
+    // `initLocalValue()` too to avoid loosing data when updating from the API.
+
     @Transient
     @PrimaryKey
     var localUuid: String = UUID.randomUUID().toString()
