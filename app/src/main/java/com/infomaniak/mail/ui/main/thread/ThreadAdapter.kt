@@ -493,7 +493,8 @@ class ThreadAdapter(
 
     private fun MessageViewHolder.bindSpam(message: Message) = with(binding) {
         val firstExpeditor = message.from.first()
-        val spamData = context.getSpamBannerData(spamAction = getSpamBannerAction(message), emailToUnblock = firstExpeditor.email)
+        val spamAction = getSpamBannerAction(message, firstExpeditor)
+        val spamData = context.getSpamBannerData(spamAction = spamAction, emailToUnblock = firstExpeditor.email)
 
         if (spamData.spamAction == SpamAction.None) {
             spamAlert.isVisible = false
@@ -507,7 +508,7 @@ class ThreadAdapter(
         hideAlertGroupIfNoneDisplayed()
     }
 
-    private fun getSpamBannerAction(message: Message): SpamAction {
+    private fun getSpamBannerAction(message: Message, firstExpeditor: Recipient): SpamAction {
 
         fun Message.shouldIgnoreForSpam(isMessageSpam: Boolean, isExpeditorAuthorized: Boolean): Boolean {
             return !isInSpamFolder() && isMessageSpam && isSpamFilterActivated() && isExpeditorAuthorized
@@ -522,7 +523,6 @@ class ThreadAdapter(
         }
 
         val isMessageSpam = message.headers?.isSpam ?: false
-        val firstExpeditor = message.from.first()
         val isExpeditorBlocked = firstExpeditor.getExpeditorIn(senderRestrictions()?.blockedSenders) != null
         val isExpeditorAuthorized = firstExpeditor.getExpeditorIn(senderRestrictions()?.authorizedSenders) != null
 
