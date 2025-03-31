@@ -1109,23 +1109,30 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Snooze
-    fun snoozeThreads(date: Date, threads: List<Thread>) = viewModelScope.launch {
-        currentMailbox.value?.let { currentMailbox ->
-            val messageUids = threads.mapNotNull { thread ->
-                thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
-            }
+    suspend fun snoozeThreads(date: Date, threads: List<Thread>): Boolean {
+        var isSuccess = false
 
-            val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
+        viewModelScope.launch {
+            currentMailbox.value?.let { currentMailbox ->
+                val messageUids = threads.mapNotNull { thread ->
+                    thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
+                }
 
-            if (responses.atLeastOneSucceeded()) {
-                // Snoozing threads requires to refresh the snooze folder. It's the only folder that will update the snooze state
-                // of any message.
-                refreshFoldersAsync(currentMailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
-            } else {
-                val errorMessageRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
-                snackbarManager.postValue(appContext.getString(errorMessageRes))
+                val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
+
+                isSuccess = responses.atLeastOneSucceeded()
+                if (isSuccess) {
+                    // Snoozing threads requires to refresh the snooze folder. It's the only folder that will update the snooze state
+                    // of any message.
+                    refreshFoldersAsync(currentMailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+                } else {
+                    val errorMessageRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
+                    snackbarManager.postValue(appContext.getString(errorMessageRes))
+                }
             }
-        }
+        }.join()
+
+        return isSuccess
     }
 
     suspend fun rescheduleSnoozedThreads(date: Date, threads: List<Thread>): BatchSnoozeResult {
@@ -1195,7 +1202,7 @@ class MainViewModel @Inject constructor(
 
         return appContext.getString(errorMessageRes)
     }
-    //endregion
+//endregion
 
     //region Undo action
     fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
@@ -1226,7 +1233,7 @@ class MainViewModel @Inject constructor(
 
         snackbarManager.postValue(appContext.getString(snackbarTitle))
     }
-    //endregion
+//endregion
 
     //region New Folder
     private suspend fun createNewFolderSync(name: String): String? {
@@ -1255,7 +1262,7 @@ class MainViewModel @Inject constructor(
         moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)
         isMovedToNewFolder.postValue(true)
     }
-    //endregion
+//endregion
 
     private fun refreshFoldersAsync(
         mailbox: Mailbox,
@@ -1283,7 +1290,7 @@ class MainViewModel @Inject constructor(
         return getActionFolderRole(message.threads, message)
     }
 
-    // TODO: Handle this correctly if MultiSelect feature is added in the Search.
+// TODO: Handle this correctly if MultiSelect feature is added in the Search.
     /**
      * Get the FolderRole of a Message or a list of Threads.
      *

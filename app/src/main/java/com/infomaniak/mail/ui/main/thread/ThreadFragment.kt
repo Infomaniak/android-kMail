@@ -631,8 +631,8 @@ class ThreadFragment : Fragment() {
 
     private fun snoozeThread(timestamp: Long, thread: Thread) {
         lifecycleScope.launch {
-            val result = mainViewModel.snoozeThreads(Date(timestamp), listOf(thread))
-            // if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread() // TODO
+            val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), listOf(thread))
+            if (isSuccess) twoPaneViewModel.closeThread()
         }
     }
 
