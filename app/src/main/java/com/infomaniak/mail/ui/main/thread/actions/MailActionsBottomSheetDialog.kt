@@ -76,6 +76,8 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         archive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReadUnread() }
         move.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onMove() }
+        // Not a setClosingOnClickListener because we need to send a setBackNavigationResult and setClosingOnClickListener closes
+        // before we had time to set the result
         snooze.setOnClickListener { onClickListener.onSnooze() }
         modifySnooze.setOnClickListener { onClickListener.onModifySnooze() }
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
