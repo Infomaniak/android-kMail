@@ -607,7 +607,7 @@ class ThreadFragment : Fragment() {
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
                     threadViewModel.threadLive.value?.let { thread ->
-                        applySavedSnoozeScheduleType(timestamp, thread)
+                        executeSavedSnoozeScheduleType(timestamp, thread)
                     }
                 },
                 onAbort = { navigateToSnoozeBottomSheet(threadViewModel.snoozeScheduleType) },
@@ -616,12 +616,12 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             threadViewModel.threadLive.value?.let { thread ->
-                applySavedSnoozeScheduleType(selectedScheduleEpoch, thread)
+                executeSavedSnoozeScheduleType(selectedScheduleEpoch, thread)
             }
         }
     }
 
-    private fun applySavedSnoozeScheduleType(timestamp: Long, thread: Thread) {
+    private fun executeSavedSnoozeScheduleType(timestamp: Long, thread: Thread) {
         when (threadViewModel.snoozeScheduleType) {
             SnoozeScheduleType.Snooze -> snoozeThread(timestamp, thread)
             SnoozeScheduleType.Modify -> rescheduleSnoozedThread(timestamp, thread)
