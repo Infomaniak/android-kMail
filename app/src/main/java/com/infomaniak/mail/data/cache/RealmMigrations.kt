@@ -42,9 +42,9 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
     migrationContext.keepDefaultValuesAfterNineteenthMigration()
-    migrationContext.initializedInternalDateAsDateAfterTwentySecondMigration()
+    migrationContext.initializeInternalDateAsDateAfterTwentySecondMigration()
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
-    migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthsMigration()
+    migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
 }
 
 // Migrate to version #1
@@ -106,7 +106,7 @@ private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
 //endregion
 
 // Migrate from version #22
-private fun MigrationContext.initializedInternalDateAsDateAfterTwentySecondMigration() {
+private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigration() {
 
     if (oldRealm.schemaVersion() <= 22L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
@@ -160,7 +160,7 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
 //endregion
 
 // Migrate from version #25
-private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthsMigration() {
+private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration() {
 
     if (oldRealm.schemaVersion() <= 25L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
