@@ -51,7 +51,6 @@ import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.invoke
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -112,23 +111,6 @@ class SharedUtils @Inject constructor(
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
             ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
         }
-    }
-
-    suspend fun unsnoozeThreads(mailbox: Mailbox, threads: List<Thread>): BatchSnoozeResult {
-        val unsnoozeResult = ioDispatcher {
-            unsnoozeThreadsWithoutRefresh(scope = null, mailbox, threads)
-        }
-
-        if (unsnoozeResult is BatchSnoozeResult.Success) {
-            // When removing the snooze state of a thread, we absolutely need to refresh the snooze folder. Refreshing the
-            // snooze folder is the only way of updating the snooze status of messages. The folder snooze will never be
-            // returned inside impactedFolders because no message ever mentions the snooze folder, we need to add it manually.
-            unsnoozeResult.impactedFolders += FolderRole.SNOOZED
-
-            refreshFolders(mailbox = mailbox, messagesFoldersIds = unsnoozeResult.impactedFolders)
-        }
-
-        return unsnoozeResult
     }
 
     fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
@@ -278,7 +260,10 @@ class SharedUtils @Inject constructor(
             val apiResponses = ApiRepository.unsnoozeThreads(mailbox.uuid, snoozeUuids)
             scope?.ensureActive()
 
-            return apiResponses.computeSnoozeResult(ImpactedFolders(impactedFolderIds))
+            // When removing the snooze state of a thread, we absolutely need to refresh the snooze folder. Refreshing the
+            // snooze folder is the only way of updating the snooze status of messages. The folder snooze will never be
+            // returned inside impactedFolders because no message ever mentions the snooze folder, we need to add it manually.
+            return apiResponses.computeSnoozeResult(ImpactedFolders(impactedFolderIds, mutableSetOf(FolderRole.SNOOZED)))
         }
 
         sealed interface AutomaticUnsnoozeResult {
