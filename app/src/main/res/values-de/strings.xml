@@ -585,6 +585,18 @@
         <item quantity="other">Erinnerungen storniert. Ihre Nachrichten sind zurück in Ihrem Posteingang</item>
     </plurals>
     <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">Diese Unterhaltung wird nicht mehr schlummern und wird archiviert</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht mehr schlummern und werden archiviert</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">Diese Unterhaltung wird nicht mehr schlummern und wird gelöscht</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht mehr schlummern und werden gelöscht</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">Diese Unterhaltung wird nicht mehr schlummern und wird verschoben</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht mehr schlummern und werden verschoben</item>
+    </plurals>
     <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>

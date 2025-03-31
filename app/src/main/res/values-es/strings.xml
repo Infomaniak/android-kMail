@@ -585,6 +585,18 @@
         <item quantity="other">Recordatorios cancelados. Tus mensajes han vuelto a tu bandeja de entrada</item>
     </plurals>
     <string name="snoozeAlertTitle">En espera hasta: %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">Esta conversación ya no estará en espera y será archivada</item>
+        <item quantity="other">Estas conversaciones ya no estarán en espera y serán archivadas</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">Esta conversación ya no estará en espera y será eliminada</item>
+        <item quantity="other">Estas conversaciones ya no estarán en espera y serán eliminadas</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">Esta conversación ya no estará en espera y será movida</item>
+        <item quantity="other">Estas conversaciones ya no estarán en espera y serán movidas</item>
+    </plurals>
     <string name="snoozedFolder">En espera</string>
     <string name="socialNetworksFolder">Redes sociales</string>
     <string name="spamFolder">Spam</string>

@@ -62,13 +62,14 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.core.utils.endOfTheWeek
 import com.infomaniak.core.utils.startOfTheDay
 import com.infomaniak.core.utils.startOfTheWeek
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.lib.core.utils.showToast
@@ -415,10 +416,75 @@ fun DescriptionAlertDialog.deleteWithConfirmationPopup(
     displayLoader: Boolean = true,
     onCancel: (() -> Unit)? = null,
     callback: () -> Unit,
-) = if (isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT) { // We don't want to display the popup for Drafts
-    showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
+) = when {
+    folderRole == FolderRole.SNOOZED -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
+    isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT -> { // We don't want to display the popup for Drafts
+        showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
+    }
+    else -> callback()
+}
+
+fun DescriptionAlertDialog.showDeletePermanentlyDialog(
+    deletedCount: Int,
+    displayLoader: Boolean,
+    onPositiveButtonClicked: () -> Unit,
+    onCancel: (() -> Unit)? = null,
+) = show(
+    title = binding.context.resources.getQuantityString(
+        R.plurals.threadListDeletionConfirmationAlertTitle,
+        deletedCount,
+        deletedCount,
+    ),
+    description = binding.context.resources.getQuantityString(
+        R.plurals.threadListDeletionConfirmationAlertDescription,
+        deletedCount,
+    ),
+    displayLoader = displayLoader,
+    onPositiveButtonClicked = onPositiveButtonClicked,
+    onCancel = onCancel,
+)
+
+fun DescriptionAlertDialog.showDeleteSnoozeDialog(
+    deletedCount: Int,
+    displayLoader: Boolean,
+    onPositiveButtonClicked: () -> Unit,
+    onCancel: (() -> Unit)? = null,
+) = show(
+    title = binding.context.getString(R.string.actionDelete),
+    description = binding.context.resources.getQuantityString(R.plurals.snoozeDeleteConfirmAlertDescription, deletedCount),
+    displayLoader = displayLoader,
+    onPositiveButtonClicked = onPositiveButtonClicked,
+    onCancel = onCancel,
+)
+
+fun DescriptionAlertDialog.moveWithConfirmationPopup(
+    folderRole: FolderRole?,
+    count: Int,
+    onPositiveButtonClicked: () -> Unit,
+) = if (folderRole == FolderRole.SNOOZED) {
+    show(
+        title = binding.context.getString(R.string.actionMove),
+        description = binding.context.resources.getQuantityString(R.plurals.snoozeMoveConfirmAlertDescription, count),
+        displayLoader = false,
+        onPositiveButtonClicked = onPositiveButtonClicked,
+    )
 } else {
-    callback()
+    onPositiveButtonClicked()
+}
+
+fun DescriptionAlertDialog.archiveWithConfirmationPopup(
+    folderRole: FolderRole?,
+    count: Int,
+    onPositiveButtonClicked: () -> Unit,
+) = if (folderRole == FolderRole.SNOOZED) {
+    show(
+        title = binding.context.getString(R.string.actionArchive),
+        description = binding.context.resources.getQuantityString(R.plurals.snoozeArchiveConfirmAlertDescription, count),
+        displayLoader = false,
+        onPositiveButtonClicked = onPositiveButtonClicked,
+    )
+} else {
+    onPositiveButtonClicked()
 }
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {

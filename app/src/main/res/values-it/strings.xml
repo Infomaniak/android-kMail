@@ -585,6 +585,18 @@
         <item quantity="other">Promemoria annullati. I tuoi messaggi sono tornati nella tua casella di posta</item>
     </plurals>
     <string name="snoozeAlertTitle">In attesa fino al: %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">Questa conversazione non sarà più posticipata e verrà archiviata</item>
+        <item quantity="other">Queste conversazioni non saranno più posticipate e verranno archiviate</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">Questa conversazione non sarà più posticipata e verrà eliminata</item>
+        <item quantity="other">Queste conversazioni non saranno più posticipate e verranno eliminate</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">Questa conversazione non sarà più posticipata e verrà spostata</item>
+        <item quantity="other">Queste conversazioni non saranno più posticipate e verranno spostate</item>
+    </plurals>
     <string name="snoozedFolder">In attesa</string>
     <string name="socialNetworksFolder">Social Network</string>
     <string name="spamFolder">Spam</string>

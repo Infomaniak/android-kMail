@@ -168,8 +168,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 //region Actions
                 override fun onArchive() = with(mainViewModel) {
-                    trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
-                    archiveThread(threadUid)
+                    descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
+                        trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
+                        archiveThread(threadUid)
+                    }
                 }
 
                 override fun onReadUnread() {
@@ -179,8 +181,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onMove() {
-                    trackBottomSheetThreadActionsEvent(ACTION_MOVE_NAME)
-                    animatedNavigation(R.id.moveFragment, MoveFragmentArgs(arrayOf(threadUid)).toBundle(), currentClassName)
+                    descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
+                        trackBottomSheetThreadActionsEvent(ACTION_MOVE_NAME)
+                        animatedNavigation(R.id.moveFragment, MoveFragmentArgs(arrayOf(threadUid)).toBundle(), currentClassName)
+                    }
                 }
 
                 override fun onSnooze() {
