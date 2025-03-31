@@ -229,8 +229,10 @@ class DraftsActionsWorker @AssistedInject constructor(
         )
     }
 
-    /** This function save the draft if the target draft failed to send due to a rate-limit exception
-     *  As it's a side effect, it should fail silently to keep the original error flow */
+    /**
+     * This function save the draft if the target draft failed to send due to a rate-limit exception.
+     * As it's a side effect, it should fail silently to keep the original error flow.
+     */
     private suspend fun saveDraftAfterRateLimitError(errorCode: String?, draft: Draft) = runCatching {
         if (errorCode == ErrorCode.SEND_LIMIT_EXCEEDED || errorCode == ErrorCode.SEND_DAILY_LIMIT_REACHED) {
             SentryLog.d(TAG, "Trying to save draft after a rate-limit error")

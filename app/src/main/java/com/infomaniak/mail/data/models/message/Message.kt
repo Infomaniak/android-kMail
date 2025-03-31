@@ -238,12 +238,12 @@ class Message : RealmObject, Snoozable {
 
     fun isInSpamFolder() = folder.role == FolderRole.SPAM
 
-    fun computeFolderAndReason(filterFolderId: String): Pair<Folder?, String?> {
+    fun computeFolderAndReason(folderId: String): Pair<Folder?, String?> {
 
         var correctFolder: Folder? = null
         var reason: String? = null
 
-        val list = threads.filter { it.folderId == filterFolderId }
+        val list = threads.filter { it.folderId == folderId }
         val count = list.count()
 
         when {
