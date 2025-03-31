@@ -567,6 +567,10 @@
         <item quantity="one">Absender erfolgreich auf die schwarze Liste gesetzt</item>
         <item quantity="other">Erfolgreich auf die schwarze Liste gesetzte Absender</item>
     </plurals>
+    <plurals name="snackbarSnoozeSuccess">
+        <item quantity="one">Sie erhalten eine Erinnerung an diese Nachricht %s</item>
+        <item quantity="other">Sie erhalten eine Erinnerung an diese Nachrichten %s</item>
+    </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Betreff in die Zwischenablage kopiert</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Konversation gelöscht</item>
@@ -575,6 +579,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Unterhaltung in %s verschoben</item>
         <item quantity="other">Unterhaltungen in %s verschoben</item>
+    </plurals>
+    <plurals name="snackbarUnsnoozeSuccess">
+        <item quantity="one">Erinnerung storniert. Ihre Nachricht ist zurück in Ihrem Posteingang</item>
+        <item quantity="other">Erinnerungen storniert. Ihre Nachrichten sind zurück in Ihrem Posteingang</item>
     </plurals>
     <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
     <string name="snoozedFolder">In der Warteschlange</string>

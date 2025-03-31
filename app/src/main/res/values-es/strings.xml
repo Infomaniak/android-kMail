@@ -567,6 +567,10 @@
         <item quantity="one">Remitente incluido en la lista negra</item>
         <item quantity="other">Remitentes incluidos con éxito en la lista negra</item>
     </plurals>
+    <plurals name="snackbarSnoozeSuccess">
+        <item quantity="one">Recibirás un recordatorio de este mensaje %s</item>
+        <item quantity="other">Recibirás un recordatorio de estos mensajes %s</item>
+    </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Tema copiado en el portapapeles</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversación eliminada</item>
@@ -575,6 +579,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversación trasladada a %s</item>
         <item quantity="other">Conversaciones trasladadas a %s</item>
+    </plurals>
+    <plurals name="snackbarUnsnoozeSuccess">
+        <item quantity="one">Recordatorio cancelado. Tu mensaje ha vuelto a tu bandeja de entrada</item>
+        <item quantity="other">Recordatorios cancelados. Tus mensajes han vuelto a tu bandeja de entrada</item>
     </plurals>
     <string name="snoozeAlertTitle">En espera hasta: %s</string>
     <string name="snoozedFolder">En espera</string>
