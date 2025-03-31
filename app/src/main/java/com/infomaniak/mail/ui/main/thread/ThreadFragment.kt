@@ -46,8 +46,8 @@ import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
-import com.infomaniak.mail.MatomoMail.CANCEL_SCHEDULE_FROM_HEADER
-import com.infomaniak.mail.MatomoMail.MODIFY_SCHEDULE_FROM_HEADER
+import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -466,11 +466,11 @@ class ThreadFragment : Fragment() {
 
             snoozeAlert.apply {
                 onAction1 {
-                    trackSnoozeEvent(MODIFY_SCHEDULE_FROM_HEADER)
+                    trackSnoozeEvent(ACTION_MODIFY_SNOOZE_NAME)
                     navigateToSnoozeBottomSheet()
                 }
                 onAction2 {
-                    trackSnoozeEvent(CANCEL_SCHEDULE_FROM_HEADER)
+                    trackSnoozeEvent(ACTION_CANCEL_SNOOZE_NAME)
                     unsnoozeThread(thread)
                 }
             }
