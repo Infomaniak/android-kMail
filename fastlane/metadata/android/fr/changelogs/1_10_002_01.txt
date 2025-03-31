@@ -1,0 +1,5 @@
+- Réorganisation de la suggestion de contacts lors de la rédaction d'un nouvel e-mail
+- Retire la date actuellement programmée lorsque l'utilisateur est invité à choisir une autre date programmée
+- Ajout de la bannière de spam
+- Ajouter des initiales à l'avatar de myKSuite
+- Affiche les fils de discussion en attente comme tels dans la Recherche

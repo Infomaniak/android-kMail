@@ -1,0 +1,5 @@
+- Reorder contacts suggestion while writing a new email
+- Hide currently scheduled date when prompting the user to choose another scheduled date
+- Add Spam banner
+- Add initials to myKSuite avatar
+- Display snoozed threads as such in the Search
