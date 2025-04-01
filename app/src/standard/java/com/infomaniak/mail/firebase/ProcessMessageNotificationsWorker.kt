@@ -17,16 +17,25 @@
  */
 package com.infomaniak.mail.firebase
 
+import android.Manifest
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.clearStack
+import com.infomaniak.lib.core.utils.hasPermissions
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.FetchMessagesManager
 import com.infomaniak.mail.utils.NotificationUtils
+import com.infomaniak.mail.utils.NotificationUtils.Companion.GENERIC_NEW_MAILS_NOTIFICATION_ID
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
@@ -42,10 +51,11 @@ import javax.inject.Singleton
  */
 @HiltWorker
 class ProcessMessageNotificationsWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
+    @Assisted private val appContext: Context,
     @Assisted params: WorkerParameters,
     private val fetchMessagesManager: FetchMessagesManager,
     private val mailboxController: MailboxController,
+    private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseProcessMessageNotificationsWorker(appContext, params) {
@@ -55,14 +65,17 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
 
         val userId = inputData.getIntOrNull(USER_ID_KEY) ?: run {
             SentryDebug.sendFailedNotification("No userId in Notification", SentryLevel.ERROR)
+            displayGenericNewMailsNotification()
             return@withContext Result.success()
         }
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: run {
             SentryDebug.sendFailedNotification("No mailboxId in Notification", SentryLevel.ERROR, userId)
+            displayGenericNewMailsNotification()
             return@withContext Result.success()
         }
         val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: run {
             SentryDebug.sendFailedNotification("No messageUid in Notification", SentryLevel.ERROR, userId, mailboxId)
+            displayGenericNewMailsNotification()
             return@withContext Result.success()
         }
 
@@ -70,6 +83,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
+            displayGenericNewMailsNotification()
             // If the Mailbox doesn't exist in Realm, it's either because :
             // - The Mailbox isn't attached to this User anymore.
             // - The user POSSIBLY recently added this new Mailbox on its account, via the Infomaniak
@@ -80,6 +94,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         }
 
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
+        var hasShownNotification = false
 
         return@withContext runCatching {
             MessageController.getMessage(messageUid, mailboxContentRealm)?.let {
@@ -89,14 +104,31 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
                 return@runCatching Result.success()
             }
 
-            fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
+            hasShownNotification = fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
 
             SentryLog.i(TAG, "Work finished")
             Result.success()
         }.getOrElse {
             Result.failure()
         }.also {
+            if (!hasShownNotification) displayGenericNewMailsNotification()
             mailboxContentRealm.close()
+        }
+    }
+
+    private fun displayGenericNewMailsNotification() {
+        if (appContext.hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
+
+            val openAppIntent = Intent(appContext, LaunchActivity::class.java).clearStack()
+            val pendingIntent = PendingIntent.getActivity(
+                appContext, 0, openAppIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+            val builder = notificationUtils
+                .buildGenericNewMailsNotification(appContext.getString(R.string.notificationNewEmail))
+                .setContentIntent(pendingIntent)
+
+            @Suppress("MissingPermission")
+            notificationManagerCompat.notify(GENERIC_NEW_MAILS_NOTIFICATION_ID, builder.build())
         }
     }
 

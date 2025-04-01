@@ -394,6 +394,7 @@
     <string name="noUpdatedAt">Mai aggiornato</string>
     <string name="noValidMailboxTitle">Non è stata trovata una casella di posta elettronica valida. Per ora può essere risolto solo con la webmail.</string>
     <string name="notificationGeneralChannelName">Notifiche generali</string>
+    <string name="notificationNewEmail">Potresti aver ricevuto nuovi messaggi</string>
     <string name="notificationNewMessagesChannelName">Nuove e-mail</string>
     <string name="notificationSyncDraftChannelName">Salvataggio delle bozze</string>
     <string name="notificationSyncMessagesChannelName">Recupero di nuove e-mail</string>

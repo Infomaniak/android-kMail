@@ -400,6 +400,7 @@
     <string name="noUpdatedAt">Never updated</string>
     <string name="noValidMailboxTitle">No valid mailbox found. Can only be fixed on the webmail for now.</string>
     <string name="notificationGeneralChannelName">General notifications</string>
+    <string name="notificationNewEmail">You might have received new messages</string>
     <string name="notificationNewMessagesChannelName">New emails</string>
     <string name="notificationSyncDraftChannelName">Saving drafts</string>
     <string name="notificationSyncMessagesChannelName">Retrieving new emails</string>

@@ -394,6 +394,7 @@
     <string name="noUpdatedAt">Nunca actualizado</string>
     <string name="noValidMailboxTitle">No se ha encontrado ningún buzón válido. Por ahora sólo se puede arreglar en el webmail.</string>
     <string name="notificationGeneralChannelName">Notificaciones generales</string>
+    <string name="notificationNewEmail">Puede que hayas recibido nuevos mensajes</string>
     <string name="notificationNewMessagesChannelName">Nuevos correos electrónicos</string>
     <string name="notificationSyncDraftChannelName">Guardar borradores</string>
     <string name="notificationSyncMessagesChannelName">Recuperación de nuevos correos electrónicos</string>

@@ -137,6 +137,14 @@ class NotificationUtils @Inject constructor(
         ).build()
     }
 
+    fun buildGenericNewMailsNotification(title: String): NotificationCompat.Builder {
+        return appContext.buildNotification(
+            channelId = appContext.getString(R.string.notification_channel_id_sync_messages_service),
+            icon = defaultSmallIcon,
+            title = title,
+        )
+    }
+
     fun buildDraftErrorNotification(
         @StringRes errorMessageRes: Int,
         action: DraftAction,
@@ -157,7 +165,7 @@ class NotificationUtils @Inject constructor(
         scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,
-    ) = with(payload) {
+    ): Boolean = with(payload) {
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
             SentryDebug.sendFailedNotification(
                 reason = "Created Notif: no Mailbox in Realm",
@@ -166,13 +174,14 @@ class NotificationUtils @Inject constructor(
                 mailboxId = mailboxId,
                 messageUid = messageUid,
             )
-            return@with
+            return@with false
         }
         val contentIntent = getContentIntent(payload = this, isUndo)
         val notificationBuilder = buildMessageNotification(mailbox.channelId, title, description)
 
         initMessageNotificationContent(mailbox, contentIntent, notificationBuilder, payload = this)
         showNotifications(scope, mailboxId, notificationManagerCompat)
+        return@with true
     }
 
     @SuppressLint("WrongConstant")
@@ -346,6 +355,8 @@ class NotificationUtils @Inject constructor(
         const val DRAFT_ACTIONS_ID = 1
         const val SYNC_MESSAGES_ID = 2
         const val EXTRA_MESSAGE_UID = "messageUid"
+
+        val GENERIC_NEW_MAILS_NOTIFICATION_ID = "genericNewMailsNotificationId".hashCode()
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

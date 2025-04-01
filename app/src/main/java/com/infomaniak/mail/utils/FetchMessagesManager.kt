@@ -70,12 +70,12 @@ class FetchMessagesManager @Inject constructor(
         mailbox: Mailbox,
         sentryMessageUid: String? = null,
         mailboxContentRealm: Realm? = null,
-    ) {
+    ): Boolean {
         coroutineScope = scope
 
         // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
         // We can leave safely.
-        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
+        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return false
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
@@ -83,7 +83,7 @@ class FetchMessagesManager @Inject constructor(
             // We don't want to display Notifications in this case.
             // We can leave safely.
             realm.close()
-            return
+            return false
         }
 
         if (folder.cursor == null) {
@@ -91,7 +91,7 @@ class FetchMessagesManager @Inject constructor(
             // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
             // We can leave safely.
             realm.close()
-            return
+            return false
         }
 
         val okHttpClient = AccountUtils.getHttpClient(userId)
@@ -118,7 +118,7 @@ class FetchMessagesManager @Inject constructor(
                     )
                 }
                 realm.close()
-                return
+                return false
             }
 
             return@let threads.filter { it.folderId == folder.id }.toList()
@@ -153,11 +153,12 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (threadsWithNewMessages.isEmpty()) {
             realm.close()
-            return
+            return false
         }
 
         // Notify Threads with new Messages
         val unReadThreadsCount = threadsWithNewMessages.count()
+        var hasShownNotification = false
         threadsWithNewMessages.forEachIndexed { index, thread ->
             thread.showThreadNotification(
                 userId = userId,
@@ -167,10 +168,13 @@ class FetchMessagesManager @Inject constructor(
                 isLastMessage = index == threadsWithNewMessages.lastIndex,
                 sentryMessageUid = sentryMessageUid,
                 okHttpClient = okHttpClient,
-            )
+            ).let {
+                if (it) hasShownNotification = true
+            }
         }
 
         realm.close()
+        return hasShownNotification
     }
 
     private suspend fun Thread.showThreadNotification(
@@ -181,7 +185,7 @@ class FetchMessagesManager @Inject constructor(
         isLastMessage: Boolean,
         sentryMessageUid: String?,
         okHttpClient: OkHttpClient,
-    ) {
+    ): Boolean {
 
         ThreadController.fetchMessagesHeavyData(messages, realm, okHttpClient)
 
@@ -194,12 +198,12 @@ class FetchMessagesManager @Inject constructor(
                 messageUid = sentryMessageUid,
                 mailbox = mailbox,
             )
-            return
+            return false
         }
 
         // If the Message has already been seen before receiving the Notification, we don't want to display it.
         // We can leave safely.
-        if (message.isSeen) return
+        if (message.isSeen) return false
 
         val formattedPreview = message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
         val body = if (message.body?.value.isNullOrBlank()) {
@@ -220,7 +224,7 @@ class FetchMessagesManager @Inject constructor(
         val description = "$subject$formattedBody".take(MAX_CHAR_LIMIT)
 
         // Show Message notification
-        notificationUtils.showMessageNotification(
+        val hasShownNotification = notificationUtils.showMessageNotification(
             scope = coroutineScope,
             notificationManagerCompat = notificationManagerCompat,
             payload = NotificationPayload(
@@ -236,7 +240,7 @@ class FetchMessagesManager @Inject constructor(
         )
 
         // Show Group Summary notification
-        if (isLastMessage) {
+        if (hasShownNotification && isLastMessage) {
             val summaryText = appContext.resources.getQuantityString(
                 R.plurals.newMessageNotificationSummary,
                 unReadThreadsCount,
@@ -257,6 +261,8 @@ class FetchMessagesManager @Inject constructor(
                 ),
             )
         }
+
+        return hasShownNotification
     }
 
     companion object {
