@@ -370,7 +370,7 @@
     <string name="myKSuiteQuotasAlertFullDescription">Liberate spazio o passate alla my kSuite+.</string>
     <string name="myKSuiteQuotasAlertFullTitle">Blocco della ricezione e dell’invio di messaggi</string>
     <string name="myKSuiteQuotasAlertTitle">Limite di memoria quasi raggiunto</string>
-    <string name="myKSuiteSpaceFullAlert">Non c’è spazio sufficiente per eseguire questa azione.</string>
+    <string name="myKSuiteSpaceFullAlert">Lo spazio di memoria non è sufficiente per eseguire questa azione.</string>
     <string name="newAccountDescription">Comunicare e archiviare documenti e foto in un ecosistema privo di pubblicità che rispetta la vostra privacy</string>
     <string name="newAccountStorageDrive">15 GB di memoria kDrive</string>
     <string name="newAccountStorageMail">20 GB di memoria per la posta</string>
