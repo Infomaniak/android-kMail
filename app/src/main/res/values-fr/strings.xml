@@ -403,6 +403,7 @@
     <string name="noUpdatedAt">Jamais mis à jour</string>
     <string name="noValidMailboxTitle">Aucune boîte valide n’a été trouvée. Ne peut être corrigé que sur le webmail pour l’instant.</string>
     <string name="notificationGeneralChannelName">Notifications générales</string>
+    <string name="notificationNewEmail">Vous pourriez avoir de nouveaux messages</string>
     <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>
     <string name="notificationSyncDraftChannelName">Sauvegarde des brouillons</string>
     <string name="notificationSyncMessagesChannelName">Récupération des nouveaux e-mails</string>

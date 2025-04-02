@@ -73,6 +73,7 @@ class LaunchActivity : AppCompatActivity() {
         setDefaultLocaleIfNeeded()
 
         handleNotificationDestinationIntent()
+
         checkUpdateIsRequired(
             BuildConfig.APPLICATION_ID,
             BuildConfig.VERSION_NAME,

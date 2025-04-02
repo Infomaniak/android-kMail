@@ -394,6 +394,7 @@
     <string name="noUpdatedAt">Nie aktualisiert</string>
     <string name="noValidMailboxTitle">Keine gültige Mailbox gefunden. Kann im Moment nur im Webmail behoben werden.</string>
     <string name="notificationGeneralChannelName">Allgemeine Benachrichtigungen</string>
+    <string name="notificationNewEmail">Sie haben möglicherweise neue Nachrichten erhalten</string>
     <string name="notificationNewMessagesChannelName">Neue Emails</string>
     <string name="notificationSyncDraftChannelName">Speichern von Entwürfen</string>
     <string name="notificationSyncMessagesChannelName">Abrufen neuer E-Mails</string>

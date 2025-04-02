@@ -28,6 +28,7 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
@@ -71,6 +72,7 @@ import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.NotificationUtils.Companion.GENERIC_NEW_MAILS_NOTIFICATION_ID
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
@@ -155,6 +157,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var inAppReviewManager: InAppReviewManager
+
+    @Inject
+    lateinit var notificationManagerCompat: NotificationManagerCompat
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
@@ -399,6 +404,7 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         playServicesUtils.checkPlayServices(this)
+        notificationManagerCompat.cancel(GENERIC_NEW_MAILS_NOTIFICATION_ID)
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
     }
 
