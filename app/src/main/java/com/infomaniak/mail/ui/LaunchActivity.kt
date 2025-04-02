@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.lib.core.extensions.setDefaultLocaleIfNeeded
@@ -39,7 +38,6 @@ import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.NotificationUtils.Companion.GENERIC_NEW_MAILS_NOTIFICATION_ID
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.launchLoginActivity
@@ -69,15 +67,12 @@ class LaunchActivity : AppCompatActivity() {
     @Inject
     lateinit var localSettings: LocalSettings
 
-    @Inject
-    lateinit var notificationManagerCompat: NotificationManagerCompat
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setDefaultLocaleIfNeeded()
 
-        handleNotifications()
+        handleNotificationDestinationIntent()
 
         checkUpdateIsRequired(
             BuildConfig.APPLICATION_ID,
@@ -141,10 +136,7 @@ class LaunchActivity : AppCompatActivity() {
             .startActivities()
     }
 
-    private fun handleNotifications() {
-
-        notificationManagerCompat.cancel(GENERIC_NEW_MAILS_NOTIFICATION_ID)
-
+    private fun handleNotificationDestinationIntent() {
         navigationArgs?.let {
             if (it.userId != AppSettings.DEFAULT_ID && it.mailboxId != AppSettings.DEFAULT_ID) {
                 if (AccountUtils.currentUserId != it.userId) AccountUtils.currentUserId = it.userId
