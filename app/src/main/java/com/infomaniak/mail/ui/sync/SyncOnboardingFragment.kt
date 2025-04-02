@@ -51,7 +51,6 @@ class SyncOnboardingFragment : Fragment() {
         setSystemBarsColors(statusBarColor = R.color.onboarding_secondary_background)
 
         binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
-        localSettings.showSyncDiscoveryBottomSheet = false
         setupClickListener()
     }
 

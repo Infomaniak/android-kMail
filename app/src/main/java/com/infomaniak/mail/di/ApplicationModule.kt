@@ -26,6 +26,7 @@ import com.infomaniak.lib.stores.AppUpdateScheduler
 import com.infomaniak.lib.stores.StoresSettingsRepository
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.ui.sync.discovery.SyncDiscoveryRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -79,4 +80,8 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun providesSvgImageLoader(mainApplication: MainApplication): ImageLoader = mainApplication.createSvgImageLoader()
+
+    @Provides
+    @Singleton
+    fun providesSyncDiscoveryRepository(appContext: Context): SyncDiscoveryRepository = SyncDiscoveryRepository(appContext)
 }

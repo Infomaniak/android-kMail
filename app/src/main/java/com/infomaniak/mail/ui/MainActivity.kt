@@ -71,6 +71,7 @@ import com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment
 import com.infomaniak.mail.ui.main.search.SearchFragmentArgs
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity
 import com.infomaniak.mail.ui.sync.SyncAutoConfigActivity
+import com.infomaniak.mail.ui.sync.discovery.SyncDiscoveryManager
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.Companion.GENERIC_NEW_MAILS_NOTIFICATION_ID
 import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
@@ -161,6 +162,9 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
 
+    @Inject
+    lateinit var syncDiscoveryManager: SyncDiscoveryManager
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
 
         var hasDragged = false
@@ -207,6 +211,9 @@ class MainActivity : BaseActivity() {
         observeDeletedMessages()
         observeDeleteThreadTrigger()
         observeDraftWorkerResults()
+
+        observeCanShowSyncDiscovery()
+
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
@@ -224,6 +231,7 @@ class MainActivity : BaseActivity() {
 
         initAppUpdateManager()
         initAppReviewManager()
+        syncDiscoveryManager.init()
     }
 
     private fun setupMenuDrawer() {
@@ -278,6 +286,14 @@ class MainActivity : BaseActivity() {
                         displayError(errorRes)
                     }
                 }
+            }
+        }
+    }
+
+    private fun observeCanShowSyncDiscovery() {
+        syncDiscoveryManager.syncDiscoveryViewModel.canShowSyncDiscovery.observe(this) { canShowSyncDiscovery ->
+            if (canShowSyncDiscovery) {
+                showSyncDiscovery()
             }
         }
     }
@@ -392,13 +408,6 @@ class MainActivity : BaseActivity() {
     private fun scheduleDraftActionsWorkWithDelay() = lifecycleScope.launch(Dispatchers.IO) {
         delay(1_000L)
         draftsActionsWorkerScheduler.scheduleWork()
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        localSettings.appLaunches++
-        showSyncDiscovery()
     }
 
     override fun onResume() {
@@ -533,8 +542,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSyncDiscovery() = with(localSettings) {
-        if (!showPermissionsOnboarding && showSyncDiscoveryBottomSheet && appLaunches > 1 && !isUserAlreadySynchronized()) {
-            showSyncDiscoveryBottomSheet = false
+        if (!showPermissionsOnboarding && !isUserAlreadySynchronized()) {
             navController.navigate(R.id.syncDiscoveryBottomSheetDialog)
         }
     }
