@@ -27,11 +27,12 @@ import com.infomaniak.core.myksuite.ui.screens.MyKSuiteDashboardScreenData
 import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils
 import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorResBasedOnId
+import com.infomaniak.lib.core.utils.canNavigate
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.R
 
 fun Fragment.openMyKSuiteUpgradeBottomSheet(matomoTrackerName: String) {
-    requireActivity().openMyKSuiteUpgradeBottomSheet(findNavController(), matomoTrackerName)
+    if (canNavigate()) requireActivity().openMyKSuiteUpgradeBottomSheet(findNavController(), matomoTrackerName)
 }
 
 fun Activity.openMyKSuiteUpgradeBottomSheet(navController: NavController, matomoTrackerName: String) {
