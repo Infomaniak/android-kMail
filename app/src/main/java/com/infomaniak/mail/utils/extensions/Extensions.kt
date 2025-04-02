@@ -475,6 +475,7 @@ fun DescriptionAlertDialog.moveWithConfirmationPopup(
 fun DescriptionAlertDialog.archiveWithConfirmationPopup(
     folderRole: FolderRole?,
     count: Int,
+    onCancel: (() -> Unit)? = null,
     onPositiveButtonClicked: () -> Unit,
 ) = if (folderRole == FolderRole.SNOOZED) {
     show(
@@ -482,6 +483,7 @@ fun DescriptionAlertDialog.archiveWithConfirmationPopup(
         description = binding.context.resources.getQuantityString(R.plurals.snoozeArchiveConfirmAlertDescription, count),
         displayLoader = false,
         onPositiveButtonClicked = onPositiveButtonClicked,
+        onCancel = onCancel,
     )
 } else {
     onPositiveButtonClicked()

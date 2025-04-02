@@ -450,8 +450,18 @@ class ThreadListFragment : TwoPaneFragment() {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                archiveThread(thread.uid)
-                folderRole == FolderRole.ARCHIVE
+                descriptionDialog.archiveWithConfirmationPopup(
+                    folderRole = folderRole,
+                    count = 1, // TODO: displayLoader?
+                    onCancel = {
+                        // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
+                        // otherwise it will notify the next item in the list and make it slightly blink
+                        if (threadListAdapter.dataSet.indexOf(thread) == position) threadListAdapter.notifyItemChanged(position)
+                    },
+                ) {
+                    archiveThread(thread.uid)
+                }
+                folderRole == FolderRole.ARCHIVE // TODO: Why is this not `false` for everyone?
             }
             SwipeAction.DELETE -> {
                 descriptionDialog.deleteWithConfirmationPopup(

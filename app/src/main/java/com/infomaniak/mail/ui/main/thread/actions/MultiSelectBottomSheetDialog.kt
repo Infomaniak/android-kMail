@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.utils.extensions.animatedNavigation
+import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -87,8 +88,13 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     toggleThreadsSeenStatus(threadsUids, shouldRead)
                 }
                 R.id.actionArchive -> {
-                    trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, threadsCount, isFromBottomSheet = true)
-                    archiveThreads(threadsUids)
+                    descriptionDialog.archiveWithConfirmationPopup(
+                        folderRole = getActionFolderRole(threads.firstOrNull()),
+                        count = threadsCount,
+                    ) {
+                        trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, threadsCount, isFromBottomSheet = true)
+                        archiveThreads(threadsUids)
+                    }
                 }
                 R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(

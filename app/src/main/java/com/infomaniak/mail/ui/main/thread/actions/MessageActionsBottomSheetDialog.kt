@@ -43,10 +43,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
-import com.infomaniak.mail.utils.extensions.animatedNavigation
-import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
-import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -130,8 +127,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             //region Actions
             override fun onArchive() {
-                trackBottomSheetMessageActionsEvent(ACTION_ARCHIVE_NAME, message.folder.role == FolderRole.ARCHIVE)
-                mainViewModel.archiveMessage(threadUid, message)
+                descriptionDialog.archiveWithConfirmationPopup(message.folder.role, count = 1) {
+                    trackBottomSheetMessageActionsEvent(ACTION_ARCHIVE_NAME, message.folder.role == FolderRole.ARCHIVE)
+                    mainViewModel.archiveMessage(threadUid, message)
+                }
             }
 
             override fun onReadUnread() {
