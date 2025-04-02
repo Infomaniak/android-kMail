@@ -167,10 +167,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //endregion
 
                 //region Actions
-                override fun onArchive() = with(mainViewModel) {
+                override fun onArchive() {
                     descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                         trackBottomSheetThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
-                        archiveThread(threadUid)
+                        mainViewModel.archiveThread(threadUid)
                     }
                 }
 
@@ -181,9 +181,14 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onMove() {
+                    val navController = findNavController()
                     descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
                         trackBottomSheetThreadActionsEvent(ACTION_MOVE_NAME)
-                        animatedNavigation(R.id.moveFragment, MoveFragmentArgs(arrayOf(threadUid)).toBundle(), currentClassName)
+                        navController.animatedNavigation(
+                            resId = R.id.moveFragment,
+                            args = MoveFragmentArgs(arrayOf(threadUid)).toBundle(),
+                            currentClassName = currentClassName,
+                        )
                     }
                 }
 

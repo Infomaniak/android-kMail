@@ -416,12 +416,19 @@ fun DescriptionAlertDialog.deleteWithConfirmationPopup(
     displayLoader: Boolean = true,
     onCancel: (() -> Unit)? = null,
     callback: () -> Unit,
-) = when {
-    folderRole == FolderRole.SNOOZED -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
-    isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT -> { // We don't want to display the popup for Drafts
-        showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
+): Boolean {
+    var isDialogShow = true
+    when {
+        folderRole == FolderRole.SNOOZED -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
+        isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT -> { // We don't want to display the popup for Drafts
+            showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
+        }
+        else -> {
+            isDialogShow = false
+            callback()
+        }
     }
-    else -> callback()
+    return isDialogShow
 }
 
 fun DescriptionAlertDialog.showDeletePermanentlyDialog(
@@ -477,16 +484,20 @@ fun DescriptionAlertDialog.archiveWithConfirmationPopup(
     count: Int,
     onCancel: (() -> Unit)? = null,
     onPositiveButtonClicked: () -> Unit,
-) = if (folderRole == FolderRole.SNOOZED) {
-    show(
-        title = binding.context.getString(R.string.actionArchive),
-        description = binding.context.resources.getQuantityString(R.plurals.snoozeArchiveConfirmAlertDescription, count),
-        displayLoader = false,
-        onPositiveButtonClicked = onPositiveButtonClicked,
-        onCancel = onCancel,
-    )
-} else {
-    onPositiveButtonClicked()
+): Boolean {
+    val isDialogShown = folderRole == FolderRole.SNOOZED
+    if (isDialogShown) {
+        show(
+            title = binding.context.getString(R.string.actionArchive),
+            description = binding.context.resources.getQuantityString(R.plurals.snoozeArchiveConfirmAlertDescription, count),
+            displayLoader = false,
+            onPositiveButtonClicked = onPositiveButtonClicked,
+            onCancel = onCancel,
+        )
+    } else {
+        onPositiveButtonClicked()
+    }
+    return isDialogShown
 }
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {

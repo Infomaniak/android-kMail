@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -141,11 +142,14 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onMove() {
                 trackBottomSheetMessageActionsEvent(ACTION_MOVE_NAME)
-                animatedNavigation(
-                    resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
-                    currentClassName = currentClassName,
-                )
+                val navController = findNavController()
+                descriptionDialog.moveWithConfirmationPopup(message.folder.role, count = 1) {
+                    navController.animatedNavigation(
+                        resId = R.id.moveFragment,
+                        args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
+                        currentClassName = currentClassName,
+                    )
+                }
             }
 
             override fun onSnooze() = Unit

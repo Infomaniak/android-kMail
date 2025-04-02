@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -39,10 +40,7 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
-import com.infomaniak.mail.utils.extensions.animatedNavigation
-import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
-import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -75,13 +73,19 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             when (id) {
                 R.id.actionMove -> {
-                    trackMultiSelectActionEvent(ACTION_MOVE_NAME, threadsCount, isFromBottomSheet = true)
-                    animatedNavigation(
-                        directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
-                            threadsUids = threadsUids.toTypedArray(),
-                        ),
-                        currentClassName = currentClassName,
-                    )
+                    val navController = findNavController()
+                    descriptionDialog.moveWithConfirmationPopup(
+                        folderRole = getActionFolderRole(threads.firstOrNull()),
+                        count = threadsCount,
+                    ) {
+                        trackMultiSelectActionEvent(ACTION_MOVE_NAME, threadsCount, isFromBottomSheet = true)
+                        navController.animatedNavigation(
+                            directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
+                                threadsUids = threadsUids.toTypedArray(),
+                            ),
+                            currentClassName = currentClassName,
+                        )
+                    }
                 }
                 R.id.actionReadUnread -> {
                     trackMultiSelectActionEvent(ACTION_MARK_AS_SEEN_NAME, threadsCount, isFromBottomSheet = true)

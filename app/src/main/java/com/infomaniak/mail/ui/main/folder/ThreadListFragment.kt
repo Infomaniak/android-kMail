@@ -461,7 +461,6 @@ class ThreadListFragment : TwoPaneFragment() {
                 ) {
                     archiveThread(thread.uid)
                 }
-                folderRole == FolderRole.ARCHIVE // TODO: Why is this not `false` for everyone?
             }
             SwipeAction.DELETE -> {
                 descriptionDialog.deleteWithConfirmationPopup(
@@ -478,15 +477,20 @@ class ThreadListFragment : TwoPaneFragment() {
                         deleteThread(thread.uid, isSwipe = true)
                     },
                 )
-                isPermanentDeleteFolder
             }
             SwipeAction.FAVORITE -> {
                 toggleThreadFavoriteStatus(thread.uid)
                 true
             }
             SwipeAction.MOVE -> {
-                animatedNavigation(ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)))
-                false
+                val navController = findNavController()
+                descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
+                    navController.animatedNavigation(
+                        directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)),
+                        currentClassName = javaClass.name,
+                    )
+                }
+                true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
                 safeNavigate(
