@@ -42,7 +42,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
 
     override val sharedPreferences = context.applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)!!
 
-    var appLaunches by sharedValue("appLaunchesKey", 0)
     var cancelDelay by sharedValue("cancelDelayKey", 10)
     var emailForwarding by sharedValue("emailForwardingKey", EmailForwarding.IN_BODY)
     var includeMessageInReply by sharedValue("includeMessageInReplyKey", true)
@@ -61,7 +60,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var firebaseToken by sharedValueNullable("firebaseTokenKey", null)
     var firebaseRegisteredUsers by sharedValue("firebaseRegisteredUsersKey", emptySet())
     var showAiDiscoveryBottomSheet by sharedValue("showAiDiscoveryBottomSheetKey", true)
-    var showSyncDiscoveryBottomSheet by sharedValue("showSyncDiscoveryBottomSheetKey", true)
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
     var isSentryTrackingEnabled by sharedValue("isSentryTrackingEnabledKey", true)
     var isMatomoTrackingEnabled by sharedValue("isMatomoTrackingEnabledKey", true)
