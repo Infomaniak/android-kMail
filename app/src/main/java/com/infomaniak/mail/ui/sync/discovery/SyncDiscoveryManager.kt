@@ -29,10 +29,20 @@ class SyncDiscoveryManager @Inject constructor(
     private val activity: FragmentActivity,
 ) : DefaultLifecycleObserver {
 
-    val syncDiscoveryViewModel: SyncDiscoveryViewModel by activity.viewModels()
+    private val syncDiscoveryViewModel: SyncDiscoveryViewModel by activity.viewModels()
 
-    fun init() {
+    private var showSyncDiscovery: (() -> Unit)? = null
+
+    fun init(showSyncDiscovery: () -> Unit) {
         activity.lifecycle.addObserver(observer = this)
+        this.showSyncDiscovery = showSyncDiscovery
+    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        syncDiscoveryViewModel.canShowSyncDiscovery.observe(owner) { canShowSyncDiscovery ->
+            if (canShowSyncDiscovery) showSyncDiscovery?.invoke()
+        }
     }
 
     override fun onResume(owner: LifecycleOwner) {

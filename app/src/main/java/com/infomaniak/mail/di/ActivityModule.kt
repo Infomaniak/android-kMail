@@ -22,7 +22,6 @@ import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.sync.discovery.SyncDiscoveryManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,8 +48,4 @@ object ActivityModule {
         reviewDialogTitleResId = R.string.reviewAlertTitle,
         feedbackUrlResId = R.string.urlUserReportAndroid,
     )
-
-    @ActivityScoped
-    @Provides
-    fun provideSyncDiscoveryManager(activity: FragmentActivity) = SyncDiscoveryManager(activity)
 }

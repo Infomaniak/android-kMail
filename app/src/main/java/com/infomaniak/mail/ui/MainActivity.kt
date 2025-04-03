@@ -212,8 +212,6 @@ class MainActivity : BaseActivity() {
         observeDeleteThreadTrigger()
         observeDraftWorkerResults()
 
-        observeCanShowSyncDiscovery()
-
         binding.drawerLayout.addDrawerListener(drawerListener)
         registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
@@ -231,7 +229,7 @@ class MainActivity : BaseActivity() {
 
         initAppUpdateManager()
         initAppReviewManager()
-        syncDiscoveryManager.init()
+        syncDiscoveryManager.init(::showSyncDiscovery)
     }
 
     private fun setupMenuDrawer() {
@@ -286,14 +284,6 @@ class MainActivity : BaseActivity() {
                         displayError(errorRes)
                     }
                 }
-            }
-        }
-    }
-
-    private fun observeCanShowSyncDiscovery() {
-        syncDiscoveryManager.syncDiscoveryViewModel.canShowSyncDiscovery.observe(this) { canShowSyncDiscovery ->
-            if (canShowSyncDiscovery) {
-                showSyncDiscovery()
             }
         }
     }
