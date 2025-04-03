@@ -69,7 +69,6 @@ import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.lib.core.utils.showToast
@@ -91,7 +90,6 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
-import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
@@ -110,7 +108,6 @@ import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
-import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
 import io.realm.kotlin.ext.copyFromRealm
@@ -409,96 +406,6 @@ fun List<Message>.getFoldersIds(exception: String? = null): ImpactedFolders {
 
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
-
-fun DescriptionAlertDialog.deleteWithConfirmationPopup(
-    folderRole: FolderRole?,
-    count: Int,
-    displayLoader: Boolean = true,
-    onCancel: (() -> Unit)? = null,
-    callback: () -> Unit,
-): Boolean {
-    var isDialogShow = true
-    when {
-        folderRole == FolderRole.SNOOZED -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
-        isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT -> { // We don't want to display the popup for Drafts
-            showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
-        }
-        else -> {
-            isDialogShow = false
-            callback()
-        }
-    }
-    return isDialogShow
-}
-
-fun DescriptionAlertDialog.showDeletePermanentlyDialog(
-    deletedCount: Int,
-    displayLoader: Boolean,
-    onPositiveButtonClicked: () -> Unit,
-    onCancel: (() -> Unit)? = null,
-) = show(
-    title = binding.context.resources.getQuantityString(
-        R.plurals.threadListDeletionConfirmationAlertTitle,
-        deletedCount,
-        deletedCount,
-    ),
-    description = binding.context.resources.getQuantityString(
-        R.plurals.threadListDeletionConfirmationAlertDescription,
-        deletedCount,
-    ),
-    displayLoader = displayLoader,
-    onPositiveButtonClicked = onPositiveButtonClicked,
-    onCancel = onCancel,
-)
-
-fun DescriptionAlertDialog.showDeleteSnoozeDialog(
-    deletedCount: Int,
-    displayLoader: Boolean,
-    onPositiveButtonClicked: () -> Unit,
-    onCancel: (() -> Unit)? = null,
-) = show(
-    title = binding.context.getString(R.string.actionDelete),
-    description = binding.context.resources.getQuantityString(R.plurals.snoozeDeleteConfirmAlertDescription, deletedCount),
-    displayLoader = displayLoader,
-    onPositiveButtonClicked = onPositiveButtonClicked,
-    onCancel = onCancel,
-)
-
-fun DescriptionAlertDialog.moveWithConfirmationPopup(
-    folderRole: FolderRole?,
-    count: Int,
-    onPositiveButtonClicked: () -> Unit,
-) = if (folderRole == FolderRole.SNOOZED) {
-    show(
-        title = binding.context.getString(R.string.actionMove),
-        description = binding.context.resources.getQuantityString(R.plurals.snoozeMoveConfirmAlertDescription, count),
-        displayLoader = false,
-        onPositiveButtonClicked = onPositiveButtonClicked,
-    )
-} else {
-    onPositiveButtonClicked()
-}
-
-fun DescriptionAlertDialog.archiveWithConfirmationPopup(
-    folderRole: FolderRole?,
-    count: Int,
-    onCancel: (() -> Unit)? = null,
-    onPositiveButtonClicked: () -> Unit,
-): Boolean {
-    val isDialogShown = folderRole == FolderRole.SNOOZED
-    if (isDialogShown) {
-        show(
-            title = binding.context.getString(R.string.actionArchive),
-            description = binding.context.resources.getQuantityString(R.plurals.snoozeArchiveConfirmAlertDescription, count),
-            displayLoader = false,
-            onPositiveButtonClicked = onPositiveButtonClicked,
-            onCancel = onCancel,
-        )
-    } else {
-        onPositiveButtonClicked()
-    }
-    return isDialogShown
-}
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
     addItemDecoration(HeaderItemDecoration(this, false) { position ->
