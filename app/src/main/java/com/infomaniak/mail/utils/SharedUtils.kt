@@ -269,12 +269,17 @@ class SharedUtils @Inject constructor(
             return apiResponses.computeSnoozeResult(ImpactedFolders(impactedFolderIds, mutableSetOf(FolderRole.SNOOZED)))
         }
 
-        fun shouldDisplaySnoozeActions(mainViewModel: MainViewModel, localSettings: LocalSettings): Boolean {
+        fun shouldDisplaySnoozeActions(
+            mainViewModel: MainViewModel,
+            localSettings: LocalSettings,
+            currentFolderRole: FolderRole?,
+        ): Boolean {
             fun hasSnoozeFeatureFlag() = mainViewModel.currentMailbox.value?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
             fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
 
-            return hasSnoozeFeatureFlag() && isConversationMode()
+            return currentFolderRole == FolderRole.INBOX || currentFolderRole == FolderRole.SNOOZED && hasSnoozeFeatureFlag() && isConversationMode()
         }
+
         sealed interface AutomaticUnsnoozeResult {
             data class Success(val impactedFolders: ImpactedFolders) : AutomaticUnsnoozeResult
             data object CannotBeUnsnoozedError : AutomaticUnsnoozeResult

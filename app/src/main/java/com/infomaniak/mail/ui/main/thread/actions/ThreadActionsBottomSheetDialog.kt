@@ -100,7 +100,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
-        val shouldDisplaySnoozeActions = SharedUtils.shouldDisplaySnoozeActions(mainViewModel, localSettings)
+        val shouldDisplaySnoozeActions = SharedUtils.shouldDisplaySnoozeActions(mainViewModel, localSettings, folderRole)
 
         snooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed.not()
         modifySnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed

@@ -206,7 +206,8 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             return threads.any { it.isSnoozed() != isFirstThreadSnoozed }
         }
 
-        val shouldDisplaySnoozeActions = SharedUtils.shouldDisplaySnoozeActions(mainViewModel, localSettings)
+        val currentFolderRole = mainViewModel.currentFolder.value?.role
+        val shouldDisplaySnoozeActions = SharedUtils.shouldDisplaySnoozeActions(mainViewModel, localSettings, currentFolderRole)
         if (shouldDisplaySnoozeActions.not() || hasMixedSnoozeState()) {
             snooze.isGone = true
             modifySnooze.isGone = true
