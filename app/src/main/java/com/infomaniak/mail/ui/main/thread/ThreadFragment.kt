@@ -619,24 +619,24 @@ class ThreadFragment : Fragment() {
 
     private fun executeSavedSnoozeScheduleType(timestamp: Long) {
         when (val type = threadViewModel.snoozeScheduleType) {
-            is SnoozeScheduleType.Snooze -> snoozeThread(timestamp, type.threadUid)
-            is SnoozeScheduleType.Modify -> rescheduleSnoozedThread(timestamp, type.threadUid)
+            is SnoozeScheduleType.Snooze -> snoozeThread(timestamp, type.threadUids)
+            is SnoozeScheduleType.Modify -> rescheduleSnoozedThread(timestamp, type.threadUids)
             null -> SentryLog.e(TAG, "Tried to execute snooze api call but there's no saved schedule type to handle")
         }
     }
 
-    private fun snoozeThread(timestamp: Long, threadUid: String) {
+    private fun snoozeThread(timestamp: Long, threadUids: List<String>) {
         lifecycleScope.launch {
-            val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), listOf(threadUid))
+            val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), threadUids)
             if (isSuccess) twoPaneViewModel.closeThread()
         }
     }
 
-    private fun rescheduleSnoozedThread(timestamp: Long, threadUid: String) {
+    private fun rescheduleSnoozedThread(timestamp: Long, threadUids: List<String>) {
         lifecycleScope.launch {
             binding.snoozeAlert.showAction1Progress()
 
-            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), listOf(threadUid))
+            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), threadUids)
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
             if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()
