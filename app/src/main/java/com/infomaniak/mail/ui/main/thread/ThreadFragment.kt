@@ -468,7 +468,7 @@ class ThreadFragment : Fragment() {
             snoozeAlert.apply {
                 onAction1 {
                     trackSnoozeEvent(ACTION_MODIFY_SNOOZE_NAME)
-                    navigateToSnoozeBottomSheet(SnoozeScheduleType.Modify)
+                    navigateToSnoozeBottomSheet(SnoozeScheduleType.Modify(thread.uid))
                 }
                 onAction2 {
                     trackSnoozeEvent(ACTION_CANCEL_SNOOZE_NAME)
@@ -606,41 +606,37 @@ class ThreadFragment : Fragment() {
             dateAndTimeSnoozeDialog.show(
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
-                    threadViewModel.threadLive.value?.let { thread ->
-                        executeSavedSnoozeScheduleType(timestamp, thread)
-                    }
+                    executeSavedSnoozeScheduleType(timestamp)
                 },
                 onAbort = { navigateToSnoozeBottomSheet(threadViewModel.snoozeScheduleType) },
             )
         }
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
-            threadViewModel.threadLive.value?.let { thread ->
-                executeSavedSnoozeScheduleType(selectedScheduleEpoch, thread)
-            }
+            executeSavedSnoozeScheduleType(selectedScheduleEpoch)
         }
     }
 
-    private fun executeSavedSnoozeScheduleType(timestamp: Long, thread: Thread) {
-        when (threadViewModel.snoozeScheduleType) {
-            SnoozeScheduleType.Snooze -> snoozeThread(timestamp, thread)
-            SnoozeScheduleType.Modify -> rescheduleSnoozedThread(timestamp, thread)
+    private fun executeSavedSnoozeScheduleType(timestamp: Long) {
+        when (val type = threadViewModel.snoozeScheduleType) {
+            is SnoozeScheduleType.Snooze -> snoozeThread(timestamp, type.threadUid)
+            is SnoozeScheduleType.Modify -> rescheduleSnoozedThread(timestamp, type.threadUid)
             null -> SentryLog.e(TAG, "Tried to execute snooze api call but there's no saved schedule type to handle")
         }
     }
 
-    private fun snoozeThread(timestamp: Long, thread: Thread) {
+    private fun snoozeThread(timestamp: Long, threadUid: String) {
         lifecycleScope.launch {
-            val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), listOf(thread))
+            val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), listOf(threadUid))
             if (isSuccess) twoPaneViewModel.closeThread()
         }
     }
 
-    private fun rescheduleSnoozedThread(timestamp: Long, thread: Thread) {
+    private fun rescheduleSnoozedThread(timestamp: Long, threadUid: String) {
         lifecycleScope.launch {
             binding.snoozeAlert.showAction1Progress()
 
-            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), listOf(thread))
+            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), listOf(threadUid))
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
             if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()

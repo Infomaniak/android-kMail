@@ -185,12 +185,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 override fun onSnooze() {
                     trackBottomSheetThreadActionsEvent(ACTION_SNOOZE_NAME)
-                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze)
+                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze(thread.uid))
                 }
 
                 override fun onModifySnooze() {
                     trackBottomSheetThreadActionsEvent(ACTION_MODIFY_SNOOZE_NAME)
-                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Modify)
+                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Modify(thread.uid))
                 }
 
                 override fun onCancelSnooze() {

@@ -1109,11 +1109,13 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Snooze
-    suspend fun snoozeThreads(date: Date, threads: List<Thread>): Boolean {
+    suspend fun snoozeThreads(date: Date, threadUids: List<String>): Boolean {
         var isSuccess = false
 
         viewModelScope.launch {
             currentMailbox.value?.let { currentMailbox ->
+                val threads = threadUids.mapNotNull { threadController.getThread(it) }
+
                 val messageUids = threads.mapNotNull { thread ->
                     thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
                 }
@@ -1135,11 +1137,14 @@ class MainViewModel @Inject constructor(
         return isSuccess
     }
 
-    suspend fun rescheduleSnoozedThreads(date: Date, threads: List<Thread>): BatchSnoozeResult {
+    suspend fun rescheduleSnoozedThreads(date: Date, threadUids: List<String>): BatchSnoozeResult {
         var rescheduleResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
 
         viewModelScope.launch(ioCoroutineContext) {
-            val snoozedThreadUuids = threads.mapNotNull { thread -> thread.snoozeUuid.takeIf { thread.isSnoozed() } }
+            val snoozedThreadUuids = threadUids.mapNotNull { threadUid ->
+                val thread = threadController.getThread(threadUid) ?: return@mapNotNull null
+                thread.snoozeUuid.takeIf { thread.isSnoozed() }
+            }
             if (snoozedThreadUuids.isEmpty()) return@launch
 
             val currentMailbox = currentMailbox.value!!

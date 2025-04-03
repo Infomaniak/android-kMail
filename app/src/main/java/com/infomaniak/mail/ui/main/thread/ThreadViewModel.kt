@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
+import android.os.Parcelable
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
@@ -50,6 +51,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 import kotlin.collections.set
 
@@ -486,8 +488,13 @@ class ThreadViewModel @Inject constructor(
 
     }
 
-    enum class SnoozeScheduleType {
-        Snooze, Modify
+    sealed interface SnoozeScheduleType : Parcelable {
+        val threadUid: String
+
+        @Parcelize
+        data class Snooze(override val threadUid: String) : SnoozeScheduleType
+        @Parcelize
+        data class Modify(override val threadUid: String) : SnoozeScheduleType
     }
 
     companion object {
