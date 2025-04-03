@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,6 +92,10 @@ object ErrorCode {
     const val MAX_SYNTAX_TOKENS_REACHED = "max_token_reached"
     const val TOO_MANY_REQUESTS = "too_many_request"
     const val OBJECT_NOT_FOUND = "object_not_found"
+    //endregion
+
+    //region Snooze
+    const val MAIL_MESSAGE_NOT_SNOOZED = "mail__message_not_snoozed"
     //endregion
 
     val apiErrorCodes = listOf(

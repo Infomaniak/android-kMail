@@ -345,6 +345,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
+    fun unsnoozeThread(mailboxUuid: String, snoozeUuid: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.snoozeAction(mailboxUuid, snoozeUuid), DELETE)
+    }
+
     fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>): List<ApiResponse<Unit>> {
         return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE_DELETE) {
             callApi(ApiRoutes.snooze(mailboxUuid), DELETE, mapOf("uuids" to it))

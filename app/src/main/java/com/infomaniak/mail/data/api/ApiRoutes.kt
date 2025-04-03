@@ -281,6 +281,10 @@ object ApiRoutes {
     fun snooze(mailboxUuid: String): String {
         return "${mailMailbox(mailboxUuid)}/snoozes"
     }
+
+    fun snoozeAction(mailboxUuid: String, snoozeUuid: String): String {
+        return "${snooze(mailboxUuid)}/$snoozeUuid"
+    }
     //endregion
 
     private fun mailboxUuidParameter(mailboxUuid: String): String {

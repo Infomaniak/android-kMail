@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
+import com.infomaniak.mail.utils.SharedUtils.Companion.AutomaticUnsnoozeResult
 import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.utils.extensions.toRealmInstant
@@ -232,8 +233,8 @@ class RefreshController @Inject constructor(
         // No need to check realm, there can't be any snoozed thread with a new message when there's a single message per thread
         if (localSettings.threadMode == ThreadMode.MESSAGE) return
 
-        val impactedFolderIds = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
-        impactedFolderIds.forEach { folderId ->
+        val impactedFolders = removeSnoozeStateOfThreadsWithNewMessages(scope, folder)
+        impactedFolders.getFolderIds(realm = this).forEach { folderId ->
             scope.ensureActive()
 
             runCatching {
@@ -244,13 +245,33 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): Set<String> {
+    private suspend fun Realm.removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): ImpactedFolders {
         return if (folder.role == FolderRole.INBOX) {
-            val snoozedThreadsWithNewMessage = ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm)
-            SharedUtils.unsnoozeThreadsWithoutRefresh(scope, mailbox, snoozedThreadsWithNewMessage)
+            val impactedFolders = ImpactedFolders()
+            val cannotBeUnsnoozedThreadUids = mutableListOf<String>()
+
+            ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm).forEach { snoozedThreadWithNewMessage ->
+                scope.ensureActive()
+                val result = SharedUtils.unnsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)
+                when (result) {
+                    is AutomaticUnsnoozeResult.Success -> impactedFolders += result.impactedFolders
+                    AutomaticUnsnoozeResult.CannotBeUnsnoozedError -> cannotBeUnsnoozedThreadUids += snoozedThreadWithNewMessage.uid
+                    AutomaticUnsnoozeResult.OtherError -> Unit
+                }
+            }
+
+            write {
+                cannotBeUnsnoozedThreadUids.forEach { manuallyUnsnoozeOutOfSyncThread(it) }
+            }
+
+            impactedFolders
         } else {
-            emptySet()
+            ImpactedFolders()
         }
+    }
+
+    private fun MutableRealm.manuallyUnsnoozeOutOfSyncThread(threadUid: String) {
+        ThreadController.getThread(threadUid, realm = this)?.manuallyUnsnooze()
     }
 
     private suspend fun Realm.fetchOnePageOfOldMessages(scope: CoroutineScope, folderId: String) {

@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -211,6 +212,28 @@ class SharedUtils @Inject constructor(
             }
         }
 
+        /**
+         * When manually unsnoozing threads, we need to know if a thread we've tried to unsnoozed failed to be unsnoozed because
+         * of a unrecoverable reason. This way we can stop trying to unsnooze it again and again. To know this, we need to use the
+         * api call that takes a single snooze uuid or we won't get the ApiResponse's error code that we need to detect this case.
+         *
+         * Start using [unsnoozeThreadsWithoutRefresh] again if we find a way to get this info with the batch call.
+         */
+        fun unnsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
+            val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: return AutomaticUnsnoozeResult.OtherError
+            val targetMessageSnoozeUuid = targetMessage.snoozeUuid ?: return AutomaticUnsnoozeResult.OtherError
+
+            val response = ApiRepository.unsnoozeThread(mailbox.uuid, targetMessageSnoozeUuid)
+
+            return when {
+                response.isSuccess() -> AutomaticUnsnoozeResult.Success(
+                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(Folder.FolderRole.SNOOZED))
+                )
+                response.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
+                else -> AutomaticUnsnoozeResult.OtherError
+            }
+        }
+
         fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
             val snoozeUuids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()
@@ -231,6 +254,12 @@ class SharedUtils @Inject constructor(
             scope.ensureActive()
 
             return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
+        }
+
+        sealed interface AutomaticUnsnoozeResult {
+            data class Success(val impactedFolders: ImpactedFolders) : AutomaticUnsnoozeResult
+            data object CannotBeUnsnoozedError : AutomaticUnsnoozeResult
+            data object OtherError : AutomaticUnsnoozeResult
         }
     }
 }

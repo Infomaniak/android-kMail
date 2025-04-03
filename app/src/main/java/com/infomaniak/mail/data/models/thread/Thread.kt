@@ -292,6 +292,15 @@ class Thread : RealmObject, Snoozable {
         return lastOrNull { it.folderId == folderId }?.isSnoozed() ?: false
     }
 
+    /**
+     * Only used for when the api tells us we're trying to automatically unsnooze a thread that's not snoozed
+     */
+    fun manuallyUnsnooze() {
+        snoozeState = null
+        snoozeEndDate = null
+        snoozeUuid = null
+    }
+
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
 
         val message = messages.lastOrNull {
