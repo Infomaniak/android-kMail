@@ -116,7 +116,7 @@ class MainViewModel @Inject constructor(
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
-    val deleteThreadOrMessageTrigger = SingleLiveEvent<Unit>()
+    val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
@@ -588,7 +588,7 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        deleteThreadOrMessageTrigger.postValue(Unit)
+        activityDialogLoaderResetTrigger.postValue(Unit)
 
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
@@ -831,6 +831,8 @@ class MainViewModel @Inject constructor(
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
         val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+
+        activityDialogLoaderResetTrigger.postValue(Unit)
 
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)

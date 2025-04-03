@@ -95,6 +95,7 @@ fun DescriptionAlertDialog.moveWithConfirmationPopup(
 fun DescriptionAlertDialog.archiveWithConfirmationPopup(
     folderRole: Folder.FolderRole?,
     count: Int,
+    displayLoader: Boolean = true,
     onCancel: (() -> Unit)? = null,
     onPositiveButtonClicked: () -> Unit,
 ): Boolean {
@@ -103,7 +104,7 @@ fun DescriptionAlertDialog.archiveWithConfirmationPopup(
         show(
             title = binding.context.getString(R.string.actionArchive),
             description = binding.context.resources.getQuantityString(R.plurals.snoozeArchiveConfirmAlertDescription, count),
-            displayLoader = false,
+            displayLoader = displayLoader,
             onPositiveButtonClicked = onPositiveButtonClicked,
             onCancel = onCancel,
         )
