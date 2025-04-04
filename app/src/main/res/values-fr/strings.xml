@@ -598,6 +598,21 @@
         <item quantity="many">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
     </plurals>
     <string name="snoozeAlertTitle">En attente jusqu’au : %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">Cette conversation ne sera plus en attente et sera archivée</item>
+        <item quantity="other">Ces conversations ne seront plus en attente et seront archivées</item>
+        <item quantity="many">Ces conversations ne seront plus en attente et seront archivées</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">Cette conversation ne sera plus en attente et sera supprimée</item>
+        <item quantity="other">Ces conversations ne seront plus en attente et seront supprimées</item>
+        <item quantity="many">Ces conversations ne seront plus en attente et seront supprimées</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">Cette conversation ne sera plus en attente et sera déplacée</item>
+        <item quantity="other">Ces conversations ne seront plus en attente et seront déplacées</item>
+        <item quantity="many">Ces conversations ne seront plus en attente et seront déplacées</item>
+    </plurals>
     <string name="snoozedFolder">En attente</string>
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>

@@ -62,10 +62,10 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.core.utils.endOfTheWeek
 import com.infomaniak.core.utils.startOfTheDay
 import com.infomaniak.core.utils.startOfTheWeek
+import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -90,7 +90,6 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
-import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
@@ -109,7 +108,6 @@ import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.TAG_SEPARATOR
-import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.kSyncAccountUri
 import com.infomaniak.mail.utils.WebViewUtils
 import io.realm.kotlin.ext.copyFromRealm
@@ -408,18 +406,6 @@ fun List<Message>.getFoldersIds(exception: String? = null): ImpactedFolders {
 
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
-
-fun DescriptionAlertDialog.deleteWithConfirmationPopup(
-    folderRole: FolderRole?,
-    count: Int,
-    displayLoader: Boolean = true,
-    onCancel: (() -> Unit)? = null,
-    callback: () -> Unit,
-) = if (isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT) { // We don't want to display the popup for Drafts
-    showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
-} else {
-    callback()
-}
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
     addItemDecoration(HeaderItemDecoration(this, false) { position ->

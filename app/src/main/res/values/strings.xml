@@ -591,6 +591,18 @@
         <item quantity="other">Reminders canceled. Your messages are back in your inbox</item>
     </plurals>
     <string name="snoozeAlertTitle">Snoozed until: %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">This conversation will no longer be snoozed and will be archived</item>
+        <item quantity="other">These conversations will no longer be snoozed and will be archived</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">This conversation will no longer be snoozed and will be deleted</item>
+        <item quantity="other">These conversations will no longer be snoozed and will be deleted</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">This conversation will no longer be snoozed and will be moved</item>
+        <item quantity="other">These conversations will no longer be snoozed and will be moved</item>
+    </plurals>
     <string name="snoozedFolder">Snoozed</string>
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>

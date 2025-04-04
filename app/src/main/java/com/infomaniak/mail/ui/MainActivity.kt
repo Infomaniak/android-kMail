@@ -209,7 +209,7 @@ class MainActivity : BaseActivity() {
         )
 
         observeDeletedMessages()
-        observeDeleteThreadTrigger()
+        observeActivityDialogLoaderReset()
         observeDraftWorkerResults()
 
         binding.drawerLayout.addDrawerListener(drawerListener)
@@ -254,8 +254,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun observeDeleteThreadTrigger() {
-        mainViewModel.deleteThreadOrMessageTrigger.observe(this) { descriptionDialog.resetLoadingAndDismiss() }
+    private fun observeActivityDialogLoaderReset() {
+        mainViewModel.activityDialogLoaderResetTrigger.observe(this) { descriptionDialog.resetLoadingAndDismiss() }
     }
 
     private fun observeDraftWorkerResults() {

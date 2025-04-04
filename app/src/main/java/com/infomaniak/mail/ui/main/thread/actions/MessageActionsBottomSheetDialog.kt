@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -43,10 +44,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
-import com.infomaniak.mail.utils.extensions.animatedNavigation
-import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
-import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
-import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -121,7 +119,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onDelete() {
-                descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+                descriptionDialog.deleteWithConfirmationPopup(message.folder.role, count = 1) {
                     trackBottomSheetMessageActionsEvent(ACTION_DELETE_NAME)
                     mainViewModel.deleteMessage(threadUid, message)
                 }
@@ -130,8 +128,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             //region Actions
             override fun onArchive() {
-                trackBottomSheetMessageActionsEvent(ACTION_ARCHIVE_NAME, message.folder.role == FolderRole.ARCHIVE)
-                mainViewModel.archiveMessage(threadUid, message)
+                descriptionDialog.archiveWithConfirmationPopup(message.folder.role, count = 1) {
+                    trackBottomSheetMessageActionsEvent(ACTION_ARCHIVE_NAME, message.folder.role == FolderRole.ARCHIVE)
+                    mainViewModel.archiveMessage(threadUid, message)
+                }
             }
 
             override fun onReadUnread() {
@@ -142,11 +142,14 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onMove() {
                 trackBottomSheetMessageActionsEvent(ACTION_MOVE_NAME)
-                animatedNavigation(
-                    resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
-                    currentClassName = currentClassName,
-                )
+                val navController = findNavController()
+                descriptionDialog.moveWithConfirmationPopup(message.folder.role, count = 1) {
+                    navController.animatedNavigation(
+                        resId = R.id.moveFragment,
+                        args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
+                        currentClassName = currentClassName,
+                    )
+                }
             }
 
             override fun onSnooze() = Unit
