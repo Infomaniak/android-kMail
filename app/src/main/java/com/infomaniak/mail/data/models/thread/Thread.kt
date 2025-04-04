@@ -104,11 +104,12 @@ class Thread : RealmObject, Snoozable {
     var isLocallyMovedOut: Boolean = false
     @Transient
     var numberOfScheduledDrafts: Int = 0
+    @Transient
+    var isLastInboxMessageSnoozed: Boolean = false
     //endregion
 
     @Ignore
     override var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
-        private set
 
     // TODO: Put this back in `private` when the Threads parental issues are fixed
     val _folders by backlinks(Folder::threads)
@@ -220,6 +221,7 @@ class Thread : RealmObject, Snoozable {
         snoozeState = null
         snoozeEndDate = null
         snoozeUuid = null
+        isLastInboxMessageSnoozed = false
     }
 
     private fun updateThread(lastMessage: Message) {
@@ -264,6 +266,38 @@ class Thread : RealmObject, Snoozable {
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
         subject = messages.first().subject
+
+        isLastInboxMessageSnoozed = messages.isLastInboxMessageSnoozed()
+    }
+
+    /**
+     * This method determines whether the last inbox message in the list is snoozed. If there are none, it returns false.
+     *
+     * Instead of querying Realm every time to retrieve the inbox folder ID, we rely on the fact that [Snoozable.isSnoozed] only
+     * returns `true` for messages whose [Message.folderId] matches the inbox folder ID.
+     *
+     * To illustrate the reasoning:
+     * | folderId == inbox | isSnoozed() | Comment                        | Result         |
+     * |-------------------|-------------|--------------------------------|----------------|
+     * | false             | false       | isSnoozed always returns false | false          |
+     * | false             | true        | This situation doesn't exist   | doesn't matter |
+     * |-------------------|-------------|--------------------------------|----------------|
+     * | true              | false       |                                | false          |
+     * | true              | true        |                                | true           |
+     *
+     * => Only returns true when the last message of inbox is snoozed
+     */
+    private fun List<Message>.isLastInboxMessageSnoozed(): Boolean {
+        return lastOrNull { it.folderId == folderId }?.isSnoozed() ?: false
+    }
+
+    /**
+     * Only used for when the api tells us we're trying to automatically unsnooze a thread that's not snoozed
+     */
+    override fun manuallyUnsnooze() {
+        super.manuallyUnsnooze()
+        messages.forEach(Message::manuallyUnsnooze)
+        duplicates.forEach(Message::manuallyUnsnooze)
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {

@@ -31,6 +31,8 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -43,6 +45,8 @@ import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -101,6 +105,13 @@ class SharedUtils @Inject constructor(
         mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
             ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+        }
+    }
+
+    suspend fun unsnoozeThreads(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>) {
+        val impactedFolders = unsnoozeThreadsWithoutRefresh(scope, mailbox, threads)
+        if (impactedFolders.isNotEmpty()) {
+            refreshFolders(mailbox = mailbox, messagesFoldersIds = ImpactedFolders(impactedFolders.toMutableSet()))
         }
     }
 
@@ -199,6 +210,56 @@ class SharedUtils @Inject constructor(
                 body().appendElement("pre").text(text).attr("style", "word-wrap: break-word; white-space: pre-wrap;")
                 return html()
             }
+        }
+
+        /**
+         * When manually unsnoozing threads, we need to know if a thread we've tried to unsnoozed failed to be unsnoozed because
+         * of a unrecoverable reason. This way we can stop trying to unsnooze it again and again. To know this, we need to use the
+         * api call that takes a single snooze uuid or we won't get the ApiResponse's error code that we need to detect this case.
+         *
+         * Start using [unsnoozeThreadsWithoutRefresh] again if we find a way to get this info with the batch call.
+         */
+        fun unnsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
+            val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: return AutomaticUnsnoozeResult.OtherError
+            val targetMessageSnoozeUuid = targetMessage.snoozeUuid ?: return AutomaticUnsnoozeResult.OtherError
+
+            val response = ApiRepository.unsnoozeThread(mailbox.uuid, targetMessageSnoozeUuid)
+
+            return when {
+                response.isSuccess() -> AutomaticUnsnoozeResult.Success(
+                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(Folder.FolderRole.SNOOZED))
+                )
+                response.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
+                else -> AutomaticUnsnoozeResult.OtherError
+            }
+        }
+
+        fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
+            val snoozeUuids: MutableList<String> = mutableListOf()
+            val impactedFolderIds: MutableSet<String> = mutableSetOf()
+
+            for (thread in threads) {
+                scope.ensureActive()
+
+                val targetMessage = thread.messages.lastOrNull(Message::isSnoozed)
+                val targetMessageSnoozeUuid = targetMessage?.snoozeUuid ?: continue
+
+                snoozeUuids += targetMessageSnoozeUuid
+                impactedFolderIds += targetMessage.folderId
+            }
+
+            if (snoozeUuids.isEmpty()) return emptySet()
+
+            val apiResponses = ApiRepository.unsnoozeThreads(mailbox.uuid, snoozeUuids)
+            scope.ensureActive()
+
+            return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
+        }
+
+        sealed interface AutomaticUnsnoozeResult {
+            data class Success(val impactedFolders: ImpactedFolders) : AutomaticUnsnoozeResult
+            data object CannotBeUnsnoozedError : AutomaticUnsnoozeResult
+            data object OtherError : AutomaticUnsnoozeResult
         }
     }
 }

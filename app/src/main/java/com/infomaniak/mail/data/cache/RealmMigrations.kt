@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.api.SnoozeUuidSerializer.lastUuidOrNull
+import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
 import io.realm.kotlin.dynamic.DynamicRealmObject
@@ -45,6 +46,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.initializeInternalDateAsDateAfterTwentySecondMigration()
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
     migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
+    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration()
 }
 
 // Migrate to version #1
@@ -157,7 +159,6 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
         }
     }
 }
-//endregion
 
 // Migrate from version #25
 private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration() {
@@ -178,6 +179,37 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
                 val snoozeAction = oldObject.getNullableValue<String>(fieldName = "snoozeAction")
                 val snoozeUuid = snoozeAction?.lastUuidOrNull()
                 set(propertyName = "snoozeUuid", value = snoozeUuid)
+            }
+        }
+    }
+}
+//endregion
+
+// Migrate from version #27
+private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration() {
+
+    if (oldRealm.schemaVersion() <= 27L) {
+        enumerate(className = "Thread") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.let { newThread ->
+                // Initialize new property by computing it based on other fields
+                val threadFolderId = newObject.getValue<String>("folderId")
+
+                val messages = newThread.getObjectList(propertyName = "messages")
+                messages.sortBy { it.getValue<RealmInstant>("internalDate") }
+                val lastMessage = messages.lastOrNull { it.getValue<String>("folderId") == threadFolderId }
+
+                val isSnoozed = if (lastMessage == null) {
+                    // Defaulting to `false` only means that this thread won't be automatically unsnoozed until it's recomputed
+                    false
+                } else {
+                    val snoozeState = lastMessage.getNullableValue<String>("_snoozeState")
+                    val snoozeEndDate = lastMessage.getNullableValue<RealmInstant>("snoozeEndDate")
+                    val snoozeUuid = lastMessage.getNullableValue<String>("snoozeUuid")
+
+                    snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
+                }
+
+                newThread.set(propertyName = "isLastInboxMessageSnoozed", value = isSnoozed)
             }
         }
     }
