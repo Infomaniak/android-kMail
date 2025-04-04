@@ -220,7 +220,7 @@ class SharedUtils @Inject constructor(
          *
          * Start using [unsnoozeThreadsWithoutRefresh] again if we find a way to get this info with the batch call.
          */
-        fun unnsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
+        fun unsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
             val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: return AutomaticUnsnoozeResult.OtherError
             val targetMessageSnoozeUuid = targetMessage.snoozeUuid ?: return AutomaticUnsnoozeResult.OtherError
 
