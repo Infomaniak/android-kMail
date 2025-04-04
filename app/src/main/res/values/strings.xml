@@ -167,7 +167,6 @@
     <string name="buttonReschedule">Reschedule</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
-    <string name="buttonScheduleTitle">Schedule</string>
     <string name="buttonSee">See</string>
     <string name="buttonSelectAll">All</string>
     <string name="buttonShare">Share</string>
@@ -304,12 +303,11 @@
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>
     <string name="errorRefusedSender">The server is refusing the sender</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">You can’t schedule an email less than %d minute in the future</item>
-        <item quantity="other">You can’t schedule an email less than %d minutes in the future</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">You can’t schedule an email less than %d minutes in the future</string>
+    <string name="errorScheduledSnoozeDelayTooShort">The minimum time to snooze an email is %d minutes</string>
     <string name="errorSendLimitExceeded">Sending limit reached</string>
     <string name="errorSnoozeFailedCancel">Failed to cancel</string>
+    <string name="errorSnoozeFailedModify">Failed to modify</string>
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
@@ -583,6 +581,7 @@
         <item quantity="other">Conversations moved to %s</item>
     </plurals>
     <string name="snoozeAlertTitle">Snoozed until: %s</string>
+    <string name="snoozeBottomSheetTitle">Snooze</string>
     <string name="snoozedFolder">Snoozed</string>
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>

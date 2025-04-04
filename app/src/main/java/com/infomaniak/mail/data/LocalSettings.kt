@@ -68,6 +68,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showWebViewOutdated by sharedValue("showWebViewOutdatedKey", true)
     var accessTokenApiCallRecord by sharedValue<ApiCallRecord>("accessTokenApiCallRecordKey", null)
     var lastSelectedScheduleEpochMillis by sharedValue<Long>("lastSelectedScheduleEpochKey", null)
+    var lastSelectedSnoozeEpochMillis by sharedValue<Long>("lastSelectedSnoozeEpochMillisKey", null)
     var storageBannerDisplayAppLaunches by sharedValue("storageBannerDisplayAppLaunchesKey", 0)
     var hasClosedStorageBanner by sharedValue("hasClosedStorageBannerKey", false)
 

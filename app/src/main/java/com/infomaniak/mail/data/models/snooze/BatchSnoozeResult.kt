@@ -15,11 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.snooze
 
-import kotlinx.serialization.Serializable
+import androidx.annotation.StringRes
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 
-@Serializable
-class BatchSnoozeResponse {
-    val cancelled: List<String> = emptyList()
+sealed interface BatchSnoozeResult {
+    data class Success(val impactedFolders: ImpactedFolders) : BatchSnoozeResult
+    sealed interface Error : BatchSnoozeResult {
+        data object NoneSucceeded : Error
+        data class ApiError(@StringRes val translatedError: Int) : Error
+        data object Unknown : Error
+    }
 }

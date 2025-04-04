@@ -161,7 +161,6 @@
     <string name="buttonReschedule">Reprogramar</string>
     <string name="buttonRestoreEmails">Restaurar correos electrónicos</string>
     <string name="buttonSchedule">Programar un correo electrónico para enviarlo más tarde</string>
-    <string name="buttonScheduleTitle">Programar</string>
     <string name="buttonSee">Véase</string>
     <string name="buttonSelectAll">Todos</string>
     <string name="buttonShare">Compartir</string>
@@ -298,12 +297,11 @@
     <string name="errorNewFolderNameTooLong">El nombre de la carpeta no debe superar los 255 caracteres</string>
     <string name="errorRefusedRecipients">El servidor rechaza todos los destinatarios</string>
     <string name="errorRefusedSender">El servidor rechaza el remitente</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">No puedes programar un correo electrónico para dentro de menos de %d minuto</item>
-        <item quantity="other">No puedes programar un correo electrónico para dentro de menos de %d minutos</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">No puedes programar un correo electrónico para dentro de menos de %d minutos</string>
+    <string name="errorScheduledSnoozeDelayTooShort">El tiempo mínimo para aplazar un correo electrónico es de %d minutos</string>
     <string name="errorSendLimitExceeded">Límite de envío alcanzado</string>
     <string name="errorSnoozeFailedCancel">Cancelación fallida</string>
+    <string name="errorSnoozeFailedModify">Modificación fallida</string>
     <string name="errorTooManyRecipients">Demasiados destinatarios</string>
     <string name="errorUnableToCreateFolder">No se puede crear la carpeta</string>
     <string name="errorUnableToFlushFolder">Imposible vaciar la carpeta</string>
@@ -577,6 +575,7 @@
         <item quantity="other">Conversaciones trasladadas a %s</item>
     </plurals>
     <string name="snoozeAlertTitle">En espera hasta: %s</string>
+    <string name="snoozeBottomSheetTitle">Poner en espera</string>
     <string name="snoozedFolder">En espera</string>
     <string name="socialNetworksFolder">Redes sociales</string>
     <string name="spamFolder">Spam</string>

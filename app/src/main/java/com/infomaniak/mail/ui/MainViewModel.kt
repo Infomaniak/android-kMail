@@ -38,10 +38,12 @@ import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.computeSnoozeResult
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
@@ -55,7 +57,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
-import com.infomaniak.mail.utils.SharedUtils.Companion.UnsnoozeResult
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
@@ -677,8 +679,7 @@ class MainViewModel @Inject constructor(
         draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
             with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
                 if (isSuccess()) {
-                    val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
+                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
                 } else {
                     snackbarManager.postValue(title = appContext.getString(translatedError))
                 }
@@ -1107,13 +1108,35 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Snooze
-    suspend fun unsnoozeThreads(threads: List<Thread>): UnsnoozeResult {
-        var unsnoozeResult: UnsnoozeResult = UnsnoozeResult.Error.Unknown
+    suspend fun rescheduleSnoozedThreads(date: Date, threads: List<Thread>): BatchSnoozeResult {
+        var rescheduleResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
+
+        viewModelScope.launch(ioCoroutineContext) {
+            val snoozedThreadUuids = threads.mapNotNull { thread -> thread.snoozeUuid.takeIf { thread.isSnoozed() } }
+            if (snoozedThreadUuids.isEmpty()) return@launch
+
+            val currentMailbox = currentMailbox.value!!
+            val result = rescheduleSnoozedThreads(currentMailbox, snoozedThreadUuids, date)
+            if (result is BatchSnoozeResult.Success) refreshFoldersAsync(currentMailbox, result.impactedFolders)
+
+            rescheduleResult = result
+        }.join()
+
+        return rescheduleResult
+    }
+
+    private fun rescheduleSnoozedThreads(currentMailbox: Mailbox, snoozeUuids: List<String>, date: Date): BatchSnoozeResult {
+        val responses = ApiRepository.rescheduleSnoozedThreads(currentMailbox.uuid, snoozeUuids, date)
+        return responses.computeSnoozeResult(ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+    }
+
+    suspend fun unsnoozeThreads(threads: List<Thread>): BatchSnoozeResult {
+        var unsnoozeResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
 
         viewModelScope.launch(ioCoroutineContext) {
             val currentMailbox = currentMailbox.value
             unsnoozeResult = if (currentMailbox == null) {
-                UnsnoozeResult.Error.Unknown
+                BatchSnoozeResult.Error.Unknown
             } else {
                 sharedUtils.unsnoozeThreads(currentMailbox, threads)
             }

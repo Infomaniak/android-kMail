@@ -161,7 +161,6 @@
     <string name="buttonReschedule">Neu planen</string>
     <string name="buttonRestoreEmails">E-Mails wiederherstellen</string>
     <string name="buttonSchedule">Planen Sie den Versand von E-Mails für einen späteren Zeitpunkt</string>
-    <string name="buttonScheduleTitle">Programmieren</string>
     <string name="buttonSee">Siehe</string>
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonShare">Teilen Sie</string>
@@ -298,12 +297,11 @@
     <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein.</string>
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorRefusedSender">Der Server lehnt den Absender ab</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">Sie können E-Mails frühestens in %d Minute senden</item>
-        <item quantity="other">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</string>
+    <string name="errorScheduledSnoozeDelayTooShort">Die Mindestzeit zum Schlummern einer E-Mail beträgt %d Minuten</string>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
     <string name="errorSnoozeFailedCancel">Abbruch fehlgeschlagen</string>
+    <string name="errorSnoozeFailedModify">Änderung fehlgeschlagen</string>
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
@@ -577,6 +575,7 @@
         <item quantity="other">Unterhaltungen in %s verschoben</item>
     </plurals>
     <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
+    <string name="snoozeBottomSheetTitle">In die Warteschlange verschieben</string>
     <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>

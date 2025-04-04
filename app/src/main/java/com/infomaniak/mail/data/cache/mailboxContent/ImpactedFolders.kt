@@ -24,6 +24,8 @@ data class ImpactedFolders(
     private val folderIds: MutableSet<String> = mutableSetOf(),
     private val folderRoles: MutableSet<FolderRole> = mutableSetOf(),
 ) {
+    constructor(roles: MutableSet<FolderRole>) : this(folderRoles = roles)
+
     operator fun plusAssign(folderId: String) {
         folderIds += folderId
     }

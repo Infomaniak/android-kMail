@@ -35,7 +35,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.getBackNavigationResult
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
@@ -43,12 +46,15 @@ import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBlockUserAction
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
+import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -62,13 +68,17 @@ import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_DATE_AND_TIME_SCHEDULE_DIALOG
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
@@ -79,7 +89,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.PermissionUtils
-import com.infomaniak.mail.utils.SharedUtils.Companion.UnsnoozeResult
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
@@ -134,6 +143,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
+
+    @Inject
+    lateinit var dateAndTimeSnoozeDialog: SelectDateAndTimeForSnoozeDialog
 
     @Inject
     lateinit var confirmScheduledDraftModificationDialog: ConfirmScheduledDraftModificationDialog
@@ -453,8 +465,14 @@ class ThreadFragment : Fragment() {
             }
 
             snoozeAlert.apply {
-                onAction1 { /*TODO*/ }
-                onAction2 { unsnoozeThread(thread) }
+                onAction1 {
+                    trackSnoozeEvent(ACTION_MODIFY_SNOOZE_NAME)
+                    navigateToSnoozeBottomSheet()
+                }
+                onAction2 {
+                    trackSnoozeEvent(ACTION_CANCEL_SNOOZE_NAME)
+                    unsnoozeThread(thread)
+                }
             }
         }
     }
@@ -565,8 +583,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupBackActionHandler() {
-
-        getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
+        getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
@@ -578,6 +595,46 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT) { selectedScheduleEpoch: Long ->
             mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch))
+        }
+
+        getBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER) { _: Boolean ->
+            dateAndTimeSnoozeDialog.show(
+                onDateSelected = { timestamp ->
+                    localSettings.lastSelectedSnoozeEpochMillis = timestamp
+                    threadViewModel.threadLive.value?.let { thread ->
+                        rescheduleSnoozedThread(timestamp, thread)
+                    }
+                },
+                onAbort = ::navigateToSnoozeBottomSheet,
+            )
+        }
+
+        getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
+            threadViewModel.threadLive.value?.let { thread ->
+                rescheduleSnoozedThread(selectedScheduleEpoch, thread)
+            }
+        }
+    }
+
+    private fun rescheduleSnoozedThread(timestamp: Long, thread: Thread) {
+        lifecycleScope.launch {
+            binding.snoozeAlert.showAction1Progress()
+
+            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), listOf(thread))
+            binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
+
+            when (result) {
+                is BatchSnoozeResult.Success -> twoPaneViewModel.closeThread()
+                is BatchSnoozeResult.Error -> {
+                    val errorMessageRes = when (result) {
+                        BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
+                        is BatchSnoozeResult.Error.ApiError -> result.translatedError
+                        BatchSnoozeResult.Error.Unknown -> com.infomaniak.lib.core.R.string.anErrorHasOccurred
+                    }
+
+                    snackbarManager.postValue(requireContext().getString(errorMessageRes))
+                }
+            }
         }
     }
 
@@ -770,6 +827,18 @@ class ThreadFragment : Fragment() {
         )
     }
 
+    private fun navigateToSnoozeBottomSheet() {
+        safeNavigate(
+            resId = R.id.snoozeBottomSheetDialog,
+            args = SnoozeBottomSheetDialogArgs(
+                lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
+                currentlyScheduledEpochMillis = threadViewModel.threadLive.value?.snoozeEndDate?.epochSeconds?.times(1000) ?: 0L,
+                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
+            ).toBundle(),
+            currentClassName = ThreadFragment::class.java.name,
+        )
+    }
+
     private fun unsnoozeThread(thread: Thread): Unit = with(binding) {
         lifecycleScope.launch {
             snoozeAlert.showAction2Progress()
@@ -778,12 +847,12 @@ class ThreadFragment : Fragment() {
             snoozeAlert.hideAction2Progress(R.string.buttonCancelReminder)
 
             when (result) {
-                is UnsnoozeResult.Success -> twoPaneViewModel.closeThread()
-                is UnsnoozeResult.Error -> {
+                is BatchSnoozeResult.Success -> twoPaneViewModel.closeThread()
+                is BatchSnoozeResult.Error -> {
                     val errorMessageRes = when (result) {
-                        UnsnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
-                        is UnsnoozeResult.Error.ApiError -> result.translatedError
-                        UnsnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
+                        BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
+                        is BatchSnoozeResult.Error.ApiError -> result.translatedError
+                        BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
                     }
 
                     snackbarManager.postValue(getString(errorMessageRes))

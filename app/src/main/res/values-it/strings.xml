@@ -161,7 +161,6 @@
     <string name="buttonReschedule">Riprogrammare</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
     <string name="buttonSchedule">Programmare l’invio di un’e-mail in un secondo momento</string>
-    <string name="buttonScheduleTitle">Pianifica</string>
     <string name="buttonSee">Vedi</string>
     <string name="buttonSelectAll">Tutti</string>
     <string name="buttonShare">Condividi</string>
@@ -298,12 +297,11 @@
     <string name="errorNewFolderNameTooLong">Il nome della cartella non deve superare i 255 caratteri</string>
     <string name="errorRefusedRecipients">Il server respinge tutti i destinatari</string>
     <string name="errorRefusedSender">Il server respinge il mittente</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">Non puoi programmare l’invio di una e-mail tra meno di %d minuto</item>
-        <item quantity="other">Non puoi programmare l’invio di una e-mail tra meno di %d minuti</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">Non puoi programmare l’invio di una e-mail tra meno di %d minuti</string>
+    <string name="errorScheduledSnoozeDelayTooShort">Il tempo minimo per posticipare un’email è di %d minuti</string>
     <string name="errorSendLimitExceeded">Limite d’invio raggiunto</string>
     <string name="errorSnoozeFailedCancel">Cancellazione non riuscita</string>
+    <string name="errorSnoozeFailedModify">Modifica non riuscita</string>
     <string name="errorTooManyRecipients">Troppi destinatari</string>
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
@@ -577,6 +575,7 @@
         <item quantity="other">Conversazioni spostate in %s</item>
     </plurals>
     <string name="snoozeAlertTitle">In attesa fino al: %s</string>
+    <string name="snoozeBottomSheetTitle">Metti in attesa</string>
     <string name="snoozedFolder">In attesa</string>
     <string name="socialNetworksFolder">Social Network</string>
     <string name="spamFolder">Spam</string>

@@ -59,6 +59,8 @@ object MatomoMail : MatomoCore {
     const val ACTION_SHARE_LINK_NAME = "shareLink"
     const val ACTION_SAVE_TO_KDRIVE_NAME = "saveInkDrive"
     const val ACTION_POSTPONE_NAME = "postpone"
+    const val ACTION_MODIFY_SNOOZE_NAME= "modifySnooze"
+    const val ACTION_CANCEL_SNOOZE_NAME = "cancelSnooze"
     const val ADD_MAILBOX_NAME = "addMailbox"
     const val DISCOVER_LATER = "discoverLater"
     const val DISCOVER_NOW = "discoverNow"
@@ -66,6 +68,8 @@ object MatomoMail : MatomoCore {
     const val SEARCH_DELETE_NAME = "deleteSearch"
     const val SEARCH_VALIDATE_NAME = "validateSearch"
     const val SWITCH_MAILBOX_NAME = "switchMailbox"
+    const val LAST_SELECTED_SCHEDULE = "lastSelectedSchedule"
+    const val SCHEDULED_CUSTOM_DATE = "scheduledCustomDate"
     //endregion
 
     @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build
@@ -281,6 +285,14 @@ object MatomoMail : MatomoCore {
 
     fun Fragment.trackScheduleSendEvent(name: String) {
         trackEvent("scheduleSend", name)
+    }
+
+    fun Context.trackScheduleSendEvent(name: String) {
+        trackEvent("scheduleSend", name)
+    }
+
+    fun Fragment.trackSnoozeEvent(name: String) {
+        trackEvent("snooze", name)
     }
 
     fun Fragment.trackMyKSuiteEvent(name: String) {
