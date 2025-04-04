@@ -619,20 +619,20 @@ class ThreadFragment : Fragment() {
 
     private fun executeSavedSnoozeScheduleType(timestamp: Long) {
         when (val type = threadViewModel.snoozeScheduleType) {
-            is SnoozeScheduleType.Snooze -> snoozeThread(timestamp, type.threadUids)
-            is SnoozeScheduleType.Modify -> rescheduleSnoozedThread(timestamp, type.threadUids)
+            is SnoozeScheduleType.Snooze -> snoozeThreads(timestamp, type.threadUids)
+            is SnoozeScheduleType.Modify -> rescheduleSnoozedThreads(timestamp, type.threadUids)
             null -> SentryLog.e(TAG, "Tried to execute snooze api call but there's no saved schedule type to handle")
         }
     }
 
-    private fun snoozeThread(timestamp: Long, threadUids: List<String>) {
+    private fun snoozeThreads(timestamp: Long, threadUids: List<String>) {
         lifecycleScope.launch {
             val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), threadUids)
             if (isSuccess) twoPaneViewModel.closeThread()
         }
     }
 
-    private fun rescheduleSnoozedThread(timestamp: Long, threadUids: List<String>) {
+    private fun rescheduleSnoozedThreads(timestamp: Long, threadUids: List<String>) {
         lifecycleScope.launch {
             binding.snoozeAlert.showAction1Progress()
 
