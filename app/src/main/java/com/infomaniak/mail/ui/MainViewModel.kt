@@ -63,6 +63,7 @@ import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
@@ -1123,14 +1124,19 @@ class MainViewModel @Inject constructor(
                 val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
 
                 isSuccess = responses.atLeastOneSucceeded()
-                if (isSuccess) {
+                val userFeedbackMessage = if (isSuccess) {
                     // Snoozing threads requires to refresh the snooze folder. It's the only folder that will update the snooze state
                     // of any message.
                     refreshFoldersAsync(currentMailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+
+                    val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
+                    appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threads.count(), formattedDate)
                 } else {
                     val errorMessageRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
-                    snackbarManager.postValue(appContext.getString(errorMessageRes))
+                    appContext.getString(errorMessageRes)
                 }
+
+                snackbarManager.postValue(userFeedbackMessage)
             }
         }.join()
 
@@ -1149,10 +1155,18 @@ class MainViewModel @Inject constructor(
 
             val currentMailbox = currentMailbox.value!!
             val result = rescheduleSnoozedThreads(currentMailbox, snoozedThreadUuids, date)
-            when (result) {
-                is BatchSnoozeResult.Success -> refreshFoldersAsync(currentMailbox, result.impactedFolders)
-                is BatchSnoozeResult.Error -> snackbarManager.postValue(getRescheduleSnoozedErrorMessage(result))
+
+            val userFeedbackMessage = when (result) {
+                is BatchSnoozeResult.Success -> {
+                    refreshFoldersAsync(currentMailbox, result.impactedFolders)
+
+                    val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
+                    appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threadUids.count(), formattedDate)
+                }
+                is BatchSnoozeResult.Error -> getRescheduleSnoozedErrorMessage(result)
             }
+
+            snackbarManager.postValue(userFeedbackMessage)
 
             rescheduleResult = result
         }.join()
@@ -1186,12 +1200,15 @@ class MainViewModel @Inject constructor(
             }
 
             unsnoozeResult.let {
-                when (it) {
+                val userFeedbackMessage = when (it) {
                     is BatchSnoozeResult.Success -> {
                         sharedUtils.refreshFolders(mailbox = currentMailbox!!, messagesFoldersIds = it.impactedFolders)
+                        appContext.resources.getQuantityString(R.plurals.snackbarUnsnoozeSuccess, threads.count())
                     }
-                    is BatchSnoozeResult.Error -> snackbarManager.postValue(getUnsnoozeErrorMessage(it))
+                    is BatchSnoozeResult.Error -> getUnsnoozeErrorMessage(it)
                 }
+
+                snackbarManager.postValue(userFeedbackMessage)
             }
         }.join()
 

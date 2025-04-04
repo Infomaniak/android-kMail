@@ -567,6 +567,10 @@
         <item quantity="one">Mittente inserito nella lista nera con successo</item>
         <item quantity="other">Mittenti inseriti nella lista nera con successo</item>
     </plurals>
+    <plurals name="snackbarSnoozeSuccess">
+        <item quantity="one">Riceverai un promemoria per questo messaggio %s</item>
+        <item quantity="other">Riceverai un promemoria per questi messaggi %s</item>
+    </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Soggetto copiato negli appunti</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversazione cancellata</item>
@@ -575,6 +579,10 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversazione spostata in %s</item>
         <item quantity="other">Conversazioni spostate in %s</item>
+    </plurals>
+    <plurals name="snackbarUnsnoozeSuccess">
+        <item quantity="one">Promemoria annullato. Il tuo messaggio è tornato nella tua casella di posta</item>
+        <item quantity="other">Promemoria annullati. I tuoi messaggi sono tornati nella tua casella di posta</item>
     </plurals>
     <string name="snoozeAlertTitle">In attesa fino al: %s</string>
     <string name="snoozedFolder">In attesa</string>

@@ -576,6 +576,11 @@
         <item quantity="other">Expéditeurs blacklistés avec succès</item>
         <item quantity="many">Expéditeurs blacklistés avec succès</item>
     </plurals>
+    <plurals name="snackbarSnoozeSuccess">
+        <item quantity="one">Vous recevrez un rappel de ce message %s</item>
+        <item quantity="other">Vous recevrez un rappel de ces messages %s</item>
+        <item quantity="many">Vous recevrez un rappel de ces messages %s</item>
+    </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Objet copié dans le presse-papiers</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation supprimée</item>
@@ -586,6 +591,11 @@
         <item quantity="one">Conversation déplacée vers %s</item>
         <item quantity="other">Conversations déplacées vers %s</item>
         <item quantity="many">Conversations déplacées vers %s</item>
+    </plurals>
+    <plurals name="snackbarUnsnoozeSuccess">
+        <item quantity="one">Rappel annulé. Votre message est revenu dans votre boîte de réception</item>
+        <item quantity="other">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
+        <item quantity="many">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
     </plurals>
     <string name="snoozeAlertTitle">En attente jusqu’au : %s</string>
     <string name="snoozedFolder">En attente</string>
