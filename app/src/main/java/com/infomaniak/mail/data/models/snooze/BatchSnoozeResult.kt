@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2025 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.snooze
 
-// The field apiName is also used to store the enum in Realm
-enum class FeatureFlag(val apiName: String) {
-    AI("ai-mail-composer"),
-    BIMI("bimi"),
-    SCHEDULE_DRAFTS("schedule-send-draft"),
-    SNOOZE("mail-snooze"),
+import androidx.annotation.StringRes
+import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
+
+sealed interface BatchSnoozeResult {
+    data class Success(val impactedFolders: ImpactedFolders) : BatchSnoozeResult
+    sealed interface Error : BatchSnoozeResult {
+        data object NoneSucceeded : Error
+        data class ApiError(@StringRes val translatedError: Int) : Error
+        data object Unknown : Error
+    }
 }

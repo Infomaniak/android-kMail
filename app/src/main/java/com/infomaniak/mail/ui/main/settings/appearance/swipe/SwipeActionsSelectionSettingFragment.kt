@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
                 R.id.readUnread to READ_UNREAD,
                 R.id.move to MOVE,
                 R.id.favorite to FAVORITE,
-                R.id.postpone to POSTPONE,
+                R.id.snooze to POSTPONE,
                 R.id.spam to SPAM,
                 R.id.quickActionMenu to QUICKACTIONS_MENU,
                 R.id.none to NONE,

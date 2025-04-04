@@ -44,7 +44,10 @@ import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
+import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
+import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
@@ -463,6 +466,7 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
         message.draftResource?.let { draftResource ->
             scheduleAlert.onAction1 {
+                context.trackScheduleSendEvent(ACTION_MODIFY_SNOOZE_NAME)
                 threadAdapterCallbacks?.onRescheduleClicked?.invoke(
                     draftResource,
                     message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
@@ -470,7 +474,10 @@ class ThreadAdapter(
             }
         }
 
-        scheduleAlert.onAction2 { threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message) }
+        scheduleAlert.onAction2 {
+            context.trackScheduleSendEvent(ACTION_CANCEL_SNOOZE_NAME)
+            threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
+        }
 
         distantImagesAlert.onAction1 {
             bodyWebViewClient.unblockDistantResources()

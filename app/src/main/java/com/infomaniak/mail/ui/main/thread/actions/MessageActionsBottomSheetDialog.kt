@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -29,7 +30,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_PRINT_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
@@ -119,7 +119,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onDelete() {
-                descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+                descriptionDialog.deleteWithConfirmationPopup(message.folder.role, count = 1) {
                     trackBottomSheetMessageActionsEvent(ACTION_DELETE_NAME)
                     mainViewModel.deleteMessage(threadUid, message)
                 }
@@ -128,8 +128,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             //region Actions
             override fun onArchive() {
-                trackBottomSheetMessageActionsEvent(ACTION_ARCHIVE_NAME, message.folder.role == FolderRole.ARCHIVE)
-                mainViewModel.archiveMessage(threadUid, message)
+                descriptionDialog.archiveWithConfirmationPopup(message.folder.role, count = 1) {
+                    trackBottomSheetMessageActionsEvent(ACTION_ARCHIVE_NAME, message.folder.role == FolderRole.ARCHIVE)
+                    mainViewModel.archiveMessage(threadUid, message)
+                }
             }
 
             override fun onReadUnread() {
@@ -140,17 +142,21 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onMove() {
                 trackBottomSheetMessageActionsEvent(ACTION_MOVE_NAME)
-                animatedNavigation(
-                    resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
-                    currentClassName = currentClassName,
-                )
+                val navController = findNavController()
+                descriptionDialog.moveWithConfirmationPopup(message.folder.role, count = 1) {
+                    navController.animatedNavigation(
+                        resId = R.id.moveFragment,
+                        args = MoveFragmentArgs(arrayOf(threadUid), messageUid).toBundle(),
+                        currentClassName = currentClassName,
+                    )
+                }
             }
 
-            override fun onPostpone() {
-                trackBottomSheetMessageActionsEvent(ACTION_POSTPONE_NAME)
-                notYetImplemented()
-            }
+            override fun onSnooze() = Unit
+
+            override fun onModifySnooze() = Unit
+
+            override fun onCancelSnooze() = Unit
 
             override fun onFavorite() {
                 trackBottomSheetMessageActionsEvent(ACTION_FAVORITE_NAME, message.isFavorite)

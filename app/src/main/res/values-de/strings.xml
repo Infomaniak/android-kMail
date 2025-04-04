@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -21,17 +21,18 @@
     <string name="accentColorSystemTitle">Farbe des Systems</string>
     <string name="actionArchive">Archiv</string>
     <string name="actionBlockSender">Absender blockieren</string>
+    <string name="actionCancelSnooze">Schlummern abbrechen</string>
     <string name="actionDelete">Löschen</string>
     <string name="actionEditMenu">Menü Bearbeiten</string>
     <string name="actionForward">Weiterleiten</string>
     <string name="actionMarkAsRead">Als gelesen markieren</string>
     <string name="actionMarkAsUnread">Als ungelesen markieren</string>
+    <string name="actionModifySnooze">Schlummern bearbeiten</string>
     <string name="actionMove">Verschieben</string>
     <string name="actionMoveToInbox">In den Posteingang verschieben</string>
     <string name="actionNonSpam">Als Nicht-Spam melden</string>
     <string name="actionOpenIn">Öffnen in</string>
     <string name="actionPhishing">Phishing melden</string>
-    <string name="actionPostpone">Aufschieben</string>
     <string name="actionPrint">Drucken</string>
     <string name="actionReply">Antwort</string>
     <string name="actionReplyAll">Alle antworten</string>
@@ -41,6 +42,7 @@
     <string name="actionShortMarkAsUnread">Ungelesen</string>
     <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Favoriten</string>
+    <string name="actionSnooze">In die Warteschlange verschieben</string>
     <string name="actionSpam">Spam melden</string>
     <string name="actionStar">Zu Favoriten hinzufügen</string>
     <string name="actionUnstar">Aus Favoriten löschen</string>
@@ -126,6 +128,7 @@
     <string name="buttonBold">Kühn</string>
     <string name="buttonBulletPoint">Aufzählungspunkt</string>
     <string name="buttonCamera">Machen Sie ein Foto</string>
+    <string name="buttonCancelReminder">Erinnerung abbrechen</string>
     <string name="buttonClose">Schliessen</string>
     <string name="buttonConfirm">Bestätigen</string>
     <string name="buttonConfirmRestoreEmails">Wiederherstellen</string>
@@ -160,7 +163,6 @@
     <string name="buttonReschedule">Neu planen</string>
     <string name="buttonRestoreEmails">E-Mails wiederherstellen</string>
     <string name="buttonSchedule">Planen Sie den Versand von E-Mails für einen späteren Zeitpunkt</string>
-    <string name="buttonScheduleTitle">Programmieren</string>
     <string name="buttonSee">Siehe</string>
     <string name="buttonSelectAll">Alle</string>
     <string name="buttonShare">Teilen Sie</string>
@@ -297,11 +299,11 @@
     <string name="errorNewFolderNameTooLong">Der Ordnername sollte nicht länger als 255 Zeichen sein.</string>
     <string name="errorRefusedRecipients">Der Server lehnt alle Empfänger ab</string>
     <string name="errorRefusedSender">Der Server lehnt den Absender ab</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">Sie können E-Mails frühestens in %d Minute senden</item>
-        <item quantity="other">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</string>
+    <string name="errorScheduledSnoozeDelayTooShort">Die Mindestzeit zum Schlummern einer E-Mail beträgt %d Minuten</string>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
+    <string name="errorSnoozeFailedCancel">Abbruch fehlgeschlagen</string>
+    <string name="errorSnoozeFailedModify">Änderung fehlgeschlagen</string>
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
@@ -565,6 +567,10 @@
         <item quantity="one">Absender erfolgreich auf die schwarze Liste gesetzt</item>
         <item quantity="other">Erfolgreich auf die schwarze Liste gesetzte Absender</item>
     </plurals>
+    <plurals name="snackbarSnoozeSuccess">
+        <item quantity="one">Sie erhalten eine Erinnerung an diese Nachricht %s</item>
+        <item quantity="other">Sie erhalten eine Erinnerung an diese Nachrichten %s</item>
+    </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Betreff in die Zwischenablage kopiert</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Konversation gelöscht</item>
@@ -573,6 +579,23 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Unterhaltung in %s verschoben</item>
         <item quantity="other">Unterhaltungen in %s verschoben</item>
+    </plurals>
+    <plurals name="snackbarUnsnoozeSuccess">
+        <item quantity="one">Erinnerung storniert. Ihre Nachricht ist zurück in Ihrem Posteingang</item>
+        <item quantity="other">Erinnerungen storniert. Ihre Nachrichten sind zurück in Ihrem Posteingang</item>
+    </plurals>
+    <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">Diese Unterhaltung wird nicht länger verschoben und wird archiviert</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht länger verschoben und werden archiviert</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">Diese Unterhaltung wird nicht länger verschoben und wird gelöscht</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht länger verschoben und werden gelöscht</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">Diese Unterhaltung wird nicht länger verschoben und wird nun bewegt</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht länger verschoben und werden nun bewegt</item>
     </plurals>
     <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>

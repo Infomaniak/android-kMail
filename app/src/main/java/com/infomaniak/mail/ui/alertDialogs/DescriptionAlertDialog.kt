@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ open class DescriptionAlertDialog @Inject constructor(
         description: CharSequence?,
         displayLoader: Boolean = true,
         displayCancelButton: Boolean = true,
-        @StringRes positiveButtonText: Int? = R.string.buttonConfirm,
+        @StringRes positiveButtonText: Int = R.string.buttonConfirm,
         @StringRes negativeButtonText: Int? = null,
         onPositiveButtonClicked: () -> Unit,
         onNegativeButtonClicked: (() -> Unit)? = null,
@@ -100,31 +100,11 @@ open class DescriptionAlertDialog @Inject constructor(
         }
     }
 
-    fun showDeletePermanentlyDialog(
-        deletedCount: Int,
-        displayLoader: Boolean,
-        onPositiveButtonClicked: () -> Unit,
-        onCancel: (() -> Unit)? = null,
-    ) = show(
-        title = activityContext.resources.getQuantityString(
-            R.plurals.threadListDeletionConfirmationAlertTitle,
-            deletedCount,
-            deletedCount,
-        ),
-        description = activityContext.resources.getQuantityString(
-            R.plurals.threadListDeletionConfirmationAlertDescription,
-            deletedCount,
-        ),
-        displayLoader = displayLoader,
-        onPositiveButtonClicked = onPositiveButtonClicked,
-        onCancel = onCancel,
-    )
-
     protected fun showDialogWithBasicInfo(
         title: String? = null,
         description: CharSequence? = null,
         displayCancelButton: Boolean = true,
-        @StringRes positiveButtonText: Int? = null,
+        @StringRes positiveButtonText: Int,
         @StringRes negativeButtonText: Int? = null,
     ) = with(binding) {
 
@@ -137,7 +117,7 @@ open class DescriptionAlertDialog @Inject constructor(
         }
 
         negativeButton.isVisible = displayCancelButton
-        positiveButtonText?.let(positiveButton::setText)
+        positiveButton.setText(positiveButtonText)
         negativeButtonText?.let(negativeButton::setText)
     }
 }

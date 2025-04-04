@@ -33,7 +33,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_POSTPONE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
 import com.google.android.material.R as RMaterial
@@ -68,6 +68,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var showWebViewOutdated by sharedValue("showWebViewOutdatedKey", true)
     var accessTokenApiCallRecord by sharedValue<ApiCallRecord>("accessTokenApiCallRecordKey", null)
     var lastSelectedScheduleEpochMillis by sharedValue<Long>("lastSelectedScheduleEpochKey", null)
+    var lastSelectedSnoozeEpochMillis by sharedValue<Long>("lastSelectedSnoozeEpochMillisKey", null)
     var storageBannerDisplayAppLaunches by sharedValue("storageBannerDisplayAppLaunchesKey", 0)
     var hasClosedStorageBanner by sharedValue("hasClosedStorageBannerKey", false)
 
@@ -177,7 +178,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         ),
         MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, ACTION_MOVE_NAME),
         FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, ACTION_FAVORITE_NAME),
-        POSTPONE(R.string.actionPostpone, R.color.swipePostpone, R.drawable.ic_alarm_clock, ACTION_POSTPONE_NAME),
+        POSTPONE(R.string.actionSnooze, R.color.swipePostpone, R.drawable.ic_alarm_clock, ACTION_SNOOZE_NAME),
         SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, ACTION_SPAM_NAME),
         QUICKACTIONS_MENU(
             R.string.settingsSwipeActionQuickActionsMenu,

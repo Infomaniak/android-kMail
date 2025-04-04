@@ -450,8 +450,18 @@ class ThreadListFragment : TwoPaneFragment() {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                archiveThread(thread.uid)
-                folderRole == FolderRole.ARCHIVE
+                descriptionDialog.archiveWithConfirmationPopup(
+                    folderRole = folderRole,
+                    count = 1,
+                    displayLoader = false,
+                    onCancel = {
+                        // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
+                        // otherwise it will notify the next item in the list and make it slightly blink
+                        if (threadListAdapter.dataSet.indexOf(thread) == position) threadListAdapter.notifyItemChanged(position)
+                    },
+                ) {
+                    archiveThread(thread.uid)
+                }
             }
             SwipeAction.DELETE -> {
                 descriptionDialog.deleteWithConfirmationPopup(
@@ -468,15 +478,20 @@ class ThreadListFragment : TwoPaneFragment() {
                         deleteThread(thread.uid, isSwipe = true)
                     },
                 )
-                isPermanentDeleteFolder
             }
             SwipeAction.FAVORITE -> {
                 toggleThreadFavoriteStatus(thread.uid)
                 true
             }
             SwipeAction.MOVE -> {
-                animatedNavigation(ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)))
-                false
+                val navController = findNavController()
+                descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
+                    navController.animatedNavigation(
+                        directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)),
+                        currentClassName = javaClass.name,
+                    )
+                }
+                true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
                 safeNavigate(

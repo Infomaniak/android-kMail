@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.models
 
 import androidx.annotation.CallSuper
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import io.realm.kotlin.types.RealmInstant
 
 interface Snoozable {

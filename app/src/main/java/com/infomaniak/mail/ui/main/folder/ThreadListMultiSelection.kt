@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 
@@ -79,9 +80,14 @@ class ThreadListMultiSelection {
                     isMultiSelectOn = false
                 }
                 R.id.quickActionArchive -> {
-                    threadListFragment.trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount)
-                    archiveThreads(selectedThreadsUids)
-                    isMultiSelectOn = false
+                    threadListFragment.descriptionDialog.archiveWithConfirmationPopup(
+                        folderRole = getActionFolderRole(thread = selectedThreads.firstOrNull()),
+                        count = selectedThreadsCount,
+                    ) {
+                        threadListFragment.trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount)
+                        archiveThreads(selectedThreadsUids)
+                        isMultiSelectOn = false
+                    }
                 }
                 R.id.quickActionFavorite -> {
                     threadListFragment.trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, selectedThreadsCount)
