@@ -22,7 +22,6 @@ package com.infomaniak.mail.data.models.thread
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
 import com.infomaniak.mail.data.api.RealmInstantSerializer
-import com.infomaniak.mail.data.api.SnoozeUuidSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshStrategy
 import com.infomaniak.mail.data.models.*
@@ -80,8 +79,7 @@ class Thread : RealmObject, Snoozable {
     private var _snoozeState: String? = null
     @SerialName("snooze_end_date")
     override var snoozeEndDate: RealmInstant? = null
-    @SerialName("snooze_action")
-    @Serializable(with = SnoozeUuidSerializer::class)
+    @SerialName("snooze_uuid")
     override var snoozeUuid: String? = null
     //endregion
 
