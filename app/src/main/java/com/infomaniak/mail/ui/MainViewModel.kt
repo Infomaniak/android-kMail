@@ -55,6 +55,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
+import com.infomaniak.mail.utils.SharedUtils.Companion.UnsnoozeResult
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
@@ -1102,6 +1103,23 @@ class MainViewModel @Inject constructor(
 
             snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
+    }
+    //endregion
+
+    //region Snooze
+    suspend fun unsnoozeThreads(threads: List<Thread>): UnsnoozeResult {
+        var unsnoozeResult: UnsnoozeResult = UnsnoozeResult.Error.Unknown
+
+        viewModelScope.launch(ioCoroutineContext) {
+            val currentMailbox = currentMailbox.value
+            unsnoozeResult = if (currentMailbox == null) {
+                UnsnoozeResult.Error.Unknown
+            } else {
+                sharedUtils.unsnoozeThreads(currentMailbox, threads)
+            }
+        }.join()
+
+        return unsnoozeResult
     }
     //endregion
 

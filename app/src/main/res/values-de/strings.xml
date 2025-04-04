@@ -126,6 +126,7 @@
     <string name="buttonBold">Kühn</string>
     <string name="buttonBulletPoint">Aufzählungspunkt</string>
     <string name="buttonCamera">Machen Sie ein Foto</string>
+    <string name="buttonCancelReminder">Erinnerung abbrechen</string>
     <string name="buttonClose">Schliessen</string>
     <string name="buttonConfirm">Bestätigen</string>
     <string name="buttonConfirmRestoreEmails">Wiederherstellen</string>
@@ -302,6 +303,7 @@
         <item quantity="other">Wählen Sie ein zukünftiges Datum, das mindestens %d Minuten in der Zukunft liegt</item>
     </plurals>
     <string name="errorSendLimitExceeded">Versandlimit erreicht</string>
+    <string name="errorSnoozeFailedCancel">Abbruch fehlgeschlagen</string>
     <string name="errorTooManyRecipients">Zu viele Empfänger</string>
     <string name="errorUnableToCreateFolder">Ordner kann nicht erstellt werden</string>
     <string name="errorUnableToFlushFolder">Der Ordner kann nicht geleert werden</string>
@@ -574,6 +576,7 @@
         <item quantity="one">Unterhaltung in %s verschoben</item>
         <item quantity="other">Unterhaltungen in %s verschoben</item>
     </plurals>
+    <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
     <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>

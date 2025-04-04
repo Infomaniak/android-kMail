@@ -132,6 +132,7 @@
     <string name="buttonBold">Bold</string>
     <string name="buttonBulletPoint">Bullet point</string>
     <string name="buttonCamera">Take a picture</string>
+    <string name="buttonCancelReminder">Cancel reminder</string>
     <string name="buttonClose">Close</string>
     <string name="buttonConfirm">Confirm</string>
     <string name="buttonConfirmRestoreEmails">Restore</string>
@@ -308,6 +309,7 @@
         <item quantity="other">You can’t schedule an email less than %d minutes in the future</item>
     </plurals>
     <string name="errorSendLimitExceeded">Sending limit reached</string>
+    <string name="errorSnoozeFailedCancel">Failed to cancel</string>
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
@@ -580,6 +582,7 @@
         <item quantity="one">Conversation moved to %s</item>
         <item quantity="other">Conversations moved to %s</item>
     </plurals>
+    <string name="snoozeAlertTitle">Snoozed until: %s</string>
     <string name="snoozedFolder">Snoozed</string>
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>

@@ -126,6 +126,7 @@
     <string name="buttonBold">Negrita</string>
     <string name="buttonBulletPoint">Viñetas</string>
     <string name="buttonCamera">Haz una foto</string>
+    <string name="buttonCancelReminder">Cancelar recordatorio</string>
     <string name="buttonClose">Cerrar</string>
     <string name="buttonConfirm">Confirme</string>
     <string name="buttonConfirmRestoreEmails">Restaurar</string>
@@ -302,6 +303,7 @@
         <item quantity="other">No puedes programar un correo electrónico para dentro de menos de %d minutos</item>
     </plurals>
     <string name="errorSendLimitExceeded">Límite de envío alcanzado</string>
+    <string name="errorSnoozeFailedCancel">Cancelación fallida</string>
     <string name="errorTooManyRecipients">Demasiados destinatarios</string>
     <string name="errorUnableToCreateFolder">No se puede crear la carpeta</string>
     <string name="errorUnableToFlushFolder">Imposible vaciar la carpeta</string>
@@ -574,6 +576,7 @@
         <item quantity="one">Conversación trasladada a %s</item>
         <item quantity="other">Conversaciones trasladadas a %s</item>
     </plurals>
+    <string name="snoozeAlertTitle">En espera hasta: %s</string>
     <string name="snoozedFolder">En espera</string>
     <string name="socialNetworksFolder">Redes sociales</string>
     <string name="spamFolder">Spam</string>

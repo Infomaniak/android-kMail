@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -31,22 +32,22 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
-import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.getApiException
-import com.infomaniak.mail.utils.extensions.getFoldersIds
-import com.infomaniak.mail.utils.extensions.getUids
+import com.infomaniak.mail.utils.extensions.*
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.invoke
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -54,6 +55,7 @@ class SharedUtils @Inject constructor(
     private val refreshController: RefreshController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     @Inject
@@ -108,11 +110,25 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    suspend fun unsnoozeThreads(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>) {
-        val impactedFolders = unsnoozeThreadsWithoutRefresh(scope, mailbox, threads)
-        if (impactedFolders.isNotEmpty()) {
-            refreshFolders(mailbox = mailbox, messagesFoldersIds = ImpactedFolders(impactedFolders.toMutableSet()))
+    suspend fun unsnoozeThreads(mailbox: Mailbox, threads: List<Thread>): UnsnoozeResult {
+        val unsnoozeResult = ioDispatcher {
+            unsnoozeThreadsWithoutRefresh(scope = null, mailbox, threads)
         }
+
+        if (unsnoozeResult is UnsnoozeResult.Success && unsnoozeResult.impactedFolderUids.isNotEmpty()) {
+            refreshFolders(
+                mailbox = mailbox,
+                // When removing the snooze state of a thread, we absolutely need to refresh the snooze folder. Refreshing the
+                // snooze folder is the only way of updating the snooze status of messages. The folder snooze will never be
+                // returned inside impactedFolders because no message ever mentions the snooze folder, we need to add it manually.
+                messagesFoldersIds = ImpactedFolders(
+                    unsnoozeResult.impactedFolderUids.toMutableSet(),
+                    mutableSetOf(FolderRole.SNOOZED),
+                ),
+            )
+        }
+
+        return unsnoozeResult
     }
 
     fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
@@ -227,19 +243,28 @@ class SharedUtils @Inject constructor(
 
             return when {
                 response.isSuccess() -> AutomaticUnsnoozeResult.Success(
-                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(Folder.FolderRole.SNOOZED))
+                    // targetMessage.folderId will never return the folder "snooze". We need to add it manually
+                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(FolderRole.SNOOZED))
                 )
                 response.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
                 else -> AutomaticUnsnoozeResult.OtherError
             }
         }
 
-        fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
+        /**
+         * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone. Outside
+         * of this algorithm, the scope doesn't need to be defined and the method can be used like any other.
+         */
+        fun unsnoozeThreadsWithoutRefresh(
+            scope: CoroutineScope?,
+            mailbox: Mailbox,
+            threads: List<Thread>
+        ): UnsnoozeResult {
             val snoozeUuids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()
 
             for (thread in threads) {
-                scope.ensureActive()
+                scope?.ensureActive()
 
                 val targetMessage = thread.messages.lastOrNull(Message::isSnoozed)
                 val targetMessageSnoozeUuid = targetMessage?.snoozeUuid ?: continue
@@ -248,12 +273,30 @@ class SharedUtils @Inject constructor(
                 impactedFolderIds += targetMessage.folderId
             }
 
-            if (snoozeUuids.isEmpty()) return emptySet()
+            if (snoozeUuids.isEmpty()) return UnsnoozeResult.Error.Unknown
 
             val apiResponses = ApiRepository.unsnoozeThreads(mailbox.uuid, snoozeUuids)
-            scope.ensureActive()
+            scope?.ensureActive()
 
-            return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
+            return when {
+                apiResponses.all { it.isSuccess().not() } -> {
+                    val translatedError = apiResponses.getFirstTranslatedError()
+                    if (translatedError == null) UnsnoozeResult.Error.Unknown else UnsnoozeResult.Error.ApiError(translatedError)
+                }
+                apiResponses.any { it.isSuccess() && it.data?.cancelled?.isNotEmpty() == true } -> {
+                    UnsnoozeResult.Success(impactedFolderIds)
+                }
+                else -> UnsnoozeResult.Error.NoneSucceeded
+            }
+        }
+
+        sealed interface UnsnoozeResult {
+            data class Success(val impactedFolderUids: Set<String>) : UnsnoozeResult
+            sealed interface Error : UnsnoozeResult {
+                data object NoneSucceeded : Error
+                data class ApiError(@StringRes val translatedError: Int) : Error
+                data object Unknown : Error
+            }
         }
 
         sealed interface AutomaticUnsnoozeResult {
