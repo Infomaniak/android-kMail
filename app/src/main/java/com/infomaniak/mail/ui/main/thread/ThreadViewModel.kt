@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.isSnoozed
@@ -104,9 +105,17 @@ class ThreadViewModel @Inject constructor(
     var snoozeScheduleType: SnoozeScheduleType? = null
 
     val isThreadSnoozeHeaderVisible = Utils.waitInitMediator(currentMailboxLive, threadLive).map { (mailbox, thread) ->
-        mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
-                && thread?.isSnoozed() == true
-                && localSettings.threadMode == LocalSettings.ThreadMode.CONVERSATION
+        if (thread?.isSnoozed() != true) {
+            ThreadHeaderVisibility.NONE
+        } else if (
+            mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
+            && thread.folder.role == FolderRole.SNOOZED
+            && localSettings.threadMode == LocalSettings.ThreadMode.CONVERSATION
+        ) {
+            ThreadHeaderVisibility.DATE_AND_ACTIONS
+        } else {
+            ThreadHeaderVisibility.DATE_ONLY
+        }
     }
 
     fun reassignThreadLive(threadUid: String) {
@@ -499,6 +508,10 @@ class ThreadViewModel @Inject constructor(
         data class Modify(override val threadUids: List<String>) : SnoozeScheduleType {
             constructor(threadUid: String) : this(listOf(threadUid))
         }
+    }
+
+    enum class ThreadHeaderVisibility {
+        DATE_AND_ACTIONS, DATE_ONLY, NONE
     }
 
     companion object {

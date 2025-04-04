@@ -574,7 +574,8 @@ class ThreadFragment : Fragment() {
 
     private fun observeSnoozeHeaderVisibility() {
         threadViewModel.isThreadSnoozeHeaderVisible.observe(viewLifecycleOwner) {
-            binding.threadAlertsLayout.isVisible = it
+            binding.threadAlertsLayout.isGone = it == ThreadViewModel.ThreadHeaderVisibility.NONE
+            binding.snoozeAlert.setActionsVisibility(it == ThreadViewModel.ThreadHeaderVisibility.DATE_AND_ACTIONS)
         }
     }
 

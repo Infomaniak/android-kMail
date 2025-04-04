@@ -100,6 +100,10 @@ class MessageAlertView @JvmOverloads constructor(
             isEnabled = true
         }
     }
+
+    fun setActionsVisibility(isVisible: Boolean) {
+        binding.actionsLayout.isVisible = isVisible
+    }
 }
 
 private fun MaterialButton.showProgress() {
