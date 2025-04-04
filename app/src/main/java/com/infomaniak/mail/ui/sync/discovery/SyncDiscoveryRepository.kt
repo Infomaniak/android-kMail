@@ -26,8 +26,10 @@ import com.infomaniak.lib.core.utils.SentryLog
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Suppress("UNCHECKED_CAST")
+@Singleton
 class SyncDiscoveryRepository @Inject constructor(private val context: Context) {
 
     private val Context.dataStore by preferencesDataStore(name = DATA_STORE_NAME)
