@@ -224,14 +224,14 @@ class SharedUtils @Inject constructor(
             val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: return AutomaticUnsnoozeResult.OtherError
             val targetMessageSnoozeUuid = targetMessage.snoozeUuid ?: return AutomaticUnsnoozeResult.OtherError
 
-            val response = ApiRepository.unsnoozeThread(mailbox.uuid, targetMessageSnoozeUuid)
+            val apiResponse = ApiRepository.unsnoozeThread(mailbox.uuid, targetMessageSnoozeUuid)
 
             return when {
-                response.isSuccess() -> AutomaticUnsnoozeResult.Success(
+                apiResponse.isSuccess() -> AutomaticUnsnoozeResult.Success(
                     // targetMessage.folderId will never return the folder "snooze". We need to add it manually
-                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(FolderRole.SNOOZED))
+                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(FolderRole.SNOOZED)),
                 )
-                response.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
+                apiResponse.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
                 else -> AutomaticUnsnoozeResult.OtherError
             }
         }
