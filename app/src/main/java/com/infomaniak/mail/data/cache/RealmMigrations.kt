@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache
 
-import com.infomaniak.mail.data.api.SnoozeUuidSerializer.lastUuidOrNull
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
@@ -183,6 +182,10 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
         }
     }
 }
+
+private const val UUID_PATTERN = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+private val lastUuidRegex = Regex("""$UUID_PATTERN(?!.*$UUID_PATTERN)""", RegexOption.IGNORE_CASE)
+private fun String.lastUuidOrNull() = lastUuidRegex.find(this)?.value
 //endregion
 
 // Migrate from version #27
