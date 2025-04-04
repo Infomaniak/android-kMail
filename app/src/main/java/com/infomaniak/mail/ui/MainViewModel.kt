@@ -1117,7 +1117,7 @@ class MainViewModel @Inject constructor(
 
         viewModelScope.launch {
             currentMailbox.value?.let { currentMailbox ->
-                val threads = threadUids.mapNotNull { threadController.getThread(it) }
+                val threads = threadUids.mapNotNull(threadController::getThread)
 
                 val messageUids = threads.mapNotNull { thread ->
                     thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
@@ -1127,8 +1127,8 @@ class MainViewModel @Inject constructor(
 
                 isSuccess = responses.atLeastOneSucceeded()
                 val userFeedbackMessage = if (isSuccess) {
-                    // Snoozing threads requires to refresh the snooze folder. It's the only folder that will update the snooze state
-                    // of any message.
+                    // Snoozing threads requires to refresh the snooze folder.
+                    // It's the only folder that will update the snooze state of any message.
                     refreshFoldersAsync(currentMailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
 
                     val formattedDate = appContext.dayOfWeekDateWithoutYear(date)

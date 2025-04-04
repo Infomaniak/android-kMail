@@ -108,7 +108,6 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import com.google.android.material.R as RMaterial
 
-
 @AndroidEntryPoint
 class ThreadFragment : Fragment() {
 
@@ -840,7 +839,7 @@ class ThreadFragment : Fragment() {
             resId = R.id.snoozeBottomSheetDialog,
             args = SnoozeBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
-                currentlyScheduledEpochMillis = threadViewModel.threadLive.value?.snoozeEndDate?.epochSeconds?.times(1000) ?: 0L,
+                currentlyScheduledEpochMillis = threadViewModel.threadLive.value?.snoozeEndDate?.epochSeconds?.times(1_000) ?: 0L,
                 isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
             currentClassName = ThreadFragment::class.java.name,

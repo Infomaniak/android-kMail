@@ -19,12 +19,12 @@ package com.infomaniak.mail.utils.extensions
 
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.utils.Utils
 
 fun DescriptionAlertDialog.deleteWithConfirmationPopup(
-    folderRole: Folder.FolderRole?,
+    folderRole: FolderRole?,
     count: Int,
     displayLoader: Boolean = true,
     onCancel: (() -> Unit)? = null,
@@ -32,8 +32,8 @@ fun DescriptionAlertDialog.deleteWithConfirmationPopup(
 ): Boolean {
     var isDialogShow = true
     when {
-        folderRole == Folder.FolderRole.SNOOZED -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
-        Utils.isPermanentDeleteFolder(folderRole) && folderRole != Folder.FolderRole.DRAFT -> { // We don't want to display the popup for Drafts
+        folderRole == FolderRole.SNOOZED -> showDeleteSnoozeDialog(count, displayLoader, callback, onCancel)
+        Utils.isPermanentDeleteFolder(folderRole) && folderRole != FolderRole.DRAFT -> { // We don't want to display the popup for Drafts
             showDeletePermanentlyDialog(count, displayLoader, callback, onCancel)
         }
         else -> {
@@ -78,10 +78,10 @@ private fun DescriptionAlertDialog.showDeleteSnoozeDialog(
 )
 
 fun DescriptionAlertDialog.moveWithConfirmationPopup(
-    folderRole: Folder.FolderRole?,
+    folderRole: FolderRole?,
     count: Int,
     onPositiveButtonClicked: () -> Unit,
-) = if (folderRole == Folder.FolderRole.SNOOZED) {
+) = if (folderRole == FolderRole.SNOOZED) {
     show(
         title = binding.context.getString(R.string.actionMove),
         description = binding.context.resources.getQuantityString(R.plurals.snoozeMoveConfirmAlertDescription, count),
@@ -93,13 +93,13 @@ fun DescriptionAlertDialog.moveWithConfirmationPopup(
 }
 
 fun DescriptionAlertDialog.archiveWithConfirmationPopup(
-    folderRole: Folder.FolderRole?,
+    folderRole: FolderRole?,
     count: Int,
     displayLoader: Boolean = true,
     onCancel: (() -> Unit)? = null,
     onPositiveButtonClicked: () -> Unit,
 ): Boolean {
-    val isDialogShown = folderRole == Folder.FolderRole.SNOOZED
+    val isDialogShown = folderRole == FolderRole.SNOOZED
     if (isDialogShown) {
         show(
             title = binding.context.getString(R.string.actionArchive),

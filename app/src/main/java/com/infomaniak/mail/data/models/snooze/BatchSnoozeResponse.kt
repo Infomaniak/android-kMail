@@ -25,7 +25,7 @@ interface BatchSnoozeResponse {
     val processedUuids: List<String>
 
     companion object {
-        fun <T: BatchSnoozeResponse> List<ApiResponse<T>>.computeSnoozeResult(impactedFolderIds: ImpactedFolders) = when {
+        fun <T : BatchSnoozeResponse> List<ApiResponse<T>>.computeSnoozeResult(impactedFolderIds: ImpactedFolders) = when {
             all { it.isSuccess().not() } -> {
                 val translatedError = getFirstTranslatedError()
                 if (translatedError == null) BatchSnoozeResult.Error.Unknown else BatchSnoozeResult.Error.ApiError(translatedError)

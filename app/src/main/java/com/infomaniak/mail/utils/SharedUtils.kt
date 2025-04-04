@@ -237,14 +237,13 @@ class SharedUtils @Inject constructor(
         }
 
         /**
-         * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone. Outside
-         * of this algorithm, the scope doesn't need to be defined and the method can be used like any other. For now it's never
-         * used, but it will be when we stop using [unsnoozeThreadWithoutRefresh].
+         * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone.
+         * Outside of this algorithm, the scope doesn't need to be defined and the method can be used like any other.
          */
         fun unsnoozeThreadsWithoutRefresh(
             scope: CoroutineScope?,
             mailbox: Mailbox,
-            threads: Collection<Thread>
+            threads: Collection<Thread>,
         ): BatchSnoozeResult {
             val snoozeUuids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()

@@ -367,7 +367,7 @@ object ApiRepository : ApiRepositoryCore() {
             callApi(
                 url = ApiRoutes.snooze(mailboxUuid),
                 method = PUT,
-                body = mapOf("uuids" to it, "end_date" to newDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR))
+                body = mapOf("uuids" to it, "end_date" to newDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)),
             )
         }
     }
