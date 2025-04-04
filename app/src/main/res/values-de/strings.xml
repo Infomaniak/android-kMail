@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -586,16 +586,16 @@
     </plurals>
     <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
     <plurals name="snoozeArchiveConfirmAlertDescription">
-        <item quantity="one">Diese Unterhaltung wird nicht mehr schlummern und wird archiviert</item>
-        <item quantity="other">Diese Unterhaltungen werden nicht mehr schlummern und werden archiviert</item>
+        <item quantity="one">Diese Unterhaltung wird nicht länger verschoben und wird archiviert</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht länger verschoben und werden archiviert</item>
     </plurals>
     <plurals name="snoozeDeleteConfirmAlertDescription">
-        <item quantity="one">Diese Unterhaltung wird nicht mehr schlummern und wird gelöscht</item>
-        <item quantity="other">Diese Unterhaltungen werden nicht mehr schlummern und werden gelöscht</item>
+        <item quantity="one">Diese Unterhaltung wird nicht länger verschoben und wird gelöscht</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht länger verschoben und werden gelöscht</item>
     </plurals>
     <plurals name="snoozeMoveConfirmAlertDescription">
-        <item quantity="one">Diese Unterhaltung wird nicht mehr schlummern und wird verschoben</item>
-        <item quantity="other">Diese Unterhaltungen werden nicht mehr schlummern und werden verschoben</item>
+        <item quantity="one">Diese Unterhaltung wird nicht länger verschoben und wird nun bewegt</item>
+        <item quantity="other">Diese Unterhaltungen werden nicht länger verschoben und werden nun bewegt</item>
     </plurals>
     <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
