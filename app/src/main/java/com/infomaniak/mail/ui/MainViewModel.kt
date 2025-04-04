@@ -38,7 +38,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.PermissionsController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
-import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.computeSnoozeResult
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
@@ -47,6 +46,8 @@ import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.computeSnoozeResult
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -57,7 +58,6 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
-import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
@@ -1117,7 +1117,10 @@ class MainViewModel @Inject constructor(
 
             val currentMailbox = currentMailbox.value!!
             val result = rescheduleSnoozedThreads(currentMailbox, snoozedThreadUuids, date)
-            if (result is BatchSnoozeResult.Success) refreshFoldersAsync(currentMailbox, result.impactedFolders)
+            when (result) {
+                is BatchSnoozeResult.Success -> refreshFoldersAsync(currentMailbox, result.impactedFolders)
+                is BatchSnoozeResult.Error -> snackbarManager.postValue(getRescheduleSnoozedErrorMessage(result))
+            }
 
             rescheduleResult = result
         }.join()
@@ -1130,6 +1133,15 @@ class MainViewModel @Inject constructor(
         return responses.computeSnoozeResult(ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
     }
 
+    private fun getRescheduleSnoozedErrorMessage(errorResult: BatchSnoozeResult.Error): String {
+        val errorMessageRes = when (errorResult) {
+            BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
+            is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
+            BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
+        }
+        return appContext.getString(errorMessageRes)
+    }
+
     suspend fun unsnoozeThreads(threads: List<Thread>): BatchSnoozeResult {
         var unsnoozeResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
 
@@ -1140,9 +1152,23 @@ class MainViewModel @Inject constructor(
             } else {
                 sharedUtils.unsnoozeThreads(currentMailbox, threads)
             }
+
+            unsnoozeResult.let {
+                if (it is BatchSnoozeResult.Error) snackbarManager.postValue(getUnsnoozeErrorMessage(it))
+            }
         }.join()
 
         return unsnoozeResult
+    }
+
+    private fun getUnsnoozeErrorMessage(errorResult: BatchSnoozeResult.Error): String {
+        val errorMessageRes = when (errorResult) {
+            BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
+            is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
+            BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
+        }
+
+        return appContext.getString(errorMessageRes)
     }
     //endregion
 
