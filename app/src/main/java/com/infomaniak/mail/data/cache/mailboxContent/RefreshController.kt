@@ -262,6 +262,12 @@ class RefreshController @Inject constructor(
 
             write {
                 cannotBeUnsnoozedThreadUids.forEach { manuallyUnsnoozeOutOfSyncThread(it) }
+
+                if (cannotBeUnsnoozedThreadUids.isNotEmpty()) {
+                    FolderController.getFolder(FolderRole.SNOOZED, realm = this)?.id?.let { snoozeFolderId ->
+                        recomputeTwinFoldersThreadsDependantProperties(snoozeFolderId)
+                    }
+                }
             }
 
             impactedFolders

@@ -110,7 +110,6 @@ class Thread : RealmObject, Snoozable {
 
     @Ignore
     override var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
-        private set
 
     // TODO: Put this back in `private` when the Threads parental issues are fixed
     val _folders by backlinks(Folder::threads)
@@ -295,10 +294,10 @@ class Thread : RealmObject, Snoozable {
     /**
      * Only used for when the api tells us we're trying to automatically unsnooze a thread that's not snoozed
      */
-    fun manuallyUnsnooze() {
-        snoozeState = null
-        snoozeEndDate = null
-        snoozeUuid = null
+    override fun manuallyUnsnooze() {
+        super.manuallyUnsnooze()
+        messages.forEach(Message::manuallyUnsnooze)
+        duplicates.forEach(Message::manuallyUnsnooze)
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {

@@ -17,13 +17,24 @@
  */
 package com.infomaniak.mail.data.models
 
+import androidx.annotation.CallSuper
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import io.realm.kotlin.types.RealmInstant
 
 interface Snoozable {
-    val snoozeState: SnoozeState?
+    var snoozeState: SnoozeState?
     var snoozeEndDate: RealmInstant?
     var snoozeUuid: String?
+
+    /**
+     * Only used for when the api tells us we're trying to automatically unsnooze a thread that's not snoozed
+     */
+    @CallSuper
+    fun manuallyUnsnooze() {
+        snoozeState = null
+        snoozeEndDate = null
+        snoozeUuid = null
+    }
 }
 
 /**
