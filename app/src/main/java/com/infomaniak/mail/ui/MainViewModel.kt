@@ -1190,7 +1190,7 @@ class MainViewModel @Inject constructor(
         return appContext.getString(errorMessageRes)
     }
 
-    suspend fun unsnoozeThreads(threads: List<Thread>): BatchSnoozeResult {
+    suspend fun unsnoozeThreads(threads: Collection<Thread>): BatchSnoozeResult {
         var unsnoozeResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
 
         viewModelScope.launch(ioCoroutineContext) {

@@ -489,12 +489,17 @@ class ThreadViewModel @Inject constructor(
     }
 
     sealed interface SnoozeScheduleType : Parcelable {
-        val threadUid: String
+        val threadUids: List<String>
 
         @Parcelize
-        data class Snooze(override val threadUid: String) : SnoozeScheduleType
+        data class Snooze(override val threadUids: List<String>) : SnoozeScheduleType {
+            constructor(threadUid: String) : this(listOf(threadUid))
+        }
+
         @Parcelize
-        data class Modify(override val threadUid: String) : SnoozeScheduleType
+        data class Modify(override val threadUids: List<String>) : SnoozeScheduleType {
+            constructor(threadUid: String) : this(listOf(threadUid))
+        }
     }
 
     companion object {

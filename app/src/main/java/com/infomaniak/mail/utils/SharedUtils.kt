@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
@@ -31,6 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -39,6 +41,7 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.comp
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
@@ -240,7 +243,7 @@ class SharedUtils @Inject constructor(
         fun unsnoozeThreadsWithoutRefresh(
             scope: CoroutineScope?,
             mailbox: Mailbox,
-            threads: List<Thread>
+            threads: Collection<Thread>
         ): BatchSnoozeResult {
             val snoozeUuids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()
@@ -264,6 +267,17 @@ class SharedUtils @Inject constructor(
             // snooze folder is the only way of updating the snooze status of messages. The folder snooze will never be
             // returned inside impactedFolders because no message ever mentions the snooze folder, we need to add it manually.
             return apiResponses.computeSnoozeResult(ImpactedFolders(impactedFolderIds, mutableSetOf(FolderRole.SNOOZED)))
+        }
+
+        fun shouldDisplaySnoozeActions(
+            mainViewModel: MainViewModel,
+            localSettings: LocalSettings,
+            currentFolderRole: FolderRole?,
+        ): Boolean {
+            fun hasSnoozeFeatureFlag() = mainViewModel.currentMailbox.value?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
+            fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
+
+            return currentFolderRole == FolderRole.INBOX || currentFolderRole == FolderRole.SNOOZED && hasSnoozeFeatureFlag() && isConversationMode()
         }
 
         sealed interface AutomaticUnsnoozeResult {

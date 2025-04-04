@@ -44,8 +44,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ThreadMode
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.isSnoozed
@@ -53,6 +51,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -101,10 +100,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
-        fun hasSnoozeFeatureFlag() = mainViewModel.currentMailbox.value?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
-        fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
-
-        val shouldDisplaySnoozeActions = hasSnoozeFeatureFlag() && isConversationMode()
+        val shouldDisplaySnoozeActions = SharedUtils.shouldDisplaySnoozeActions(mainViewModel, localSettings, folderRole)
 
         snooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed.not()
         modifySnooze.isVisible = shouldDisplaySnoozeActions && isThreadSnoozed
