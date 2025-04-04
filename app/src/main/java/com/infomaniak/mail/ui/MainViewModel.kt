@@ -58,6 +58,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
+import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
@@ -1150,11 +1151,16 @@ class MainViewModel @Inject constructor(
             unsnoozeResult = if (currentMailbox == null) {
                 BatchSnoozeResult.Error.Unknown
             } else {
-                sharedUtils.unsnoozeThreads(currentMailbox, threads)
+                ioDispatcher { unsnoozeThreadsWithoutRefresh(scope = null, currentMailbox, threads) }
             }
 
             unsnoozeResult.let {
-                if (it is BatchSnoozeResult.Error) snackbarManager.postValue(getUnsnoozeErrorMessage(it))
+                when (it) {
+                    is BatchSnoozeResult.Success -> {
+                        sharedUtils.refreshFolders(mailbox = currentMailbox!!, messagesFoldersIds = it.impactedFolders)
+                    }
+                    is BatchSnoozeResult.Error -> snackbarManager.postValue(getUnsnoozeErrorMessage(it))
+                }
             }
         }.join()
 
