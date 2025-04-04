@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -47,14 +47,33 @@
             app:visibleDivider="false"
             tools:visibility="visible" />
 
-        <!-- TODO: Display this when Postpone/Snooze action will be done (v2) -->
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/postpone"
+            android:id="@+id/snooze"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:icon="@drawable/ic_alarm_clock"
-            app:title="@string/actionPostpone"
+            app:title="@string/actionSnooze"
+            app:visibleDivider="false"
+            tools:visibility="visible" />
+
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            android:id="@+id/modifySnooze"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:icon="@drawable/ic_alarm_clock"
+            app:title="@string/actionModifySnooze"
+            app:visibleDivider="false"
+            tools:visibility="visible" />
+
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            android:id="@+id/cancelSnooze"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:icon="@drawable/ic_circle_cross"
+            app:title="@string/actionCancelSnooze"
             app:visibleDivider="false"
             tools:visibility="visible" />
 

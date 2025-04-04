@@ -86,7 +86,9 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.*
+import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
@@ -466,7 +468,7 @@ class ThreadFragment : Fragment() {
             snoozeAlert.apply {
                 onAction1 {
                     trackSnoozeEvent(ACTION_MODIFY_SNOOZE_NAME)
-                    navigateToSnoozeBottomSheet()
+                    navigateToSnoozeBottomSheet(SnoozeScheduleType.Modify(thread.uid))
                 }
                 onAction2 {
                     trackSnoozeEvent(ACTION_CANCEL_SNOOZE_NAME)
@@ -596,30 +598,45 @@ class ThreadFragment : Fragment() {
             mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch))
         }
 
+        getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
+            navigateToSnoozeBottomSheet(snoozeScheduleType)
+        }
+
         getBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeSnoozeDialog.show(
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
-                    threadViewModel.threadLive.value?.let { thread ->
-                        rescheduleSnoozedThread(timestamp, thread)
-                    }
+                    executeSavedSnoozeScheduleType(timestamp)
                 },
-                onAbort = ::navigateToSnoozeBottomSheet,
+                onAbort = { navigateToSnoozeBottomSheet(threadViewModel.snoozeScheduleType) },
             )
         }
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
-            threadViewModel.threadLive.value?.let { thread ->
-                rescheduleSnoozedThread(selectedScheduleEpoch, thread)
-            }
+            executeSavedSnoozeScheduleType(selectedScheduleEpoch)
         }
     }
 
-    private fun rescheduleSnoozedThread(timestamp: Long, thread: Thread) {
+    private fun executeSavedSnoozeScheduleType(timestamp: Long) {
+        when (val type = threadViewModel.snoozeScheduleType) {
+            is SnoozeScheduleType.Snooze -> snoozeThread(timestamp, type.threadUid)
+            is SnoozeScheduleType.Modify -> rescheduleSnoozedThread(timestamp, type.threadUid)
+            null -> SentryLog.e(TAG, "Tried to execute snooze api call but there's no saved schedule type to handle")
+        }
+    }
+
+    private fun snoozeThread(timestamp: Long, threadUid: String) {
+        lifecycleScope.launch {
+            val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), listOf(threadUid))
+            if (isSuccess) twoPaneViewModel.closeThread()
+        }
+    }
+
+    private fun rescheduleSnoozedThread(timestamp: Long, threadUid: String) {
         lifecycleScope.launch {
             binding.snoozeAlert.showAction1Progress()
 
-            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), listOf(thread))
+            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), listOf(threadUid))
             binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
 
             if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()
@@ -815,7 +832,8 @@ class ThreadFragment : Fragment() {
         )
     }
 
-    private fun navigateToSnoozeBottomSheet() {
+    private fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?) {
+        threadViewModel.snoozeScheduleType = snoozeScheduleType
         safeNavigate(
             resId = R.id.snoozeBottomSheetDialog,
             args = SnoozeBottomSheetDialogArgs(
@@ -922,6 +940,8 @@ class ThreadFragment : Fragment() {
     }
 
     companion object {
+        private val TAG = ThreadFragment::class.java.simpleName
+
         private const val COLLAPSE_TITLE_THRESHOLD = 0.5
         private const val ARCHIVE_INDEX = 2
 

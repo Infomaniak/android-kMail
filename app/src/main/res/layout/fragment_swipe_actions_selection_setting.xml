@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -69,11 +69,11 @@
 
                 <!-- TODO: Display this when Postpone/Snooze action will be done (v2) -->
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                    android:id="@+id/postpone"
+                    android:id="@+id/snooze"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
-                    app:text="@string/actionPostpone" />
+                    app:text="@string/actionSnooze" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/spam"

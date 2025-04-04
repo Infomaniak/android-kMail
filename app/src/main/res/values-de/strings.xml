@@ -21,17 +21,18 @@
     <string name="accentColorSystemTitle">Farbe des Systems</string>
     <string name="actionArchive">Archiv</string>
     <string name="actionBlockSender">Absender blockieren</string>
+    <string name="actionCancelSnooze">Schlummern abbrechen</string>
     <string name="actionDelete">Löschen</string>
     <string name="actionEditMenu">Menü Bearbeiten</string>
     <string name="actionForward">Weiterleiten</string>
     <string name="actionMarkAsRead">Als gelesen markieren</string>
     <string name="actionMarkAsUnread">Als ungelesen markieren</string>
+    <string name="actionModifySnooze">Schlummern bearbeiten</string>
     <string name="actionMove">Verschieben</string>
     <string name="actionMoveToInbox">In den Posteingang verschieben</string>
     <string name="actionNonSpam">Als Nicht-Spam melden</string>
     <string name="actionOpenIn">Öffnen in</string>
     <string name="actionPhishing">Phishing melden</string>
-    <string name="actionPostpone">Aufschieben</string>
     <string name="actionPrint">Drucken</string>
     <string name="actionReply">Antwort</string>
     <string name="actionReplyAll">Alle antworten</string>
@@ -41,6 +42,7 @@
     <string name="actionShortMarkAsUnread">Ungelesen</string>
     <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Favoriten</string>
+    <string name="actionSnooze">In die Warteschlange verschieben</string>
     <string name="actionSpam">Spam melden</string>
     <string name="actionStar">Zu Favoriten hinzufügen</string>
     <string name="actionUnstar">Aus Favoriten löschen</string>
@@ -575,7 +577,6 @@
         <item quantity="other">Unterhaltungen in %s verschoben</item>
     </plurals>
     <string name="snoozeAlertTitle">Ausstehend bis: %s</string>
-    <string name="snoozeBottomSheetTitle">In die Warteschlange verschieben</string>
     <string name="snoozedFolder">In der Warteschlange</string>
     <string name="socialNetworksFolder">Soziale Netzwerke</string>
     <string name="spamFolder">Spam</string>
