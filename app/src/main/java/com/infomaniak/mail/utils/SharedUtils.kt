@@ -220,30 +220,30 @@ class SharedUtils @Inject constructor(
          *
          * Start using [unsnoozeThreadsWithoutRefresh] again if we find a way to get this info with the batch call.
          */
-        fun unnsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
+        fun unsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
             val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: return AutomaticUnsnoozeResult.OtherError
             val targetMessageSnoozeUuid = targetMessage.snoozeUuid ?: return AutomaticUnsnoozeResult.OtherError
 
-            val response = ApiRepository.unsnoozeThread(mailbox.uuid, targetMessageSnoozeUuid)
+            val apiResponse = ApiRepository.unsnoozeThread(mailbox.uuid, targetMessageSnoozeUuid)
 
             return when {
-                response.isSuccess() -> AutomaticUnsnoozeResult.Success(
+                apiResponse.isSuccess() -> AutomaticUnsnoozeResult.Success(
                     // targetMessage.folderId will never return the folder "snooze". We need to add it manually
-                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(FolderRole.SNOOZED))
+                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(FolderRole.SNOOZED)),
                 )
-                response.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
+                apiResponse.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
                 else -> AutomaticUnsnoozeResult.OtherError
             }
         }
 
         /**
-         * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone. Outside
-         * of this algorithm, the scope doesn't need to be defined and the method can be used like any other.
+         * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone.
+         * Outside of this algorithm, the scope doesn't need to be defined and the method can be used like any other.
          */
         fun unsnoozeThreadsWithoutRefresh(
             scope: CoroutineScope?,
             mailbox: Mailbox,
-            threads: Collection<Thread>
+            threads: Collection<Thread>,
         ): BatchSnoozeResult {
             val snoozeUuids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()
