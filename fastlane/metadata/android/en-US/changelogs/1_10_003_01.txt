@@ -1,0 +1,2 @@
+- Displays a generic notification when a new email may have arrived
+- Add the ability to snooze emails

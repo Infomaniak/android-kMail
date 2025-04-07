@@ -1,0 +1,2 @@
+- Affiche une notification générique quand un nouveau courriel est possiblement arrivé
+- Ajout de la possibilité de mettre des courriels en attente
