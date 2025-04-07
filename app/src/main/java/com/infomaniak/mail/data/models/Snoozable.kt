@@ -41,3 +41,5 @@ interface Snoozable {
  * the condition used in [ThreadController.Companion.isSnoozedState].
  */
 fun Snoozable.isSnoozed() = snoozeState == SnoozeState.Snoozed && snoozeEndDate != null && snoozeUuid != null
+
+fun Snoozable.isUnsnoozed() = snoozeState == SnoozeState.Unsnoozed && snoozeEndDate != null
