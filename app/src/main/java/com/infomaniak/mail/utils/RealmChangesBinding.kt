@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
@@ -164,16 +165,22 @@ class RealmChangesBinding<T : BaseRealmObject, VH : ViewHolder> private construc
     }
 
     private fun LiveData<Boolean>.observeWaiting(whenCanNotify: () -> Unit) {
-        observe(lifecycleOwner) { canNotify ->
-            if (canNotify) {
-                if (recyclerView == null) {
-                    throw NullPointerException("You forgot to assign the `recyclerView` used in `waitingBeforeNotifyAdapter`.")
-                } else {
-                    recyclerView?.postOnAnimation { whenCanNotify() }
+        var observer: Observer<Boolean>? = null
+
+        observer = object : Observer<Boolean> {
+            override fun onChanged(value: Boolean) {
+                if (value) {
+                    if (recyclerView == null) {
+                        throw NullPointerException("You forgot to assign the `recyclerView` used in `waitingBeforeNotifyAdapter`.")
+                    } else {
+                        recyclerView?.postOnAnimation { whenCanNotify() }
+                    }
+                    observer?.let { waitingBeforeNotifyAdapter?.removeObserver(it) }
                 }
-                waitingBeforeNotifyAdapter?.removeObservers(lifecycleOwner)
             }
         }
+
+        observe(lifecycleOwner, observer)
     }
 
     interface OnRealmChanged<T> {
