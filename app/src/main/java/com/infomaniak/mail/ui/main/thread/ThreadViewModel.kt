@@ -24,7 +24,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.*
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -107,18 +107,16 @@ class ThreadViewModel @Inject constructor(
 
     val isThreadSnoozeHeaderVisible = Utils.waitInitMediator(currentMailboxLive, threadLive).map { (mailbox, thread) ->
         when {
-            thread?.isSnoozed() != true -> {
-                ThreadHeaderVisibility.NONE
-            }
-            mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
-                    && thread.folder.role == FolderRole.SNOOZED
-                    && localSettings.threadMode == ThreadMode.CONVERSATION -> {
-                ThreadHeaderVisibility.MESSAGE_AND_ACTIONS
-            }
-            else -> {
-                ThreadHeaderVisibility.MESSAGE_ONLY
-            }
+            thread == null || thread.isSnoozed().not() -> ThreadHeaderVisibility.NONE
+            thread.shouldDisplayHeaderActions(mailbox) -> ThreadHeaderVisibility.MESSAGE_AND_ACTIONS
+            else -> ThreadHeaderVisibility.MESSAGE_ONLY
         }
+    }
+
+    private fun Thread.shouldDisplayHeaderActions(mailbox: Mailbox?): Boolean {
+        return mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
+                && folder.role == FolderRole.SNOOZED
+                && localSettings.threadMode == ThreadMode.CONVERSATION
     }
 
     fun reassignThreadLive(threadUid: String) {
