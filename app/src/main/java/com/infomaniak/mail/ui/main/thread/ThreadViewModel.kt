@@ -24,6 +24,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.*
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -105,16 +106,18 @@ class ThreadViewModel @Inject constructor(
     var snoozeScheduleType: SnoozeScheduleType? = null
 
     val isThreadSnoozeHeaderVisible = Utils.waitInitMediator(currentMailboxLive, threadLive).map { (mailbox, thread) ->
-        if (thread?.isSnoozed() != true) {
-            ThreadHeaderVisibility.NONE
-        } else if (
+        when {
+            thread?.isSnoozed() != true -> {
+                ThreadHeaderVisibility.NONE
+            }
             mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
-            && thread.folder.role == FolderRole.SNOOZED
-            && localSettings.threadMode == LocalSettings.ThreadMode.CONVERSATION
-        ) {
-            ThreadHeaderVisibility.DATE_AND_ACTIONS
-        } else {
-            ThreadHeaderVisibility.DATE_ONLY
+                    && thread.folder.role == FolderRole.SNOOZED
+                    && localSettings.threadMode == ThreadMode.CONVERSATION -> {
+                ThreadHeaderVisibility.MESSAGE_AND_ACTIONS
+            }
+            else -> {
+                ThreadHeaderVisibility.MESSAGE_ONLY
+            }
         }
     }
 
@@ -491,9 +494,7 @@ class ThreadViewModel @Inject constructor(
     )
 
     private enum class MessageBehavior {
-        DISPLAYED,
-        COLLAPSED,
-        FIRST_AFTER_BLOCK,
+        DISPLAYED, COLLAPSED, FIRST_AFTER_BLOCK,
     }
 
     sealed interface SnoozeScheduleType : Parcelable {
@@ -511,7 +512,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     enum class ThreadHeaderVisibility {
-        DATE_AND_ACTIONS, DATE_ONLY, NONE
+        MESSAGE_AND_ACTIONS, MESSAGE_ONLY, NONE,
     }
 
     companion object {

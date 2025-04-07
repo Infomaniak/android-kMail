@@ -86,7 +86,7 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.*
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
@@ -572,10 +572,10 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeSnoozeHeaderVisibility() {
+    private fun observeSnoozeHeaderVisibility() = with(binding) {
         threadViewModel.isThreadSnoozeHeaderVisible.observe(viewLifecycleOwner) {
-            binding.threadAlertsLayout.isGone = it == ThreadViewModel.ThreadHeaderVisibility.NONE
-            binding.snoozeAlert.setActionsVisibility(it == ThreadViewModel.ThreadHeaderVisibility.DATE_AND_ACTIONS)
+            threadAlertsLayout.isGone = it == ThreadHeaderVisibility.NONE
+            snoozeAlert.setActionsVisibility(it == ThreadHeaderVisibility.MESSAGE_AND_ACTIONS)
         }
     }
 
