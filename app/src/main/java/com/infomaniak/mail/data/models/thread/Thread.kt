@@ -285,6 +285,7 @@ class Thread : RealmObject, Snoozable {
      *
      * => Only returns true when the last message of inbox is snoozed
      */
+    @Suppress("NullableBooleanElvis")
     private fun List<Message>.isLastInboxMessageSnoozed(): Boolean {
         return lastOrNull { it.folderId == folderId }?.isSnoozed() ?: false
     }
