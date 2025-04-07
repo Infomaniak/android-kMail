@@ -24,6 +24,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -32,6 +33,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.isSnoozed
@@ -104,9 +106,17 @@ class ThreadViewModel @Inject constructor(
     var snoozeScheduleType: SnoozeScheduleType? = null
 
     val isThreadSnoozeHeaderVisible = Utils.waitInitMediator(currentMailboxLive, threadLive).map { (mailbox, thread) ->
-        mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
-                && thread?.isSnoozed() == true
-                && localSettings.threadMode == LocalSettings.ThreadMode.CONVERSATION
+        when {
+            thread == null || thread.isSnoozed().not() -> ThreadHeaderVisibility.NONE
+            thread.shouldDisplayHeaderActions(mailbox) -> ThreadHeaderVisibility.MESSAGE_AND_ACTIONS
+            else -> ThreadHeaderVisibility.MESSAGE_ONLY
+        }
+    }
+
+    private fun Thread.shouldDisplayHeaderActions(mailbox: Mailbox?): Boolean {
+        return mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
+                && folder.role == FolderRole.SNOOZED
+                && localSettings.threadMode == ThreadMode.CONVERSATION
     }
 
     fun reassignThreadLive(threadUid: String) {
@@ -482,9 +492,7 @@ class ThreadViewModel @Inject constructor(
     )
 
     private enum class MessageBehavior {
-        DISPLAYED,
-        COLLAPSED,
-        FIRST_AFTER_BLOCK,
+        DISPLAYED, COLLAPSED, FIRST_AFTER_BLOCK,
     }
 
     sealed interface SnoozeScheduleType : Parcelable {
@@ -499,6 +507,10 @@ class ThreadViewModel @Inject constructor(
         data class Modify(override val threadUids: List<String>) : SnoozeScheduleType {
             constructor(threadUid: String) : this(listOf(threadUid))
         }
+    }
+
+    enum class ThreadHeaderVisibility {
+        MESSAGE_AND_ACTIONS, MESSAGE_ONLY, NONE,
     }
 
     companion object {
