@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -231,10 +232,14 @@ class SharedUtils @Inject constructor(
                     // targetMessage.folderId will never return the folder "snooze". We need to add it manually
                     ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(FolderRole.SNOOZED)),
                 )
-                apiResponse.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
+                apiResponse.willNeverSucceed() -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
                 else -> AutomaticUnsnoozeResult.OtherError
             }
         }
+
+        private fun ApiResponse<Boolean>.willNeverSucceed() = error?.let {
+            it.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED || it.code == ErrorCode.OBJECT_NOT_FOUND
+        } ?: false
 
         /**
          * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone.
