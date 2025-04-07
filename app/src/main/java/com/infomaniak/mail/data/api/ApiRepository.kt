@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
+import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.R
@@ -53,6 +54,8 @@ import com.infomaniak.mail.data.models.mailbox.*
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignaturesResult
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeCancelResponse
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeUpdateResponse
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.AccountUtils
@@ -345,12 +348,36 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
+    fun snoozeMessages(mailboxUuid: String, messageUids: List<String>, date: Date): List<ApiResponse<Unit>> {
+        return batchOver(messageUids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE_POST) {
+            callApi(
+                url = ApiRoutes.snooze(mailboxUuid),
+                method = POST,
+                body = mapOf("uids" to it, "end_date" to date.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)),
+            )
+        }
+    }
+
+    fun rescheduleSnoozedThreads(
+        mailboxUuid: String,
+        snoozeUuids: List<String>,
+        newDate: Date,
+    ): List<ApiResponse<BatchSnoozeUpdateResponse>> {
+        return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE) {
+            callApi(
+                url = ApiRoutes.snooze(mailboxUuid),
+                method = PUT,
+                body = mapOf("uuids" to it, "end_date" to newDate.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)),
+            )
+        }
+    }
+
     fun unsnoozeThread(mailboxUuid: String, snoozeUuid: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.snoozeAction(mailboxUuid, snoozeUuid), DELETE)
     }
 
-    fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>): List<ApiResponse<Unit>> {
-        return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE_DELETE) {
+    fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>): List<ApiResponse<BatchSnoozeCancelResponse>> {
+        return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE) {
             callApi(ApiRoutes.snooze(mailboxUuid), DELETE, mapOf("uuids" to it))
         }
     }

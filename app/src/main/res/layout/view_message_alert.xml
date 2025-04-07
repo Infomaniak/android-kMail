@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023-2024 Infomaniak Network SA
+  ~ Copyright (C) 2023-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/icon"
@@ -42,12 +42,15 @@
         android:layout_marginTop="@dimen/marginStandardSmall"
         android:layout_marginEnd="@dimen/marginStandardMedium"
         app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@id/actionsLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/icon"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginBottom="@dimen/marginStandardSmall"
         tools:text="@string/alertBlockedImagesDescription" />
 
     <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/actionsLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="-16dp"
@@ -57,6 +60,7 @@
         app:flexDirection="row"
         app:flexWrap="wrap"
         app:justifyContent="flex_start"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/description"
         app:layout_constraintTop_toBottomOf="@id/description">

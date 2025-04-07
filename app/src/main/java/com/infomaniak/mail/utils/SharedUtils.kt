@@ -19,9 +19,11 @@ package com.infomaniak.mail.utils
 
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
@@ -31,11 +33,16 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.computeSnoozeResult
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
@@ -45,6 +52,7 @@ import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import javax.inject.Inject
@@ -54,6 +62,7 @@ class SharedUtils @Inject constructor(
     private val refreshController: RefreshController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     @Inject
@@ -105,13 +114,6 @@ class SharedUtils @Inject constructor(
         mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
             ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
-        }
-    }
-
-    suspend fun unsnoozeThreads(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>) {
-        val impactedFolders = unsnoozeThreadsWithoutRefresh(scope, mailbox, threads)
-        if (impactedFolders.isNotEmpty()) {
-            refreshFolders(mailbox = mailbox, messagesFoldersIds = ImpactedFolders(impactedFolders.toMutableSet()))
         }
     }
 
@@ -219,27 +221,40 @@ class SharedUtils @Inject constructor(
          *
          * Start using [unsnoozeThreadsWithoutRefresh] again if we find a way to get this info with the batch call.
          */
-        fun unnsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
+        fun unsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
             val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: return AutomaticUnsnoozeResult.OtherError
             val targetMessageSnoozeUuid = targetMessage.snoozeUuid ?: return AutomaticUnsnoozeResult.OtherError
 
-            val response = ApiRepository.unsnoozeThread(mailbox.uuid, targetMessageSnoozeUuid)
+            val apiResponse = ApiRepository.unsnoozeThread(mailbox.uuid, targetMessageSnoozeUuid)
 
             return when {
-                response.isSuccess() -> AutomaticUnsnoozeResult.Success(
-                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(Folder.FolderRole.SNOOZED))
+                apiResponse.isSuccess() -> AutomaticUnsnoozeResult.Success(
+                    // targetMessage.folderId will never return the folder "snooze". We need to add it manually
+                    ImpactedFolders(mutableSetOf(targetMessage.folderId), mutableSetOf(FolderRole.SNOOZED)),
                 )
-                response.error?.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
+                apiResponse.willNeverSucceed() -> AutomaticUnsnoozeResult.CannotBeUnsnoozedError
                 else -> AutomaticUnsnoozeResult.OtherError
             }
         }
 
-        fun unsnoozeThreadsWithoutRefresh(scope: CoroutineScope, mailbox: Mailbox, threads: List<Thread>): Set<String> {
+        private fun ApiResponse<Boolean>.willNeverSucceed() = error?.let {
+            it.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED || it.code == ErrorCode.OBJECT_NOT_FOUND
+        } ?: false
+
+        /**
+         * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone.
+         * Outside of this algorithm, the scope doesn't need to be defined and the method can be used like any other.
+         */
+        fun unsnoozeThreadsWithoutRefresh(
+            scope: CoroutineScope?,
+            mailbox: Mailbox,
+            threads: Collection<Thread>,
+        ): BatchSnoozeResult {
             val snoozeUuids: MutableList<String> = mutableListOf()
             val impactedFolderIds: MutableSet<String> = mutableSetOf()
 
             for (thread in threads) {
-                scope.ensureActive()
+                scope?.ensureActive()
 
                 val targetMessage = thread.messages.lastOrNull(Message::isSnoozed)
                 val targetMessageSnoozeUuid = targetMessage?.snoozeUuid ?: continue
@@ -248,12 +263,26 @@ class SharedUtils @Inject constructor(
                 impactedFolderIds += targetMessage.folderId
             }
 
-            if (snoozeUuids.isEmpty()) return emptySet()
+            if (snoozeUuids.isEmpty()) return BatchSnoozeResult.Error.Unknown
 
             val apiResponses = ApiRepository.unsnoozeThreads(mailbox.uuid, snoozeUuids)
-            scope.ensureActive()
+            scope?.ensureActive()
 
-            return if (apiResponses.atLeastOneSucceeded()) impactedFolderIds else emptySet()
+            // When removing the snooze state of a thread, we absolutely need to refresh the snooze folder. Refreshing the
+            // snooze folder is the only way of updating the snooze status of messages. The folder snooze will never be
+            // returned inside impactedFolders because no message ever mentions the snooze folder, we need to add it manually.
+            return apiResponses.computeSnoozeResult(ImpactedFolders(impactedFolderIds, mutableSetOf(FolderRole.SNOOZED)))
+        }
+
+        fun shouldDisplaySnoozeActions(
+            mainViewModel: MainViewModel,
+            localSettings: LocalSettings,
+            currentFolderRole: FolderRole?,
+        ): Boolean {
+            fun hasSnoozeFeatureFlag() = mainViewModel.currentMailbox.value?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
+            fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
+
+            return currentFolderRole == FolderRole.INBOX || currentFolderRole == FolderRole.SNOOZED && hasSnoozeFeatureFlag() && isConversationMode()
         }
 
         sealed interface AutomaticUnsnoozeResult {

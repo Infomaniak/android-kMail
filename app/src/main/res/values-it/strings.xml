@@ -21,17 +21,18 @@
     <string name="accentColorSystemTitle">Colore del sistema</string>
     <string name="actionArchive">Archivia</string>
     <string name="actionBlockSender">Blocca mittente</string>
+    <string name="actionCancelSnooze">Annulla il posticipo</string>
     <string name="actionDelete">Cestina</string>
     <string name="actionEditMenu">Menu Modifica</string>
     <string name="actionForward">Inoltra</string>
     <string name="actionMarkAsRead">Segna come letto</string>
     <string name="actionMarkAsUnread">Segna come non letto</string>
+    <string name="actionModifySnooze">Modifica il posticipo</string>
     <string name="actionMove">Sposta</string>
     <string name="actionMoveToInbox">Sposta nella casella di posta</string>
     <string name="actionNonSpam">Segnala come non spam</string>
     <string name="actionOpenIn">Aprire con</string>
     <string name="actionPhishing">Segnala phishing</string>
-    <string name="actionPostpone">Rimanda</string>
     <string name="actionPrint">Stampa</string>
     <string name="actionReply">Rispondi</string>
     <string name="actionReplyAll">Rispondi a tutti</string>
@@ -41,6 +42,7 @@
     <string name="actionShortMarkAsUnread">Non letto</string>
     <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Preferiti</string>
+    <string name="actionSnooze">Metti in attesa</string>
     <string name="actionSpam">Segnala spam</string>
     <string name="actionStar">Aggiungi ai preferiti</string>
     <string name="actionUnstar">Elimina dai preferiti</string>
@@ -126,6 +128,7 @@
     <string name="buttonBold">In grassetto</string>
     <string name="buttonBulletPoint">Punto di riferimento</string>
     <string name="buttonCamera">Scattare una foto</string>
+    <string name="buttonCancelReminder">Annulla promemoria</string>
     <string name="buttonClose">Chiudi</string>
     <string name="buttonConfirm">Conferma</string>
     <string name="buttonConfirmRestoreEmails">Ripristino</string>
@@ -160,7 +163,6 @@
     <string name="buttonReschedule">Riprogrammare</string>
     <string name="buttonRestoreEmails">Ripristino delle e-mail</string>
     <string name="buttonSchedule">Programmare l’invio di un’e-mail in un secondo momento</string>
-    <string name="buttonScheduleTitle">Pianifica</string>
     <string name="buttonSee">Vedi</string>
     <string name="buttonSelectAll">Tutti</string>
     <string name="buttonShare">Condividi</string>
@@ -297,11 +299,11 @@
     <string name="errorNewFolderNameTooLong">Il nome della cartella non deve superare i 255 caratteri</string>
     <string name="errorRefusedRecipients">Il server respinge tutti i destinatari</string>
     <string name="errorRefusedSender">Il server respinge il mittente</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">Non puoi programmare l’invio di una e-mail tra meno di %d minuto</item>
-        <item quantity="other">Non puoi programmare l’invio di una e-mail tra meno di %d minuti</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">Non puoi programmare l’invio di una e-mail tra meno di %d minuti</string>
+    <string name="errorScheduledSnoozeDelayTooShort">Il tempo minimo per posticipare un’email è di %d minuti</string>
     <string name="errorSendLimitExceeded">Limite d’invio raggiunto</string>
+    <string name="errorSnoozeFailedCancel">Cancellazione non riuscita</string>
+    <string name="errorSnoozeFailedModify">Modifica non riuscita</string>
     <string name="errorTooManyRecipients">Troppi destinatari</string>
     <string name="errorUnableToCreateFolder">Impossibile creare la cartella</string>
     <string name="errorUnableToFlushFolder">Impossibile svuotare la cartella</string>
@@ -565,6 +567,10 @@
         <item quantity="one">Mittente inserito nella lista nera con successo</item>
         <item quantity="other">Mittenti inseriti nella lista nera con successo</item>
     </plurals>
+    <plurals name="snackbarSnoozeSuccess">
+        <item quantity="one">Riceverai un promemoria per questo messaggio %s</item>
+        <item quantity="other">Riceverai un promemoria per questi messaggi %s</item>
+    </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Soggetto copiato negli appunti</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversazione cancellata</item>
@@ -573,6 +579,23 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversazione spostata in %s</item>
         <item quantity="other">Conversazioni spostate in %s</item>
+    </plurals>
+    <plurals name="snackbarUnsnoozeSuccess">
+        <item quantity="one">Promemoria annullato. Il tuo messaggio è tornato nella tua casella di posta</item>
+        <item quantity="other">Promemoria annullati. I tuoi messaggi sono tornati nella tua casella di posta</item>
+    </plurals>
+    <string name="snoozeAlertTitle">In attesa fino al: %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">Questa conversazione non sarà più posticipata e verrà archiviata</item>
+        <item quantity="other">Queste conversazioni non saranno più posticipate e verranno archiviate</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">Questa conversazione non sarà più posticipata e verrà eliminata</item>
+        <item quantity="other">Queste conversazioni non saranno più posticipate e verranno eliminate</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">Questa conversazione non sarà più posticipata e verrà spostata</item>
+        <item quantity="other">Queste conversazioni non saranno più posticipate e verranno spostate</item>
     </plurals>
     <string name="snoozedFolder">In attesa</string>
     <string name="socialNetworksFolder">Social Network</string>

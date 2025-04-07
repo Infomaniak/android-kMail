@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -56,6 +57,14 @@ fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: Str
 
 fun Fragment.animatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String? = null) {
     if (canNavigate(currentClassName)) findNavController().navigate(resId, args, getAnimatedNavOptions())
+}
+
+fun NavController.animatedNavigation(directions: NavDirections, currentClassName: String) {
+    if (canNavigate(currentClassName, currentClassName)) navigate(directions, getAnimatedNavOptions())
+}
+
+fun NavController.animatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String) {
+    if (canNavigate(currentClassName, currentClassName)) navigate(resId, args, getAnimatedNavOptions())
 }
 
 fun Fragment.safeNavigateToNewMessageActivity(

@@ -42,9 +42,12 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.computeSnoozeResult
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
@@ -55,10 +58,12 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
+import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import com.infomaniak.mail.utils.Utils.isPermanentDeleteFolder
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
@@ -111,7 +116,7 @@ class MainViewModel @Inject constructor(
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
     val deletedMessages = SingleLiveEvent<Set<String>>()
-    val deleteThreadOrMessageTrigger = SingleLiveEvent<Unit>()
+    val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
@@ -583,7 +588,7 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        deleteThreadOrMessageTrigger.postValue(Unit)
+        activityDialogLoaderResetTrigger.postValue(Unit)
 
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
@@ -676,8 +681,7 @@ class MainViewModel @Inject constructor(
         draftResource?.takeIf { it.isNotBlank() }?.let { resource ->
             with(ApiRepository.rescheduleDraft(resource, scheduleDate)) {
                 if (isSuccess()) {
-                    val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
-                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
+                    refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
                 } else {
                     snackbarManager.postValue(title = appContext.getString(translatedError))
                 }
@@ -827,6 +831,8 @@ class MainViewModel @Inject constructor(
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
         val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+
+        activityDialogLoaderResetTrigger.postValue(Unit)
 
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
@@ -1105,6 +1111,123 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
+    //region Snooze
+    suspend fun snoozeThreads(date: Date, threadUids: List<String>): Boolean {
+        var isSuccess = false
+
+        viewModelScope.launch {
+            currentMailbox.value?.let { currentMailbox ->
+                val threads = threadUids.mapNotNull(threadController::getThread)
+
+                val messageUids = threads.mapNotNull { thread ->
+                    thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
+                }
+
+                val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
+
+                isSuccess = responses.atLeastOneSucceeded()
+                val userFeedbackMessage = if (isSuccess) {
+                    // Snoozing threads requires to refresh the snooze folder.
+                    // It's the only folder that will update the snooze state of any message.
+                    refreshFoldersAsync(currentMailbox, ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+
+                    val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
+                    appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threads.count(), formattedDate)
+                } else {
+                    val errorMessageRes = responses.getFirstTranslatedError() ?: RCore.string.anErrorHasOccurred
+                    appContext.getString(errorMessageRes)
+                }
+
+                snackbarManager.postValue(userFeedbackMessage)
+            }
+        }.join()
+
+        return isSuccess
+    }
+
+    suspend fun rescheduleSnoozedThreads(date: Date, threadUids: List<String>): BatchSnoozeResult {
+        var rescheduleResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
+
+        viewModelScope.launch(ioCoroutineContext) {
+            val snoozedThreadUuids = threadUids.mapNotNull { threadUid ->
+                val thread = threadController.getThread(threadUid) ?: return@mapNotNull null
+                thread.snoozeUuid.takeIf { thread.isSnoozed() }
+            }
+            if (snoozedThreadUuids.isEmpty()) return@launch
+
+            val currentMailbox = currentMailbox.value!!
+            val result = rescheduleSnoozedThreads(currentMailbox, snoozedThreadUuids, date)
+
+            val userFeedbackMessage = when (result) {
+                is BatchSnoozeResult.Success -> {
+                    refreshFoldersAsync(currentMailbox, result.impactedFolders)
+
+                    val formattedDate = appContext.dayOfWeekDateWithoutYear(date)
+                    appContext.resources.getQuantityString(R.plurals.snackbarSnoozeSuccess, threadUids.count(), formattedDate)
+                }
+                is BatchSnoozeResult.Error -> getRescheduleSnoozedErrorMessage(result)
+            }
+
+            snackbarManager.postValue(userFeedbackMessage)
+
+            rescheduleResult = result
+        }.join()
+
+        return rescheduleResult
+    }
+
+    private fun rescheduleSnoozedThreads(currentMailbox: Mailbox, snoozeUuids: List<String>, date: Date): BatchSnoozeResult {
+        val responses = ApiRepository.rescheduleSnoozedThreads(currentMailbox.uuid, snoozeUuids, date)
+        return responses.computeSnoozeResult(ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+    }
+
+    private fun getRescheduleSnoozedErrorMessage(errorResult: BatchSnoozeResult.Error): String {
+        val errorMessageRes = when (errorResult) {
+            BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedModify
+            is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
+            BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
+        }
+        return appContext.getString(errorMessageRes)
+    }
+
+    suspend fun unsnoozeThreads(threads: Collection<Thread>): BatchSnoozeResult {
+        var unsnoozeResult: BatchSnoozeResult = BatchSnoozeResult.Error.Unknown
+
+        viewModelScope.launch(ioCoroutineContext) {
+            val currentMailbox = currentMailbox.value
+            unsnoozeResult = if (currentMailbox == null) {
+                BatchSnoozeResult.Error.Unknown
+            } else {
+                ioDispatcher { unsnoozeThreadsWithoutRefresh(scope = null, currentMailbox, threads) }
+            }
+
+            unsnoozeResult.let {
+                val userFeedbackMessage = when (it) {
+                    is BatchSnoozeResult.Success -> {
+                        sharedUtils.refreshFolders(mailbox = currentMailbox!!, messagesFoldersIds = it.impactedFolders)
+                        appContext.resources.getQuantityString(R.plurals.snackbarUnsnoozeSuccess, threads.count())
+                    }
+                    is BatchSnoozeResult.Error -> getUnsnoozeErrorMessage(it)
+                }
+
+                snackbarManager.postValue(userFeedbackMessage)
+            }
+        }.join()
+
+        return unsnoozeResult
+    }
+
+    private fun getUnsnoozeErrorMessage(errorResult: BatchSnoozeResult.Error): String {
+        val errorMessageRes = when (errorResult) {
+            BatchSnoozeResult.Error.NoneSucceeded -> R.string.errorSnoozeFailedCancel
+            is BatchSnoozeResult.Error.ApiError -> errorResult.translatedError
+            BatchSnoozeResult.Error.Unknown -> RCore.string.anErrorHasOccurred
+        }
+
+        return appContext.getString(errorMessageRes)
+    }
+//endregion
+
     //region Undo action
     fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
 
@@ -1134,7 +1257,7 @@ class MainViewModel @Inject constructor(
 
         snackbarManager.postValue(appContext.getString(snackbarTitle))
     }
-    //endregion
+//endregion
 
     //region New Folder
     private suspend fun createNewFolderSync(name: String): String? {
@@ -1163,7 +1286,7 @@ class MainViewModel @Inject constructor(
         moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)
         isMovedToNewFolder.postValue(true)
     }
-    //endregion
+//endregion
 
     private fun refreshFoldersAsync(
         mailbox: Mailbox,
@@ -1191,7 +1314,7 @@ class MainViewModel @Inject constructor(
         return getActionFolderRole(message.threads, message)
     }
 
-    // TODO: Handle this correctly if MultiSelect feature is added in the Search.
+// TODO: Handle this correctly if MultiSelect feature is added in the Search.
     /**
      * Get the FolderRole of a Message or a list of Threads.
      *

@@ -33,6 +33,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
@@ -40,9 +41,11 @@ import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
+import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
@@ -51,6 +54,7 @@ import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBlockUserAction
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
+import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -64,13 +68,17 @@ import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.*
-import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_DATE_AND_TIME_SCHEDULE_DIALOG
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.Companion.SCHEDULE_DRAFT_RESULT
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
@@ -78,17 +86,21 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.*
 import com.infomaniak.mail.ui.main.thread.actions.*
+import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 import kotlin.math.absoluteValue
@@ -133,6 +145,9 @@ class ThreadFragment : Fragment() {
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
 
     @Inject
+    lateinit var dateAndTimeSnoozeDialog: SelectDateAndTimeForSnoozeDialog
+
+    @Inject
     lateinit var confirmScheduledDraftModificationDialog: ConfirmScheduledDraftModificationDialog
 
     private var _binding: FragmentThreadBinding? = null
@@ -167,6 +182,7 @@ class ThreadFragment : Fragment() {
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
+        observeSnoozeHeaderVisibility()
 
         observeThreadOpening()
         observeAutoAdvance()
@@ -442,6 +458,22 @@ class ThreadFragment : Fragment() {
 
             val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == thread.messages.size
             quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
+
+            thread.snoozeEndDate?.let { snoozeEndDate ->
+                val formattedDate = context.formatDayOfWeekAdaptiveYear(snoozeEndDate.toDate())
+                snoozeAlert.setDescription(getString(R.string.snoozeAlertTitle, formattedDate))
+            }
+
+            snoozeAlert.apply {
+                onAction1 {
+                    trackSnoozeEvent(ACTION_MODIFY_SNOOZE_NAME)
+                    navigateToSnoozeBottomSheet(SnoozeScheduleType.Modify(thread.uid))
+                }
+                onAction2 {
+                    trackSnoozeEvent(ACTION_CANCEL_SNOOZE_NAME)
+                    unsnoozeThread(thread)
+                }
+            }
         }
     }
 
@@ -540,13 +572,19 @@ class ThreadFragment : Fragment() {
         }
     }
 
+    private fun observeSnoozeHeaderVisibility() = with(binding) {
+        threadViewModel.isThreadSnoozeHeaderVisible.observe(viewLifecycleOwner) {
+            threadAlertsLayout.isGone = it == ThreadHeaderVisibility.NONE
+            snoozeAlert.setActionsVisibility(it == ThreadHeaderVisibility.MESSAGE_AND_ACTIONS)
+        }
+    }
+
     private fun observeAutoAdvance() {
         mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner, ::tryToAutoAdvance)
     }
 
     private fun setupBackActionHandler() {
-
-        getBackNavigationResult(OPEN_DATE_AND_TIME_SCHEDULE_DIALOG) { _: Boolean ->
+        getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
@@ -558,6 +596,50 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(SCHEDULE_DRAFT_RESULT) { selectedScheduleEpoch: Long ->
             mainViewModel.rescheduleDraft(Date(selectedScheduleEpoch))
+        }
+
+        getBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET) { snoozeScheduleType: SnoozeScheduleType ->
+            navigateToSnoozeBottomSheet(snoozeScheduleType)
+        }
+
+        getBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER) { _: Boolean ->
+            dateAndTimeSnoozeDialog.show(
+                onDateSelected = { timestamp ->
+                    localSettings.lastSelectedSnoozeEpochMillis = timestamp
+                    executeSavedSnoozeScheduleType(timestamp)
+                },
+                onAbort = { navigateToSnoozeBottomSheet(threadViewModel.snoozeScheduleType) },
+            )
+        }
+
+        getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
+            executeSavedSnoozeScheduleType(selectedScheduleEpoch)
+        }
+    }
+
+    private fun executeSavedSnoozeScheduleType(timestamp: Long) {
+        when (val type = threadViewModel.snoozeScheduleType) {
+            is SnoozeScheduleType.Snooze -> snoozeThreads(timestamp, type.threadUids)
+            is SnoozeScheduleType.Modify -> rescheduleSnoozedThreads(timestamp, type.threadUids)
+            null -> SentryLog.e(TAG, "Tried to execute snooze api call but there's no saved schedule type to handle")
+        }
+    }
+
+    private fun snoozeThreads(timestamp: Long, threadUids: List<String>) {
+        lifecycleScope.launch {
+            val isSuccess = mainViewModel.snoozeThreads(Date(timestamp), threadUids)
+            if (isSuccess) twoPaneViewModel.closeThread()
+        }
+    }
+
+    private fun rescheduleSnoozedThreads(timestamp: Long, threadUids: List<String>) {
+        lifecycleScope.launch {
+            binding.snoozeAlert.showAction1Progress()
+
+            val result = mainViewModel.rescheduleSnoozedThreads(Date(timestamp), threadUids)
+            binding.snoozeAlert.hideAction1Progress(R.string.buttonModify)
+
+            if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()
         }
     }
 
@@ -596,8 +678,10 @@ class ThreadFragment : Fragment() {
                     threadViewModel.clickOnQuickActionBar(menuId)
                 }
                 R.id.quickActionArchive -> {
-                    trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
-                    mainViewModel.archiveThread(threadUid)
+                    descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
+                        trackThreadActionsEvent(ACTION_ARCHIVE_NAME, isFromArchive)
+                        mainViewModel.archiveThread(threadUid)
+                    }
                 }
                 R.id.quickActionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
@@ -750,6 +834,30 @@ class ThreadFragment : Fragment() {
         )
     }
 
+    private fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?) {
+        threadViewModel.snoozeScheduleType = snoozeScheduleType
+        safeNavigate(
+            resId = R.id.snoozeBottomSheetDialog,
+            args = SnoozeBottomSheetDialogArgs(
+                lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
+                currentlyScheduledEpochMillis = threadViewModel.threadLive.value?.snoozeEndDate?.epochSeconds?.times(1_000) ?: 0L,
+                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
+            ).toBundle(),
+            currentClassName = ThreadFragment::class.java.name,
+        )
+    }
+
+    private fun unsnoozeThread(thread: Thread): Unit = with(binding) {
+        lifecycleScope.launch {
+            snoozeAlert.showAction2Progress()
+
+            val result = mainViewModel.unsnoozeThreads(listOf(thread))
+            snoozeAlert.hideAction2Progress(R.string.buttonCancelReminder)
+
+            if (result is BatchSnoozeResult.Success) twoPaneViewModel.closeThread()
+        }
+    }
+
     private fun modifyScheduledDraft(message: Message) {
         confirmScheduledDraftModificationDialog.show(
             title = getString(R.string.editSendTitle),
@@ -834,6 +942,8 @@ class ThreadFragment : Fragment() {
     }
 
     companion object {
+        private val TAG = ThreadFragment::class.java.simpleName
+
         private const val COLLAPSE_TITLE_THRESHOLD = 0.5
         private const val ARCHIVE_INDEX = 2
 

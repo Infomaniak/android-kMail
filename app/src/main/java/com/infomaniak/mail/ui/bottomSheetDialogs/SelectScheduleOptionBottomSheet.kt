@@ -107,7 +107,9 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
         binding.customScheduleOption.setOnClickListener { onCustomScheduleOptionClicked() }
     }
 
-    private fun Date.isNotAlreadySelected(): Boolean = time.truncateToMinute() != currentlyScheduledEpochMillis?.truncateToMinute()
+    private fun Date.isNotAlreadySelected(): Boolean {
+        return time.truncateToMinute() != currentlyScheduledEpochMillis?.truncateToMinute()
+    }
 
     private fun Long.truncateToMinute(): Long {
         return Calendar.getInstance().apply {

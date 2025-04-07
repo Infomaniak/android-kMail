@@ -49,7 +49,8 @@ object Utils {
     const val MAX_OLD_PAGES_TO_FETCH_TO_GET_ENOUGH_THREADS = 5 // We don't want to spam the API, so we just get a few pages
 
     const val MAX_UIDS_PER_CALL = 1_000 // Beware: the API refuses a MAX_UIDS_PER_CALL bigger than 1000
-    const val MAX_UUIDS_PER_CALL_SNOOZE_DELETE = 100
+    const val MAX_UUIDS_PER_CALL_SNOOZE = 100 // Only for DELETE and PUT
+    const val MAX_UUIDS_PER_CALL_SNOOZE_POST = 200 // Only for POST
 
     const val TAG_SEPARATOR = " "
 

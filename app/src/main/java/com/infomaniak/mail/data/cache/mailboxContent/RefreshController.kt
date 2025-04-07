@@ -246,34 +246,33 @@ class RefreshController @Inject constructor(
     }
 
     private suspend fun Realm.removeSnoozeStateOfThreadsWithNewMessages(scope: CoroutineScope, folder: Folder): ImpactedFolders {
-        return if (folder.role == FolderRole.INBOX) {
-            val impactedFolders = ImpactedFolders()
-            val cannotBeUnsnoozedThreadUids = mutableListOf<String>()
+        if (folder.role != FolderRole.INBOX) return ImpactedFolders()
 
-            ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm).forEach { snoozedThreadWithNewMessage ->
-                scope.ensureActive()
-                val result = SharedUtils.unnsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)
-                when (result) {
-                    is AutomaticUnsnoozeResult.Success -> impactedFolders += result.impactedFolders
-                    AutomaticUnsnoozeResult.CannotBeUnsnoozedError -> cannotBeUnsnoozedThreadUids += snoozedThreadWithNewMessage.uid
-                    AutomaticUnsnoozeResult.OtherError -> Unit
-                }
+        val impactedFolders = ImpactedFolders()
+        val cannotBeUnsnoozedThreadUids = mutableListOf<String>()
+
+        ThreadController.getSnoozedThreadsWithNewMessage(folder.id, realm).forEach { snoozedThreadWithNewMessage ->
+            scope.ensureActive()
+
+            val result = SharedUtils.unsnoozeThreadWithoutRefresh(mailbox, snoozedThreadWithNewMessage)
+            when (result) {
+                is AutomaticUnsnoozeResult.Success -> impactedFolders += result.impactedFolders
+                AutomaticUnsnoozeResult.CannotBeUnsnoozedError -> cannotBeUnsnoozedThreadUids += snoozedThreadWithNewMessage.uid
+                AutomaticUnsnoozeResult.OtherError -> Unit
             }
-
-            write {
-                cannotBeUnsnoozedThreadUids.forEach { manuallyUnsnoozeOutOfSyncThread(it) }
-
-                if (cannotBeUnsnoozedThreadUids.isNotEmpty()) {
-                    FolderController.getFolder(FolderRole.SNOOZED, realm = this)?.id?.let { snoozeFolderId ->
-                        recomputeTwinFoldersThreadsDependantProperties(snoozeFolderId)
-                    }
-                }
-            }
-
-            impactedFolders
-        } else {
-            ImpactedFolders()
         }
+
+        write {
+            cannotBeUnsnoozedThreadUids.forEach { manuallyUnsnoozeOutOfSyncThread(it) }
+
+            if (cannotBeUnsnoozedThreadUids.isNotEmpty()) {
+                FolderController.getFolder(FolderRole.SNOOZED, realm = this)?.id?.let { snoozeFolderId ->
+                    recomputeTwinFoldersThreadsDependantProperties(snoozeFolderId)
+                }
+            }
+        }
+
+        return impactedFolders
     }
 
     private fun MutableRealm.manuallyUnsnoozeOutOfSyncThread(threadUid: String) {

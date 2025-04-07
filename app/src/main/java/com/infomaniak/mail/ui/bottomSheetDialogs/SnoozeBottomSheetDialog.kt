@@ -21,16 +21,16 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.LAST_SELECTED_SCHEDULE
 import com.infomaniak.mail.MatomoMail.SCHEDULED_CUSTOM_DATE
-import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
+import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottomSheet() {
+class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottomSheet() {
 
-    private val navigationArgs: ScheduleSendBottomSheetDialogArgs by navArgs()
+    private val navigationArgs: SnoozeBottomSheetDialogArgs by navArgs()
 
     override val isCurrentMailboxFree: Boolean by lazy { navigationArgs.isCurrentMailboxFree }
 
@@ -39,30 +39,30 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
     override val lastSelectedEpoch: Long? by lazy { navigationArgs.lastSelectedScheduleEpochMillis.takeIf { it != 0L } }
     override val currentlyScheduledEpochMillis: Long? by lazy { navigationArgs.currentlyScheduledEpochMillis.takeIf { it != 0L } }
 
-    override val titleRes: Int = R.string.scheduleSendingTitle
+    override val titleRes: Int = R.string.actionSnooze
 
     override fun onLastScheduleOptionClicked() {
         if (lastSelectedEpoch != null) {
-            trackScheduleSendEvent(LAST_SELECTED_SCHEDULE)
-            setBackNavigationResult(SCHEDULE_DRAFT_RESULT, lastSelectedEpoch)
+            trackSnoozeEvent(LAST_SELECTED_SCHEDULE)
+            setBackNavigationResult(SNOOZE_RESULT, lastSelectedEpoch)
         }
     }
 
     override fun onScheduleOptionClicked(dateItem: ScheduleOption) {
-        trackScheduleSendEvent(dateItem.matomoValue)
-        setBackNavigationResult(SCHEDULE_DRAFT_RESULT, dateItem.date().time)
+        trackSnoozeEvent(dateItem.matomoValue)
+        setBackNavigationResult(SNOOZE_RESULT, dateItem.date().time)
     }
 
     override fun onCustomScheduleOptionClicked() {
         if (navigationArgs.isCurrentMailboxFree) {
             openMyKSuiteUpgradeBottomSheet(SCHEDULED_CUSTOM_DATE)
         } else {
-            setBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER, true)
+            setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)
         }
     }
 
     companion object {
-        const val SCHEDULE_DRAFT_RESULT = "schedule_draft_result"
-        const val OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER = "open_schedule_draft_date_and_time_picker"
+        const val SNOOZE_RESULT = "snooze_result"
+        const val OPEN_SNOOZE_DATE_AND_TIME_PICKER = "open_snooze_date_and_time_picker"
     }
 }

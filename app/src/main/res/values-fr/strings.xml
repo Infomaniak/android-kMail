@@ -21,17 +21,18 @@
     <string name="accentColorSystemTitle">Couleur du système</string>
     <string name="actionArchive">Archiver</string>
     <string name="actionBlockSender">Bloquer l’expéditeur</string>
+    <string name="actionCancelSnooze">Annuler la mise en attente</string>
     <string name="actionDelete">Supprimer</string>
     <string name="actionEditMenu">Modifier le menu</string>
     <string name="actionForward">Transférer</string>
     <string name="actionMarkAsRead">Marquer comme lu</string>
     <string name="actionMarkAsUnread">Marquer comme non lu</string>
+    <string name="actionModifySnooze">Modifier la mise en attente</string>
     <string name="actionMove">Déplacer</string>
     <string name="actionMoveToInbox">Déplacer vers la boîte de réception</string>
     <string name="actionNonSpam">Signaler comme légitime</string>
     <string name="actionOpenIn">Ouvrir dans</string>
     <string name="actionPhishing">Signaler comme hameçonnage</string>
-    <string name="actionPostpone">Reporter</string>
     <string name="actionPrint">Imprimer</string>
     <string name="actionReply">Répondre</string>
     <string name="actionReplyAll">Répondre à tous</string>
@@ -41,6 +42,7 @@
     <string name="actionShortMarkAsUnread">Non lu</string>
     <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Favoris</string>
+    <string name="actionSnooze">Mettre en attente</string>
     <string name="actionSpam">Signaler comme spam</string>
     <string name="actionStar">Ajouter aux favoris</string>
     <string name="actionUnstar">Retirer des favoris</string>
@@ -128,6 +130,7 @@
     <string name="buttonBold">Gras</string>
     <string name="buttonBulletPoint">Puce</string>
     <string name="buttonCamera">Prendre une photo</string>
+    <string name="buttonCancelReminder">Annuler le rappel</string>
     <string name="buttonClose">Fermer</string>
     <string name="buttonConfirm">Confirmer</string>
     <string name="buttonConfirmRestoreEmails">Restaurer</string>
@@ -162,7 +165,6 @@
     <string name="buttonReschedule">Reprogrammer</string>
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
     <string name="buttonSchedule">Programmer l’envoi de l’e-mail</string>
-    <string name="buttonScheduleTitle">Programmer</string>
     <string name="buttonSee">Consulter</string>
     <string name="buttonSelectAll">Tout</string>
     <string name="buttonShare">Partager</string>
@@ -299,12 +301,11 @@
     <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="errorRefusedRecipients">Le serveur refuse tous les destinataires</string>
     <string name="errorRefusedSender">Le serveur refuse l’expéditeur</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">Vous ne pouvez pas programmer un e-mail dans moins de %d minute</item>
-        <item quantity="other">Vous ne pouvez pas programmer un e-mail dans moins de %d minutes</item>
-        <item quantity="many">Vous ne pouvez pas programmer un e-mail dans moins de %d de minutes</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">Vous ne pouvez pas programmer un e-mail dans moins de %d minutes</string>
+    <string name="errorScheduledSnoozeDelayTooShort">Le délai minimum pour mettre un e-mail en attente est de %d minutes</string>
     <string name="errorSendLimitExceeded">Limite d’envoi atteinte</string>
+    <string name="errorSnoozeFailedCancel">Échec de l’annulation</string>
+    <string name="errorSnoozeFailedModify">Échec de la modification</string>
     <string name="errorTooManyRecipients">Trop de destinataires</string>
     <string name="errorUnableToCreateFolder">Impossible de créer le dossier</string>
     <string name="errorUnableToFlushFolder">Impossible de vider le dossier</string>
@@ -575,6 +576,11 @@
         <item quantity="other">Expéditeurs blacklistés avec succès</item>
         <item quantity="many">Expéditeurs blacklistés avec succès</item>
     </plurals>
+    <plurals name="snackbarSnoozeSuccess">
+        <item quantity="one">Vous recevrez un rappel de ce message %s</item>
+        <item quantity="other">Vous recevrez un rappel de ces messages %s</item>
+        <item quantity="many">Vous recevrez un rappel de ces messages %s</item>
+    </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Objet copié dans le presse-papiers</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation supprimée</item>
@@ -585,6 +591,27 @@
         <item quantity="one">Conversation déplacée vers %s</item>
         <item quantity="other">Conversations déplacées vers %s</item>
         <item quantity="many">Conversations déplacées vers %s</item>
+    </plurals>
+    <plurals name="snackbarUnsnoozeSuccess">
+        <item quantity="one">Rappel annulé. Votre message est revenu dans votre boîte de réception</item>
+        <item quantity="other">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
+        <item quantity="many">Rappels annulés. Vos messages sont revenus dans votre boîte de réception</item>
+    </plurals>
+    <string name="snoozeAlertTitle">En attente jusqu’au : %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">Cette conversation ne sera plus en attente et sera archivée</item>
+        <item quantity="other">Ces conversations ne seront plus en attente et seront archivées</item>
+        <item quantity="many">Ces conversations ne seront plus en attente et seront archivées</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">Cette conversation ne sera plus en attente et sera supprimée</item>
+        <item quantity="other">Ces conversations ne seront plus en attente et seront supprimées</item>
+        <item quantity="many">Ces conversations ne seront plus en attente et seront supprimées</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">Cette conversation ne sera plus en attente et sera déplacée</item>
+        <item quantity="other">Ces conversations ne seront plus en attente et seront déplacées</item>
+        <item quantity="many">Ces conversations ne seront plus en attente et seront déplacées</item>
     </plurals>
     <string name="snoozedFolder">En attente</string>
     <string name="socialNetworksFolder">Réseaux sociaux</string>

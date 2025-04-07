@@ -27,17 +27,18 @@
     <string name="accentColorSystemTitle">System color</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
+    <string name="actionCancelSnooze">Cancel snooze</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
     <string name="actionForward">Forward</string>
     <string name="actionMarkAsRead">Mark as read</string>
     <string name="actionMarkAsUnread">Mark as unread</string>
+    <string name="actionModifySnooze">Modify snooze</string>
     <string name="actionMove">Move</string>
     <string name="actionMoveToInbox">Move to inbox</string>
     <string name="actionNonSpam">Report as not spam</string>
     <string name="actionOpenIn">Open in</string>
     <string name="actionPhishing">Report phishing</string>
-    <string name="actionPostpone">Postpone</string>
     <string name="actionPrint">Print</string>
     <string name="actionReply">Reply</string>
     <string name="actionReplyAll">Reply all</string>
@@ -47,6 +48,7 @@
     <string name="actionShortMarkAsUnread">Unread</string>
     <string name="actionShortSpam">Spam</string>
     <string name="actionShortStar">Favorites</string>
+    <string name="actionSnooze">Snooze</string>
     <string name="actionSpam">Report spam</string>
     <string name="actionStar">Add to favorites</string>
     <string name="actionUnstar">Delete from favorites</string>
@@ -132,6 +134,7 @@
     <string name="buttonBold">Bold</string>
     <string name="buttonBulletPoint">Bullet point</string>
     <string name="buttonCamera">Take a picture</string>
+    <string name="buttonCancelReminder">Cancel reminder</string>
     <string name="buttonClose">Close</string>
     <string name="buttonConfirm">Confirm</string>
     <string name="buttonConfirmRestoreEmails">Restore</string>
@@ -166,7 +169,6 @@
     <string name="buttonReschedule">Reschedule</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
-    <string name="buttonScheduleTitle">Schedule</string>
     <string name="buttonSee">See</string>
     <string name="buttonSelectAll">All</string>
     <string name="buttonShare">Share</string>
@@ -303,11 +305,11 @@
     <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="errorRefusedRecipients">The server is refusing all recipients</string>
     <string name="errorRefusedSender">The server is refusing the sender</string>
-    <plurals name="errorScheduleDelayTooShort">
-        <item quantity="one">You can’t schedule an email less than %d minute in the future</item>
-        <item quantity="other">You can’t schedule an email less than %d minutes in the future</item>
-    </plurals>
+    <string name="errorScheduleDelayTooShort">You can’t schedule an email less than %d minutes in the future</string>
+    <string name="errorScheduledSnoozeDelayTooShort">The minimum time to snooze an email is %d minutes</string>
     <string name="errorSendLimitExceeded">Sending limit reached</string>
+    <string name="errorSnoozeFailedCancel">Failed to cancel</string>
+    <string name="errorSnoozeFailedModify">Failed to modify</string>
     <string name="errorTooManyRecipients">Too many recipients</string>
     <string name="errorUnableToCreateFolder">Unable to create the folder</string>
     <string name="errorUnableToFlushFolder">Folder cannot be emptied</string>
@@ -571,6 +573,10 @@
         <item quantity="one">Sender successfully blacklisted</item>
         <item quantity="other">Senders successfully blacklisted</item>
     </plurals>
+    <plurals name="snackbarSnoozeSuccess">
+        <item quantity="one">You will receive a reminder for this message %s</item>
+        <item quantity="other">You will receive a reminder for these messages %s</item>
+    </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Subject copied to the clipboard</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation deleted</item>
@@ -579,6 +585,23 @@
     <plurals name="snackbarThreadMoved">
         <item quantity="one">Conversation moved to %s</item>
         <item quantity="other">Conversations moved to %s</item>
+    </plurals>
+    <plurals name="snackbarUnsnoozeSuccess">
+        <item quantity="one">Reminder canceled. Your message is back in your inbox</item>
+        <item quantity="other">Reminders canceled. Your messages are back in your inbox</item>
+    </plurals>
+    <string name="snoozeAlertTitle">Snoozed until: %s</string>
+    <plurals name="snoozeArchiveConfirmAlertDescription">
+        <item quantity="one">This conversation will no longer be snoozed and will be archived</item>
+        <item quantity="other">These conversations will no longer be snoozed and will be archived</item>
+    </plurals>
+    <plurals name="snoozeDeleteConfirmAlertDescription">
+        <item quantity="one">This conversation will no longer be snoozed and will be deleted</item>
+        <item quantity="other">These conversations will no longer be snoozed and will be deleted</item>
+    </plurals>
+    <plurals name="snoozeMoveConfirmAlertDescription">
+        <item quantity="one">This conversation will no longer be snoozed and will be moved</item>
+        <item quantity="other">These conversations will no longer be snoozed and will be moved</item>
     </plurals>
     <string name="snoozedFolder">Snoozed</string>
     <string name="socialNetworksFolder">Social networks</string>

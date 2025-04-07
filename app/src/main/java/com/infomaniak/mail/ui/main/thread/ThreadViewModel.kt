@@ -18,10 +18,13 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
+import android.os.Parcelable
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -29,8 +32,11 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -47,6 +53,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 import kotlin.collections.set
 
@@ -62,6 +69,7 @@ class ThreadViewModel @Inject constructor(
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
+    private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -92,6 +100,24 @@ class ThreadViewModel @Inject constructor(
 
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
+
+    // Remember what type of snooze action the snooze schedule bottom sheet is used for,
+    // so we know what call to execute when a date is chosen
+    var snoozeScheduleType: SnoozeScheduleType? = null
+
+    val isThreadSnoozeHeaderVisible = Utils.waitInitMediator(currentMailboxLive, threadLive).map { (mailbox, thread) ->
+        when {
+            thread == null || thread.isSnoozed().not() -> ThreadHeaderVisibility.NONE
+            thread.shouldDisplayHeaderActions(mailbox) -> ThreadHeaderVisibility.MESSAGE_AND_ACTIONS
+            else -> ThreadHeaderVisibility.MESSAGE_ONLY
+        }
+    }
+
+    private fun Thread.shouldDisplayHeaderActions(mailbox: Mailbox?): Boolean {
+        return mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
+                && folder.role == FolderRole.SNOOZED
+                && localSettings.threadMode == ThreadMode.CONVERSATION
+    }
 
     fun reassignThreadLive(threadUid: String) {
         threadLiveJob?.cancel()
@@ -466,9 +492,25 @@ class ThreadViewModel @Inject constructor(
     )
 
     private enum class MessageBehavior {
-        DISPLAYED,
-        COLLAPSED,
-        FIRST_AFTER_BLOCK,
+        DISPLAYED, COLLAPSED, FIRST_AFTER_BLOCK,
+    }
+
+    sealed interface SnoozeScheduleType : Parcelable {
+        val threadUids: List<String>
+
+        @Parcelize
+        data class Snooze(override val threadUids: List<String>) : SnoozeScheduleType {
+            constructor(threadUid: String) : this(listOf(threadUid))
+        }
+
+        @Parcelize
+        data class Modify(override val threadUids: List<String>) : SnoozeScheduleType {
+            constructor(threadUid: String) : this(listOf(threadUid))
+        }
+    }
+
+    enum class ThreadHeaderVisibility {
+        MESSAGE_AND_ACTIONS, MESSAGE_ONLY, NONE,
     }
 
     companion object {

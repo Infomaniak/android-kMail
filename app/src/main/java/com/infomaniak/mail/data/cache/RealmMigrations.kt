@@ -158,6 +158,7 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
         }
     }
 }
+//endregion
 
 // Migrate from version #25
 private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration() {
