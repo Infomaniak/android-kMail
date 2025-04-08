@@ -40,12 +40,6 @@ interface RefreshStrategy {
 
     fun shouldHideEmptyFolder(): Boolean
 
-    /**
-     * When a [Message] is added, updated or deleted, we recompute threads that are impacted by this change. If this method
-     * returns true, the impacted threads will also consider threads where the processed [Message] appears as a duplicate.
-     */
-    fun alsoRecomputeDuplicatedThreads(): Boolean
-
     fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message?
 
     fun processDeletedMessage(
