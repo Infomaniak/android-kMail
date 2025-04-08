@@ -226,7 +226,7 @@ class ThreadListMultiSelection {
             var shouldUnfavorite = selectedThreads.isNotEmpty()
 
             for (thread in selectedThreads) {
-                shouldUnread = shouldUnread && thread.unseenMessagesCount == 0
+                shouldUnread = shouldUnread && thread.isSeen
                 shouldUnfavorite = shouldUnfavorite && thread.isFavorite
 
                 if (!shouldUnread && !shouldUnfavorite) break

@@ -873,7 +873,7 @@ class MainViewModel @Inject constructor(
 
         val isSeen = when {
             message != null -> message.isSeen
-            threads.count() == 1 -> threads.single().unseenMessagesCount == 0
+            threads.count() == 1 -> threads.single().isSeen
             else -> !shouldRead
         }
 

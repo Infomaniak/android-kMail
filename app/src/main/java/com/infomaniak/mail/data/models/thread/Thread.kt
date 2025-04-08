@@ -106,6 +106,8 @@ class Thread : RealmObject, Snoozable {
     var isLastInboxMessageSnoozed: Boolean = false
     //endregion
 
+    val isSeen get() = unseenMessagesCount == 0
+
     @Ignore
     override var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
 

@@ -85,7 +85,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             isFromArchive = folderRole == FolderRole.ARCHIVE
             isFromSpam = folderRole == FolderRole.SPAM
 
-            setMarkAsReadUi(thread.unseenMessagesCount == 0)
+            setMarkAsReadUi(thread.isSeen)
             setArchiveUi(isFromArchive)
             setFavoriteUi(thread.isFavorite)
             setJunkUi()
@@ -171,7 +171,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onReadUnread() {
-                    trackBottomSheetThreadActionsEvent(ACTION_MARK_AS_SEEN_NAME, value = thread.unseenMessagesCount == 0)
+                    trackBottomSheetThreadActionsEvent(ACTION_MARK_AS_SEEN_NAME, value = thread.isSeen)
                     mainViewModel.toggleThreadSeenStatus(threadUid)
                     twoPaneViewModel.closeThread()
                 }
