@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache
 
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject
@@ -35,17 +36,19 @@ val USER_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
 val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
-    migrationContext.keepDefaultValuesAfterSixthMigration()
+    val map = mutableMapOf<String, Any?>()
+    migrationContext.keepDefaultValuesAfterSixthMigration(map)
 }
 
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
-    migrationContext.keepDefaultValuesAfterNineteenthMigration()
-    migrationContext.initializeInternalDateAsDateAfterTwentySecondMigration()
-    migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
-    migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
-    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration()
+    val map = mutableMapOf<String, Any?>()
+    migrationContext.keepDefaultValuesAfterNineteenthMigration(map)
+    migrationContext.initializeInternalDateAsDateAfterTwentySecondMigration(map)
+    migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration(map)
+    migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration(map)
+    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration(map)
 }
 
 // Migrate to version #1
@@ -65,40 +68,52 @@ private fun MigrationContext.deleteRealmFromFirstMigration() {
  * Documentation to handle manual migrations :
  * https://www.mongodb.com/docs/atlas/device-sdks/sdk/kotlin/realm-database/schemas/change-an-object-model/
  */
-private fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
+private fun MigrationContext.keepDefaultValuesAfterSixthMigration(map: MutableMap<String, Any?>) {
     if (oldRealm.schemaVersion() <= 6L) {
         enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
 
                 // Add property with default value
-                set(propertyName = "_isValidInLdap", value = true)
+                setSafe(propertyName = "_isValidInLdap", value = true, map = map)
 
                 // Rename property without losing its previous value
-                set(propertyName = "_isLocked", value = oldObject.getValue<Boolean>(fieldName = "isLocked"))
+                setSafe(
+                    propertyName = "_isLocked",
+                    value = oldObject.getValueSafe<Boolean>(fieldName = "isLocked", map),
+                    map = map,
+                )
 
                 // Rename property without losing its previous value
-                set(propertyName = "hasValidPassword", value = oldObject.getValue<Boolean>(fieldName = "isPasswordValid"))
+                setSafe(
+                    propertyName = "hasValidPassword",
+                    value = oldObject.getValueSafe<Boolean>(fieldName = "isPasswordValid", map),
+                    map = map,
+                )
             }
         }
     }
 }
 
 // Migrate from version #19
-private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
+private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration(map: MutableMap<String, Any?>) {
 
     if (oldRealm.schemaVersion() <= 19L) {
 
         enumerate(className = "Folder") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Add property with default value
-                set(propertyName = "isDisplayed", value = true)
+                setSafe(propertyName = "isDisplayed", value = true, map = map)
             }
         }
 
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Rename property without losing its previous value
-                set(propertyName = "isScheduledMessage", value = oldObject.getValue<Boolean>(fieldName = "isScheduled"))
+                setSafe(
+                    propertyName = "isScheduledMessage",
+                    value = oldObject.getValueSafe<Boolean>(fieldName = "isScheduled", map),
+                    map = map
+                )
             }
         }
 
@@ -107,26 +122,42 @@ private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {
 //endregion
 
 // Migrate from version #22
-private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigration() {
+private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigration(map: MutableMap<String, Any?>) {
 
     if (oldRealm.schemaVersion() <= 22L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
-                set(propertyName = "internalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+                setSafe(
+                    propertyName = "internalDate",
+                    value = oldObject.getValueSafe<RealmInstant>(fieldName = "date", map),
+                    map = map
+                )
 
                 // Initialize new property with old property value
-                set(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+                setSafe(
+                    propertyName = "originalDate",
+                    value = oldObject.getValueSafe<RealmInstant>(fieldName = "date", map),
+                    map = map
+                )
             }
         }
 
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
-                set(propertyName = "internalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+                setSafe(
+                    propertyName = "internalDate",
+                    value = oldObject.getValueSafe<RealmInstant>(fieldName = "date", map),
+                    map = map
+                )
 
                 // Initialize new property with old property value
-                set(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+                setSafe(
+                    propertyName = "originalDate",
+                    value = oldObject.getValueSafe<RealmInstant>(fieldName = "date", map),
+                    map = map
+                )
             }
         }
     }
@@ -134,26 +165,26 @@ private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigrat
 //endregion
 
 // Migrate from version #24
-private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration() {
+private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration(map: MutableMap<String, Any?>) {
 
     if (oldRealm.schemaVersion() <= 24L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
-                val displayDate = oldObject.getNullableValue<RealmInstant>(fieldName = "originalDate")
-                    ?: oldObject.getValue<RealmInstant>(fieldName = "internalDate")
+                val displayDate = oldObject.getNullableValueSafe<RealmInstant>(fieldName = "originalDate", map)
+                    ?: oldObject.getValueSafe<RealmInstant>(fieldName = "internalDate", map)
 
-                set(propertyName = "displayDate", value = displayDate)
+                setSafe(propertyName = "displayDate", value = displayDate, map = map)
             }
         }
 
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
-                val displayDate = oldObject.getNullableValue<RealmInstant>(fieldName = "originalDate")
-                    ?: oldObject.getValue<RealmInstant>(fieldName = "internalDate")
+                val displayDate = oldObject.getNullableValueSafe<RealmInstant>(fieldName = "originalDate", map)
+                    ?: oldObject.getValueSafe<RealmInstant>(fieldName = "internalDate", map)
 
-                set(propertyName = "displayDate", value = displayDate)
+                setSafe(propertyName = "displayDate", value = displayDate, map = map)
             }
         }
     }
@@ -161,24 +192,24 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
 //endregion
 
 // Migrate from version #25
-private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration() {
+private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration(map: MutableMap<String, Any?>) {
 
     if (oldRealm.schemaVersion() <= 25L) {
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
-                val snoozeAction = oldObject.getNullableValue<String>(fieldName = "snoozeAction")
+                val snoozeAction = oldObject.getNullableValueSafe<String>(fieldName = "snoozeAction", map)
                 val snoozeUuid = snoozeAction?.lastUuidOrNull()
-                set(propertyName = "snoozeUuid", value = snoozeUuid)
+                setSafe(propertyName = "snoozeUuid", value = snoozeUuid, map = map)
             }
         }
 
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
-                val snoozeAction = oldObject.getNullableValue<String>(fieldName = "snoozeAction")
+                val snoozeAction = oldObject.getNullableValueSafe<String>(fieldName = "snoozeAction", map)
                 val snoozeUuid = snoozeAction?.lastUuidOrNull()
-                set(propertyName = "snoozeUuid", value = snoozeUuid)
+                setSafe(propertyName = "snoozeUuid", value = snoozeUuid, map = map)
             }
         }
     }
@@ -190,32 +221,99 @@ private fun String.lastUuidOrNull() = lastUuidRegex.find(this)?.value
 //endregion
 
 // Migrate from version #27
-private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration() {
+private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration(map: MutableMap<String, Any?>) {
 
     if (oldRealm.schemaVersion() <= 27L) {
         enumerate(className = "Thread") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.let { newThread ->
                 // Initialize new property by computing it based on other fields
-                val threadFolderId = newObject.getValue<String>("folderId")
+                val threadFolderId = newObject.getValueSafe<String>("folderId", map)
 
+                // TODO: getObjectListSafe
                 val messages = newThread.getObjectList(propertyName = "messages")
                 messages.sortBy { it.getValue<RealmInstant>("internalDate") }
-                val lastMessage = messages.lastOrNull { it.getValue<String>("folderId") == threadFolderId }
+                val lastMessage = messages.lastOrNull { it.getValueSafe<String>("folderId", map) == threadFolderId }
 
                 val isSnoozed = if (lastMessage == null) {
                     // Defaulting to `false` only means that this thread won't be automatically unsnoozed until it's recomputed
                     false
                 } else {
-                    val snoozeState = lastMessage.getNullableValue<String>("_snoozeState")
-                    val snoozeEndDate = lastMessage.getNullableValue<RealmInstant>("snoozeEndDate")
-                    val snoozeUuid = lastMessage.getNullableValue<String>("snoozeUuid")
+                    val snoozeState = lastMessage.getNullableValueSafe<String>("_snoozeState", map)
+                    val snoozeEndDate = lastMessage.getNullableValueSafe<RealmInstant>("snoozeEndDate", map)
+                    val snoozeUuid = lastMessage.getNullableValueSafe<String>("snoozeUuid", map)
 
                     snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
                 }
 
-                newThread.set(propertyName = "isLastInboxMessageSnoozed", value = isSnoozed)
+                newThread.setSafe(propertyName = "isLastInboxMessageSnoozed", value = isSnoozed, map = map)
             }
         }
     }
 }
 //endregion
+
+/**
+ * If the property we're trying to set doesn't exist anymore in our model at the latest schema version, instead of crashing, cache
+ * the data locally inside a shared [map] where future migrations can retrieve this intermediate value. Future migrations will
+ * fail to read this value from the old model's values as well and will refer to [map] to read the last updated intermediate value
+ */
+fun DynamicMutableRealmObject.setSafe(propertyName: String, value: Any?, map: MutableMap<String, Any?>) {
+    runCatching {
+        set(propertyName, value)
+    }.onFailure {
+        if (it !is IllegalArgumentException) {
+            // TODO
+            SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
+        }
+        map[propertyName] = value
+    }
+}
+
+// private inline fun <reified T : Any> DynamicRealmObject.getValueSafe(fieldName: String, defaultValue: T): T {
+//     return getOrDefault(defaultValue) { getValue<T>(fieldName) }
+// }
+//
+// private inline fun <reified T : Any> DynamicRealmObject.getNullableValueSafe(fieldName: String, defaultValue: T): T? {
+//     return getNullableOrDefault<T>(defaultValue) { getNullableValue<T>(fieldName) }
+// }
+
+private inline fun <reified T : Any> DynamicRealmObject.getValueSafe(fieldName: String, map: MutableMap<String, Any?>): T? {
+    return getOrDefault<T>(lazyDefaultValue = { map[fieldName] as T }) { getValue<T>(fieldName) }
+}
+
+private inline fun <reified T : Any> DynamicRealmObject.getNullableValueSafe(
+    fieldName: String,
+    map: MutableMap<String, Any?>,
+): T? {
+    return getNullableOrDefault<T>(lazyDefaultValue = {
+        if (map.containsKey(fieldName)) map[fieldName] as T? else error("Trying to access a field name that can't be found in the old realm object nor in a previous migration")
+    }) {
+        getNullableValue<T>(fieldName)
+    }
+}
+
+private inline fun <reified T : Any> DynamicRealmObject.getOrDefault(lazyDefaultValue: () -> T, block: () -> T): T {
+    return runCatching {
+        block()
+    }.getOrElse {
+        if (it !is IllegalArgumentException) {
+            // TODO
+            SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
+        }
+        lazyDefaultValue()
+    }
+}
+
+private inline fun <reified T : Any> DynamicRealmObject.getNullableOrDefault(lazyDefaultValue: () -> T?, block: () -> T?): T? {
+    return runCatching {
+        block()
+    }.getOrElse {
+        if (it !is IllegalArgumentException) {
+            // TODO
+            SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
+        }
+        lazyDefaultValue()
+    }
+}
+
+private const val TAG = "RealmMigrations"
