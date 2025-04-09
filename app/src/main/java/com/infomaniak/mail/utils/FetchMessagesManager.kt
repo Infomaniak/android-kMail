@@ -38,7 +38,6 @@ import com.infomaniak.mail.utils.NotificationUtils.Companion.EXTRA_MESSAGE_UID
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
 import io.realm.kotlin.Realm
-import io.sentry.SentryLevel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
@@ -76,14 +75,7 @@ class FetchMessagesManager @Inject constructor(
         // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
         // We can leave safely.
         if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
-            SentryDebug.sendFailedNotification(
-                reason = "Notifications are disabled",
-                sentryLevel = SentryLevel.ERROR,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
+            SentryDebug.sendFailedNotification("Notifications are disabled", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return false
         }
 
@@ -94,7 +86,6 @@ class FetchMessagesManager @Inject constructor(
             // We can leave safely.
             SentryDebug.sendFailedNotification(
                 reason = "Can't find the INBOX in Realm",
-                sentryLevel = SentryLevel.ERROR,
                 userId = userId,
                 mailboxId = mailbox.mailboxId,
                 messageUid = sentryMessageUid,
@@ -108,14 +99,7 @@ class FetchMessagesManager @Inject constructor(
             // We only want to display Notifications about Mailboxes that the User opened at least once.
             // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
             // We can leave safely.
-            SentryDebug.sendFailedNotification(
-                reason = "INBOX was never opened",
-                sentryLevel = SentryLevel.ERROR,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
+            SentryDebug.sendFailedNotification("INBOX was never opened", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             realm.close()
             return false
         }
@@ -135,7 +119,6 @@ class FetchMessagesManager @Inject constructor(
                 if (shouldLogToSentry(throwable)) {
                     SentryDebug.sendFailedNotification(
                         reason = "RefreshThreads failed",
-                        sentryLevel = SentryLevel.ERROR,
                         userId = userId,
                         mailboxId = mailbox.mailboxId,
                         messageUid = sentryMessageUid,
@@ -180,7 +163,6 @@ class FetchMessagesManager @Inject constructor(
         if (threadsWithNewMessages.isEmpty()) {
             SentryDebug.sendFailedNotification(
                 reason = "All new Messages were already received in a previous notification",
-                sentryLevel = SentryLevel.ERROR,
                 userId = userId,
                 mailboxId = mailbox.mailboxId,
                 messageUid = sentryMessageUid,
@@ -224,28 +206,14 @@ class FetchMessagesManager @Inject constructor(
         ThreadController.fetchMessagesHeavyData(messages, realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
-            SentryDebug.sendFailedNotification(
-                reason = "No Message in the Thread",
-                sentryLevel = SentryLevel.ERROR,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
+            SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return false
         }
 
         // If the Message has already been seen before receiving the Notification, we don't want to display it.
         // We can leave safely.
         if (message.isSeen) {
-            SentryDebug.sendFailedNotification(
-                reason = "Message was already seen",
-                sentryLevel = SentryLevel.ERROR,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
+            SentryDebug.sendFailedNotification("Message was already seen", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return false
         }
 

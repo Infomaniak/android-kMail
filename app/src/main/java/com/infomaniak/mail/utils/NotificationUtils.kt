@@ -47,7 +47,6 @@ import com.infomaniak.mail.receivers.NotificationActionsReceiver.Companion.UNDO_
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import io.realm.kotlin.Realm
-import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import java.util.UUID
 import javax.inject.Inject
@@ -167,13 +166,7 @@ class NotificationUtils @Inject constructor(
         payload: NotificationPayload,
     ): Boolean = with(payload) {
         val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
-            SentryDebug.sendFailedNotification(
-                reason = "Created Notif: no Mailbox in Realm",
-                sentryLevel = SentryLevel.ERROR,
-                userId = userId,
-                mailboxId = mailboxId,
-                messageUid = messageUid,
-            )
+            SentryDebug.sendFailedNotification("Created Notif: no Mailbox in Realm", userId, mailboxId, messageUid)
             return@with false
         }
         val contentIntent = getContentIntent(payload = this, isUndo)

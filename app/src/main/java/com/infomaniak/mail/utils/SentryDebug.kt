@@ -210,14 +210,13 @@ object SentryDebug {
 
     fun sendFailedNotification(
         reason: String,
-        sentryLevel: SentryLevel,
         userId: Int? = null,
         mailboxId: Int? = null,
         messageUid: String? = null,
         mailbox: Mailbox? = null,
         throwable: Throwable? = null,
     ) {
-        Sentry.captureMessage("Failed Notif : $reason", sentryLevel) { scope ->
+        Sentry.captureMessage("Failed Notif : $reason", SentryLevel.ERROR) { scope ->
             scope.setExtra("userId", "${userId?.toString()}")
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("mailboxId", "${mailboxId?.toString()}")
