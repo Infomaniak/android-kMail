@@ -40,6 +40,8 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -129,6 +131,8 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
 
             @Suppress("MissingPermission")
             notificationManagerCompat.notify(GENERIC_NEW_MAILS_NOTIFICATION_ID, builder.build())
+
+            Sentry.captureMessage("Send a generic notification", SentryLevel.INFO)
         }
     }
 

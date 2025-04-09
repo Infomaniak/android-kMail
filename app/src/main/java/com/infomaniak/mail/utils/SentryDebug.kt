@@ -216,7 +216,10 @@ object SentryDebug {
         mailbox: Mailbox? = null,
         throwable: Throwable? = null,
     ) {
-        Sentry.captureMessage("Failed Notif : $reason", SentryLevel.ERROR) { scope ->
+
+        val category = "Failed Notif : $reason"
+
+        Sentry.captureMessage(category, SentryLevel.ERROR) { scope ->
             scope.setExtra("userId", "${userId?.toString()}")
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("mailboxId", "${mailboxId?.toString()}")
@@ -225,6 +228,20 @@ object SentryDebug {
             scope.setExtra("messageUid", "$messageUid")
             throwable?.let { scope.setExtra("throwable", it.stackTraceToString()) }
         }
+
+        addInfoBreadcrumb(
+            category = category,
+            data = mutableMapOf(
+                "1_userId" to "${userId?.toString()}",
+                "2_currentUserId" to "[${AccountUtils.currentUserId}]",
+                "3_mailboxId" to "${mailboxId?.toString()}",
+                "4_mailbox.email" to "[${mailbox?.email}]",
+                "5_currentMailboxEmail" to "[${AccountUtils.currentMailboxEmail}]",
+                "6_messageUid" to "$messageUid",
+            ).also { map ->
+                throwable?.let { map.put("7_throwable", it.stackTraceToString()) }
+            },
+        )
     }
 
     fun sendOrphanMessages(previousCursor: String?, folder: Folder, realm: TypedRealm): List<Message> {
