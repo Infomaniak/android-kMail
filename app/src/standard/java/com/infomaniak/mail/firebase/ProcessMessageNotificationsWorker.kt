@@ -83,6 +83,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
+            SentryDebug.sendFailedNotification("No Mailbox in Realm", SentryLevel.ERROR, userId, mailboxId, messageUid)
             displayGenericNewMailsNotification()
             // If the Mailbox doesn't exist in Realm, it's either because :
             // - The Mailbox isn't attached to this User anymore.
