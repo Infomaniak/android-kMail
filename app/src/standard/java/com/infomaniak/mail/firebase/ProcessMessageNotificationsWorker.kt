@@ -40,7 +40,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -64,17 +63,17 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         SentryLog.i(TAG, "Work started")
 
         val userId = inputData.getIntOrNull(USER_ID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("No userId in Notification", SentryLevel.ERROR)
+            SentryDebug.sendFailedNotification("No userId in Notification")
             displayGenericNewMailsNotification()
             return@withContext Result.success()
         }
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("No mailboxId in Notification", SentryLevel.ERROR, userId)
+            SentryDebug.sendFailedNotification("No mailboxId in Notification", userId)
             displayGenericNewMailsNotification()
             return@withContext Result.success()
         }
         val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: run {
-            SentryDebug.sendFailedNotification("No messageUid in Notification", SentryLevel.ERROR, userId, mailboxId)
+            SentryDebug.sendFailedNotification("No messageUid in Notification", userId, mailboxId)
             displayGenericNewMailsNotification()
             return@withContext Result.success()
         }
@@ -83,7 +82,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
-            SentryDebug.sendFailedNotification("No Mailbox in Realm", SentryLevel.ERROR, userId, mailboxId, messageUid)
+            SentryDebug.sendFailedNotification("No Mailbox in Realm", userId, mailboxId, messageUid)
             displayGenericNewMailsNotification()
             // If the Mailbox doesn't exist in Realm, it's either because :
             // - The Mailbox isn't attached to this User anymore.
