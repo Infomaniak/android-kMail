@@ -213,7 +213,7 @@ class ThreadViewModel @Inject constructor(
     private fun computeFirstIndexAfterBlock(thread: Thread, list: RealmResults<Message>): Int {
 
         val firstDefaultIndex = list.count() - 2
-        val firstUnreadIndex = if (thread.unseenMessagesCount > 0) list.indexOfFirstOrNull { !it.isSeen } else null
+        val firstUnreadIndex = if (thread.isSeen) null else list.indexOfFirstOrNull { !it.isSeen }
         val notNullFirstUnreadIndex = firstUnreadIndex ?: firstDefaultIndex
 
         return minOf(notNullFirstUnreadIndex, firstDefaultIndex)
@@ -313,7 +313,7 @@ class ThreadViewModel @Inject constructor(
         if (threadState.isFirstOpening) {
             threadState.isFirstOpening = false
             sendMatomoAndSentryAboutThreadMessagesCount(thread)
-            if (thread.unseenMessagesCount > 0) markThreadAsSeen(thread)
+            if (thread.isSeen.not()) markThreadAsSeen(thread)
         }
 
         emit(thread)

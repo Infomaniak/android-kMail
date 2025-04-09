@@ -256,7 +256,7 @@ class ThreadListAdapter @Inject constructor(
             threadCountText.text = "$messagesCount"
             threadCountCard.isVisible = messagesCount > 1
 
-            if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
+            if (isSeen) setThreadUiRead() else setThreadUiUnread()
         }
 
         selectionCardView.setOnClickListener { onThreadClicked(thread, position) }
@@ -562,7 +562,7 @@ class ThreadListAdapter @Inject constructor(
         fun getSwipeActionUiData(swipeAction: SwipeAction) = when (swipeAction) {
             SwipeAction.READ_UNREAD -> SwipeActionUiData(
                 colorRes = swipeAction.colorRes,
-                iconRes = if (unseenMessagesCount > 0) R.drawable.ic_envelope_open else swipeAction.iconRes,
+                iconRes = if (isSeen) swipeAction.iconRes else R.drawable.ic_envelope_open,
             )
             SwipeAction.FAVORITE -> SwipeActionUiData(
                 colorRes = swipeAction.colorRes,
