@@ -26,7 +26,8 @@
         android:id="@+id/newMessageConstraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/newMessageBackgroundColor">
+        android:background="@color/newMessageBackgroundColor"
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
