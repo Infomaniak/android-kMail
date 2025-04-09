@@ -70,11 +70,12 @@ private fun MigrationContext.deleteRealmFromFirstMigration() {
  */
 private fun MigrationContext.keepDefaultValuesAfterSixthMigration(map: MutableMap<String, MutableList<DynamicRealmObject.() -> Any?>>) {
     if (oldRealm.schemaVersion() <= 6L) {
+        var isFirstInstance = true
         enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
 
                 // Add property with default value
-                setSafe(propertyName = "_isValidInLdap", oldObject, howToGetTheValueFromOldObject = { true }, map = map)
+                setSafe(propertyName = "_isValidInLdap", oldObject, howToGetTheValueFromOldObject = { true }, map = map, isFirstInstance)
 
                 // Rename property without losing its previous value
                 setSafe(
@@ -82,6 +83,7 @@ private fun MigrationContext.keepDefaultValuesAfterSixthMigration(map: MutableMa
                     oldObject = oldObject,
                     howToGetTheValueFromOldObject = { getValueSafe<Boolean>(fieldName = "isLocked", oldObject, map) },
                     map = map,
+                    isFirstInstance = isFirstInstance,
                 )
 
                 // Rename property without losing its previous value
@@ -90,7 +92,10 @@ private fun MigrationContext.keepDefaultValuesAfterSixthMigration(map: MutableMa
                     oldObject = oldObject,
                     howToGetTheValueFromOldObject = { getValueSafe<Boolean>(fieldName = "isPasswordValid", oldObject, map) },
                     map = map,
+                    isFirstInstance = isFirstInstance,
                 )
+
+                isFirstInstance = false
             }
         }
     }
@@ -101,13 +106,17 @@ private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration(map: Muta
 
     if (oldRealm.schemaVersion() <= 19L) {
 
+        var isFirstInstance = true
         enumerate(className = "Folder") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Add property with default value
-                setSafe(propertyName = "isDisplayed", oldObject, howToGetTheValueFromOldObject = { true }, map = map)
+                setSafe(propertyName = "isDisplayed", oldObject, howToGetTheValueFromOldObject = { true }, map = map, isFirstInstance)
+
+                isFirstInstance = false
             }
         }
 
+        isFirstInstance = true
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Rename property without losing its previous value
@@ -115,8 +124,11 @@ private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration(map: Muta
                     propertyName = "isScheduledMessage",
                     oldObject = oldObject,
                     howToGetTheValueFromOldObject = { getValueSafe<Boolean>(fieldName = "isScheduled", oldObject, map) },
-                    map = map
+                    map = map,
+                    isFirstInstance = isFirstInstance,
                 )
+
+                isFirstInstance = false
             }
         }
 
@@ -128,6 +140,7 @@ private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration(map: Muta
 private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigration(map: MutableMap<String, MutableList<DynamicRealmObject.() -> Any?>>) {
 
     if (oldRealm.schemaVersion() <= 22L) {
+        var isFirstInstance = true
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
@@ -135,7 +148,8 @@ private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigrat
                     propertyName = "internalDate",
                     oldObject = oldObject,
                     howToGetTheValueFromOldObject = { getValueSafe<RealmInstant>(fieldName = "date", oldObject, map) },
-                    map = map
+                    map = map,
+                    isFirstInstance = isFirstInstance,
                 )
 
                 // Initialize new property with old property value
@@ -143,11 +157,15 @@ private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigrat
                     propertyName = "originalDate",
                     oldObject = oldObject,
                     howToGetTheValueFromOldObject = { getValueSafe<RealmInstant>(fieldName = "date", oldObject, map) },
-                    map = map
+                    map = map,
+                    isFirstInstance = isFirstInstance,
                 )
+
+                isFirstInstance = false
             }
         }
 
+        isFirstInstance = true
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
@@ -155,7 +173,8 @@ private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigrat
                     propertyName = "internalDate",
                     oldObject = oldObject,
                     howToGetTheValueFromOldObject = { getValueSafe<RealmInstant>(fieldName = "date", oldObject, map) },
-                    map = map
+                    map = map,
+                    isFirstInstance = isFirstInstance,
                 )
 
                 // Initialize new property with old property value
@@ -163,8 +182,11 @@ private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigrat
                     propertyName = "originalDate",
                     oldObject = oldObject,
                     howToGetTheValueFromOldObject = { getValueSafe<RealmInstant>(fieldName = "date", oldObject, map) },
-                    map = map
+                    map = map,
+                    isFirstInstance = isFirstInstance,
                 )
+
+                isFirstInstance = false
             }
         }
     }
@@ -175,6 +197,7 @@ private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigrat
 private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration(map: MutableMap<String, MutableList<DynamicRealmObject.() -> Any?>>) {
 
     if (oldRealm.schemaVersion() <= 24L) {
+        var isFirstInstance = true
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
@@ -187,10 +210,14 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
                             ?: getValueSafe<RealmInstant>(fieldName = "internalDate", oldObject, map)
                     },
                     map = map,
+                    isFirstInstance = isFirstInstance
                 )
+
+                isFirstInstance = false
             }
         }
 
+        isFirstInstance = true
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
@@ -202,7 +229,10 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
                             ?: getValueSafe<RealmInstant>(fieldName = "internalDate", oldObject, map)
                     },
                     map = map,
+                    isFirstInstance = isFirstInstance,
                 )
+
+                isFirstInstance = false
             }
         }
     }
@@ -213,6 +243,7 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
 private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration(map: MutableMap<String, MutableList<DynamicRealmObject.() -> Any?>>) {
 
     if (oldRealm.schemaVersion() <= 25L) {
+        var isFirstInstance = true
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
@@ -224,10 +255,14 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
                         snoozeAction?.lastUuidOrNull()
                     },
                     map = map,
+                    isFirstInstance = isFirstInstance,
                 )
+
+                isFirstInstance = false
             }
         }
 
+        isFirstInstance = true
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
@@ -239,7 +274,10 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
                         snoozeAction?.lastUuidOrNull()
                     },
                     map = map,
+                    isFirstInstance = isFirstInstance,
                 )
+
+                isFirstInstance = false
             }
         }
     }
@@ -254,6 +292,7 @@ private fun String.lastUuidOrNull() = lastUuidRegex.find(this)?.value
 private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration(map: MutableMap<String, MutableList<DynamicRealmObject.() -> Any?>>) {
 
     if (oldRealm.schemaVersion() <= 27L) {
+        var isFirstInstance = true
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.let { newThread ->
                 // Initialize new property by computing it based on other fields
@@ -280,7 +319,10 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigr
                         }
                     },
                     map = map,
+                    isFirstInstance = isFirstInstance,
                 )
+
+                isFirstInstance = false
             }
         }
     }
@@ -296,7 +338,8 @@ fun DynamicMutableRealmObject.setSafe(
     propertyName: String,
     oldObject: DynamicRealmObject,
     howToGetTheValueFromOldObject: DynamicRealmObject.() -> Any?,
-    map: MutableMap<String, MutableList<DynamicRealmObject.() -> Any?>>
+    map: MutableMap<String, MutableList<DynamicRealmObject.() -> Any?>>,
+    isFirstInstance: Boolean,
 ) {
     runCatching {
         set(propertyName, oldObject.howToGetTheValueFromOldObject())
@@ -305,7 +348,9 @@ fun DynamicMutableRealmObject.setSafe(
             // TODO
             SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
         }
-        map.getOrPut(propertyName, { mutableListOf() }) += howToGetTheValueFromOldObject
+        if (isFirstInstance) {
+            map.getOrPut(propertyName, { mutableListOf() }) += howToGetTheValueFromOldObject
+        }
     }
 }
 
