@@ -147,7 +147,7 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
                 // If migrating from a version a bit too old, "originalDate" might not have existed in the old object
                 val originalDate = oldObject.getNullableValueOrRecover(
                     fieldName = "originalDate",
-                    recover = { oldObject.getValue<RealmInstant>(fieldName = "date") },
+                    recovery = { oldObject.getValue<RealmInstant>(fieldName = "date") },
                 )
 
                 val displayDate = originalDate ?: oldObject.getValue<RealmInstant>(fieldName = "internalDate")
@@ -163,7 +163,7 @@ private fun MigrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourth
                 // If migrating from a version a bit too old, "originalDate" might not have existed in the old object
                 val originalDate = oldObject.getNullableValueOrRecover(
                     fieldName = "originalDate",
-                    recover = { oldObject.getValue<RealmInstant>(fieldName = "date") },
+                    recovery = { oldObject.getValue<RealmInstant>(fieldName = "date") },
                 )
 
                 val displayDate = originalDate ?: oldObject.getValue<RealmInstant>(fieldName = "internalDate")
@@ -184,7 +184,7 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
                 // Initialize new property with old property value
 
                 // If snoozeAction was never initialized, default to null the same way the code used to set its default value
-                val snoozeAction = oldObject.getNullableValueOrRecover<String>(fieldName = "snoozeAction", recover = { null })
+                val snoozeAction = oldObject.getNullableValueOrRecover<String>(fieldName = "snoozeAction", recovery = { null })
                 val snoozeUuid = snoozeAction?.lastUuidOrNull()
                 set(propertyName = "snoozeUuid", value = snoozeUuid)
             }
@@ -195,7 +195,7 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
                 // Initialize new property with old property value
 
                 // If snoozeAction was never initialized, default to null the same way the code used to set its default value
-                val snoozeAction = oldObject.getNullableValueOrRecover<String>(fieldName = "snoozeAction", recover = { null })
+                val snoozeAction = oldObject.getNullableValueOrRecover<String>(fieldName = "snoozeAction", recovery = { null })
                 val snoozeUuid = snoozeAction?.lastUuidOrNull()
                 set(propertyName = "snoozeUuid", value = snoozeUuid)
             }
@@ -257,12 +257,12 @@ private fun DynamicMutableRealmObject.setSafe(propertyName: String, value: Any?)
  *
  * Used for when we can be migrating from versions of the model that might never have had [fieldName] initialized.
  */
-private inline fun <reified T : Any> DynamicRealmObject.getNullableValueOrRecover(fieldName: String, recover: () -> T?): T? {
+private inline fun <reified T : Any> DynamicRealmObject.getNullableValueOrRecover(fieldName: String, recovery: () -> T?): T? {
     return runCatching {
         getNullableValue<T>(fieldName)
     }.getOrElse {
         if (it !is IllegalArgumentException) SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
 
-        recover()
+        recovery()
     }
 }
