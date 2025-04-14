@@ -74,34 +74,23 @@ class FetchMessagesManager @Inject constructor(
 
         // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
         // We can leave safely.
-        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) {
-            SentryDebug.sendFailedNotification("Notifications are disabled", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
-            return false
-        }
+        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return true
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
             // If we can't find the INBOX in Realm, it means the user never opened this Mailbox.
             // We don't want to display Notifications in this case.
             // We can leave safely.
-            SentryDebug.sendFailedNotification(
-                reason = "Can't find the INBOX in Realm",
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
             realm.close()
-            return false
+            return true
         }
 
         if (folder.cursor == null) {
             // We only want to display Notifications about Mailboxes that the User opened at least once.
             // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
             // We can leave safely.
-            SentryDebug.sendFailedNotification("INBOX was never opened", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             realm.close()
-            return false
+            return true
         }
 
         val okHttpClient = AccountUtils.getHttpClient(userId)
@@ -161,15 +150,8 @@ class FetchMessagesManager @Inject constructor(
         // It means we already got them all when we received a previous notification.
         // We can leave safely.
         if (threadsWithNewMessages.isEmpty()) {
-            SentryDebug.sendFailedNotification(
-                reason = "All new Messages were already received in a previous notification",
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
             realm.close()
-            return false
+            return true
         }
 
         // Notify Threads with new Messages
@@ -212,10 +194,7 @@ class FetchMessagesManager @Inject constructor(
 
         // If the Message has already been seen before receiving the Notification, we don't want to display it.
         // We can leave safely.
-        if (message.isSeen) {
-            SentryDebug.sendFailedNotification("Message was already seen", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
-            return false
-        }
+        if (message.isSeen) return true
 
         val formattedPreview = message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
         val body = if (message.body?.value.isNullOrBlank()) {

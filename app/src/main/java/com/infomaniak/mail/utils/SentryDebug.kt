@@ -229,19 +229,21 @@ object SentryDebug {
             throwable?.let { scope.setExtra("throwable", it.stackTraceToString()) }
         }
 
-        addInfoBreadcrumb(
-            category = category,
-            data = mutableMapOf(
-                "1_userId" to "${userId?.toString()}",
-                "2_currentUserId" to "[${AccountUtils.currentUserId}]",
-                "3_mailboxId" to "${mailboxId?.toString()}",
-                "4_mailbox.email" to "[${mailbox?.email}]",
-                "5_currentMailboxEmail" to "[${AccountUtils.currentMailboxEmail}]",
-                "6_messageUid" to "$messageUid",
-            ).also { map ->
-                throwable?.let { map.put("7_throwable", it.stackTraceToString()) }
-            },
-        )
+        // TODO: If the generic new mails notification still pops up too often, maybe put back
+        //  these breadcrumbs and the Sentry log in `displayGenericNewMailsNotification()`.
+        // addInfoBreadcrumb(
+        //     category = category,
+        //     data = mutableMapOf(
+        //         "1_userId" to "${userId?.toString()}",
+        //         "2_currentUserId" to "[${AccountUtils.currentUserId}]",
+        //         "3_mailboxId" to "${mailboxId?.toString()}",
+        //         "4_mailbox.email" to "[${mailbox?.email}]",
+        //         "5_currentMailboxEmail" to "[${AccountUtils.currentMailboxEmail}]",
+        //         "6_messageUid" to "$messageUid",
+        //     ).also { map ->
+        //         throwable?.let { map.put("7_throwable", it.stackTraceToString()) }
+        //     },
+        // )
     }
 
     fun sendOrphanMessages(previousCursor: String?, folder: Folder, realm: TypedRealm): List<Message> {

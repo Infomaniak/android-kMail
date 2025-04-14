@@ -40,8 +40,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.workers.BaseProcessMessageNotificationsWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -84,8 +82,6 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
         val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: run {
-            SentryDebug.sendFailedNotification("No Mailbox in Realm", userId, mailboxId, messageUid)
-            displayGenericNewMailsNotification()
             // If the Mailbox doesn't exist in Realm, it's either because :
             // - The Mailbox isn't attached to this User anymore.
             // - The user POSSIBLY recently added this new Mailbox on its account, via the Infomaniak
@@ -99,15 +95,16 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         var hasShownNotification = false
 
         return@withContext runCatching {
+
             MessageController.getMessage(messageUid, mailboxContentRealm)?.let {
                 // If the Message is already in Realm, it means we already fetched it when we received a previous Notification.
                 // So we've already shown it in a previous batch of Notifications.
                 // We can leave safely.
+                hasShownNotification = true
                 return@runCatching Result.success()
             }
 
             hasShownNotification = fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
-
             SentryLog.i(TAG, "Work finished")
             Result.success()
         }.getOrElse {
@@ -132,7 +129,9 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             @Suppress("MissingPermission")
             notificationManagerCompat.notify(GENERIC_NEW_MAILS_NOTIFICATION_ID, builder.build())
 
-            Sentry.captureMessage("Send a generic notification", SentryLevel.INFO)
+            // TODO: If the generic new mails notification still pops up too often, maybe
+            //  put back this log and the breadcrumbs in `sendFailedNotification()`.
+            // Sentry.captureMessage("Send a generic notification", SentryLevel.INFO)
         }
     }
 
