@@ -67,16 +67,16 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
         onAbort = null
     }
 
-    fun show(onDateSelected: (Long) -> Unit, onAbort: (() -> Unit)? = null) {
-        showDialogWithBasicInfo()
+    fun show(positiveButtonResId: Int? = null, onDateSelected: (Long) -> Unit, onAbort: (() -> Unit)? = null) {
+        showDialogWithBasicInfo(positiveButtonResId)
         setupListeners(onDateSelected, onAbort)
     }
 
-    private fun showDialogWithBasicInfo() {
+    private fun showDialogWithBasicInfo(positiveButtonResId: Int?) {
         alertDialog.show()
 
         selectDate(Date().roundUpToNextTenMinutes())
-        positiveButton.setText(positiveButtonText)
+        positiveButton.setText(positiveButtonResId ?: positiveButtonText)
     }
 
     private fun setupListeners(onDateSelected: (Long) -> Unit, onAbort: (() -> Unit)?) = with(alertDialog) {

@@ -86,7 +86,8 @@ import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
-import com.infomaniak.mail.ui.main.thread.ThreadViewModel.*
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
@@ -604,6 +605,7 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeSnoozeDialog.show(
+                positiveButtonResId = threadViewModel.snoozeScheduleType?.positiveButtonResId,
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
                     executeSavedSnoozeScheduleType(timestamp)

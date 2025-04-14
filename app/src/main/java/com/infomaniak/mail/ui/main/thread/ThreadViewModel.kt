@@ -19,10 +19,12 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
 import android.os.Parcelable
+import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
@@ -495,16 +497,16 @@ class ThreadViewModel @Inject constructor(
         DISPLAYED, COLLAPSED, FIRST_AFTER_BLOCK,
     }
 
-    sealed interface SnoozeScheduleType : Parcelable {
-        val threadUids: List<String>
+    sealed class SnoozeScheduleType(@StringRes val positiveButtonResId: Int) : Parcelable {
+        abstract val threadUids: List<String>
 
         @Parcelize
-        data class Snooze(override val threadUids: List<String>) : SnoozeScheduleType {
+        data class Snooze(override val threadUids: List<String>) : SnoozeScheduleType(R.string.buttonConfirm) {
             constructor(threadUid: String) : this(listOf(threadUid))
         }
 
         @Parcelize
-        data class Modify(override val threadUids: List<String>) : SnoozeScheduleType {
+        data class Modify(override val threadUids: List<String>) : SnoozeScheduleType(R.string.buttonModify) {
             constructor(threadUid: String) : this(listOf(threadUid))
         }
     }
