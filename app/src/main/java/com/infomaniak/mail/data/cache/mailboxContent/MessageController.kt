@@ -90,24 +90,27 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     fun getFavoriteMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread, "${Message::isFavorite.name} == true")
+        return getMessagesAndTheirDuplicates(thread, "${Message::isFavorite.name} == true")
     }
 
     fun getMovableMessages(thread: Thread): List<Message> {
         val byFolderId = "${Message::folderId.name} == '${thread.folderId}'"
-        return getMessagesAndDuplicates(thread, "$byFolderId AND $isNotScheduledMessage")
+        return getMessagesAndTheirDuplicates(thread, "$byFolderId AND $isNotScheduledMessage")
     }
 
     fun getUnscheduledMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread, isNotScheduledMessage)
+        return getMessagesAndTheirDuplicates(thread, isNotScheduledMessage)
+    }
+
+    private fun getMessagesAndTheirDuplicates(thread: Thread, query: String): List<Message> {
+        val messages = thread.messages.query(query).find()
+        val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).find()
+        return messages + duplicates
     }
 
     private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {
-
         val messages = thread.messages.query(query).find()
-
-        val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).find()
-
+        val duplicates = thread.duplicates.query(query).find()
         return messages + duplicates
     }
 
