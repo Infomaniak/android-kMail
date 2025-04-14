@@ -182,7 +182,9 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
         enumerate(className = "Message") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
-                val snoozeAction = oldObject.getNullableValue<String>(fieldName = "snoozeAction")
+
+                // If snoozeAction was never initialized, default to null the same way the code used to set its default value
+                val snoozeAction = oldObject.getNullableValueOrRecover<String>(fieldName = "snoozeAction", recover = { null })
                 val snoozeUuid = snoozeAction?.lastUuidOrNull()
                 set(propertyName = "snoozeUuid", value = snoozeUuid)
             }
@@ -191,7 +193,9 @@ private fun MigrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigrat
         enumerate(className = "Thread") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.apply {
                 // Initialize new property with old property value
-                val snoozeAction = oldObject.getNullableValue<String>(fieldName = "snoozeAction")
+
+                // If snoozeAction was never initialized, default to null the same way the code used to set its default value
+                val snoozeAction = oldObject.getNullableValueOrRecover<String>(fieldName = "snoozeAction", recover = { null })
                 val snoozeUuid = snoozeAction?.lastUuidOrNull()
                 set(propertyName = "snoozeUuid", value = snoozeUuid)
             }
