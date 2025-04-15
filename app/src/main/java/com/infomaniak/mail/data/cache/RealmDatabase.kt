@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache
 
 import android.content.Context
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.AppSettings.Companion.DEFAULT_ID
 import com.infomaniak.mail.data.models.addressBook.AddressBook
@@ -48,6 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.io.File
 
 @Suppress("ObjectPropertyName")
 object RealmDatabase {
@@ -72,20 +74,41 @@ object RealmDatabase {
     //region Open Realms
     fun appSettings(): Realm = runBlocking(Dispatchers.IO) {
         appSettingsMutex.withLock {
-            _appSettings ?: Realm.open(RealmConfig.appSettings).also { _appSettings = it }
+            _appSettings ?: openRealmOrDropDbAndReboot(RealmConfig.appSettings).also { _appSettings = it }
         }
     }
 
     fun userInfo(): Realm = runBlocking(Dispatchers.IO) {
         userInfoMutex.withLock {
-            _userInfo ?: Realm.open(RealmConfig.userInfo).also { _userInfo = it }
+            _userInfo ?: openRealmOrDropDbAndReboot(RealmConfig.userInfo).also { _userInfo = it }
         }
     }
 
-    val mailboxInfo get() = Realm.open(RealmConfig.mailboxInfo)
+    val mailboxInfo get() = openRealmOrDropDbAndReboot(RealmConfig.mailboxInfo)
 
     val newMailboxContentInstance get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-    fun newMailboxContentInstance(userId: Int, mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(userId, mailboxId))
+    fun newMailboxContentInstance(userId: Int, mailboxId: Int): Realm {
+        return openRealmOrDropDbAndReboot(RealmConfig.mailboxContent(userId, mailboxId))
+    }
+
+    /**
+     * When the user has an error like a migration error that prevents from opening a realm database rendering the app unusable,
+     * at least delete the realm and reboot the app so the user will be able to access the app even if it means downloading all
+     * messages again from zero.
+     *
+     * Realm doesn't seem to let us simply delete the realm and reopen it so we needed to find another alternative like rebooting
+     * the app. Anyway, this heavy operation should only affect users as a last resort when we can't recover in any other way.
+     */
+    private fun openRealmOrDropDbAndReboot(configuration: RealmConfiguration): Realm = runCatching {
+        Realm.open(configuration)
+    }.onFailure {
+        if (BuildConfig.DEBUG.not()) {
+            Sentry.captureException(it)
+
+            File(configuration.path).delete()
+            runBlocking { AccountUtils.reloadApp?.invoke() }
+        }
+    }.getOrThrow()
 
     class MailboxContent {
         operator fun invoke() = runBlocking(Dispatchers.IO) {
