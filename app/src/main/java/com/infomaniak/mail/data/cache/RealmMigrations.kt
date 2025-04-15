@@ -119,7 +119,7 @@ private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigrat
                 set(propertyName = "internalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
 
                 // Initialize new property with old property value
-                setSafe(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+                setIfPropertyExists(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
             }
         }
 
@@ -129,7 +129,7 @@ private fun MigrationContext.initializeInternalDateAsDateAfterTwentySecondMigrat
                 set(propertyName = "internalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
 
                 // Initialize new property with old property value
-                setSafe(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
+                setIfPropertyExists(propertyName = "originalDate", value = oldObject.getValue<RealmInstant>(fieldName = "date"))
             }
         }
     }
@@ -243,7 +243,7 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigr
  * If the property we're trying to set doesn't exist anymore in our model at the latest schema version, instead of crashing skip
  * this property value.
  */
-private fun DynamicMutableRealmObject.setSafe(propertyName: String, value: Any?) {
+private fun DynamicMutableRealmObject.setIfPropertyExists(propertyName: String, value: Any?) {
     runCatching {
         set(propertyName, value)
     }.onFailure {
