@@ -20,6 +20,7 @@
 package com.infomaniak.mail.data.models.message
 
 import com.infomaniak.core.utils.apiEnum
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
@@ -228,20 +229,18 @@ class Message : RealmObject, Snoozable {
                     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
                 }
 
-                correctFolder = (threads.firstOrNull { it.folderId == folderId } ?: threads.first()).folder
+                correctFolder = (threads.firstOrNull { it.folder.id == folderId } ?: threads.first()).folder
             }
 
-            return@run correctFolder!!
+            return@run correctFolder
         }
-
-    fun isInSpamFolder() = folder.role == FolderRole.SPAM
 
     fun computeFolderAndReason(folderId: String): Pair<Folder?, String?> {
 
         var correctFolder: Folder? = null
         var reason: String? = null
 
-        val list = threads.filter { it.folderId == folderId }
+        val list = threads.filter { it.folder.id == folderId }
         val count = list.count()
 
         when {
@@ -250,8 +249,20 @@ class Message : RealmObject, Snoozable {
             else -> correctFolder = list.first().folder
         }
 
+        if (correctFolder == null) {
+            SentryLog.d(
+                tag = "Message.folder",
+                msg = "folderId: $folderId | " +
+                        "threads: ${threads.map { "${it.folderId} - ${it.folder.id}" }} | " +
+                        "list: ${list.map { "${it.folderId} - ${it.folder.id}" }} | " +
+                        "count: ${list.count()} - $count",
+            )
+        }
+
         return correctFolder to reason
     }
+
+    fun isInSpamFolder() = folder.role == FolderRole.SPAM
 
     inline val sender get() = from.firstOrNull()
 
