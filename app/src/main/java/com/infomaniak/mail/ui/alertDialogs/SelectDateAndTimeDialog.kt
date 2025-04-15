@@ -39,7 +39,7 @@ import com.infomaniak.lib.core.R as RCore
 abstract class SelectDateAndTimeDialog(private val activityContext: Context) : BaseAlertDialog(activityContext) {
 
     @get:StringRes
-    abstract val positiveButtonText: Int
+    abstract val defaultPositiveButtonResId: Int
 
     abstract fun defineCalendarConstraint(): CalendarConstraints.Builder
 
@@ -76,7 +76,7 @@ abstract class SelectDateAndTimeDialog(private val activityContext: Context) : B
         alertDialog.show()
 
         selectDate(Date().roundUpToNextTenMinutes())
-        positiveButton.setText(positiveButtonResId ?: positiveButtonText)
+        positiveButton.setText(positiveButtonResId ?: defaultPositiveButtonResId)
     }
 
     private fun setupListeners(onDateSelected: (Long) -> Unit, onAbort: (() -> Unit)?) = with(alertDialog) {
