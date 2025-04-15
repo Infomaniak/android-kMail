@@ -38,8 +38,8 @@ import com.infomaniak.lib.core.R as RCore
 
 abstract class SelectDateAndTimeDialog(private val activityContext: Context) : BaseAlertDialog(activityContext) {
 
-    @get:StringRes
-    abstract val defaultPositiveButtonResId: Int
+    @StringRes
+    open val defaultPositiveButtonResId: Int = R.string.buttonConfirm
 
     abstract fun defineCalendarConstraint(): CalendarConstraints.Builder
 
