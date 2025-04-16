@@ -210,14 +210,16 @@ object SentryDebug {
 
     fun sendFailedNotification(
         reason: String,
-        sentryLevel: SentryLevel,
         userId: Int? = null,
         mailboxId: Int? = null,
         messageUid: String? = null,
         mailbox: Mailbox? = null,
         throwable: Throwable? = null,
     ) {
-        Sentry.captureMessage("Failed Notif : $reason", sentryLevel) { scope ->
+
+        val category = "Failed Notif : $reason"
+
+        Sentry.captureMessage(category, SentryLevel.ERROR) { scope ->
             scope.setExtra("userId", "${userId?.toString()}")
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("mailboxId", "${mailboxId?.toString()}")
@@ -226,6 +228,22 @@ object SentryDebug {
             scope.setExtra("messageUid", "$messageUid")
             throwable?.let { scope.setExtra("throwable", it.stackTraceToString()) }
         }
+
+        // TODO: If the generic new mails notification still pops up too often, maybe put back
+        //  these breadcrumbs and the Sentry log in `displayGenericNewMailsNotification()`.
+        // addInfoBreadcrumb(
+        //     category = category,
+        //     data = mutableMapOf(
+        //         "1_userId" to "${userId?.toString()}",
+        //         "2_currentUserId" to "[${AccountUtils.currentUserId}]",
+        //         "3_mailboxId" to "${mailboxId?.toString()}",
+        //         "4_mailbox.email" to "[${mailbox?.email}]",
+        //         "5_currentMailboxEmail" to "[${AccountUtils.currentMailboxEmail}]",
+        //         "6_messageUid" to "$messageUid",
+        //     ).also { map ->
+        //         throwable?.let { map.put("7_throwable", it.stackTraceToString()) }
+        //     },
+        // )
     }
 
     fun sendOrphanMessages(previousCursor: String?, folder: Folder, realm: TypedRealm): List<Message> {

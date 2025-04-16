@@ -38,7 +38,6 @@ import com.infomaniak.mail.utils.NotificationUtils.Companion.EXTRA_MESSAGE_UID
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
 import io.realm.kotlin.Realm
-import io.sentry.SentryLevel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
@@ -75,7 +74,7 @@ class FetchMessagesManager @Inject constructor(
 
         // If the user disabled Notifications for this Mailbox, we don't want to display any Notification.
         // We can leave safely.
-        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return false
+        if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return true
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: run {
@@ -83,7 +82,7 @@ class FetchMessagesManager @Inject constructor(
             // We don't want to display Notifications in this case.
             // We can leave safely.
             realm.close()
-            return false
+            return true
         }
 
         if (folder.cursor == null) {
@@ -91,7 +90,7 @@ class FetchMessagesManager @Inject constructor(
             // If we don't have any cursor for this Mailbox's INBOX, it means it was never opened.
             // We can leave safely.
             realm.close()
-            return false
+            return true
         }
 
         val okHttpClient = AccountUtils.getHttpClient(userId)
@@ -109,7 +108,6 @@ class FetchMessagesManager @Inject constructor(
                 if (shouldLogToSentry(throwable)) {
                     SentryDebug.sendFailedNotification(
                         reason = "RefreshThreads failed",
-                        sentryLevel = SentryLevel.ERROR,
                         userId = userId,
                         mailboxId = mailbox.mailboxId,
                         messageUid = sentryMessageUid,
@@ -153,7 +151,7 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (threadsWithNewMessages.isEmpty()) {
             realm.close()
-            return false
+            return true
         }
 
         // Notify Threads with new Messages
@@ -190,20 +188,13 @@ class FetchMessagesManager @Inject constructor(
         ThreadController.fetchMessagesHeavyData(messages, realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
-            SentryDebug.sendFailedNotification(
-                reason = "No Message in the Thread",
-                sentryLevel = SentryLevel.ERROR,
-                userId = userId,
-                mailboxId = mailbox.mailboxId,
-                messageUid = sentryMessageUid,
-                mailbox = mailbox,
-            )
+            SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)
             return false
         }
 
         // If the Message has already been seen before receiving the Notification, we don't want to display it.
         // We can leave safely.
-        if (message.isSeen) return false
+        if (message.isSeen) return true
 
         val formattedPreview = message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
         val body = if (message.body?.value.isNullOrBlank()) {
