@@ -68,6 +68,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -78,6 +79,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
@@ -514,8 +516,13 @@ class ThreadListFragment : TwoPaneFragment() {
                 toggleThreadSpamStatus(thread.uid)
                 false
             }
-            SwipeAction.POSTPONE -> {
-                notYetImplemented()
+            SwipeAction.SNOOZE -> {
+                val snoozeScheduleType = if (thread.isSnoozed()) {
+                    SnoozeScheduleType.Modify(thread.uid)
+                } else {
+                    SnoozeScheduleType.Snooze(thread.uid)
+                }
+                navigateToSnoozeBottomSheet(snoozeScheduleType, thread.snoozeEndDate)
                 true
             }
             SwipeAction.NONE -> error("Cannot swipe on an action which is not set")

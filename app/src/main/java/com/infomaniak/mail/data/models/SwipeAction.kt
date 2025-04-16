@@ -41,7 +41,7 @@ enum class SwipeAction(
     ),
     MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, MatomoMail.ACTION_MOVE_NAME),
     FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, MatomoMail.ACTION_FAVORITE_NAME),
-    POSTPONE(R.string.actionSnooze, R.color.swipePostpone, R.drawable.ic_alarm_clock, MatomoMail.ACTION_SNOOZE_NAME),
+    SNOOZE(R.string.actionSnooze, R.color.swipeSnooze, R.drawable.ic_alarm_clock, MatomoMail.ACTION_SNOOZE_NAME),
     SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, MatomoMail.ACTION_SPAM_NAME),
     QUICKACTIONS_MENU(
         R.string.settingsSwipeActionQuickActionsMenu,
