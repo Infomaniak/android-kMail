@@ -102,7 +102,7 @@
     <color name="swipeMove">@color/fougere_dark</color>
     <color name="swipeReadUnread">@color/cobalt_dark</color>
     <color name="swipeFavorite">@color/favoriteYellow</color>
-    <color name="swipePostpone">@color/azur_dark</color>
+    <color name="swipeSnooze">@color/coral_dark</color>
     <color name="swipeSpam">@color/orangeWarning</color>
     <color name="swipeArchive">@color/mauve_dark</color>
     <color name="swipeQuickActionMenu">@color/app_blue_dark</color>

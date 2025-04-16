@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
@@ -49,6 +50,10 @@ class TwoPaneViewModel @Inject constructor(
     inline val isThreadOpen get() = currentThreadUid.value != null
     val rightPaneFolderName = MutableLiveData<String>()
     var previousFolderId: String? = null
+
+    // Remember what type of snooze action the snooze schedule bottom sheet is used for,
+    // so we know what call to execute when a date is chosen
+    var snoozeScheduleType: SnoozeScheduleType? = null
 
     val newMessageArgs = SingleLiveEvent<NewMessageActivityArgs>()
     val navArgs = SingleLiveEvent<NavData>()
@@ -98,6 +103,10 @@ class TwoPaneViewModel @Inject constructor(
                 mailToUri = mailToUri,
             ),
         )
+    }
+
+    fun safelyNavigate(@IdRes resId: Int, args: Bundle) {
+        navArgs.value = NavData(resId, args)
     }
 
     data class NavData(

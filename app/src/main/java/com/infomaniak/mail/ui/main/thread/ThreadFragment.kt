@@ -77,11 +77,9 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialog.C
 import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogArgs
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
-import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
-import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel.NavData
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ContextMenuType
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
@@ -604,12 +602,12 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeSnoozeDialog.show(
-                positiveButtonResId = threadViewModel.snoozeScheduleType?.positiveButtonResId,
+                positiveButtonResId = twoPaneViewModel.snoozeScheduleType?.positiveButtonResId,
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
                     executeSavedSnoozeScheduleType(timestamp)
                 },
-                onAbort = { navigateToSnoozeBottomSheet(threadViewModel.snoozeScheduleType) },
+                onAbort = { navigateToSnoozeBottomSheet(twoPaneViewModel.snoozeScheduleType) },
             )
         }
 
@@ -619,7 +617,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun executeSavedSnoozeScheduleType(timestamp: Long) {
-        when (val type = threadViewModel.snoozeScheduleType) {
+        when (val type = twoPaneViewModel.snoozeScheduleType) {
             is SnoozeScheduleType.Snooze -> snoozeThreads(timestamp, type.threadUids)
             is SnoozeScheduleType.Modify -> rescheduleSnoozedThreads(timestamp, type.threadUids)
             null -> SentryLog.e(TAG, "Tried to execute snooze api call but there's no saved schedule type to handle")
@@ -835,15 +833,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?) {
-        threadViewModel.snoozeScheduleType = snoozeScheduleType
-        safeNavigate(
-            resId = R.id.snoozeBottomSheetDialog,
-            args = SnoozeBottomSheetDialogArgs(
-                lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
-                currentlyScheduledEpochMillis = threadViewModel.threadLive.value?.snoozeEndDate?.epochSeconds?.times(1_000) ?: 0L,
-                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
-            ).toBundle(),
-        )
+        twoPaneFragment.navigateToSnoozeBottomSheet(snoozeScheduleType, threadViewModel.threadLive.value?.snoozeEndDate)
     }
 
     private fun unsnoozeThread(thread: Thread): Unit = with(binding) {
@@ -894,7 +884,7 @@ class ThreadFragment : Fragment() {
     fun isScrolledToTheTop(): Boolean? = _binding?.messagesListNestedScrollView?.isAtTheTop()
 
     private fun safeNavigate(@IdRes resId: Int, args: Bundle) {
-        twoPaneViewModel.navArgs.value = NavData(resId, args)
+        twoPaneViewModel.safelyNavigate(resId, args)
     }
 
     private fun tryToAutoAdvance(listThreadUids: List<String>) = with(twoPaneFragment.threadListAdapter) {
