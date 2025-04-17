@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
@@ -109,10 +110,7 @@ class MenuDrawerFragment : Fragment() {
     private fun setupListeners() {
         binding.settingsButton.setOnClickListener {
             closeDrawer()
-            safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment(),
-                currentClassName = currentClassName,
-            )
+            safelyNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
         }
     }
 
