@@ -24,12 +24,14 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.SharedUtils
 
 enum class SwipeAction(
     @StringRes val nameRes: Int,
     @ColorRes val colorRes: Int,
     @DrawableRes val iconRes: Int?,
     val matomoValue: String,
+    val displayBehavior: DisplayBehavior = alwaysAvailableDisplay,
 ) {
     DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, MatomoMail.ACTION_DELETE_NAME),
     ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, MatomoMail.ACTION_ARCHIVE_NAME),
@@ -41,7 +43,7 @@ enum class SwipeAction(
     ),
     MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, MatomoMail.ACTION_MOVE_NAME),
     FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, MatomoMail.ACTION_FAVORITE_NAME),
-    SNOOZE(R.string.actionSnooze, R.color.swipeSnooze, R.drawable.ic_alarm_clock, MatomoMail.ACTION_SNOOZE_NAME),
+    SNOOZE(R.string.actionSnooze, R.color.swipeSnooze, R.drawable.ic_alarm_clock, MatomoMail.ACTION_SNOOZE_NAME, snoozeDisplay),
     SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, MatomoMail.ACTION_SPAM_NAME),
     QUICKACTIONS_MENU(
         R.string.settingsSwipeActionQuickActionsMenu,
@@ -54,4 +56,10 @@ enum class SwipeAction(
 
     @ColorInt
     fun getBackgroundColor(context: Context): Int = context.getColor(colorRes)
+}
+
+private val alwaysAvailableDisplay = DisplayBehavior { _, _, _ -> true }
+
+private val snoozeDisplay = DisplayBehavior { _, featureFlags, localSettings ->
+    SharedUtils.isSnoozeAvailable(featureFlags, localSettings)
 }

@@ -65,9 +65,9 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
-import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -354,6 +354,19 @@ class ThreadListFragment : TwoPaneFragment() {
             disableDragDirection(DirectionFlag.RIGHT)
             disableDragDirection(DirectionFlag.LEFT)
             addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
+        }
+    }
+
+    private fun updateDisabledSwipeActions() {
+        val folderRole = mainViewModel.currentFolder.value?.role
+        val featureFlags = mainViewModel.currentMailbox.value?.featureFlags
+
+        val canSwipeLeft = localSettings.swipeLeft.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)
+        val canSwipeRight = localSettings.swipeRight.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)
+
+        binding.threadsList.apply {
+            if (canSwipeLeft) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+            if (canSwipeRight) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
         }
     }
 
@@ -654,6 +667,7 @@ class ThreadListFragment : TwoPaneFragment() {
             checkLastUpdateDay()
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             startUpdatedAtJob()
+            updateDisabledSwipeActions()
         }
     }
 
