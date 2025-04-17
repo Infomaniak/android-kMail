@@ -279,10 +279,14 @@ class SharedUtils @Inject constructor(
             localSettings: LocalSettings,
             currentFolderRole: FolderRole?,
         ): Boolean {
-            fun hasSnoozeFeatureFlag() = mainViewModel.currentMailbox.value?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
-            fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
+            fun isSnoozeAvailable() = isSnoozeAvailable(mainViewModel.currentMailbox.value?.featureFlags, localSettings)
+            return currentFolderRole == FolderRole.INBOX || currentFolderRole == FolderRole.SNOOZED && isSnoozeAvailable()
+        }
 
-            return currentFolderRole == FolderRole.INBOX || currentFolderRole == FolderRole.SNOOZED && hasSnoozeFeatureFlag() && isConversationMode()
+        fun isSnoozeAvailable(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Boolean {
+            fun hasSnoozeFeatureFlag() = featureFlags?.contains(FeatureFlag.SNOOZE) == true
+            fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
+            return hasSnoozeFeatureFlag() && isConversationMode()
         }
 
         sealed interface AutomaticUnsnoozeResult {
