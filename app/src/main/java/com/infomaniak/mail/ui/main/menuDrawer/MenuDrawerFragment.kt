@@ -110,7 +110,7 @@ class MenuDrawerFragment : Fragment() {
     private fun setupListeners() {
         binding.settingsButton.setOnClickListener {
             closeDrawer()
-            safelyNavigate(directions = ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
+            safelyNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
         }
     }
 
