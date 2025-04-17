@@ -26,7 +26,6 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -34,7 +33,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
@@ -45,6 +43,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.SharedUtils.Companion.isSnoozeAvailable
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
@@ -116,9 +115,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun Thread.shouldDisplayHeaderActions(mailbox: Mailbox?): Boolean {
-        return mailbox?.featureFlags?.contains(FeatureFlag.SNOOZE) == true
-                && folder.role == FolderRole.SNOOZED
-                && localSettings.threadMode == ThreadMode.CONVERSATION
+        return isSnoozeAvailable(mailbox?.featureFlags, localSettings) && folder.role == FolderRole.SNOOZED
     }
 
     fun reassignThreadLive(threadUid: String) {
