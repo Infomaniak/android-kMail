@@ -29,8 +29,8 @@ import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.SwipeAction
-import com.infomaniak.mail.data.LocalSettings.SwipeAction.*
+import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.SwipeAction.*
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
