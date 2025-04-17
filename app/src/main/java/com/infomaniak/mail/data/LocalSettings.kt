@@ -20,7 +20,9 @@ package com.infomaniak.mail.data
 import android.content.Context
 import android.os.Build
 import android.view.ContextThemeWrapper
-import androidx.annotation.*
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor.ApiCallRecord
@@ -28,14 +30,8 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SharedValues
 import com.infomaniak.lib.core.utils.sharedValue
 import com.infomaniak.lib.core.utils.transaction
-import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_SNOOZE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.SwipeAction
 import com.google.android.material.R as RMaterial
 
 class LocalSettings private constructor(context: Context) : SharedValues {
@@ -160,37 +156,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         }
 
         override fun toString() = name.lowercase()
-    }
-
-    enum class SwipeAction(
-        @StringRes val nameRes: Int,
-        @ColorRes val colorRes: Int,
-        @DrawableRes val iconRes: Int?,
-        val matomoValue: String,
-    ) {
-        DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, ACTION_DELETE_NAME),
-        ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, ACTION_ARCHIVE_NAME),
-        READ_UNREAD(
-            R.string.settingsSwipeActionReadUnread,
-            R.color.swipeReadUnread,
-            R.drawable.ic_envelope,
-            ACTION_MARK_AS_SEEN_NAME,
-        ),
-        MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, ACTION_MOVE_NAME),
-        FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, ACTION_FAVORITE_NAME),
-        POSTPONE(R.string.actionSnooze, R.color.swipePostpone, R.drawable.ic_alarm_clock, ACTION_SNOOZE_NAME),
-        SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, ACTION_SPAM_NAME),
-        QUICKACTIONS_MENU(
-            R.string.settingsSwipeActionQuickActionsMenu,
-            R.color.swipeQuickActionMenu,
-            R.drawable.ic_param_dots,
-            "quickActions",
-        ),
-        TUTORIAL(R.string.settingsSwipeActionNone, R.color.progressbarTrackColor, null, "tutorial"),
-        NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null, "none");
-
-        @ColorInt
-        fun getBackgroundColor(context: Context): Int = context.getColor(colorRes)
     }
 
     enum class ThreadMode(@StringRes val localisedNameRes: Int, val matomoValue: String) {
