@@ -38,7 +38,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
@@ -832,7 +831,6 @@ class ThreadFragment : Fragment() {
                 currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
                 isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
-            currentClassName = ThreadFragment::class.java.name,
         )
     }
 
@@ -845,7 +843,6 @@ class ThreadFragment : Fragment() {
                 currentlyScheduledEpochMillis = threadViewModel.threadLive.value?.snoozeEndDate?.epochSeconds?.times(1_000) ?: 0L,
                 isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
             ).toBundle(),
-            currentClassName = ThreadFragment::class.java.name,
         )
     }
 

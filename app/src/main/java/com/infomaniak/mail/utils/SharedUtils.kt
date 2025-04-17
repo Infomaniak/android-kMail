@@ -41,7 +41,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.computeSnoozeResult
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
@@ -52,7 +51,6 @@ import com.infomaniak.mail.utils.extensions.getUids
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import javax.inject.Inject
@@ -62,7 +60,6 @@ class SharedUtils @Inject constructor(
     private val refreshController: RefreshController,
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     @Inject
