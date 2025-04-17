@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,12 +30,14 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import kotlin.reflect.KMutableProperty0
 
 @Serializable
 class Mailbox : RealmObject {
@@ -103,7 +105,7 @@ class Mailbox : RealmObject {
     //region UI data (Transient & Ignore)
     @Transient
     @Ignore
-    val featureFlags = FeatureFlagSet()
+    val featureFlags = FeatureFlagSet(::_featureFlags)
     //endregion
 
     inline val channelGroupId get() = "$mailboxId"
@@ -157,15 +159,26 @@ class Mailbox : RealmObject {
         return@with !areNotificationsEnabled() || isGroupBlocked || isChannelBlocked
     }
 
-    inner class FeatureFlagSet {
+    class FeatureFlagSet(val featureFlagsBacking: KMutableProperty0<RealmSet<String>>) {
         fun contains(featureFlag: FeatureFlag): Boolean {
-            return _featureFlags.contains(featureFlag.apiName)
+            return featureFlagsBacking.get().contains(featureFlag.apiName)
         }
 
-        fun setFeatureFlags(featureFlags: List<String>) = with(_featureFlags) {
+        fun setFeatureFlags(featureFlags: List<String>) = with(featureFlagsBacking.get()) {
             clear()
             addAll(featureFlags)
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as FeatureFlagSet
+
+            return featureFlagsBacking.get() == other.featureFlagsBacking.get()
+        }
+
+        override fun hashCode(): Int = featureFlagsBacking.get().hashCode()
     }
 
     companion object {
