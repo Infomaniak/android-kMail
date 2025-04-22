@@ -1,0 +1,3 @@
+- Remove the snooze status of an "unsnoozed" thread when reading it from any folder
+- Adapt text between confirm/modify depending on the type of snooze action
+- Display generic new mails notification less often

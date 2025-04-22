@@ -1,0 +1,3 @@
+- Corrige l'affichage des fils de discussions quand ils sortent de la mise en attente
+- Adapte le texte du bouton confirmer/modifier en fonction du type d'action de mise en attente
+- Affiche moins souvent la notification générique des nouveaux courriels
