@@ -586,6 +586,7 @@ class ThreadFragment : Fragment() {
     private fun setupBackActionHandler() {
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
+                positiveButtonResId = R.string.buttonModify,
                 onDateSelected = { timestamp ->
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
                     mainViewModel.rescheduleDraft(Date(timestamp))
