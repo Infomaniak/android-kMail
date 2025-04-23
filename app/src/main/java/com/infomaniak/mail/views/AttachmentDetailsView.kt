@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
+import coil.dispose
 import coil.load
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.lib.core.utils.getAttributes
@@ -67,6 +68,10 @@ class AttachmentDetailsView @JvmOverloads constructor(
         fileName.text = attachment.name
         fileSize.text = context.formatShortFileSize(attachment.size)
         icon.load(attachment.getFileTypeFromMimeType().icon)
+    }
+
+    fun cleanUp() {
+        binding.icon.dispose()
     }
 
     private enum class DisplayStyle(
