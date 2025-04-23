@@ -582,6 +582,7 @@
         <item quantity="many">Vous recevrez un rappel de ces messages %s</item>
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Objet copié dans le presse-papiers</string>
+    <string name="snackbarSwipeActionIncompatible">Action de balayage incompatible</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation supprimée</item>
         <item quantity="other">Conversations supprimées</item>

@@ -160,7 +160,7 @@ class ThreadListFragment : TwoPaneFragment() {
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
             threadListFragment = this,
-            unlockSwipeActionsIfSet = {},
+            unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
         )
 
@@ -264,19 +264,12 @@ class ThreadListFragment : TwoPaneFragment() {
     }
 
     private fun updateSwipeActionsAccordingToSettings() {
-        with(binding.threadsList) {
-            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
-            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
+        unlockSwipeActionsIfSet()
 
-            behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
-            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
-        }
-
-        // Manually update disabled states in case local values have changed when coming back from settings
+        // Manually update disabled states in case LocalSettings have changed when coming back from settings
         val featureFlags = mainViewModel.currentMailbox.value?.featureFlags ?: return
         val folderRole = mainViewModel.currentFolderLive.value?.role ?: return
-        val isMultiSelectOn = mainViewModel.isMultiSelectOn
-        updateDisabledSwipeActions(featureFlags, folderRole, isMultiSelectOn)
+        updateDisabledSwipeActions(featureFlags, folderRole)
     }
 
     override fun onDestroyView() {
@@ -347,6 +340,10 @@ class ThreadListFragment : TwoPaneFragment() {
                 override var onPositionClickedChanged: (Int, Int) -> Unit = ::updateAutoAdvanceNaturalThread
 
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
+
+                override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = {
+                    mainViewModel.currentMailboxLive.value?.featureFlags
+                }
             },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
@@ -369,22 +366,27 @@ class ThreadListFragment : TwoPaneFragment() {
         }
     }
 
-    private fun updateDisabledSwipeActions(
-        featureFlags: Mailbox.FeatureFlagSet,
-        folderRole: FolderRole?,
-        isMultiSelectOn: Boolean,
-    ) {
-        val canSwipeLeft = isMultiSelectOn.not()
-                && localSettings.swipeLeft.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)
-        val canSwipeRight = isMultiSelectOn.not()
-                && localSettings.swipeRight.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)
+    private fun updateDisabledSwipeActions(featureFlags: Mailbox.FeatureFlagSet, folderRole: FolderRole?) {
+        val isLeftEnabled = localSettings.swipeLeft.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)
+        val isRightEnabled = localSettings.swipeRight.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)
 
-        setSwipeActionEnabledState(DirectionFlag.LEFT, canSwipeLeft)
-        setSwipeActionEnabledState(DirectionFlag.RIGHT, canSwipeRight)
+        setSwipeActionEnabledState(DirectionFlag.LEFT, isLeftEnabled)
+        setSwipeActionEnabledState(DirectionFlag.RIGHT, isRightEnabled)
     }
 
     private fun setSwipeActionEnabledState(swipeDirection: DirectionFlag, isEnabled: Boolean) = with(binding.threadsList) {
-        if (isEnabled) enableSwipeDirection(swipeDirection) else disableSwipeDirection(swipeDirection)
+        fun SwipeAction.getIconRes(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
+        fun SwipeAction.getBackgroundColor(): Int {
+            return if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
+        }
+
+        if (swipeDirection == DirectionFlag.LEFT) {
+            behindSwipedItemIconDrawableId = localSettings.swipeLeft.getIconRes()
+            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor()
+        } else {
+            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.getIconRes()
+            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor()
+        }
     }
 
     private fun setupListeners() = with(binding) {
@@ -470,9 +472,13 @@ class ThreadListFragment : TwoPaneFragment() {
         position: Int,
         isPermanentDeleteFolder: Boolean,
     ): Boolean = with(mainViewModel) {
-        trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
-
         val folderRole = thread.folder.role
+        if (!swipeAction.displayBehavior.canDisplay(folderRole, currentMailboxLive.value?.featureFlags, localSettings)) {
+            snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
+            return@with true
+        }
+
+        trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
 
         val shouldKeepItemBecauseOfAction = when (swipeAction) {
             SwipeAction.TUTORIAL -> {
@@ -688,8 +694,8 @@ class ThreadListFragment : TwoPaneFragment() {
     }
 
     private fun observeSwipeActionImpactingValues() {
-        mainViewModel.swipeActionImpactingValues.observe(viewLifecycleOwner) { (featureFlags, folderRole, isMultiSelectOn) ->
-            updateDisabledSwipeActions(featureFlags, folderRole, isMultiSelectOn)
+        mainViewModel.swipeActionImpactingValues.observe(viewLifecycleOwner) { (featureFlags, folderRole) ->
+            updateDisabledSwipeActions(featureFlags, folderRole)
         }
     }
 

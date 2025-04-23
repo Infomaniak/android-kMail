@@ -572,6 +572,7 @@
         <item quantity="other">Sie erhalten eine Erinnerung an diese Nachrichten %s</item>
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Betreff in die Zwischenablage kopiert</string>
+    <string name="snackbarSwipeActionIncompatible">Wischaktion inkompatibel</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Konversation gelöscht</item>
         <item quantity="other">Konversationen gelöscht</item>

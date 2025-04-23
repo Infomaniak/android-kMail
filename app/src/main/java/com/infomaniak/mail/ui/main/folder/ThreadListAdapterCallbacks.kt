@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 
 interface ThreadListAdapterCallbacks {
@@ -26,4 +27,5 @@ interface ThreadListAdapterCallbacks {
     var onLoadMoreClicked: () -> Unit
     var onPositionClickedChanged: (position: Int, previousPosition: Int) -> Unit
     var deleteThreadInRealm: (threadUid: String) -> Unit
+    val getFeatureFlags: () -> Mailbox.FeatureFlagSet?
 }
