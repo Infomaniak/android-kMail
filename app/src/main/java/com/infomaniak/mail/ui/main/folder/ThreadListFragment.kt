@@ -266,10 +266,11 @@ class ThreadListFragment : TwoPaneFragment() {
     private fun updateSwipeActionsAccordingToSettings() {
         unlockSwipeActionsIfSet()
 
-        // Manually update disabled states in case LocalSettings have changed when coming back from settings
-        val featureFlags = mainViewModel.featureFlagsLive.value ?: return
-        val folderRole = mainViewModel.currentFolderLive.value?.role ?: return
-        updateDisabledSwipeActionsUi(featureFlags, folderRole)
+        // Manually update disabled ui in case LocalSettings have changed when coming back from settings
+        updateDisabledSwipeActionsUi(
+            featureFlags = mainViewModel.featureFlagsLive.value,
+            folderRole = mainViewModel.currentFolderLive.value?.role,
+        )
     }
 
     override fun onDestroyView() {
@@ -364,7 +365,7 @@ class ThreadListFragment : TwoPaneFragment() {
         }
     }
 
-    private fun updateDisabledSwipeActionsUi(featureFlags: Mailbox.FeatureFlagSet, folderRole: FolderRole?) {
+    private fun updateDisabledSwipeActionsUi(featureFlags: Mailbox.FeatureFlagSet?, folderRole: FolderRole?) {
         val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
         val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
 
