@@ -204,7 +204,7 @@ class MainViewModel @Inject constructor(
         it?.let(folderController::getFolderAsync) ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
 
-    val swipeActionImpactingValues = Utils.waitInitMediator(featureFlagsLive, currentFolderLive) {
+    val swipeActionContext = Utils.waitInitMediator(featureFlagsLive, currentFolderLive) {
         (it[0] as Mailbox.FeatureFlagSet) to (it[1] as Folder).role
     }.distinctUntilChanged()
 

@@ -170,7 +170,7 @@ class ThreadListFragment : TwoPaneFragment() {
         observeFilter()
         observeCurrentFolder()
         observeCurrentFolderLive()
-        observeSwipeActionImpactingValues()
+        observeSwipeActionContext()
         observeUpdatedAtTriggers()
         observeFlushFolderTrigger()
         observeUpdateInstall()
@@ -692,8 +692,8 @@ class ThreadListFragment : TwoPaneFragment() {
         }
     }
 
-    private fun observeSwipeActionImpactingValues() {
-        mainViewModel.swipeActionImpactingValues.observe(viewLifecycleOwner) { (featureFlags, folderRole) ->
+    private fun observeSwipeActionContext() {
+        mainViewModel.swipeActionContext.observe(viewLifecycleOwner) { (featureFlags, folderRole) ->
             updateDisabledSwipeActionsUi(featureFlags, folderRole)
         }
     }
