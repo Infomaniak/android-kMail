@@ -179,6 +179,9 @@ class Thread : RealmObject, Snoozable {
     }
 
     fun recomputeThread(realm: MutableRealm? = null) {
+
+        messages.sortBy { it.internalDate }
+
         val lastCurrentFolderMessage = messages.lastOrNull { it.folderId == folderId }
         val lastMessage = if (isFromSearch) {
             // In the search, some threads (such as threads from the snooze folder) won't have any messages with the same folderId
@@ -232,8 +235,6 @@ class Thread : RealmObject, Snoozable {
                 snoozeUuid = message.snoozeUuid
             }
         }
-
-        messages.sortBy { it.internalDate }
 
         messages.forEach { message ->
             messagesIds += message.messageIds

@@ -48,7 +48,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.initializeInternalDateAsDateAfterTwentySecondMigration()
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
     migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
-    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration()
+    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration()
 }
 
 // Migrate to version #1
@@ -208,10 +208,11 @@ private val lastUuidRegex = Regex("""$UUID_PATTERN(?!.*$UUID_PATTERN)""", RegexO
 private fun String.lastUuidOrNull() = lastUuidRegex.find(this)?.value
 //endregion
 
-// Migrate from version #27
-private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration() {
+// Migrate from version #27 or #28
+// Bumping to schema 29 required to recompute the Thread object again. If already done for schema 28, no need to do it twice
+private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration() {
 
-    if (oldRealm.schemaVersion() <= 27L) {
+    if (oldRealm.schemaVersion() <= 28L) {
         enumerate(className = "Thread") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.let { newThread ->
                 // Initialize new property by computing it based on other fields
@@ -219,15 +220,23 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigr
 
                 val messages = newThread.getObjectList(propertyName = "messages")
                 messages.sortBy { it.getValue<RealmInstant>("internalDate") }
+
                 val lastMessage = messages.lastOrNull { it.getValue<String>("folderId") == threadFolderId }
 
                 val isSnoozed = if (lastMessage == null) {
                     // Defaulting to `false` only means that this thread won't be automatically unsnoozed until it's recomputed
                     false
                 } else {
-                    val snoozeState = lastMessage.getNullableValue<String>("_snoozeState")
-                    val snoozeEndDate = lastMessage.getNullableValue<RealmInstant>("snoozeEndDate")
-                    val snoozeUuid = lastMessage.getNullableValue<String>("snoozeUuid")
+                    val snoozeState = lastMessage.getNullableValueOrRecover<String>("_snoozeState", recovery = { null })
+                    val snoozeEndDate = lastMessage.getNullableValueOrRecover<RealmInstant>("snoozeEndDate", recovery = { null })
+                    val snoozeUuid = lastMessage.getNullableValueOrRecover<String>("snoozeUuid", recovery = { null })
+
+                    lastMessage.getValueOrNull<RealmInstant>("displayDate")?.let { displayDate ->
+                        newThread.set(propertyName = "displayDate", value = displayDate)
+                    }
+                    lastMessage.getValueOrNull<RealmInstant>("internalDate")?.let { internalDate ->
+                        newThread.set(propertyName = "internalDate", value = internalDate)
+                    }
 
                     snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
                 }
@@ -252,7 +261,7 @@ private fun DynamicMutableRealmObject.setIfPropertyExists(propertyName: String, 
 }
 
 /**
- * Tries to get read [fieldName] but if the value is not in the [DynamicRealmObject], instead of crashing, fallback to an
+ * Tries to read [fieldName] but if the value is not in the [DynamicRealmObject], instead of crashing, fallback to an
  * alternative recovery method to get the expected value.
  *
  * Used for when we can be migrating from versions of the model that might never have had [fieldName] initialized.
@@ -264,5 +273,21 @@ private inline fun <reified T : Any> DynamicRealmObject.getNullableValueOrRecove
         if (it !is IllegalArgumentException) SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
 
         recovery()
+    }
+}
+
+/**
+ * Tries to read [fieldName] but if the value is not in the [DynamicRealmObject], instead of crashing, fallback to an
+ * alternative recovery method to get the expected value.
+ *
+ * Used for when we can be migrating from versions of the model that might never have had [fieldName] initialized.
+ */
+private inline fun <reified T : Any> DynamicRealmObject.getValueOrNull(fieldName: String): T? {
+    return runCatching {
+        getValue<T>(fieldName)
+    }.getOrElse {
+        if (it !is IllegalArgumentException) SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
+
+        null
     }
 }
