@@ -269,7 +269,7 @@ class ThreadListFragment : TwoPaneFragment() {
         // Manually update disabled states in case LocalSettings have changed when coming back from settings
         val featureFlags = mainViewModel.currentMailbox.value?.featureFlags ?: return
         val folderRole = mainViewModel.currentFolderLive.value?.role ?: return
-        updateDisabledSwipeActions(featureFlags, folderRole)
+        updateDisabledSwipeActionsUi(featureFlags, folderRole)
     }
 
     override fun onDestroyView() {
@@ -366,15 +366,15 @@ class ThreadListFragment : TwoPaneFragment() {
         }
     }
 
-    private fun updateDisabledSwipeActions(featureFlags: Mailbox.FeatureFlagSet, folderRole: FolderRole?) {
+    private fun updateDisabledSwipeActionsUi(featureFlags: Mailbox.FeatureFlagSet, folderRole: FolderRole?) {
         val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
         val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
 
-        setSwipeActionEnabledState(DirectionFlag.LEFT, isLeftEnabled)
-        setSwipeActionEnabledState(DirectionFlag.RIGHT, isRightEnabled)
+        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled)
+        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled)
     }
 
-    private fun setSwipeActionEnabledState(swipeDirection: DirectionFlag, isEnabled: Boolean) = with(binding.threadsList) {
+    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean) = with(binding.threadsList) {
         fun SwipeAction.getIconRes(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
         fun SwipeAction.getBackgroundColor(): Int {
             return if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
@@ -695,7 +695,7 @@ class ThreadListFragment : TwoPaneFragment() {
 
     private fun observeSwipeActionImpactingValues() {
         mainViewModel.swipeActionImpactingValues.observe(viewLifecycleOwner) { (featureFlags, folderRole) ->
-            updateDisabledSwipeActions(featureFlags, folderRole)
+            updateDisabledSwipeActionsUi(featureFlags, folderRole)
         }
     }
 
