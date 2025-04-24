@@ -24,9 +24,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.utils.SharedUtils
 
 enum class SwipeAction(
@@ -34,8 +32,8 @@ enum class SwipeAction(
     @ColorRes val colorRes: Int,
     @DrawableRes val iconRes: Int?,
     val matomoValue: String,
-    val displayBehavior: DisplayBehavior = alwaysDisplay,
-) {
+    private val swipeDisplayBehavior: SwipeDisplayBehavior = alwaysDisplay,
+) : SwipeDisplayBehavior by swipeDisplayBehavior {
     DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, MatomoMail.ACTION_DELETE_NAME),
     ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, MatomoMail.ACTION_ARCHIVE_NAME),
     READ_UNREAD(
@@ -59,20 +57,12 @@ enum class SwipeAction(
 
     @ColorInt
     fun getBackgroundColor(context: Context): Int = context.getColor(colorRes)
-
-    fun interface DisplayBehavior {
-        fun canDisplay(
-            folderRole: FolderRole?,
-            featureFlags: Mailbox.FeatureFlagSet?,
-            localSettings: LocalSettings,
-        ): Boolean
-    }
 }
 
-private val alwaysDisplay = SwipeAction.DisplayBehavior { _, _, _ -> true }
+private val alwaysDisplay = SwipeDisplayBehavior { _, _, _ -> true }
 
-private val neverDisplay = SwipeAction.DisplayBehavior { _, _, _ -> false }
+private val neverDisplay = SwipeDisplayBehavior { _, _, _ -> false }
 
-private val snoozeDisplay = SwipeAction.DisplayBehavior { role, featureFlags, localSettings ->
+private val snoozeDisplay = SwipeDisplayBehavior { role, featureFlags, localSettings ->
     (role == FolderRole.INBOX || role == FolderRole.SNOOZED) && SharedUtils.isSnoozeAvailable(featureFlags, localSettings)
 }

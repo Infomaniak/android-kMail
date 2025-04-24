@@ -576,14 +576,14 @@ class ThreadListAdapter @Inject constructor(
         (recyclerView as DragDropSwipeRecyclerView).apply {
             val featureFlags = callbacks?.getFeatureFlags?.invoke()
 
-            if (localSettings.swipeLeft.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)) {
+            if (localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)) {
                 getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
                     behindSwipedItemBackgroundColor = context.getColor(colorRes)
                     behindSwipedItemIconDrawableId = iconRes
                 }
             }
 
-            if (localSettings.swipeRight.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)) {
+            if (localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)) {
                 getSwipeActionUiData(localSettings.swipeRight)?.let { (colorRes, iconRes) ->
                     behindSwipedItemBackgroundSecondaryColor = context.getColor(colorRes)
                     behindSwipedItemIconSecondaryDrawableId = iconRes

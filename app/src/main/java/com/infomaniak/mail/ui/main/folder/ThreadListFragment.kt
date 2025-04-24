@@ -367,8 +367,8 @@ class ThreadListFragment : TwoPaneFragment() {
     }
 
     private fun updateDisabledSwipeActions(featureFlags: Mailbox.FeatureFlagSet, folderRole: FolderRole?) {
-        val isLeftEnabled = localSettings.swipeLeft.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)
-        val isRightEnabled = localSettings.swipeRight.displayBehavior.canDisplay(folderRole, featureFlags, localSettings)
+        val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
+        val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
 
         setSwipeActionEnabledState(DirectionFlag.LEFT, isLeftEnabled)
         setSwipeActionEnabledState(DirectionFlag.RIGHT, isRightEnabled)
@@ -473,7 +473,7 @@ class ThreadListFragment : TwoPaneFragment() {
         isPermanentDeleteFolder: Boolean,
     ): Boolean = with(mainViewModel) {
         val folderRole = thread.folder.role
-        if (!swipeAction.displayBehavior.canDisplay(folderRole, currentMailboxLive.value?.featureFlags, localSettings)) {
+        if (!swipeAction.canDisplay(folderRole, currentMailboxLive.value?.featureFlags, localSettings)) {
             snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
             return@with true
         }
