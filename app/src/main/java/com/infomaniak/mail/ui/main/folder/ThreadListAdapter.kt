@@ -553,29 +553,9 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun Thread.updateDynamicIcons() {
-
-        fun computeDynamicAction(folderRole: FolderRole, swipeAction: SwipeAction) = SwipeActionUiData(
-            colorRes = if (folder.role == folderRole) R.color.swipeInbox else swipeAction.colorRes,
-            iconRes = if (folder.role == folderRole) R.drawable.ic_drawer_inbox else swipeAction.iconRes,
-        )
-
-        fun getSwipeActionUiData(swipeAction: SwipeAction) = when (swipeAction) {
-            SwipeAction.READ_UNREAD -> SwipeActionUiData(
-                colorRes = swipeAction.colorRes,
-                iconRes = if (isSeen) swipeAction.iconRes else R.drawable.ic_envelope_open,
-            )
-            SwipeAction.FAVORITE -> SwipeActionUiData(
-                colorRes = swipeAction.colorRes,
-                iconRes = if (isFavorite) R.drawable.ic_unstar else swipeAction.iconRes,
-            )
-            SwipeAction.ARCHIVE -> computeDynamicAction(FolderRole.ARCHIVE, swipeAction)
-            SwipeAction.SPAM -> computeDynamicAction(FolderRole.SPAM, swipeAction)
-            else -> null
-        }
+        val featureFlags = callbacks?.getFeatureFlags?.invoke()
 
         (recyclerView as DragDropSwipeRecyclerView).apply {
-            val featureFlags = callbacks?.getFeatureFlags?.invoke()
-
             if (localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)) {
                 getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
                     behindSwipedItemBackgroundColor = context.getColor(colorRes)
@@ -589,6 +569,27 @@ class ThreadListAdapter @Inject constructor(
                     behindSwipedItemIconSecondaryDrawableId = iconRes
                 }
             }
+        }
+    }
+
+    private fun Thread.getSwipeActionUiData(swipeAction: SwipeAction): SwipeActionUiData? {
+        fun computeDynamicAction(folderRole: FolderRole, swipeAction: SwipeAction) = SwipeActionUiData(
+            colorRes = if (folder.role == folderRole) R.color.swipeInbox else swipeAction.colorRes,
+            iconRes = if (folder.role == folderRole) R.drawable.ic_drawer_inbox else swipeAction.iconRes,
+        )
+
+        return when (swipeAction) {
+            SwipeAction.READ_UNREAD -> SwipeActionUiData(
+                colorRes = swipeAction.colorRes,
+                iconRes = if (isSeen) swipeAction.iconRes else R.drawable.ic_envelope_open,
+            )
+            SwipeAction.FAVORITE -> SwipeActionUiData(
+                colorRes = swipeAction.colorRes,
+                iconRes = if (isFavorite) R.drawable.ic_unstar else swipeAction.iconRes,
+            )
+            SwipeAction.ARCHIVE -> computeDynamicAction(FolderRole.ARCHIVE, swipeAction)
+            SwipeAction.SPAM -> computeDynamicAction(FolderRole.SPAM, swipeAction)
+            else -> null
         }
     }
 
