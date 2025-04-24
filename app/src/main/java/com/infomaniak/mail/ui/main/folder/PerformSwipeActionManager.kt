@@ -1,0 +1,160 @@
+/*
+ * Infomaniak Mail - Android
+ * Copyright (C) 2025 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.mail.ui.main.folder
+
+import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.MatomoCore
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.utils.extensions.*
+
+object PerformSwipeActionManager {
+
+    /**
+     * The boolean return value is used to know if we should keep the Thread in
+     * the RecyclerView (true), or remove it when the swipe is done (false).
+     */
+    fun ThreadListFragment.performSwipeActionOnThread(
+        swipeAction: SwipeAction,
+        thread: Thread,
+        position: Int,
+        isPermanentDeleteFolder: Boolean,
+        mainViewModel: MainViewModel,
+        localSettings: LocalSettings,
+    ): Boolean {
+        val folderRole = thread.folder.role
+        if (!swipeAction.canDisplay(folderRole, mainViewModel.featureFlagsLive.value, localSettings)) {
+            snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
+            return true
+        }
+
+        trackEvent("swipeActions", swipeAction.matomoValue, MatomoCore.TrackerAction.DRAG)
+
+        val shouldKeepItemBecauseOfAction = performSwipeAction(
+            swipeAction = swipeAction,
+            folderRole = folderRole,
+            thread = thread,
+            position = position,
+            isPermanentDeleteFolder = isPermanentDeleteFolder,
+        )
+
+        val shouldKeepItemBecauseOfNoConnection = !mainViewModel.hasNetwork
+        return shouldKeepItemBecauseOfAction || shouldKeepItemBecauseOfNoConnection
+    }
+
+    private fun ThreadListFragment.performSwipeAction(
+        swipeAction: SwipeAction,
+        folderRole: FolderRole?,
+        thread: Thread,
+        position: Int,
+        isPermanentDeleteFolder: Boolean
+    ) = when (swipeAction) {
+        SwipeAction.TUTORIAL -> {
+            localSettings.setDefaultSwipeActions()
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
+            findNavController().navigate(R.id.swipeActionsSettingsFragment, args = null, getAnimatedNavOptions())
+            true
+        }
+        SwipeAction.ARCHIVE -> {
+            descriptionDialog.archiveWithConfirmationPopup(
+                folderRole = folderRole,
+                count = 1,
+                displayLoader = false,
+                onCancel = {
+                    // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
+                    // otherwise it will notify the next item in the list and make it slightly blink
+                    if (threadListAdapter.dataSet.indexOf(thread) == position) threadListAdapter.notifyItemChanged(position)
+                },
+            ) {
+                mainViewModel.archiveThread(thread.uid)
+            }
+        }
+        SwipeAction.DELETE -> {
+            descriptionDialog.deleteWithConfirmationPopup(
+                folderRole = folderRole,
+                count = 1,
+                displayLoader = false,
+                onCancel = {
+                    // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
+                    // otherwise it will notify the next item in the list and make it slightly blink
+                    if (threadListAdapter.dataSet.indexOf(thread) == position) threadListAdapter.notifyItemChanged(position)
+                },
+                callback = {
+                    if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
+                    mainViewModel.deleteThread(thread.uid, isSwipe = true)
+                },
+            )
+        }
+        SwipeAction.FAVORITE -> {
+            mainViewModel.toggleThreadFavoriteStatus(thread.uid)
+            true
+        }
+        SwipeAction.MOVE -> {
+            val navController = findNavController()
+            descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
+                navController.animatedNavigation(
+                    directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(arrayOf(thread.uid)),
+                    currentClassName = javaClass.name,
+                )
+            }
+            true
+        }
+        SwipeAction.QUICKACTIONS_MENU -> {
+            safeNavigate(
+                ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                    threadUid = thread.uid,
+                    shouldLoadDistantResources = false,
+                )
+            )
+            true
+        }
+        SwipeAction.READ_UNREAD -> {
+            mainViewModel.toggleThreadSeenStatus(thread.uid)
+            mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
+        }
+        SwipeAction.SPAM -> {
+            mainViewModel.toggleThreadSpamStatus(thread.uid)
+            false
+        }
+        SwipeAction.SNOOZE -> {
+            val snoozeScheduleType = if (thread.isSnoozed()) {
+                SnoozeScheduleType.Modify(thread.uid)
+            } else {
+                SnoozeScheduleType.Snooze(thread.uid)
+            }
+            navigateToSnoozeBottomSheet(snoozeScheduleType, thread.snoozeEndDate)
+            true
+        }
+        SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
+    }
+
+    private fun LocalSettings.setDefaultSwipeActions() {
+        if (swipeRight == SwipeAction.TUTORIAL) swipeRight = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_RIGHT
+        if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_LEFT
+    }
+}
