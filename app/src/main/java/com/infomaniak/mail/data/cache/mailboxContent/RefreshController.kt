@@ -220,13 +220,34 @@ class RefreshController @Inject constructor(
         if (previousCursor == null) {
             fetchOldMessagesUids(scope, folder)
         } else {
-            fetchActivities(scope, folder, previousCursor)
+            fetchActivities(scope, folder, previousCursor).also { hasTooManyActivities ->
+                if (hasTooManyActivities) {
+                    resetFolder(folder.id)
+                    fetchOldMessagesUids(scope, folder)
+                }
+            }
         }
 
         impactedThreads += fetchAllNewPages(scope, folder.id)
         fetchAllOldPages(scope, folder.id)
 
         return impactedThreads
+    }
+
+    private suspend fun Realm.resetFolder(folderId: String) {
+        write {
+            val folder = getUpToDateFolder(folderId)
+
+            MessageController.deleteMessages(appContext, mailbox, folder.messages(realm = this), realm = this)
+            if (folder.threads.isNotEmpty()) delete(folder.threads)
+
+            folder.lastUpdatedAt = null
+            folder.cursor = null
+            folder.unreadCountLocal = 0
+            folder.oldMessagesUidsToFetch.clear()
+            folder.newMessagesUidsToFetch.clear()
+            folder.remainingOldMessagesToFetch = Utils.NUMBER_OF_OLD_MESSAGES_TO_FETCH
+        }
     }
 
     private suspend fun Realm.extraRefresh(scope: CoroutineScope, folder: Folder) {
@@ -309,18 +330,20 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private suspend fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String) {
+    private suspend fun Realm.fetchActivities(scope: CoroutineScope, folder: Folder, previousCursor: String): Boolean {
 
         val activities = when (folder.role) {
             FolderRole.SNOOZED -> getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
             else -> getMessagesUidsDelta<DefaultMessageFlags>(folder.id, previousCursor)
-        } ?: return
+        } ?: return false
         scope.ensureActive()
 
         val logMessage = "Deleted: ${activities.deletedShortUids.count()} | " +
                 "Updated: ${activities.updatedMessages.count()} | " +
                 "Added: ${activities.addedShortUids.count()}"
         SentryLog.d("API", "$logMessage | ${folder.displayForSentry()}")
+
+        if (hasTooManyActivities(activities)) return true
 
         addSentryBreadcrumbForActivities(logMessage, mailbox.email, folder, activities)
 
@@ -346,6 +369,23 @@ class RefreshController @Inject constructor(
         updateMailboxUnreadCount(inboxUnreadCount)
 
         sendOrphanMessages(folder, previousCursor)
+
+        return false
+    }
+
+    private fun hasTooManyActivities(activities: ActivitiesResult<out MessageFlags>): Boolean = with(activities) {
+
+        val deletedCount = deletedShortUids.count()
+        val updatedCount = updatedMessages.count()
+        val addedCount = addedShortUids.count()
+        val counts = listOf(deletedCount, updatedCount, addedCount)
+
+        return if (counts.any { it > Utils.MAX_DELTA_PER_ACTIVITIES_CALL }) {
+            SentryDebug.sendTooManyActivities(cursor, deletedCount, updatedCount, addedCount)
+            true
+        } else {
+            false
+        }
     }
 
     private suspend fun Realm.fetchAllNewPages(scope: CoroutineScope, folderId: String): Set<Thread> {
