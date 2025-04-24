@@ -441,10 +441,14 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
+    private fun List<Int>.getAtStart(quantity: Int) = subList(0, quantity) to subList(quantity, count())
+
+    private fun List<Int>.getAtEnd(quantity: Int) = subList(count() - quantity, count()) to subList(0, count() - quantity)
+
     private fun computeUids(folder: Folder, direction: Direction): Pair<List<Int>, List<Int>> {
         val allUids = if (direction == Direction.TO_THE_FUTURE) folder.newMessagesUidsToFetch else folder.oldMessagesUidsToFetch
         return if (allUids.count() > Utils.PAGE_SIZE) {
-            allUids.subList(0, Utils.PAGE_SIZE) to allUids.subList(Utils.PAGE_SIZE, allUids.count())
+            if (direction == Direction.TO_THE_FUTURE) allUids.getAtEnd(Utils.PAGE_SIZE) else allUids.getAtStart(Utils.PAGE_SIZE)
         } else {
             allUids to emptyList<Int>().toRealmList()
         }
