@@ -65,9 +65,9 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
-import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -109,7 +109,15 @@ class ThreadListFragment : TwoPaneFragment() {
     private var lastUpdatedDate: Date? = null
     private var previousCustomFolderId: String? = null
 
-    private val showLoadingTimer: CountDownTimer by lazy { UtilsCore.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
+    private val showLoadingTimer: CountDownTimer by lazy {
+        UtilsCore.createRefreshTimer(onTimerFinish = { changeRefreshState(isRefreshing = true) })
+    }
+    private val hideLoadingTimer: CountDownTimer by lazy {
+        UtilsCore.createRefreshTimer(
+            milliseconds = TIME_OUT_LOADER_MS,
+            onTimerFinish = { changeRefreshState(isRefreshing = false) }
+        )
+    }
 
     private var isFirstTimeRefreshingThreads = true
 
@@ -610,8 +618,10 @@ class ThreadListFragment : TwoPaneFragment() {
             .observe(viewLifecycleOwner) { isDownloading ->
                 if (isDownloading) {
                     showLoadingTimer.start()
+                    hideLoadingTimer.start()
                 } else {
                     showLoadingTimer.cancel()
+                    hideLoadingTimer.cancel()
                     binding.swipeRefreshLayout.isRefreshing = false
                 }
             }
@@ -838,8 +848,8 @@ class ThreadListFragment : TwoPaneFragment() {
 
     private fun isCurrentFolderRole(role: FolderRole) = mainViewModel.currentFolder.value?.role == role
 
-    private fun showRefreshLayout() {
-        binding.swipeRefreshLayout.isRefreshing = true
+    private fun changeRefreshState(isRefreshing: Boolean) {
+        binding.swipeRefreshLayout.isRefreshing = isRefreshing
     }
 
     private fun showErrorShareUrl() {
@@ -859,5 +869,7 @@ class ThreadListFragment : TwoPaneFragment() {
 
     companion object {
         private const val WEBVIEW_PACKAGE_NAME = "com.google.android.webview"
+
+        private const val TIME_OUT_LOADER_MS = 30_000L
     }
 }
