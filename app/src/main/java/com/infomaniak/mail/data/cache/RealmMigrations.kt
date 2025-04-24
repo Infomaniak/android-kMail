@@ -27,6 +27,7 @@ import io.realm.kotlin.dynamic.getValue
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 import io.realm.kotlin.types.RealmInstant
+import io.realm.kotlin.types.RealmList
 
 private const val TAG = "RealmMigrations"
 
@@ -220,6 +221,9 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndT
 
                 val messages = newThread.getObjectList(propertyName = "messages")
                 messages.sortBy { it.getValue<RealmInstant>("internalDate") }
+
+                setIsAnsweredAndIsForwarded(messages, newThread)
+
                 val lastMessage = messages.lastOrNull { it.getValue<String>("folderId") == threadFolderId }
 
                 val isSnoozed = if (lastMessage == null) {
@@ -230,16 +234,43 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndT
                     val snoozeEndDate = lastMessage.getNullableValue<RealmInstant>("snoozeEndDate")
                     val snoozeUuid = lastMessage.getNullableValue<String>("snoozeUuid")
 
+                    newThread.set(propertyName = "_snoozeState", value = snoozeState)
+                    newThread.set(propertyName = "snoozeEndDate", value = snoozeEndDate)
+                    newThread.set(propertyName = "snoozeUuid", value = snoozeUuid)
+
+                    newThread.set(propertyName = "displayDate", value = lastMessage.getValue<RealmInstant>("displayDate"))
+                    newThread.set(propertyName = "internalDate", value = lastMessage.getValue<RealmInstant>("internalDate"))
+                    newThread.set(propertyName = "subject", value = newThread.getNullableValue<String>("subject"))
+
                     snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
                 }
 
                 newThread.set(propertyName = "isLastInboxMessageSnoozed", value = isSnoozed)
-                
-                newThread.set(propertyName = "displayDate", value = lastMessage?.getValue<RealmInstant>("displayDate"))
-                newThread.set(propertyName = "internalDate", value = lastMessage?.getValue<RealmInstant>("internalDate"))
             }
         }
     }
+}
+
+private fun setIsAnsweredAndIsForwarded(
+    messages: RealmList<DynamicMutableRealmObject>,
+    newThread: DynamicMutableRealmObject,
+) {
+    var isAnswered = false
+    var isForwarded = false
+
+    messages.forEach { message ->
+        if (message.getValue<Boolean>("isAnswered")) {
+            isAnswered = true
+            isForwarded = false
+        }
+        if (message.getValue<Boolean>("isForwarded")) {
+            isAnswered = false
+            isForwarded = true
+        }
+    }
+
+    newThread.set(propertyName = "isAnswered", value = isAnswered)
+    newThread.set(propertyName = "isForwarded", value = isForwarded)
 }
 //endregion
 
