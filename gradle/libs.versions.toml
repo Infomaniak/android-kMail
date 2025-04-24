@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.8.1"
+androidGradlePlugin = "8.8.2"
 coilSvg = "2.7.0"
 compose = "1.7.8"
 dotsindicator = "5.1.0"
@@ -12,13 +12,12 @@ hiltAndroidx = "1.2.0"
 jsoup = "1.19.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-kapt = "2.0.21"
-kotlin = "2.0.21"
-ksp = "2.0.21-1.0.28"
+kotlin = "2.0.21" # Keep the same version as the one in Core
+ksp = "2.0.21-1.0.28" # Keep the same version as the one in Core
 leakcanaryAndroid = "2.12"
 lifecycleProcess = "2.8.7"
 lottie = "6.6.6"
-navigation = "2.8.7"
+navigation = "2.8.9"
 playServices = "18.6.0"
 realmKotlin = "3.0.0"
 richHtmlEditor = "0.2.0"
@@ -61,6 +60,6 @@ android-library = { id = "com.android.library", version.ref = "androidGradlePlug
 dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 realm-kotlin = { id = "io.realm.kotlin", version.ref = "realmKotlin" }
