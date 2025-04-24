@@ -277,6 +277,15 @@ object SentryDebug {
         }
     }
 
+    fun sendTooManyActivities(cursor: String, deletedCount: Int, updatedCount: Int, addedCount: Int) {
+        Sentry.captureMessage("tooManyDiffs", SentryLevel.INFO) { scope ->
+            scope.setExtra("cursor", cursor)
+            scope.setExtra("deletedCount", "$deletedCount")
+            scope.setExtra("updatedCount", "$updatedCount")
+            scope.setExtra("addedCount", "$addedCount")
+        }
+    }
+
     fun sendOverScrolledMessage(clientWidth: Int, scrollWidth: Int, messageUid: String) {
         Sentry.captureMessage("When resizing the mail with js, after zooming, it can still scroll.", SentryLevel.ERROR) { scope ->
             scope.setTag("messageUid", messageUid)
