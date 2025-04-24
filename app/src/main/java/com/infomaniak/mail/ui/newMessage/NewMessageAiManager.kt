@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
@@ -203,8 +202,8 @@ class NewMessageAiManager @Inject constructor(
     }
 
     fun observeAiFeatureFlagUpdates() {
-        newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
-            val isAiEnabled = mailbox.featureFlags.contains(FeatureFlag.AI)
+        newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
+            val isAiEnabled = featureFlags.contains(FeatureFlag.AI)
             binding.editorAi.isVisible = isAiEnabled
             if (isAiEnabled) navigateToDiscoveryBottomSheetIfFirstTime()
         }

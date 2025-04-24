@@ -176,9 +176,7 @@ class SearchFragment : TwoPaneFragment() {
 
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
 
-                override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = {
-                    mainViewModel.currentMailboxLive.value?.featureFlags
-                }
+                override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
             },
         )
 

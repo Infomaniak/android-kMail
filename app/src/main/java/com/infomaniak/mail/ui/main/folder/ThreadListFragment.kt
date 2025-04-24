@@ -267,7 +267,7 @@ class ThreadListFragment : TwoPaneFragment() {
         unlockSwipeActionsIfSet()
 
         // Manually update disabled states in case LocalSettings have changed when coming back from settings
-        val featureFlags = mainViewModel.currentMailbox.value?.featureFlags ?: return
+        val featureFlags = mainViewModel.featureFlagsLive.value ?: return
         val folderRole = mainViewModel.currentFolderLive.value?.role ?: return
         updateDisabledSwipeActionsUi(featureFlags, folderRole)
     }
@@ -341,9 +341,7 @@ class ThreadListFragment : TwoPaneFragment() {
 
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
 
-                override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = {
-                    mainViewModel.currentMailboxLive.value?.featureFlags
-                }
+                override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
             },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
@@ -473,7 +471,7 @@ class ThreadListFragment : TwoPaneFragment() {
         isPermanentDeleteFolder: Boolean,
     ): Boolean = with(mainViewModel) {
         val folderRole = thread.folder.role
-        if (!swipeAction.canDisplay(folderRole, currentMailboxLive.value?.featureFlags, localSettings)) {
+        if (!swipeAction.canDisplay(folderRole, featureFlagsLive.value, localSettings)) {
             snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
             return@with true
         }

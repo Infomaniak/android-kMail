@@ -61,7 +61,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         val actionResId = navigationArgs.titleResId
         root.setTitle(actionResId)
 
-        snooze.isVisible = SharedUtils.isSnoozeAvailable(mainViewModel.currentMailboxLive.value?.featureFlags, localSettings)
+        snooze.isVisible = SharedUtils.isSnoozeAvailable(mainViewModel.featureFlagsLive.value, localSettings)
 
         radioGroup.apply {
             initBijectionTable(
