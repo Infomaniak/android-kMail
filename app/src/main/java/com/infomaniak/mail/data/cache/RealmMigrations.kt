@@ -27,7 +27,6 @@ import io.realm.kotlin.dynamic.getValue
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.migration.AutomaticSchemaMigration.MigrationContext
 import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
 
 private const val TAG = "RealmMigrations"
 
@@ -222,8 +221,6 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndT
                 val messages = newThread.getObjectList(propertyName = "messages")
                 messages.sortBy { it.getValue<RealmInstant>("internalDate") }
 
-                setIsAnsweredAndIsForwarded(messages, newThread)
-
                 val lastMessage = messages.lastOrNull { it.getValue<String>("folderId") == threadFolderId }
 
                 val isSnoozed = if (lastMessage == null) {
@@ -234,17 +231,12 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndT
                     val snoozeEndDate = lastMessage.getNullableValueOrRecover<RealmInstant>("snoozeEndDate", recovery = { null })
                     val snoozeUuid = lastMessage.getNullableValueOrRecover<String>("snoozeUuid", recovery = { null })
 
-                    newThread.set(propertyName = "_snoozeState", value = snoozeState)
-                    newThread.set(propertyName = "snoozeEndDate", value = snoozeEndDate)
-                    newThread.set(propertyName = "snoozeUuid", value = snoozeUuid)
-
                     lastMessage.getValueOrNull<RealmInstant>("displayDate")?.let { displayDate ->
                         newThread.set(propertyName = "displayDate", value = displayDate)
                     }
                     lastMessage.getValueOrNull<RealmInstant>("internalDate")?.let { internalDate ->
                         newThread.set(propertyName = "internalDate", value = internalDate)
                     }
-                    newThread.set(propertyName = "subject", value = newThread.getNullableValue<String>("subject"))
 
                     snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
                 }
@@ -253,28 +245,6 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndT
             }
         }
     }
-}
-
-private fun setIsAnsweredAndIsForwarded(
-    messages: RealmList<DynamicMutableRealmObject>,
-    newThread: DynamicMutableRealmObject,
-) {
-    var isAnswered = false
-    var isForwarded = false
-
-    messages.forEach { message ->
-        if (message.getValue<Boolean>("isAnswered")) {
-            isAnswered = true
-            isForwarded = false
-        }
-        if (message.getValue<Boolean>("isForwarded")) {
-            isAnswered = false
-            isForwarded = true
-        }
-    }
-
-    newThread.set(propertyName = "isAnswered", value = isAnswered)
-    newThread.set(propertyName = "isForwarded", value = isForwarded)
 }
 //endregion
 
