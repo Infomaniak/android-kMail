@@ -259,9 +259,7 @@ class ThreadAdapter(
 
     override fun onViewRecycled(holder: ThreadAdapterViewHolder) {
         super.onViewRecycled(holder)
-        if (holder is MessageViewHolder) {
-            holder.onViewRecycled()
-        }
+        if (holder is MessageViewHolder) holder.onViewRecycled()
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) = with(threadAdapterState) {
