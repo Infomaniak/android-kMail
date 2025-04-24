@@ -441,9 +441,9 @@ class RefreshController @Inject constructor(
         return impactedThreads
     }
 
-    private fun List<Int>.getAtStart(size: Int) = subList(0, size) to subList(size, count())
+    private fun List<Int>.getAtStart(quantity: Int) = subList(0, quantity) to subList(quantity, count())
 
-    private fun List<Int>.getAtEnd(size: Int) = subList(count() - size, count()) to subList(0, count() - size)
+    private fun List<Int>.getAtEnd(quantity: Int) = subList(count() - quantity, count()) to subList(0, count() - quantity)
 
     private fun computeUids(folder: Folder, direction: Direction): Pair<List<Int>, List<Int>> {
         val allUids = if (direction == Direction.TO_THE_FUTURE) folder.newMessagesUidsToFetch else folder.oldMessagesUidsToFetch
