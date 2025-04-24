@@ -47,12 +47,14 @@ import com.infomaniak.mail.MatomoMail.ACTION_FORWARD_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.CUSTOM_SCHEDULE_CONFIRM
 import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBlockUserAction
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
+import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.MatomoMail.trackThreadActionsEvent
 import com.infomaniak.mail.R
@@ -586,6 +588,7 @@ class ThreadFragment : Fragment() {
             dateAndTimeScheduleDialog.show(
                 positiveButtonResId = R.string.buttonModify,
                 onDateSelected = { timestamp ->
+                    trackScheduleSendEvent(CUSTOM_SCHEDULE_CONFIRM)
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
                     mainViewModel.rescheduleDraft(Date(timestamp))
                 },
@@ -605,6 +608,7 @@ class ThreadFragment : Fragment() {
             dateAndTimeSnoozeDialog.show(
                 positiveButtonResId = twoPaneViewModel.snoozeScheduleType?.positiveButtonResId,
                 onDateSelected = { timestamp ->
+                    trackSnoozeEvent(CUSTOM_SCHEDULE_CONFIRM)
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
                     executeSavedSnoozeScheduleType(timestamp)
                 },
