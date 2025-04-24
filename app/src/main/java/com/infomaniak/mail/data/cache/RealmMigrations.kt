@@ -230,16 +230,20 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndT
                     // Defaulting to `false` only means that this thread won't be automatically unsnoozed until it's recomputed
                     false
                 } else {
-                    val snoozeState = lastMessage.getNullableValue<String>("_snoozeState")
-                    val snoozeEndDate = lastMessage.getNullableValue<RealmInstant>("snoozeEndDate")
-                    val snoozeUuid = lastMessage.getNullableValue<String>("snoozeUuid")
+                    val snoozeState = lastMessage.getNullableValueOrRecover<String>("_snoozeState", recovery = { null })
+                    val snoozeEndDate = lastMessage.getNullableValueOrRecover<RealmInstant>("snoozeEndDate", recovery = { null })
+                    val snoozeUuid = lastMessage.getNullableValueOrRecover<String>("snoozeUuid", recovery = { null })
 
                     newThread.set(propertyName = "_snoozeState", value = snoozeState)
                     newThread.set(propertyName = "snoozeEndDate", value = snoozeEndDate)
                     newThread.set(propertyName = "snoozeUuid", value = snoozeUuid)
 
-                    newThread.set(propertyName = "displayDate", value = lastMessage.getValue<RealmInstant>("displayDate"))
-                    newThread.set(propertyName = "internalDate", value = lastMessage.getValue<RealmInstant>("internalDate"))
+                    lastMessage.getValueOrNull<RealmInstant>("displayDate")?.let { displayDate ->
+                        newThread.set(propertyName = "displayDate", value = displayDate)
+                    }
+                    lastMessage.getValueOrNull<RealmInstant>("internalDate")?.let { internalDate ->
+                        newThread.set(propertyName = "internalDate", value = internalDate)
+                    }
                     newThread.set(propertyName = "subject", value = newThread.getNullableValue<String>("subject"))
 
                     snoozeState == SnoozeState.Snoozed.apiValue && snoozeEndDate != null && snoozeUuid != null
@@ -299,5 +303,21 @@ private inline fun <reified T : Any> DynamicRealmObject.getNullableValueOrRecove
         if (it !is IllegalArgumentException) SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
 
         recovery()
+    }
+}
+
+/**
+ * Tries to get read [fieldName] but if the value is not in the [DynamicRealmObject], instead of crashing, fallback to an
+ * alternative recovery method to get the expected value.
+ *
+ * Used for when we can be migrating from versions of the model that might never have had [fieldName] initialized.
+ */
+private inline fun <reified T : Any> DynamicRealmObject.getValueOrNull(fieldName: String): T? {
+    return runCatching {
+        getValue<T>(fieldName)
+    }.getOrElse {
+        if (it !is IllegalArgumentException) SentryLog.e(TAG, "Unexpected exception thrown during realm migration", it)
+
+        null
     }
 }
