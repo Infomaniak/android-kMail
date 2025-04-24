@@ -261,7 +261,7 @@ private fun DynamicMutableRealmObject.setIfPropertyExists(propertyName: String, 
 }
 
 /**
- * Tries to get read [fieldName] but if the value is not in the [DynamicRealmObject], instead of crashing, fallback to an
+ * Tries to read [fieldName] but if the value is not in the [DynamicRealmObject], instead of crashing, fallback to an
  * alternative recovery method to get the expected value.
  *
  * Used for when we can be migrating from versions of the model that might never have had [fieldName] initialized.
@@ -277,7 +277,7 @@ private inline fun <reified T : Any> DynamicRealmObject.getNullableValueOrRecove
 }
 
 /**
- * Tries to get read [fieldName] but if the value is not in the [DynamicRealmObject], instead of crashing, fallback to an
+ * Tries to read [fieldName] but if the value is not in the [DynamicRealmObject], instead of crashing, fallback to an
  * alternative recovery method to get the expected value.
  *
  * Used for when we can be migrating from versions of the model that might never have had [fieldName] initialized.
