@@ -48,7 +48,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.initializeInternalDateAsDateAfterTwentySecondMigration()
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
     migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
-    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration()
+    migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration()
 }
 
 // Migrate to version #1
@@ -208,10 +208,11 @@ private val lastUuidRegex = Regex("""$UUID_PATTERN(?!.*$UUID_PATTERN)""", RegexO
 private fun String.lastUuidOrNull() = lastUuidRegex.find(this)?.value
 //endregion
 
-// Migrate from version #27
-private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigration() {
+// Migrate from version #27 or #28
+// Bumping to schema 29 required to recompute the Thread object again. If already done for schema 28, no need to do it twice
+private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration() {
 
-    if (oldRealm.schemaVersion() <= 27L) {
+    if (oldRealm.schemaVersion() <= 28L) {
         enumerate(className = "Thread") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
             newObject?.let { newThread ->
                 // Initialize new property by computing it based on other fields
@@ -233,6 +234,9 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhMigr
                 }
 
                 newThread.set(propertyName = "isLastInboxMessageSnoozed", value = isSnoozed)
+                
+                newThread.set(propertyName = "displayDate", value = lastMessage?.getValue<RealmInstant>("displayDate"))
+                newThread.set(propertyName = "internalDate", value = lastMessage?.getValue<RealmInstant>("internalDate"))
             }
         }
     }
