@@ -295,6 +295,10 @@
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="errorMailboxLocked">Cette adresse est bloquée</string>
     <string name="errorMailboxPasswordLength">Le mot de passe doit comporter entre 6 et 80 caractères</string>
+    <string name="errorMaxNumberOfScheduledSnoozeReached">Vous avez atteint le nombre maximal de mises en attente programmées</string>
+    <string name="errorMessageCannotBeSnoozed">Ce message ne peut pas être mis en attente</string>
+    <string name="errorMessageNotSnoozed">Ce message n’est pas mis en attente</string>
+    <string name="errorMessageSnoozeAlreadyScheduled">Une mise en attente est déjà programmée pour ce message</string>
     <string name="errorMoveDestinationNotFound">Le dossier de destination n’existe pas</string>
     <string name="errorNewFolderAlreadyExists">Le dossier existe déjà</string>
     <string name="errorNewFolderInvalidCharacter">Le nom du dossier comporte des caractères invalides</string>

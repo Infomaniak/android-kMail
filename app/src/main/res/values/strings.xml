@@ -299,6 +299,10 @@
     <string name="errorLoginTitle">Login error</string>
     <string name="errorMailboxLocked">This mailbox is locked</string>
     <string name="errorMailboxPasswordLength">The password must be between 6 and 80 characters</string>
+    <string name="errorMaxNumberOfScheduledSnoozeReached">You’ve reached the maximum number of scheduled snoozes</string>
+    <string name="errorMessageCannotBeSnoozed">This message cannot be snoozed</string>
+    <string name="errorMessageNotSnoozed">This message is not currently snoozed</string>
+    <string name="errorMessageSnoozeAlreadyScheduled">A snooze is already scheduled for this message</string>
     <string name="errorMoveDestinationNotFound">The destination folder does not exist</string>
     <string name="errorNewFolderAlreadyExists">The folder already exists</string>
     <string name="errorNewFolderInvalidCharacter">The folder name contains invalid characters</string>

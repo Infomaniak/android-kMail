@@ -293,6 +293,10 @@
     <string name="errorLoginTitle">Errore di accesso</string>
     <string name="errorMailboxLocked">Questo indirizzo e-mail è bloccato</string>
     <string name="errorMailboxPasswordLength">La password deve essere compresa tra 6 e 80 caratteri</string>
+    <string name="errorMaxNumberOfScheduledSnoozeReached">Hai raggiunto il numero massimo di posticipi programmati</string>
+    <string name="errorMessageCannotBeSnoozed">Questo messaggio non può essere posticipato</string>
+    <string name="errorMessageNotSnoozed">Questo messaggio non è stato posticipato</string>
+    <string name="errorMessageSnoozeAlreadyScheduled">Questo messaggio ha già un posticipo programmato</string>
     <string name="errorMoveDestinationNotFound">La cartella di destinazione è inesistente</string>
     <string name="errorNewFolderAlreadyExists">La cartella è già esistente</string>
     <string name="errorNewFolderInvalidCharacter">Il nome della cartella contiene caratteri non validi</string>
