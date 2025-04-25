@@ -20,7 +20,6 @@ package com.infomaniak.mail.utils
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -224,11 +223,8 @@ class SharedUtils @Inject constructor(
             impactedFolders: ImpactedFolders,
         ): BatchSnoozeResult {
             return if (snoozeUuids.count() == 1) {
-                val apiResponse = ApiRepository.rescheduleSnoozedThread(mailboxUuid, snoozeUuids.single(), newDate)
-                when {
-                    apiResponse.isSuccess() -> BatchSnoozeResult.Success(impactedFolders)
-                    else -> BatchSnoozeResult.Error.ApiError(apiResponse.translateError())
-                }
+                val snoozeUuid = snoozeUuids.single()
+                ApiRepository.rescheduleSnoozedThread(mailboxUuid, snoozeUuid, newDate).computeSnoozeResult(impactedFolders)
             } else {
                 ApiRepository.rescheduleSnoozedThreads(mailboxUuid, snoozeUuids, newDate).computeSnoozeResult(impactedFolders)
             }
@@ -240,11 +236,7 @@ class SharedUtils @Inject constructor(
          */
         fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>, impactedFolders: ImpactedFolders): BatchSnoozeResult {
             return if (snoozeUuids.count() == 1) {
-                val apiResponse = ApiRepository.unsnoozeThread(mailboxUuid, snoozeUuids.single())
-                when {
-                    apiResponse.isSuccess() -> BatchSnoozeResult.Success(impactedFolders)
-                    else -> BatchSnoozeResult.Error.ApiError(apiResponse.translateError())
-                }
+                ApiRepository.unsnoozeThread(mailboxUuid, snoozeUuids.single()).computeSnoozeResult(impactedFolders)
             } else {
                 ApiRepository.unsnoozeThreads(mailboxUuid, snoozeUuids).computeSnoozeResult(impactedFolders)
             }
