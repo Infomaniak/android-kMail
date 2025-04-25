@@ -46,9 +46,11 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.richhtmleditor.StatusCommand.*
+import com.infomaniak.mail.MatomoMail.CUSTOM_SCHEDULE_CONFIRM
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
+import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ExternalContent
@@ -223,6 +225,7 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
+                    trackScheduleSendEvent(CUSTOM_SCHEDULE_CONFIRM)
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
                     scheduleDraft(timestamp)
                 },

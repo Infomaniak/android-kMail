@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
+import androidx.annotation.IntRange
 import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -32,11 +33,15 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.MIN_SELECTABLE_DATE_MINUTES
+import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.*
+import com.infomaniak.mail.ui.bottomSheetDialogs.RelativeDay.*
+import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleOption.*
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView
 import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import java.util.Calendar
 import java.util.Date
+import kotlin.time.Duration.Companion.minutes
 
 abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
 
@@ -88,8 +93,8 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun createCommonScheduleOptions() {
-        val currentTime = TimeToDisplay.getTimeToDisplayFromDate()
-        ScheduleOption.entries.forEach { scheduleOption ->
+        val currentTime = Date()
+        WeekPeriod.getCurrent().scheduleOptions.forEach { scheduleOption ->
             if (scheduleOption.canBeDisplayedAt(currentTime) && scheduleOption.isNotAlreadySelected()) {
                 binding.scheduleOptions.addView(createScheduleOptionItem(scheduleOption))
             }
@@ -122,87 +127,52 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     private fun ScheduleOption.isNotAlreadySelected() = date().isNotAlreadySelected()
 }
 
-enum class TimeToDisplay {
-    NIGHT,
-    MORNING,
-    AFTERNOON,
-    EVENING,
-    WEEKEND;
-
-    companion object {
-        fun getTimeToDisplayFromDate(): TimeToDisplay {
-            val now = Date()
-            val timeSlot = Date(now.time)
-            return if (now.isWeekend()) {
-                WEEKEND
-            } else {
-                when (now) {
-                    in timeSlot.setHour(7).setMinute(55)..timeSlot.setHour(13).setMinute(54) -> MORNING
-                    in timeSlot.setHour(13).setMinute(55)..timeSlot.setHour(17).setMinute(54) -> AFTERNOON
-                    in timeSlot.setHour(17).setMinute(55)..timeSlot.setHour(23).setMinute(54) -> EVENING
-                    else -> NIGHT // Between 23:55 and 7:54, inclusive
-                }
-            }
-        }
-    }
-}
+private val HIDE_INTERVAL = 5.minutes // Beware: the API refuses schedules smaller than 5 minutes
 
 enum class ScheduleOption(
+    private val day: RelativeDay,
+    private val hour: HourOfTheDay,
     @StringRes val titleRes: Int,
     @DrawableRes val iconRes: Int,
-    val date: () -> Date,
-    private val timeToDisplay: List<TimeToDisplay>,
     val matomoValue: String,
 ) {
-    LATER_THIS_MORNING(
-        R.string.laterThisMorning,
-        R.drawable.ic_morning_sunrise_schedule,
-        { Date().getMorning() },
-        listOf(TimeToDisplay.NIGHT),
-        "laterThisMorning",
-    ),
-    MONDAY_MORNING(
-        R.string.mondayMorning,
-        R.drawable.ic_morning_schedule,
-        { Date().getNextMonday().getMorning() },
-        listOf(TimeToDisplay.WEEKEND),
-        "nextMondayMorning",
-    ),
-    MONDAY_AFTERNOON(
-        R.string.mondayAfternoon,
-        R.drawable.ic_afternoon_schedule,
-        { Date().getNextMonday().getAfternoon() },
-        listOf(TimeToDisplay.WEEKEND),
-        "nextMondayAfternoon",
-    ),
-    THIS_AFTERNOON(
-        R.string.thisAfternoon,
-        R.drawable.ic_afternoon_schedule,
-        { Date().getAfternoon() },
-        listOf(TimeToDisplay.MORNING),
-        "thisAfternoon",
-    ),
-    THIS_EVENING(
-        R.string.thisEvening,
-        R.drawable.ic_evening_schedule,
-        { Date().getEvening() },
-        listOf(TimeToDisplay.AFTERNOON),
-        "thisEvening",
-    ),
-    TOMORROW_MORNING(
-        R.string.tomorrowMorning,
-        R.drawable.ic_morning_schedule,
-        { Date().tomorrow().getMorning() },
-        listOf(TimeToDisplay.NIGHT, TimeToDisplay.MORNING, TimeToDisplay.AFTERNOON, TimeToDisplay.EVENING),
-        "tomorrowMorning",
-    ),
-    NEXT_MONDAY(
-        R.string.nextMonday,
-        R.drawable.ic_arrow_return,
-        { Date().getNextMonday().getMorning() },
-        listOf(TimeToDisplay.NIGHT, TimeToDisplay.MORNING, TimeToDisplay.AFTERNOON, TimeToDisplay.EVENING),
-        "nextMonday",
-    );
+    LaterThisMorning(Today, Morning, R.string.laterThisMorning, R.drawable.ic_morning_sunrise_schedule, "laterThisMorning"),
+    ThisAfternoon(Today, Afternoon, R.string.thisAfternoon, R.drawable.ic_afternoon_schedule, "thisAfternoon"),
+    ThisEvening(Today, Evening, R.string.thisEvening, R.drawable.ic_evening_schedule, "thisEvening"),
+    TomorrowMorning(Tomorrow, Morning, R.string.tomorrowMorning, R.drawable.ic_morning_schedule, "tomorrowMorning"),
+    NextMondayMorning(NextMonday, Morning, R.string.nextMonday, R.drawable.ic_arrow_return, "nextMonday"),
 
-    fun canBeDisplayedAt(timeToDisplay: TimeToDisplay): Boolean = timeToDisplay in this.timeToDisplay
+    MondayMorning(NextMonday, Morning, R.string.mondayMorning, R.drawable.ic_morning_schedule, "nextMondayMorning"),
+    MondayAfternoon(NextMonday, Afternoon, R.string.mondayAfternoon, R.drawable.ic_afternoon_schedule, "nextMondayAfternoon");
+
+    fun date(): Date = day.getDate().getTimeAtHour(hour.hourOfTheDay)
+    fun canBeDisplayedAt(date: Date): Boolean = date.time < minimalDisplayTime()
+    private fun minimalDisplayTime() = date().time - HIDE_INTERVAL.inWholeMilliseconds
+}
+
+private enum class RelativeDay(val getDate: () -> Date) {
+    Today({ Date() }),
+    Tomorrow({ Date().tomorrow() }),
+    NextMonday({ Date().getNextMonday() }),
+}
+
+private enum class HourOfTheDay(@IntRange(0, 23) val hourOfTheDay: Int) {
+    Morning(8),
+    Afternoon(14),
+    Evening(18),
+}
+
+/**
+ * Represents a period inside the current week. In other words, a timeframe used to group relevant schedule options based on when
+ * they should be displayed.
+ *
+ * @param scheduleOptions The available schedule options that can be displayed to the user during each period
+ */
+private enum class WeekPeriod(vararg val scheduleOptions: ScheduleOption) {
+    Weekday(LaterThisMorning, ThisAfternoon, ThisEvening, TomorrowMorning, NextMondayMorning),
+    Weekend(MondayMorning, MondayAfternoon);
+
+    companion object {
+        fun getCurrent(): WeekPeriod = if (Date().isWeekend()) Weekend else Weekday
+    }
 }

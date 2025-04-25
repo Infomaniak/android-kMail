@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.mail.MatomoMail.CUSTOM_SCHEDULE
 import com.infomaniak.mail.MatomoMail.LAST_SELECTED_SCHEDULE
 import com.infomaniak.mail.MatomoMail.SCHEDULED_CUSTOM_DATE
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
@@ -57,6 +58,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
         if (navigationArgs.isCurrentMailboxFree) {
             openMyKSuiteUpgradeBottomSheet(SCHEDULED_CUSTOM_DATE)
         } else {
+            trackScheduleSendEvent(CUSTOM_SCHEDULE)
             setBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER, true)
         }
     }

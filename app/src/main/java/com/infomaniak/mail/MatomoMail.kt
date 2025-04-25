@@ -69,7 +69,10 @@ object MatomoMail : MatomoCore {
     const val SEARCH_VALIDATE_NAME = "validateSearch"
     const val SWITCH_MAILBOX_NAME = "switchMailbox"
     const val LAST_SELECTED_SCHEDULE = "lastSelectedSchedule"
+    const val CUSTOM_SCHEDULE = "customSchedule"
+    const val CUSTOM_SCHEDULE_CONFIRM = "customScheduleConfirm"
     const val SCHEDULED_CUSTOM_DATE = "scheduledCustomDate"
+    const val SNOOZE_CUSTOM_DATE = "snoozeCustomDate"
     //endregion
 
     @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build
