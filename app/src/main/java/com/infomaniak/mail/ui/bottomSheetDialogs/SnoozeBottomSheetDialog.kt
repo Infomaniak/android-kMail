@@ -56,9 +56,9 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
 
     override fun onCustomScheduleOptionClicked() {
         if (navigationArgs.isCurrentMailboxFree) {
-            trackSnoozeEvent(CUSTOM_SCHEDULE)
             openMyKSuiteUpgradeBottomSheet(SNOOZE_CUSTOM_DATE)
         } else {
+            trackSnoozeEvent(CUSTOM_SCHEDULE)
             setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)
         }
     }

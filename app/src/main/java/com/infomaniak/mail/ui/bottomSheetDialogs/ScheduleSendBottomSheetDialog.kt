@@ -56,9 +56,9 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
 
     override fun onCustomScheduleOptionClicked() {
         if (navigationArgs.isCurrentMailboxFree) {
-            trackScheduleSendEvent(CUSTOM_SCHEDULE)
             openMyKSuiteUpgradeBottomSheet(SCHEDULED_CUSTOM_DATE)
         } else {
+            trackScheduleSendEvent(CUSTOM_SCHEDULE)
             setBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER, true)
         }
     }
