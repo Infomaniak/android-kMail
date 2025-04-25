@@ -68,6 +68,7 @@ import com.infomaniak.core.utils.startOfTheWeek
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.removeAccents
@@ -294,7 +295,7 @@ inline fun <reified T> ApiResponse<T>.getApiException(): Exception {
 
 fun List<ApiResponse<*>>.atLeastOneSucceeded(): Boolean = any { it.isSuccess() }
 
-fun List<ApiResponse<*>>.getFirstTranslatedError(): Int? = firstOrNull { it.isSuccess().not() }?.translatedError
+fun List<ApiResponse<*>>.getFirstTranslatedError(): Int? = firstOrNull { it.isSuccess().not() }?.translateError()
 
 fun List<ApiResponse<*>>.allFailed(): Boolean = none { it.isSuccess() }
 //endregion

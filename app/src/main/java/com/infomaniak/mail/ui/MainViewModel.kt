@@ -46,7 +46,6 @@ import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.computeSnoozeResult
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -1187,8 +1186,12 @@ class MainViewModel @Inject constructor(
     }
 
     private fun rescheduleSnoozedThreads(currentMailbox: Mailbox, snoozeUuids: List<String>, date: Date): BatchSnoozeResult {
-        val responses = ApiRepository.rescheduleSnoozedThreads(currentMailbox.uuid, snoozeUuids, date)
-        return responses.computeSnoozeResult(ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)))
+        return SharedUtils.rescheduleSnoozedThreads(
+            mailboxUuid = currentMailbox.uuid,
+            snoozeUuids = snoozeUuids,
+            newDate = date,
+            impactedFolders = ImpactedFolders(mutableSetOf(FolderRole.SNOOZED)),
+        )
     }
 
     private fun getRescheduleSnoozedErrorMessage(errorResult: BatchSnoozeResult.Error): String {

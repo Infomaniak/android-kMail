@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -53,6 +54,7 @@ import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
+import java.util.Date
 import javax.inject.Inject
 
 class SharedUtils @Inject constructor(
@@ -212,6 +214,43 @@ class SharedUtils @Inject constructor(
         }
 
         /**
+         * Will manually switch to the single uuid api call when batching over a single message. This is needed to receive api
+         * errors from the api, because batches will never return api errors for now.
+         */
+        fun rescheduleSnoozedThreads(
+            mailboxUuid: String,
+            snoozeUuids: List<String>,
+            newDate: Date,
+            impactedFolders: ImpactedFolders,
+        ): BatchSnoozeResult {
+            return if (snoozeUuids.count() == 1) {
+                val apiResponse = ApiRepository.rescheduleSnoozedThread(mailboxUuid, snoozeUuids.single(), newDate)
+                when {
+                    apiResponse.isSuccess() -> BatchSnoozeResult.Success(impactedFolders)
+                    else -> BatchSnoozeResult.Error.ApiError(apiResponse.translateError())
+                }
+            } else {
+                ApiRepository.rescheduleSnoozedThreads(mailboxUuid, snoozeUuids, newDate).computeSnoozeResult(impactedFolders)
+            }
+        }
+
+        /**
+         * Will manually switch to the single uuid api call when batching over a single message. This is needed to receive api
+         * errors from the api, because batches will never return api errors for now.
+         */
+        fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>, impactedFolders: ImpactedFolders): BatchSnoozeResult {
+            return if (snoozeUuids.count() == 1) {
+                val apiResponse = ApiRepository.unsnoozeThread(mailboxUuid, snoozeUuids.single())
+                when {
+                    apiResponse.isSuccess() -> BatchSnoozeResult.Success(impactedFolders)
+                    else -> BatchSnoozeResult.Error.ApiError(apiResponse.translateError())
+                }
+            } else {
+                ApiRepository.unsnoozeThreads(mailboxUuid, snoozeUuids).computeSnoozeResult(impactedFolders)
+            }
+        }
+
+        /**
          * When manually unsnoozing threads, we need to know if a thread we've tried to unsnoozed failed to be unsnoozed because
          * of a unrecoverable reason. This way we can stop trying to unsnooze it again and again. To know this, we need to use the
          * api call that takes a single snooze uuid or we won't get the ApiResponse's error code that we need to detect this case.
@@ -262,13 +301,14 @@ class SharedUtils @Inject constructor(
 
             if (snoozeUuids.isEmpty()) return BatchSnoozeResult.Error.Unknown
 
-            val apiResponses = ApiRepository.unsnoozeThreads(mailbox.uuid, snoozeUuids)
-            scope?.ensureActive()
-
             // When removing the snooze state of a thread, we absolutely need to refresh the snooze folder. Refreshing the
             // snooze folder is the only way of updating the snooze status of messages. The folder snooze will never be
             // returned inside impactedFolders because no message ever mentions the snooze folder, we need to add it manually.
-            return apiResponses.computeSnoozeResult(ImpactedFolders(impactedFolderIds, mutableSetOf(FolderRole.SNOOZED)))
+            return unsnoozeThreads(
+                mailboxUuid = mailbox.uuid,
+                snoozeUuids = snoozeUuids,
+                impactedFolders = ImpactedFolders(impactedFolderIds, mutableSetOf(FolderRole.SNOOZED))
+            )
         }
 
         fun shouldDisplaySnoozeActions(
