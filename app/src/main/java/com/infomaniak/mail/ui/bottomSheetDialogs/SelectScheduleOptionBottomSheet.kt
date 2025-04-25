@@ -127,7 +127,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     private fun ScheduleOption.isNotAlreadySelected() = date().isNotAlreadySelected()
 }
 
-private val SCHEDULE_MARGIN = 5.minutes
+private val HIDE_INTERVAL = 5.minutes // No smaller than 5 minutes
 
 enum class ScheduleOption(
     private val day: RelativeDay,
@@ -146,7 +146,8 @@ enum class ScheduleOption(
     MondayAfternoon(NextMonday, Afternoon, R.string.mondayAfternoon, R.drawable.ic_afternoon_schedule, "nextMondayAfternoon");
 
     fun date(): Date = day.getDate().getTimeAtHour(hour.hourOfTheDay)
-    fun canBeDisplayedAt(date: Date): Boolean = date.time < date().time - SCHEDULE_MARGIN.inWholeMilliseconds
+    fun canBeDisplayedAt(date: Date): Boolean = date.time < minimalDisplayTime()
+    private fun minimalDisplayTime() = date().time - HIDE_INTERVAL.inWholeMilliseconds
 }
 
 private enum class RelativeDay(val getDate: () -> Date) {
