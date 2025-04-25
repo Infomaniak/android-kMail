@@ -162,6 +162,12 @@ private enum class HourOfTheDay(@IntRange(0, 23) val hourOfTheDay: Int) {
     Evening(18),
 }
 
+/**
+ * Represents a period inside the current week. In other words, a timeframe used to group relevant schedule options based on when
+ * they should be displayed.
+ *
+ * @param scheduleOptions The available schedule options that can be displayed to the user during each period
+ */
 private enum class WeekPeriod(vararg val scheduleOptions: ScheduleOption) {
     Weekday(LaterThisMorning, ThisAfternoon, ThisEvening, TomorrowMorning, NextMondayMorning),
     Weekend(MondayMorning, MondayAfternoon);
