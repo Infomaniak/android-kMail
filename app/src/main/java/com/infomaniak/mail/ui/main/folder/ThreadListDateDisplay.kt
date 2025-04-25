@@ -53,7 +53,16 @@ enum class ThreadListDateDisplay(
         formatThreadDate = { thread ->
             // If the thread is in SnoozeState.Snoozed then we necessarily have a snoozeEndDate
             val date = thread.snoozeEndDate ?: RealmInstant.MIN
-            if (date.isInTheFuture()) relativeFormatting(date) else defaultFormatting(date)
+            relativeFormatting(date)
+        }
+    ),
+    Unsnoozed(
+        iconRes = R.drawable.ic_alarm_clock_thick,
+        iconColorRes = R.color.snoozeColor,
+        formatThreadDate = { thread ->
+            // If the thread is in SnoozeState.Unsnoozed then we necessarily have a snoozeEndDate
+            val date = thread.snoozeEndDate ?: RealmInstant.MIN
+            defaultFormatting(date)
         }
     )
 }

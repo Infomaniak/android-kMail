@@ -347,7 +347,8 @@ class Thread : RealmObject, Snoozable {
 
     fun computeThreadListDateDisplay(folderRole: FolderRole?) = when {
         numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
-        isSnoozed() || isUnsnoozed() -> ThreadListDateDisplay.Snoozed
+        isSnoozed() -> ThreadListDateDisplay.Snoozed
+        isUnsnoozed() -> ThreadListDateDisplay.Unsnoozed
         else -> ThreadListDateDisplay.Default
     }
 
