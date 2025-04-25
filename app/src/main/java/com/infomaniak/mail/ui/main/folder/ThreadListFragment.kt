@@ -65,9 +65,9 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
-import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -277,11 +277,15 @@ class ThreadListFragment : TwoPaneFragment() {
     }
 
     private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
-        val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
-        if (leftIsSet) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+        val isMultiSelectClosed = mainViewModel.isMultiSelectOn.not()
 
-        val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
-        if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
+        val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE
+        val isLeftEnabled = isLeftSet && isMultiSelectClosed
+        if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+
+        val isRightSet = localSettings.swipeRight != SwipeAction.NONE
+        val isRightEnabled = isRightSet && isMultiSelectClosed
+        if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
     }
 
     private fun setupDensityDependentUi() = with(binding) {
