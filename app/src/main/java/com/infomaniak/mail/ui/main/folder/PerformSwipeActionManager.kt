@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.extensions.*
@@ -39,13 +38,11 @@ object PerformSwipeActionManager {
      * The boolean return value is used to know if we should keep the Thread in
      * the RecyclerView (true), or remove it when the swipe is done (false).
      */
-    fun ThreadListFragment.performSwipeActionOnThread(
+    fun ThreadListFragment.performSwipeAction(
         swipeAction: SwipeAction,
         thread: Thread,
         position: Int,
         isPermanentDeleteFolder: Boolean,
-        mainViewModel: MainViewModel,
-        localSettings: LocalSettings,
     ): Boolean {
         val folderRole = thread.folder.role
         if (!swipeAction.canDisplay(folderRole, mainViewModel.featureFlagsLive.value, localSettings)) {

@@ -465,7 +465,7 @@ class ThreadListFragment : TwoPaneFragment() {
         position: Int,
         isPermanentDeleteFolder: Boolean,
     ): Boolean = with(PerformSwipeActionManager) {
-        performSwipeActionOnThread(swipeAction, thread, position, isPermanentDeleteFolder, mainViewModel, localSettings)
+        performSwipeAction(swipeAction, thread, position, isPermanentDeleteFolder)
     }
 
     private fun extendCollapseFab(scrollDirection: ScrollDirection) = with(binding) {
