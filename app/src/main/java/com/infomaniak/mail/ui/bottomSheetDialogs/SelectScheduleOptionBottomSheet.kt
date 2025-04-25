@@ -127,7 +127,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
     private fun ScheduleOption.isNotAlreadySelected() = date().isNotAlreadySelected()
 }
 
-private val HIDE_INTERVAL = 5.minutes // No smaller than 5 minutes
+private val HIDE_INTERVAL = 5.minutes // Beware: the API refuses schedules smaller than 5 minutes
 
 enum class ScheduleOption(
     private val day: RelativeDay,
