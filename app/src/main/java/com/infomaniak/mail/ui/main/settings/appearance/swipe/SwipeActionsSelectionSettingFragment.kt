@@ -21,7 +21,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
@@ -32,6 +34,8 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.SwipeAction.*
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
+import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -41,6 +45,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
 
     private var binding: FragmentSwipeActionsSelectionSettingBinding by safeBinding()
     private val navigationArgs: SwipeActionsSelectionSettingFragmentArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
     lateinit var localSettings: LocalSettings
@@ -56,6 +61,8 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         val actionResId = navigationArgs.titleResId
         root.setTitle(actionResId)
 
+        snooze.isVisible = SharedUtils.isSnoozeAvailable(mainViewModel.featureFlagsLive.value, localSettings)
+
         radioGroup.apply {
             initBijectionTable(
                 R.id.delete to DELETE,
@@ -63,7 +70,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
                 R.id.readUnread to READ_UNREAD,
                 R.id.move to MOVE,
                 R.id.favorite to FAVORITE,
-                R.id.snooze to POSTPONE,
+                R.id.snooze to SNOOZE,
                 R.id.spam to SPAM,
                 R.id.quickActionMenu to QUICKACTIONS_MENU,
                 R.id.none to NONE,

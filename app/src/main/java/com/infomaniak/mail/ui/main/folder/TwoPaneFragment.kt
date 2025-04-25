@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
@@ -40,11 +40,14 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.search.SearchFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.extensions.*
+import io.realm.kotlin.types.RealmInstant
 import javax.inject.Inject
 
 abstract class TwoPaneFragment : Fragment() {
@@ -125,16 +128,16 @@ abstract class TwoPaneFragment : Fragment() {
         clearEmlCacheDir(requireContext())
     }
 
-    private fun observeThreadNavigation() = with(twoPaneViewModel) {
+    private fun observeThreadNavigation() {
         getBackNavigationResult(AttachmentExt.DOWNLOAD_ATTACHMENT_RESULT, ::startActivity)
         getBackNavigationResult(DownloadMessagesProgressDialog.DOWNLOAD_MESSAGES_RESULT, resultActivityResultLauncher::launch)
 
-        newMessageArgs.observe(viewLifecycleOwner) {
+        twoPaneViewModel.newMessageArgs.observe(viewLifecycleOwner) {
             safeNavigateToNewMessageActivity(args = it.toBundle())
         }
 
-        navArgs.observe(viewLifecycleOwner) { (resId, args) ->
-            safeNavigate(resId, args)
+        twoPaneViewModel.navArgs.observe(viewLifecycleOwner) { (resId, args) ->
+            safelyNavigate(resId, args)
         }
     }
 
@@ -236,5 +239,17 @@ abstract class TwoPaneFragment : Fragment() {
         } else {
             AutoAdvanceMode.PREVIOUS_THREAD
         }
+    }
+
+    fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?, snoozeEndDate: RealmInstant?) {
+        twoPaneViewModel.snoozeScheduleType = snoozeScheduleType
+        twoPaneViewModel.safelyNavigate(
+            resId = R.id.snoozeBottomSheetDialog,
+            args = SnoozeBottomSheetDialogArgs(
+                lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
+                currentlyScheduledEpochMillis = snoozeEndDate?.epochSeconds?.times(1_000) ?: 0L,
+                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
+            ).toBundle(),
+        )
     }
 }

@@ -51,9 +51,9 @@ import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
-import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
@@ -553,13 +553,32 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun Thread.updateDynamicIcons() {
+        val featureFlags = callbacks?.getFeatureFlags?.invoke()
 
+        (recyclerView as DragDropSwipeRecyclerView).apply {
+            if (localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)) {
+                getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
+                    behindSwipedItemBackgroundColor = context.getColor(colorRes)
+                    behindSwipedItemIconDrawableId = iconRes
+                }
+            }
+
+            if (localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)) {
+                getSwipeActionUiData(localSettings.swipeRight)?.let { (colorRes, iconRes) ->
+                    behindSwipedItemBackgroundSecondaryColor = context.getColor(colorRes)
+                    behindSwipedItemIconSecondaryDrawableId = iconRes
+                }
+            }
+        }
+    }
+
+    private fun Thread.getSwipeActionUiData(swipeAction: SwipeAction): SwipeActionUiData? {
         fun computeDynamicAction(folderRole: FolderRole, swipeAction: SwipeAction) = SwipeActionUiData(
             colorRes = if (folder.role == folderRole) R.color.swipeInbox else swipeAction.colorRes,
             iconRes = if (folder.role == folderRole) R.drawable.ic_drawer_inbox else swipeAction.iconRes,
         )
 
-        fun getSwipeActionUiData(swipeAction: SwipeAction) = when (swipeAction) {
+        return when (swipeAction) {
             SwipeAction.READ_UNREAD -> SwipeActionUiData(
                 colorRes = swipeAction.colorRes,
                 iconRes = if (isSeen) swipeAction.iconRes else R.drawable.ic_envelope_open,
@@ -571,18 +590,6 @@ class ThreadListAdapter @Inject constructor(
             SwipeAction.ARCHIVE -> computeDynamicAction(FolderRole.ARCHIVE, swipeAction)
             SwipeAction.SPAM -> computeDynamicAction(FolderRole.SPAM, swipeAction)
             else -> null
-        }
-
-        (recyclerView as DragDropSwipeRecyclerView).apply {
-            getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
-                behindSwipedItemBackgroundColor = context.getColor(colorRes)
-                behindSwipedItemIconDrawableId = iconRes
-            }
-
-            getSwipeActionUiData(localSettings.swipeRight)?.let { (colorRes, iconRes) ->
-                behindSwipedItemBackgroundSecondaryColor = context.getColor(colorRes)
-                behindSwipedItemIconSecondaryDrawableId = iconRes
-            }
         }
     }
 

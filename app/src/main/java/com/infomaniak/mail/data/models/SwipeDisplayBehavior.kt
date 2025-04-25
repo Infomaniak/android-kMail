@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024-2025 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.folder
+package com.infomaniak.mail.data.models
 
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.data.models.thread.Thread
 
-interface ThreadListAdapterCallbacks {
-    var onSwipeFinished: (() -> Unit)?
-    var onThreadClicked: (thread: Thread) -> Unit
-    var onFlushClicked: ((dialogTitle: String) -> Unit)?
-    var onLoadMoreClicked: () -> Unit
-    var onPositionClickedChanged: (position: Int, previousPosition: Int) -> Unit
-    var deleteThreadInRealm: (threadUid: String) -> Unit
-    val getFeatureFlags: () -> Mailbox.FeatureFlagSet?
+fun interface SwipeDisplayBehavior {
+    fun canDisplay(folderRole: Folder.FolderRole?, featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Boolean
 }

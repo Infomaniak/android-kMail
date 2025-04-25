@@ -572,6 +572,7 @@
         <item quantity="other">Riceverai un promemoria per questi messaggi %s</item>
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Soggetto copiato negli appunti</string>
+    <string name="snackbarSwipeActionIncompatible">Azione di scorrimento incompatibile</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversazione cancellata</item>
         <item quantity="other">Conversazioni cancellate</item>

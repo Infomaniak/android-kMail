@@ -151,6 +151,12 @@ class MainViewModel @Inject constructor(
         it?.let(mailboxController::getMailbox)
     }.asLiveData(ioCoroutineContext)
 
+    private val currentMailboxLive = _currentMailboxObjectId.filterNotNull().flatMapLatest { objectId ->
+        mailboxController.getMailboxAsync(objectId).mapNotNull { it.obj }
+    }.asLiveData(ioCoroutineContext)
+
+    val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
+
     val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController.getMenuDrawerDefaultFoldersAsync()
             .map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
@@ -197,6 +203,10 @@ class MainViewModel @Inject constructor(
     val currentFolderLive = _currentFolderId.flatMapLatest {
         it?.let(folderController::getFolderAsync) ?: emptyFlow()
     }.asLiveData(ioCoroutineContext)
+
+    val swipeActionContext = Utils.waitInitMediator(featureFlagsLive, currentFolderLive) {
+        (it[0] as Mailbox.FeatureFlagSet) to (it[1] as Folder).role
+    }.distinctUntilChanged()
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 

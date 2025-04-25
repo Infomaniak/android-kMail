@@ -68,6 +68,8 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
+import com.infomaniak.mail.data.models.isSnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -78,6 +80,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
+import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
@@ -167,6 +170,7 @@ class ThreadListFragment : TwoPaneFragment() {
         observeFilter()
         observeCurrentFolder()
         observeCurrentFolderLive()
+        observeSwipeActionContext()
         observeUpdatedAtTriggers()
         observeFlushFolderTrigger()
         observeUpdateInstall()
@@ -259,14 +263,14 @@ class ThreadListFragment : TwoPaneFragment() {
         isFirstTimeRefreshingThreads = false
     }
 
-    private fun updateSwipeActionsAccordingToSettings() = with(binding.threadsList) {
-        behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
-        behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
-
-        behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
-        behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
-
+    private fun updateSwipeActionsAccordingToSettings() {
         unlockSwipeActionsIfSet()
+
+        // Manually update disabled ui in case LocalSettings have changed when coming back from settings
+        updateDisabledSwipeActionsUi(
+            featureFlags = mainViewModel.featureFlagsLive.value,
+            folderRole = mainViewModel.currentFolderLive.value?.role,
+        )
     }
 
     override fun onDestroyView() {
@@ -337,6 +341,8 @@ class ThreadListFragment : TwoPaneFragment() {
                 override var onPositionClickedChanged: (Int, Int) -> Unit = ::updateAutoAdvanceNaturalThread
 
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
+
+                override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
             },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
@@ -356,6 +362,29 @@ class ThreadListFragment : TwoPaneFragment() {
             disableDragDirection(DirectionFlag.RIGHT)
             disableDragDirection(DirectionFlag.LEFT)
             addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
+        }
+    }
+
+    private fun updateDisabledSwipeActionsUi(featureFlags: Mailbox.FeatureFlagSet?, folderRole: FolderRole?) {
+        val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
+        val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
+
+        setSwipeActionEnabledUi(DirectionFlag.LEFT, isLeftEnabled)
+        setSwipeActionEnabledUi(DirectionFlag.RIGHT, isRightEnabled)
+    }
+
+    private fun setSwipeActionEnabledUi(swipeDirection: DirectionFlag, isEnabled: Boolean) = with(binding.threadsList) {
+        fun SwipeAction.getIconRes(): Int? = if (isEnabled) iconRes else R.drawable.ic_close_small
+        fun SwipeAction.getBackgroundColor(): Int {
+            return if (isEnabled) getBackgroundColor(context) else SwipeAction.NONE.getBackgroundColor(context)
+        }
+
+        if (swipeDirection == DirectionFlag.LEFT) {
+            behindSwipedItemIconDrawableId = localSettings.swipeLeft.getIconRes()
+            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor()
+        } else {
+            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.getIconRes()
+            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor()
         }
     }
 
@@ -442,9 +471,13 @@ class ThreadListFragment : TwoPaneFragment() {
         position: Int,
         isPermanentDeleteFolder: Boolean,
     ): Boolean = with(mainViewModel) {
-        trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
-
         val folderRole = thread.folder.role
+        if (!swipeAction.canDisplay(folderRole, featureFlagsLive.value, localSettings)) {
+            snackbarManager.setValue(getString(R.string.snackbarSwipeActionIncompatible))
+            return@with true
+        }
+
+        trackEvent("swipeActions", swipeAction.matomoValue, TrackerAction.DRAG)
 
         val shouldKeepItemBecauseOfAction = when (swipeAction) {
             SwipeAction.TUTORIAL -> {
@@ -514,8 +547,13 @@ class ThreadListFragment : TwoPaneFragment() {
                 toggleThreadSpamStatus(thread.uid)
                 false
             }
-            SwipeAction.POSTPONE -> {
-                notYetImplemented()
+            SwipeAction.SNOOZE -> {
+                val snoozeScheduleType = if (thread.isSnoozed()) {
+                    SnoozeScheduleType.Modify(thread.uid)
+                } else {
+                    SnoozeScheduleType.Snooze(thread.uid)
+                }
+                navigateToSnoozeBottomSheet(snoozeScheduleType, thread.snoozeEndDate)
                 true
             }
             SwipeAction.NONE -> error("Cannot swipe on an action which is not set")
@@ -651,6 +689,12 @@ class ThreadListFragment : TwoPaneFragment() {
             checkLastUpdateDay()
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             startUpdatedAtJob()
+        }
+    }
+
+    private fun observeSwipeActionContext() {
+        mainViewModel.swipeActionContext.observe(viewLifecycleOwner) { (featureFlags, folderRole) ->
+            updateDisabledSwipeActionsUi(featureFlags, folderRole)
         }
     }
 

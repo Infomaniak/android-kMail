@@ -572,6 +572,7 @@
         <item quantity="other">Recibirás un recordatorio de estos mensajes %s</item>
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Tema copiado en el portapapeles</string>
+    <string name="snackbarSwipeActionIncompatible">Acción de deslizamiento incompatible</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversación eliminada</item>
         <item quantity="other">Conversaciones eliminadas</item>

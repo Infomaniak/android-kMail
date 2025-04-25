@@ -81,7 +81,7 @@ import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import org.jsoup.nodes.Document
 import java.util.Date
 import javax.inject.Inject
@@ -161,10 +161,12 @@ class NewMessageViewModel @Inject constructor(
 
     val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
-    val currentMailboxLive = mailboxController.getMailboxAsync(
+    private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
-    ).map { it.obj }.asLiveData(ioCoroutineContext)
+    ).mapNotNull { it.obj }.asLiveData(ioCoroutineContext)
+
+    val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
     val mergedContacts = liveData(ioCoroutineContext) {
         val list = mergedContactController.getSortedMergedContacts().copyFromRealm()

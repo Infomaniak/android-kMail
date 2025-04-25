@@ -682,8 +682,8 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeScheduledDraftsFeatureFlagUpdates() {
-        newMessageViewModel.currentMailboxLive.observeNotNull(viewLifecycleOwner) { mailbox ->
-            val isScheduledDraftsEnabled = mailbox.featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
+        newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
+            val isScheduledDraftsEnabled = featureFlags.contains(FeatureFlag.SCHEDULE_DRAFTS)
             binding.scheduleButton.isVisible = isScheduledDraftsEnabled
         }
     }

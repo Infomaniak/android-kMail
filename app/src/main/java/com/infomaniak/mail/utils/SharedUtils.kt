@@ -276,7 +276,7 @@ class SharedUtils @Inject constructor(
             localSettings: LocalSettings,
             currentFolderRole: FolderRole?,
         ): Boolean {
-            fun isSnoozeAvailable() = isSnoozeAvailable(mainViewModel.currentMailbox.value?.featureFlags, localSettings)
+            fun isSnoozeAvailable() = isSnoozeAvailable(mainViewModel.featureFlagsLive.value, localSettings)
             return currentFolderRole == FolderRole.INBOX || currentFolderRole == FolderRole.SNOOZED && isSnoozeAvailable()
         }
 

@@ -578,6 +578,7 @@
         <item quantity="other">You will receive a reminder for these messages %s</item>
     </plurals>
     <string name="snackbarSubjectCopiedToClipboard">Subject copied to the clipboard</string>
+    <string name="snackbarSwipeActionIncompatible">Swipe action incompatible</string>
     <plurals name="snackbarThreadDeletedPermanently">
         <item quantity="one">Conversation deleted</item>
         <item quantity="other">Conversations deleted</item>
