@@ -279,12 +279,12 @@ class ThreadListFragment : TwoPaneFragment() {
     private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
         val isMultiSelectClosed = mainViewModel.isMultiSelectOn.not()
 
-        val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
-        val isLeftEnabled = leftIsSet && isMultiSelectClosed
+        val isLeftSet = localSettings.swipeLeft != SwipeAction.NONE
+        val isLeftEnabled = isLeftSet && isMultiSelectClosed
         if (isLeftEnabled) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
 
-        val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
-        val isRightEnabled = rightIsSet && isMultiSelectClosed
+        val isRightSet = localSettings.swipeRight != SwipeAction.NONE
+        val isRightEnabled = isRightSet && isMultiSelectClosed
         if (isRightEnabled) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
     }
 
