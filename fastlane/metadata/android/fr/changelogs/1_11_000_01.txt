@@ -1,0 +1,4 @@
+- Ajout de l'action de balayage pour mettre un courriel en attente
+- Correction de fautes de frappe
+- Lors de la récupération de nouveaux messages, affiche d'abord les plus récents
+- Bloque les actions de balayre lors d'une multi-sélection

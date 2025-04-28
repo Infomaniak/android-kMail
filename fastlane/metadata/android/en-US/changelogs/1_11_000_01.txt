@@ -1,0 +1,4 @@
+- Add snooze swipe action
+- Typos fixing
+- When fetching new Messages, display newest first
+- Block swipe actions while in multiselection
