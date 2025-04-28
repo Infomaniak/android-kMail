@@ -37,7 +37,12 @@ fun View.updatePaddingWithStatusBar(insets: WindowInsetsCompat) {
 
 fun View.updatePaddingWithSystemBars(insets: WindowInsetsCompat) {
     val systemBars = insets.systemBars()
-    updatePadding(left = systemBars.left, right = systemBars.right, bottom = systemBars.bottom)
+    val systemGesture = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+    updatePadding(
+        left = maxOf(systemGesture.left, systemBars.left),
+        right = maxOf(systemGesture.right, systemBars.right),
+        bottom = maxOf(systemGesture.bottom, systemBars.bottom),
+    )
 }
 
 fun WindowInsetsCompat.statusBar() = getInsets(WindowInsetsCompat.Type.statusBars())
