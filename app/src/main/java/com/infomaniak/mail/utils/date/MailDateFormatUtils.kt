@@ -18,7 +18,7 @@
 package com.infomaniak.mail.utils.date
 
 import android.content.Context
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import com.infomaniak.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithYear
@@ -45,7 +45,7 @@ object MailDateFormatUtils {
     }
 
     fun Date.formatForHeader(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (SDK_INT >= 26) {
             formatWithLocal(FormatData.BOTH, FormatStyle.FULL, FormatStyle.SHORT)
         } else {
             format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)

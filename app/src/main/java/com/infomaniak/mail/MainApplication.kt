@@ -21,7 +21,7 @@ import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Intent
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
@@ -161,8 +161,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                 detectLeakedClosableObjects()
                 detectLeakedRegistrationObjects()
                 detectFileUriExposure()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) detectContentUriWithoutPermission()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) detectCredentialProtectedWhileLocked()
+                if (SDK_INT >= 26) detectContentUriWithoutPermission()
+                if (SDK_INT >= 29) detectCredentialProtectedWhileLocked()
             }.build()
         )
     }

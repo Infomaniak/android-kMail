@@ -18,7 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.calendar
 
 import android.content.Context
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -240,7 +240,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     }
 
     private fun Date.formatDateAndHour(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (SDK_INT >= 26) {
             formatWithLocal(FormatData.BOTH, FormatStyle.MEDIUM, FormatStyle.SHORT)
         } else {
             format("$FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR $FORMAT_HOUR_MINUTES") // Fallback on unambiguous format
@@ -248,7 +248,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     }
 
     private fun Date.formatMediumDate(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (SDK_INT >= 26) {
             formatWithLocal(FormatData.DATE, FormatStyle.MEDIUM)
         } else {
             format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on textual day, day, month, year ordering for everyone
@@ -256,7 +256,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     }
 
     private fun Date.formatFullDate(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (SDK_INT >= 26) {
             formatWithLocal(FormatData.DATE, FormatStyle.FULL)
         } else {
             format(FORMAT_FULL_DATE) // Fallback on day, month, year ordering for everyone
@@ -264,7 +264,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
     }
 
     private fun Date.formatShortHour(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (SDK_INT >= 26) {
             formatWithLocal(FormatData.HOUR, FormatStyle.SHORT)
         } else {
             format(FORMAT_HOUR_MINUTES) // Fallback on 24 hours separated by colon format for everyone

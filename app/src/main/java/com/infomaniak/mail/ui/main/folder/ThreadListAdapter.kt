@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.folder
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.text.Spannable
 import android.text.TextUtils.TruncateAt
 import android.view.HapticFeedbackConstants
@@ -605,12 +605,12 @@ class ThreadListAdapter @Inject constructor(
         val dx = abs(offsetX)
         val progress = dx.toFloat() / root.width
 
-        if (progress < 0.5 && !viewHolder.isSwipedOverHalf) {
+        if (progress < 0.5f && !viewHolder.isSwipedOverHalf) {
             viewHolder.isSwipedOverHalf = true
             root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-        } else if (progress > 0.5 && viewHolder.isSwipedOverHalf) {
+        } else if (progress > 0.5f && viewHolder.isSwipedOverHalf) {
             viewHolder.isSwipedOverHalf = false
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            if (SDK_INT >= 27) {
                 root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
             } else {
                 root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)

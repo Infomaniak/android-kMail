@@ -18,7 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.Manifest
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -40,7 +40,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
     private var storageForActivityResult: ActivityResultLauncher<String>? = null
 
     val hasDownloadManagerPermission
-        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q || activity.hasPermissions(arrayOf(STORAGE_PERMISSION))
+        get() = SDK_INT >= 29 || activity.hasPermissions(arrayOf(STORAGE_PERMISSION))
 
     fun registerMainPermissions(onPermissionResult: ((permissions: Map<String, Boolean>) -> Unit)? = null) {
         mainForActivityResult = activity.registerForActivityResult(RequestMultiplePermissions()) { authorizedPermissions ->
@@ -50,9 +50,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
     }
 
     private fun updateNotificationPermissionSetting() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            activity.hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
-        ) {
+        if (SDK_INT >= 33 && activity.hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
             localSettings.hasAlreadyEnabledNotifications = true
         }
     }
@@ -87,7 +85,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
      * Manually disabled means the permission was granted at one point, but is no more.
      */
     fun registerNotificationsPermissionIfNeeded(fragment: Fragment) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !localSettings.hasAlreadyEnabledNotifications) {
+        if (SDK_INT >= 33 && !localSettings.hasAlreadyEnabledNotifications) {
             notificationsPermissionForActivityResult = fragment.registerForActivityResult(RequestPermission()) { hasPermission ->
                 if (hasPermission) localSettings.hasAlreadyEnabledNotifications = true
                 notificationsCallback?.invoke(hasPermission)
@@ -100,7 +98,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
      * Manually disabled means the permission was granted at one point, but is no more.
      */
     fun requestNotificationsPermissionIfNeeded(notificationsCallback: (Boolean) -> Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !localSettings.hasAlreadyEnabledNotifications) {
+        if (SDK_INT >= 33 && !localSettings.hasAlreadyEnabledNotifications) {
             this.notificationsCallback = notificationsCallback
             notificationsPermissionForActivityResult?.launch(POST_NOTIFICATIONS_PERMISSION)
         }
@@ -114,7 +112,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
      * Register storage permission only for Android API below 29.
      */
     fun registerDownloadManagerPermission(fragment: Fragment) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        if (SDK_INT < 29) {
             storageForActivityResult = fragment.registerForActivityResult(RequestPermission()) { hasPermission ->
                 if (hasPermission) downloadCallback?.invoke()
             }
@@ -126,16 +124,16 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
      */
     fun requestDownloadManagerPermission(downloadCallback: () -> Unit) {
         this.downloadCallback = downloadCallback
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) storageForActivityResult?.launch(STORAGE_PERMISSION)
+        if (SDK_INT < 29) storageForActivityResult?.launch(STORAGE_PERMISSION)
     }
     //endregion
 
     companion object {
 
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        @RequiresApi(33)
         private const val POST_NOTIFICATIONS_PERMISSION = Manifest.permission.POST_NOTIFICATIONS
         const val READ_CONTACTS_PERMISSION = Manifest.permission.READ_CONTACTS
-        @get:DeprecatedSinceApi(Build.VERSION_CODES.Q, "Only used for DownloadManager below API 29")
+        @get:DeprecatedSinceApi(29, "Only used for DownloadManager below API 29")
         private const val STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE
 
         /**
@@ -146,7 +144,7 @@ class PermissionUtils @Inject constructor(private val activity: FragmentActivity
         fun getMainPermissions(mustRequireNotification: Boolean): Array<String> {
             val mainPermissions = mutableListOf(READ_CONTACTS_PERMISSION)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && mustRequireNotification) {
+            if (SDK_INT >= 33 && mustRequireNotification) {
                 mainPermissions.add(POST_NOTIFICATIONS_PERMISSION)
             }
 
