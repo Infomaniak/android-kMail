@@ -59,6 +59,7 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeUpdateResponse
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
@@ -358,6 +359,17 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
+    fun rescheduleSnoozedThread(mailboxUuid: String, snoozeUuid: String, date: Date): ApiResponse<Boolean> {
+        return callApi(
+            url = ApiRoutes.snoozeAction(mailboxUuid, snoozeUuid),
+            method = PUT,
+            body = mapOf("end_date" to date.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)),
+        )
+    }
+
+    /**
+     * Do not call directly, use the [SharedUtils.rescheduleSnoozedThreads] instead to correctly support api error messages.
+     */
     fun rescheduleSnoozedThreads(
         mailboxUuid: String,
         snoozeUuids: List<String>,
@@ -376,6 +388,9 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.snoozeAction(mailboxUuid, snoozeUuid), DELETE)
     }
 
+    /**
+     * Do not call directly, use the [SharedUtils.unsnoozeThreads] instead to correctly support api error messages.
+     */
     fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>): List<ApiResponse<BatchSnoozeCancelResponse>> {
         return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE) {
             callApi(ApiRoutes.snooze(mailboxUuid), DELETE, mapOf("uuids" to it))

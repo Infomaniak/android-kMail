@@ -293,6 +293,10 @@
     <string name="errorLoginTitle">Login-Fehler</string>
     <string name="errorMailboxLocked">Diese Mailbox ist gesperrt</string>
     <string name="errorMailboxPasswordLength">Das Passwort muss zwischen 6 und 80 Zeichen lang sein</string>
+    <string name="errorMaxNumberOfScheduledSnoozeReached">Sie haben die maximale Anzahl geplanter Schlummerzeiten erreicht</string>
+    <string name="errorMessageCannotBeSnoozed">Diese Nachricht kann nicht in den Schlummermodus versetzt werden</string>
+    <string name="errorMessageNotSnoozed">Diese Nachricht ist derzeit nicht im Schlummermodus</string>
+    <string name="errorMessageSnoozeAlreadyScheduled">Für diese Nachricht ist bereits ein Schlummern geplant</string>
     <string name="errorMoveDestinationNotFound">Der Zielordner besteht nicht</string>
     <string name="errorNewFolderAlreadyExists">Der Ordner besteht bereits</string>
     <string name="errorNewFolderInvalidCharacter">Der Ordnername enthält ungültige Zeichen</string>

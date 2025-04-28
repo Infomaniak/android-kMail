@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.snooze
 
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 
@@ -34,6 +35,13 @@ interface BatchSnoozeResponse {
                 BatchSnoozeResult.Success(impactedFolderIds)
             }
             else -> BatchSnoozeResult.Error.NoneSucceeded
+        }
+
+        fun ApiResponse<Boolean>.computeSnoozeResult(impactedFolderIds: ImpactedFolders): BatchSnoozeResult {
+            return when {
+                isSuccess() -> BatchSnoozeResult.Success(impactedFolderIds)
+                else -> BatchSnoozeResult.Error.ApiError(translateError())
+            }
         }
     }
 }

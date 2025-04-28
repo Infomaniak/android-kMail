@@ -293,6 +293,10 @@
     <string name="errorLoginTitle">Error de inicio de sesión</string>
     <string name="errorMailboxLocked">Esta dirección de correo electrónico está bloqueada</string>
     <string name="errorMailboxPasswordLength">La contraseña debe tener entre 6 y 80 caracteres</string>
+    <string name="errorMaxNumberOfScheduledSnoozeReached">Has alcanzado el número máximo de aplazamientos programados</string>
+    <string name="errorMessageCannotBeSnoozed">Este mensaje no se puede aplazar</string>
+    <string name="errorMessageNotSnoozed">Este mensaje no está aplazado actualmente</string>
+    <string name="errorMessageSnoozeAlreadyScheduled">Este mensaje ya tiene un aplazamiento programado</string>
     <string name="errorMoveDestinationNotFound">La carpeta de destino no existe</string>
     <string name="errorNewFolderAlreadyExists">La carpeta ya existe</string>
     <string name="errorNewFolderInvalidCharacter">El nombre de la carpeta contiene caracteres no válidos</string>

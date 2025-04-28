@@ -96,6 +96,9 @@ object ErrorCode {
 
     //region Snooze
     const val MAIL_MESSAGE_NOT_SNOOZED = "mail__message_not_snoozed"
+    const val MAIL_MESSAGE_SNOOZE_ALREADY_SCHEDULED = "mail__message_snooze_already_scheduled"
+    const val MAIL_MESSAGE_MAX_NUMBER_OF_SCHEDULED_SNOOZE_REACHED = "mail__message_max_number_of_scheduled_snooze_reached"
+    const val MAIL_MESSAGE_CANNOT_BE_SNOOZE = "mail__message_cannot_be_snooze"
     //endregion
 
     val apiErrorCodes = listOf(
@@ -136,6 +139,12 @@ object ErrorCode {
 
         // Action
         ApiErrorCode(MOVE_DESTINATION_NOT_FOUND, R.string.errorMoveDestinationNotFound),
+
+        // Snooze
+        ApiErrorCode(MAIL_MESSAGE_NOT_SNOOZED, R.string.errorMessageNotSnoozed),
+        ApiErrorCode(MAIL_MESSAGE_SNOOZE_ALREADY_SCHEDULED, R.string.errorMessageSnoozeAlreadyScheduled),
+        ApiErrorCode(MAIL_MESSAGE_MAX_NUMBER_OF_SCHEDULED_SNOOZE_REACHED, R.string.errorMaxNumberOfScheduledSnoozeReached),
+        ApiErrorCode(MAIL_MESSAGE_CANNOT_BE_SNOOZE, R.string.errorMessageCannotBeSnoozed),
     )
 
     private val ignoredErrorCodesForDrafts = setOf(
