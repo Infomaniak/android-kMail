@@ -29,6 +29,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
@@ -140,6 +141,8 @@ class ThreadListFragment : TwoPaneFragment() {
             navigationBarColor = if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor,
         )
 
+        handleEdgeToEdge()
+
         threadListViewModel.deleteSearchData()
         bindAlertToViewLifecycle(descriptionDialog)
 
@@ -191,6 +194,15 @@ class ThreadListFragment : TwoPaneFragment() {
 
     override fun doAfterFolderChanged() {
         navigateFromNotificationToThread()
+    }
+
+    private fun handleEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            binding.appBarLayout.applyStatusBarInsets(insets)
+            binding.threadsConstraintLayout.applySideAndBottomSystemInsets(insets)
+            // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
+            insets
+        }
     }
 
     private fun navigateFromNotificationToThread() {
