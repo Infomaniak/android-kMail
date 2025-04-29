@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.content.Context
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -26,6 +27,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
+import dagger.hilt.android.qualifiers.ApplicationContext
+import io.realm.kotlin.TypedRealm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -34,6 +37,7 @@ import javax.inject.Singleton
 @Singleton
 class SearchUtils @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
+    @ApplicationContext private val appContext: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -80,17 +84,37 @@ class SearchUtils @Inject constructor(
         }
     }
 
+    fun convertToSearchThreads(searchMessages: List<Message>): List<Thread> {
+        val cachedFolderNames = mutableMapOf<String, String>()
+
+        return searchMessages.map { message ->
+            message.toThread().apply {
+                uid = "search-${message.uid}"
+                isFromSearch = true
+                recomputeThread()
+                sharedThreadProcessing(appContext, cachedFolderNames, realm = mailboxContentRealm())
+            }
+        }
+    }
+
     companion object {
         private val TAG = SearchUtils::class.java.simpleName
 
-        fun List<Message>.convertToSearchThreads(): List<Thread> {
-            return map { message ->
-                message.toThread().apply {
-                    uid = "search-${message.uid}"
-                    isFromSearch = true
-                    recomputeThread()
-                }
-            }
+        /**
+         * Thread processing that applies to both search threads from the api and from realm. Be careful, it relies on
+         * [Thread.folderId] being set correctly.
+         */
+        fun Thread.sharedThreadProcessing(context: Context, cachedFolderNames: MutableMap<String, String>, realm: TypedRealm) {
+            setFolderName(cachedFolderNames, realm, context)
+        }
+
+        private fun Thread.setFolderName(cachedFolderNames: MutableMap<String, String>, realm: TypedRealm, context: Context) {
+            val computedFolderName = cachedFolderNames[folderId]
+                ?: FolderController.getFolder(folderId, realm)
+                    ?.getLocalizedName(context)
+                    ?.also { cachedFolderNames[folderId] = it }
+
+            computedFolderName?.let { folderName = it }
         }
     }
 }
