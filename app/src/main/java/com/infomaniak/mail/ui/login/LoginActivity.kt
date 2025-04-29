@@ -42,6 +42,8 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +67,8 @@ class LoginActivity : AppCompatActivity() {
         lockOrientationForSmallScreens()
 
         super.onCreate(savedInstanceState)
+
+        binding.applyWindowInsetsListener { root, insets -> root.applySideAndBottomSystemInsets(insets) }
         setContentView(binding.root)
 
         infomaniakLogin = getInfomaniakLogin()
