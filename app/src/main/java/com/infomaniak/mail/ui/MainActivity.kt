@@ -39,7 +39,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
-import com.google.android.material.card.MaterialCardView
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
@@ -239,16 +238,15 @@ class MainActivity : BaseActivity() {
 
     private fun handleMenuDrawerEdgeToEdge() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val statusBarInsets = insets.statusBar()
             val menuDrawerFragment = binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment>()
-            val drawerHeader = menuDrawerFragment.view?.findViewById<MaterialCardView>(R.id.drawerHeader)
-
-            drawerHeader?.setContentPadding(
-                /* left = */ drawerHeader.contentPaddingLeft,
-                /* top = */ statusBarInsets.top,
-                /* right = */ drawerHeader.contentPaddingRight,
-                /* bottom = */ drawerHeader.contentPaddingBottom,
-            )
+            menuDrawerFragment.drawerHeader?.let {
+                it.setContentPadding(
+                    /* left = */ it.contentPaddingLeft,
+                    /* top = */ insets.statusBar().top,
+                    /* right = */ it.contentPaddingRight,
+                    /* bottom = */ it.contentPaddingBottom,
+                )
+            }
 
             menuDrawerFragment.view?.applySideAndBottomSystemInsets(insets)
 

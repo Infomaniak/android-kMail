@@ -88,6 +88,8 @@ class MenuDrawerFragment : Fragment() {
 
     var exitDrawer: (() -> Unit)? = null
 
+    val drawerHeader get() = _binding?.drawerHeader
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
