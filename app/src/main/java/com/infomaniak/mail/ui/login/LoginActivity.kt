@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,14 +20,16 @@ package com.infomaniak.mail.ui.login
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.api.ApiController.toApiError
+import com.infomaniak.lib.core.api.InternalTranslatedErrorCode
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.utils.ErrorCode
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -46,7 +48,6 @@ import com.infomaniak.mail.utils.extensions.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
-import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
@@ -100,13 +101,13 @@ class LoginActivity : AppCompatActivity() {
     companion object {
 
         suspend fun authenticateUser(context: Context, apiToken: ApiToken, mailboxController: MailboxController): Any {
-            if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(RCore.string.errorUserAlreadyPresent)
+            if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
 
             InfomaniakCore.bearerToken = apiToken.accessToken
             val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor) }
 
             if (userProfileResponse.result == ApiResponseStatus.ERROR) return userProfileResponse
-            if (userProfileResponse.data == null) return getErrorResponse(RCore.string.anErrorHasOccurred)
+            if (userProfileResponse.data == null) return getErrorResponse(InternalTranslatedErrorCode.UnknownError)
 
             val user = userProfileResponse.data!!.apply {
                 this.apiToken = apiToken
@@ -125,14 +126,14 @@ class LoginActivity : AppCompatActivity() {
                         mailboxController.updateMailboxes(mailboxes)
                         return@let if (mailboxes.none { it.isAvailable }) MailboxErrorCode.NO_VALID_MAILBOX else user
                     } ?: run {
-                        getErrorResponse(RCore.string.serverError)
+                        getErrorResponse(InternalTranslatedErrorCode.UnknownError)
                     }
                 }
             }
         }
 
-        private fun getErrorResponse(@StringRes text: Int): ApiResponse<Any> {
-            return ApiResponse(result = ApiResponseStatus.ERROR, translatedError = text)
+        private fun getErrorResponse(error: ErrorCode.Translated): ApiResponse<Any> {
+            return ApiResponse(result = ApiResponseStatus.ERROR, error = error.toApiError())
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
@@ -119,7 +120,7 @@ class InvalidPasswordFragment : Fragment() {
         }
 
         invalidPasswordViewModel.requestPasswordResult.observe(viewLifecycleOwner) { apiResponse ->
-            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarMailboxPasswordRequested else apiResponse.translatedError)
+            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarMailboxPasswordRequested else apiResponse.translateError())
         }
     }
 
