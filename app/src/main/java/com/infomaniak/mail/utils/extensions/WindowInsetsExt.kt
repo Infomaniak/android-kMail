@@ -30,12 +30,12 @@ fun ViewBinding.applyWindowInsetsListener(listener: (rootView: View, insets: Win
     }
 }
 
-fun View.updatePaddingWithStatusBar(insets: WindowInsetsCompat) {
+fun View.applyStatusBarInsets(insets: WindowInsetsCompat) {
     val statusBar = insets.statusBar()
     updatePadding(top = statusBar.top, left = statusBar.left, right = statusBar.right, bottom = statusBar.bottom)
 }
 
-fun View.updatePaddingWithSystemBars(insets: WindowInsetsCompat) {
+fun View.applySideAndBottomSystemInsets(insets: WindowInsetsCompat) {
     val systemBars = insets.systemBars()
     val systemGesture = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
     updatePadding(

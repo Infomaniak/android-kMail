@@ -86,8 +86,8 @@ class SettingsFragment : Fragment() {
 
     private fun handleEdgeToEdge() {
         binding.applyWindowInsetsListener { rootView, insets ->
-            binding.root.appBarLayout.updatePaddingWithStatusBar(insets)
-            rootView.updatePaddingWithSystemBars(insets)
+            binding.root.appBarLayout.applyStatusBarInsets(insets)
+            rootView.applySideAndBottomSystemInsets(insets)
         }
     }
 
