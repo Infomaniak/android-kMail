@@ -29,6 +29,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
@@ -139,6 +140,13 @@ class ThreadListFragment : TwoPaneFragment() {
             statusBarColor = R.color.backgroundHeaderColor,
             navigationBarColor = if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor,
         )
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            binding.appBarLayout.applyStatusBarInsets(insets)
+            binding.threadsConstraintLayout.applySideAndBottomSystemInsets(insets)
+            // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
+            insets
+        }
 
         threadListViewModel.deleteSearchData()
         bindAlertToViewLifecycle(descriptionDialog)
