@@ -141,12 +141,7 @@ class ThreadListFragment : TwoPaneFragment() {
             navigationBarColor = if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor,
         )
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            binding.appBarLayout.applyStatusBarInsets(insets)
-            binding.threadsConstraintLayout.applySideAndBottomSystemInsets(insets)
-            // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
-            insets
-        }
+        handleEdgeToEdge()
 
         threadListViewModel.deleteSearchData()
         bindAlertToViewLifecycle(descriptionDialog)
@@ -199,6 +194,15 @@ class ThreadListFragment : TwoPaneFragment() {
 
     override fun doAfterFolderChanged() {
         navigateFromNotificationToThread()
+    }
+
+    private fun handleEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            binding.appBarLayout.applyStatusBarInsets(insets)
+            binding.threadsConstraintLayout.applySideAndBottomSystemInsets(insets)
+            // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
+            insets
+        }
     }
 
     private fun navigateFromNotificationToThread() {
