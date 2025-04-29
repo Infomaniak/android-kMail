@@ -68,7 +68,7 @@ class LoginActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        binding.applyWindowInsetsListener { root, insets -> root.applySideAndBottomSystemInsets(insets) }
+        binding.applyWindowInsetsListener(shouldConsume = false) { root, insets -> root.applySideAndBottomSystemInsets(insets) }
         setContentView(binding.root)
 
         infomaniakLogin = getInfomaniakLogin()
