@@ -37,6 +37,8 @@ class SimpleSettingView @JvmOverloads constructor(
 
     private val binding: ViewSimpleSettingBinding
 
+    val appBarLayout get() = binding.appBarLayout
+
     /**
      * We can receive 2 types of children:
      * - Children that come from the binding
