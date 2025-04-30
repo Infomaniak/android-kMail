@@ -101,7 +101,7 @@ class SearchUtils @Inject constructor(
         }
     }
 
-    suspend fun convertApiThreadsToSearchThreads(remoteThreads: List<Thread>, filterFolder: Folder?): List<Thread> {
+    suspend fun convertRemoteThreadsToSearchThreads(remoteThreads: List<Thread>, filterFolder: Folder?): List<Thread> {
         val cachedFolderNames = mutableMapOf<String, String>()
         return remoteThreads.map { remoteThread ->
             currentCoroutineContext().ensureActive()

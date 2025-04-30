@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.search
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
@@ -30,8 +29,8 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
@@ -206,18 +205,6 @@ class SearchViewModel @Inject constructor(
         query: String,
         shouldGetNextPage: Boolean,
     ) {
-
-        suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
-            runCatching {
-                data?.threads?.let { remoteThreads ->
-                    threadController.initSearchFolderThreads(remoteThreads, folder)
-                }
-            }.getOrElse { exception ->
-                exception.printStackTrace()
-                Sentry.captureException(exception)
-            }
-        }
-
         visibilityMode.postValue(VisibilityMode.LOADING)
 
         val currentMailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
@@ -231,15 +218,13 @@ class SearchViewModel @Inject constructor(
         if (isFirstPage && isLastPage) searchUtils.deleteRealmSearchData()
 
         if (apiResponse.isSuccess()) {
+            createSearchThreadsFromRemote(apiResponse.data?.threads, folder)
             with(apiResponse) {
-                initSearchFolderThreads()
                 resourceNext = data?.resourceNext
                 isFirstPage = data?.resourcePrevious == null
             }
         } else if (isLastPage) {
-            val searchMessages = messageController.searchMessages(query, newFilters, folderId)
-            val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
-            threadController.saveSearchThreads(searchThreads)
+            createSearchThreadsFromLocal(query, newFilters, folderId)
         }
 
         if (folder != lastExecutedFolder) lastExecutedFolder = folder
@@ -253,6 +238,27 @@ class SearchViewModel @Inject constructor(
         }
 
         visibilityMode.postValue(resultsVisibilityMode)
+    }
+
+    private suspend fun createSearchThreadsFromRemote(apiThreads: List<Thread>?, folder: Folder?) {
+        runCatching {
+            apiThreads?.let { remoteThreads ->
+                threadController.createSearchThreadsFromRemote(remoteThreads, folder)
+            }
+        }.getOrElse { exception ->
+            exception.printStackTrace()
+            Sentry.captureException(exception)
+        }
+    }
+
+    private suspend fun createSearchThreadsFromLocal(
+        query: String,
+        newFilters: Set<ThreadFilter>,
+        folderId: String,
+    ) {
+        val searchMessages = messageController.searchMessages(query, newFilters, folderId)
+        val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
+        threadController.saveSearchThreads(searchThreads)
     }
 
     companion object {

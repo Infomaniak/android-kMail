@@ -86,11 +86,11 @@ class ThreadController @Inject constructor(
      * @param remoteThreads The list of API Threads that need to be processed.
      * @param filterFolder The selected Folder on which we filter the Search.
      */
-    suspend fun initSearchFolderThreads(
+    suspend fun createSearchThreadsFromRemote(
         remoteThreads: List<Thread>,
         filterFolder: Folder?,
     ): Unit = withContext(ioDispatcher) {
-        val threads = searchUtils.convertApiThreadsToSearchThreads(remoteThreads, filterFolder)
+        val threads = searchUtils.convertRemoteThreadsToSearchThreads(remoteThreads, filterFolder)
         mailboxContentRealm().write { saveSearchThreads(threads) }
     }
     //endregion
