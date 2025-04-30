@@ -243,7 +243,8 @@ class SearchViewModel @Inject constructor(
     private suspend fun createSearchThreadsFromRemote(apiThreads: List<Thread>?, folder: Folder?) {
         runCatching {
             apiThreads?.let { remoteThreads ->
-                threadController.createSearchThreadsFromRemote(remoteThreads, folder)
+                val threads = searchUtils.convertRemoteThreadsToSearchThreads(remoteThreads, folder)
+                threadController.saveSearchThreads(threads)
             }
         }.getOrElse { exception ->
             exception.printStackTrace()

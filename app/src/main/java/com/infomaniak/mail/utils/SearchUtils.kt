@@ -101,6 +101,14 @@ class SearchUtils @Inject constructor(
         }
     }
 
+    /**
+     * Initialize the search Threads obtained from the API.
+     * - Format the remote Threads to make them compatible with the existing logic.
+     * - Preserve old Messages data if it already exists locally.
+     * - Handle duplicates using the existing logic.
+     * @param remoteThreads The list of API Threads that need to be processed.
+     * @param filterFolder The selected Folder on which we filter the Search.
+     */
     suspend fun convertRemoteThreadsToSearchThreads(remoteThreads: List<Thread>, filterFolder: Folder?): List<Thread> {
         val cachedFolderNames = mutableMapOf<String, String>()
         return remoteThreads.map { remoteThread ->

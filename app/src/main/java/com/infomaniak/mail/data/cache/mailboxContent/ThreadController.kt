@@ -43,7 +43,6 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -77,32 +76,14 @@ class ThreadController @Inject constructor(
     fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
         return getThreadQuery(uid, mailboxContentRealm()).asFlow()
     }
-
-    /**
-     * Initialize the search Threads obtained from the API.
-     * - Format the remote Threads to make them compatible with the existing logic.
-     * - Preserve old Messages data if it already exists locally.
-     * - Handle duplicates using the existing logic.
-     * @param remoteThreads The list of API Threads that need to be processed.
-     * @param filterFolder The selected Folder on which we filter the Search.
-     */
-    suspend fun createSearchThreadsFromRemote(
-        remoteThreads: List<Thread>,
-        filterFolder: Folder?,
-    ): Unit = withContext(ioDispatcher) {
-        val threads = searchUtils.convertRemoteThreadsToSearchThreads(remoteThreads, filterFolder)
-        mailboxContentRealm().write { saveSearchThreads(threads) }
-    }
     //endregion
 
     //region Edit data
     suspend fun saveSearchThreads(searchThreads: List<Thread>) {
-        mailboxContentRealm().write { saveSearchThreads(searchThreads) }
-    }
-
-    private fun MutableRealm.saveSearchThreads(searchThreads: List<Thread>) {
-        FolderController.getOrCreateSearchFolder(realm = this).apply {
-            threads.replaceContent(searchThreads)
+        mailboxContentRealm().write {
+            FolderController.getOrCreateSearchFolder(realm = this).apply {
+                threads.replaceContent(searchThreads)
+            }
         }
     }
 
