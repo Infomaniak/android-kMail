@@ -76,7 +76,7 @@ class IntroFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.applyWindowInsetsListener { root, insets ->
+        binding.applyWindowInsetsListener { _, insets ->
             binding.dummyToolbar.layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 insets.statusBar().top,
