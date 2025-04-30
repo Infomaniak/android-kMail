@@ -238,7 +238,7 @@ class SearchViewModel @Inject constructor(
             }
         } else if (isLastPage) {
             val searchMessages = messageController.searchMessages(query, newFilters, folderId)
-            val searchThreads = searchUtils.convertToSearchThreads(searchMessages)
+            val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
             threadController.saveSearchThreads(searchThreads)
         }
 

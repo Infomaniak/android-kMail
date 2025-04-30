@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import android.content.Context
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
@@ -29,7 +28,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.SearchUtils.Companion.sharedThreadProcessing
+import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.extensions.replaceContent
 import io.realm.kotlin.MutableRealm
@@ -43,15 +42,13 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 class ThreadController @Inject constructor(
-    private val context: Context,
+    private val searchUtils: SearchUtils,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -93,53 +90,8 @@ class ThreadController @Inject constructor(
         remoteThreads: List<Thread>,
         filterFolder: Folder?,
     ): Unit = withContext(ioDispatcher) {
-        val cachedFolderNames = mutableMapOf<String, String>()
-        val threads = remoteThreads.map { remoteThread ->
-            ensureActive()
-
-            remoteThread.apply {
-                isFromSearch = true
-                setFolderId(filterFolder)
-                keepOldMessagesData(filterFolder, mailboxContentRealm())
-                sharedThreadProcessing(context, cachedFolderNames, realm = mailboxContentRealm())
-            }
-        }
-
+        val threads = searchUtils.convertApiThreadsToSearchThreads(remoteThreads, filterFolder)
         mailboxContentRealm().write { saveSearchThreads(threads) }
-    }
-
-
-    private fun Thread.setFolderId(filterFolder: Folder?) {
-        this.folderId = if (messages.count() == 1) messages.single().folderId else filterFolder!!.id
-    }
-
-    private suspend fun Thread.keepOldMessagesData(filterFolder: Folder?, realm: Realm) {
-        messages.forEach { remoteMessage: Message ->
-            currentCoroutineContext().ensureActive()
-
-            val localMessage = MessageController.getMessage(remoteMessage.uid, realm)
-            if (localMessage == null) {
-                // The Search only returns Messages from TRASH if we explicitly selected this folder,
-                // which is the reason why we can compute the `isTrashed` value so loosely.
-                remoteMessage.initLocalValues(
-                    areHeavyDataFetched = false,
-                    isTrashed = filterFolder?.role == FolderRole.TRASH,
-                    messageIds = remoteMessage.computeMessageIds(),
-                    draftLocalUuid = null,
-                    isFromSearch = true,
-                    isDeletedOnApi = false,
-                    latestCalendarEventResponse = null,
-                    swissTransferFiles = realmListOf(),
-                )
-            } else {
-                remoteMessage.keepLocalValues(localMessage)
-            }
-
-            messagesIds += remoteMessage.messageIds
-
-            // TODO: Remove this when the API returns the good value for [Message.hasAttachments]
-            if (remoteMessage.hasAttachable) hasAttachable = true
-        }
     }
     //endregion
 

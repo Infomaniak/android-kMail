@@ -23,13 +23,18 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -84,9 +89,8 @@ class SearchUtils @Inject constructor(
         }
     }
 
-    fun convertToSearchThreads(searchMessages: List<Message>): List<Thread> {
+    fun convertLocalMessagesToSearchThreads(searchMessages: List<Message>): List<Thread> {
         val cachedFolderNames = mutableMapOf<String, String>()
-
         return searchMessages.map { message ->
             message.toThread().apply {
                 uid = "search-${message.uid}"
@@ -97,24 +101,71 @@ class SearchUtils @Inject constructor(
         }
     }
 
-    companion object {
-        private val TAG = SearchUtils::class.java.simpleName
+    suspend fun convertApiThreadsToSearchThreads(remoteThreads: List<Thread>, filterFolder: Folder?): List<Thread> {
+        val cachedFolderNames = mutableMapOf<String, String>()
+        return remoteThreads.map { remoteThread ->
+            currentCoroutineContext().ensureActive()
 
-        /**
-         * Thread processing that applies to both search threads from the api and from realm. Be careful, it relies on
-         * [Thread.folderId] being set correctly.
-         */
-        fun Thread.sharedThreadProcessing(context: Context, cachedFolderNames: MutableMap<String, String>, realm: Realm) {
-            setFolderName(cachedFolderNames, realm, context)
-        }
-
-        private fun Thread.setFolderName(cachedFolderNames: MutableMap<String, String>, realm: Realm, context: Context) {
-            val computedFolderName = cachedFolderNames[folderId]
-                ?: FolderController.getFolder(folderId, realm)
-                    ?.getLocalizedName(context)
-                    ?.also { cachedFolderNames[folderId] = it }
-
-            computedFolderName?.let { folderName = it }
+            remoteThread.apply {
+                isFromSearch = true
+                setFolderId(filterFolder)
+                keepOldMessagesData(filterFolder, mailboxContentRealm())
+                sharedThreadProcessing(appContext, cachedFolderNames, realm = mailboxContentRealm())
+            }
         }
     }
+
+    private fun Thread.setFolderId(filterFolder: Folder?) {
+        this.folderId = if (messages.count() == 1) messages.single().folderId else filterFolder!!.id
+    }
+
+    private suspend fun Thread.keepOldMessagesData(filterFolder: Folder?, realm: Realm) {
+        messages.forEach { remoteMessage: Message ->
+            currentCoroutineContext().ensureActive()
+
+            val localMessage = MessageController.getMessage(remoteMessage.uid, realm)
+            if (localMessage == null) {
+                // The Search only returns Messages from TRASH if we explicitly selected this folder,
+                // which is the reason why we can compute the `isTrashed` value so loosely.
+                remoteMessage.initLocalValues(
+                    areHeavyDataFetched = false,
+                    isTrashed = filterFolder?.role == FolderRole.TRASH,
+                    messageIds = remoteMessage.computeMessageIds(),
+                    draftLocalUuid = null,
+                    isFromSearch = true,
+                    isDeletedOnApi = false,
+                    latestCalendarEventResponse = null,
+                    swissTransferFiles = realmListOf(),
+                )
+            } else {
+                remoteMessage.keepLocalValues(localMessage)
+            }
+
+            messagesIds += remoteMessage.messageIds
+
+            // TODO: Remove this when the API returns the good value for [Message.hasAttachments]
+            if (remoteMessage.hasAttachable) hasAttachable = true
+        }
+    }
+
+    companion object {
+        private val TAG = SearchUtils::class.java.simpleName
+    }
+}
+
+/**
+ * Thread processing that applies to both search threads from the api and from realm. Be careful, it relies on
+ * [Thread.folderId] being set correctly.
+ */
+private fun Thread.sharedThreadProcessing(context: Context, cachedFolderNames: MutableMap<String, String>, realm: Realm) {
+    setFolderName(cachedFolderNames, realm, context)
+}
+
+private fun Thread.setFolderName(cachedFolderNames: MutableMap<String, String>, realm: Realm, context: Context) {
+    val computedFolderName = cachedFolderNames[folderId]
+        ?: FolderController.getFolder(folderId, realm)
+            ?.getLocalizedName(context)
+            ?.also { cachedFolderNames[folderId] = it }
+
+    computedFolderName?.let { folderName = it }
 }
