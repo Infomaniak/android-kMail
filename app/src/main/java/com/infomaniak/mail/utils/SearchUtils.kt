@@ -28,7 +28,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.realm.kotlin.TypedRealm
+import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -104,11 +104,11 @@ class SearchUtils @Inject constructor(
          * Thread processing that applies to both search threads from the api and from realm. Be careful, it relies on
          * [Thread.folderId] being set correctly.
          */
-        fun Thread.sharedThreadProcessing(context: Context, cachedFolderNames: MutableMap<String, String>, realm: TypedRealm) {
+        fun Thread.sharedThreadProcessing(context: Context, cachedFolderNames: MutableMap<String, String>, realm: Realm) {
             setFolderName(cachedFolderNames, realm, context)
         }
 
-        private fun Thread.setFolderName(cachedFolderNames: MutableMap<String, String>, realm: TypedRealm, context: Context) {
+        private fun Thread.setFolderName(cachedFolderNames: MutableMap<String, String>, realm: Realm, context: Context) {
             val computedFolderName = cachedFolderNames[folderId]
                 ?: FolderController.getFolder(folderId, realm)
                     ?.getLocalizedName(context)

@@ -210,7 +210,7 @@ class SearchViewModel @Inject constructor(
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
                 data?.threads?.let { remoteThreads ->
-                    threadController.initAndGetSearchFolderThreads(remoteThreads, folder)
+                    threadController.initSearchFolderThreads(remoteThreads, folder)
                 }
             }.getOrElse { exception ->
                 exception.printStackTrace()

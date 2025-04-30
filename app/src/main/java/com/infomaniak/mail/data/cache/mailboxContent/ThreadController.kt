@@ -43,6 +43,7 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -88,60 +89,56 @@ class ThreadController @Inject constructor(
      * @param remoteThreads The list of API Threads that need to be processed.
      * @param filterFolder The selected Folder on which we filter the Search.
      */
-    // TODO: Make it so this method actually returns threads instead of saving them to realm so we can have low coupling logic
-    suspend fun initAndGetSearchFolderThreads(
+    suspend fun initSearchFolderThreads(
         remoteThreads: List<Thread>,
         filterFolder: Folder?,
     ): Unit = withContext(ioDispatcher) {
+        val cachedFolderNames = mutableMapOf<String, String>()
+        val threads = remoteThreads.map { remoteThread ->
+            ensureActive()
 
-        fun Thread.setFolderId(filterFolder: Folder?) {
-            this.folderId = if (messages.count() == 1) messages.single().folderId else filterFolder!!.id
-        }
-
-        fun Thread.keepOldMessagesData(realm: MutableRealm) {
-            messages.forEach { remoteMessage: Message ->
-                this@withContext.ensureActive()
-
-                val localMessage = MessageController.getMessage(remoteMessage.uid, realm)
-                if (localMessage == null) {
-                    // The Search only returns Messages from TRASH if we explicitly selected this folder,
-                    // which is the reason why we can compute the `isTrashed` value so loosely.
-                    remoteMessage.initLocalValues(
-                        areHeavyDataFetched = false,
-                        isTrashed = filterFolder?.role == FolderRole.TRASH,
-                        messageIds = remoteMessage.computeMessageIds(),
-                        draftLocalUuid = null,
-                        isFromSearch = true,
-                        isDeletedOnApi = false,
-                        latestCalendarEventResponse = null,
-                        swissTransferFiles = realmListOf(),
-                    )
-                } else {
-                    remoteMessage.keepLocalValues(localMessage)
-                }
-
-                messagesIds += remoteMessage.messageIds
-
-                // TODO: Remove this when the API returns the good value for [Message.hasAttachments]
-                if (remoteMessage.hasAttachable) hasAttachable = true
+            remoteThread.apply {
+                isFromSearch = true
+                setFolderId(filterFolder)
+                keepOldMessagesData(filterFolder, mailboxContentRealm())
+                sharedThreadProcessing(context, cachedFolderNames, realm = mailboxContentRealm())
             }
         }
 
-        return@withContext mailboxContentRealm().write {
-            val cachedFolderNames = mutableMapOf<String, String>()
+        mailboxContentRealm().write { saveSearchThreads(threads) }
+    }
 
-            val threads = remoteThreads.map { remoteThread ->
-                ensureActive()
 
-                remoteThread.apply {
-                    isFromSearch = true
-                    setFolderId(filterFolder)
-                    keepOldMessagesData(this@write)
-                    sharedThreadProcessing(context, cachedFolderNames, realm = this@write)
-                }
+    private fun Thread.setFolderId(filterFolder: Folder?) {
+        this.folderId = if (messages.count() == 1) messages.single().folderId else filterFolder!!.id
+    }
+
+    private suspend fun Thread.keepOldMessagesData(filterFolder: Folder?, realm: Realm) {
+        messages.forEach { remoteMessage: Message ->
+            currentCoroutineContext().ensureActive()
+
+            val localMessage = MessageController.getMessage(remoteMessage.uid, realm)
+            if (localMessage == null) {
+                // The Search only returns Messages from TRASH if we explicitly selected this folder,
+                // which is the reason why we can compute the `isTrashed` value so loosely.
+                remoteMessage.initLocalValues(
+                    areHeavyDataFetched = false,
+                    isTrashed = filterFolder?.role == FolderRole.TRASH,
+                    messageIds = remoteMessage.computeMessageIds(),
+                    draftLocalUuid = null,
+                    isFromSearch = true,
+                    isDeletedOnApi = false,
+                    latestCalendarEventResponse = null,
+                    swissTransferFiles = realmListOf(),
+                )
+            } else {
+                remoteMessage.keepLocalValues(localMessage)
             }
 
-            saveSearchThreads(threads)
+            messagesIds += remoteMessage.messageIds
+
+            // TODO: Remove this when the API returns the good value for [Message.hasAttachments]
+            if (remoteMessage.hasAttachable) hasAttachable = true
         }
     }
     //endregion
