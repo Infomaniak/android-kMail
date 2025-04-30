@@ -79,7 +79,7 @@ class ThreadController @Inject constructor(
     }
 
     /**
-     * Initialize and retrieve the search Threads obtained from the API.
+     * Initialize the search Threads obtained from the API.
      * - Format the remote Threads to make them compatible with the existing logic.
      * - Preserve old Messages data if it already exists locally.
      * - Handle duplicates using the existing logic.
