@@ -166,7 +166,7 @@ class SearchViewModel @Inject constructor(
         folder: Folder? = filterFolder,
         shouldGetNextPage: Boolean = false,
     ) = withContext(ioCoroutineContext) {
-        searchJob?.cancel()
+        cancelSearch()
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
@@ -213,7 +213,7 @@ class SearchViewModel @Inject constructor(
         val searchFilters = searchUtils.searchFilters(query, newFilters, resource)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resource)
 
-        searchJob?.ensureActive()
+        currentCoroutineContext().ensureActive()
 
         if (isFirstPage && isLastPage) searchUtils.deleteRealmSearchData()
 
