@@ -197,7 +197,7 @@ class ThreadListFragment : TwoPaneFragment() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             binding.appBarLayout.applyStatusBarInsets(insets)
             binding.threadsList.applySideAndBottomSystemInsets(insets)
-            val marginStandardSize = resources.getDimensionPixelSize(com.infomaniak.lib.core.R.dimen.marginStandard)
+            val marginStandardSize = resources.getDimensionPixelSize(RCore.dimen.marginStandard)
             binding.newMessageFab.setMargins(bottom = marginStandardSize + insets.systemBars().bottom)
             // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
             insets
