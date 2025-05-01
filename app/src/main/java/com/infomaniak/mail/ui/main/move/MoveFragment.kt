@@ -38,10 +38,7 @@ import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
-import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
-import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
+import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -66,6 +63,11 @@ class MoveFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
+
+        binding.applyWindowInsetsListener { _, insets ->
+            binding.appBarLayout.applyStatusBarInsets(insets)
+            binding.foldersRecyclerView.applySideAndBottomSystemInsets(insets)
+        }
 
         bindAlertToViewLifecycle(createFolderDialog)
         setupRecyclerView()
