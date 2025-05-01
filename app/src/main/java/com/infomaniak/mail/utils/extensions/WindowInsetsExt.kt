@@ -37,12 +37,7 @@ fun View.applyStatusBarInsets(insets: WindowInsetsCompat) {
 
 fun View.applySideAndBottomSystemInsets(insets: WindowInsetsCompat) {
     val systemBars = insets.systemBars()
-    val systemGesture = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
-    updatePadding(
-        left = maxOf(systemGesture.left, systemBars.left),
-        right = maxOf(systemGesture.right, systemBars.right),
-        bottom = maxOf(systemGesture.bottom, systemBars.bottom),
-    )
+    updatePadding(left = systemBars.left, right = systemBars.right, bottom = systemBars.bottom)
 }
 
 fun WindowInsetsCompat.statusBar() = getInsets(WindowInsetsCompat.Type.statusBars())
