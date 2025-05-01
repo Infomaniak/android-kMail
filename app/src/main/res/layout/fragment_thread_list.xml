@@ -266,6 +266,7 @@
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- The margin bottom is also managed by the Edge-To-Edge, see [ThreadListFragment] -->
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/newMessageFab"
             android:layout_width="wrap_content"

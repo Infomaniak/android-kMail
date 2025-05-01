@@ -50,11 +50,8 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.Swi
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -199,7 +196,9 @@ class ThreadListFragment : TwoPaneFragment() {
     private fun handleEdgeToEdge() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             binding.appBarLayout.applyStatusBarInsets(insets)
-            binding.threadsConstraintLayout.applySideAndBottomSystemInsets(insets)
+            binding.threadsList.applySideAndBottomSystemInsets(insets)
+            val marginStandardSize = resources.getDimensionPixelSize(com.infomaniak.lib.core.R.dimen.marginStandard)
+            binding.newMessageFab.setMargins(bottom = marginStandardSize + insets.systemBars().bottom)
             // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
             insets
         }
