@@ -248,7 +248,7 @@ class MainActivity : BaseActivity() {
                 )
             }
 
-            menuDrawerFragment.view?.applySideAndBottomSystemInsets(insets)
+            menuDrawerFragment.drawerContent?.applySideAndBottomSystemInsets(insets)
 
             insets
         }
