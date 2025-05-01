@@ -29,7 +29,7 @@ import com.infomaniak.lib.core.api.InternalTranslatedErrorCode
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.ErrorCode
+import com.infomaniak.lib.core.utils.ErrorCodeTranslated
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -132,7 +132,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        private fun getErrorResponse(error: ErrorCode.Translated): ApiResponse<Any> {
+        private fun getErrorResponse(error: ErrorCodeTranslated): ApiResponse<Any> {
             return ApiResponse(result = ApiResponseStatus.ERROR, error = error.toApiError())
         }
     }
