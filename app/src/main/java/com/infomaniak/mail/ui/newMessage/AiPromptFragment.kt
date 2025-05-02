@@ -29,6 +29,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -37,7 +40,10 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.ime
 import com.infomaniak.mail.utils.extensions.postfixWithTag
+import com.infomaniak.mail.utils.extensions.systemBars
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,6 +77,11 @@ class AiPromptFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.applyWindowInsetsListener { root, insets ->
+            val imeBottomInsets = insets.ime().bottom
+            root.setMargins(bottom = imeBottomInsets)
+            binding.aiCardLayout.setMargins(bottom = if (imeBottomInsets == 0) insets.systemBars().bottom else 0)
+        }
         setUi()
     }
 
@@ -132,7 +143,7 @@ class AiPromptFragment : Fragment() {
     }
 
     private fun updateButtonEnabledState(prompt: Editable?) {
-        binding.generateButton.isEnabled = prompt?.isNotEmpty() ?: false
+        binding.generateButton.isEnabled = prompt?.isNotEmpty() == true
     }
 
     override fun onResume() {
