@@ -59,10 +59,5 @@ class DetailedRecipientAdapter(
         bimi = newBimi
     }
 
-    fun clear() {
-        recipients = emptyList()
-        bimi = null
-    }
-
     class DetailedRecipientViewHolder(val binding: ItemDetailedContactBinding) : ViewHolder(binding.root)
 }

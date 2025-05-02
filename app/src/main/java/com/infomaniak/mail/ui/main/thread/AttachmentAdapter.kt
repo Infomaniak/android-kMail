@@ -76,19 +76,10 @@ class AttachmentAdapter(
 
     override fun getItemCount(): Int = runCatchingRealm { attachments.count() }.getOrDefault(0)
 
-    override fun onViewRecycled(holder: AttachmentViewHolder) {
-        super.onViewRecycled(holder)
-        holder.onViewRecycled()
-    }
-
     fun submitList(newList: List<Attachable>) = runCatchingRealm {
         attachments.clear()
         attachments.addAll(newList)
         notifyDataSetChanged()
-    }
-
-    fun clear() {
-        attachments.clear()
     }
 
     private fun ItemAttachmentBinding.toggleEndIconVisibility(shouldDisplayCloseButton: Boolean) {
@@ -96,10 +87,5 @@ class AttachmentAdapter(
         moreButton.isVisible = !shouldDisplayCloseButton
     }
 
-    class AttachmentViewHolder(val binding: ItemAttachmentBinding) : ViewHolder(binding.root) {
-
-        fun onViewRecycled() {
-            binding.attachmentDetails.cleanUp()
-        }
-    }
+    class AttachmentViewHolder(val binding: ItemAttachmentBinding) : ViewHolder(binding.root)
 }

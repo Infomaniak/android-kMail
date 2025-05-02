@@ -257,11 +257,6 @@ class ThreadAdapter(
         }
     }
 
-    override fun onViewRecycled(holder: ThreadAdapterViewHolder) {
-        super.onViewRecycled(holder)
-        if (holder is MessageViewHolder) holder.onViewRecycled()
-    }
-
     private fun initMapForNewMessage(message: Message, position: Int) = with(threadAdapterState) {
         if (isExpandedMap[message.uid] == null) {
             isExpandedMap[message.uid] = message.shouldBeExpanded(position, items.lastIndex)
@@ -980,27 +975,6 @@ class ThreadAdapter(
                     onWebViewFinishedLoading = onWebViewFinishedLoading,
                 )
             }
-        }
-
-        fun onViewRecycled() {
-            binding.bodyWebView.clearWebView()
-            _bodyWebViewClient = null
-
-            binding.fullMessageWebView.clearWebView()
-            _fullMessageWebViewClient = null
-
-            fromAdapter.clear()
-            toAdapter.clear()
-            ccAdapter.clear()
-            bccAdapter.clear()
-            attachmentAdapter.clear()
-        }
-
-        private fun WebView.clearWebView() {
-            stopLoading()
-            clearHistory()
-            loadUrl("about:blank")
-            destroy()
         }
 
         private fun ItemMessageBinding.promptUserForDistantImages() {
