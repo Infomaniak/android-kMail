@@ -32,6 +32,8 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingPagerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -55,6 +57,8 @@ class PermissionsOnboardingPagerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        applyWindowInsetsListener(shouldConsume = false) { root, insets -> root.applySideAndBottomSystemInsets(insets) }
 
         requireActivity().window.statusBarColor = localSettings.accentColor.getOnboardingSecondaryBackground(context)
 

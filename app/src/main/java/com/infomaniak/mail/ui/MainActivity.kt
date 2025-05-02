@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
@@ -200,6 +201,8 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
+        enableEdgeToEdge()
+        
         setContentView(binding.root)
         handleOnBackPressed()
         handleMenuDrawerEdgeToEdge()
