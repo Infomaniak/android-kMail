@@ -169,6 +169,8 @@ class ThreadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        handleEdgeToEdge()
+
         setupUi()
         setupAdapter()
         setupDialogs()
@@ -192,6 +194,13 @@ class ThreadFragment : Fragment() {
         observeReportDisplayProblemResult()
 
         observeMessageOfUserToBlock()
+    }
+
+    private fun handleEdgeToEdge() {
+        binding.applyWindowInsetsListener { rootView, insets ->
+            binding.mainAppBar.applyStatusBarInsets(insets)
+            rootView.applySideAndBottomSystemInsets(insets)
+        }
     }
 
     private fun observeReportDisplayProblemResult() {
@@ -257,7 +266,10 @@ class ThreadFragment : Fragment() {
             toolbar,
             messagesListNestedScrollView,
             shouldUpdateStatusBar = twoPaneFragment::isOnlyRightShown,
-            otherUpdates = { color -> appBar.backgroundTintList = ColorStateList.valueOf(color) },
+            otherUpdates = { color ->
+                mainAppBar.backgroundTintList = ColorStateList.valueOf(color)
+                appBar.backgroundTintList = ColorStateList.valueOf(color)
+            },
         )
     }
 
