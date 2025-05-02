@@ -177,6 +177,7 @@ private fun Thread.setFolderName(cachedNamedFolders: MutableMap<String, NamedFol
             ?.let { NamedFolder.fromFolder(it, context) }
             ?.also { cachedNamedFolders[folderId] = it }
 
+    // If the remote folder id is inbox and the thread is snoozed, instead of using its default name, change it to snooze
     val computedFolderName = cachedNamedFolder?.let {
         if (it is NamedFolder.Role && it.role == FolderRole.INBOX && isSnoozed()) {
             context.getString(FolderRole.SNOOZED.folderNameRes)
