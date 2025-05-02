@@ -123,12 +123,12 @@ class SearchFragment : TwoPaneFragment() {
         observeHistory()
     }
 
-    private fun handleEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            binding.appBar.applyStatusBarInsets(insets)
-            binding.mailRecyclerView.applySideAndBottomSystemInsets(insets)
-            binding.recentSearchesRecyclerView.applySideAndBottomSystemInsets(insets)
-            binding.noResultsEmptyState.applySideAndBottomSystemInsets(insets)
+    private fun handleEdgeToEdge(): Unit = with(binding) {
+        ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+            appBar.applyStatusBarInsets(insets)
+            mailRecyclerView.applySideAndBottomSystemInsets(insets)
+            recentSearchesRecyclerView.applySideAndBottomSystemInsets(insets)
+            noResultsEmptyState.applySideAndBottomSystemInsets(insets)
             insets
         }
     }
