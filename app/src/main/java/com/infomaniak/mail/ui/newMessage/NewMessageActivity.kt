@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebView
