@@ -39,6 +39,8 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -77,6 +79,8 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        applyWindowInsetsListener(shouldConsume = false) { root, insets -> root.applySideAndBottomSystemInsets(insets) }
 
         loginUtils.initShowError(::showError)
 
