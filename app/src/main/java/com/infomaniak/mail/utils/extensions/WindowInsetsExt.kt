@@ -45,3 +45,4 @@ fun View.applySideAndBottomSystemInsets(insets: WindowInsetsCompat) {
 
 fun WindowInsetsCompat.statusBar() = getInsets(WindowInsetsCompat.Type.statusBars())
 fun WindowInsetsCompat.systemBars() = getInsets(WindowInsetsCompat.Type.systemBars())
+fun WindowInsetsCompat.ime() = getInsets(WindowInsetsCompat.Type.ime())
