@@ -535,6 +535,7 @@ class RefreshController @Inject constructor(
         folderId: String,
         currentFolderRefreshStrategy: RefreshStrategy,
     ): ImpactedFolders {
+        if (shortUids.isEmpty()) return ImpactedFolders()
 
         val threads = mutableSetOf<Thread>()
         shortUids.forEach { shortUid ->
