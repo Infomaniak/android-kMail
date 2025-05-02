@@ -218,8 +218,8 @@ class SearchViewModel @Inject constructor(
         if (isFirstPage && isLastPage) searchUtils.deleteRealmSearchData()
 
         if (apiResponse.isSuccess()) {
-            createSearchThreadsFromRemote(apiResponse.data?.threads, folder)
             with(apiResponse) {
+                data?.let { createSearchThreadsFromRemote(it.threads, folder) }
                 resourceNext = data?.resourceNext
                 isFirstPage = data?.resourcePrevious == null
             }
@@ -240,12 +240,10 @@ class SearchViewModel @Inject constructor(
         visibilityMode.postValue(resultsVisibilityMode)
     }
 
-    private suspend fun createSearchThreadsFromRemote(apiThreads: List<Thread>?, folder: Folder?) {
+    private suspend fun createSearchThreadsFromRemote(remoteThreads: List<Thread>, folder: Folder?) {
         runCatching {
-            apiThreads?.let { remoteThreads ->
-                val threads = searchUtils.convertRemoteThreadsToSearchThreads(remoteThreads, folder)
-                threadController.saveSearchThreads(threads)
-            }
+            val searchThreads = searchUtils.convertRemoteThreadsToSearchThreads(remoteThreads, folder)
+            threadController.saveSearchThreads(searchThreads)
         }.getOrElse { exception ->
             exception.printStackTrace()
             Sentry.captureException(exception)
