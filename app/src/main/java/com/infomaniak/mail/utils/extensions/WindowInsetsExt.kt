@@ -23,10 +23,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.viewbinding.ViewBinding
 
-fun ViewBinding.applyWindowInsetsListener(listener: (rootView: View, insets: WindowInsetsCompat) -> Unit) {
+fun ViewBinding.applyWindowInsetsListener(
+    shouldConsume: Boolean = true,
+    listener: (rootView: View, insets: WindowInsetsCompat) -> Unit,
+) {
     ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
         listener(view, insets)
-        WindowInsetsCompat.CONSUMED
+        if (shouldConsume) WindowInsetsCompat.CONSUMED else insets
     }
 }
 
@@ -42,3 +45,4 @@ fun View.applySideAndBottomSystemInsets(insets: WindowInsetsCompat) {
 
 fun WindowInsetsCompat.statusBar() = getInsets(WindowInsetsCompat.Type.statusBars())
 fun WindowInsetsCompat.systemBars() = getInsets(WindowInsetsCompat.Type.systemBars())
+fun WindowInsetsCompat.ime() = getInsets(WindowInsetsCompat.Type.ime())
