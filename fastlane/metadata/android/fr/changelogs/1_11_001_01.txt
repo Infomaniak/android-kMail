@@ -1,0 +1,2 @@
+- Corrige les e-mails invisible à l'intérieur d'une conversation
+- Rend les erreurs lors du partage d'un e-mail plus claire

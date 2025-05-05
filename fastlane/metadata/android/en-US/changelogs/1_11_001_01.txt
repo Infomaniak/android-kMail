@@ -1,0 +1,2 @@
+- Fix invisible emails inside of an opened thread
+- Make sharing email error clearer
