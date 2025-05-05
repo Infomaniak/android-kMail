@@ -27,13 +27,17 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
+import com.infomaniak.mail.ui.main.thread.actions.ActionItemView.TrailingContent
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import kotlinx.coroutines.runBlocking
 
 abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     protected var binding: BottomSheetActionsMenuBinding by safeBinding()
+
     override val mainViewModel: MainViewModel by activityViewModels()
     protected val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
 
@@ -72,6 +76,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
 
         computeReportDisplayProblemVisibility()
+        setShareTrailingContent()
 
         archive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReadUnread() }
@@ -84,7 +89,13 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         favorite.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onFavorite() }
         reportJunk.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportJunk() }
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
-        share.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onShare() }
+        share.setClosingOnClickListener(shouldCloseMultiSelection) {
+            if (mainViewModel.currentMailbox.value?.isFreeMailbox == true) {
+                openMyKSuiteUpgradeBottomSheet("shareEmail", ThreadListFragment::class.java.name)
+            } else {
+                onClickListener.onShare()
+            }
+        }
         saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
 
@@ -98,13 +109,21 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
+    private fun setShareTrailingContent() {
+        binding.share.trailingContent = if (mainViewModel.currentMailbox.value?.isFreeMailbox == true) {
+            TrailingContent.MyKSuiteChip
+        } else {
+            TrailingContent.None
+        }
+    }
+
     fun initOnClickListener(listener: OnActionClick) {
         onClickListener = listener
     }
 
     private fun computeReportDisplayProblemVisibility() = runBlocking {
         binding.reportDisplayProblem.isVisible =
-            mainViewModel.currentMailbox.value?.let { AccountUtils.getUserById(it.userId)?.isStaff } ?: false
+            mainViewModel.currentMailbox.value?.let { AccountUtils.getUserById(it.userId)?.isStaff } == true
     }
 
     private fun computeUnreadStyle(isSeen: Boolean) = if (isSeen) {
