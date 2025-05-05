@@ -504,7 +504,7 @@ class MainViewModel @Inject constructor(
             if (isSuccess()) {
                 forceRefreshThreads()
             } else {
-                snackbarManager.postValue(appContext.getString(translatedError))
+                snackbarManager.postValue(appContext.getString(translateError()))
             }
         }
     }
@@ -654,7 +654,7 @@ class MainViewModel @Inject constructor(
                 else -> appContext.getString(R.string.snackbarMessageMoved, destination)
             }
         } else {
-            appContext.getString(apiResponses.first().translatedError)
+            appContext.getString(apiResponses.first().translateError())
         }
 
         val undoData = if (undoResources.isEmpty()) null else UndoData(undoResources, undoFoldersIds, undoDestinationId)
@@ -692,7 +692,7 @@ class MainViewModel @Inject constructor(
                 if (isSuccess()) {
                     refreshFoldersAsync(currentMailbox.value!!, ImpactedFolders(mutableSetOf(FolderRole.SCHEDULED_DRAFTS)))
                 } else {
-                    snackbarManager.postValue(title = appContext.getString(translatedError))
+                    snackbarManager.postValue(title = appContext.getString(translateError()))
                 }
             }
         } ?: run {
@@ -712,7 +712,7 @@ class MainViewModel @Inject constructor(
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
             onSuccess()
         } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translatedError))
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
         }
     }
 
@@ -788,7 +788,7 @@ class MainViewModel @Inject constructor(
         val destination = destinationFolder.getLocalizedName(appContext)
 
         val snackbarTitle = when {
-            apiResponses.allFailed() -> appContext.getString(apiResponses.first().translatedError)
+            apiResponses.allFailed() -> appContext.getString(apiResponses.first().translateError())
             message == null -> appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, threads.count(), destination)
             else -> appContext.getString(R.string.snackbarMessageMoved, destination)
         }
@@ -1072,7 +1072,7 @@ class MainViewModel @Inject constructor(
                 if (getActionFolderRole(message.threads, message) != FolderRole.SPAM) toggleMessageSpamStatus(threadUid, message)
                 R.string.snackbarReportPhishingConfirmation
             } else {
-                translatedError
+                translateError()
             }
 
             reportPhishingTrigger.postValue(Unit)
@@ -1113,7 +1113,7 @@ class MainViewModel @Inject constructor(
 
         with(ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)) {
 
-            val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translatedError
+            val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translateError()
 
             snackbarManager.postValue(appContext.getString(snackbarTitle))
         }
@@ -1264,8 +1264,7 @@ class MainViewModel @Inject constructor(
 
         val snackbarTitle = when {
             failedCall == null -> R.string.snackbarMoveCancelled
-            failedCall.translatedError == 0 -> RCore.string.anErrorHasOccurred
-            else -> failedCall.translatedError
+            else -> failedCall.translateError()
         }
 
         snackbarManager.postValue(appContext.getString(snackbarTitle))
@@ -1356,7 +1355,7 @@ class MainViewModel @Inject constructor(
                 updateUserInfo()
                 R.string.snackbarContactSaved
             } else {
-                translatedError
+                translateError()
             }
 
             snackbarManager.postValue(appContext.getString(snackbarTitle))

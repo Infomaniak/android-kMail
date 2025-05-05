@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -200,7 +201,7 @@ class SharedUtils @Inject constructor(
                     if (apiException !is ApiController.NetworkException) {
                         Sentry.captureException(SignatureException(apiException.message, apiException))
                     }
-                    translatedError
+                    translateError()
                 }
             }
         }

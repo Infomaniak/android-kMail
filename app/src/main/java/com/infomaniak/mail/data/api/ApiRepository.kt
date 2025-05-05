@@ -22,10 +22,11 @@ import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.api.ApiController.ApiMethod.*
+import com.infomaniak.lib.core.api.ApiController.toApiError
 import com.infomaniak.lib.core.api.ApiRepositoryCore
+import com.infomaniak.lib.core.api.InternalTranslatedErrorCode
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
@@ -490,7 +491,7 @@ object ApiRepository : ApiRepositoryCore() {
         return ApiController.json.decodeFromString(response.body?.string() ?: "")
 
     }.getOrElse {
-        return ApiResponse(result = ApiResponseStatus.ERROR, translatedError = R.string.anErrorHasOccurred)
+        return ApiResponse(result = ApiResponseStatus.ERROR, error = InternalTranslatedErrorCode.UnknownError.toApiError())
     }
 
     fun getSwissTransferContainer(containerUuid: String): ApiResponse<SwissTransferContainer> {

@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.mail.R
@@ -140,7 +141,7 @@ object AttachmentExt {
             }
         } else {
             val baseMessage = "Upload failed for attachment $localUuid"
-            val errorMessage = "error : ${apiResponse?.translatedError}"
+            val errorMessage = "error : ${apiResponse?.translateError()}"
             SentryLog.i(
                 tag = ATTACHMENT_TAG,
                 msg = "$baseMessage - $errorMessage - data : ${apiResponse?.data}",

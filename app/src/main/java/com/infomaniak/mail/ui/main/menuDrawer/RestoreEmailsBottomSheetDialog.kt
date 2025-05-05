@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import com.infomaniak.core.utils.FORMAT_EVENT_DATE
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
@@ -104,7 +105,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
                     }
                 }
             } else {
-                showSnackbar(apiResponse.translatedError)
+                showSnackbar(apiResponse.translateError())
                 findNavController().popBackStack()
             }
         }
@@ -118,7 +119,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         restoreEmailViewModel.restoreEmails(formattedDate).observe(viewLifecycleOwner) { apiResponse ->
             restoreEmailsButtonProgressTimer.cancel()
             binding.restoreMailsButton.hideProgressCatching(R.string.buttonConfirmRestoreEmails)
-            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else apiResponse.translatedError)
+            showSnackbar(if (apiResponse.isSuccess()) R.string.snackbarRestorationLaunched else apiResponse.translateError())
             findNavController().popBackStack()
         }
     }
