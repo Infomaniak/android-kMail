@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import android.content.Context
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
@@ -29,7 +28,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.SearchUtils.Companion.convertToSearchThreads
+import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.extensions.replaceContent
 import io.realm.kotlin.MutableRealm
@@ -43,14 +42,12 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 class ThreadController @Inject constructor(
-    private val context: Context,
+    private val searchUtils: SearchUtils,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -79,97 +76,13 @@ class ThreadController @Inject constructor(
     fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
         return getThreadQuery(uid, mailboxContentRealm()).asFlow()
     }
-
-    /**
-     * Initialize and retrieve the search Threads obtained from the API.
-     * - Format the remote Threads to make them compatible with the existing logic.
-     * - Preserve old Messages data if it already exists locally.
-     * - Handle duplicates using the existing logic.
-     * @param remoteThreads The list of API Threads that need to be processed.
-     * @param filterFolder The selected Folder on which we filter the Search.
-     * @return List of search Threads. The search only returns Messages from SPAM or TRASH if we explicitly selected those folders
-     */
-    suspend fun initAndGetSearchFolderThreads(
-        remoteThreads: List<Thread>,
-        filterFolder: Folder?,
-    ): List<Thread> = withContext(ioDispatcher) {
-
-        fun MutableRealm.keepOldMessagesData(remoteThread: Thread) {
-
-            remoteThread.messages.forEach { remoteMessage: Message ->
-                ensureActive()
-
-                val localMessage = MessageController.getMessage(remoteMessage.uid, realm = this)
-
-                if (localMessage == null) {
-                    // The Search only returns Messages from TRASH if we explicitly selected this folder,
-                    // which is the reason why we can compute the `isTrashed` value so loosely.
-                    remoteMessage.initLocalValues(
-                        areHeavyDataFetched = false,
-                        isTrashed = filterFolder?.role == FolderRole.TRASH,
-                        messageIds = remoteMessage.computeMessageIds(),
-                        draftLocalUuid = null,
-                        isFromSearch = true,
-                        isDeletedOnApi = false,
-                        latestCalendarEventResponse = null,
-                        swissTransferFiles = realmListOf(),
-                    )
-                } else {
-                    remoteMessage.keepLocalValues(localMessage)
-                }
-
-                remoteThread.messagesIds += remoteMessage.messageIds
-
-                // TODO: Remove this when the API returns the good value for [Message.hasAttachments]
-                if (remoteMessage.hasAttachable) remoteThread.hasAttachable = true
-            }
-        }
-
-        return@withContext mailboxContentRealm().write {
-            val searchFolder = FolderController.getOrCreateSearchFolder(realm = this)
-            val cachedFolderIds = mutableMapOf<String, String>()
-
-            remoteThreads.map { remoteThread ->
-                ensureActive()
-
-                remoteThread.isFromSearch = true
-
-                // If we only have 1 Message, we want to display its Folder name.
-                val folderId = if (remoteThread.messages.count() == 1) {
-                    val firstMessageFolderId = remoteThread.messages.single().folderId
-                    setFolderName(firstMessageFolderId, remoteThread, cachedFolderIds)
-                    firstMessageFolderId
-                } else {
-                    filterFolder!!.id
-                }
-                remoteThread.folderId = folderId
-
-                keepOldMessagesData(remoteThread)
-
-                return@map remoteThread
-            }.also(searchFolder.threads::addAll)
-        }
-    }
-
-    private fun MutableRealm.setFolderName(
-        firstMessageFolderId: String,
-        remoteThread: Thread,
-        cachedFolderIds: MutableMap<String, String>,
-    ) {
-        val folderName = cachedFolderIds[firstMessageFolderId]
-            ?: FolderController.getFolder(firstMessageFolderId, this)
-                ?.getLocalizedName(context)
-                ?.also { cachedFolderIds[firstMessageFolderId] = it }
-
-        folderName?.let { remoteThread.folderName = it }
-    }
     //endregion
 
     //region Edit data
-    suspend fun saveThreads(searchMessages: List<Message>) {
+    suspend fun saveSearchThreads(searchThreads: List<Thread>) {
         mailboxContentRealm().write {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
-                threads.replaceContent(searchMessages.convertToSearchThreads())
+                threads.replaceContent(searchThreads)
             }
         }
     }

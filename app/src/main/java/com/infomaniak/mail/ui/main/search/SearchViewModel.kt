@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.search
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
@@ -30,8 +29,8 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
@@ -167,7 +166,7 @@ class SearchViewModel @Inject constructor(
         folder: Folder? = filterFolder,
         shouldGetNextPage: Boolean = false,
     ) = withContext(ioCoroutineContext) {
-        searchJob?.cancel()
+        cancelSearch()
         searchJob = launch {
             delay(SEARCH_DEBOUNCE_DURATION)
             ensureActive()
@@ -206,18 +205,6 @@ class SearchViewModel @Inject constructor(
         query: String,
         shouldGetNextPage: Boolean,
     ) {
-
-        suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
-            runCatching {
-                data?.threads?.let { remoteThreads ->
-                    threadController.initAndGetSearchFolderThreads(remoteThreads, folder)
-                }
-            }.getOrElse { exception ->
-                exception.printStackTrace()
-                Sentry.captureException(exception)
-            }
-        }
-
         visibilityMode.postValue(VisibilityMode.LOADING)
 
         val currentMailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
@@ -226,18 +213,18 @@ class SearchViewModel @Inject constructor(
         val searchFilters = searchUtils.searchFilters(query, newFilters, resource)
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resource)
 
-        searchJob?.ensureActive()
+        currentCoroutineContext().ensureActive()
 
         if (isFirstPage && isLastPage) searchUtils.deleteRealmSearchData()
 
         if (apiResponse.isSuccess()) {
             with(apiResponse) {
-                initSearchFolderThreads()
+                data?.let { createSearchThreadsFromRemote(it.threads, folder) }
                 resourceNext = data?.resourceNext
                 isFirstPage = data?.resourcePrevious == null
             }
         } else if (isLastPage) {
-            threadController.saveThreads(searchMessages = messageController.searchMessages(query, newFilters, folderId))
+            createSearchThreadsFromLocal(query, newFilters, folderId)
         }
 
         if (folder != lastExecutedFolder) lastExecutedFolder = folder
@@ -251,6 +238,26 @@ class SearchViewModel @Inject constructor(
         }
 
         visibilityMode.postValue(resultsVisibilityMode)
+    }
+
+    private suspend fun createSearchThreadsFromRemote(remoteThreads: List<Thread>, folder: Folder?) {
+        runCatching {
+            val searchThreads = searchUtils.convertRemoteThreadsToSearchThreads(remoteThreads, folder)
+            threadController.saveSearchThreads(searchThreads)
+        }.getOrElse { exception ->
+            exception.printStackTrace()
+            Sentry.captureException(exception)
+        }
+    }
+
+    private suspend fun createSearchThreadsFromLocal(
+        query: String,
+        newFilters: Set<ThreadFilter>,
+        folderId: String,
+    ) {
+        val searchMessages = messageController.searchMessages(query, newFilters, folderId)
+        val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
+        threadController.saveSearchThreads(searchThreads)
     }
 
     companion object {
