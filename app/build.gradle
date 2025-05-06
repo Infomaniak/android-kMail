@@ -61,6 +61,7 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility javaVersion
         targetCompatibility javaVersion
     }
@@ -123,6 +124,8 @@ dependencies {
     implementation libs.sentry.android.fragment
 
     implementation libs.coil.svg
+
+    coreLibraryDesugaring libs.desugar.jdk
 
     // Compose
     implementation libs.compose.ui.android
