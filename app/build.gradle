@@ -94,6 +94,7 @@ dependencies {
     implementation project(':Core:Legacy:Confetti')
     implementation project(':Core:Legacy:Stores')
     implementation project(':Core:MyKSuite')
+    implementation project(':Core:Network')
     implementation project(':HtmlCleaner')
 
     implementation libs.rich.html.editor
