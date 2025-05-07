@@ -25,10 +25,12 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.search.NamedFolder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.realmListOf
@@ -90,13 +92,13 @@ class SearchUtils @Inject constructor(
     }
 
     fun convertLocalMessagesToSearchThreads(searchMessages: List<Message>): List<Thread> {
-        val cachedFolderNames = mutableMapOf<String, String>()
+        val cachedNamedFolders = mutableMapOf<String, NamedFolder>()
         return searchMessages.map { message ->
             message.toThread().apply {
                 uid = "search-${message.uid}"
                 isFromSearch = true
                 recomputeThread()
-                sharedThreadProcessing(appContext, cachedFolderNames, realm = mailboxContentRealm())
+                sharedThreadProcessing(appContext, cachedNamedFolders, realm = mailboxContentRealm())
             }
         }
     }
@@ -110,7 +112,7 @@ class SearchUtils @Inject constructor(
      * @param filterFolder The selected Folder on which we filter the Search.
      */
     suspend fun convertRemoteThreadsToSearchThreads(remoteThreads: List<Thread>, filterFolder: Folder?): List<Thread> {
-        val cachedFolderNames = mutableMapOf<String, String>()
+        val cachedNamedFolders = mutableMapOf<String, NamedFolder>()
         return remoteThreads.map { remoteThread ->
             currentCoroutineContext().ensureActive()
 
@@ -118,7 +120,7 @@ class SearchUtils @Inject constructor(
                 isFromSearch = true
                 setFolderId(filterFolder)
                 keepOldMessagesData(filterFolder, mailboxContentRealm())
-                sharedThreadProcessing(appContext, cachedFolderNames, realm = mailboxContentRealm())
+                sharedThreadProcessing(appContext, cachedNamedFolders, realm = mailboxContentRealm())
             }
         }
     }
@@ -165,15 +167,26 @@ class SearchUtils @Inject constructor(
  * Thread processing that applies to both search threads from the api and from realm. Be careful, it relies on
  * [Thread.folderId] being set correctly.
  */
-private fun Thread.sharedThreadProcessing(context: Context, cachedFolderNames: MutableMap<String, String>, realm: Realm) {
-    setFolderName(cachedFolderNames, realm, context)
+private fun Thread.sharedThreadProcessing(context: Context, cachedNamedFolders: MutableMap<String, NamedFolder>, realm: Realm) {
+    setFolderName(cachedNamedFolders, realm, context)
 }
 
-private fun Thread.setFolderName(cachedFolderNames: MutableMap<String, String>, realm: Realm, context: Context) {
-    val computedFolderName = cachedFolderNames[folderId]
+private fun Thread.setFolderName(cachedNamedFolders: MutableMap<String, NamedFolder>, realm: Realm, context: Context) {
+    val cachedNamedFolder = cachedNamedFolders[folderId]
         ?: FolderController.getFolder(folderId, realm)
-            ?.getLocalizedName(context)
-            ?.also { cachedFolderNames[folderId] = it }
+            ?.let { NamedFolder.fromFolder(it, context) }
+            ?.also { cachedNamedFolders[folderId] = it }
 
-    computedFolderName?.let { folderName = it }
+    cachedNamedFolder?.let { namedFolder ->
+        folderName = namedFolder.computeDisplayedName(thread = this, context)
+    }
+}
+
+// If the remote folder id is inbox and the thread is snoozed, instead of using its default name, change it to snooze
+private fun NamedFolder.computeDisplayedName(thread: Thread, context: Context): String {
+    return if (this is NamedFolder.Role && role == FolderRole.INBOX && thread.isSnoozed()) {
+        context.getString(FolderRole.SNOOZED.folderNameRes)
+    } else {
+        getName(context)
+    }
 }
