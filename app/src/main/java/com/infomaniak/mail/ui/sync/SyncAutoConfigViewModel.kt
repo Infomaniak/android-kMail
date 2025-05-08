@@ -21,7 +21,7 @@ import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.R
@@ -49,13 +49,7 @@ class SyncAutoConfigViewModel @Inject constructor(
 
     fun isSyncAppUpToDate(): Boolean = runCatching {
         val packageInfo = appContext.packageManager.getPackageInfo(SYNC_PACKAGE, PackageManager.GET_ACTIVITIES)
-
-        val versionCode = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            packageInfo.versionCode.toLong()
-        } else {
-            packageInfo.longVersionCode
-        }
-
+        val versionCode = if (SDK_INT >= 28) packageInfo.longVersionCode else packageInfo.versionCode.toLong()
         versionCode >= SYNC_MINIMUM_VERSION
     }.getOrElse {
         false

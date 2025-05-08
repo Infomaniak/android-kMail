@@ -27,7 +27,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.net.Uri
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.text.Html
 import android.text.Spannable
 import android.text.Spanned
@@ -434,7 +434,7 @@ fun Context.copyStringToClipboard(value: String, @StringRes snackbarTitle: Int, 
     val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     clipboardManager.setPrimaryClip(ClipData.newPlainText(value, value))
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) snackbarManager.setValue(getString(snackbarTitle))
+    if (SDK_INT < 33) snackbarManager.setValue(getString(snackbarTitle))
 }
 
 fun Context.shareString(value: String) {
@@ -505,7 +505,7 @@ fun Fragment.setSystemBarsColors(
 }
 
 fun Window.updateNavigationBarColor(@ColorInt color: Int) {
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) navigationBarColor = color
+    if (SDK_INT >= 27) navigationBarColor = color
 }
 
 fun Activity.getMainApplication() = (application as MainApplication)
@@ -669,9 +669,7 @@ fun <T : Correspondent> List<T>.findUser(): T? = firstOrNull(Correspondent::isMe
 fun List<Correspondent>.isUserIn(): Boolean = findUser() != null
 
 fun ViewPager2.removeOverScrollForApiBelow31() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-        (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
-    }
+    if (SDK_INT < 31) (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
 }
 
 fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean): Int? {

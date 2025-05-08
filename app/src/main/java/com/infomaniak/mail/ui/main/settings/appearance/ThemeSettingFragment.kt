@@ -17,13 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.settings.appearance
 
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
-import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -69,7 +69,7 @@ class ThemeSettingFragment : Fragment() {
     }
 
     private fun setSystemThemeVisibility() {
-        binding.systemTheme.isGone = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+        binding.systemTheme.isVisible = SDK_INT >= 29
     }
 
     private fun chooseTheme(theme: Theme) {

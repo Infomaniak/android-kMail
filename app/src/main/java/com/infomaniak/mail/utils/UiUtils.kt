@@ -21,7 +21,7 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -52,9 +52,7 @@ object UiUtils {
 
     @ColorInt
     fun pointBetweenColors(@ColorInt from: Int, @ColorInt to: Int, percent: Float): Int {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            pointBetweenColors25(from, to, percent)
-        } else {
+        return if (SDK_INT >= 26) {
             val fromColor = from.toColor()
             val toColor = to.toColor()
             Color.pack(
@@ -63,6 +61,8 @@ object UiUtils {
                 pointBetweenColor(fromColor.blue(), toColor.blue(), percent),
                 pointBetweenColor(fromColor.alpha(), toColor.alpha(), percent),
             ).toColorInt()
+        } else {
+            pointBetweenColors25(from, to, percent)
         }
     }
 

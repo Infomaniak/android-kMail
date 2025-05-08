@@ -21,14 +21,14 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.NotificationWithIdAndTag
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
-import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.pendingIntentFlags
+import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.PENDING_INTENT_FLAGS
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
@@ -65,7 +65,7 @@ class NotificationUtils @Inject constructor(
     private val notificationsJobByMailboxId = mutableMapOf<Int, Job?>()
 
     fun initNotificationChannel() = with(appContext) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (SDK_INT >= 26) {
             val channelList = mutableListOf<NotificationChannel>()
 
             val generalChannel = buildNotificationChannel(
@@ -94,7 +94,7 @@ class NotificationUtils @Inject constructor(
     }
 
     fun initMailNotificationChannel(mailbox: Mailbox) = with(appContext) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (SDK_INT >= 26) {
             val groups = mutableListOf<NotificationChannelGroup>()
             val channels = mutableListOf<NotificationChannel>()
 
@@ -193,7 +193,7 @@ class NotificationUtils @Inject constructor(
                 openThreadUid = if (isSummary) null else threadUid,
             ).toBundle(),
         )
-        return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, pendingIntentFlags)
+        return PendingIntent.getActivity(appContext, requestCode.hashCode(), intent, PENDING_INTENT_FLAGS)
     }
 
     private fun buildMessageNotification(
@@ -272,14 +272,14 @@ class NotificationUtils @Inject constructor(
 
         fun createBroadcastAction(@StringRes title: Int, intent: Intent): NotificationCompat.Action {
             val requestCode = UUID.randomUUID().hashCode()
-            val pendingIntent = PendingIntent.getBroadcast(appContext, requestCode, intent, pendingIntentFlags)
+            val pendingIntent = PendingIntent.getBroadcast(appContext, requestCode, intent, PENDING_INTENT_FLAGS)
             return NotificationCompat.Action(null, appContext.getString(title), pendingIntent)
         }
 
         fun createActivityAction(@StringRes title: Int, activity: Class<*>, args: Bundle): NotificationCompat.Action {
             val requestCode = UUID.randomUUID().hashCode()
             val intent = Intent(appContext, activity).clearStack().putExtras(args)
-            val pendingIntent = PendingIntent.getActivity(appContext, requestCode, intent, pendingIntentFlags)
+            val pendingIntent = PendingIntent.getActivity(appContext, requestCode, intent, PENDING_INTENT_FLAGS)
             return NotificationCompat.Action(null, appContext.getString(title), pendingIntent)
         }
 
@@ -352,7 +352,7 @@ class NotificationUtils @Inject constructor(
         val GENERIC_NEW_MAILS_NOTIFICATION_ID = "genericNewMailsNotificationId".hashCode()
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (SDK_INT >= 26) {
                 deleteNotificationChannels(mailbox.map { it.channelId })
             }
         }

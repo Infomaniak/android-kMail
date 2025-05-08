@@ -18,7 +18,7 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.content.Context
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.text.format.DateUtils
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -89,7 +89,7 @@ private fun Context.defaultFormatting(date: RealmInstant) = with(date.toDate()) 
 }
 
 private fun Date.formatNumericalDayMonthYear(): String {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    return if (SDK_INT >= 26) {
         formatWithLocal(FormatData.DATE, FormatStyle.SHORT)
     } else {
         format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR) // Fallback on unambiguous date format for any local

@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -94,7 +94,7 @@ class AiViewModel @Inject constructor(
     fun splitBodyAndSubject(proposition: String): Pair<String?, String> {
         val match = MATCH_SUBJECT_REGEX.find(proposition)
         // The method get on MatchGroupCollection is not available on API25
-        return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N_MR1) {
+        return if (SDK_INT == 25) {
             splitBodyAndSubjectForAPI25(match, proposition)
         } else {
             splitBodyAndSubjectAfterAPI25(match, proposition)
@@ -111,7 +111,7 @@ class AiViewModel @Inject constructor(
         return subject to content
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(26)
     private fun splitBodyAndSubjectAfterAPI25(match: MatchResult?, proposition: String): Pair<String?, String> {
         val content = match?.groups?.get("content")?.value ?: return null to proposition
         val subject = match.groups["subject"]?.value?.trim()

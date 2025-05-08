@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data
 
 import android.content.Context
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.view.ContextThemeWrapper
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -46,7 +46,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var isAppLocked by sharedValue("isAppLockedKey", false)
     var aiEngine by sharedValue("aiEngineKey", AiEngine.FALCON)
     var threadDensity by sharedValue("threadDensityKey", ThreadDensity.LARGE)
-    var theme by sharedValue("themeKey", if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) Theme.LIGHT else Theme.SYSTEM)
+    var theme by sharedValue("themeKey", if (SDK_INT >= 29) Theme.SYSTEM else Theme.LIGHT)
     var accentColor by sharedValue("accentColorKey", AccentColor.PINK)
     var swipeRight by sharedValue("swipeRightKey", SwipeAction.TUTORIAL)
     var swipeLeft by sharedValue("swipeLeftKey", SwipeAction.TUTORIAL)
