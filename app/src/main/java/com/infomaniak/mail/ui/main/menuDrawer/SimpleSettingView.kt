@@ -21,9 +21,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowInsets
 import android.widget.LinearLayout
 import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.infomaniak.lib.core.utils.getAttributes
@@ -62,18 +62,9 @@ class SimpleSettingView @JvmOverloads constructor(
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
-    override fun onApplyWindowInsets(insets: WindowInsets?): WindowInsets? {
-        insets?.let {
-            val windowsCompatInsets = WindowInsetsCompat.toWindowInsetsCompat(insets)
-            binding.appBarLayout.applyStatusBarInsets(windowsCompatInsets)
-            binding.root.applySideAndBottomSystemInsets(windowsCompatInsets)
-        }
-
-        return super.onApplyWindowInsets(insets)
-    }
-
     override fun addView(child: View, index: Int, params: ViewGroupLayoutParams?) {
         if (isBindingInflated) {
+            handleEdgeToEdge(child)
             binding.cardView.addView(child, index, params)
         } else {
             super.addView(child, index, params)
@@ -86,5 +77,13 @@ class SimpleSettingView @JvmOverloads constructor(
 
     fun setTitle(title: String) {
         binding.toolbar.title = title
+    }
+
+    private fun handleEdgeToEdge(childContent: View) {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { root, insets ->
+            binding.appBarLayout.applyStatusBarInsets(insets)
+            childContent.applySideAndBottomSystemInsets(insets)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 }

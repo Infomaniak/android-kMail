@@ -202,7 +202,7 @@ class MainActivity : BaseActivity() {
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
         enableEdgeToEdge()
-        
+
         setContentView(binding.root)
         handleOnBackPressed()
         handleMenuDrawerEdgeToEdge()
