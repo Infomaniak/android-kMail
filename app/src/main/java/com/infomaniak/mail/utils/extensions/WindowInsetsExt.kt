@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils.extensions
 
 import android.view.View
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -39,10 +40,11 @@ fun View.applyStatusBarInsets(insets: WindowInsetsCompat) {
 }
 
 fun View.applySideAndBottomSystemInsets(insets: WindowInsetsCompat) {
-    val systemBars = insets.systemBars()
+    val systemBars = Insets.max(insets.systemBars(), insets.cutout())
     updatePadding(left = systemBars.left, right = systemBars.right, bottom = systemBars.bottom)
 }
 
+fun WindowInsetsCompat.cutout() = getInsets(WindowInsetsCompat.Type.displayCutout())
 fun WindowInsetsCompat.statusBar() = getInsets(WindowInsetsCompat.Type.statusBars())
 fun WindowInsetsCompat.systemBars() = getInsets(WindowInsetsCompat.Type.systemBars())
 fun WindowInsetsCompat.ime() = getInsets(WindowInsetsCompat.Type.ime())
