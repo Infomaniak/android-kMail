@@ -21,9 +21,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowInsets
 import android.widget.LinearLayout
 import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.infomaniak.lib.core.utils.getAttributes
@@ -60,7 +60,16 @@ class SimpleSettingView @JvmOverloads constructor(
         }
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        handleEdgeToEdge()
+    }
+
+    override fun onApplyWindowInsets(insets: WindowInsets?): WindowInsets? {
+        insets?.let {
+            val windowsCompatInsets = WindowInsetsCompat.toWindowInsetsCompat(insets)
+            binding.appBarLayout.applyStatusBarInsets(windowsCompatInsets)
+            binding.root.applySideAndBottomSystemInsets(windowsCompatInsets)
+        }
+
+        return super.onApplyWindowInsets(insets)
     }
 
     override fun addView(child: View, index: Int, params: ViewGroupLayoutParams?) {
@@ -77,13 +86,5 @@ class SimpleSettingView @JvmOverloads constructor(
 
     fun setTitle(title: String) {
         binding.toolbar.title = title
-    }
-
-    private fun handleEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(this) { root, insets ->
-            binding.appBarLayout.applyStatusBarInsets(insets)
-            root.applySideAndBottomSystemInsets(insets)
-            WindowInsetsCompat.CONSUMED
-        }
     }
 }
