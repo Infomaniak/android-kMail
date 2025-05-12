@@ -1,0 +1,3 @@
+- Display messages coming from the Snooze folder as such in the Search
+- Add missing folder name tags in Search results
+- Update app icon

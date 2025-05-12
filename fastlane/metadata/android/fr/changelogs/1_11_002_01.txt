@@ -1,0 +1,3 @@
+- Affiche les messages provenant du dossier Mis en attente en tant que tel dans la Recherche
+- Ajout des balises manquantes de noms de dossier dans les résultats de la Recherche
+- Mise à jour de l'icône de l'application
