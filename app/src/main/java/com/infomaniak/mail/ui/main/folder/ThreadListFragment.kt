@@ -29,6 +29,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -196,9 +197,13 @@ class ThreadListFragment : TwoPaneFragment() {
     private fun handleEdgeToEdge() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             binding.appBarLayout.applyStatusBarInsets(insets)
-            binding.threadsList.applySideAndBottomSystemInsets(insets)
+            binding.swipeRefreshLayout.applySideAndBottomSystemInsets(insets)
             val marginStandardSize = resources.getDimensionPixelSize(RCore.dimen.marginStandard)
-            binding.newMessageFab.setMargins(bottom = marginStandardSize + insets.systemBars().bottom)
+            val insetsSystemCutout = Insets.max(insets.systemBars(), insets.cutout())
+            binding.newMessageFab.setMargins(
+                bottom = marginStandardSize + insetsSystemCutout.bottom,
+                right = marginStandardSize + insetsSystemCutout.right,
+            )
             // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
             insets
         }
