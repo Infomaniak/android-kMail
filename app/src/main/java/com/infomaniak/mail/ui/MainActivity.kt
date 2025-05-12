@@ -30,8 +30,9 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.view.ViewCompat
+import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
@@ -80,9 +81,10 @@ import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
-import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.cutout
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
-import com.infomaniak.mail.utils.extensions.statusBar
+import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -240,20 +242,25 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleMenuDrawerEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+        binding.applyWindowInsetsListener(shouldConsume = false) { _, insets ->
             val menuDrawerFragment = binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment>()
+            val systemsCutoutInsets = Insets.max(insets.systemBars(), insets.cutout())
             menuDrawerFragment.drawerHeader?.let {
                 it.setContentPadding(
-                    /* left = */ it.contentPaddingLeft,
-                    /* top = */ insets.statusBar().top,
+                    /* left = */ systemsCutoutInsets.left,
+                    /* top = */ systemsCutoutInsets.top,
                     /* right = */ it.contentPaddingRight,
                     /* bottom = */ it.contentPaddingBottom,
                 )
             }
 
-            menuDrawerFragment.drawerContent?.applySideAndBottomSystemInsets(insets)
-
-            insets
+            menuDrawerFragment.drawerContent?.let {
+                it.updatePadding(
+                    left = systemsCutoutInsets.left,
+                    top = it.paddingTop,
+                    bottom = systemsCutoutInsets.bottom,
+                )
+            }
         }
     }
 
