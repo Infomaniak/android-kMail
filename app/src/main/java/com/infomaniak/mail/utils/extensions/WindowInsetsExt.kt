@@ -39,13 +39,18 @@ fun View.applyStatusBarInsets(insets: WindowInsetsCompat) {
     updatePadding(top = statusBar.top, left = statusBar.left, right = statusBar.right)
 }
 
-fun View.applySideAndBottomSystemInsets(insets: WindowInsetsCompat, withTop: Boolean = false) {
+fun View.applySideAndBottomSystemInsets(
+    insets: WindowInsetsCompat,
+    withTop: Boolean = false,
+    withSides: Boolean = true,
+    withBottom: Boolean = true,
+) {
     val systemBarsCutout = Insets.max(insets.systemBars(), insets.cutout())
     updatePadding(
-        left = systemBarsCutout.left,
+        left = if (withSides) systemBarsCutout.left else 0,
         top = if (withTop) systemBarsCutout.top else 0,
-        right = systemBarsCutout.right,
-        bottom = systemBarsCutout.bottom,
+        right = if (withSides) systemBarsCutout.right else 0,
+        bottom = if (withBottom) systemBarsCutout.bottom else 0,
     )
 }
 
