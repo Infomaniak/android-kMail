@@ -26,7 +26,6 @@ import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.annotation.ColorRes
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -124,12 +123,9 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun handleEdgeToEdge(): Unit = with(binding) {
-        ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
             appBar.applyStatusBarInsets(insets)
-            mailRecyclerView.applySideAndBottomSystemInsets(insets)
-            recentSearchesRecyclerView.applySideAndBottomSystemInsets(insets)
-            noResultsEmptyState.applySideAndBottomSystemInsets(insets)
-            insets
+            swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
         }
     }
 
