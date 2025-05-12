@@ -196,10 +196,12 @@ class ThreadFragment : Fragment() {
         observeMessageOfUserToBlock()
     }
 
-    private fun handleEdgeToEdge() {
-        binding.applyWindowInsetsListener { rootView, insets ->
-            binding.mainAppBar.applyStatusBarInsets(insets)
-            rootView.applySideAndBottomSystemInsets(insets)
+    private fun handleEdgeToEdge() = with(binding) {
+        // We don't consume insets because the QuickActionBarView needs it
+        applyWindowInsetsListener(shouldConsume = false) { rootView, insets ->
+            mainAppBar.applyStatusBarInsets(insets)
+            appBar.applySideAndBottomSystemInsets(insets, withBottom = false)
+            messagesListNestedScrollView.applySideAndBottomSystemInsets(insets)
         }
     }
 
