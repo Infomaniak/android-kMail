@@ -60,7 +60,6 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeUpdateResponse
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
@@ -316,11 +315,13 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxUuid: String,
         folderId: String,
         cursor: String,
+        uids: String?,
         okHttpClient: OkHttpClient?,
     ): ApiResponse<ActivitiesResult<T>> {
         return callApi(
             url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor),
-            method = GET,
+            method = if (uids == null) GET else POST,
+            body = if (uids == null) null else mapOf("uids" to uids),
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )
     }
