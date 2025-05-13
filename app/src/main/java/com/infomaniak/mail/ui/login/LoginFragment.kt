@@ -187,7 +187,6 @@ class LoginFragment : Fragment() {
         val oldSecondaryBackground = oldAccentColor.getOnboardingSecondaryBackground(requireContext())
 
         animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
-            requireActivity().window.statusBarColor = color
             binding.dummyToolbarEdgeToEdge.setBackgroundColor(color)
         }
     }
