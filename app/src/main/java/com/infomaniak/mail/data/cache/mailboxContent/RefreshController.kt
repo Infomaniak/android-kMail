@@ -59,6 +59,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.query.Sort
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -336,7 +337,7 @@ class RefreshController @Inject constructor(
 
         val activities = when (folder.role) {
             FolderRole.SNOOZED -> getMessagesUidsDelta<SnoozeMessageFlags>(folder.id, previousCursor)
-            else -> getMessagesUidsDelta<DefaultMessageFlags>(folder.id, previousCursor)
+            else -> getMessagesUidsDelta<DefaultMessageFlags>(folder.id, previousCursor, uids = getMessagesUidsRanges(folder.id))
         } ?: return false
         scope.ensureActive()
 
@@ -373,6 +374,47 @@ class RefreshController @Inject constructor(
         sendOrphanMessages(folder, previousCursor)
 
         return false
+    }
+
+    private fun Realm.getMessagesUidsRanges(folderId: String): String? {
+        val messages = MessageController.getMessagesByFolderIdBlocking(folderId, realm = this, Sort.ASCENDING)
+        if (messages.isEmpty()) return null
+
+        // Everything, with ranges (1 loop)
+        var uids = ""
+        var prevUid = -1
+        var wasInRange = false
+        messages.forEachIndexed { index, message ->
+            val nextUid = message.shortUid
+            if (index == 0) {
+                uids += nextUid
+                prevUid = nextUid
+            } else {
+                val isInRange = nextUid == prevUid + 1
+                if (!isInRange) {
+                    uids += if (wasInRange) ":${prevUid},${nextUid}" else ",${nextUid}"
+                }
+                prevUid = nextUid
+                wasInRange = isInRange
+            }
+        }
+        if (wasInRange) uids += ":${prevUid}"
+        return uids
+
+        // Everything, with ranges (2 loops)
+        // return messages.withIndex()
+        //     .groupBy { (index, message) -> message.shortUid - index }.values
+        //     .joinToString(separator = ",") { range ->
+        //         val firstUid = range.first().value.shortUid
+        //         val lastUid = range.last().value.shortUid
+        //         if (firstUid == lastUid) "$firstUid" else "$firstUid:$lastUid"
+        //     }
+
+        // Only first & last
+        // return "${messages.first().shortUid}:${messages.last().shortUid}"
+
+        // Everything, without ranges
+        // return messages.joinToString(separator = ",") { "${it.shortUid}" }
     }
 
     private fun hasTooManyActivities(activities: ActivitiesResult<out MessageFlags>): Boolean = with(activities) {
@@ -682,8 +724,9 @@ class RefreshController @Inject constructor(
     private suspend inline fun <reified T : MessageFlags> RefreshScope.getMessagesUidsDelta(
         folderId: String,
         previousCursor: String,
+        uids: String? = null,
     ): ActivitiesResult<T>? {
-        return with(ApiRepository.getMessagesUidsDelta<T>(mailbox.uuid, folderId, previousCursor, okHttpClient)) {
+        return with(ApiRepository.getMessagesUidsDelta<T>(mailbox.uuid, folderId, previousCursor, uids, okHttpClient)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
         }
