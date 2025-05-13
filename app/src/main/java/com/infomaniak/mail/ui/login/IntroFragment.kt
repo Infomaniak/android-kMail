@@ -41,10 +41,8 @@ import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
-import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.enumValueFrom
 import com.infomaniak.mail.utils.extensions.repeatFrame
-import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -75,13 +73,6 @@ class IntroFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.applyWindowInsetsListener { _, insets ->
-            binding.dummyToolbar.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                insets.statusBar().top,
-            )
-        }
 
         when (navigationArgs.position) {
             0 -> introViewModel.updatedAccentColor.value?.let { (newAccentColor, _) ->
@@ -184,7 +175,6 @@ class IntroFragment : Fragment() {
 
         colorAnimator = animateColorChange(oldColor, newColor) { color ->
             waveBackground.imageTintList = ColorStateList.valueOf(color)
-            dummyToolbar.setBackgroundColor(color)
         }
     }
 
