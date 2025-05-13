@@ -54,10 +54,13 @@ class SyncOnboardingFragment : Fragment() {
         setSystemBarsColors(statusBarColor = R.color.onboarding_secondary_background)
 
         binding.applyWindowInsetsListener { root, insets ->
-            binding.dummyToolbarEdgeToEdge.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                insets.statusBar().top,
-            )
+            binding.dummyToolbarEdgeToEdge.apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    insets.statusBar().top,
+                )
+                context?.getColor(R.color.onboarding_secondary_background)?.let(::setBackgroundColor)
+            }
             root.applySideAndBottomSystemInsets(insets)
         }
 
