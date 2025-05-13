@@ -348,11 +348,13 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxUuid: String,
         folderId: String,
         cursor: String,
+        uids: String?,
         okHttpClient: OkHttpClient?,
     ): ApiResponse<ActivitiesResult<T>> {
         return callApi(
             url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor),
-            method = GET,
+            method = if (uids == null) GET else POST,
+            body = if (uids == null) null else mapOf("uids" to uids),
             okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
         )
     }
