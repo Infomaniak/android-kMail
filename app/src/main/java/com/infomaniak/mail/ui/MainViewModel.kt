@@ -18,7 +18,9 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
+import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -47,7 +49,6 @@ import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
@@ -70,6 +71,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.Sort
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -80,6 +82,7 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.system.measureTimeMillis
 import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -257,6 +260,114 @@ class MainViewModel @Inject constructor(
         currentFilter.apply { value = value }
     }
     //endregion
+
+    fun benchmarkGetMessagesUidsRanges() = viewModelScope.launch(ioCoroutineContext) {
+        delay(5_000L)
+        getMessagesUidsRanges()
+    }
+
+    private fun getMessagesUidsRanges() {
+
+        fun oneLoop(messages: List<Message>): String {
+            var uids = ""
+            var prevUid = -1
+            var wasInRange = false
+            messages.forEachIndexed { index, message ->
+                val nextUid = message.shortUid
+                if (index == 0) {
+                    uids += nextUid
+                    prevUid = nextUid
+                } else {
+                    val isInRange = nextUid == prevUid + 1
+                    if (!isInRange) {
+                        uids += if (wasInRange) ":${prevUid},${nextUid}" else ",${nextUid}"
+                    }
+                    prevUid = nextUid
+                    wasInRange = isInRange
+                }
+            }
+            if (wasInRange) uids += ":${prevUid}"
+            return uids
+        }
+
+        fun twoLoops(messages: List<Message>): String {
+            return messages.withIndex()
+                .groupBy { (index, message) -> message.shortUid - index }.values
+                .joinToString(separator = ",") { range ->
+                    val firstUid = range.first().value.shortUid
+                    val lastUid = range.last().value.shortUid
+                    if (firstUid == lastUid) "$firstUid" else "$firstUid:$lastUid"
+                }
+        }
+
+        fun measureTimeCustom(custom: () -> String) {
+            val count = 100
+            var duration = 0L
+            var uids = ""
+            repeat(count) {
+                duration += measureTimeMillis {
+                    uids = custom()
+                }
+            }
+            duration /= count
+            Log.i("TOTO", uids)
+            Log.i("TOTO", "Content length : ${uids.length}")
+            Log.d("TOTO", "$duration ms")
+            Log.d("TOTO", "##########################################")
+        }
+
+        val messages1 = MessageController.getMessagesByFolderId(
+            folderId = "eJwzMFTQVXBKLlDwTczMKQYAGJ8D.g--",
+            realm = mailboxContentRealm(),
+            sort = Sort.ASCENDING,
+        )
+        if (messages1.isEmpty()) return
+        if (messages1.count() == 1) return
+
+        Log.d("TOTO", "Number of messages : ${messages1.count()}")
+        Log.d("TOTO", messages1.joinToString(separator = ",") { "${it.shortUid}" })
+
+        val twoLoops = twoLoops(messages1)
+        val oneLoop = oneLoop(messages1)
+        if (oneLoop == twoLoops) Log.e("TOTO", "Contents are the same") else Log.e("TOTO", "Contents are different")
+        Log.d("TOTO", "##########################################")
+
+        // Everything, with ranges (1 loop)
+        Log.e("TOTO", "Everything, with ranges (1 loop)")
+        val messages2 = MessageController.getMessagesByFolderId(
+            folderId = "eJwzMFTQVXBKLlDwTczMKQYAGJ8D.g--",
+            realm = mailboxContentRealm(),
+            sort = Sort.ASCENDING,
+        )
+        measureTimeCustom { oneLoop(messages2) }
+
+        // Everything, with ranges (2 loops)
+        Log.e("TOTO", "Everything, with ranges (2 loops)")
+        val messages3 = MessageController.getMessagesByFolderId(
+            folderId = "eJwzMFTQVXBKLlDwTczMKQYAGJ8D.g--",
+            realm = mailboxContentRealm(),
+            sort = Sort.ASCENDING,
+        )
+        measureTimeCustom { twoLoops(messages3) }
+
+        // Everything, without ranges
+        Log.e("TOTO", "Everything, without ranges")
+        val messages4 = MessageController.getMessagesByFolderId(
+            folderId = "eJwzMFTQVXBKLlDwTczMKQYAGJ8D.g--",
+            realm = mailboxContentRealm(),
+            sort = Sort.ASCENDING,
+        )
+        measureTimeCustom { messages4.joinToString(separator = ",") { "${it.shortUid}" } }
+
+        // Only first & last
+        Log.e("TOTO", "Only first & last")
+        val messages5 = MessageController.getMessagesByFolderId(
+            folderId = "eJwzMFTQVXBKLlDwTczMKQYAGJ8D.g--",
+            realm = mailboxContentRealm(),
+            sort = Sort.ASCENDING,
+        )
+        measureTimeCustom { "${messages5.first().shortUid}:${messages5.last().shortUid}" }
+    }
 
     //region Merged Contacts
     val mergedContactsLive: LiveData<MergedContactDictionary> = avatarMergedContactData.mergedContactLiveData
