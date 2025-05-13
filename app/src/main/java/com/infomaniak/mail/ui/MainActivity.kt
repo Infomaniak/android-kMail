@@ -230,6 +230,8 @@ class MainActivity : BaseActivity() {
         initAppUpdateManager()
         initAppReviewManager()
         syncDiscoveryManager.init(::showSyncDiscovery)
+
+        mainViewModel.benchmarkGetMessagesUidsRanges()
     }
 
     private fun setupMenuDrawer() {
