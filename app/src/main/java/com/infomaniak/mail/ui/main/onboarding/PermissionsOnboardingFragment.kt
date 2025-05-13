@@ -53,10 +53,13 @@ class PermissionsOnboardingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.applyWindowInsetsListener { _, insets ->
-            binding.dummyToolbarEdgeToEdge.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                insets.statusBar().top,
-            )
+            binding.dummyToolbarEdgeToEdge.apply {
+                context?.getColor(R.color.onboarding_secondary_background)?.let(::setBackgroundColor)
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    insets.statusBar().top,
+                )
+            }
         }
 
         setPermissionUi()
