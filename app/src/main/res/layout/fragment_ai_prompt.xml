@@ -136,14 +136,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="@dimen/marginStandardSmall"
                             android:importantForAccessibility="no"
-                            tools:src="@drawable/ic_ai_engine_chat_gpt" />
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:importantForAccessibility="no"
-                            android:src="@drawable/ic_chevron_right" />
-
+                            android:src="@drawable/ic_ai_engine_falcon" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

@@ -29,12 +29,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
-import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
-import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
@@ -93,13 +91,6 @@ class AiPromptFragment : Fragment() {
         prompt.showKeyboard()
         initPromptTextAndPlaceholder()
         closeButton.setOnClickListener { newMessageFragment.closeAiPrompt() }
-
-        generateWithButton.setOnClickListener {
-            trackEvent("promptAiEngine", "openEngineChoice")
-            safelyNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiEngineChoiceFragment())
-        }
-
-        aiEngineIcon.setImageResource(localSettings.aiEngine.iconRes)
 
         generateButton.setOnClickListener {
             newMessageFragment.navigateToPropositionFragment()

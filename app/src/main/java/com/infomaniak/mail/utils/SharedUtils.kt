@@ -17,12 +17,9 @@
  */
 package com.infomaniak.mail.utils
 
-import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.mail.MatomoMail.trackEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
@@ -43,7 +40,6 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeResponse.Companion.comp
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
@@ -152,26 +148,6 @@ class SharedUtils @Inject constructor(
                     it.featureFlags.setFeatureFlags(featureFlags = data ?: emptyList())
                 }
             }
-        }
-    }
-
-    fun manageAiEngineSettings(
-        fragment: Fragment,
-        settingRadioGroupView: SettingRadioGroupView,
-        matomoCategory: String,
-        onClick: (() -> Unit)? = null,
-    ) {
-        settingRadioGroupView.initBijectionTable(
-            R.id.falcon to LocalSettings.AiEngine.FALCON,
-            R.id.chatGpt to LocalSettings.AiEngine.CHAT_GPT,
-        )
-
-        settingRadioGroupView.check(localSettings.aiEngine)
-
-        settingRadioGroupView.onItemCheckedListener { _, _, engine ->
-            localSettings.aiEngine = engine as LocalSettings.AiEngine
-            fragment.trackEvent(matomoCategory, engine.matomoValue)
-            onClick?.invoke()
         }
     }
 

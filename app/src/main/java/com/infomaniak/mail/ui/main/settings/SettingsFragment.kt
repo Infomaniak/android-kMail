@@ -40,7 +40,6 @@ import com.infomaniak.mail.MatomoMail.trackMyKSuiteEvent
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
@@ -84,7 +83,6 @@ class SettingsFragment : Fragment() {
         setSubtitlesInitialState()
         setupMyKSuite()
 
-        observeFeatureFlag()
         observeMyKSuiteData()
     }
 
@@ -155,7 +153,6 @@ class SettingsFragment : Fragment() {
 
     private fun setSubtitlesInitialState() = with(binding) {
         with(localSettings) {
-            settingsAiEngine.setSubtitle(aiEngine.localisedNameRes)
             settingsThreadListDensity.setSubtitle(threadDensity.localisedNameRes)
             settingsTheme.setSubtitle(theme.localisedNameRes)
             settingsAccentColor.setSubtitle(accentColor.localisedNameRes)
@@ -202,10 +199,6 @@ class SettingsFragment : Fragment() {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
 
-        settingsAiEngine.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToAiEngineSetting())
-        }
-
         settingsExternalContent.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
         }
@@ -240,12 +233,6 @@ class SettingsFragment : Fragment() {
 
         settingsAccountManagement.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToAccountManagementSettings())
-        }
-    }
-
-    private fun observeFeatureFlag() {
-        mainViewModel.featureFlagsLive.observe(viewLifecycleOwner) {
-            binding.settingsAiEngine.isVisible = it.contains(FeatureFlag.AI)
         }
     }
 }

@@ -84,7 +84,6 @@ class AiViewModel @Inject constructor(
             contextMessage,
             userMessage,
             currentMailboxUuid,
-            localSettings.aiEngine,
         )
 
         ensureActive()
@@ -153,14 +152,12 @@ class AiViewModel @Inject constructor(
     }
 
     fun performShortcut(shortcut: Shortcut, currentMailboxUuid: String) = viewModelScope.launch(ioCoroutineContext) {
-        val aiEngine = localSettings.aiEngine
-
-        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxUuid, aiEngine)
+        var apiResponse = ApiRepository.aiShortcutWithContext(conversationContextId!!, shortcut, currentMailboxUuid)
         ensureActive()
 
         val hasConversationExpired = apiResponse.error?.code == ErrorCode.OBJECT_NOT_FOUND
         if (hasConversationExpired) {
-            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxUuid, aiEngine)
+            apiResponse = ApiRepository.aiShortcutNoContext(shortcut, history.toList(), currentMailboxUuid)
             ensureActive()
         }
 
