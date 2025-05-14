@@ -36,7 +36,6 @@ fun ViewBinding.applyWindowInsetsListener(
 
 fun View.applyStatusBarInsets(insets: WindowInsetsCompat) = with(insets.safeArea()) {
     updatePadding(top = top, left = left, right = right)
-    this@applyStatusBarInsets
 }
 
 fun View.applySideAndBottomSystemInsets(
@@ -51,12 +50,6 @@ fun View.applySideAndBottomSystemInsets(
         right = if (withSides) right else 0,
         bottom = if (withBottom) bottom else 0,
     )
-    this@applySideAndBottomSystemInsets
-}
-
-fun View.applyImeInsets(insets: WindowInsetsCompat) = with(insets.safeArea()) {
-    updatePadding(left = left, top = top, right = right, bottom = bottom)
-    this@applyImeInsets
 }
 
 fun WindowInsetsCompat.cutout() = getInsets(WindowInsetsCompat.Type.displayCutout())
