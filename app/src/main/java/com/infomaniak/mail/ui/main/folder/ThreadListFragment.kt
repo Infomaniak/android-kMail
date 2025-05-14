@@ -29,7 +29,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.graphics.Insets
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
@@ -200,11 +199,9 @@ class ThreadListFragment : TwoPaneFragment() {
             swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
 
             val marginStandardSize = resources.getDimensionPixelSize(RCore.dimen.marginStandard)
-            val insetsSystemCutout = Insets.max(insets.systemBars(), insets.cutout())
-            binding.newMessageFab.setMargins(
-                bottom = marginStandardSize + insetsSystemCutout.bottom,
-                right = marginStandardSize + insetsSystemCutout.right,
-            )
+            with(insets.safeArea()) {
+                binding.newMessageFab.setMargins(bottom = marginStandardSize + bottom, right = marginStandardSize + right)
+            }
         }
     }
 
