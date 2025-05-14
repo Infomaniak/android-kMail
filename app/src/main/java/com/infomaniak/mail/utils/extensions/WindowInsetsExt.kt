@@ -34,9 +34,9 @@ fun ViewBinding.applyWindowInsetsListener(
     }
 }
 
-fun View.applyStatusBarInsets(insets: WindowInsetsCompat) {
-    val statusBar = Insets.max(insets.systemBars(), insets.cutout())
-    updatePadding(top = statusBar.top, left = statusBar.left, right = statusBar.right)
+fun View.applyStatusBarInsets(insets: WindowInsetsCompat) = with(insets.safeArea()) {
+    updatePadding(top = top, left = left, right = right)
+    this@applyStatusBarInsets
 }
 
 fun View.applySideAndBottomSystemInsets(
@@ -44,17 +44,23 @@ fun View.applySideAndBottomSystemInsets(
     withTop: Boolean = false,
     withSides: Boolean = true,
     withBottom: Boolean = true,
-) {
-    val systemBarsCutout = Insets.max(insets.systemBars(), insets.cutout())
+) = with(insets.safeArea()) {
     updatePadding(
-        left = if (withSides) systemBarsCutout.left else 0,
-        top = if (withTop) systemBarsCutout.top else 0,
-        right = if (withSides) systemBarsCutout.right else 0,
-        bottom = if (withBottom) systemBarsCutout.bottom else 0,
+        left = if (withSides) left else 0,
+        top = if (withTop) top else 0,
+        right = if (withSides) right else 0,
+        bottom = if (withBottom) bottom else 0,
     )
+    this@applySideAndBottomSystemInsets
+}
+
+fun View.applyImeInsets(insets: WindowInsetsCompat) = with(insets.safeArea()) {
+    updatePadding(left = left, top = top, right = right, bottom = bottom)
+    this@applyImeInsets
 }
 
 fun WindowInsetsCompat.cutout() = getInsets(WindowInsetsCompat.Type.displayCutout())
 fun WindowInsetsCompat.statusBar() = getInsets(WindowInsetsCompat.Type.statusBars())
 fun WindowInsetsCompat.systemBars() = getInsets(WindowInsetsCompat.Type.systemBars())
 fun WindowInsetsCompat.ime() = getInsets(WindowInsetsCompat.Type.ime())
+fun WindowInsetsCompat.safeArea() = Insets.max(systemBars(), cutout())
