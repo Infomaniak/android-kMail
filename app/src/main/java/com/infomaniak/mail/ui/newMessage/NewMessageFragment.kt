@@ -220,7 +220,7 @@ class NewMessageFragment : Fragment() {
 
     private fun handleEdgeToEdge() = with(binding) {
         applyWindowInsetsListener(shouldConsume = false) { root, insets ->
-            toolbar.applySideAndBottomSystemInsets(insets, withBottom = false)
+            toolbar.applyStatusBarInsets(insets)
             compositionNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
             externalBannerContent.applySideAndBottomSystemInsets(insets, withBottom = false)
             editorActionsLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
@@ -228,7 +228,6 @@ class NewMessageFragment : Fragment() {
             val imeBottomInset = insets.ime().bottom
             newMessageConstraintLayout.updatePadding(
                 bottom = if (imeBottomInset == 0) insets.systemBars().bottom else 0,
-                top = insets.safeArea().top,
             )
             editorToolbar.setMargins(bottom = imeBottomInset)
         }
