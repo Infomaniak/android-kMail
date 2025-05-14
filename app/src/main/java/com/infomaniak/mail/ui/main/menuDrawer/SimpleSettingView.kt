@@ -23,14 +23,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSimpleSettingBinding
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import android.view.ViewGroup.LayoutParams as ViewGroupLayoutParams
 
 class SimpleSettingView @JvmOverloads constructor(
@@ -80,10 +79,9 @@ class SimpleSettingView @JvmOverloads constructor(
     }
 
     private fun handleEdgeToEdge(childContent: View) {
-        ViewCompat.setOnApplyWindowInsetsListener(this) { root, insets ->
+        binding.applyWindowInsetsListener { _, insets ->
             binding.appBarLayout.applyStatusBarInsets(insets)
             childContent.applySideAndBottomSystemInsets(insets)
-            WindowInsetsCompat.CONSUMED
         }
     }
 }
