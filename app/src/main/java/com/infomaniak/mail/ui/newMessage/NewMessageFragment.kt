@@ -166,6 +166,14 @@ class NewMessageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.newMessageBackgroundColor)
 
+        binding.applyWindowInsetsListener { root, insets ->
+            binding.compositionNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
+            binding.editorActionsLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
+            binding.externalBannerContent.applySideAndBottomSystemInsets(insets, withBottom = false)
+            binding.toolbar.applySideAndBottomSystemInsets(insets, withBottom = false)
+            binding.newMessageConstraintLayout.applySideAndBottomSystemInsets(insets, withSides = false, withTop = true)
+        }
+
         SentryDebug.addNavigationBreadcrumb(
             name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
             arguments = newMessageActivityArgs.toBundle(),
