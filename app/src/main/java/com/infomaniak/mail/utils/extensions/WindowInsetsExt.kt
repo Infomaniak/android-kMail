@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils.extensions
 
 import android.view.View
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -34,15 +35,26 @@ fun ViewBinding.applyWindowInsetsListener(
 }
 
 fun View.applyStatusBarInsets(insets: WindowInsetsCompat) {
-    val statusBar = insets.statusBar()
-    updatePadding(top = statusBar.top, left = statusBar.left, right = statusBar.right, bottom = statusBar.bottom)
+    val statusBar = Insets.max(insets.systemBars(), insets.cutout())
+    updatePadding(top = statusBar.top, left = statusBar.left, right = statusBar.right)
 }
 
-fun View.applySideAndBottomSystemInsets(insets: WindowInsetsCompat) {
-    val systemBars = insets.systemBars()
-    updatePadding(left = systemBars.left, right = systemBars.right, bottom = systemBars.bottom)
+fun View.applySideAndBottomSystemInsets(
+    insets: WindowInsetsCompat,
+    withTop: Boolean = false,
+    withSides: Boolean = true,
+    withBottom: Boolean = true,
+) {
+    val systemBarsCutout = Insets.max(insets.systemBars(), insets.cutout())
+    updatePadding(
+        left = if (withSides) systemBarsCutout.left else 0,
+        top = if (withTop) systemBarsCutout.top else 0,
+        right = if (withSides) systemBarsCutout.right else 0,
+        bottom = if (withBottom) systemBarsCutout.bottom else 0,
+    )
 }
 
+fun WindowInsetsCompat.cutout() = getInsets(WindowInsetsCompat.Type.displayCutout())
 fun WindowInsetsCompat.statusBar() = getInsets(WindowInsetsCompat.Type.statusBars())
 fun WindowInsetsCompat.systemBars() = getInsets(WindowInsetsCompat.Type.systemBars())
 fun WindowInsetsCompat.ime() = getInsets(WindowInsetsCompat.Type.ime())

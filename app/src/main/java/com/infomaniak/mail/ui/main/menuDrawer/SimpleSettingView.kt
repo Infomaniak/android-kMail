@@ -60,11 +60,11 @@ class SimpleSettingView @JvmOverloads constructor(
         }
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        handleEdgeToEdge()
     }
 
     override fun addView(child: View, index: Int, params: ViewGroupLayoutParams?) {
         if (isBindingInflated) {
+            handleEdgeToEdge(child)
             binding.cardView.addView(child, index, params)
         } else {
             super.addView(child, index, params)
@@ -79,10 +79,10 @@ class SimpleSettingView @JvmOverloads constructor(
         binding.toolbar.title = title
     }
 
-    private fun handleEdgeToEdge() {
+    private fun handleEdgeToEdge(childContent: View) {
         ViewCompat.setOnApplyWindowInsetsListener(this) { root, insets ->
             binding.appBarLayout.applyStatusBarInsets(insets)
-            root.applySideAndBottomSystemInsets(insets)
+            childContent.applySideAndBottomSystemInsets(insets)
             WindowInsetsCompat.CONSUMED
         }
     }
