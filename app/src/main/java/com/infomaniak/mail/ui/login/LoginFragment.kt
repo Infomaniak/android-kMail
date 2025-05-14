@@ -39,7 +39,10 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
+import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -77,6 +80,14 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        applyWindowInsetsListener(shouldConsume = false) { root, insets ->
+            root.applySideAndBottomSystemInsets(insets)
+            dummyToolbarEdgeToEdge.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                insets.statusBar().top,
+            )
+        }
 
         loginUtils.initShowError(::showError)
 
@@ -176,7 +187,7 @@ class LoginFragment : Fragment() {
         val oldSecondaryBackground = oldAccentColor.getOnboardingSecondaryBackground(requireContext())
 
         animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
-            requireActivity().window.statusBarColor = color
+            binding.dummyToolbarEdgeToEdge.setBackgroundColor(color)
         }
     }
 

@@ -20,7 +20,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.login.LoginActivity">
+    tools:context=".ui.login.LoginFragment">
+
+    <View
+        android:id="@+id/dummyToolbarEdgeToEdge"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="?attr/colorPrimaryContainer"
+        tools:layout_height="@dimen/marginLarge" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/introViewpager"
@@ -29,7 +37,7 @@
         app:layout_constraintBottom_toTopOf="@id/footer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/dummyToolbarEdgeToEdge" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/footer"

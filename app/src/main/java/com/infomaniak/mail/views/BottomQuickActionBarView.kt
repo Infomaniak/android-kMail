@@ -28,13 +28,12 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.getResourceIdOrThrow
-import androidx.core.view.get
-import androidx.core.view.isGone
-import androidx.core.view.size
+import androidx.core.view.*
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 
 class BottomQuickActionBarView @JvmOverloads constructor(
     context: Context,
@@ -49,6 +48,7 @@ class BottomQuickActionBarView @JvmOverloads constructor(
 
     init {
         init()
+        handleEdgeToEdge()
     }
 
     fun init(@MenuRes menuRes: Int? = null) {
@@ -95,4 +95,11 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     }
 
     fun getButtonCount() = buttons.count()
+
+    private fun handleEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { root, insets ->
+            root.applySideAndBottomSystemInsets(insets)
+            WindowInsetsCompat.CONSUMED
+        }
+    }
 }

@@ -5,7 +5,7 @@ buildscript {
     }
 
     extra.apply {
-        set("appCompileSdk", 34)
+        set("appCompileSdk", 35)
         set("appMinSdk", 25)
         set("javaVersion", JavaVersion.VERSION_17)
     }
