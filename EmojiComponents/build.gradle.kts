@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     alias(core.plugins.kotlin.android)
+    alias(core.plugins.compose.compiler)
 }
 
 val appCompileSdk: Int by rootProject.extra
@@ -20,6 +21,14 @@ android {
         targetCompatibility = javaVersion
     }
 
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+
     kotlinOptions {
         jvmTarget = javaVersion.toString()
     }
@@ -30,4 +39,20 @@ android {
         create("standard") {}
         create("fdroid") {}
     }
+}
+
+dependencies {
+    implementation(project(":Core:Compose:Margin"))
+    implementation(project(":Core:Compose:MaterialThemeFromXml"))
+
+    implementation(libs.compose.ui.android)
+
+    implementation(core.androidx.core.ktx)
+
+    implementation(platform(core.compose.bom))
+    implementation(core.compose.runtime)
+    implementation(core.compose.material3)
+    implementation(core.compose.ui)
+    debugImplementation(core.compose.ui.tooling)
+    implementation(core.compose.ui.tooling.preview)
 }

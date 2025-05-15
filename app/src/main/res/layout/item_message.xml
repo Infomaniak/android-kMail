@@ -553,7 +553,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/emojiReactions"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/webViewsFrameLayout"
@@ -574,6 +574,17 @@
                 android:text="@string/messageShowQuotedText" />
 
         </FrameLayout>
+
+        <com.infomaniak.emojicomponents.views.EmojiReactionsView
+            android:id="@+id/emojiReactions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            app:chipCornerRadius="@dimen/chipCornerRadius"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/webViewsFrameLayout" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/alertsGroup"
