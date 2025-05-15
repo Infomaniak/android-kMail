@@ -17,6 +17,7 @@ plugins {
     alias(libs.plugins.dagger.hilt) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
     alias(libs.plugins.jetbrains.kotlin.serialization) apply false
+    alias(core.plugins.compose.compiler) version libs.versions.kotlin apply false
     alias(libs.plugins.kapt) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.realm.kotlin) apply false
