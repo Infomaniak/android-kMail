@@ -33,7 +33,6 @@ import android.text.Spannable
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ClickableSpan
-import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.view.inputmethod.EditorInfo
@@ -63,6 +62,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.infomaniak.core.utils.endOfTheWeek
+import com.infomaniak.core.utils.isEmailRfc5321Compliant
 import com.infomaniak.core.utils.startOfTheDay
 import com.infomaniak.core.utils.startOfTheWeek
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
@@ -134,7 +134,7 @@ fun Fragment.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.
 
 fun Activity.notYetImplemented(anchor: View? = null) = showSnackbar(getString(R.string.workInProgressTitle), anchor)
 
-fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
+fun String.isEmail(): Boolean = isEmailRfc5321Compliant()
 
 fun String.removeLineBreaksFromHtml(): Document = jsoupParseWithLog(replace("\r", "").replace("\n", ""))
 
