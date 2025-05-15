@@ -95,6 +95,7 @@ dependencies {
     implementation project(':Core:Legacy:Stores')
     implementation project(':Core:MyKSuite')
     implementation project(':Core:Network')
+    implementation project(':EmojiComponents')
     implementation project(':HtmlCleaner')
 
     implementation libs.rich.html.editor

@@ -31,4 +31,5 @@ include ':app',
         ':Core:Network',
         ':Core:Sentry',
         ':Core:UserAvatar',
+        ':EmojiComponents',
         ':HtmlCleaner'
