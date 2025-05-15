@@ -427,11 +427,9 @@ object ApiRepository : ApiRepositoryCore() {
         shortcut: Shortcut,
         currentMailboxUuid: String,
     ): ApiResponse<AiResult> {
-        val body = aiBaseBody()
         return callApi(
             url = ApiRoutes.aiShortcutWithContext(contextId, action = shortcut.apiRoute!!, currentMailboxUuid),
             method = PATCH,
-            body = body,
             okHttpClient = HttpClient.okHttpClientLongTimeout,
         )
     }
@@ -450,14 +448,7 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    private fun aiBaseBody(vararg additionalValues: Pair<String, Any>): Map<String, Any> {
-            return mapOf("engine" to "falcon", *additionalValues)
-    }
-
-    private fun getAiBodyFromMessages(messages: List<AiMessage>) = aiBaseBody(
-        "messages" to messages,
-        "output" to "mail",
-    )
+    private fun getAiBodyFromMessages(messages: List<AiMessage>) = mapOf("messages" to messages, "output" to "mail")
 
     fun getFeatureFlags(currentMailboxUuid: String): ApiResponse<List<String>> {
         return callApi(ApiRoutes.featureFlags(currentMailboxUuid), GET)
