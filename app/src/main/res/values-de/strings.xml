@@ -57,9 +57,6 @@
     <string name="aiButtonRetry">Wiederholen</string>
     <string name="aiDiscoveryDescription">Vereinfachen Sie das Schreiben von Nachrichten mit künstlicher Intelligenz.</string>
     <string name="aiDiscoveryTitle">Schreiben Sie Ihre E-Mails mit KI</string>
-    <string name="aiEngineChatGpt">ChatGPT</string>
-    <string name="aiEngineFalcon">Souveräne KI</string>
-    <string name="aiEngineWarning">Wenn Sie ChatGPT benutzen, werden Ihre Daten von der US-amerikanischen Firma OpenAI verarbeitet. Wir raten Ihnen, sie nicht für sensible Nachrichten zu verwenden.</string>
     <string name="aiErrorContextMaxTokenReached">Die E-Mail, auf die Sie antworten, ist zu lang, als dass die KI derzeit eine Antwort generieren könnte.\n\nFassen Sie zusammen, was Sie sagen möchten, um ihre Hilfe zu erhalten.</string>
     <string name="aiErrorMaxTokenReached">Ihre Anfrage ist zu lang, bitte kürzen Sie sie.</string>
     <string name="aiErrorTooManyRequests">In kurzer Zeit wurden zu viele Anfragen gestellt. Bitte haben Sie etwas Geduld.</string>
@@ -456,7 +453,6 @@
     <string name="settingsAccentColor">Akzentfarbe</string>
     <string name="settingsAccentColorDescription">Wählen Sie die Akzentfarbe für die Anwendung</string>
     <string name="settingsAccountManagementTitle">Kontoführung</string>
-    <string name="settingsAiEngineDescription">Wählen Sie Ihren Schreibassistent</string>
     <string name="settingsAppLock">App-Sperre</string>
     <string name="settingsAuthorizeTracking">Verfolgung genehmigen</string>
     <string name="settingsAutoAdvanceDescription">Auswählen, was angezeigt werden soll, wenn eine Nachricht archiviert oder gelöscht wird</string>

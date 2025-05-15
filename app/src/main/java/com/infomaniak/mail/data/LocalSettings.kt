@@ -20,7 +20,6 @@ package com.infomaniak.mail.data
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.view.ContextThemeWrapper
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
@@ -44,7 +43,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var askEmailAcknowledgement by sharedValue("askEmailAcknowledgmentKey", false)
     var hasAlreadyEnabledNotifications by sharedValue("hasAlreadyEnabledNotificationsKey", false)
     var isAppLocked by sharedValue("isAppLockedKey", false)
-    var aiEngine by sharedValue("aiEngineKey", AiEngine.FALCON)
     var threadDensity by sharedValue("threadDensityKey", ThreadDensity.LARGE)
     var theme by sharedValue("themeKey", if (SDK_INT >= 29) Theme.SYSTEM else Theme.LIGHT)
     var accentColor by sharedValue("accentColorKey", AccentColor.PINK)
@@ -98,16 +96,6 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     enum class EmailForwarding(@StringRes val localisedNameRes: Int) {
         IN_BODY(R.string.settingsTransferInBody),
         AS_ATTACHMENT(R.string.settingsTransferAsAttachment),
-    }
-
-    enum class AiEngine(
-        @StringRes val localisedNameRes: Int,
-        @DrawableRes val iconRes: Int,
-        val matomoValue: String,
-        val apiValue: String,
-    ) {
-        FALCON(R.string.aiEngineFalcon, R.drawable.ic_ai_engine_falcon, "falcon", "falcon"),
-        CHAT_GPT(R.string.aiEngineChatGpt, R.drawable.ic_ai_engine_chat_gpt, "chatGpt", "gpt"),
     }
 
     enum class ThreadDensity(@StringRes val localisedNameRes: Int) {

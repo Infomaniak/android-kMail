@@ -63,9 +63,6 @@
     <string name="aiButtonRetry">Retry</string>
     <string name="aiDiscoveryDescription">Simplify your message writing with Artificial Intelligence.</string>
     <string name="aiDiscoveryTitle">Write your emails using AI</string>
-    <string name="aiEngineChatGpt">ChatGPT</string>
-    <string name="aiEngineFalcon">Sovereign AI</string>
-    <string name="aiEngineWarning">By using ChatGPT, your data will be processed by the American company OpenAI. We advise you not to use it for sensitive messages.</string>
     <string name="aiErrorContextMaxTokenReached">The email you’re replying to is too long for the AI to generate a response.\n\nSummarize what you want to say to get its help.</string>
     <string name="aiErrorMaxTokenReached">Your request is too long, please shorten it.</string>
     <string name="aiErrorTooManyRequests">Too many requests in a short time. Please wait.</string>
@@ -462,7 +459,6 @@
     <string name="settingsAccentColor">Accent color</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
     <string name="settingsAccountManagementTitle">Account management</string>
-    <string name="settingsAiEngineDescription">Select your AI writing assistant</string>
     <string name="settingsAppLock">App lock</string>
     <string name="settingsAuthorizeTracking">Authorize tracking</string>
     <string name="settingsAutoAdvanceDescription">Select what to display when a message is archived or deleted</string>
