@@ -44,9 +44,11 @@ import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
+import io.realm.kotlin.ext.realmDictionaryOf
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.serializers.RealmListKSerializer
+import io.realm.kotlin.types.RealmDictionary
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -179,6 +181,8 @@ class Message : RealmObject, Snoozable {
     var swissTransferFiles = realmListOf<SwissTransferFile>()
     @Transient
     var hasAttachable: Boolean = false
+    @Transient
+    var emojiReactions: RealmDictionary<EmojiReactionState?> = realmDictionaryOf()
     //endregion
 
     //region UI data (Transient & Ignore)
