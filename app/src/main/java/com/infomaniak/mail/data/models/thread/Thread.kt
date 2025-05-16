@@ -26,7 +26,9 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.toRealmInstant
@@ -36,6 +38,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.serializers.RealmListKSerializer
+import io.realm.kotlin.types.RealmDictionary
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -203,6 +206,8 @@ class Thread : RealmObject, Snoozable {
 
         updateThread(lastMessage)
 
+        updateMessages()
+
         // Remove duplicates in Recipients lists
         val unmanagedFrom = if (from.getRealm<Realm>() == null) from else from.copyFromRealm()
         val unmanagedTo = if (to.getRealm<Realm>() == null) to else to.copyFromRealm()
@@ -300,6 +305,16 @@ class Thread : RealmObject, Snoozable {
         duplicates.forEach(Message::manuallyUnsnooze)
     }
 
+    private fun updateMessages() {
+        val reactionsPerMessageId = computeReactionsPerMessageId()
+
+        messages.forEach { message ->
+            reactionsPerMessageId[message.messageId]?.let { reactions ->
+                message.emojiReactions.overrideWith(reactions)
+            }
+        }
+    }
+
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
 
         val message = messages.lastOrNull {
@@ -367,5 +382,34 @@ class Thread : RealmObject, Snoozable {
 
     companion object {
         const val FORMAT_DAY_OF_THE_WEEK = "EEE"
+
+        private fun Thread.computeReactionsPerMessageId(): Map<String, MutableMap<String, EmojiReactionState>> = buildMap {
+            for (message in messages) {
+                val emoji = message.emojiReaction ?: continue
+
+                val replyToIds = message.inReplyTo?.parseMessagesIds() ?: emptyList()
+                replyToIds.forEach { replyToId ->
+                    val emojis = getOrPut(replyToId) { emptyEmojiReaction(emoji) }
+
+                    if (emojis.containsKey(emoji).not()) {
+                        emojis[emoji] = EmojiReactionState()
+                    }
+
+                    emojis[emoji]!!.apply {
+                        count += 1
+                        hasReacted = message.from.any { it.isMe() }
+                    }
+                }
+            }
+        }
+
+        private fun emptyEmojiReaction(emoji: String) = mutableMapOf(emoji to EmojiReactionState())
+
+        // TODO: Reset the state of the emoji dictionary
+        private fun RealmDictionary<EmojiReactionState?>.overrideWith(reactions: Map<String, EmojiReactionState>) {
+            reactions.forEach { (emoji, state) ->
+                this[emoji] = state
+            }
+        }
     }
 }

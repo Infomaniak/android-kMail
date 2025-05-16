@@ -400,17 +400,6 @@ class Message : RealmObject, Snoozable {
             if (isNotBlank()) completion(this)
         }
 
-        // Encountered formats so far:
-        // `x@x.x`
-        // `<x@x.x>`
-        // `<x@x.x><x@x.x><x@x.x>`
-        // `<x@x.x> <x@x.x> <x@x.x>`
-        // `<x@x.x> <x@x.x> x@x.x`
-        fun String.parseMessagesIds(): List<String> = this
-            .removePrefix("<")
-            .removeSuffix(">")
-            .split(">\\s*<|>?\\s+<?".toRegex())
-
         return realmSetOf<String>().apply {
             messageId?.ifNotBlank { addAll(it.parseMessagesIds()) }
             references?.ifNotBlank { addAll(it.parseMessagesIds()) }
@@ -455,5 +444,16 @@ class Message : RealmObject, Snoozable {
 
     override fun hashCode(): Int = uid.hashCode()
 
-    companion object
+    companion object {
+        // Encountered formats so far:
+        // `x@x.x`
+        // `<x@x.x>`
+        // `<x@x.x><x@x.x><x@x.x>`
+        // `<x@x.x> <x@x.x> <x@x.x>`
+        // `<x@x.x> <x@x.x> x@x.x`
+        fun String.parseMessagesIds(): List<String> = this
+            .removePrefix("<")
+            .removeSuffix(">")
+            .split(">\\s*<|>?\\s+<?".toRegex())
+    }
 }
