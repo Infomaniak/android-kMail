@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.message
 
+import com.infomaniak.core.utils.ApiEnum
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -137,6 +138,10 @@ class Message : RealmObject, Snoozable {
     @SerialName("snooze_uuid")
     override var snoozeUuid: String? = null
     var headers: Headers? = null
+    @SerialName("emoji_reaction")
+    var emojiReaction: String? = null
+    @SerialName("emoji_reaction_not_allowed_reason")
+    private var _emojiReactionNotAllowedReason: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
@@ -196,6 +201,14 @@ class Message : RealmObject, Snoozable {
 
     @Ignore
     override var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
+
+    @Ignore
+    var emojiReactionNotAllowedReason: EmojiReactionNotAllowedReason? by apiEnum(::_emojiReactionNotAllowedReason)
+
+    val isReaction get() = emojiReaction != null
+
+    // TODO: Add check to know if the user has already reacted 5 times to an email
+    val isReactionAllowed get() = _emojiReactionNotAllowedReason != null
 
     val threads by backlinks(Thread::messages)
 
@@ -292,6 +305,17 @@ class Message : RealmObject, Snoozable {
         NONE,
         PENDING,
         ACKNOWLEDGED,
+    }
+
+    enum class EmojiReactionNotAllowedReason(override val apiValue: String) : ApiEnum {
+        EmojiReactionFolderNotAllowedDraft("folder_not_allowed_draft"),
+        EmojiReactionFolderNotAllowedScheduledDraft("folder_not_allowed_scheduled_draft"),
+        EmojiReactionFolderNotAllowedSpam("folder_not_allowed_spam"),
+        EmojiReactionFolderNotAllowedTrash("folder_not_allowed_trash"),
+        EmojiReactionMessageInReplyToNotAllowed("message_in_reply_to_not_allowed"),
+        EmojiReactionMessageInReplyToNotValid("message_in_reply_to_not_valid"),
+        EmojiReactionMaxRecipient("max_recipient"),
+        EmojiReactionRecipientNotAllowed("recipient_not_allowed"),
     }
 
     fun keepLocalValues(localMessage: Message) {
