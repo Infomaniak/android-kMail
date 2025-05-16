@@ -315,6 +315,9 @@ class Message : RealmObject, Snoozable {
             isDeletedOnApi = localMessage.isDeletedOnApi,
             latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
             swissTransferFiles = localMessage.swissTransferFiles,
+            emojiReaction = localMessage.emojiReaction,
+            emojiReactions = localMessage.emojiReactions,
+            isHiddenEmojiReaction = localMessage.isHiddenEmojiReaction,
         )
         keepHeavyData(localMessage)
     }
@@ -328,6 +331,9 @@ class Message : RealmObject, Snoozable {
         isDeletedOnApi: Boolean,
         latestCalendarEventResponse: CalendarEventResponse?,
         swissTransferFiles: RealmList<SwissTransferFile>,
+        emojiReaction: String?, // TODO: Remove when api returns it
+        emojiReactions: RealmDictionary<EmojiReactionState?>,
+        isHiddenEmojiReaction: Boolean,
     ) {
         this.areHeavyDataFetched = areHeavyDataFetched
         this.isTrashed = isTrashed
@@ -337,6 +343,9 @@ class Message : RealmObject, Snoozable {
         this.isDeletedOnApi = isDeletedOnApi
         this.latestCalendarEventResponse = latestCalendarEventResponse
         this.swissTransferFiles.replaceContent(swissTransferFiles)
+        this.emojiReaction = emojiReaction
+        this.emojiReactions = emojiReactions
+        this.isHiddenEmojiReaction = isHiddenEmojiReaction
 
         this.shortUid = uid.toShortUid()
         this.hasAttachable = hasAttachments || swissTransferUuid != null
