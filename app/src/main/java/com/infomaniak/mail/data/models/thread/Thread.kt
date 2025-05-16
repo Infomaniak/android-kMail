@@ -218,6 +218,8 @@ class Thread : RealmObject, Snoozable {
 
         updateThread(lastMessage)
 
+        updateMessages()
+
         // Remove duplicates in Recipients lists
         val unmanagedFrom = if (from.getRealm<Realm>() == null) from else from.copyFromRealm()
         val unmanagedTo = if (to.getRealm<Realm>() == null) to else to.copyFromRealm()
@@ -313,6 +315,16 @@ class Thread : RealmObject, Snoozable {
         super.manuallyUnsnooze()
         messages.forEach(Message::manuallyUnsnooze)
         duplicates.forEach(Message::manuallyUnsnooze)
+    }
+
+    private fun updateMessages() {
+        val reactionsPerMessageId = computeReactionsPerMessageId()
+
+        messages.forEach { message ->
+            reactionsPerMessageId[message.messageId]?.let { reactions ->
+                message.emojiReactions.overrideWith(reactions)
+            }
+        }
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
