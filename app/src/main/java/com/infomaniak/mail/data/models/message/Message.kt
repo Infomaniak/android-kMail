@@ -166,6 +166,8 @@ class Message : RealmObject, Snoozable {
     var swissTransferFiles = realmListOf<SwissTransferFile>()
     @Transient
     var hasAttachable: Boolean = false
+    @Transient
+    var emojiReactions: RealmDictionary<EmojiReactionState?> = realmDictionaryOf()
     //endregion
 
     //region UI data (Transient & Ignore)
