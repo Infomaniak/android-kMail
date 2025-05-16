@@ -73,6 +73,7 @@ import com.infomaniak.mail.utils.date.DateFormatUtils.fullDateWithYear
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.mailFormattedDate
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
+import io.realm.kotlin.types.RealmDictionary
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -682,6 +683,12 @@ class ThreadAdapter(
         quoteButton.setOnClickListener { toggleWebViews(message) }
         quoteButtonFrameLayout.isVisible = hasQuote
 
+        val reactions = message.emojiReactions.filterNotNull()
+        emojiReactions.apply {
+            isGone = reactions.isEmpty()
+            setEmojiReactions(reactions)
+        }
+
         initWebViewClientIfNeeded(
             message,
             threadAdapterCallbacks?.navigateToNewMessageActivity,
@@ -995,5 +1002,11 @@ class ThreadAdapter(
             HitTestResult.SRC_ANCHOR_TYPE to ContextMenuType.LINK,
             HitTestResult.SRC_IMAGE_ANCHOR_TYPE to ContextMenuType.LINK,
         )
+    }
+}
+
+private fun <T> RealmDictionary<T?>.filterNotNull(): Map<String, T> = buildMap {
+    this@filterNotNull.forEach { (key, value) ->
+        if (value != null) this[key] = value
     }
 }
