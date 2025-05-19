@@ -299,6 +299,12 @@ class SharedUtils @Inject constructor(
             return hasSnoozeFeatureFlag() && isConversationMode()
         }
 
+        fun isReactionsAvailable(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Boolean {
+            fun hasEmojiFeatureFlag() = featureFlags?.contains(FeatureFlag.EMOJI_REACTION) == true
+            fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
+            return hasEmojiFeatureFlag() && isConversationMode()
+        }
+
         sealed interface AutomaticUnsnoozeResult {
             data class Success(val impactedFolders: ImpactedFolders) : AutomaticUnsnoozeResult
             data object CannotBeUnsnoozedError : AutomaticUnsnoozeResult
