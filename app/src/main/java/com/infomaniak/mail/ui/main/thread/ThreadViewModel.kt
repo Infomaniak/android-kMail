@@ -150,7 +150,9 @@ class ThreadViewModel @Inject constructor(
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
         AccountUtils.currentMailboxId,
-    ).map { it.obj }.asLiveData(ioCoroutineContext)
+    ).mapNotNull { it.obj }.asLiveData(ioCoroutineContext)
+
+    val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
@@ -171,8 +173,9 @@ class ThreadViewModel @Inject constructor(
             threadFlow.filterNotNull().collect { thread ->
                 // These 2 will always be empty or not all together at the same time.
                 if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
-                    thread.messages.forEachIndexed { index, message ->
-                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
+                    val displayedMessages = thread.getDisplayedMessages(featureFlagsLive.value, localSettings)
+                    displayedMessages.forEachIndexed { index, message ->
+                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isThemeTheSameMap[message.uid] = true
                     }
                 }
@@ -325,7 +328,7 @@ class ThreadViewModel @Inject constructor(
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
 
-        val nbMessages = thread.messages.count()
+        val nbMessages = thread.getDisplayedMessages(featureFlagsLive.value, localSettings).count()
 
         trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
 
