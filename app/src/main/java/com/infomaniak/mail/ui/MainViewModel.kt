@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -47,7 +48,6 @@ import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
@@ -1129,7 +1129,7 @@ class MainViewModel @Inject constructor(
                 val threads = threadUids.mapNotNull(threadController::getThread)
 
                 val messageUids = threads.mapNotNull { thread ->
-                    thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
+                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings).lastOrNull { it.folderId == currentFolderId }?.uid
                 }
 
                 val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
