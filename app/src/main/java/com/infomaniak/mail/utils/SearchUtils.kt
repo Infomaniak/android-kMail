@@ -127,7 +127,8 @@ class SearchUtils @Inject constructor(
     }
 
     private fun Thread.setFolderId(filterFolder: Folder?) {
-        this.folderId = if (messages.count() == 1) messages.single().folderId else filterFolder!!.id
+        val allMessages = messages
+        this.folderId = if (allMessages.count() == 1) allMessages.single().folderId else filterFolder!!.id
     }
 
     private suspend fun Thread.keepOldMessagesData(filterFolder: Folder?, realm: Realm) {

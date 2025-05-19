@@ -47,7 +47,9 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     //region Queries
     private fun getSortedAndNotDeletedMessagesQuery(threadUid: String): RealmQuery<Message>? {
         return ThreadController.getThread(threadUid, mailboxContentRealm())
-            ?.messages?.query("${Message::isDeletedOnApi.name} == false")
+            ?.getDisplayedMessages()
+            ?.query("${Message::isDeletedOnApi.name} == false")
+            ?.query("${Message::emojiReaction.name} == $0", null)
             ?.sort(Message::internalDate.name, Sort.ASCENDING)
     }
     //endregion
@@ -72,10 +74,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                 " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
                 ").@count < 1"
 
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").last()
-            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").last()
-            ?: messages.query(isNotScheduledDraft).last()
-            ?: messages.last()
+        return getDisplayedMessages().query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").last()
+            ?: getDisplayedMessages().query("$isNotDraft AND $isNotScheduledDraft").last()
+            ?: getDisplayedMessages().query(isNotScheduledDraft).last()
+            ?: getDisplayedMessages().last()
     }
 
     fun getLastMessageAndItsDuplicatesToExecuteAction(thread: Thread): List<Message> {
@@ -103,13 +105,13 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     private fun getMessagesAndTheirDuplicates(thread: Thread, query: String): List<Message> {
-        val messages = thread.messages.query(query).find()
+        val messages = thread.getDisplayedMessages().query(query).find()
         val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).find()
         return messages + duplicates
     }
 
     private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {
-        val messages = thread.messages.query(query).find()
+        val messages = thread.getDisplayedMessages().query(query).find()
         val duplicates = thread.duplicates.query(query).find()
         return messages + duplicates
     }
@@ -159,7 +161,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     fun getMessagesCountInThread(threadUid: String, realm: Realm): Int? {
-        return ThreadController.getThread(threadUid, realm)?.messages?.count()
+        return ThreadController.getThread(threadUid, realm)?.getDisplayedMessages()?.count()
     }
     //endregion
 
@@ -196,7 +198,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
-            return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
+            return thread?.getDisplayedMessages()?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
         }
         //endregion
 
