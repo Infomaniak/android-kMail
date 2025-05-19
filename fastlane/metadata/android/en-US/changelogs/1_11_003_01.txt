@@ -1,0 +1,2 @@
+- Detect more valid email addresses
+- Remove "ChatGPT" as AI redaction choice

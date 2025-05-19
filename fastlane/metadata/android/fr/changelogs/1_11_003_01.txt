@@ -1,0 +1,2 @@
+- Détection d'un plus grand nombre d'adresses électroniques valides
+- Suppression de "ChatGPT" comme choix de rédaction pour l'IA
