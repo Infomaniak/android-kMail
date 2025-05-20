@@ -71,8 +71,6 @@ class Thread : RealmObject, Snoozable {
     @PrimaryKey
     var uid: String = ""
     var messages = realmListOf<Message>()
-    fun getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings) = if (SharedUtils.isReactionsAvailable(featureFlags, localSettings)) messages.filter { it.isReaction.not() } else messages
-    fun getDisplayedMessages() = TODO()
     // This value should always be provided because messages always have at least an internalDate. Because of this, the initial value is meaningless
     @SerialName("internal_date")
     var internalDate: RealmInstant = Date().toRealmInstant()
@@ -174,6 +172,10 @@ class Thread : RealmObject, Snoozable {
         }
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
+
+    fun getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): RealmList<Message> {
+        return if (SharedUtils.isReactionsAvailable(featureFlags, localSettings)) messagesWithContent else messages
+    }
 
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
 
@@ -349,7 +351,10 @@ class Thread : RealmObject, Snoozable {
         return targetMessageIds.parseMessagesIds().any(threadMessageIds::contains)
     }
 
-    fun computeAvatarRecipient(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Pair<Recipient?, Bimi?> = runCatching {
+    fun computeAvatarRecipient(
+        featureFlags: Mailbox.FeatureFlagSet?,
+        localSettings: LocalSettings,
+    ): Pair<Recipient?, Bimi?> = runCatching {
         val messages = getDisplayedMessages(featureFlags, localSettings)
 
         val message = messages.lastOrNull {
