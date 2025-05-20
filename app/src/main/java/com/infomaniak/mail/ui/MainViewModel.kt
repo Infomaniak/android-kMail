@@ -1458,11 +1458,11 @@ class MainViewModel @Inject constructor(
 
     private fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
         val isWorkingWithThread = message == null
-        return isWorkingWithThread || threadHasOnlyOneMessageLeft(threadsUids.first())
+        return isWorkingWithThread || threadHasOnlyOneDisplayedMessageLeft(threadsUids.first())
     }
 
-    private fun threadHasOnlyOneMessageLeft(threadUid: String): Boolean {
-        return messageController.getMessagesCountInThread(threadUid, mailboxContentRealm()) == 1
+    private fun threadHasOnlyOneDisplayedMessageLeft(threadUid: String): Boolean {
+        return messageController.getDisplayedMessagesCountInThread(threadUid, mailboxContentRealm()) == 1
     }
 
     fun shareThreadUrl(messageUid: String) {

@@ -60,8 +60,7 @@ class Thread : RealmObject, Snoozable {
     @PrimaryKey
     var uid: String = ""
     var messages = realmListOf<Message>()
-    fun getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings) = if (SharedUtils.isReactionsAvailable(featureFlags, localSettings)) messages.filter { it.isReaction.not() } else messages
-    fun getDisplayedMessages() = TODO()
+    fun getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings) = if (SharedUtils.isReactionsAvailable(featureFlags, localSettings)) messages.filter { it.isHiddenEmojiReaction.not() } else messages
     // This value should always be provided because messages always have at least an internalDate. Because of this, the initial value is meaningless
     @SerialName("internal_date")
     var internalDate: RealmInstant = Date().toRealmInstant()
@@ -322,36 +321,37 @@ class Thread : RealmObject, Snoozable {
         }
     }
 
-    fun computeAvatarRecipient(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Pair<Recipient?, Bimi?> = runCatching {
-        val messages = getDisplayedMessages(featureFlags, localSettings)
+    fun computeAvatarRecipient(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Pair<Recipient?, Bimi?> =
+        runCatching {
+            val messages = getDisplayedMessages(featureFlags, localSettings)
 
-        val message = messages.lastOrNull {
-            it.folder.role != FolderRole.SENT &&
-                    it.folder.role != FolderRole.DRAFT &&
-                    it.folder.role != FolderRole.SCHEDULED_DRAFTS
-        } ?: messages.last()
+            val message = messages.lastOrNull {
+                it.folder.role != FolderRole.SENT &&
+                        it.folder.role != FolderRole.DRAFT &&
+                        it.folder.role != FolderRole.SCHEDULED_DRAFTS
+            } ?: messages.last()
 
-        val recipients = when (message.folder.role) {
-            FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS -> message.to
-            else -> message.from
+            val recipients = when (message.folder.role) {
+                FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS -> message.to
+                else -> message.from
+            }
+
+            return@runCatching recipients.firstOrNull() to message.bimi
+
+        }.getOrElse { throwable ->
+            Sentry.captureException(throwable) { scope ->
+                scope.setExtra("thread.folder.role", folder.role?.name.toString())
+                scope.setExtra("thread.folder.id", folder.id)
+                scope.setExtra("thread.folderId", folderId)
+                scope.setExtra("thread.uid", uid)
+                scope.setExtra("thread.messages.count", "${messages.count()}")
+                scope.setExtra("thread.duplicates.count", "${duplicates.count()}")
+                scope.setExtra("thread.isFromSearch", "$isFromSearch")
+                scope.setExtra("thread.hasDrafts", "$hasDrafts")
+            }
+
+            return@getOrElse null to null
         }
-
-        return@runCatching recipients.firstOrNull() to message.bimi
-
-    }.getOrElse { throwable ->
-        Sentry.captureException(throwable) { scope ->
-            scope.setExtra("thread.folder.role", folder.role?.name.toString())
-            scope.setExtra("thread.folder.id", folder.id)
-            scope.setExtra("thread.folderId", folderId)
-            scope.setExtra("thread.uid", uid)
-            scope.setExtra("thread.messages.count", "${messages.count()}")
-            scope.setExtra("thread.duplicates.count", "${duplicates.count()}")
-            scope.setExtra("thread.isFromSearch", "$isFromSearch")
-            scope.setExtra("thread.hasDrafts", "$hasDrafts")
-        }
-
-        return@getOrElse null to null
-    }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> = when (folder.role) {
         FolderRole.SENT, FolderRole.DRAFT, FolderRole.SCHEDULED_DRAFTS -> to

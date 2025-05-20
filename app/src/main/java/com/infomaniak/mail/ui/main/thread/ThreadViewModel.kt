@@ -125,7 +125,7 @@ class ThreadViewModel @Inject constructor(
 
     fun reassignMessagesLive(threadUid: String) {
         reassignMessages {
-            messageController.getSortedAndNotDeletedMessagesAsync(threadUid)?.map { mapRealmMessagesResult(it.list, threadUid) }
+            messageController.getSortedNotDeletedAndDisplayedMessagesAsync(threadUid)?.map { mapRealmMessagesResult(it.list, threadUid) }
         }
     }
 

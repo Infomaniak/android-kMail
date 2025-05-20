@@ -45,11 +45,10 @@ import javax.inject.Inject
 class MessageController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     //region Queries
-    private fun getSortedAndNotDeletedMessagesQuery(threadUid: String): RealmQuery<Message>? {
+    private fun getSortedNotDeletedAndDisplayedMessagesQuery(threadUid: String): RealmQuery<Message>? {
         return ThreadController.getThread(threadUid, mailboxContentRealm())
-            ?.getDisplayedMessages()
-            ?.query("${Message::isDeletedOnApi.name} == false")
-            ?.query("${Message::emojiReaction.name} == $0", null)
+            ?.messages
+            ?.query("${Message::isDeletedOnApi.name} == false AND ${Message::isHiddenEmojiReaction.name} == false")
             ?.sort(Message::internalDate.name, Sort.ASCENDING)
     }
     //endregion
@@ -74,10 +73,13 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
                 " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
                 ").@count < 1"
 
-        return getDisplayedMessages().query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").last()
-            ?: getDisplayedMessages().query("$isNotDraft AND $isNotScheduledDraft").last()
-            ?: getDisplayedMessages().query(isNotScheduledDraft).last()
-            ?: getDisplayedMessages().last()
+        val isNotHiddenEmojiReaction = "${Message::isHiddenEmojiReaction.name} == false"
+
+        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe AND $isNotHiddenEmojiReaction")
+            .last()
+            ?: messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotHiddenEmojiReaction").last()
+            ?: messages.query("$isNotScheduledDraft AND $isNotHiddenEmojiReaction").last()
+            ?: messages.query(isNotHiddenEmojiReaction).last()!!
     }
 
     fun getLastMessageAndItsDuplicatesToExecuteAction(thread: Thread): List<Message> {
@@ -105,13 +107,13 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     private fun getMessagesAndTheirDuplicates(thread: Thread, query: String): List<Message> {
-        val messages = thread.getDisplayedMessages().query(query).find()
+        val messages = thread.messages.query(query).find()
         val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).find()
         return messages + duplicates
     }
 
     private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {
-        val messages = thread.getDisplayedMessages().query(query).find()
+        val messages = thread.messages.query(query).find()
         val duplicates = thread.duplicates.query(query).find()
         return messages + duplicates
     }
@@ -152,16 +154,21 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         }.find().copyFromRealm()
     }
 
-    fun getSortedAndNotDeletedMessagesAsync(threadUid: String): Flow<ResultsChange<Message>>? {
-        return getSortedAndNotDeletedMessagesQuery(threadUid)?.asFlow()
+    fun getSortedNotDeletedAndDisplayedMessagesAsync(threadUid: String): Flow<ResultsChange<Message>>? {
+        return getSortedNotDeletedAndDisplayedMessagesQuery(threadUid)?.asFlow()
     }
 
     fun getMessageAsync(messageUid: String): Flow<SingleQueryChange<Message>> {
         return getMessagesQuery(messageUid, mailboxContentRealm()).first().asFlow()
     }
 
-    fun getMessagesCountInThread(threadUid: String, realm: Realm): Int? {
-        return ThreadController.getThread(threadUid, realm)?.getDisplayedMessages()?.count()
+    fun getDisplayedMessagesCountInThread(threadUid: String, realm: Realm): Int? {
+        return ThreadController.getThread(threadUid, realm)
+            ?.messages
+            ?.query("${Message::isHiddenEmojiReaction.name} == false")
+            ?.count()
+            ?.find()
+            ?.toInt()
     }
     //endregion
 
@@ -198,7 +205,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
 
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
-            return thread?.getDisplayedMessages()?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
+            return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
         }
         //endregion
 
