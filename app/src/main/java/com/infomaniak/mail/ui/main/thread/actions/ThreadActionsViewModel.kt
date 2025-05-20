@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@ package com.infomaniak.mail.ui.main.thread.actions
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,6 +34,7 @@ import javax.inject.Inject
 class ThreadActionsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val messageController: MessageController,
+    mailboxController: MailboxController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -46,13 +49,21 @@ class ThreadActionsViewModel @Inject constructor(
         .mapNotNull { it.obj }
         .asLiveData(ioCoroutineContext)
 
+    private val currentMailboxLive = mailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).mapNotNull { it.obj }.asLiveData(ioCoroutineContext)
+
+    private val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
+
     fun getThreadAndMessageUidToReplyTo() = liveData(ioCoroutineContext) {
         val thread = threadController.getThread(threadUid) ?: run {
             emit(null)
             return@liveData
         }
 
-        val uidToReplyTo = messageUidToReplyTo ?: messageController.getLastMessageToExecuteAction(thread).uid
+        val uidToReplyTo = messageUidToReplyTo
+            ?: messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid
 
         emit(thread to uidToReplyTo)
     }
