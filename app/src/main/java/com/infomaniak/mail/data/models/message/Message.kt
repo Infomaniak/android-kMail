@@ -48,6 +48,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 import java.util.Date
+import kotlin.random.Random
 
 @Serializable
 class Message : RealmObject, Snoozable {
@@ -211,21 +212,24 @@ class Message : RealmObject, Snoozable {
             }
 
             if (correctFolder == null) {
-
-                Sentry.captureMessage(
-                    "Message doesn't have a parent Thread from its own Folder, it should not be possible",
-                    SentryLevel.ERROR,
-                ) { scope ->
-                    scope.setTag("issueType", reason ?: "null") // The `null` value is supposedly impossible
-                    scope.setExtra("threadsUid", threads.joinToString { it.uid })
-                    scope.setExtra("threadsCount", "${threads.count()}")
-                    scope.setExtra(
-                        "threadsFolder",
-                        "${threads.map { "role:[${it.folder.role?.name}] (folderId:[${it.folderId}] | folder.id:[${it.folder.id}])" }}",
-                    )
-                    scope.setExtra("messageUid", uid)
-                    scope.setExtra("folderId", folderId)
-                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                // TODO: As of 20/05/2025, this event is taking the Sentry server down because it's emitting way too often.
+                //  So we temporarily set it to emit in only 2% of cases, while we are working on a fix.
+                if (Random.nextInt(0, 100) < 2) {
+                    Sentry.captureMessage(
+                        "Message doesn't have a parent Thread from its own Folder, it should not be possible",
+                        SentryLevel.ERROR,
+                    ) { scope ->
+                        scope.setTag("issueType", reason ?: "null") // The `null` value is supposedly impossible
+                        scope.setExtra("threadsUid", threads.joinToString { it.uid })
+                        scope.setExtra("threadsCount", "${threads.count()}")
+                        scope.setExtra(
+                            "threadsFolder",
+                            "${threads.map { "role:[${it.folder.role?.name}] (folderId:[${it.folderId}] | folder.id:[${it.folder.id}])" }}",
+                        )
+                        scope.setExtra("messageUid", uid)
+                        scope.setExtra("folderId", folderId)
+                        scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                    }
                 }
 
                 correctFolder = (threads.firstOrNull { it.folderId == folderId } ?: threads.first()).folder
