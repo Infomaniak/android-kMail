@@ -18,28 +18,44 @@
 package com.infomaniak.mail.data.models.thread
 
 import com.infomaniak.mail.data.models.message.EmojiReactionState
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import io.realm.kotlin.types.RealmDictionary
 
-fun Thread.computeReactionsPerMessageId(): Map<String, MutableMap<String, EmojiReactionState>> = buildMap {
+fun Thread.computeReactionsPerMessageId(): ReactionData {
+    val reactionsPerMessageId = mutableMapOf<String, MutableMap<String, EmojiReactionState>>()
+    val messageIds = mutableSetOf<String>()
+
     for (message in messages) {
-        val emoji = message.emojiReaction ?: continue
+        message.messageId?.let { messageIds += it }
+        reactionsPerMessageId.addReactionsOf(message)
+    }
 
-        val replyToIds = message.inReplyTo?.parseMessagesIds() ?: emptyList()
-        replyToIds.forEach { replyToId ->
-            val emojis = getOrPut(replyToId) { emptyEmojiReaction(emoji) }
+    return ReactionData(reactionsPerMessageId, messageIds)
+}
 
-            if (emojis.containsKey(emoji).not()) {
-                emojis[emoji] = EmojiReactionState()
-            }
+private fun MutableMap<String, MutableMap<String, EmojiReactionState>>.addReactionsOf(message: Message) {
+    val emoji = message.emojiReaction ?: return
 
-            emojis[emoji]!!.apply {
-                count += 1
-                hasReacted = message.from.any { it.isMe() }
-            }
+    val replyToIds = message.inReplyTo?.parseMessagesIds() ?: emptyList()
+    replyToIds.forEach { replyToId ->
+        val emojis = getOrPut(replyToId) { emptyEmojiReaction(emoji) }
+
+        if (emojis.containsKey(emoji).not()) {
+            emojis[emoji] = EmojiReactionState()
+        }
+
+        emojis[emoji]!!.apply {
+            count += 1
+            hasReacted = message.from.any { it.isMe() }
         }
     }
 }
+
+data class ReactionData(
+    val reactionsPerMessageId: Map<String, MutableMap<String, EmojiReactionState>>,
+    val messageIds: Set<String>,
+)
 
 private fun emptyEmojiReaction(emoji: String) = mutableMapOf(emoji to EmojiReactionState())
 
