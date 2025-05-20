@@ -25,10 +25,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
@@ -78,7 +80,9 @@ import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
+import com.infomaniak.mail.utils.extensions.statusBar
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -197,8 +201,11 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
+        enableEdgeToEdge()
+        
         setContentView(binding.root)
         handleOnBackPressed()
+        handleMenuDrawerEdgeToEdge()
         registerMainPermissions()
 
         checkUpdateIsRequired(
@@ -230,6 +237,24 @@ class MainActivity : BaseActivity() {
         initAppUpdateManager()
         initAppReviewManager()
         syncDiscoveryManager.init(::showSyncDiscovery)
+    }
+
+    private fun handleMenuDrawerEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val menuDrawerFragment = binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment>()
+            menuDrawerFragment.drawerHeader?.let {
+                it.setContentPadding(
+                    /* left = */ it.contentPaddingLeft,
+                    /* top = */ insets.statusBar().top,
+                    /* right = */ it.contentPaddingRight,
+                    /* bottom = */ it.contentPaddingBottom,
+                )
+            }
+
+            menuDrawerFragment.drawerContent?.applySideAndBottomSystemInsets(insets)
+
+            insets
+        }
     }
 
     private fun setupMenuDrawer() {

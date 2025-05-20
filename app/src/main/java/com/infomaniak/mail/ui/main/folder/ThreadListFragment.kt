@@ -29,6 +29,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentContainerView
@@ -49,11 +50,8 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.Swi
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -140,6 +138,8 @@ class ThreadListFragment : TwoPaneFragment() {
             navigationBarColor = if (mainViewModel.isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor,
         )
 
+        handleEdgeToEdge()
+
         threadListViewModel.deleteSearchData()
         bindAlertToViewLifecycle(descriptionDialog)
 
@@ -191,6 +191,17 @@ class ThreadListFragment : TwoPaneFragment() {
 
     override fun doAfterFolderChanged() {
         navigateFromNotificationToThread()
+    }
+
+    private fun handleEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            binding.appBarLayout.applyStatusBarInsets(insets)
+            binding.threadsList.applySideAndBottomSystemInsets(insets)
+            val marginStandardSize = resources.getDimensionPixelSize(RCore.dimen.marginStandard)
+            binding.newMessageFab.setMargins(bottom = marginStandardSize + insets.systemBars().bottom)
+            // Since threadFragment is in this view, we also share the inset with it, so that we can manage the edgeToEdge
+            insets
+        }
     }
 
     private fun navigateFromNotificationToThread() {

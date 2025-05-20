@@ -31,40 +31,50 @@
         android:visibility="gone"
         tools:visibility="visible">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/mainAppBar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:touchscreenBlocksFocus="false"
-            app:contentInsetEnd="0dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/backgroundColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:titleTextAppearance="@style/H2">
+            app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical">
+                android:layout_height="?attr/actionBarSize"
+                android:touchscreenBlocksFocus="false"
+                app:contentInsetEnd="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:titleTextAppearance="@style/H2">
 
-                <TextView
-                    android:id="@+id/toolbarSubject"
-                    style="@style/H2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:lines="1" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/iconFavorite"
-                    style="@style/IconButton"
-                    android:layout_marginEnd="@dimen/threadHorizontalMargin"
-                    android:contentDescription="@string/actionStar"
-                    app:icon="@drawable/ic_star" />
+                    <TextView
+                        android:id="@+id/toolbarSubject"
+                        style="@style/H2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:lines="1" />
 
-            </LinearLayout>
-        </com.google.android.material.appbar.MaterialToolbar>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/iconFavorite"
+                        style="@style/IconButton"
+                        android:layout_marginEnd="@dimen/threadHorizontalMargin"
+                        android:contentDescription="@string/actionStar"
+                        app:icon="@drawable/ic_star" />
+
+                </LinearLayout>
+            </com.google.android.material.appbar.MaterialToolbar>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/threadCoordinatorLayout"
@@ -73,7 +83,7 @@
             app:layout_constraintBottom_toTopOf="@id/quickActionBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar">
+            app:layout_constraintTop_toBottomOf="@id/mainAppBar">
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/appBar"

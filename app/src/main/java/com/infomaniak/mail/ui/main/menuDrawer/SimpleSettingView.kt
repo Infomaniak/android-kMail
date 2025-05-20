@@ -21,13 +21,17 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSimpleSettingBinding
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
+import android.view.ViewGroup.LayoutParams as ViewGroupLayoutParams
 
 class SimpleSettingView @JvmOverloads constructor(
     context: Context,
@@ -56,9 +60,10 @@ class SimpleSettingView @JvmOverloads constructor(
         }
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        handleEdgeToEdge()
     }
 
-    override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
+    override fun addView(child: View, index: Int, params: ViewGroupLayoutParams?) {
         if (isBindingInflated) {
             binding.cardView.addView(child, index, params)
         } else {
@@ -72,5 +77,13 @@ class SimpleSettingView @JvmOverloads constructor(
 
     fun setTitle(title: String) {
         binding.toolbar.title = title
+    }
+
+    private fun handleEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(this) { root, insets ->
+            binding.appBarLayout.applyStatusBarInsets(insets)
+            root.applySideAndBottomSystemInsets(insets)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 }
