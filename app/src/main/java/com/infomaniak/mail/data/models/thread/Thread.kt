@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -42,7 +41,6 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -129,19 +127,21 @@ class Thread : RealmObject, Snoozable {
                     else -> "multiple parents" // Thread has multiple parent folders
                 }
             }
-            Sentry.captureMessage(
-                "Thread doesn't have a unique parent Folder, it should not be possible",
-                SentryLevel.ERROR,
-            ) { scope ->
-                scope.setTag("issueType", reason)
-                scope.setTag("foldersId", _folders.joinToString { it.id })
-                scope.setTag("foldersCount", "${_folders.count()}")
-                scope.setExtra("folders_", "${_folders.map { "role:[${it.role?.name}] (id:[${it.id}])" }}")
-                scope.setExtra("foldersCount_", "${_folders.count()}")
-                scope.setExtra("threadUid", uid)
-                scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                scope.setExtra("exception", exception.message.toString())
-            }
+            // TODO: As of 20/05/2025, this Sentry is temporarily disabled, while we are working on a fix.
+            //  It's disabled because it's spamming the Sentry server way too much.
+            // Sentry.captureMessage(
+            //     "Thread doesn't have a unique parent Folder, it should not be possible",
+            //     SentryLevel.ERROR,
+            // ) { scope ->
+            //     scope.setTag("issueType", reason)
+            //     scope.setTag("foldersId", _folders.joinToString { it.id })
+            //     scope.setTag("foldersCount", "${_folders.count()}")
+            //     scope.setExtra("folders_", "${_folders.map { "role:[${it.role?.name}] (id:[${it.id}])" }}")
+            //     scope.setExtra("foldersCount_", "${_folders.count()}")
+            //     scope.setExtra("threadUid", uid)
+            //     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+            //     scope.setExtra("exception", exception.message.toString())
+            // }
 
             return@getOrElse _folders.firstOrNull { uid.contains(it.id) } ?: _folders.first()
         }
