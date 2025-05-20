@@ -115,6 +115,12 @@ class Thread : RealmObject, Snoozable {
     var numberOfScheduledDrafts: Int = 0
     @Transient
     var isLastInboxMessageSnoozed: Boolean = false
+
+    /**
+     * The list messages where messages that are emoji reactions have been filtered out
+     */
+    @Transient
+    var messagesWithContent = realmListOf<Message>()
     //endregion
 
     val isSeen get() = unseenMessagesCount == 0
@@ -321,13 +327,15 @@ class Thread : RealmObject, Snoozable {
     private fun updateMessages() {
         val (reactionsPerMessageId, messageIds) = computeReactionsPerMessageId()
 
+        messagesWithContent.clear()
         messages.forEach { message ->
             reactionsPerMessageId[message.messageId]?.let { reactions ->
                 message.emojiReactions.overrideWith(reactions)
             }
 
             val inReplyTo = message.inReplyTo ?: ""
-            message.isHiddenEmojiReaction = message.isReaction && inReplyTo.parseMessagesIds().any { messageIds.contains(it) }
+            val isHiddenEmojiReaction = message.isReaction && inReplyTo.parseMessagesIds().any { messageIds.contains(it) }
+            if (isHiddenEmojiReaction.not()) messagesWithContent += message
         }
     }
 
