@@ -31,7 +31,6 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
 import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
 import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.toRealmInstant
@@ -41,8 +40,6 @@ import io.realm.kotlin.types.*
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PersistedName
 import io.realm.kotlin.types.annotations.PrimaryKey
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -212,21 +209,23 @@ class Message : RealmObject, Snoozable {
 
             if (correctFolder == null) {
 
-                Sentry.captureMessage(
-                    "Message doesn't have a parent Thread from its own Folder, it should not be possible",
-                    SentryLevel.ERROR,
-                ) { scope ->
-                    scope.setTag("issueType", reason ?: "null") // The `null` value is supposedly impossible
-                    scope.setExtra("threadsUid", threads.joinToString { it.uid })
-                    scope.setExtra("threadsCount", "${threads.count()}")
-                    scope.setExtra(
-                        "threadsFolder",
-                        "${threads.map { "role:[${it.folder.role?.name}] (folderId:[${it.folderId}] | folder.id:[${it.folder.id}])" }}",
-                    )
-                    scope.setExtra("messageUid", uid)
-                    scope.setExtra("folderId", folderId)
-                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
-                }
+                // TODO: As of 20/05/2025, this Sentry is temporarily disabled, while we are working on a fix.
+                //  It's disabled because it's spamming the Sentry server way too much.
+                // Sentry.captureMessage(
+                //     "Message doesn't have a parent Thread from its own Folder, it should not be possible",
+                //     SentryLevel.ERROR,
+                // ) { scope ->
+                //     scope.setTag("issueType", reason ?: "null") // The `null` value is supposedly impossible
+                //     scope.setExtra("threadsUid", threads.joinToString { it.uid })
+                //     scope.setExtra("threadsCount", "${threads.count()}")
+                //     scope.setExtra(
+                //         "threadsFolder",
+                //         "${threads.map { "role:[${it.folder.role?.name}] (folderId:[${it.folderId}] | folder.id:[${it.folder.id}])" }}",
+                //     )
+                //     scope.setExtra("messageUid", uid)
+                //     scope.setExtra("folderId", folderId)
+                //     scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                // }
 
                 correctFolder = (threads.firstOrNull { it.folderId == folderId } ?: threads.first()).folder
             }
