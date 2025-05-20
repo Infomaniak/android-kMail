@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.isUnsnoozed
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.toRealmInstant
@@ -318,12 +319,15 @@ class Thread : RealmObject, Snoozable {
     }
 
     private fun updateMessages() {
-        val reactionsPerMessageId = computeReactionsPerMessageId()
+        val (reactionsPerMessageId, messageIds) = computeReactionsPerMessageId()
 
         messages.forEach { message ->
             reactionsPerMessageId[message.messageId]?.let { reactions ->
                 message.emojiReactions.overrideWith(reactions)
             }
+
+            val inReplyTo = message.inReplyTo ?: ""
+            message.isHiddenEmojiReaction = message.isReaction && inReplyTo.parseMessagesIds().any { messageIds.contains(it) }
         }
     }
 
