@@ -183,6 +183,8 @@ class Message : RealmObject, Snoozable {
     var hasAttachable: Boolean = false
     @Transient
     var emojiReactions: RealmDictionary<EmojiReactionState?> = realmDictionaryOf()
+    @Transient
+    var isHiddenEmojiReaction = false
     //endregion
 
     //region UI data (Transient & Ignore)
