@@ -137,6 +137,10 @@ class Message : RealmObject, Snoozable {
     @SerialName("snooze_uuid")
     override var snoozeUuid: String? = null
     var headers: Headers? = null
+    @SerialName("encrypted")
+    var isEncrypted: Boolean = false
+    @SerialName("encryption_password")
+    var encryptionPassword: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
