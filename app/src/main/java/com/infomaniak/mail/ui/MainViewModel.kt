@@ -212,7 +212,6 @@ class MainViewModel @Inject constructor(
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
     val isNetworkAvailable = NetworkAvailability(appContext).isNetworkAvailable
-
     var hasNetwork: Boolean = true
         private set
 
