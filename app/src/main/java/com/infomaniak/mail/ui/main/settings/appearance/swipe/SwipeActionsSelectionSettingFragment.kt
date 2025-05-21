@@ -36,6 +36,7 @@ import com.infomaniak.mail.data.models.SwipeAction.*
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -57,6 +58,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
+        handleEdgeToEdge()
 
         val actionResId = navigationArgs.titleResId
         root.setTitle(actionResId)
@@ -96,5 +98,12 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
             name = "${swipeAction.matomoValue}Swipe",
             value = (navigationArgs.titleResId == R.string.settingsSwipeLeft).toFloat(),
         )
+    }
+
+    private fun handleEdgeToEdge() = with(binding) {
+        root.setCustomInsetsBehavior { insets, contentView ->
+            contentView.applySideAndBottomSystemInsets(insets, withBottom = false)
+            linearLayoutContainer.applySideAndBottomSystemInsets(insets, withSides = false)
+        }
     }
 }
