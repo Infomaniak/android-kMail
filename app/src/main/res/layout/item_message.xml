@@ -386,6 +386,16 @@
             app:layout_constraintTop_toBottomOf="@id/messageDetails">
 
             <com.infomaniak.mail.ui.main.thread.MessageAlertView
+                android:id="@+id/encryptionAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:icon="@drawable/ic_padlock"
+                tools:action1="@string/buttonCopyPassword"
+                tools:description="@string/encryptedMessageReceiverTitle"
+                tools:visibility="visible" />
+
+            <com.infomaniak.mail.ui.main.thread.MessageAlertView
                 android:id="@+id/scheduleAlert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
