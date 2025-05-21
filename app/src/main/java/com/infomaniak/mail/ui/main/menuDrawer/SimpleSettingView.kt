@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.infomaniak.lib.core.utils.getAttributes
@@ -31,6 +30,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSimpleSettingBinding
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import android.view.ViewGroup.LayoutParams as ViewGroupLayoutParams
 
 class SimpleSettingView @JvmOverloads constructor(
@@ -49,6 +49,10 @@ class SimpleSettingView @JvmOverloads constructor(
      * We need to only add the second type of children to the `binding.cardView` to be able to display them
      */
     private var isBindingInflated: Boolean = false
+
+    private var customInsetsBehavior: ((WindowInsetsCompat, View) -> Unit) = { insets, contentView ->
+        contentView.applySideAndBottomSystemInsets(insets)
+    }
 
     init {
         orientation = VERTICAL
@@ -79,11 +83,14 @@ class SimpleSettingView @JvmOverloads constructor(
         binding.toolbar.title = title
     }
 
+    fun setCustomInsetsBehavior(customBodyInsets: (WindowInsetsCompat, View) -> Unit) {
+        customInsetsBehavior = customBodyInsets
+    }
+
     private fun handleEdgeToEdge(childContent: View) {
-        ViewCompat.setOnApplyWindowInsetsListener(this) { root, insets ->
+        binding.applyWindowInsetsListener(shouldConsume = false) { _, insets ->
             binding.appBarLayout.applyStatusBarInsets(insets)
-            childContent.applySideAndBottomSystemInsets(insets)
-            WindowInsetsCompat.CONSUMED
+            customInsetsBehavior(insets, childContent)
         }
     }
 }
