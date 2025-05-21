@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -47,7 +48,6 @@ import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MailboxInfoRealm
@@ -212,19 +212,20 @@ class MainViewModel @Inject constructor(
     val currentThreadsLive = MutableLiveData<ResultsChange<Thread>>()
 
     val isNetworkAvailable = NetworkAvailability(appContext).isNetworkAvailable
-        .mapLatest {
-            SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
-            it
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = null,
-        )
 
-    inline val hasNetwork get() = isNetworkAvailable.value != false
+    var hasNetwork: Boolean = true
+        private set
 
     private var currentThreadsLiveJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            isNetworkAvailable.collect {
+                SentryLog.d("Internet availability", if (it) "Available" else "Unavailable")
+                hasNetwork = it
+            }
+        }
+    }
 
     fun reassignCurrentThreadsLive() {
         currentThreadsLiveJob?.cancel()
