@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ class PrintMailFragment : Fragment() {
             threadAdapter.submitList(items)
         }
 
-        threadViewModel.reassignMessagesLiveWithoutSuperCollapsedBlock(navigationArgs.messageUid)
+        threadViewModel.updateCurrentThreadUid(threadViewModel.SingleMessage(navigationArgs.messageUid))
     }
 
     private fun setupAdapter() = with(threadViewModel) {
@@ -72,7 +72,6 @@ class PrintMailFragment : Fragment() {
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
-                override val hasSuperCollapsedBlockBeenClicked by threadState::hasSuperCollapsedBlockBeenClicked
                 override val verticalScroll by threadState::verticalScroll
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
