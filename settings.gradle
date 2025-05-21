@@ -19,5 +19,16 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = 'Infomaniak Mail'
-include ':app', ':Core:FragmentNavigation', ':Core:Legacy', ':Core:Legacy:AppLock', ':Core:Legacy:BugTracker',
-        ':Core:Legacy:Confetti', ':Core:Legacy:Stores', ':Core:MyKSuite', ':Core:Network', ':Core:Sentry', ':Core:UserAvatar', ':HtmlCleaner'
+include ':app',
+        ':Core:Compose:MaterialThemeFromXml',
+        ':Core:FragmentNavigation',
+        ':Core:Legacy',
+        ':Core:Legacy:AppLock',
+        ':Core:Legacy:BugTracker',
+        ':Core:Legacy:Confetti',
+        ':Core:Legacy:Stores',
+        ':Core:MyKSuite',
+        ':Core:Network',
+        ':Core:Sentry',
+        ':Core:UserAvatar',
+        ':HtmlCleaner'
