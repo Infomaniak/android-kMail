@@ -19,11 +19,11 @@ package com.infomaniak.mail.ui.main.thread
 
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
+import kotlinx.coroutines.flow.MutableStateFlow
 
 interface ThreadAdapterState {
     val isExpandedMap: MutableMap<String, Boolean>
     val isThemeTheSameMap: MutableMap<String, Boolean>
-    val hasSuperCollapsedBlockBeenClicked: Boolean
     val verticalScroll: Int?
     val isCalendarEventExpandedMap: MutableMap<String, Boolean>
 }
@@ -32,7 +32,7 @@ class ThreadState {
 
     val isExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val isThemeTheSameMap: MutableMap<String, Boolean> = mutableMapOf()
-    var hasSuperCollapsedBlockBeenClicked: Boolean = false
+    var hasSuperCollapsedBlockBeenClicked: MutableStateFlow<Boolean> = MutableStateFlow(false)
     var verticalScroll: Int? = null
     val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val treatedMessagesForCalendarEvent: MutableSet<String> = mutableSetOf()
@@ -43,7 +43,7 @@ class ThreadState {
     fun reset() {
         isExpandedMap.clear()
         isThemeTheSameMap.clear()
-        hasSuperCollapsedBlockBeenClicked = false
+        hasSuperCollapsedBlockBeenClicked.value = false
         verticalScroll = null
         isCalendarEventExpandedMap.clear()
         treatedMessagesForCalendarEvent.clear()
