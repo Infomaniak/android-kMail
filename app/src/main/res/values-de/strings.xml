@@ -62,7 +62,7 @@
     <string name="aiErrorMaxTokenReached">Ihre Anfrage ist zu lang, bitte kürzen Sie sie.</string>
     <string name="aiErrorTooManyRequests">In kurzer Zeit wurden zu viele Anfragen gestellt. Bitte haben Sie etwas Geduld.</string>
     <string name="aiErrorUnknown">Es ist ein Fehler aufgetreten. Wenn dieser Fehler weiterhin besteht, wenden Sie sich bitte an unseren Support.\nVielen Dank für Ihre Geduld.</string>
-    <string name="aiGenerationTitlePrompt">Erstellt von</string>
+    <string name="aiGenerationTitlePrompt">Erzeugt mit</string>
     <string name="aiMenuEditRequest">Meine Anfrage bearbeiten</string>
     <string name="aiMenuExpand">Erweitern</string>
     <string name="aiMenuFriendlyWriting">Freundliches Schreiben</string>
@@ -131,6 +131,7 @@
     <string name="buttonConfirm">Bestätigen</string>
     <string name="buttonConfirmRestoreEmails">Wiederherstellen</string>
     <string name="buttonContinue">Weiter</string>
+    <string name="buttonCopyPassword">Passwort kopieren</string>
     <string name="buttonCreate">Erstellen</string>
     <string name="buttonCreateAccount">Ein Konto erstellen</string>
     <string name="buttonCreateFolder">Einen Ordner hinzufügen</string>
@@ -184,7 +185,7 @@
     <string name="commercialFolder">Werbeaktionen</string>
     <string name="confirmLogoutDescription">Sind Sie sicher, dass Sie sich von %s abmelden möchten?</string>
     <string name="confirmLogoutTitle">Abmelden</string>
-    <string name="confirmationToBlockAnExpeditorText">Diese E-Mail und alle zukünftigen Nachrichten von %s werden in den Junk-Mail-Ordner verschoben.</string>
+    <string name="confirmationToBlockAnExpeditorText">Alle zukünftigen Nachrichten von %s werden in den Junk-Mail-Ordner verschoben.</string>
     <string name="contactActionAddToContacts">Zu Kontakten hinzufügen</string>
     <string name="contactActionCopyEmailAddress">E-Mail Adresse kopieren</string>
     <string name="contactActionWriteEmail">Schreiben Sie eine E-Mail</string>
@@ -267,6 +268,20 @@
     <string name="emptyStateTrashDescription">Verschieben Sie die Nachrichten in den Papierkorb. Sie werden nach 30 Tagen endgültig gelöscht.</string>
     <string name="emptyStateTrashTitle">Der Papierkorb ist leer</string>
     <string name="enableFilterButton">Filter einschalten</string>
+    <string name="encryptMessageRecipientsDescription">Die Nachricht wird für alle Ihre Empfänger verschlüsselt.</string>
+    <string name="encryptedMessageAddPasswordButton">Mit Passwort schützen</string>
+    <string name="encryptedMessageAddPasswordDescription1">Die automatische Verschlüsselung ist für die folgenden Empfänger nicht verfügbar:</string>
+    <string name="encryptedMessageAddPasswordDescription2">Fügen Sie ein Passwort hinzu, um die Nachricht zu sichern, und teilen Sie sie dann über einen anderen sicheren Weg (kChat, SMS usw.) mit den Empfängern.</string>
+    <string name="encryptedMessageAddPasswordInformation">Die Empfänger erhalten einen sicheren Link, der 30 Tage lang gültig ist und ein Passwort enthält, mit dem sie Ihre Nachricht lesen können.</string>
+    <string name="encryptedMessageDescription">Diese Nachricht wurde verschlüsselt und verfällt 30 Tage nach dem Versand für Empfänger, die nicht von der automatischen Verschlüsselung profitieren können.</string>
+    <string name="encryptedMessageDisableEncryptionButton">Verschlüsselung deaktivieren</string>
+    <string name="encryptedMessagePasswordLabel">Passwort zur Freigabe (über kChat, SMS oder andere sichere Weg)</string>
+    <string name="encryptedMessageReceiverTitle">Diese Nachricht wurde vom Absender aus Gründen der Vertraulichkeit verschlüsselt.</string>
+    <string name="encryptedMessageSnackbarEncryptionActivated">Die Verschlüsselung wurde aktiviert</string>
+    <string name="encryptedMessageTitle">Diese Nachricht wurde verschlüsselt.</string>
+    <string name="encryptedProtectionAdDescription1">Sichern Sie Ihre vertraulichen Nachrichten mit Verschlüsselung.</string>
+    <string name="encryptedProtectionAdDescription2">Nur der Betreff der verschlüsselten Nachrichten wird in den Suchergebnissen angezeigt, während ihr Inhalt sicher bleibt.</string>
+    <string name="encryptedProtectionAdTitle">Meine Nachricht schützen</string>
     <string name="enterPasswordDescription1">Ihr Passwort wurde geändert. Wenn es nicht von Ihnen stammt, wenden Sie sich bitte an Ihren Administrator.</string>
     <string name="enterPasswordDescription2">Bitte geben Sie das neue Passwort für die E-Mail-Adresse %s ein</string>
     <string name="enterPasswordOrDescription">oder</string>
@@ -608,12 +623,8 @@
     <string name="thisAfternoon">Heute Nachmittag</string>
     <string name="thisEvening">Heute Abend</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
-        <item quantity="one">Sind Sie sicher, dass Sie diese Nachricht endgültig löschen wollen?</item>
-        <item quantity="other">Sind Sie sicher, dass Sie diese Nachrichten endgültig löschen wollen?</item>
-    </plurals>
-    <plurals name="threadListDeletionConfirmationAlertTitle">
-        <item quantity="one">%d Nachricht löschen</item>
-        <item quantity="other">%d Nachrichten löschen</item>
+        <item quantity="one">Sind Sie sicher, dass Sie diese Konversation endgültig löschen wollen?</item>
+        <item quantity="other">Sind Sie sicher, dass Sie diese Konversationen endgültig löschen wollen?</item>
     </plurals>
     <string name="threadListEmptyDraftButton">Leere Entwürfe</string>
     <string name="threadListEmptyFolderAlertDescription">Sind Sie sicher, dass Sie alle Nachrichten in diesem Ordner dauerhaft löschen wollen?</string>
