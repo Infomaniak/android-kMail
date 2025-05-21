@@ -19,7 +19,7 @@ package com.infomaniak.mail.utils.extensions
 
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder.*
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.utils.Utils
 
@@ -51,7 +51,7 @@ private fun DescriptionAlertDialog.showDeletePermanentlyDialog(
     onCancel: (() -> Unit)? = null,
 ) = show(
     title = binding.context.resources.getQuantityString(
-        R.plurals.threadListDeletionConfirmationAlertTitle,
+        R.plurals.threadListDeletionConfirmationAlertDescription,
         deletedCount,
         deletedCount,
     ),
