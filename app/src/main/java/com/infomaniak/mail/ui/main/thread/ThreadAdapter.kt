@@ -221,7 +221,6 @@ class ThreadAdapter(
 
         bindHeader(message)
         bindAlerts(message)
-        bindSpam(message)
         bindCalendarEvent(message)
         bindAttachments(message)
         bindContent(message)
@@ -370,22 +369,6 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.displayDate.toDate()
 
-        if (message.isScheduledDraft) {
-            scheduleAlert.setDescription(
-                context.getString(
-                    R.string.scheduledEmailHeader,
-                    message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
-                ),
-            )
-            scheduleSendIcon.isVisible = true
-            alertsGroup.isVisible = true
-            scheduleAlert.isVisible = true
-        } else {
-            scheduleSendIcon.isGone = true
-            alertsGroup.isGone = true
-            scheduleAlert.isGone = true
-        }
-
         if (message.isDraft) {
             userAvatar.loadUserAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
@@ -474,6 +457,67 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
+        if (message.isEncrypted) {
+            bindEncryption(message)
+        } else {
+            encryptionAlert.isGone = true
+        }
+
+        if (message.isScheduledDraft) {
+            bindScheduled(message)
+        } else {
+            scheduleSendIcon.isGone = true
+            scheduleAlert.isGone = true
+        }
+
+        distantImagesAlert.onAction1 {
+            bodyWebViewClient.unblockDistantResources()
+            fullMessageWebViewClient.unblockDistantResources()
+
+            manuallyAllowedMessagesUids.add(message.uid)
+
+            reloadVisibleWebView()
+
+            distantImagesAlert.isGone = true
+            hideAlertGroupIfNoneDisplayed()
+        }
+
+        bindSpam(message)
+
+        hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
+    }
+
+    private fun ItemMessageBinding.bindEncryption(message: Message) {
+        encryptionAlert.apply {
+            isVisible = true
+            val (descriptionRes, actionRes) = if (message.from.all(Recipient::isMe)) {
+                val hasPassword = message.encryptionPassword?.isNotBlank() == true
+                if (hasPassword) {
+                    R.string.encryptedMessageDescription to R.string.buttonCopyPassword
+                } else {
+                    R.string.encryptedMessageTitle to null
+                }
+            } else {
+                R.string.encryptedMessageReceiverTitle to null
+            }
+
+            setDescription(context.getString(descriptionRes))
+            actionRes?.let { setAction1Text(context.getString(it)) } ?: setActionsVisibility(isVisible = false)
+        }
+    }
+
+    private fun ItemMessageBinding.bindScheduled(message: Message) {
+        scheduleAlert.setDescription(
+            context.getString(
+                R.string.scheduledEmailHeader,
+                message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
+            ),
+        )
+
+        scheduleSendIcon.isVisible = true
+        alertsGroup.isVisible = true
+        scheduleAlert.isVisible = true
+
         message.draftResource?.let { draftResource ->
             scheduleAlert.onAction1 {
                 trackScheduleSendEvent(MatomoName.ModifySnooze)
@@ -488,18 +532,6 @@ class ThreadAdapter(
             trackScheduleSendEvent(MatomoName.CancelSnooze)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
         }
-
-        distantImagesAlert.onAction1 {
-            bodyWebViewClient.unblockDistantResources()
-            fullMessageWebViewClient.unblockDistantResources()
-
-            manuallyAllowedMessagesUids.add(message.uid)
-
-            reloadVisibleWebView()
-
-            distantImagesAlert.isGone = true
-            hideAlertGroupIfNoneDisplayed()
-        }
     }
 
     //region Spam
@@ -509,7 +541,7 @@ class ThreadAdapter(
 
     private data class SpamData(val spamAction: SpamAction, val description: String = "", val action: String = "")
 
-    private fun MessageViewHolder.bindSpam(message: Message) = with(binding) {
+    private fun ItemMessageBinding.bindSpam(message: Message) {
         val firstExpeditor = message.from.firstOrNull()
         val spamAction = getSpamBannerAction(message, firstExpeditor)
         val spamData = context.getSpamBannerData(spamAction = spamAction, emailToUnblock = firstExpeditor?.email)
@@ -522,8 +554,6 @@ class ThreadAdapter(
             spamAlert.setAction1Text(spamData.action)
             spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor!!) }
         }
-
-        hideAlertGroupIfNoneDisplayed()
     }
 
     private fun getSpamBannerAction(message: Message, firstExpeditor: Recipient?): SpamAction {
