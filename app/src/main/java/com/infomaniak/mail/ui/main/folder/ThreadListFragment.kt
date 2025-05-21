@@ -511,11 +511,9 @@ class ThreadListFragment : TwoPaneFragment() {
             mainViewModel.isNetworkAvailable.collect { isNetworkAvailable ->
                 if (_binding == null) return@collect
 
-                if (isNetworkAvailable != null) {
-                    TransitionManager.beginDelayedTransition(binding.root)
-                    binding.noNetwork.isGone = isNetworkAvailable
-                    if (!isNetworkAvailable) updateThreadsVisibility()
-                }
+                TransitionManager.beginDelayedTransition(binding.root)
+                binding.noNetwork.isGone = isNetworkAvailable
+                if (!isNetworkAvailable) updateThreadsVisibility()
             }
         }
     }
