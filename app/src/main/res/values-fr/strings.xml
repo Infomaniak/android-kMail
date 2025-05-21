@@ -61,7 +61,7 @@
     <string name="aiErrorMaxTokenReached">Votre demande est trop longue, veuillez la raccourcir.</string>
     <string name="aiErrorTooManyRequests">Trop de requêtes ont été effectuées en un court laps de temps. Veuillez patienter.</string>
     <string name="aiErrorUnknown">Une erreur s’est produite. Si cette erreur persiste, veuillez contacter notre service d’assistance.\nMerci pour votre patience.</string>
-    <string name="aiGenerationTitlePrompt">Générer avec</string>
+    <string name="aiGenerationTitlePrompt">Généré avec</string>
     <string name="aiMenuEditRequest">Modifier ma demande</string>
     <string name="aiMenuExpand">Rallonger</string>
     <string name="aiMenuFriendlyWriting">Rédaction amicale</string>
@@ -132,6 +132,7 @@
     <string name="buttonConfirm">Confirmer</string>
     <string name="buttonConfirmRestoreEmails">Restaurer</string>
     <string name="buttonContinue">Continuer</string>
+    <string name="buttonCopyPassword">Copier le mot de passe</string>
     <string name="buttonCreate">Créer</string>
     <string name="buttonCreateAccount">Créer un compte</string>
     <string name="buttonCreateFolder">Ajouter un dossier</string>
@@ -185,7 +186,7 @@
     <string name="commercialFolder">Promotions</string>
     <string name="confirmLogoutDescription">Êtes-vous sûr de vouloir vous déconnecter du compte %s ?</string>
     <string name="confirmLogoutTitle">Me déconnecter</string>
-    <string name="confirmationToBlockAnExpeditorText">Cet e-mail et tous les futurs messages de %s seront déplacés dans le dossier Courrier indésirable.</string>
+    <string name="confirmationToBlockAnExpeditorText">Tous les futurs messages de %s seront déplacés dans le dossier Courrier indésirable.</string>
     <string name="contactActionAddToContacts">Ajouter aux contacts</string>
     <string name="contactActionCopyEmailAddress">Copier l’adresse mail</string>
     <string name="contactActionWriteEmail">Écrire un e-mail</string>
@@ -268,6 +269,20 @@
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
     <string name="enableFilterButton">Activer le filtre</string>
+    <string name="encryptMessageRecipientsDescription">Le message sera chiffré pour l’ensemble de vos destinataires.</string>
+    <string name="encryptedMessageAddPasswordButton">Protéger par mot de passe</string>
+    <string name="encryptedMessageAddPasswordDescription1">Le chiffrement automatique n’est pas disponible pour les destinataires suivants :</string>
+    <string name="encryptedMessageAddPasswordDescription2">Ajoutez un mot de passe pour sécuriser le message, puis partagez-le aux destinataires par un autre moyen sécurisé (kChat, SMS, etc.).</string>
+    <string name="encryptedMessageAddPasswordInformation">Les destinataires recevront un lien sécurisé, valable 30 jours, et devront saisir le mot de passe pour lire votre message.</string>
+    <string name="encryptedMessageDescription">Ce message a été chiffré et expirera 30 jours après l’envoi uniquement pour les destinataires ne pouvant bénéficier du chiffrement automatique.</string>
+    <string name="encryptedMessageDisableEncryptionButton">Désactiver le chiffrement</string>
+    <string name="encryptedMessagePasswordLabel">Mot de passe à partager (via kChat, SMS ou autre moyen sécurisé)</string>
+    <string name="encryptedMessageReceiverTitle">Ce message a été chiffré par l’expéditeur pour des raisons de confidentialité.</string>
+    <string name="encryptedMessageSnackbarEncryptionActivated">Le chiffrement a bien été activé</string>
+    <string name="encryptedMessageTitle">Ce message a été chiffré.</string>
+    <string name="encryptedProtectionAdDescription1">Sécurisez vos messages confidentiels avec le chiffrement.</string>
+    <string name="encryptedProtectionAdDescription2">Dans les résultats de recherche, seul l’objet des messages chiffrés sera visible, leur contenu restera sécurisé.</string>
+    <string name="encryptedProtectionAdTitle">Protéger mon message</string>
     <string name="enterPasswordDescription1">Votre mot de passe a été modifié. Si vous n’en êtes pas à l’origine, veuillez contacter votre administrateur.</string>
     <string name="enterPasswordDescription2">Veuillez saisir le nouveau mot de passe de l’adresse mail %s</string>
     <string name="enterPasswordOrDescription">ou</string>
@@ -622,14 +637,9 @@
     <string name="thisAfternoon">Cet après-midi</string>
     <string name="thisEvening">Ce soir</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
-        <item quantity="one">Êtes-vous sûr de vouloir supprimer ce message définitivement ?</item>
-        <item quantity="other">Êtes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
-        <item quantity="many">Êtes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
-    </plurals>
-    <plurals name="threadListDeletionConfirmationAlertTitle">
-        <item quantity="one">Supprimer %d message</item>
-        <item quantity="other">Supprimer %d messages</item>
-        <item quantity="many">Supprimer %d de messages</item>
+        <item quantity="one">Êtes-vous sûr de vouloir supprimer cette conversation définitivement ?</item>
+        <item quantity="other">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
+        <item quantity="many">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
     </plurals>
     <string name="threadListEmptyDraftButton">Vider les brouillons</string>
     <string name="threadListEmptyFolderAlertDescription">Êtes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
