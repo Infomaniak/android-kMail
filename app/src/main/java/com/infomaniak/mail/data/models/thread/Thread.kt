@@ -37,7 +37,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -174,7 +174,7 @@ class Thread : RealmObject, Snoozable {
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
 
     fun getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): RealmList<Message> {
-        return if (SharedUtils.isReactionsAvailable(featureFlags, localSettings)) messagesWithContent else messages
+        return if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) messagesWithContent else messages
     }
 
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
