@@ -583,15 +583,6 @@
                                 app:icon="@drawable/ic_editor_camera" />
 
                             <com.google.android.material.button.MaterialButton
-                                android:id="@+id/editorClock"
-                                style="@style/EditorIconButton"
-                                android:layout_width="@dimen/newMessageToolbarItemWidth"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/buttonSchedule"
-                                android:visibility="gone"
-                                app:icon="@drawable/ic_editor_clock" />
-
-                            <com.google.android.material.button.MaterialButton
                                 android:id="@+id/editorAi"
                                 style="@style/EditorIconButton"
                                 android:layout_width="@dimen/newMessageToolbarItemWidth"

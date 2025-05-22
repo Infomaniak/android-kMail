@@ -22,7 +22,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -71,7 +70,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                         editorWebView.createLink(displayText, url)
                     }
                 }
-                EditorAction.CLOCK -> fragment.notYetImplemented()
                 EditorAction.AI -> aiManager.openAiPrompt()
                 EditorAction.BOLD -> editorWebView.toggleBold()
                 EditorAction.ITALIC -> editorWebView.toggleItalic()
@@ -92,7 +90,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
-        linkEditor(editorClock, EditorAction.CLOCK)
         linkEditor(editorAi, EditorAction.AI)
 
         linkEditor(buttonBold, EditorAction.BOLD)
@@ -147,7 +144,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         ATTACHMENT("importFile"),
         CAMERA("importFromCamera"),
         LINK("addLink"),
-        CLOCK(MatomoMail.ACTION_SNOOZE_NAME),
         AI("aiWriter"),
         BOLD("bold"),
         ITALIC("italic"),
