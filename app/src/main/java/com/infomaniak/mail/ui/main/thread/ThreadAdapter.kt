@@ -491,15 +491,14 @@ class ThreadAdapter(
     private fun ItemMessageBinding.bindEncryption(message: Message) {
         encryptionAlert.apply {
             isVisible = true
-            val (descriptionRes, actionRes) = if (message.from.all(Recipient::isMe)) {
-                val hasPassword = message.encryptionPassword?.isNotBlank() == true
-                if (hasPassword) {
-                    R.string.encryptedMessageDescription to R.string.buttonCopyPassword
-                } else {
-                    R.string.encryptedMessageTitle to null
-                }
-            } else {
-                R.string.encryptedMessageReceiverTitle to null
+
+            val isMe = message.from.all(Recipient::isMe)
+            val hasPassword = message.encryptionPassword?.isNotBlank() == true
+
+            val (descriptionRes, actionRes) = when {
+                isMe && hasPassword -> R.string.encryptedMessageDescription to R.string.buttonCopyPassword
+                isMe -> R.string.encryptedMessageTitle to null
+                else -> R.string.encryptedMessageReceiverTitle to null
             }
 
             setDescription(context.getString(descriptionRes))
