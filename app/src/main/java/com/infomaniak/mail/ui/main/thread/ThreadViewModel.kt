@@ -290,30 +290,6 @@ class ThreadViewModel @Inject constructor(
         sendBatchesRecursively(input = items, output = mutableListOf(), batchSize = 2)
     }
 
-    fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
-
-        val thread = threadController.getThread(threadUid) ?: run {
-            emit(null)
-            return@liveData
-        }
-
-        // These 2 will always be empty or not all together at the same time.
-        if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
-            thread.messages.forEachIndexed { index, message ->
-                threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
-                threadState.isThemeTheSameMap[message.uid] = true
-            }
-        }
-
-        if (threadState.isFirstOpening) {
-            threadState.isFirstOpening = false
-            sendMatomoAndSentryAboutThreadMessagesCount(thread)
-            if (thread.isSeen.not()) markThreadAsSeen(thread)
-        }
-
-        emit(thread)
-    }
-
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
         sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
