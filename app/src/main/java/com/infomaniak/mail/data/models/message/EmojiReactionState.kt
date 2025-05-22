@@ -21,6 +21,6 @@ import com.infomaniak.emojicomponents.data.ReactionState
 import io.realm.kotlin.types.EmbeddedRealmObject
 
 class EmojiReactionState : ReactionState, EmbeddedRealmObject {
-    override var count: Int = 0
+    override var authors: List<String> = mutableListOf()
     override var hasReacted: Boolean = false
 }

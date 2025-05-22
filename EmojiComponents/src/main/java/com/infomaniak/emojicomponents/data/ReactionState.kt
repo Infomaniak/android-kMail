@@ -18,6 +18,8 @@
 package com.infomaniak.emojicomponents.data
 
 interface ReactionState {
-    val count: Int
+    val authors: List<String>
     val hasReacted: Boolean
 }
+
+val ReactionState.count get() = authors.count()

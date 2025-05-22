@@ -20,12 +20,12 @@ package com.infomaniak.emojicomponents
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.infomaniak.emojicomponents.data.ReactionState
 
-internal fun SnapshotStateMap<String, ReactionState>.updateWithEmoji(emoji: String) {
+internal fun SnapshotStateMap<String, ReactionState>.updateWithEmoji(emoji: String, author: String) {
     if (this[emoji]?.hasReacted == true) return
 
-    val oldCount = this[emoji]?.count ?: 0
+    val oldAuthors = this[emoji]?.authors ?: emptyList()
     this[emoji] = object : ReactionState {
-        override val count: Int = oldCount + 1
+        override val authors: List<String> = oldAuthors + author
         override val hasReacted: Boolean = true
     }
 }

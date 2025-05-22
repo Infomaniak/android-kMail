@@ -30,7 +30,6 @@ import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.components.EmojiReactions
 import com.infomaniak.emojicomponents.data.ReactionState
-import com.infomaniak.emojicomponents.updateWithEmoji
 
 class EmojiReactionsView @JvmOverloads constructor(
     context: Context,
@@ -39,6 +38,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 ) : AbstractComposeView(context, attrs, defStyleAttr) {
 
     private val reactionsState = mutableStateMapOf<String, ReactionState>()
+    private var clickListener: ((emoji: String) -> Unit)? = null
 
     private var chipCornerRadius: Float? = null
 
@@ -58,9 +58,13 @@ class EmojiReactionsView @JvmOverloads constructor(
         MaterialThemeFromXml {
             EmojiReactions(
                 reactions = { reactionsState },
-                onEmojiClicked = { emoji -> reactionsState.updateWithEmoji(emoji) },
+                onEmojiClicked = { emoji -> clickListener?.invoke(emoji) },
                 shape = chipCornerRadius?.let { RoundedCornerShape(it) } ?: InputChipDefaults.shape
             )
         }
+    }
+
+    fun setOnClickListener(listener: (emoji: String) -> Unit) {
+        clickListener = listener
     }
 }

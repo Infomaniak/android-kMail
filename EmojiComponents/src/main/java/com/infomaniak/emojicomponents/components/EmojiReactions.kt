@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.data.count
 import com.infomaniak.emojicomponents.theme.Margin
 import com.infomaniak.emojicomponents.updateWithEmoji
 
@@ -59,22 +60,22 @@ fun EmojiReactions(
 @Preview
 @Composable
 private fun EmojiReactionsPreview() {
-    class State(override val count: Int, override val hasReacted: Boolean) : ReactionState
+    class State(override val authors: List<String>, override val hasReacted: Boolean) : ReactionState
 
     val reactions: SnapshotStateMap<String, ReactionState> = remember {
         mutableStateMapOf(
-            "✅" to State(3, false),
-            "\uD83D\uDCCC" to State(1, false),
-            "\uD83D\uDE00" to State(5, true),
-            "\uD83D\uDE0D" to State(3, false),
-            "\uD83E\uDEE5" to State(2, true),
+            "✅" to State(listOf("Alice", "Bob", "Charles"), false),
+            "\uD83D\uDCCC" to State(listOf("Alice"), false),
+            "\uD83D\uDE00" to State(listOf("Alice", "Bob", "Charles", "Zebra"), true),
+            "\uD83D\uDE0D" to State(listOf("Alice", "Bob"), false),
+            "\uD83E\uDEE5" to State(listOf("Alice", "Bob", "Charles", "Zebra"), true),
         )
     }
 
     Surface {
         EmojiReactions(
             { reactions },
-            { emoji -> reactions.updateWithEmoji(emoji) },
+            { emoji -> reactions.updateWithEmoji(emoji, "Zebra") },
         )
     }
 }

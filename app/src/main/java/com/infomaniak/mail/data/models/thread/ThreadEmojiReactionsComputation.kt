@@ -46,7 +46,7 @@ private fun MutableMap<String, MutableMap<String, EmojiReactionState>>.addReacti
         }
 
         emojis[emoji]!!.apply {
-            count += 1
+            message.from.firstOrNull()?.let { authors = authors + it.getNameOrEmail() }
             hasReacted = message.from.any { it.isMe() }
         }
     }
