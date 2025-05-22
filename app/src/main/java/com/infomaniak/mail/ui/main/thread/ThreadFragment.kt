@@ -805,7 +805,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun expandSuperCollapsedBlock() {
-        threadViewModel.threadState.hasSuperCollapsedBlockBeenClicked.value = true
+        threadViewModel.threadState.clickSuperCollapsedBlock()
     }
 
     private fun navigateToAttendees(attendees: List<Attendee>) {
