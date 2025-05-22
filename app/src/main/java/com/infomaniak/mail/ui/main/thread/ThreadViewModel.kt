@@ -54,7 +54,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
-import kotlin.collections.set
 
 typealias ThreadAdapterItems = List<Any>
 typealias MessagesWithoutHeavyData = List<Message>
@@ -80,7 +79,7 @@ class ThreadViewModel @Inject constructor(
     val threadState = ThreadState()
 
     private val threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow(replay = 1)
-    val threadFlow: Flow<Thread?> = threadOpeningModeFlow.map { mode -> mode.threadUid?.let { threadController.getThread(it) } }
+    val threadFlow: Flow<Thread?> = threadOpeningModeFlow.map { mode -> mode.threadUid?.let(threadController::getThread) }
 
     // Could this directly collect threadOpeningModeFlow instead of collecting threadFlow?
     @OptIn(ExperimentalCoroutinesApi::class)
