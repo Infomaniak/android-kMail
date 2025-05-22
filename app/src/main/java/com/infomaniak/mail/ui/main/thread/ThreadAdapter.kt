@@ -502,7 +502,14 @@ class ThreadAdapter(
             }
 
             setDescription(context.getString(descriptionRes))
-            actionRes?.let { setAction1Text(context.getString(it)) } ?: setActionsVisibility(isVisible = false)
+            actionRes?.let {
+                setAction1Text(context.getString(it))
+                onAction1 {
+                    message.encryptionPassword?.let { password ->
+                        threadAdapterCallbacks?.onCopyEncryptionPassword?.invoke(password)
+                    }
+                }
+            } ?: setActionsVisibility(isVisible = false)
         }
     }
 
@@ -967,6 +974,7 @@ class ThreadAdapter(
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
+        var onCopyEncryptionPassword: ((String) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {
