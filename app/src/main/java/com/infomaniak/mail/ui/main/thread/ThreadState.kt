@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,13 @@ package com.infomaniak.mail.ui.main.thread
 
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 interface ThreadAdapterState {
     val isExpandedMap: MutableMap<String, Boolean>
     val isThemeTheSameMap: MutableMap<String, Boolean>
-    val hasSuperCollapsedBlockBeenClicked: Boolean
     val verticalScroll: Int?
     val isCalendarEventExpandedMap: MutableMap<String, Boolean>
 }
@@ -32,7 +34,8 @@ class ThreadState {
 
     val isExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val isThemeTheSameMap: MutableMap<String, Boolean> = mutableMapOf()
-    var hasSuperCollapsedBlockBeenClicked: Boolean = false
+    private val _hasSuperCollapsedBlockBeenClicked: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val hasSuperCollapsedBlockBeenClicked: StateFlow<Boolean> = _hasSuperCollapsedBlockBeenClicked.asStateFlow()
     var verticalScroll: Int? = null
     val isCalendarEventExpandedMap: MutableMap<String, Boolean> = mutableMapOf()
     val treatedMessagesForCalendarEvent: MutableSet<String> = mutableSetOf()
@@ -43,12 +46,16 @@ class ThreadState {
     fun reset() {
         isExpandedMap.clear()
         isThemeTheSameMap.clear()
-        hasSuperCollapsedBlockBeenClicked = false
+        _hasSuperCollapsedBlockBeenClicked.value = false
         verticalScroll = null
         isCalendarEventExpandedMap.clear()
         treatedMessagesForCalendarEvent.clear()
         cachedSplitBodies.clear()
         isFirstOpening = true
         superCollapsedBlock = null
+    }
+
+    fun clickSuperCollapsedBlock() {
+        _hasSuperCollapsedBlockBeenClicked.value = true
     }
 }
