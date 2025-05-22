@@ -280,7 +280,6 @@ class ThreadFragment : Fragment() {
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
                 override val isThemeTheSameMap by threadState::isThemeTheSameMap
-                override val hasSuperCollapsedBlockBeenClicked by threadState::hasSuperCollapsedBlockBeenClicked
                 override val verticalScroll by threadState::verticalScroll
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
@@ -412,23 +411,20 @@ class ThreadFragment : Fragment() {
         phoneContextualMenuAlertDialog.initValues(snackbarManager)
     }
 
-    private fun observeThreadOpening() = with(threadViewModel) {
-
+    private fun observeThreadOpening() {
         twoPaneViewModel.currentThreadUid.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { threadUid ->
-
             displayThreadView()
+            threadViewModel.updateCurrentThreadUid(threadViewModel.AllMessages(threadUid))
+        }
 
-            openThread(threadUid).observe(viewLifecycleOwner) { thread ->
-
+        lifecycleScope.launch {
+            threadViewModel.threadFlow.collect { thread ->
                 if (thread == null) {
                     twoPaneViewModel.closeThread()
-                    return@observe
+                    return@collect
                 }
 
-                initUi(threadUid, folderRole = mainViewModel.getActionFolderRole(thread))
-
-                reassignThreadLive(threadUid)
-                reassignMessagesLive(threadUid)
+                initUi(thread.uid, folderRole = mainViewModel.getActionFolderRole(thread))
             }
         }
     }
@@ -488,7 +484,7 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            if (threadState.hasSuperCollapsedBlockBeenClicked) {
+            if (threadState.hasSuperCollapsedBlockBeenClicked.value) {
                 displayBatchedMessages(items)
             } else {
                 threadAdapter.submitList(items)
@@ -808,9 +804,8 @@ class ThreadFragment : Fragment() {
         binding.messagesListNestedScrollView.scrollY = scrollY
     }
 
-    private fun expandSuperCollapsedBlock() = with(threadViewModel) {
-        threadState.hasSuperCollapsedBlockBeenClicked = true
-        reassignMessagesLive(twoPaneViewModel.currentThreadUid.value!!)
+    private fun expandSuperCollapsedBlock() {
+        threadViewModel.threadState.clickSuperCollapsedBlock()
     }
 
     private fun navigateToAttendees(attendees: List<Attendee>) {
