@@ -43,7 +43,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.SharedUtils.Companion.isSnoozeAvailable
+import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
