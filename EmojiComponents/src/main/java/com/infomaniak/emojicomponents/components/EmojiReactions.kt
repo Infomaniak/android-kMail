@@ -28,8 +28,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.icons.FaceSmileRoundPlus
+import com.infomaniak.emojicomponents.icons.Icons
 import com.infomaniak.emojicomponents.theme.Margin
 import com.infomaniak.emojicomponents.updateWithEmoji
 
@@ -38,6 +41,8 @@ import com.infomaniak.emojicomponents.updateWithEmoji
 fun EmojiReactions(
     reactions: () -> Map<String, ReactionState>,
     onEmojiClicked: (String) -> Unit,
+    addReactionIcon: ImageVector = EmojiReactionsDefaults.addReactionIcon,
+    onAddReactionClick: () -> Unit,
     modifier: Modifier = Modifier,
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
@@ -53,7 +58,16 @@ fun EmojiReactions(
                 shape = shape,
             )
         }
+        AddReactionChip(
+            addReactionIcon,
+            onClick = onAddReactionClick,
+            shape = shape,
+        )
     }
+}
+
+object EmojiReactionsDefaults {
+    val addReactionIcon = Icons.FaceSmileRoundPlus
 }
 
 @Preview
@@ -75,6 +89,8 @@ private fun EmojiReactionsPreview() {
         EmojiReactions(
             reactions = { reactions },
             onEmojiClicked = { emoji -> reactions.updateWithEmoji(emoji) },
+            addReactionIcon = Icons.FaceSmileRoundPlus,
+            onAddReactionClick = {},
         )
     }
 }

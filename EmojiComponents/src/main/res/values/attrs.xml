@@ -19,6 +19,7 @@
 
     <declare-styleable name="EmojiReactionsView">
         <attr name="chipCornerRadius" format="dimension" />
+        <attr name="addReactionIcon" format="reference" />
     </declare-styleable>
 
 </resources>
