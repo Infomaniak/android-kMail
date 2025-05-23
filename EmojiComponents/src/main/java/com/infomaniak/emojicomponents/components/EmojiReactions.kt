@@ -71,8 +71,8 @@ private fun EmojiReactionsPreview() {
 
     Surface {
         EmojiReactions(
-            { reactions },
-            { emoji -> reactions.updateWithEmoji(emoji) },
+            reactions = { reactions },
+            onEmojiClicked = { emoji -> reactions.updateWithEmoji(emoji) },
         )
     }
 }
