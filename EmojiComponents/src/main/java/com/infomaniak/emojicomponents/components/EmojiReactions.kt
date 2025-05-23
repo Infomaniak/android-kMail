@@ -36,9 +36,9 @@ import com.infomaniak.emojicomponents.updateWithEmoji
 fun EmojiReactions(
     reactions: () -> Map<String, ReactionState>,
     onEmojiClicked: (String) -> Unit,
+    modifier: Modifier = Modifier,
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
-    modifier: Modifier = Modifier,
 ) {
     FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
         reactions().forEach { (emoji, state) ->
