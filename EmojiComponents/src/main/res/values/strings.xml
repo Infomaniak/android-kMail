@@ -16,10 +16,5 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-
-    <declare-styleable name="EmojiReactionsView">
-        <attr name="chipCornerRadius" format="dimension" />
-        <attr name="addReactionIcon" format="reference" />
-    </declare-styleable>
-
+    <string name="contentDescriptionAddReaction">Add reaction</string>
 </resources>
