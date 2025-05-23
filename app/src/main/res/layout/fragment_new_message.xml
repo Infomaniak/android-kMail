@@ -688,6 +688,16 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <com.google.android.material.button.MaterialButton
+                            android:id="@+id/encryptionButton"
+                            style="@style/IconButton"
+                            android:layout_width="@dimen/newMessageToolbarItemWidth"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/encryptedProtectionAdDescription1"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_padlock"
+                            tools:visibility="visible" />
+
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/scheduleButton"
                             style="@style/IconButton"
                             android:layout_width="@dimen/newMessageToolbarItemWidth"
