@@ -660,4 +660,6 @@
     <string name="warningEventHasPassed">This event has already passed</string>
     <string name="warningEventIsCancelled">This event has been cancelled</string>
     <string name="workInProgressTitle">Available soon</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
