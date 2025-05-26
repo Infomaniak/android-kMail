@@ -1274,6 +1274,12 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
+    //region Emoji reaction
+    fun sendEmojiReply(emoji: String, messageUid: String) {
+        // TODO
+    }
+    //endregion
+
     //region Undo action
     fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
 
