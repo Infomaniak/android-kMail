@@ -138,6 +138,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.requestMailboxPassword(mailboxHostingId, mailboxName), POST)
     }
 
+    fun isInfomaniakMailbox(emails: List<String>): ApiResponse<Map<String, Boolean>> {
+        return callApi(ApiRoutes.isInfomaniakMailboxes(emails), GET)
+    }
+
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
     fun createFolder(mailboxUuid: String, name: String): ApiResponse<Folder> {
