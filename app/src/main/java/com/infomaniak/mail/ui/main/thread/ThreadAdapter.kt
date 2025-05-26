@@ -530,7 +530,7 @@ class ThreadAdapter(
             return restrictedSenders?.firstOrNull { email == it.email }?.email
         }
 
-        val isMessageSpam = message.headers?.isSpam ?: false
+        val isMessageSpam = message.headers?.isSpam == true
         val isExpeditorBlocked = firstExpeditor?.getExpeditorIn(senderRestrictions()?.blockedSenders) != null
         val isExpeditorAuthorized = firstExpeditor?.getExpeditorIn(senderRestrictions()?.authorizedSenders) != null
 
