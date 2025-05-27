@@ -81,11 +81,11 @@ class ThreadViewModel @Inject constructor(
     @DoNotReadDirectly
     private val _threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow(replay = 1)
     @OptIn(DoNotReadDirectly::class)
-    private val threadOpeningModeFlow = _threadOpeningModeFlow.distinctUntilChanged()
+    private val threadOpeningModeFlow = _threadOpeningModeFlow.distinctUntilChangedBy { it.threadUid }
 
     val threadFlow: Flow<Thread?> = threadOpeningModeFlow
         .map { mode -> mode.threadUid?.let(threadController::getThread) }
-        .shareIn(viewModelScope, SharingStarted.Lazily)
+        .shareIn(viewModelScope, SharingStarted.Lazily, 1)
 
     // Could this directly collect threadOpeningModeFlow instead of collecting threadFlow?
     @OptIn(ExperimentalCoroutinesApi::class)
