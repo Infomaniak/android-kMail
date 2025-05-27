@@ -85,7 +85,7 @@ class ThreadViewModel @Inject constructor(
 
     val threadFlow: Flow<Thread?> = threadOpeningModeFlow
         .map { mode -> mode.threadUid?.let(threadController::getThread) }
-        .shareIn(viewModelScope, SharingStarted.Lazily, 1)
+        .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
     // Could this directly collect threadOpeningModeFlow instead of collecting threadFlow?
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -95,6 +95,13 @@ class ThreadViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
+        /**
+         * Ideally, [ThreadState.hasSuperCollapsedBlockBeenClicked] should be passed directly to [ThreadOpeningMode.getMessages].
+         *
+         * However, due to the current high level of coupling in this code, direct integration is not feasible.
+         * As a workaround, [ThreadState.hasSuperCollapsedBlockBeenClicked] is used solely to retrigger the computation.
+         * The [ThreadOpeningMode.getMessages] method will independently determine the appropriate value to use.
+         */
         combine(threadOpeningModeFlow, threadState.hasSuperCollapsedBlockBeenClicked) { mode, _ ->
             mode
         }.flatMapLatest { mode -> mode.getMessages() }.asLiveData(ioCoroutineContext)
