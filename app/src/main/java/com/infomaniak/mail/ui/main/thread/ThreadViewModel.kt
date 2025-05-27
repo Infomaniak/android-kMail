@@ -78,7 +78,11 @@ class ThreadViewModel @Inject constructor(
 
     val threadState = ThreadState()
 
-    private val threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow()
+    @DoNotReadDirectly
+    private val _threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow(replay = 1)
+    @OptIn(DoNotReadDirectly::class)
+    private val threadOpeningModeFlow = _threadOpeningModeFlow.distinctUntilChanged()
+
     val threadFlow: Flow<Thread?> = threadOpeningModeFlow
         .map { mode -> mode.threadUid?.let(threadController::getThread) }
         .shareIn(viewModelScope, SharingStarted.Lazily)
@@ -452,9 +456,10 @@ class ThreadViewModel @Inject constructor(
         emit(response.isSuccess())
     }
 
+    @OptIn(DoNotReadDirectly::class)
     fun updateCurrentThreadUid(mode: ThreadOpeningMode) {
         viewModelScope.launch {
-            threadOpeningModeFlow.emit(mode)
+            _threadOpeningModeFlow.emit(mode)
         }
     }
 
@@ -513,6 +518,14 @@ class ThreadViewModel @Inject constructor(
                 ?.map { mapRealmMessagesResult(it.list, threadUid) } ?: emptyFlow()
         }
     }
+
+    @RequiresOptIn(
+        level = RequiresOptIn.Level.ERROR,
+        message = "Do not use this backing field directly, it will emit the same value multiple times"
+    )
+    @Retention(AnnotationRetention.BINARY)
+    @Target(AnnotationTarget.PROPERTY)
+    private annotation class DoNotReadDirectly
 
     companion object {
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
