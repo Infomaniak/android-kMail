@@ -85,6 +85,8 @@ class ThreadViewModel @Inject constructor(
 
     val threadFlow: Flow<Thread?> = threadOpeningModeFlow
         .map { mode -> mode.threadUid?.let(threadController::getThread) }
+        // replay = 1 is needed because the UI relies on this flow to set click listeners. If there's a config change but no
+        // replay value, the click listeners won't ever be set
         .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
     // Could this directly collect threadOpeningModeFlow instead of collecting threadFlow?
