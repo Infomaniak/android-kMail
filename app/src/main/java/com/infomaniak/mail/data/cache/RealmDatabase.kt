@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.models.message.Headers
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.data.models.signature.Signature
+import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
@@ -187,7 +188,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 3L
         const val MAILBOX_INFO_SCHEMA_VERSION = 9L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 29L
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 30L // Emoji reactions
         //endregion
 
         //region Configurations names
@@ -230,6 +231,7 @@ object RealmDatabase {
             SwissTransferFile::class,
             Attendee::class,
             Bimi::class,
+            EmojiReactionState::class,
         )
         //endregion
 
