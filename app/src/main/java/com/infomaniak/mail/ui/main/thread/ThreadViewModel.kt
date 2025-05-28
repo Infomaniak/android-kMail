@@ -89,11 +89,12 @@ class ThreadViewModel @Inject constructor(
         // replay value, the click listeners won't ever be set
         .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
-    // Could this directly collect threadOpeningModeFlow instead of collecting threadFlow?
     @OptIn(ExperimentalCoroutinesApi::class)
-    val threadLive = threadFlow.filterNotNull().flatMapLatest { thread ->
-        threadController.getThreadAsync(thread.uid).map { it.obj }
-    }.asLiveData(ioCoroutineContext)
+    val threadLive = threadOpeningModeFlow
+        .mapNotNull { it.threadUid }
+        .flatMapLatest(threadController::getThreadAsync)
+        .map { it.obj }
+        .asLiveData(ioCoroutineContext)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
