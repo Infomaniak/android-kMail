@@ -1,9 +1,5 @@
-# GitHub Actions Virtual Environments
-# https://github.com/actions/virtual-environments/
-
 # Rebases a pull request on the repo's default branch when the "rebase" label is added
-# Note: you'll need to add a personal access token to your repo, `PERSONAL_ACCESS_TOKEN`. (`REBASE_PR_TOKEN`)
-# Link: https://github.com/jessesquires/gh-workflows/blob/main/.github/workflows/rebase-default-branch.yml
+# Link: https://github.com/Infomaniak/.github/blob/main/workflow-templates/rebase-default-branch.yml
 
 name: Rebase Pull Request
 
