@@ -51,12 +51,9 @@ import io.realm.kotlin.query.RealmResults
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.*
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
-import kotlin.collections.set
 
 typealias ThreadAdapterItems = List<Any>
 typealias MessagesWithoutHeavyData = List<Message>
@@ -76,21 +73,47 @@ class ThreadViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private var threadLiveJob: Job? = null
-    private var messagesLiveJob: Job? = null
     private var fetchMessagesJob: Job? = null
     private var fetchCalendarEventJob: Job? = null
 
-    val threadLive = MutableLiveData<Thread?>()
-    val messagesLive = MutableLiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>()
+    val threadState = ThreadState()
+
+    @DoNotReadDirectly
+    private val _threadOpeningModeFlow: MutableSharedFlow<ThreadOpeningMode> = MutableSharedFlow(replay = 1)
+    @OptIn(DoNotReadDirectly::class)
+    private val threadOpeningModeFlow = _threadOpeningModeFlow.distinctUntilChangedBy { it.threadUid }
+
+    val threadFlow: Flow<Thread?> = threadOpeningModeFlow
+        .map { mode -> mode.threadUid?.let(threadController::getThread) }
+        // replay = 1 is needed because the UI relies on this flow to set click listeners. If there's a config change but no
+        // replay value, the click listeners won't ever be set
+        .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
+
+    // Could this directly collect threadOpeningModeFlow instead of collecting threadFlow?
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val threadLive = threadFlow.filterNotNull().flatMapLatest { thread ->
+        threadController.getThreadAsync(thread.uid).map { it.obj }
+    }.asLiveData(ioCoroutineContext)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
+        /**
+         * Ideally, [ThreadState.hasSuperCollapsedBlockBeenClicked] should be passed directly to [ThreadOpeningMode.getMessages].
+         *
+         * However, due to the current high level of coupling in this code, direct integration is not feasible.
+         * As a workaround, [ThreadState.hasSuperCollapsedBlockBeenClicked] is used solely to retrigger the computation.
+         * The [ThreadOpeningMode.getMessages] method will independently determine the appropriate value to use.
+         */
+        combine(threadOpeningModeFlow, threadState.hasSuperCollapsedBlockBeenClicked) { mode, _ ->
+            mode
+        }.flatMapLatest { mode -> mode.getMessages() }.asLiveData(ioCoroutineContext)
+
     val batchedMessages = SingleLiveEvent<List<Any>>()
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     val failedMessagesUids = SingleLiveEvent<List<String>>()
     var deletedMessagesUids = mutableSetOf<String>()
-
-    val threadState = ThreadState()
 
     private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
@@ -110,36 +133,28 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    private fun Thread.shouldDisplayHeaderActions(mailbox: Mailbox?): Boolean {
-        return isSnoozeAvailable(mailbox?.featureFlags, localSettings) && folder.role == FolderRole.SNOOZED
-    }
+    init {
+        viewModelScope.launch {
+            threadFlow.filterNotNull().collect { thread ->
+                // These 2 will always be empty or not all together at the same time.
+                if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
+                    thread.messages.forEachIndexed { index, message ->
+                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
+                        threadState.isThemeTheSameMap[message.uid] = true
+                    }
+                }
 
-    fun reassignThreadLive(threadUid: String) {
-        threadLiveJob?.cancel()
-        threadLiveJob = viewModelScope.launch(ioCoroutineContext) {
-            threadController.getThreadAsync(threadUid).map { it.obj }.collect(threadLive::postValue)
-        }
-    }
-
-    fun reassignMessagesLive(threadUid: String) {
-        reassignMessages {
-            messageController.getSortedAndNotDeletedMessagesAsync(threadUid)?.map { mapRealmMessagesResult(it.list, threadUid) }
-        }
-    }
-
-    fun reassignMessagesLiveWithoutSuperCollapsedBlock(messageUid: String) {
-        reassignMessages {
-            messageController.getMessageAsync(messageUid).mapNotNull {
-                it.obj?.let { message -> mapRealmMessagesResultWithoutSuperCollapsedBlock(message) }
+                if (threadState.isFirstOpening) {
+                    threadState.isFirstOpening = false
+                    sendMatomoAndSentryAboutThreadMessagesCount(thread)
+                    if (thread.isSeen.not()) markThreadAsSeen(thread)
+                }
             }
         }
     }
 
-    private fun reassignMessages(messagesFlow: (() -> Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>?)) {
-        messagesLiveJob?.cancel()
-        messagesLiveJob = viewModelScope.launch(ioCoroutineContext) {
-            messagesFlow()?.collect(messagesLive::postValue)
-        }
+    private fun Thread.shouldDisplayHeaderActions(mailbox: Mailbox?): Boolean {
+        return isSnoozeAvailable(mailbox?.featureFlags, localSettings) && folder.role == FolderRole.SNOOZED
     }
 
     private suspend fun mapRealmMessagesResult(
@@ -223,7 +238,7 @@ class ThreadViewModel @Inject constructor(
      */
     private fun shouldBlockBeDisplayed(messagesCount: Int, firstIndexAfterBlock: Int): Boolean = with(threadState) {
         return superCollapsedBlock?.shouldBeDisplayed == true && // If the Block was hidden, we mustn't ever display it again
-                !hasSuperCollapsedBlockBeenClicked && // Block hasn't been expanded by the user
+                !hasSuperCollapsedBlockBeenClicked.value && // Block hasn't been expanded by the user
                 messagesCount >= SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT && // At least 5 Messages in the Thread
                 firstIndexAfterBlock >= SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT  // At least 2 Messages in the Block
     }
@@ -288,30 +303,6 @@ class ThreadViewModel @Inject constructor(
         }
 
         sendBatchesRecursively(input = items, output = mutableListOf(), batchSize = 2)
-    }
-
-    fun openThread(threadUid: String) = liveData(ioCoroutineContext) {
-
-        val thread = threadController.getThread(threadUid) ?: run {
-            emit(null)
-            return@liveData
-        }
-
-        // These 2 will always be empty or not all together at the same time.
-        if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
-            thread.messages.forEachIndexed { index, message ->
-                threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
-                threadState.isThemeTheSameMap[message.uid] = true
-            }
-        }
-
-        if (threadState.isFirstOpening) {
-            threadState.isFirstOpening = false
-            sendMatomoAndSentryAboutThreadMessagesCount(thread)
-            if (thread.isSeen.not()) markThreadAsSeen(thread)
-        }
-
-        emit(thread)
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
@@ -474,6 +465,13 @@ class ThreadViewModel @Inject constructor(
         emit(response.isSuccess())
     }
 
+    @OptIn(DoNotReadDirectly::class)
+    fun updateCurrentThreadUid(mode: ThreadOpeningMode) {
+        viewModelScope.launch {
+            _threadOpeningModeFlow.emit(mode)
+        }
+    }
+
     data class SubjectDataResult(
         val thread: Thread?,
         val mergedContacts: MergedContactDictionary?,
@@ -507,6 +505,36 @@ class ThreadViewModel @Inject constructor(
     enum class ThreadHeaderVisibility {
         MESSAGE_AND_ACTIONS, MESSAGE_ONLY, NONE,
     }
+
+    sealed interface ThreadOpeningMode {
+        val threadUid: String?
+        fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>
+    }
+
+    inner class SingleMessage(val messageUid: String) : ThreadOpeningMode {
+        override val threadUid: String? = null
+
+        override fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
+            return messageController.getMessageAsync(messageUid).mapNotNull {
+                it.obj?.let { message -> mapRealmMessagesResultWithoutSuperCollapsedBlock(message) }
+            }
+        }
+    }
+
+    inner class AllMessages(override val threadUid: String) : ThreadOpeningMode {
+        override fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
+            return messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
+                ?.map { mapRealmMessagesResult(it.list, threadUid) } ?: emptyFlow()
+        }
+    }
+
+    @RequiresOptIn(
+        level = RequiresOptIn.Level.ERROR,
+        message = "Do not use this backing field directly, it will emit the same value multiple times"
+    )
+    @Retention(AnnotationRetention.BINARY)
+    @Target(AnnotationTarget.PROPERTY)
+    private annotation class DoNotReadDirectly
 
     companion object {
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
