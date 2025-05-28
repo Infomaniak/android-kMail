@@ -90,9 +90,11 @@ class ThreadViewModel @Inject constructor(
         .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val threadLive = threadOpeningModeFlow.filterNot { it.threadUid == null }.flatMapLatest { mode ->
-        threadController.getThreadAsync(mode.threadUid!!).map { it.obj }
-    }.asLiveData(ioCoroutineContext)
+    val threadLive = threadOpeningModeFlow
+        .mapNotNull { it.threadUid }
+        .flatMapLatest(threadController::getThreadAsync)
+        .map { it.obj }
+        .asLiveData(ioCoroutineContext)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
