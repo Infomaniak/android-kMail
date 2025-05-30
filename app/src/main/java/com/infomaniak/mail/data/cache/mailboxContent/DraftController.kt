@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,8 +57,10 @@ class DraftController @Inject constructor(
     //endregion
 
     //region Edit data
-    fun upsertDraft(draft: Draft, realm: MutableRealm) {
-        realm.copyToRealm(draft, UpdatePolicy.ALL)
+    suspend fun upsertDraft(draft: Draft) {
+        mailboxContentRealm().write {
+            upsertDraft(draft, realm = this)
+        }
     }
 
     suspend fun deleteDraft(draft: Draft) {
@@ -69,12 +71,8 @@ class DraftController @Inject constructor(
     //endregion
 
     //region Open Draft
-    suspend fun fetchHeavyDataIfNeeded(message: Message, realm: Realm): Pair<Message, Boolean> {
-        if (message.isFullyDownloaded()) return message to false
-
-        val (deleted, failed) = ThreadController.fetchMessagesHeavyData(listOf(message), realm)
-        val hasFailedFetching = deleted.isNotEmpty() || failed.isNotEmpty()
-        return MessageController.getMessage(message.uid, realm)!! to hasFailedFetching
+    suspend fun fetchHeavyDataIfNeeded(message: Message): Pair<Message, Boolean> {
+        return fetchHeavyDataIfNeeded(message, mailboxContentRealm())
     }
     //endregion
 
@@ -117,8 +115,22 @@ class DraftController @Inject constructor(
         //endregion
 
         //region Edit data
+        fun upsertDraft(draft: Draft, realm: MutableRealm) {
+            realm.copyToRealm(draft, UpdatePolicy.ALL)
+        }
+
         fun updateDraft(localUuid: String, realm: MutableRealm, onUpdate: (Draft) -> Unit) {
             getDraft(localUuid, realm)?.let(onUpdate)
+        }
+        //endregion
+
+        //region Open draft
+        suspend fun fetchHeavyDataIfNeeded(message: Message, realm: Realm): Pair<Message, Boolean> {
+            if (message.isFullyDownloaded()) return message to false
+
+            val (deleted, failed) = ThreadController.fetchMessagesHeavyData(listOf(message), realm)
+            val hasFailedFetching = deleted.isNotEmpty() || failed.isNotEmpty()
+            return MessageController.getMessage(message.uid, realm)!! to hasFailedFetching
         }
         //endregion
     }
