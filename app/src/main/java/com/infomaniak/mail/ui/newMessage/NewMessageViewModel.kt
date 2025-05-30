@@ -38,7 +38,6 @@ import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.lib.core.utils.getFileNameAndSize
 import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.lib.core.utils.parcelableArrayListExtra
@@ -53,7 +52,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ReplyForwardFooterManager
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.ContactGroupController
@@ -79,13 +77,9 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageActivity.DraftSaveConfiguration
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.EXACT_MATCH
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.EXACT_MATCH_AND_IS_DEFAULT
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.NO_MATCH
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.ONLY_EMAIL_MATCH
-import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.SignatureScore.ONLY_EMAIL_MATCH_AND_IS_DEFAULT
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.arrangeMergedContacts
+import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -96,7 +90,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.AttachmentExt.findSpecificAttachment
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.getDefault
 import com.infomaniak.mail.utils.extensions.htmlToText
 import com.infomaniak.mail.utils.extensions.isEmail
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
@@ -138,7 +131,7 @@ class NewMessageViewModel @Inject constructor(
     private val addressBookController: AddressBookController,
     private val contactGroupController: ContactGroupController,
     private val notificationManagerCompat: NotificationManagerCompat,
-    private val replyForwardFooterManager: ReplyForwardFooterManager,
+    private val draftInitManager: DraftInitManager,
     private val sharedUtils: SharedUtils,
     private val signatureUtils: SignatureUtils,
     private val snackbarManager: SnackbarManager,
@@ -275,7 +268,10 @@ class NewMessageViewModel @Inject constructor(
             } else {
                 getExistingDraft(draftLocalUuid) ?: return@runCatching
             }
-        }.cancellable().onFailure(Sentry::captureException)
+        }.cancellable().onFailure {
+            it.printStackTrace()
+            Sentry.captureException(it)
+        }
 
         draft?.let {
 
@@ -284,7 +280,7 @@ class NewMessageViewModel @Inject constructor(
             dismissNotification()
             markAsRead(currentMailbox, realm)
 
-            realm.write { draftController.upsertDraft(it, realm = this) }
+            realm.write { DraftController.upsertDraft(it, realm = this) }
             it.saveSnapshot(initialBody.content)
             it.initLiveData(signatures)
             _isShimmering.emit(false)
@@ -318,10 +314,15 @@ class NewMessageViewModel @Inject constructor(
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
                     ?.let { message ->
-                        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(message, realm)
+                        val (fullMessage, hasFailedFetching) = DraftController.fetchHeavyDataIfNeeded(message, realm)
                         if (hasFailedFetching) return null
 
-                        setPreviousMessage(draft = this, draftMode = draftMode, previousMessage = fullMessage)
+                        with(draftInitManager) {
+                            setPreviousMessage(draftMode = draftMode, previousMessage = fullMessage)
+                        }
+
+                        val quote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
+                        if (quote != null) initialQuote = quote
 
                         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
                         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
@@ -331,18 +332,13 @@ class NewMessageViewModel @Inject constructor(
             }
         }
 
-        val defaultSignature = signatures.getDefault(draftMode)
-        val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
-        val signature = if (shouldPreselectSignature) {
-            defaultSignature ?: guessMostFittingSignature(previousMessage!!, signatures)
-        } else {
-            defaultSignature
+        with(draftInitManager) {
+            val signature = chooseSignature(currentMailbox.email, signatures, draftMode, previousMessage)
+            setSignature(signature)
+            if (signature.content.isNotEmpty()) {
+                initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
+            }
         }
-
-        initSignature(
-            draft = this,
-            signature = signature ?: Signature.getDummySignature(appContext, email = currentMailbox.email, isDefault = true),
-        )
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
     }
@@ -357,64 +353,6 @@ class NewMessageViewModel @Inject constructor(
 
     fun getMergedContactFromAddressBook(addressBook: AddressBook): List<MergedContact> {
         return mergedContactController.getMergedContactFromAddressBook(addressBook)
-    }
-
-    private fun initSignature(draft: Draft, signature: Signature) {
-        draft.identityId = signature.id.toString()
-
-        if (signature.content.isNotEmpty()) {
-            initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
-        }
-    }
-
-    private suspend fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
-        draft.inReplyTo = previousMessage.messageId
-
-        val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
-        draft.references = "${previousReferences}${previousMessage.messageId}"
-
-        draft.subject = formatSubject(draftMode, previousMessage.subject ?: "")
-
-        when (draftMode) {
-            DraftMode.REPLY, DraftMode.REPLY_ALL -> {
-                draft.inReplyToUid = previousMessage.uid
-
-                val (toList, ccList) = previousMessage.getRecipientsForReplyTo(replyAll = draftMode == DraftMode.REPLY_ALL)
-                draft.to = toList.toRealmList()
-                draft.cc = ccList.toRealmList()
-
-                initialQuote = replyForwardFooterManager.createReplyFooter(previousMessage)
-            }
-            DraftMode.FORWARD -> {
-                draft.forwardedUid = previousMessage.uid
-
-                val mailboxUuid = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
-                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.forEach { attachment ->
-                    draft.attachments += attachment.apply {
-                        resource = previousMessage.attachments.find { it.name == name }?.resource
-                        setUploadStatus(AttachmentUploadStatus.UPLOADED)
-                    }
-                    SentryDebug.addDraftBreadcrumbs(draft, step = "set previousMessage when reply/replyAll/Forward")
-                }
-
-                initialQuote = replyForwardFooterManager.createForwardFooter(previousMessage, draft.attachments)
-            }
-            DraftMode.NEW_MAIL -> Unit
-        }
-    }
-
-    private fun formatSubject(draftMode: DraftMode, subject: String): String {
-
-        fun String.isReply(): Boolean = this in Regex(REGEX_REPLY, RegexOption.IGNORE_CASE)
-        fun String.isForward(): Boolean = this in Regex(REGEX_FORWARD, RegexOption.IGNORE_CASE)
-
-        val prefix = when (draftMode) {
-            DraftMode.REPLY, DraftMode.REPLY_ALL -> if (subject.isReply()) "" else PREFIX_REPLY
-            DraftMode.FORWARD -> if (subject.isForward()) "" else PREFIX_FORWARD
-            DraftMode.NEW_MAIL -> error("`${DraftMode::class.simpleName}` cannot be `${DraftMode.NEW_MAIL.name}` here.")
-        }
-
-        return prefix + subject
     }
 
     private fun saveNavArgsToSavedState(localUuid: String) {
@@ -616,79 +554,6 @@ class NewMessageViewModel @Inject constructor(
             }
             else -> value
         }.ifBlank { null }
-    }
-
-    private fun guessMostFittingSignature(message: Message, signatures: List<Signature>): Signature? {
-
-        val signatureEmailsMap = signatures.groupBy { it.senderEmail.lowercase() }
-
-        return findSignatureInRecipients(message.to, signatureEmailsMap)
-            ?: findSignatureInRecipients(message.from, signatureEmailsMap)
-            ?: findSignatureInRecipients(message.cc, signatureEmailsMap)
-    }
-
-    private fun findSignatureInRecipients(
-        recipients: RealmList<Recipient>,
-        signatureEmailsMap: Map<String, List<Signature>>,
-    ): Signature? {
-
-        val matchingEmailRecipients = recipients.filter { it.email.lowercase() in signatureEmailsMap }
-        if (matchingEmailRecipients.isEmpty()) return null // If no Recipient represents us, go to next Recipients
-
-        var bestScore = NO_MATCH
-        var bestSignature: Signature? = null
-        matchingEmailRecipients.forEach { recipient ->
-            val signatures = signatureEmailsMap[recipient.email.lowercase()] ?: return@forEach
-            val (score, signature) = computeScore(recipient, signatures)
-            when (score) {
-                EXACT_MATCH_AND_IS_DEFAULT -> return signature
-                else -> {
-                    if (score.strictlyGreaterThan(bestScore)) {
-                        bestScore = score
-                        bestSignature = signature
-                    }
-                }
-            }
-        }
-
-        return bestSignature
-    }
-
-    /**
-     * Only pass in Signatures that have the same email address as the Recipient
-     */
-    private fun computeScore(recipient: Recipient, signatures: List<Signature>): Pair<SignatureScore, Signature> {
-        var bestScore: SignatureScore = NO_MATCH
-        var bestSignature: Signature? = null
-
-        signatures.forEach { signature ->
-            when (val score = computeScore(recipient, signature)) {
-                EXACT_MATCH_AND_IS_DEFAULT -> return score to signature
-                else -> if (score.strictlyGreaterThan(bestScore)) {
-                    bestScore = score
-                    bestSignature = signature
-                }
-            }
-        }
-
-        return bestScore to bestSignature!!
-    }
-
-    /**
-     * Only pass in a Signature that has the same email address as the Recipient
-     */
-    private fun computeScore(recipient: Recipient, signature: Signature): SignatureScore {
-        val isExactMatch = recipient.name == signature.senderName
-        val isDefault = signature.isDefault
-
-        val score = when {
-            isExactMatch && isDefault -> EXACT_MATCH_AND_IS_DEFAULT
-            isExactMatch -> EXACT_MATCH
-            isDefault -> ONLY_EMAIL_MATCH_AND_IS_DEFAULT
-            else -> ONLY_EMAIL_MATCH
-        }
-
-        return score
     }
 
     private fun handleSingleSendIntent(draft: Draft, intent: Intent) = with(intent) {
@@ -1124,7 +989,7 @@ class NewMessageViewModel @Inject constructor(
     ) = withContext(mainDispatcher) {
         when (action) {
             DraftAction.SAVE -> showSaveToast(isFinishing, isTaskRoot)
-            DraftAction.SEND -> showSendToast(isTaskRoot)
+            DraftAction.SEND, DraftAction.SEND_REACTION -> showSendToast(isTaskRoot)
             DraftAction.SCHEDULE -> showScheduleToast(isTaskRoot)
         }
     }
@@ -1165,16 +1030,6 @@ class NewMessageViewModel @Inject constructor(
         ATTACHMENTS_TOO_BIG,
     }
 
-    enum class SignatureScore(private val weight: Int) {
-        EXACT_MATCH_AND_IS_DEFAULT(4),
-        EXACT_MATCH(3),
-        ONLY_EMAIL_MATCH_AND_IS_DEFAULT(2),
-        ONLY_EMAIL_MATCH(1),
-        NO_MATCH(0);
-
-        fun strictlyGreaterThan(other: SignatureScore): Boolean = weight > other.weight
-    }
-
     data class InitResult(
         val draft: Draft,
         val signatures: List<Signature>,
@@ -1211,10 +1066,5 @@ class NewMessageViewModel @Inject constructor(
 
         private const val ATTACHMENTS_MAX_SIZE = 25L * 1_024L * 1_024L // 25 MB
         private const val SUBJECT_MAX_LENGTH = 998
-
-        private const val PREFIX_REPLY = "Re: "
-        private const val PREFIX_FORWARD = "Fw: "
-        private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
-        private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
     }
 }
