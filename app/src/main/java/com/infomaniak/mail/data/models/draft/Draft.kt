@@ -71,6 +71,9 @@ class Draft : RealmObject {
     @SerialName("st_uuid")
     var swissTransferUuid: String? = null
 
+    @SerialName("emoji_reaction")
+    var emojiReaction: String? = null
+
     /**
      * We can't have both `delay` & `scheduleDate`. They are mutually exclusive.
      *
@@ -134,6 +137,7 @@ class Draft : RealmObject {
     enum class DraftAction(val apiCallValue: String, val matomoValue: String) {
         SAVE("save", "saveDraft"),
         SEND("send", "sendMail"),
+        SEND_REACTION("send_reaction", "sendReaction"),
         SCHEDULE("schedule", "scheduleDraft"),
     }
 
