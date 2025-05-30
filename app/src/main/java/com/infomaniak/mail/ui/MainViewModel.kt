@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
@@ -66,6 +67,7 @@ import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
@@ -100,6 +102,9 @@ class MainViewModel @Inject constructor(
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
     private val threadController: ThreadController,
+    private val draftManager: DraftManager,
+    private val draftController: DraftController,
+    private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val snackbarManager: SnackbarManager,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -1133,7 +1138,8 @@ class MainViewModel @Inject constructor(
                 val threads = threadUids.mapNotNull(threadController::getThread)
 
                 val messageUids = threads.mapNotNull { thread ->
-                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings).lastOrNull { it.folderId == currentFolderId }?.uid
+                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings)
+                        .lastOrNull { it.folderId == currentFolderId }?.uid
                 }
 
                 val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
@@ -1243,11 +1249,40 @@ class MainViewModel @Inject constructor(
 
         return appContext.getString(errorMessageRes)
     }
-//endregion
+    //endregion
 
     //region Emoji reaction
     fun sendEmojiReply(emoji: String, messageUid: String) {
-        // TODO
+        viewModelScope.launch {
+            val previousMessage = messageController.getMessage(messageUid) ?: return@launch
+            val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(previousMessage)
+            if (hasFailedFetching) return@launch
+            val draftMode = Draft.DraftMode.REPLY_ALL
+
+            val draft = Draft().apply {
+                with(draftManager) {
+                    setPreviousMessage(draftMode, fullMessage)
+                }
+
+                val quote = draftManager.createQuote(draftMode, fullMessage, attachments)
+                body = EMOJI_REACTION_PLACEHOLDER + quote
+
+                val currentMailbox = currentMailboxLive.asFlow().first()
+                with(draftManager) {
+                    val signature = chooseSignature(currentMailbox.email, currentMailbox.signatures, draftMode, fullMessage)
+                    setSignature(signature)
+                }
+
+                mimeType = Utils.TEXT_HTML
+
+                action = Draft.DraftAction.SEND_REACTION
+                emojiReaction = emoji
+            }
+
+            draftController.upsertDraft(draft)
+
+            draftsActionsWorkerScheduler.scheduleWork(draft.localUuid)
+        }
     }
     //endregion
 
@@ -1279,7 +1314,7 @@ class MainViewModel @Inject constructor(
 
         snackbarManager.postValue(appContext.getString(snackbarTitle))
     }
-//endregion
+    //endregion
 
     //region New Folder
     private suspend fun createNewFolderSync(name: String): String? {
@@ -1308,7 +1343,7 @@ class MainViewModel @Inject constructor(
         moveThreadsOrMessageTo(newFolderId, threadsUids, messageUid)
         isMovedToNewFolder.postValue(true)
     }
-//endregion
+    //endregion
 
     private fun refreshFoldersAsync(
         mailbox: Mailbox,
@@ -1504,5 +1539,7 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
+
+        private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
 }

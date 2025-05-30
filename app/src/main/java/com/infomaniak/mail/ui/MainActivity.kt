@@ -316,7 +316,7 @@ class MainActivity : BaseActivity() {
                         showSavedDraftSnackbar(associatedMailboxUuid, remoteDraftUuid)
                     }
                 }
-                DraftAction.SEND -> {
+                DraftAction.SEND, DraftAction.SEND_REACTION -> {
                     showSentDraftSnackbar()
                 }
                 DraftAction.SCHEDULE -> {
