@@ -42,6 +42,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent, Parcelable {
     var isOrganizer: Boolean = false
     @SerialName("state")
     private var _state: String = ""
+    override var canBeEncrypted: Boolean = false
     //endregion
 
     val state get() = AttendanceState.entries.firstOrNull { it.apiValue == _state } ?: AttendanceState.NEEDS_ACTION

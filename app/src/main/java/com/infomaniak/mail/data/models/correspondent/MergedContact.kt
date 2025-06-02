@@ -33,8 +33,7 @@ class MergedContact() : RealmObject, Correspondent, Parcelable {
 
     override var email: String = ""
     override var name: String = ""
-
-    var canBeEncrypted: Boolean = false
+    override var canBeEncrypted: Boolean = false
 
     var avatar: String? = null
         private set

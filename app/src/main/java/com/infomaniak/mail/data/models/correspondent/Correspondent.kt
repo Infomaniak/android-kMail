@@ -25,8 +25,9 @@ import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.sentry.Sentry
 
 interface Correspondent {
-    val email: String
-    val name: String
+    var email: String
+    var name: String
+    var canBeEncrypted: Boolean
 
     val initials: String
 
