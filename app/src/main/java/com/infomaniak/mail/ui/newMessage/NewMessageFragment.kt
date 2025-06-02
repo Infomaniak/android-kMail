@@ -214,7 +214,11 @@ class NewMessageFragment : Fragment() {
             observeAiFeatureFlagUpdates()
         }
 
-        encryptionMessageManager.observeEncryptionFeatureFlagUpdates()
+        with(encryptionMessageManager) {
+            observeEncryptionFeatureFlagUpdates()
+            observeEncryptionActivation()
+            observeUncryptableRecipients()
+        }
 
         with(recipientFieldsManager) {
             setOnFocusChangedListeners()
@@ -297,6 +301,7 @@ class NewMessageFragment : Fragment() {
             binding = binding,
             fragment = this@NewMessageFragment,
             aiManager = aiManager,
+            encryptionManager = encryptionMessageManager,
             openFilePicker = filePicker::open,
         )
 
