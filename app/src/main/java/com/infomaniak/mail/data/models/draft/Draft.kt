@@ -83,6 +83,11 @@ class Draft : RealmObject {
     @SerialName("st_uuid")
     var swissTransferUuid: String? = null
 
+    @SerialName("encrypted")
+    var isEncrypted: Boolean = false
+    @SerialName("encryption_password")
+    var encryptionPassword: String? = null
+
     /**
      * We can't have both `delay` & `scheduleDate`. They are mutually exclusive.
      *
