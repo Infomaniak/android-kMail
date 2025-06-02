@@ -53,11 +53,7 @@ class EncryptionViewModel @Inject constructor(
             if (apiResponse.isSuccess()) {
                 val uncryptableEmailAddresses: MutableList<String> = mutableListOf()
                 apiResponse.data?.let { encryptableMailboxesMap ->
-                    val contacts = mergedContactController.getSortedMergedContacts()
-                    encryptableMailboxesMap.forEach { (email, canBeEncrypted) ->
-                        if (canBeEncrypted) uncryptableEmailAddresses.add(email)
-                        contacts.find { it.email == email }?.canBeEncrypted = canBeEncrypted
-                    }
+                    mergedContactController.updateEncryptionStatus(encryptableMailboxesMap)
                 }
                 uncryptableRecipients.postValue(uncryptableEmailAddresses)
             } else {
