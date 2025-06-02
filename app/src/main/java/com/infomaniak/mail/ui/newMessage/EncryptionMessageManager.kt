@@ -19,10 +19,14 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.core.view.isVisible
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import com.infomaniak.mail.ui.main.SnackbarManager
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
@@ -31,6 +35,7 @@ import javax.inject.Inject
 class EncryptionMessageManager @Inject constructor(
     @ActivityContext private val activityContext: Context,
     private val localSettings: LocalSettings,
+    private val snackbarManager: SnackbarManager,
 ) : NewMessageManager() {
 
     private inline val activity get() = activityContext as Activity
@@ -59,6 +64,29 @@ class EncryptionMessageManager @Inject constructor(
             binding.encryptionButton.isVisible = isEncryptionPossible
             if (isEncryptionPossible) navigateToDiscoveryBottomSheetIfFirstTime()
         }
+    }
+
+    fun observeUncryptableRecipients() {
+        encryptionViewModel.uncryptableRecipients.observe(viewLifecycleOwner) { recipients ->
+            Log.e("TOTO", "observeUncryptableRecipients: ${recipients.joinToString()}")
+        }
+    }
+
+    fun toggleEncryption() {
+        val recipients = newMessageViewModel.allRecipients
+        if (recipients.isNotEmpty()) encryptionViewModel.checkIfEmailsCanBeEncrypted(recipients.map(Recipient::email))
+        newMessageViewModel.toggleIsEncryptionActivated()
+    }
+
+    fun observeEncryptionActivation() {
+        newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
+            if (isEncrypted) {
+                snackbarManager.postValue(fragment.getString(R.string.encryptedMessageSnackbarEncryptionActivated))
+            } else {
+                // TODO
+            }
+        }
+
     }
 
     private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
