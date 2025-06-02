@@ -17,13 +17,52 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EncryptionViewModel @Inject constructor(
+    application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel()
+    private val mergedContactController: MergedContactController,
+    private val snackbarManager: SnackbarManager,
+) : AndroidViewModel(application) {
+
+    val uncryptableRecipients: MutableLiveData<List<String>> = MutableLiveData()
+
+    fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
+        viewModelScope.launch(ioDispatcher) {
+            val apiResponse = ApiRepository.isInfomaniakMailbox(emails)
+            Log.e(
+                "TOTO",
+                "checkIfEmailsCanBeEncrypted: ${apiResponse.data?.toList()?.joinToString { "${it.first} ${it.second}" }}"
+            )
+            if (apiResponse.isSuccess()) {
+                val uncryptableEmailAddresses: MutableList<String> = mutableListOf()
+                apiResponse.data?.let { encryptableMailboxesMap ->
+                    val contacts = mergedContactController.getSortedMergedContacts()
+                    encryptableMailboxesMap.forEach { (email, canBeEncrypted) ->
+                        if (canBeEncrypted) uncryptableEmailAddresses.add(email)
+                        contacts.find { it.email == email }?.canBeEncrypted = canBeEncrypted
+                    }
+                }
+                uncryptableRecipients.postValue(uncryptableEmailAddresses)
+            } else {
+                snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
+            }
+        }
+    }
+}
