@@ -96,6 +96,8 @@ import com.infomaniak.lib.core.R as RCore
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
+    // Do not merge into master. Temp commit for empty feature branch
+
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
