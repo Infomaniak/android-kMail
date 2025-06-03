@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.newMessage
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import androidx.core.view.isVisible
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -68,7 +67,12 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeUncryptableRecipients() {
         encryptionViewModel.uncryptableRecipients.observe(viewLifecycleOwner) { recipients ->
-            Log.e("TOTO", "observeUncryptableRecipients: ${recipients.joinToString()}")
+            // TODO Replace this by the lock button with the number of uncryptable recipients
+            if (recipients.isNotEmpty()) {
+                snackbarManager.postValue(
+                    fragment.getString(R.string.encryptedMessageAddPasswordDescription1) + recipients.joinToString(" "),
+                )
+            }
         }
     }
 
