@@ -51,11 +51,10 @@ class EncryptionViewModel @Inject constructor(
                 "checkIfEmailsCanBeEncrypted: ${apiResponse.data?.toList()?.joinToString { "${it.first} ${it.second}" }}"
             )
             if (apiResponse.isSuccess()) {
-                val uncryptableEmailAddresses: MutableList<String> = mutableListOf()
                 apiResponse.data?.let { encryptableMailboxesMap ->
-                    mergedContactController.updateEncryptionStatus(encryptableMailboxesMap)
+                    val uncryptableEmailAddresses = mergedContactController.updateEncryptionStatus(encryptableMailboxesMap)
+                    uncryptableRecipients.postValue(uncryptableEmailAddresses)
                 }
-                uncryptableRecipients.postValue(uncryptableEmailAddresses)
             } else {
                 snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
             }

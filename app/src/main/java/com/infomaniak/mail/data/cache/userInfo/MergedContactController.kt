@@ -62,15 +62,29 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
         userInfoRealm.update<MergedContact>(mergedContacts)
     }
 
-    suspend fun updateEncryptionStatus(encryptableMailboxesMap: Map<String, Boolean>) {
+    /**
+     * Update merged contacts' encryption status and return the list of contact that cannot be encrypted
+     *
+     * @param encryptableMailboxesMap key : email of the merged contacts,
+     * value : if the contact with this email can receive encrypted message
+     *
+     * @return A list of the uncryptable emails
+     */
+    suspend fun updateEncryptionStatus(encryptableMailboxesMap: Map<String, Boolean>): List<String> {
         SentryLog.d(RealmDatabase.TAG, "MergedContacts: Save new data")
+        val uncryptableEmailAddresses: MutableList<String> = mutableListOf()
+
         userInfoRealm.write {
             encryptableMailboxesMap.forEach { (email, canBeEncrypted) ->
                 getMergedContactsByEmailQuery(email, realm = this).find().forEach {
                     it.canBeEncrypted = canBeEncrypted
                 }
+
+                if (!canBeEncrypted) uncryptableEmailAddresses.add(email)
             }
         }
+
+        return uncryptableEmailAddresses
     }
     //endregion
 }
