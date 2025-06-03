@@ -1,0 +1,1 @@
+- Detect email addresses with upper case characters as valid

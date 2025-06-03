@@ -1,0 +1,1 @@
+- Détecte les adresses électroniques contenant des caractères en majuscules comme étant valides
