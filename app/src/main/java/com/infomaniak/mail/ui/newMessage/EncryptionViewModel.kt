@@ -48,11 +48,13 @@ class EncryptionViewModel @Inject constructor(
             val apiResponse = ApiRepository.isInfomaniakMailbox(emails)
             Log.e(
                 "TOTO",
-                "checkIfEmailsCanBeEncrypted: ${apiResponse.data?.toList()?.joinToString { "${it.first} ${it.second}" }}"
+                "checkIfEmailsCanBeEncrypted: ${
+                    apiResponse.data?.toList()?.joinToString { "${it.email} ${it.isInfomaniakHosted}" }
+                }"
             )
             if (apiResponse.isSuccess()) {
-                apiResponse.data?.let { encryptableMailboxesMap ->
-                    val uncryptableEmailAddresses = mergedContactController.updateEncryptionStatus(encryptableMailboxesMap)
+                apiResponse.data?.let { mailboxHostingStatuses ->
+                    val uncryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
                     uncryptableRecipients.postValue(uncryptableEmailAddresses)
                 }
             } else {
