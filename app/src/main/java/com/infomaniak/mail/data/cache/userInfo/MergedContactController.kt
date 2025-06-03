@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.cache.userInfo
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.mailbox.MailboxHostingStatus
 import com.infomaniak.mail.di.UserInfoRealm
 import com.infomaniak.mail.utils.extensions.update
 import io.realm.kotlin.MutableRealm
@@ -70,17 +71,17 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
      *
      * @return A list of the uncryptable emails
      */
-    suspend fun updateEncryptionStatus(encryptableMailboxesMap: Map<String, Boolean>): List<String> {
+    suspend fun updateEncryptionStatus(encryptableMailboxesMap: List<MailboxHostingStatus>): List<String> {
         SentryLog.d(RealmDatabase.TAG, "MergedContacts: Save new data")
         val uncryptableEmailAddresses: MutableList<String> = mutableListOf()
 
         userInfoRealm.write {
-            encryptableMailboxesMap.forEach { (email, canBeEncrypted) ->
-                getMergedContactsByEmailQuery(email, realm = this).find().forEach {
-                    it.canBeEncrypted = canBeEncrypted
+            encryptableMailboxesMap.forEach { mailboxStatus ->
+                getMergedContactsByEmailQuery(mailboxStatus.email, realm = this).find().forEach {
+                    it.canBeEncrypted = mailboxStatus.isInfomaniakHosted
                 }
 
-                if (!canBeEncrypted) uncryptableEmailAddresses.add(email)
+                if (!mailboxStatus.isInfomaniakHosted) uncryptableEmailAddresses.add(mailboxStatus.email)
             }
         }
 
