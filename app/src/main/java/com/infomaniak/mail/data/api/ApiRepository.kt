@@ -157,7 +157,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.requestMailboxPassword(mailboxHostingId, mailboxName), POST)
     }
 
-    suspend fun isInfomaniakMailbox(emails: List<String>): ApiResponse<Map<String, Boolean>> {
+    suspend fun isInfomaniakMailbox(emails: List<String>): ApiResponse<List<MailboxHostingStatus>> {
         return callApi(ApiRoutes.isInfomaniakMailboxes(emails), GET)
     }
 
