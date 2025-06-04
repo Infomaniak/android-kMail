@@ -235,7 +235,7 @@ class Message : RealmObject, Snoozable {
                 correctFolder = (threads.firstOrNull { it.folderId == folderId } ?: threads.first()).folder
             }
 
-            return@run correctFolder!!
+            return@run correctFolder
         }
 
     fun isInSpamFolder() = folder.role == FolderRole.SPAM
