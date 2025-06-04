@@ -351,12 +351,7 @@ class Thread : RealmObject, Snoozable {
         return targetMessageIds.parseMessagesIds().any(threadMessageIds::contains)
     }
 
-    fun computeAvatarRecipient(
-        featureFlags: Mailbox.FeatureFlagSet?,
-        localSettings: LocalSettings,
-    ): Pair<Recipient?, Bimi?> = runCatching {
-        val messages = getDisplayedMessages(featureFlags, localSettings)
-
+    fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
         val message = messages.lastOrNull {
             it.folder.role != FolderRole.SENT &&
                     it.folder.role != FolderRole.DRAFT &&
