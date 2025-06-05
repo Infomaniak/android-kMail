@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.lib.core.utils.await
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.ai.AiMessage
@@ -75,20 +76,20 @@ import com.infomaniak.core.myksuite.ui.network.ApiRoutes as MyKSuiteApiRoutes
 
 object ApiRepository : ApiRepositoryCore() {
 
-    inline fun <reified T> callApi(
+    suspend inline fun <reified T> callApi(
         url: String,
         method: ApiController.ApiMethod,
         body: Any? = null,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
     ): T = ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
 
-    fun ping(): ApiResponse<String> = callApi(ApiRoutes.ping(), GET)
+    suspend fun ping(): ApiResponse<String> = callApi(ApiRoutes.ping(), GET)
 
-    fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
+    suspend fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
-    fun getContacts(): ApiResponse<List<Contact>> = callApi(ApiRoutes.contacts(), GET)
+    suspend fun getContacts(): ApiResponse<List<Contact>> = callApi(ApiRoutes.contacts(), GET)
 
-    fun addContact(addressBookId: Int, recipient: Recipient): ApiResponse<Int> {
+    suspend fun addContact(addressBookId: Int, recipient: Recipient): ApiResponse<Int> {
         val (firstName, lastName) = recipient.computeFirstAndLastName()
 
         val body = mapOf(
@@ -101,50 +102,50 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.contact(), POST, body)
     }
 
-    fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
+    suspend fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
-    fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature?): ApiResponse<Boolean> {
+    suspend fun setDefaultSignature(mailboxHostingId: Int, mailboxName: String, signature: Signature?): ApiResponse<Boolean> {
         // If the signature is `null`, it means we want to have no default signature.
         // If we want to remove the default signature, we have to send `null` to the API call.
         val body = """{"default_signature_id":${signature?.id}}"""
         return callApi(ApiRoutes.signature(mailboxHostingId, mailboxName), POST, body)
     }
 
-    fun getBackups(mailboxHostingId: Int, mailboxName: String): ApiResponse<BackupResult> {
+    suspend fun getBackups(mailboxHostingId: Int, mailboxName: String): ApiResponse<BackupResult> {
         return callApi(ApiRoutes.backups(mailboxHostingId, mailboxName), GET)
     }
 
-    fun restoreBackup(mailboxHostingId: Int, mailboxName: String, date: String): ApiResponse<Boolean> {
+    suspend fun restoreBackup(mailboxHostingId: Int, mailboxName: String, date: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.backups(mailboxHostingId, mailboxName), PUT, body = mapOf("date" to date))
     }
 
-    fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
+    suspend fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
         return callApi(ApiRoutes.mailboxes(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
     }
 
-    fun addNewMailbox(mailAddress: String, password: String): ApiResponse<MailboxLinkedResult> {
+    suspend fun addNewMailbox(mailAddress: String, password: String): ApiResponse<MailboxLinkedResult> {
         return callApi(ApiRoutes.manageMailboxes(), POST, mapOf("mail" to mailAddress, "password" to password))
     }
 
-    fun detachMailbox(mailboxId: Int): ApiResponse<Boolean> = callApi(ApiRoutes.manageMailbox(mailboxId), DELETE)
+    suspend fun detachMailbox(mailboxId: Int): ApiResponse<Boolean> = callApi(ApiRoutes.manageMailbox(mailboxId), DELETE)
 
-    fun updateMailboxPassword(mailboxId: Int, password: String): ApiResponse<Boolean> {
+    suspend fun updateMailboxPassword(mailboxId: Int, password: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.updateMailboxPassword(mailboxId), PUT, mapOf("password" to password))
     }
 
-    fun requestMailboxPassword(mailboxHostingId: Int, mailboxName: String): ApiResponse<Boolean> {
+    suspend fun requestMailboxPassword(mailboxHostingId: Int, mailboxName: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.requestMailboxPassword(mailboxHostingId, mailboxName), POST)
     }
 
-    fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
+    suspend fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
-    fun createFolder(mailboxUuid: String, name: String): ApiResponse<Folder> {
+    suspend fun createFolder(mailboxUuid: String, name: String): ApiResponse<Folder> {
         return callApi(ApiRoutes.folders(mailboxUuid), POST, mapOf("name" to name))
     }
 
-    fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
+    suspend fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
         return callApi(
             url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html"),
             method = GET,
@@ -152,24 +153,24 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
+    suspend fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }
 
-    fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
+    suspend fun getPermissions(mailboxLinkId: Int, mailboxHostingId: Int): ApiResponse<MailboxPermissions> {
         return callApi(ApiRoutes.permissions(mailboxLinkId, mailboxHostingId), GET)
     }
 
     //region Spam
-    fun setSpamFilter(mailboxHostingId: Int, mailboxName: String, activateSpamFilter: Boolean): ApiResponse<Unit> {
+    suspend fun setSpamFilter(mailboxHostingId: Int, mailboxName: String, activateSpamFilter: Boolean): ApiResponse<Unit> {
         return callApi(ApiRoutes.mailboxInfo(mailboxHostingId, mailboxName), PATCH, mapOf("has_move_spam" to activateSpamFilter))
     }
 
-    fun getSendersRestrictions(mailboxHostingId: Int, mailboxName: String): ApiResponse<SendersRestrictions> {
+    suspend fun getSendersRestrictions(mailboxHostingId: Int, mailboxName: String): ApiResponse<SendersRestrictions> {
         return callApi(ApiRoutes.getSendersRestrictions(mailboxHostingId, mailboxName), GET)
     }
 
-    fun updateBlockedSenders(
+    suspend fun updateBlockedSenders(
         mailboxHostingId: Int,
         mailboxName: String,
         updatedSendersRestrictions: SendersRestrictions,
@@ -182,54 +183,58 @@ object ApiRepository : ApiRepositoryCore() {
     }
     //endregion
 
-    fun getExternalMailInfo(mailboxHostingId: Int, mailboxName: String): ApiResponse<MailboxExternalMailInfo> {
+    suspend fun getExternalMailInfo(mailboxHostingId: Int, mailboxName: String): ApiResponse<MailboxExternalMailInfo> {
         return callApi(ApiRoutes.externalMailInfo(mailboxHostingId, mailboxName), GET)
     }
 
-    fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+    suspend fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
         return batchOver(messagesUids) {
             callApi(ApiRoutes.messagesSeen(mailboxUuid), POST, mapOf("uids" to it))
         }
     }
 
-    fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+    suspend fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
         return batchOver(messagesUids) {
             callApi(ApiRoutes.messagesUnseen(mailboxUuid), POST, mapOf("uids" to it))
         }
     }
 
-    fun saveDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SaveDraftResult> {
+    suspend fun saveDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SaveDraftResult> {
         return uploadDraft(mailboxUuid, draft, okHttpClient)
     }
 
-    fun sendDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SendDraftResult> {
+    suspend fun sendDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SendDraftResult> {
         return uploadDraft(mailboxUuid, draft, okHttpClient)
     }
 
-    fun scheduleDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<ScheduleDraftResult> {
+    suspend fun scheduleDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<ScheduleDraftResult> {
         return uploadDraft(mailboxUuid, draft, okHttpClient)
     }
 
-    private inline fun <reified T> uploadDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<T> {
+    private inline suspend fun <reified T> uploadDraft(
+        mailboxUuid: String,
+        draft: Draft,
+        okHttpClient: OkHttpClient
+    ): ApiResponse<T> {
         val body = getDraftBody(draft)
         return draft.remoteUuid?.let { putDraft(mailboxUuid, body, okHttpClient, it) }
             ?: run { postDraft(mailboxUuid, body, okHttpClient) }
     }
 
-    private inline fun <reified T> putDraft(
+    private inline suspend fun <reified T> putDraft(
         mailboxUuid: String,
         body: String,
         okHttpClient: OkHttpClient,
         uuid: String,
     ): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
-    private inline fun <reified T> postDraft(
+    private inline suspend fun <reified T> postDraft(
         mailboxUuid: String,
         body: String,
         okHttpClient: OkHttpClient,
     ): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
-    private fun getDraftBody(draft: Draft): String {
+    private suspend fun getDraftBody(draft: Draft): String {
         val updatedDraft = if (draft.identityId == Draft.NO_IDENTITY.toString()) {
             // When we select no signature, we create a dummy signature with -1 (NO_IDENTITY) as identity ID.
             // But we can't send that to the API, instead we need to put the `null` value.
@@ -240,7 +245,7 @@ object ApiRepository : ApiRepositoryCore() {
         return Json.encodeToString(updatedDraft.getJsonRequestBody()).removeEmptyRealmLists()
     }
 
-    fun attachmentsToForward(mailboxUuid: String, message: Message): ApiResponse<AttachmentsToForwardResult> {
+    suspend fun attachmentsToForward(mailboxUuid: String, message: Message): ApiResponse<AttachmentsToForwardResult> {
 
         val body = mapOf(
             "to_forward_uids" to arrayOf(message.uid),
@@ -250,13 +255,13 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.attachmentToForward(mailboxUuid), POST, body)
     }
 
-    fun deleteMessages(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+    suspend fun deleteMessages(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
         return batchOver(messagesUids) {
             callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to it))
         }
     }
 
-    fun moveMessages(
+    suspend fun moveMessages(
         mailboxUuid: String,
         messagesUids: List<String>,
         destinationId: String,
@@ -272,33 +277,34 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
-    fun deleteDraft(mailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {
+    suspend fun deleteDraft(mailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {
         return callApi(ApiRoutes.draft(mailboxUuid, remoteDraftUuid), DELETE)
     }
 
-    fun unscheduleDraft(unscheduleDraftUrl: String): ApiResponse<Unit> {
+    suspend fun unscheduleDraft(unscheduleDraftUrl: String): ApiResponse<Unit> {
         return callApi(ApiRoutes.resource(unscheduleDraftUrl), DELETE)
     }
 
-    fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {
+    suspend fun rescheduleDraft(draftResource: String, scheduleDate: Date): ApiResponse<Unit> {
         return callApi(ApiRoutes.rescheduleDraft(draftResource, scheduleDate), PUT)
     }
 
-    fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
+    suspend fun getDraft(messageDraftResource: String): ApiResponse<Draft> =
+        callApi(ApiRoutes.resource(messageDraftResource), GET)
 
-    fun addToFavorites(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+    suspend fun addToFavorites(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
         return batchOver(messagesUids) {
             callApi(ApiRoutes.starMessages(mailboxUuid), POST, mapOf("uids" to it))
         }
     }
 
-    fun removeFromFavorites(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
+    suspend fun removeFromFavorites(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
         return batchOver(messagesUids) {
             callApi(ApiRoutes.unstarMessages(mailboxUuid), POST, mapOf("uids" to it))
         }
     }
 
-    fun getDateOrderedMessagesUids(
+    suspend fun getDateOrderedMessagesUids(
         mailboxUuid: String,
         folderId: String,
         okHttpClient: OkHttpClient?,
@@ -310,7 +316,7 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    inline fun <reified T : MessageFlags> getMessagesUidsDelta(
+    inline suspend fun <reified T : MessageFlags> getMessagesUidsDelta(
         mailboxUuid: String,
         folderId: String,
         cursor: String,
@@ -323,7 +329,7 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    fun getMessagesByUids(
+    suspend fun getMessagesByUids(
         mailboxUuid: String,
         folderId: String,
         uids: List<Int>,
@@ -336,19 +342,19 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    fun undoAction(undoResources: String): ApiResponse<Boolean> {
+    suspend fun undoAction(undoResources: String): ApiResponse<Boolean> {
         return callApi(url = ApiRoutes.resource(undoResources), method = POST)
     }
 
-    fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
+    suspend fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
         return callApi(ApiRoutes.reportPhishing(mailboxUuid, folderId, shortUid), POST, mapOf("type" to "phishing"))
     }
 
-    fun blockUser(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
+    suspend fun blockUser(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
-    fun snoozeMessages(mailboxUuid: String, messageUids: List<String>, date: Date): List<ApiResponse<Unit>> {
+    suspend fun snoozeMessages(mailboxUuid: String, messageUids: List<String>, date: Date): List<ApiResponse<Unit>> {
         return batchOver(messageUids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE_POST) {
             callApi(
                 url = ApiRoutes.snooze(mailboxUuid),
@@ -358,7 +364,7 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
-    fun rescheduleSnoozedThread(mailboxUuid: String, snoozeUuid: String, date: Date): ApiResponse<Boolean> {
+    suspend fun rescheduleSnoozedThread(mailboxUuid: String, snoozeUuid: String, date: Date): ApiResponse<Boolean> {
         return callApi(
             url = ApiRoutes.snoozeAction(mailboxUuid, snoozeUuid),
             method = PUT,
@@ -369,7 +375,7 @@ object ApiRepository : ApiRepositoryCore() {
     /**
      * Do not call directly, use the [SharedUtils.rescheduleSnoozedThreads] instead to correctly support api error messages.
      */
-    fun rescheduleSnoozedThreads(
+    suspend fun rescheduleSnoozedThreads(
         mailboxUuid: String,
         snoozeUuids: List<String>,
         newDate: Date,
@@ -383,20 +389,25 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
-    fun unsnoozeThread(mailboxUuid: String, snoozeUuid: String): ApiResponse<Boolean> {
+    suspend fun unsnoozeThread(mailboxUuid: String, snoozeUuid: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.snoozeAction(mailboxUuid, snoozeUuid), DELETE)
     }
 
     /**
      * Do not call directly, use the [SharedUtils.unsnoozeThreads] instead to correctly support api error messages.
      */
-    fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>): List<ApiResponse<BatchSnoozeCancelResponse>> {
+    suspend fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>): List<ApiResponse<BatchSnoozeCancelResponse>> {
         return batchOver(snoozeUuids, limit = Utils.MAX_UUIDS_PER_CALL_SNOOZE) {
             callApi(ApiRoutes.snooze(mailboxUuid), DELETE, mapOf("uuids" to it))
         }
     }
 
-    fun searchThreads(mailboxUuid: String, folderId: String, filters: String, resource: String?): ApiResponse<ThreadResult> {
+    suspend fun searchThreads(
+        mailboxUuid: String,
+        folderId: String,
+        filters: String,
+        resource: String?
+    ): ApiResponse<ThreadResult> {
 
         val url = if (resource.isNullOrBlank()) {
             ApiRoutes.search(mailboxUuid, folderId, filters)
@@ -407,11 +418,11 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url, GET)
     }
 
-    fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> {
+    suspend fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
     }
 
-    fun startNewConversation(
+    suspend fun startNewConversation(
         contextMessage: ContextMessage?,
         message: UserMessage,
         currentMailboxUuid: String,
@@ -422,7 +433,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.aiConversation(currentMailboxUuid), POST, body, HttpClient.okHttpClientLongTimeout)
     }
 
-    fun aiShortcutWithContext(
+    suspend fun aiShortcutWithContext(
         contextId: String,
         shortcut: Shortcut,
         currentMailboxUuid: String,
@@ -434,7 +445,7 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    fun aiShortcutNoContext(
+    suspend fun aiShortcutNoContext(
         shortcut: Shortcut,
         history: List<AiMessage>,
         currentMailboxUuid: String,
@@ -450,11 +461,11 @@ object ApiRepository : ApiRepositoryCore() {
 
     private fun getAiBodyFromMessages(messages: List<AiMessage>) = mapOf("messages" to messages, "output" to "mail")
 
-    fun getFeatureFlags(currentMailboxUuid: String): ApiResponse<List<String>> {
+    suspend fun getFeatureFlags(currentMailboxUuid: String): ApiResponse<List<String>> {
         return callApi(ApiRoutes.featureFlags(currentMailboxUuid), GET)
     }
 
-    fun getCredentialsPassword(): ApiResponse<InfomaniakPassword> = runCatching {
+    suspend fun getCredentialsPassword(): ApiResponse<InfomaniakPassword> = runCatching {
 
         val headers = HttpUtils.getHeaders(contentType = null)
             .newBuilder()
@@ -471,7 +482,7 @@ object ApiRepository : ApiRepositoryCore() {
             .post(formBuilder.build())
             .build()
 
-        val response = HttpClient.okHttpClient.newCall(request).execute()
+        val response = HttpClient.okHttpClient.newCall(request).await()
 
         return ApiController.json.decodeFromString(response.body?.string() ?: "")
 
@@ -479,7 +490,7 @@ object ApiRepository : ApiRepositoryCore() {
         return ApiResponse(result = ApiResponseStatus.ERROR, error = InternalTranslatedErrorCode.UnknownError.toApiError())
     }
 
-    fun getSwissTransferContainer(containerUuid: String): ApiResponse<SwissTransferContainer> {
+    suspend fun getSwissTransferContainer(containerUuid: String): ApiResponse<SwissTransferContainer> {
         return callApi(url = ApiRoutes.swissTransferContainer(containerUuid), method = GET)
     }
 
@@ -491,11 +502,11 @@ object ApiRepository : ApiRepositoryCore() {
         return HttpClient.okHttpClient.newBuilder().build().newCall(request).execute()
     }
 
-    fun getAttachmentCalendarEvent(resource: String): ApiResponse<CalendarEventResponse> {
+    suspend fun getAttachmentCalendarEvent(resource: String): ApiResponse<CalendarEventResponse> {
         return callApi(url = ApiRoutes.calendarEvent(resource), method = GET)
     }
 
-    fun replyToCalendarEvent(
+    suspend fun replyToCalendarEvent(
         attendanceState: AttendanceState,
         useInfomaniakCalendarRoute: Boolean,
         calendarEventId: Int,
@@ -510,20 +521,20 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
-    fun getShareLink(mailboxUuid: String, folderId: String, mailId: Int): ApiResponse<ShareThread> {
+    suspend fun getShareLink(mailboxUuid: String, folderId: String, mailId: Int): ApiResponse<ShareThread> {
         return callApi(url = ApiRoutes.shareLink(mailboxUuid, folderId, mailId), method = POST)
     }
 
-    fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): Response {
+    suspend fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): Response {
         val request = Request.Builder().url(ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid))
             .headers(HttpUtils.getHeaders(EML_CONTENT_TYPE))
             .get()
             .build()
 
-        return HttpClient.okHttpClient.newCall(request).execute()
+        return HttpClient.okHttpClient.newCall(request).await()
     }
 
-    fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
+    suspend fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
         return callApi(url = MyKSuiteApiRoutes.myKSuiteData(), method = GET, okHttpClient = okHttpClient)
     }
 
@@ -544,7 +555,7 @@ object ApiRepository : ApiRepositoryCore() {
             .post(attachmentFile.asRequestBody(attachment.mimeType.toMediaType()))
             .build()
 
-        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).execute()
+        val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).await()
 
         return response.body?.string()?.let { ApiController.json.decodeFromString<ApiResponse<Attachment>>(it) }
     }
@@ -556,12 +567,12 @@ object ApiRepository : ApiRepositoryCore() {
      * @param perform Request to perform
      * @return Array of the perform return type
      */
-    private fun <T, R> batchOver(
+    private suspend fun <T, R> batchOver(
         values: List<T>,
         limit: Int = Utils.MAX_UIDS_PER_CALL,
-        perform: (List<T>) -> ApiResponse<R>,
+        perform: suspend (List<T>) -> ApiResponse<R>,
     ): List<ApiResponse<R>> {
-        return values.chunked(limit).map(perform)
+        return values.chunked(limit).map { perform(it) }
     }
 
     /**

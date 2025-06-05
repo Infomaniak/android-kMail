@@ -27,7 +27,7 @@ object FirebaseApiRepository {
 
     private const val registerDevice = "$INFOMANIAK_API_V1/devices/register"
 
-    fun registerForNotifications(registrationInfo: RegistrationInfo, okHttpClient: OkHttpClient): ApiResponse<Boolean> {
+    suspend fun registerForNotifications(registrationInfo: RegistrationInfo, okHttpClient: OkHttpClient): ApiResponse<Boolean> {
         return ApiRepository.callApi(registerDevice, POST, registrationInfo, okHttpClient)
     }
 }

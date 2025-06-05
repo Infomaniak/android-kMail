@@ -25,6 +25,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
@@ -43,7 +44,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
-import kotlin.collections.set
 
 @HiltViewModel
 class DownloadMessagesViewModel @Inject constructor(
@@ -119,7 +119,7 @@ class DownloadMessagesViewModel @Inject constructor(
             }
 
             deferredResponses.awaitAll()
-        }.getOrElse {
+        }.cancellable().getOrElse {
             if (it is ByteArrayNetworkException) SentryLog.e(TAG, "Error while sharing messages to kDrive:", it)
             null
         }

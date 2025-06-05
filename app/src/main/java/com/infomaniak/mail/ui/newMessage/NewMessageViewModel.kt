@@ -240,7 +240,7 @@ class NewMessageViewModel @Inject constructor(
         emit(draft)
     }
 
-    private fun getExistingDraft(localUuid: String?): Draft? {
+    private suspend fun getExistingDraft(localUuid: String?): Draft? {
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
             if (draft.identityId.isNullOrBlank()) {
@@ -300,7 +300,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
+    private suspend fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
         draft.inReplyTo = previousMessage.messageId
 
         val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
@@ -489,7 +489,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
+    private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
 
         @Suppress("UNUSED_PARAMETER")
         fun trackOpenLocal(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
@@ -506,7 +506,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun getLatestLocalDraft(localUuid: String?) = localUuid?.let(draftController::getDraft)?.copyFromRealm()
 
-    private fun fetchDraft(): Draft? {
+    private suspend fun fetchDraft(): Draft? {
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
 
             /**

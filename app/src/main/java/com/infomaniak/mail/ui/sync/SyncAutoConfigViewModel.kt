@@ -64,7 +64,7 @@ class SyncAutoConfigViewModel @Inject constructor(
         }
     }
 
-    private fun fetchCredentials(scope: CoroutineScope): String? {
+    private suspend fun fetchCredentials(scope: CoroutineScope): String? {
 
         val apiResponse = ApiRepository.getCredentialsPassword()
         scope.ensureActive()
