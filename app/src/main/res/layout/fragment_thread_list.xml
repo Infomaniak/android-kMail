@@ -26,8 +26,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/threadsConstraintLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -283,8 +284,9 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/threadHostFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:visibility="gone" />
 
 </LinearLayout>
