@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ class CalendarEventResponseTest {
         }
 
         // If nothing changed at all, no change should be detected
-        assertTrue(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, message))
+        assertTrue(ThreadAdapter.MessageDiffCallback.everythingButSpecificPayloadsIsTheSame(message, message))
 
         // If data inside the Message have changed, like its heavy data being downloaded, the change must be detected
         val filledBody = Body().apply {
@@ -56,7 +56,7 @@ class CalendarEventResponseTest {
             splitBody = null
             latestCalendarEventResponse = response1
         }
-        assertFalse(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, otherThingsButAttendeesChanged))
+        assertFalse(ThreadAdapter.MessageDiffCallback.everythingButSpecificPayloadsIsTheSame(message, otherThingsButAttendeesChanged))
 
         // If only the attendance state of Attendees has changed in the Message, the change must NOT be detected
         val userStoredEvent2 = getBasicCalendarEvent(AttendanceState.ACCEPTED)
@@ -66,7 +66,7 @@ class CalendarEventResponseTest {
             splitBody = null
             latestCalendarEventResponse = response2
         }
-        assertTrue(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, onlyAttendeesChanged))
+        assertTrue(ThreadAdapter.MessageDiffCallback.everythingButSpecificPayloadsIsTheSame(message, onlyAttendeesChanged))
 
         // If both the attendance state and another field has changed, the change must be detected
         val otherThingsAndAttendeesChanged = Message().apply {
@@ -74,7 +74,7 @@ class CalendarEventResponseTest {
             splitBody = null
             latestCalendarEventResponse = response2
         }
-        assertFalse(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, otherThingsAndAttendeesChanged))
+        assertFalse(ThreadAdapter.MessageDiffCallback.everythingButSpecificPayloadsIsTheSame(message, otherThingsAndAttendeesChanged))
     }
 
     @Test

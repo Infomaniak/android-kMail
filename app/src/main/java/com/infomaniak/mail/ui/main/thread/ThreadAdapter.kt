@@ -42,6 +42,7 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.utils.format
+import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
@@ -57,6 +58,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
+import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
@@ -145,7 +147,6 @@ class ThreadAdapter(
     }
 
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-
         val payload = payloads.firstOrNull()
         if (payload !is NotifyType) {
             super.onBindViewHolder(holder, position, payloads)
@@ -159,6 +160,7 @@ class ThreadAdapter(
                 NotifyType.RE_RENDER -> reloadVisibleWebView()
                 NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.uid)
                 NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item)
+                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item)
             }
         }
     }.getOrDefault(Unit)
@@ -177,6 +179,16 @@ class ThreadAdapter(
     private fun ItemMessageBinding.handleCalendarAttendancePayload(message: Message) {
         val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees ?: emptyList()
         calendarEvent.onlyUpdateAttendance(attendees)
+    }
+
+    private fun ItemMessageBinding.handleEmojiReactionPayload(message: Message) {
+        emojiReactions.bindEmojiReactions(message)
+    }
+
+    private fun EmojiReactionsView.bindEmojiReactions(message: Message) {
+        val reactions = message.emojiReactions.filterNotNull()
+        isGone = false // reactions.isEmpty()
+        setEmojiReactions(reactions)
     }
 
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {
@@ -683,12 +695,8 @@ class ThreadAdapter(
         quoteButton.setOnClickListener { toggleWebViews(message) }
         quoteButtonFrameLayout.isVisible = hasQuote
 
-        val reactions = message.emojiReactions.filterNotNull()
-        emojiReactions.apply {
-            isGone = false // reactions.isEmpty()
-            setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
-            setEmojiReactions(reactions)
-        }
+        emojiReactions.bindEmojiReactions(message)
+        emojiReactions.setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
 
         initWebViewClientIfNeeded(
             message,
@@ -820,6 +828,7 @@ class ThreadAdapter(
         RE_RENDER,
         FAILED_MESSAGE,
         ONLY_REBIND_CALENDAR_ATTENDANCE,
+        ONLY_REBIND_EMOJI_REACTIONS,
     }
 
     enum class ContextMenuType {
@@ -842,8 +851,9 @@ class ThreadAdapter(
             return when (oldItem) {
                 is Message -> {
                     newItem is Message &&
-                            areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
-                            newItem.latestCalendarEventResponse == oldItem.latestCalendarEventResponse
+                            areMessageContentsTheSameExceptSpecificPayloads(oldItem, newItem) &&
+                            newItem.latestCalendarEventResponse == oldItem.latestCalendarEventResponse &&
+                            newItem.emojiReactions.containsTheSameEmojiValuesAs(oldItem.emojiReactions)
                 }
                 is SuperCollapsedBlock -> {
                     newItem is SuperCollapsedBlock &&
@@ -857,24 +867,45 @@ class ThreadAdapter(
 
             if (oldItem !is Message || newItem !is Message) return null
 
-            // If everything but Attendees is the same, then we know the only thing that could've changed is Attendees.
-            return if (everythingButAttendeesIsTheSame(oldItem, newItem)) NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE else null
+            return if (everythingButSpecificPayloadsIsTheSame(oldItem, newItem)) {
+                when {
+                    newItem.emojiReactions.containsTheSameEmojiValuesAs(oldItem.emojiReactions).not()
+                        -> NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE
+                    // If everything but specific payloads is the same and it's none of the above that changed, then we know the
+                    // only thing that could've changed is Attendees.
+                    else -> NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE
+                }
+            } else {
+                null
+            }
         }
 
         companion object {
-            fun everythingButAttendeesIsTheSame(oldMessage: Message, newMessage: Message): Boolean {
+            fun everythingButSpecificPayloadsIsTheSame(oldMessage: Message, newMessage: Message): Boolean {
                 val newCalendarEventResponse = newMessage.latestCalendarEventResponse
                 val oldCalendarEventResponse = oldMessage.latestCalendarEventResponse
 
-                return (areMessageContentsTheSameExceptCalendar(oldMessage, newMessage) &&
-                        !(newCalendarEventResponse == null && oldCalendarEventResponse == null)
-                        && newCalendarEventResponse?.everythingButAttendeesIsTheSame(oldCalendarEventResponse) == true)
+                return areMessageContentsTheSameExceptSpecificPayloads(oldMessage, newMessage)
+                        && !(newCalendarEventResponse == null && oldCalendarEventResponse == null)
+                        && newCalendarEventResponse?.everythingButAttendeesIsTheSame(oldCalendarEventResponse) == true
+                        && newMessage.emojiReactions == oldMessage.emojiReactions
             }
 
-            private fun areMessageContentsTheSameExceptCalendar(oldMessage: Message, newMessage: Message): Boolean {
+            private fun areMessageContentsTheSameExceptSpecificPayloads(oldMessage: Message, newMessage: Message): Boolean {
                 return newMessage.body?.value == oldMessage.body?.value &&
                         newMessage.splitBody == oldMessage.splitBody &&
                         newMessage.shouldHideDivider == oldMessage.shouldHideDivider
+            }
+
+            fun RealmDictionary<EmojiReactionState?>.containsTheSameEmojiValuesAs(other: RealmDictionary<EmojiReactionState?>): Boolean {
+                if (this.size != other.size) return false
+
+                for ((emoji, state) in this) {
+                    if (other.containsKey(emoji).not()) return false
+                    if (state != other[emoji]) return false
+                }
+
+                return true
             }
         }
     }
