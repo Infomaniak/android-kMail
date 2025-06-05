@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -487,6 +488,9 @@ class ThreadFragment : Fragment() {
 
         messagesLive.observe(viewLifecycleOwner) { (items, messagesToFetch) ->
             SentryLog.i("UI", "Received ${items.count()} messages")
+
+            Log.e("gibran", "observeMessagesLive - items.count(): ${items.count()}")
+            Log.e("gibran", "observeMessagesLive - items.map { it.reac }: ${items.joinToString { if (it is Message) it.emojiReactions.toString() else "-"}}")
 
             if (items.isEmpty()) {
                 mainViewModel.deletedMessages.value = deletedMessagesUids

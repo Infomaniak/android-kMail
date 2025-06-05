@@ -875,6 +875,7 @@ class ThreadAdapter(
                 return newMessage.body?.value == oldMessage.body?.value &&
                         newMessage.splitBody == oldMessage.splitBody &&
                         newMessage.shouldHideDivider == oldMessage.shouldHideDivider
+                        newMessage.emojiReactions == oldMessage.emojiReactions
             }
         }
     }
