@@ -23,4 +23,22 @@ import io.realm.kotlin.types.EmbeddedRealmObject
 class EmojiReactionState : ReactionState, EmbeddedRealmObject {
     override var count: Int = 0
     override var hasReacted: Boolean = false
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as EmojiReactionState
+
+        if (count != other.count) return false
+        if (hasReacted != other.hasReacted) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = count
+        result = 31 * result + hasReacted.hashCode()
+        return result
+    }
 }
