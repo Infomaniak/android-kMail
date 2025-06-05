@@ -211,7 +211,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun configureRoomDatabases() {
-        AccountUtils.init(this)
+        AccountUtils.init()
         myKSuiteDataUtils.initDatabase(this)
     }
 
