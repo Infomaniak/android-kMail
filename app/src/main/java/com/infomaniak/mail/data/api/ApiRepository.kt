@@ -494,12 +494,12 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.swissTransferContainer(containerUuid), method = GET)
     }
 
-    fun downloadAttachment(resource: String): Response {
+    suspend fun downloadAttachment(resource: String): Response {
         val request = Request.Builder()
             .url(ApiRoutes.resource(resource))
             .headers(HttpUtils.getHeaders(contentType = null))
             .build()
-        return HttpClient.okHttpClient.newBuilder().build().newCall(request).execute()
+        return HttpClient.okHttpClient.newBuilder().build().newCall(request).await()
     }
 
     suspend fun getAttachmentCalendarEvent(resource: String): ApiResponse<CalendarEventResponse> {

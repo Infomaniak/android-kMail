@@ -57,7 +57,7 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsCacheRootDir, userId, mailboxId), attachmentPath)
     }
 
-    fun downloadThenSaveAttachmentToCacheDir(context: Context, localAttachment: Attachment): Boolean {
+    suspend fun downloadThenSaveAttachmentToCacheDir(context: Context, localAttachment: Attachment): Boolean {
 
         fun Response.saveAttachmentTo(outputFile: File): Boolean {
             if (!isSuccessful) return false
@@ -70,7 +70,7 @@ object LocalStorageUtils {
             return false
         }
 
-        val attachment = runCatching { localAttachment.resource?.let(ApiRepository::downloadAttachment) }.getOrNull()
+        val attachment = runCatching { localAttachment.resource?.let { ApiRepository.downloadAttachment(it) } }.getOrNull()
         return attachment?.saveAttachmentTo(localAttachment.getCacheFile(context)) == true
     }
 

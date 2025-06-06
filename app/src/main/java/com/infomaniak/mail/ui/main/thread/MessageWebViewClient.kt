@@ -35,6 +35,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
 
 class MessageWebViewClient(
@@ -62,7 +63,7 @@ class MessageWebViewClient(
                 } else {
                     runCatching {
                         val resource = attachment.resource ?: return super.shouldInterceptRequest(view, request)
-                        ApiRepository.downloadAttachment(resource)
+                        runBlocking { ApiRepository.downloadAttachment(resource) }
                     }.getOrNull()?.body?.byteStream()?.readBytes()?.let {
                         LocalStorageUtils.saveAttachmentToCacheDir(it.inputStream(), cacheFile)
                         it.inputStream()
