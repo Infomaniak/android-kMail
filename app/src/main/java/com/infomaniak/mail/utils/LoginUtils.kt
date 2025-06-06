@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
@@ -41,7 +42,10 @@ import com.infomaniak.mail.utils.Utils.MailboxErrorCode
 import com.infomaniak.mail.utils.extensions.launchNoMailboxActivity
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ActivityScoped
@@ -87,8 +91,7 @@ class LoginUtils @Inject constructor(
                     is TokenResult.Success -> onAuthenticateUserSuccess(tokenResult.apiToken, infomaniakLogin)
                     is TokenResult.Error -> onAuthenticateUserError(tokenResult.errorStatus)
                 }
-            }.onFailure { exception ->
-                if (exception is CancellationException) throw exception
+            }.cancellable().onFailure { exception ->
                 onAuthenticateUserError(ErrorStatus.UNKNOWN)
                 SentryLog.e("authenticateUser", "Failure on getToken", exception)
             }
@@ -145,8 +148,7 @@ class LoginUtils @Inject constructor(
             if (errorStatus != null) {
                 SentryLog.e("DeleteTokenError", "API response error $errorStatus")
             }
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
+        }.cancellable().onFailure {
             SentryLog.e("DeleteTokenError", "Failure on deleteToken")
         }
     }

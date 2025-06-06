@@ -22,6 +22,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.core.cancellable
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.di.IoDispatcher
@@ -66,7 +67,7 @@ class DownloadAttachmentViewModel @Inject constructor(
             } else {
                 null
             }
-        }.getOrNull()
+        }.cancellable().getOrNull()
 
         emit(downloadedAttachment)
     }

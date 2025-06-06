@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.api
 
+import com.infomaniak.core.cancellable
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
@@ -486,7 +487,7 @@ object ApiRepository : ApiRepositoryCore() {
 
         return ApiController.json.decodeFromString(response.body?.string() ?: "")
 
-    }.getOrElse {
+    }.cancellable().getOrElse {
         return ApiResponse(result = ApiResponseStatus.ERROR, error = InternalTranslatedErrorCode.UnknownError.toApiError())
     }
 

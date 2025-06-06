@@ -26,6 +26,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import com.infomaniak.core.cancellable
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
@@ -220,7 +221,7 @@ class NewMessageViewModel @Inject constructor(
             } else {
                 getExistingDraft(draftLocalUuid) ?: return@runCatching
             }
-        }.onFailure(Sentry::captureException)
+        }.cancellable().onFailure(Sentry::captureException)
 
         draft?.let {
 

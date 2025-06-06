@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.net.Uri
+import com.infomaniak.core.cancellable
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Attachment
@@ -70,7 +71,9 @@ object LocalStorageUtils {
             return false
         }
 
-        val attachment = runCatching { localAttachment.resource?.let { ApiRepository.downloadAttachment(it) } }.getOrNull()
+        val attachment = runCatching {
+            localAttachment.resource?.let { ApiRepository.downloadAttachment(it) }
+        }.cancellable().getOrNull()
         return attachment?.saveAttachmentTo(localAttachment.getCacheFile(context)) == true
     }
 

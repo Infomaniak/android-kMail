@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
@@ -330,7 +331,7 @@ class ThreadController @Inject constructor(
                         swissTransferContainer = fetchSwissTransferContainer(swissTransferUuid)
                     }
                     return@runCatching ApiCallsResults(localMessage, apiResponse, swissTransferContainer)
-                }.getOrElse {
+                }.cancellable().getOrElse {
                     // This `getOrElse` is here only to catch `OutOfMemoryError` when trying to deserialize very big Body.
                     failedMessagesUids.add(localMessage.uid)
                     return@getOrElse null
@@ -346,7 +347,7 @@ class ThreadController @Inject constructor(
                 SentryLog.i(TAG, "Could not fetch SwissTransfer container")
                 null
             }
-        }.getOrNull()
+        }.cancellable().getOrNull()
 
         // If we've already got this Message's Draft beforehand, we need to save
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
