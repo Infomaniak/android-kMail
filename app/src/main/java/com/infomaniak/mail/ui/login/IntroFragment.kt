@@ -66,11 +66,14 @@ class IntroFragment : Fragment() {
     private var colorAnimator: ValueAnimator? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentIntroBinding.inflate(inflater, container, false).also {
+            binding = it
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
         when (navigationArgs.position) {
             0 -> introViewModel.updatedAccentColor.value?.let { (newAccentColor, _) ->
                 pinkBlueSwitch.isVisible = true

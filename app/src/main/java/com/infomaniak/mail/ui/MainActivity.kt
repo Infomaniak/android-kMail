@@ -25,11 +25,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
@@ -78,7 +80,9 @@ import com.infomaniak.mail.utils.UiUtils.progressivelyColorSystemBars
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.Utils.openShortcutHelp
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
+import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -197,8 +201,11 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
+        enableEdgeToEdge()
+
         setContentView(binding.root)
         handleOnBackPressed()
+        handleMenuDrawerEdgeToEdge()
         registerMainPermissions()
 
         checkUpdateIsRequired(
@@ -230,6 +237,24 @@ class MainActivity : BaseActivity() {
         initAppUpdateManager()
         initAppReviewManager()
         syncDiscoveryManager.init(::showSyncDiscovery)
+    }
+
+    private fun handleMenuDrawerEdgeToEdge() {
+        binding.applyWindowInsetsListener(shouldConsume = false) { _, insets ->
+            val menuDrawerFragment = binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment>()
+            with(insets.safeArea()) {
+                menuDrawerFragment.drawerHeader?.let {
+                    it.setContentPadding(
+                        /* left = */ left,
+                        /* top = */ top,
+                        /* right = */ it.contentPaddingRight,
+                        /* bottom = */ it.contentPaddingBottom,
+                    )
+                }
+
+                menuDrawerFragment.drawerContent?.let { it.updatePadding(left = left, top = it.paddingTop, bottom = bottom) }
+            }
+        }
     }
 
     private fun setupMenuDrawer() {

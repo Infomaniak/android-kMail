@@ -101,6 +101,8 @@ class SearchFragment : TwoPaneFragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
+        handleEdgeToEdge()
+
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SEARCH.id)
 
         searchViewModel.executePendingSearch()
@@ -118,6 +120,13 @@ class SearchFragment : TwoPaneFragment() {
         observeVisibilityModeUpdates()
         observeSearchResults()
         observeHistory()
+    }
+
+    private fun handleEdgeToEdge(): Unit = with(binding) {
+        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
+            appBar.applyStatusBarInsets(insets)
+            swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
+        }
     }
 
     override fun onStop() {

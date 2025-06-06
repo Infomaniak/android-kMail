@@ -31,6 +31,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentPermissionsOnboardingBinding
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -49,6 +51,17 @@ class PermissionsOnboardingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.applyWindowInsetsListener { _, insets ->
+            binding.dummyToolbarEdgeToEdge.apply {
+                context?.getColor(R.color.onboarding_secondary_background)?.let(::setBackgroundColor)
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    insets.statusBar().top,
+                )
+            }
+        }
+
         setPermissionUi()
     }
 

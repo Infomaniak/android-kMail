@@ -31,10 +31,10 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
             android:background="@color/newMessageBackgroundColor"
             android:touchscreenBlocksFocus="false"
-            app:contentInsetEnd="@dimen/marginStandardSmall"
             app:layout_constraintBottom_toTopOf="@id/compositionNestedScrollView"
             app:layout_constraintTop_toTopOf="parent"
             app:navigationContentDescription="@string/buttonClose"
@@ -484,33 +484,40 @@
             app:layout_constraintTop_toBottomOf="@+id/compositionNestedScrollView"
             tools:visibility="visible">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/informationButton"
-                style="@style/TextButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/externalBannerContent"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
-                android:fontFamily="@font/suisseintl_medium"
-                android:minHeight="0dp"
-                android:paddingVertical="0dp"
-                android:text="@string/externalDialogTitleRecipient"
-                android:textColor="@color/externalTagOnBackground"
-                app:icon="@drawable/ic_external_information"
-                app:iconGravity="end"
-                app:iconTint="@color/externalTagOnBackground" />
+                android:orientation="horizontal">
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/informationButton"
+                    style="@style/TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/marginStandardMedium"
+                    android:fontFamily="@font/suisseintl_medium"
+                    android:minHeight="0dp"
+                    android:paddingVertical="0dp"
+                    android:text="@string/externalDialogTitleRecipient"
+                    android:textColor="@color/externalTagOnBackground"
+                    app:icon="@drawable/ic_external_information"
+                    app:iconGravity="end"
+                    app:iconTint="@color/externalTagOnBackground" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/closeButton"
-                style="@style/IconButtonSmall"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
-                app:icon="@drawable/ic_close_small"
-                app:iconTint="@color/externalTagOnBackground" />
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/closeButton"
+                    style="@style/IconButtonSmall"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    app:icon="@drawable/ic_close_small"
+                    app:iconTint="@color/externalTagOnBackground" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
@@ -533,157 +540,173 @@
                     app:dividerColor="@color/backgroundColorTertiary"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editorTextOptions"
-                    style="@style/EditorIconButton"
-                    android:layout_width="@dimen/newMessageToolbarItemWidth"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/buttonTextOptionsOpen"
-                    app:icon="@drawable/ic_editor_text_options"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/dynamicEditorActionsLayout"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <HorizontalScrollView
-                    android:id="@+id/dynamicEditorActionsLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/sendLayout"
-                    app:layout_constraintStart_toEndOf="@id/editorTextOptions"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <FrameLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent">
-
-                        <LinearLayout
-                            android:id="@+id/editorActions"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal"
-                            tools:visibility="gone">
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/editorAttachment"
-                                style="@style/EditorIconButton"
-                                android:layout_width="@dimen/newMessageToolbarItemWidth"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/buttonAttachment"
-                                app:icon="@drawable/ic_attachment" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/editorCamera"
-                                style="@style/EditorIconButton"
-                                android:layout_width="@dimen/newMessageToolbarItemWidth"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/buttonCamera"
-                                android:visibility="gone"
-                                app:icon="@drawable/ic_editor_camera" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/editorAi"
-                                style="@style/EditorIconButton"
-                                android:layout_width="@dimen/newMessageToolbarItemWidth"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/buttonSchedule"
-                                android:theme="@style/AiCursorAndPrimaryColorTheme"
-                                android:visibility="gone"
-                                app:icon="@drawable/ic_ai_magic_wand"
-                                app:iconTint="@color/aiColor"
-                                tools:visibility="visible" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/formatOptionsLayout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal"
-                            android:visibility="gone"
-                            tools:visibility="visible">
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/buttonLink"
-                                style="@style/EditorFormatButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="@string/buttonStrikeThrough"
-                                app:icon="@drawable/ic_editor_link" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/buttonList"
-                                style="@style/EditorFormatButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="@string/buttonUnorderedList"
-                                app:icon="@drawable/ic_editor_list" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/buttonBold"
-                                style="@style/EditorFormatButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="@string/buttonBold"
-                                app:icon="@drawable/ic_editor_bold" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/buttonItalic"
-                                style="@style/EditorFormatButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="@string/buttonItalic"
-                                app:icon="@drawable/ic_editor_italic" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/buttonUnderline"
-                                style="@style/EditorFormatButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="@string/buttonUnderline"
-                                app:icon="@drawable/ic_editor_underline" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/buttonStrikeThrough"
-                                style="@style/EditorFormatButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="@string/buttonStrikeThrough"
-                                app:icon="@drawable/ic_editor_strikethrough" />
-
-                        </LinearLayout>
-                    </FrameLayout>
-                </HorizontalScrollView>
-
                 <LinearLayout
-                    android:id="@+id/sendLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:id="@+id/editorActionsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/scheduleButton"
-                        style="@style/IconButton"
+                        android:id="@+id/editorTextOptions"
+                        style="@style/EditorIconButton"
                         android:layout_width="@dimen/newMessageToolbarItemWidth"
                         android:layout_height="match_parent"
-                        android:contentDescription="@string/scheduleSendingTitle"
-                        android:visibility="gone"
-                        app:icon="@drawable/ic_schedule_send"
-                        tools:visibility="visible" />
+                        android:contentDescription="@string/buttonTextOptionsOpen"
+                        app:icon="@drawable/ic_editor_text_options" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/sendButton"
-                        style="@style/IconButton"
-                        android:layout_width="@dimen/newMessageToolbarItemWidth"
+                    <HorizontalScrollView
+                        android:id="@+id/dynamicEditorActionsLayout"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:contentDescription="@string/send"
-                        app:icon="@drawable/ic_send" />
+                        android:layout_weight="1"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/sendLayout"
+                        app:layout_constraintStart_toEndOf="@id/editorTextOptions"
+                        app:layout_constraintTop_toTopOf="parent">
 
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent">
+
+                            <LinearLayout
+                                android:id="@+id/editorActions"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                tools:visibility="gone">
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/editorAttachment"
+                                    style="@style/EditorIconButton"
+                                    android:layout_width="@dimen/newMessageToolbarItemWidth"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="@string/buttonAttachment"
+                                    app:icon="@drawable/ic_attachment" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/editorCamera"
+                                    style="@style/EditorIconButton"
+                                    android:layout_width="@dimen/newMessageToolbarItemWidth"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="@string/buttonCamera"
+                                    android:visibility="gone"
+                                    app:icon="@drawable/ic_editor_camera" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/editorClock"
+                                    style="@style/EditorIconButton"
+                                    android:layout_width="@dimen/newMessageToolbarItemWidth"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="@string/buttonSchedule"
+                                    android:visibility="gone"
+                                    app:icon="@drawable/ic_editor_clock" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/editorAi"
+                                    style="@style/EditorIconButton"
+                                    android:layout_width="@dimen/newMessageToolbarItemWidth"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="@string/buttonSchedule"
+                                    android:theme="@style/AiCursorAndPrimaryColorTheme"
+                                    android:visibility="gone"
+                                    app:icon="@drawable/ic_ai_magic_wand"
+                                    app:iconTint="@color/aiColor"
+                                    tools:visibility="visible" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/formatOptionsLayout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                android:visibility="gone"
+                                tools:visibility="visible">
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/buttonLink"
+                                    style="@style/EditorFormatButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/buttonStrikeThrough"
+                                    app:icon="@drawable/ic_editor_link" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/buttonList"
+                                    style="@style/EditorFormatButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/buttonUnorderedList"
+                                    app:icon="@drawable/ic_editor_list" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/buttonBold"
+                                    style="@style/EditorFormatButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/buttonBold"
+                                    app:icon="@drawable/ic_editor_bold" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/buttonItalic"
+                                    style="@style/EditorFormatButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/buttonItalic"
+                                    app:icon="@drawable/ic_editor_italic" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/buttonUnderline"
+                                    style="@style/EditorFormatButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/buttonUnderline"
+                                    app:icon="@drawable/ic_editor_underline" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/buttonStrikeThrough"
+                                    style="@style/EditorFormatButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/buttonStrikeThrough"
+                                    app:icon="@drawable/ic_editor_strikethrough" />
+
+                            </LinearLayout>
+                        </FrameLayout>
+                    </HorizontalScrollView>
+
+                    <LinearLayout
+                        android:id="@+id/sendLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/scheduleButton"
+                            style="@style/IconButton"
+                            android:layout_width="@dimen/newMessageToolbarItemWidth"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/scheduleSendingTitle"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_schedule_send"
+                            tools:visibility="visible" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/sendButton"
+                            style="@style/IconButton"
+                            android:layout_width="@dimen/newMessageToolbarItemWidth"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/send"
+                            app:icon="@drawable/ic_send" />
+
+                    </LinearLayout>
                 </LinearLayout>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>

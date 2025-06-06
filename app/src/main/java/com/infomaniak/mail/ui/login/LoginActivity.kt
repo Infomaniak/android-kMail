@@ -19,7 +19,9 @@ package com.infomaniak.mail.ui.login
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
@@ -66,6 +68,10 @@ class LoginActivity : AppCompatActivity() {
         lockOrientationForSmallScreens()
 
         super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
+
         setContentView(binding.root)
 
         infomaniakLogin = getInfomaniakLogin()

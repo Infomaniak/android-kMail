@@ -39,6 +39,7 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -166,6 +167,8 @@ class NewMessageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.newMessageBackgroundColor)
 
+        handleEdgeToEdge()
+
         SentryDebug.addNavigationBreadcrumb(
             name = findNavController().currentDestination?.displayName ?: "newMessageFragment",
             arguments = newMessageActivityArgs.toBundle(),
@@ -213,6 +216,21 @@ class NewMessageFragment : Fragment() {
         }
 
         observeScheduledDraftsFeatureFlagUpdates()
+    }
+
+    private fun handleEdgeToEdge() = with(binding) {
+        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
+            toolbar.applyStatusBarInsets(insets)
+            compositionNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
+            externalBannerContent.applySideAndBottomSystemInsets(insets, withBottom = false)
+            editorActionsLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
+
+            val imeBottomInset = insets.ime().bottom
+            newMessageConstraintLayout.updatePadding(
+                bottom = if (imeBottomInset == 0) insets.systemBars().bottom else 0,
+            )
+            editorToolbar.setMargins(bottom = imeBottomInset)
+        }
     }
 
     private fun setupBackActionHandler() {

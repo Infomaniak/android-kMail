@@ -169,6 +169,8 @@ class ThreadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        handleEdgeToEdge()
+
         setupUi()
         setupAdapter()
         setupDialogs()
@@ -192,6 +194,15 @@ class ThreadFragment : Fragment() {
         observeReportDisplayProblemResult()
 
         observeMessageOfUserToBlock()
+    }
+
+    private fun handleEdgeToEdge() = with(binding) {
+        // We don't consume insets because the QuickActionBarView needs it
+        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
+            mainAppBar.applyStatusBarInsets(insets)
+            appBar.applySideAndBottomSystemInsets(insets, withBottom = false)
+            messagesListNestedScrollView.applySideAndBottomSystemInsets(insets)
+        }
     }
 
     private fun observeReportDisplayProblemResult() {
@@ -257,7 +268,10 @@ class ThreadFragment : Fragment() {
             toolbar,
             messagesListNestedScrollView,
             shouldUpdateStatusBar = twoPaneFragment::isOnlyRightShown,
-            otherUpdates = { color -> appBar.backgroundTintList = ColorStateList.valueOf(color) },
+            otherUpdates = { color ->
+                mainAppBar.backgroundTintList = ColorStateList.valueOf(color)
+                appBar.backgroundTintList = ColorStateList.valueOf(color)
+            },
         )
     }
 

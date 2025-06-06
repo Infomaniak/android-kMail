@@ -88,6 +88,9 @@ class MenuDrawerFragment : Fragment() {
 
     var exitDrawer: (() -> Unit)? = null
 
+    val drawerHeader get() = _binding?.drawerHeader
+    val drawerContent get() = _binding?.menuDrawerRecyclerView
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { _binding = it }.root
     }
