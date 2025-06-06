@@ -211,7 +211,7 @@ object ApiRepository : ApiRepositoryCore() {
         return uploadDraft(mailboxUuid, draft, okHttpClient)
     }
 
-    private inline suspend fun <reified T> uploadDraft(
+    private suspend inline fun <reified T> uploadDraft(
         mailboxUuid: String,
         draft: Draft,
         okHttpClient: OkHttpClient
@@ -221,20 +221,20 @@ object ApiRepository : ApiRepositoryCore() {
             ?: run { postDraft(mailboxUuid, body, okHttpClient) }
     }
 
-    private inline suspend fun <reified T> putDraft(
+    private suspend inline fun <reified T> putDraft(
         mailboxUuid: String,
         body: String,
         okHttpClient: OkHttpClient,
         uuid: String,
     ): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
-    private inline suspend fun <reified T> postDraft(
+    private suspend inline fun <reified T> postDraft(
         mailboxUuid: String,
         body: String,
         okHttpClient: OkHttpClient,
     ): ApiResponse<T> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
-    private suspend fun getDraftBody(draft: Draft): String {
+    private fun getDraftBody(draft: Draft): String {
         val updatedDraft = if (draft.identityId == Draft.NO_IDENTITY.toString()) {
             // When we select no signature, we create a dummy signature with -1 (NO_IDENTITY) as identity ID.
             // But we can't send that to the API, instead we need to put the `null` value.
@@ -316,7 +316,7 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
-    inline suspend fun <reified T : MessageFlags> getMessagesUidsDelta(
+    suspend inline fun <reified T : MessageFlags> getMessagesUidsDelta(
         mailboxUuid: String,
         folderId: String,
         cursor: String,
