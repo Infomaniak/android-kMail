@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
@@ -119,7 +120,7 @@ class DownloadMessagesViewModel @Inject constructor(
             }
 
             deferredResponses.awaitAll()
-        }.getOrElse {
+        }.cancellable().getOrElse { // TODO: Check if we simply shouldn't handle this cancellation exception
             if (it is ByteArrayNetworkException) SentryLog.e(TAG, "Error while sharing messages to kDrive:", it)
             null
         }

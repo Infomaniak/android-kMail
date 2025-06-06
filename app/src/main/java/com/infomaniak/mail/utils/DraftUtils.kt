@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.api.ApiController.NetworkException
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.isNetworkException
@@ -63,7 +64,7 @@ private suspend fun Draft.uploadAttachments(mailbox: Mailbox, realm: Realm) {
     attachmentsToUpload.forEach { attachment ->
         runCatching {
             attachment.startUpload(localUuid, mailbox, realm)
-        }.onFailure { exception ->
+        }.cancellable().onFailure { exception ->
             SentryLog.d(ATTACHMENT_TAG, "${exception.message}", exception)
             if ((exception as Exception).isNetworkException()) throw NetworkException()
             throw exception
