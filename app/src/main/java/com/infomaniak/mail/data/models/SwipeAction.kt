@@ -52,7 +52,7 @@ enum class SwipeAction(
         R.drawable.ic_param_dots,
         "quickActions",
     ),
-    TUTORIAL(R.string.settingsSwipeActionNone, R.color.progressbarTrackColor, null, "tutorial"),
+    TUTORIAL(R.string.settingsSwipeActionToDefine, R.color.progressbarTrackColor, null, "tutorial"),
     NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null, "none", neverDisplay);
 
     @ColorInt
