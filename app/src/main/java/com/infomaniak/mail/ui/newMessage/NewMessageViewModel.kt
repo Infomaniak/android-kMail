@@ -26,6 +26,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.MailTo
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import com.infomaniak.core.cancellable
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
@@ -220,7 +221,7 @@ class NewMessageViewModel @Inject constructor(
             } else {
                 getExistingDraft(draftLocalUuid) ?: return@runCatching
             }
-        }.onFailure(Sentry::captureException)
+        }.cancellable().onFailure(Sentry::captureException)
 
         draft?.let {
 
@@ -240,7 +241,7 @@ class NewMessageViewModel @Inject constructor(
         emit(draft)
     }
 
-    private fun getExistingDraft(localUuid: String?): Draft? {
+    private suspend fun getExistingDraft(localUuid: String?): Draft? {
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
             if (draft.identityId.isNullOrBlank()) {
@@ -300,7 +301,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
+    private suspend fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
         draft.inReplyTo = previousMessage.messageId
 
         val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
@@ -489,7 +490,7 @@ class NewMessageViewModel @Inject constructor(
         }
     }
 
-    private fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
+    private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
 
         @Suppress("UNUSED_PARAMETER")
         fun trackOpenLocal(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
@@ -506,7 +507,7 @@ class NewMessageViewModel @Inject constructor(
 
     private fun getLatestLocalDraft(localUuid: String?) = localUuid?.let(draftController::getDraft)?.copyFromRealm()
 
-    private fun fetchDraft(): Draft? {
+    private suspend fun fetchDraft(): Draft? {
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
 
             /**

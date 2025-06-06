@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.core.cancellable
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteDataManager
 import com.infomaniak.lib.core.networking.HttpClient
@@ -27,7 +28,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class MyKSuiteDataUtils @Inject constructor(private val mailboxController: MailboxController) : MyKSuiteDataManager() {
@@ -52,8 +52,7 @@ class MyKSuiteDataUtils @Inject constructor(private val mailboxController: Mailb
         }
 
         return@runCatching apiResponse.data
-    }.getOrElse { exception ->
-        if (exception is CancellationException) throw exception
+    }.cancellable().getOrElse { exception ->
         SentryLog.d(TAG, "Exception during myKSuite data fetch", exception)
         null
     }

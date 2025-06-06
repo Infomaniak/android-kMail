@@ -24,6 +24,7 @@ import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
@@ -107,7 +108,7 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             hasShownNotification = fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
             SentryLog.i(TAG, "Work finished")
             Result.success()
-        }.getOrElse {
+        }.cancellable().getOrElse {
             Result.failure()
         }.also {
             if (!hasShownNotification) displayGenericNewMailsNotification()

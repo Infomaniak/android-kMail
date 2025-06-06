@@ -649,14 +649,14 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region API calls
-    private fun getDateOrderedMessagesUids(folderId: String): NewMessagesResult? {
+    private suspend fun getDateOrderedMessagesUids(folderId: String): NewMessagesResult? {
         return with(ApiRepository.getDateOrderedMessagesUids(mailbox.uuid, folderId, okHttpClient)) {
             if (!isSuccess()) throwErrorAsException()
             return@with data
         }
     }
 
-    private inline fun <reified T : MessageFlags> getMessagesUidsDelta(
+    private suspend inline fun <reified T : MessageFlags> getMessagesUidsDelta(
         folderId: String,
         previousCursor: String,
     ): ActivitiesResult<T>? {

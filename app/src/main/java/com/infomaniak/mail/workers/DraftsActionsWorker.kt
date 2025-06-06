@@ -23,6 +23,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import androidx.work.WorkInfo.State
+import com.infomaniak.core.cancellable
 import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.lib.core.api.ApiController.NetworkException
 import com.infomaniak.lib.core.models.ApiResponse
@@ -50,7 +51,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
@@ -171,7 +171,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     }
                     return@with
                 }
-            }.onFailure { exception ->
+            }.cancellable().onFailure { exception ->
                 when (exception) {
                     is NetworkException -> {
                         mailboxContentRealm.executeRealmCallbacks(realmActionsOnDraft)
@@ -243,7 +243,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
             executeDraftAction(draftController.getDraft(draft.localUuid)!!, mailbox.uuid)
         }
-    }.onFailure { if (it is CancellationException) throw it }
+    }.cancellable()
 
     private suspend fun Realm.executeRealmCallbacks(realmActionsOnDraft: List<(MutableRealm) -> Unit>) {
         write {

@@ -193,7 +193,7 @@ class SharedUtils @Inject constructor(
          * Will manually switch to the single uuid api call when batching over a single message. This is needed to receive api
          * errors from the api, because batches will never return api errors for now.
          */
-        fun rescheduleSnoozedThreads(
+        suspend fun rescheduleSnoozedThreads(
             mailboxUuid: String,
             snoozeUuids: List<String>,
             newDate: Date,
@@ -211,7 +211,11 @@ class SharedUtils @Inject constructor(
          * Will manually switch to the single uuid api call when batching over a single message. This is needed to receive api
          * errors from the api, because batches will never return api errors for now.
          */
-        fun unsnoozeThreads(mailboxUuid: String, snoozeUuids: List<String>, impactedFolders: ImpactedFolders): BatchSnoozeResult {
+        suspend fun unsnoozeThreads(
+            mailboxUuid: String,
+            snoozeUuids: List<String>,
+            impactedFolders: ImpactedFolders
+        ): BatchSnoozeResult {
             return if (snoozeUuids.count() == 1) {
                 ApiRepository.unsnoozeThread(mailboxUuid, snoozeUuids.single()).computeSnoozeResult(impactedFolders)
             } else {
@@ -226,7 +230,7 @@ class SharedUtils @Inject constructor(
          *
          * Start using [unsnoozeThreadsWithoutRefresh] again if we find a way to get this info with the batch call.
          */
-        fun unsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
+        suspend fun unsnoozeThreadWithoutRefresh(mailbox: Mailbox, thread: Thread): AutomaticUnsnoozeResult {
             val targetMessage = thread.messages.lastOrNull(Message::isSnoozed) ?: return AutomaticUnsnoozeResult.OtherError
             val targetMessageSnoozeUuid = targetMessage.snoozeUuid ?: return AutomaticUnsnoozeResult.OtherError
 
@@ -250,7 +254,7 @@ class SharedUtils @Inject constructor(
          * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone.
          * Outside of this algorithm, the scope doesn't need to be defined and the method can be used like any other.
          */
-        fun unsnoozeThreadsWithoutRefresh(
+        suspend fun unsnoozeThreadsWithoutRefresh(
             scope: CoroutineScope?,
             mailbox: Mailbox,
             threads: Collection<Thread>,
