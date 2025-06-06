@@ -219,7 +219,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun handleEdgeToEdge() = with(binding) {
-        applyWindowInsetsListener(shouldConsume = false) { root, insets ->
+        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
             toolbar.applyStatusBarInsets(insets)
             compositionNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
             externalBannerContent.applySideAndBottomSystemInsets(insets, withBottom = false)
