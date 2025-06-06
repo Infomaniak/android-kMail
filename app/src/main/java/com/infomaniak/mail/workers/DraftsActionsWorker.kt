@@ -51,7 +51,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
@@ -244,7 +243,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             }
             executeDraftAction(draftController.getDraft(draft.localUuid)!!, mailbox.uuid)
         }
-    }.cancellable().onFailure { if (it is CancellationException) throw it }
+    }.cancellable()
 
     private suspend fun Realm.executeRealmCallbacks(realmActionsOnDraft: List<(MutableRealm) -> Unit>) {
         write {
