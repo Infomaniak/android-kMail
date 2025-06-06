@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,8 +47,8 @@ object AccountUtils : CredentialManager() {
 
     var reloadApp: (suspend () -> Unit)? = null
 
-    fun init(context: Context) {
-        userDatabase = UserDatabase.getDatabase(context)
+    fun init() {
+        userDatabase = UserDatabase.getDatabase()
 
         Sentry.setUser(SentryUser().apply { id = currentUserId.toString() })
     }

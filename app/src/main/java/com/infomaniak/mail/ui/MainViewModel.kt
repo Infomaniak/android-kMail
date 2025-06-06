@@ -1185,7 +1185,7 @@ class MainViewModel @Inject constructor(
         return rescheduleResult
     }
 
-    private fun rescheduleSnoozedThreads(currentMailbox: Mailbox, snoozeUuids: List<String>, date: Date): BatchSnoozeResult {
+    private suspend fun rescheduleSnoozedThreads(currentMailbox: Mailbox, snoozeUuids: List<String>, date: Date): BatchSnoozeResult {
         return SharedUtils.rescheduleSnoozedThreads(
             mailboxUuid = currentMailbox.uuid,
             snoozeUuids = snoozeUuids,
@@ -1249,7 +1249,7 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val (resources, foldersIds, destinationFolderId) = undoData
 
-        val apiResponses = resources.map(ApiRepository::undoAction)
+        val apiResponses = resources.map { ApiRepository.undoAction(it) }
 
         if (apiResponses.atLeastOneSucceeded()) {
             // Don't use `refreshFoldersAsync` here, it will make the Snackbars blink.

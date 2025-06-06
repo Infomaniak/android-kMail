@@ -316,7 +316,7 @@ class ThreadController @Inject constructor(
             return deletedMessagesUids to failedMessagesUids
         }
 
-        private fun getApiCallsResults(
+        private suspend fun getApiCallsResults(
             messages: List<Message>,
             okHttpClient: OkHttpClient?,
             failedMessagesUids: MutableList<String>,
@@ -338,7 +338,7 @@ class ThreadController @Inject constructor(
             }
         }
 
-        private fun fetchSwissTransferContainer(uuid: String): SwissTransferContainer? = runCatching {
+        private suspend fun fetchSwissTransferContainer(uuid: String): SwissTransferContainer? = runCatching {
             val apiResponse = ApiRepository.getSwissTransferContainer(uuid)
             return@runCatching if (apiResponse.isSuccess()) {
                 apiResponse.data

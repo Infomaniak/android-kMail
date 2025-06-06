@@ -404,7 +404,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    private fun fetchCalendarEvent(item: Any, forceFetch: Boolean): Pair<Message, ApiResponse<CalendarEventResponse>>? {
+    private suspend fun fetchCalendarEvent(item: Any, forceFetch: Boolean): Pair<Message, ApiResponse<CalendarEventResponse>>? {
 
         if (item !is Message) return null
         val message: Message = item
