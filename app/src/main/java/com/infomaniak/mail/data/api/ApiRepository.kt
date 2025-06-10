@@ -22,7 +22,6 @@ import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
-import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.api.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.api.ApiController.toApiError
@@ -468,18 +467,13 @@ object ApiRepository : ApiRepositoryCore() {
 
     suspend fun getCredentialsPassword(): ApiResponse<InfomaniakPassword> = runCatching {
 
-        val headers = HttpUtils.getHeaders(contentType = null)
-            .newBuilder()
-            .set("Authorization", "Bearer ${InfomaniakCore.bearerToken}")
-            .build()
-
         val formBuilder = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("name", "Infomaniak Sync - ${Date().format(FORMAT_FULL_DATE_WITH_HOUR)}")
 
         val request = Request.Builder()
             .url(ApiRoutes.getCredentialsPassword())
-            .headers(headers)
+            .headers(HttpUtils.getHeaders(contentType = null))
             .post(formBuilder.build())
             .build()
 
