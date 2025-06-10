@@ -55,7 +55,7 @@
                     app:itemAction="chevron"
                     app:ripple="false"
                     app:title="@string/settingsSwipeRight"
-                    tools:subtitle="@string/settingsSwipeActionNone" />
+                    tools:subtitle="@string/settingsSwipeActionToDefine" />
 
                 <include
                     android:id="@+id/swipeRightIllustration"
@@ -84,7 +84,7 @@
                     app:itemAction="chevron"
                     app:ripple="false"
                     app:title="@string/settingsSwipeLeft"
-                    tools:subtitle="@string/settingsSwipeActionNone" />
+                    tools:subtitle="@string/settingsSwipeActionToDefine" />
 
                 <include
                     android:id="@+id/swipeLeftIllustration"
