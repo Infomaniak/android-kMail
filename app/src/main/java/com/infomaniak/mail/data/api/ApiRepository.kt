@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.lib.core.networking.ManualAuthorizationRequired
 import com.infomaniak.lib.core.utils.await
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
@@ -471,6 +472,7 @@ object ApiRepository : ApiRepositoryCore() {
             .setType(MultipartBody.FORM)
             .addFormDataPart("name", "Infomaniak Sync - ${Date().format(FORMAT_FULL_DATE_WITH_HOUR)}")
 
+        @OptIn(ManualAuthorizationRequired::class)
         val request = Request.Builder()
             .url(ApiRoutes.getCredentialsPassword())
             .headers(HttpUtils.getHeaders(contentType = null))
@@ -490,6 +492,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     suspend fun downloadAttachment(resource: String): Response {
+        @OptIn(ManualAuthorizationRequired::class)
         val request = Request.Builder()
             .url(ApiRoutes.resource(resource))
             .headers(HttpUtils.getHeaders(contentType = null))
@@ -521,6 +524,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     suspend fun getDownloadedMessage(mailboxUuid: String, folderId: String, shortUid: Int): Response {
+        @OptIn(ManualAuthorizationRequired::class)
         val request = Request.Builder().url(ApiRoutes.downloadMessage(mailboxUuid, folderId, shortUid))
             .headers(HttpUtils.getHeaders(EML_CONTENT_TYPE))
             .get()
@@ -539,6 +543,7 @@ object ApiRepository : ApiRepositoryCore() {
         mailbox: Mailbox,
         userApiToken: String,
     ): ApiResponse<Attachment>? {
+        @OptIn(ManualAuthorizationRequired::class)
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
             .addUnsafeNonAscii("x-ws-attachment-filename", attachment.name)
