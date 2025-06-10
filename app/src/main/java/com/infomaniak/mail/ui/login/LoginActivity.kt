@@ -115,6 +115,7 @@ class LoginActivity : AppCompatActivity() {
                 val newRequest = changeAccessToken(chain.request(), apiToken)
                 chain.proceed(newRequest)
             }.build()
+
             val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(okhttpClient) }
 
             if (userProfileResponse.result == ApiResponseStatus.ERROR) return userProfileResponse

@@ -123,7 +123,7 @@ class LoginUtils @Inject constructor(
         AccountUtils.reloadApp?.invoke()
     }
 
-    private suspend fun Context.mailboxError(errorCode: MailboxErrorCode) {
+    private fun Context.mailboxError(errorCode: MailboxErrorCode) {
         when (errorCode) {
             MailboxErrorCode.NO_MAILBOX -> launchNoMailboxActivity()
             MailboxErrorCode.NO_VALID_MAILBOX -> launchNoValidMailboxesActivity()
