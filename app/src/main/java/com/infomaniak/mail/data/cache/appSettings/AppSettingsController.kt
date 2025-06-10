@@ -21,6 +21,8 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 object AppSettingsController {
 
@@ -28,6 +30,11 @@ object AppSettingsController {
     fun getAppSettings(realm: MutableRealm? = null): AppSettings {
         val block: (MutableRealm) -> AppSettings = { it.query<AppSettings>().first().find() ?: it.copyToRealm(AppSettings()) }
         return realm?.let(block) ?: RealmDatabase.appSettings().writeBlocking(block)
+    }
+
+    fun getCurrentUserIdFlow(customRealm: MutableRealm? = null): Flow<Int?> {
+        val realm = customRealm ?: RealmDatabase.appSettings()
+        return realm.query<AppSettings>().first().asFlow().map { it.obj?.currentUserId }
     }
     //endregion
 
