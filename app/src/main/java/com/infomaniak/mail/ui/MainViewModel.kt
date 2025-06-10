@@ -1188,7 +1188,7 @@ class MainViewModel @Inject constructor(
     private suspend fun rescheduleSnoozedThreads(
         currentMailbox: Mailbox,
         snoozeUuids: List<String>,
-        date: Date
+        date: Date,
     ): BatchSnoozeResult {
         return SharedUtils.rescheduleSnoozedThreads(
             mailboxUuid = currentMailbox.uuid,
@@ -1447,8 +1447,8 @@ class MainViewModel @Inject constructor(
 
     fun scheduleDownload(downloadUrl: String, filename: String) = viewModelScope.launch(ioCoroutineContext) {
         val snackbarTitleRes = if (ApiRepository.ping().isSuccess()) {
-            val token = AccountUtils.currentUser?.apiToken?.accessToken
-            DownloadManagerUtils.scheduleDownload(appContext, downloadUrl, filename, userBearerToken = token)
+            val userBearerToken = AccountUtils.currentUser?.apiToken?.accessToken
+            DownloadManagerUtils.scheduleDownload(appContext, downloadUrl, filename, userBearerToken)
             R.string.snackbarDownloadInProgress
         } else {
             RCore.string.errorDownload
