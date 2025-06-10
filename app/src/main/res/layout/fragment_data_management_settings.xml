@@ -19,7 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:title="@string/settingsDataManagementTitle">
+    app:title="@string/trackingManagementTitle">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/marginStandardMedium"
-                android:text="@string/settingsDataManagementDescription" />
+                android:text="@string/trackingManagementTitle" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/dataManagementSourceCodeButton"
@@ -53,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardVerySmall"
-                android:text="@string/settingsDataManagementSourceCode" />
+                android:text="@string/applicationSourceCode" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/dataManagementMatomo"
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_matomo"
                 app:itemAction="chevron"
-                app:title="@string/settingsMatomoTitle" />
+                app:title="@string/trackingMatomoTitle" />
 
             <com.google.android.material.divider.MaterialDivider style="@style/ItemDivider" />
 
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_sentry"
                 app:itemAction="chevron"
-                app:title="@string/settingsSentryTitle" />
+                app:title="@string/trackingSentryTitle" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
