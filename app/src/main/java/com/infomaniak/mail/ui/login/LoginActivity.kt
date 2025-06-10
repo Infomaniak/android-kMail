@@ -25,7 +25,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.api.ApiController.toApiError
 import com.infomaniak.lib.core.api.InternalTranslatedErrorCode
 import com.infomaniak.lib.core.auth.TokenAuthenticator.Companion.changeAccessToken
@@ -110,7 +109,6 @@ class LoginActivity : AppCompatActivity() {
         suspend fun authenticateUser(context: Context, apiToken: ApiToken, mailboxController: MailboxController): Any {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
 
-            InfomaniakCore.bearerToken = apiToken.accessToken
             val okhttpClient = HttpClient.okHttpClientNoTokenInterceptor.newBuilder().addInterceptor { chain ->
                 val newRequest = changeAccessToken(chain.request(), apiToken)
                 chain.proceed(newRequest)
