@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/marginStandardMedium"
-                android:text="@string/trackingManagementTitle" />
+                android:text="@string/trackingManagementDescription" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/dataManagementSourceCodeButton"
