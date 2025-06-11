@@ -535,7 +535,7 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun Body.asPlainText(): String? {
-        //TODO: When the API handles blank characters, remove ifBlank
+        // TODO: When the API handles blank characters, remove ifBlank
         return when (type) {
             Utils.TEXT_HTML -> {
                 val splitBodyContent = MessageBodyUtils.splitContentAndQuote(this).content
