@@ -25,9 +25,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.api.ApiController.toApiError
 import com.infomaniak.lib.core.api.InternalTranslatedErrorCode
+import com.infomaniak.lib.core.auth.TokenAuthenticator.Companion.changeAccessToken
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.lib.core.networking.HttpClient
@@ -109,8 +109,12 @@ class LoginActivity : AppCompatActivity() {
         suspend fun authenticateUser(context: Context, apiToken: ApiToken, mailboxController: MailboxController): Any {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
 
-            InfomaniakCore.bearerToken = apiToken.accessToken
-            val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(HttpClient.okHttpClientNoTokenInterceptor) }
+            val okhttpClient = HttpClient.okHttpClientNoTokenInterceptor.newBuilder().addInterceptor { chain ->
+                val newRequest = changeAccessToken(chain.request(), apiToken)
+                chain.proceed(newRequest)
+            }.build()
+
+            val userProfileResponse = Dispatchers.IO { ApiRepository.getUserProfile(okhttpClient) }
 
             if (userProfileResponse.result == ApiResponseStatus.ERROR) return userProfileResponse
             if (userProfileResponse.data == null) return getErrorResponse(InternalTranslatedErrorCode.UnknownError)
@@ -120,7 +124,7 @@ class LoginActivity : AppCompatActivity() {
                 this.organizations = arrayListOf()
             }
 
-            val apiResponse = Dispatchers.IO { ApiRepository.getMailboxes(HttpClient.okHttpClientNoTokenInterceptor) }
+            val apiResponse = Dispatchers.IO { ApiRepository.getMailboxes(okhttpClient) }
 
             return when {
                 !apiResponse.isSuccess() -> apiResponse

@@ -27,7 +27,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.BuildConfig.AUTOLOG_URL
 import com.infomaniak.lib.core.BuildConfig.TERMINATE_ACCOUNT_URL
-import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.ui.WebViewActivity
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.FragmentAccountManagementSettingsBinding
@@ -72,7 +71,7 @@ class AccountManagementSettingsFragment : Fragment() {
             WebViewActivity.startActivity(
                 context = requireContext(),
                 url = TERMINATE_ACCOUNT_FULL_URL,
-                headers = mapOf("Authorization" to "Bearer ${InfomaniakCore.bearerToken}"),
+                headers = mapOf("Authorization" to "Bearer ${AccountUtils.currentUser?.apiToken?.accessToken}"),
                 urlToQuit = URL_REDIRECT_SUCCESSFUL_ACCOUNT_DELETION,
                 activityResultLauncher = resultActivityResultLauncher,
             )

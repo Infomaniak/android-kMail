@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
 import com.infomaniak.lib.core.models.ApiResponseStatus
@@ -61,7 +60,6 @@ object AccountUtils : CredentialManager() {
                 id = currentUserId.toString()
                 email = user?.email
             })
-            InfomaniakCore.bearerToken = user?.apiToken?.accessToken.toString()
         }
 
     override var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId

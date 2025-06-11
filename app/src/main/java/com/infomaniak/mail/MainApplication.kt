@@ -51,6 +51,7 @@ import com.infomaniak.lib.stores.AppUpdateScheduler
 import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
+import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
@@ -63,10 +64,8 @@ import io.sentry.android.core.SentryAndroid
 import io.sentry.android.core.SentryAndroidOptions
 import io.sentry.android.fragment.FragmentLifecycleIntegration
 import io.sentry.android.fragment.FragmentLifecycleState
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import org.matomo.sdk.Tracker
 import java.util.UUID
 import javax.inject.Inject
@@ -268,15 +267,23 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        val userTokenFlow = AppSettingsController.getCurrentUserIdFlow()
+            .mapLatest { id -> id?.let { AccountUtils.getUserById(it)?.apiToken } }
+            .filterNotNull()
+            .shareIn(globalCoroutineScope, SharingStarted.Lazily, replay = 1)
+
         override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
+            if (AccountUtils.currentUser == null) AccountUtils.requestCurrentUser()
             AccountUtils.setUserToken(AccountUtils.currentUser!!, apiToken)
         }
 
         override suspend fun onRefreshTokenError() {
+            if (AccountUtils.currentUser == null) AccountUtils.requestCurrentUser()
             refreshTokenError(AccountUtils.currentUser!!)
         }
 
-        override suspend fun getApiToken(): ApiToken? = AccountUtils.currentUser?.apiToken
+        override suspend fun getApiToken(): ApiToken? = userTokenFlow.first()
 
         override fun getCurrentUserId(): Int = AccountUtils.currentUserId
     }
