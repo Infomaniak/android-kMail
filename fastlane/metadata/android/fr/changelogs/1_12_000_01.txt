@@ -1,0 +1,2 @@
+- Gestion bords-à-bords dans Android 15
+- Mise à jour du libellé des actions de balayage

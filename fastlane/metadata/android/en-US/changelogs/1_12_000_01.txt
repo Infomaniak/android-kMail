@@ -1,0 +1,2 @@
+- Handle edge-to-edge in Android 15
+- Update swipe actions wording
