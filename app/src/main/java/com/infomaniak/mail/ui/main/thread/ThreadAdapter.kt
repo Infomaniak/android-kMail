@@ -748,6 +748,7 @@ class ThreadAdapter(
 
         emojiReactions.bindEmojiReactions(message)
         emojiReactions.setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
+        emojiReactions.setOnEmojiClickListener { emoji ->  threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, message.uid) }
 
         initWebViewClientIfNeeded(
             message,
@@ -1014,6 +1015,7 @@ class ThreadAdapter(
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
         var onEncryptionSeeConcernedRecipients: ((List<Recipient>) -> Unit)? = null,
         var onAddReaction: ((Message) -> Unit)? = null,
+        var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {
