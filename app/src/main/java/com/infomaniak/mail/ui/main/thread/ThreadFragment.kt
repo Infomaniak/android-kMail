@@ -366,6 +366,7 @@ class ThreadFragment : Fragment() {
                 onRescheduleClicked = ::rescheduleDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onAddReaction = { navigateToEmojiPicker(it.uid) },
+                onAddEmoji = { emoji, messageUid -> mainViewModel.sendEmojiReply(emoji, messageUid) },
             ),
         )
 
