@@ -708,6 +708,7 @@ class ThreadAdapter(
 
         emojiReactions.bindEmojiReactions(message)
         emojiReactions.setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
+        emojiReactions.setOnEmojiClickListener { emoji ->  threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, message.uid) }
 
         initWebViewClientIfNeeded(
             message,
@@ -973,6 +974,7 @@ class ThreadAdapter(
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
         var onAddReaction: ((Message) -> Unit)? = null,
+        var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {
