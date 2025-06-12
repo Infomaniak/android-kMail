@@ -44,6 +44,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SharedUtils.Companion.isSnoozeAvailable
+import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
@@ -126,13 +127,16 @@ class ThreadViewModel @Inject constructor(
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
 
-    val isThreadSnoozeHeaderVisible = Utils.waitInitMediator(currentMailboxLive, threadLive).map { (mailbox, thread) ->
-        when {
-            thread == null || thread.isSnoozed().not() -> ThreadHeaderVisibility.NONE
-            thread.shouldDisplayHeaderActions(mailbox) -> ThreadHeaderVisibility.MESSAGE_AND_ACTIONS
-            else -> ThreadHeaderVisibility.MESSAGE_ONLY
+    val isThreadSnoozeHeaderVisible: LiveData<ThreadHeaderVisibility> = Utils.waitInitMediator(currentMailboxLive, threadLive)
+        .map { (mailbox, thread) ->
+            runCatchingRealm {
+                when {
+                    thread == null || thread.isSnoozed().not() -> ThreadHeaderVisibility.NONE
+                    thread.shouldDisplayHeaderActions(mailbox) -> ThreadHeaderVisibility.MESSAGE_AND_ACTIONS
+                    else -> ThreadHeaderVisibility.MESSAGE_ONLY
+                }
+            }.getOrElse { ThreadHeaderVisibility.NONE }
         }
-    }
 
     init {
         viewModelScope.launch {
