@@ -221,5 +221,11 @@
                 android:value="true" />
         </service>
 
+        <!-- The CrossAppLoginService is designed to be bound, and checks the identity of its clients. -->
+        <service
+            android:name=".CrossAppLoginService"
+            android:exported="true"
+            tools:ignore="ExportedService"/>
+
     </application>
 </manifest>

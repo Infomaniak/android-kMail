@@ -87,6 +87,7 @@ android {
 
 dependencies {
     implementation project(':Core')
+    implementation project(':Core:CrossAppLogin')
     implementation project(':Core:FragmentNavigation')
     implementation project(':Core:Legacy')
     implementation project(':Core:Legacy:AppLock')
