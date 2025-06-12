@@ -310,6 +310,17 @@
     <string name="errorCorruptAttachment">Der Entwurf konnte nicht bearbeitet werden, ein Anhang ist beschädigt</string>
     <string name="errorDraftNotFound">Entwurf unauffindbar</string>
     <string name="errorEditScheduledMessage">Geplante oder versendete Nachrichten können nicht geändert werden</string>
+    <string name="errorEmojiReactionAlreadyUsed">Sie haben bereits mit dieser Reaktion reagiert</string>
+    <string name="errorEmojiReactionFolderNotAllowedDraft">Sie können nicht auf einen Entwurf reagieren</string>
+    <string name="errorEmojiReactionFolderNotAllowedScheduledDraft">Sie können nicht auf eine geplante E-Mail antworten</string>
+    <string name="errorEmojiReactionFolderNotAllowedSpam">Sie können nicht auf eine als Spam markierte E-Mail reagieren</string>
+    <string name="errorEmojiReactionFolderNotAllowedTrash">Sie können nicht auf eine E-Mail im Papierkorb reagieren</string>
+    <string name="errorEmojiReactionMaxReactionReached">Sie haben die maximale Anzahl an Reaktionen für diese E-Mail erreicht</string>
+    <string name="errorEmojiReactionMaxRecipient">Sie können nicht auf eine E-Mail mit mehr als 20 Empfängern reagieren</string>
+    <string name="errorEmojiReactionMessageInReplyEncrypted">Sie können nicht auf eine verschlüsselte E-Mail reagieren</string>
+    <string name="errorEmojiReactionMessageInReplyToNotAllowed">Sie können nicht auf diese Art von E-Mail reagieren</string>
+    <string name="errorEmojiReactionMessageInReplyToNotValid">Sie können nicht auf diese E-Mail reagieren</string>
+    <string name="errorEmojiReactionRecipientNotAllowed">Nur Empfänger und Absender können auf diese E-Mail reagieren</string>
     <string name="errorFileNameTooLong">Dateiname zu lang</string>
     <string name="errorFolderDoesNotExist">Der Ordner besteht nicht</string>
     <string name="errorGetCredentials">Konnte keine Anmeldeinformationen erhalten</string>

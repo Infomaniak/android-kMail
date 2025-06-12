@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import com.infomaniak.lib.core.utils.ApiErrorCode
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.message.Message.EmojiReactionNotAllowedReason
 import com.infomaniak.lib.core.R as RCore
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -100,6 +101,12 @@ object ErrorCode {
     const val MAIL_MESSAGE_MAX_NUMBER_OF_SCHEDULED_SNOOZE_REACHED = "mail__message_max_number_of_scheduled_snooze_reached"
     const val MAIL_MESSAGE_CANNOT_BE_SNOOZE = "mail__message_cannot_be_snooze"
     //endregion
+    //endregion
+
+    //region Emoji reactions
+    const val EMOJI_REACTION_MAX_REACTION_REACHED = "emoji_reaction__max_reaction_reached"
+    const val EMOJI_REACTION_ALREADY_USED = "emoji_reaction__already_used"
+    //endregion
 
     //region Encryption
     const val ENCRYPTION_PASSWORD_IS_REQUIRED = "encryption_password_is_required"
@@ -151,7 +158,20 @@ object ErrorCode {
         ApiErrorCode(MAIL_MESSAGE_CANNOT_BE_SNOOZE, R.string.errorMessageCannotBeSnoozed),
 
         //Encryption
-        ApiErrorCode(ENCRYPTION_PASSWORD_IS_REQUIRED, R.string.encryptedStatePanelIncomplete)
+        ApiErrorCode(ENCRYPTION_PASSWORD_IS_REQUIRED, R.string.encryptedStatePanelIncomplete),
+
+        // Emoji reactions
+        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedDraft,
+        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedScheduledDraft,
+        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedSpam,
+        EmojiReactionNotAllowedReason.EmojiReactionFolderNotAllowedTrash,
+        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToNotAllowed,
+        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToNotValid,
+        EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToEncrypted,
+        EmojiReactionNotAllowedReason.EmojiReactionMaxRecipient,
+        EmojiReactionNotAllowedReason.EmojiReactionRecipientNotAllowed,
+        ApiErrorCode(EMOJI_REACTION_MAX_REACTION_REACHED, R.string.errorEmojiReactionMaxReactionReached),
+        ApiErrorCode(EMOJI_REACTION_ALREADY_USED, R.string.errorEmojiReactionAlreadyUsed),
     )
 
     private val ignoredErrorCodesForDrafts = setOf(
