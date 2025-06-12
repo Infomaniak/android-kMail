@@ -148,12 +148,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             isMultiSelectOn = false
         }
 
-        binding.spam.setClosingOnClickListener(shouldCloseMultiSelection = true) {
-            trackMultiSelectActionEvent(ACTION_SPAM_NAME, threadsCount, isFromBottomSheet = true)
-            toggleThreadsSpamStatus(threadsUids)
-            isMultiSelectOn = false
-        }
-
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, threadsCount, isFromBottomSheet = true)
             toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
@@ -176,13 +170,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         // val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
         // TODO: When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
-
-        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-        val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
-        binding.spam.apply {
-            setIconResource(spamIcon)
-            setTitle(spamText)
-        }
 
         val favoriteIcon = if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar
         val favoriteText = if (shouldFavorite) R.string.actionStar else R.string.actionUnstar
