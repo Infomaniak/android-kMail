@@ -31,7 +31,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.SentryDebug
-import com.infomaniak.mail.utils.extensions.replaceContent
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -83,7 +82,7 @@ class ThreadController @Inject constructor(
     suspend fun saveSearchThreads(searchThreads: List<Thread>) {
         mailboxContentRealm().write {
             FolderController.getOrCreateSearchFolder(realm = this).apply {
-                threads.replaceContent(searchThreads)
+                threads.addAll(searchThreads)
             }
         }
     }
