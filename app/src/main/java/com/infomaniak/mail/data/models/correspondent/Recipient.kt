@@ -34,6 +34,15 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
 
+    //region Local data (Transient)
+
+    // ------------- !IMPORTANT! -------------
+    // Every field that is added in this Transient region should be declared in
+    // `initLocalValue()` too to avoid loosing data when updating from the API.
+    @Transient
+    override var canBeEncrypted: Boolean = false
+    //endregion
+
     //region UI data (Transient & Ignore)
     // Only indicates how to display the Recipient chip when composing a new Message.
     // `isExternal()` could return true even if this value is false.
@@ -52,10 +61,11 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
     override var contactedTimes: Int? = null
     override var other: Boolean = false
 
-    fun initLocalValues(email: String? = null, name: String? = null): Recipient {
+    fun initLocalValues(email: String? = null, name: String? = null, canBeEncrypted: Boolean? = null): Recipient {
 
         email?.let { this.email = it }
         name?.let { this.name = it }
+        canBeEncrypted?.let { this.canBeEncrypted = it }
 
         return this
     }
@@ -88,13 +98,15 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
         override fun create(parcel: Parcel): Recipient {
             val email = parcel.readString()!!
             val name = parcel.readString()!!
+            val canBeEncrypted = parcel.readBoolean()
 
-            return Recipient().initLocalValues(email, name)
+            return Recipient().initLocalValues(email, name, canBeEncrypted)
         }
 
         override fun Recipient.write(parcel: Parcel, flags: Int) {
             parcel.writeString(email)
             parcel.writeString(name)
+            parcel.writeBoolean(canBeEncrypted)
         }
     }
 }

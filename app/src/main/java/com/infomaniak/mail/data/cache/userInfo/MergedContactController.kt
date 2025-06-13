@@ -20,8 +20,10 @@ package com.infomaniak.mail.data.cache.userInfo
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.mailbox.MailboxHostingStatus
 import com.infomaniak.mail.di.UserInfoRealm
 import com.infomaniak.mail.utils.extensions.update
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
@@ -39,6 +41,10 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
             .sort(MergedContact::name.name)
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
     }
+
+    private fun getMergedContactsByEmailQuery(email: String, realm: MutableRealm): RealmQuery<MergedContact> {
+        return realm.query<MergedContact>("${MergedContact::email.name} == $0", email)
+    }
     //endregion
 
     //region Get data
@@ -55,6 +61,31 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
     suspend fun update(mergedContacts: List<MergedContact>) {
         SentryLog.d(RealmDatabase.TAG, "MergedContacts: Save new data")
         userInfoRealm.update<MergedContact>(mergedContacts)
+    }
+
+    /**
+     * Update merged contacts' encryption status and return the list of contact that cannot be encrypted
+     *
+     * @param encryptableMailboxesMap key : email of the merged contacts,
+     * value : if the contact with this email can receive encrypted message
+     *
+     * @return A list of the uncryptable emails
+     */
+    suspend fun updateEncryptionStatus(encryptableMailboxesMap: List<MailboxHostingStatus>): List<String> {
+        SentryLog.d(RealmDatabase.TAG, "MergedContacts: Save new data")
+        val uncryptableEmailAddresses: MutableList<String> = mutableListOf()
+
+        userInfoRealm.write {
+            encryptableMailboxesMap.forEach { mailboxStatus ->
+                getMergedContactsByEmailQuery(mailboxStatus.email, realm = this).find().forEach {
+                    it.canBeEncrypted = mailboxStatus.isInfomaniakHosted
+                }
+
+                if (!mailboxStatus.isInfomaniakHosted) uncryptableEmailAddresses.add(mailboxStatus.email)
+            }
+        }
+
+        return uncryptableEmailAddresses
     }
     //endregion
 }

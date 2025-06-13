@@ -38,6 +38,9 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     private var _aiManager: NewMessageAiManager? = null
     private inline val aiManager: NewMessageAiManager get() = _aiManager!!
 
+    private var _encryptionManager: EncryptionMessageManager? = null
+    private inline val encryptionManager: EncryptionMessageManager get() = _encryptionManager!!
+
     private var _openFilePicker: (() -> Unit)? = null
 
     fun initValues(
@@ -45,6 +48,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         binding: FragmentNewMessageBinding,
         fragment: NewMessageFragment,
         aiManager: NewMessageAiManager,
+        encryptionManager: EncryptionMessageManager,
         openFilePicker: () -> Unit,
     ) {
         super.initValues(
@@ -55,6 +59,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         )
 
         _aiManager = aiManager
+        _encryptionManager = encryptionManager
         _openFilePicker = openFilePicker
     }
 
@@ -76,6 +81,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
                 EditorAction.UNDERLINE -> editorWebView.toggleUnderline()
                 EditorAction.STRIKE_THROUGH -> editorWebView.toggleStrikeThrough()
                 EditorAction.UNORDERED_LIST -> editorWebView.toggleUnorderedList()
+                EditorAction.ENCRYPTION -> encryptionManager.toggleEncryption()
             }
         }
     }
@@ -91,6 +97,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
         linkEditor(editorAi, EditorAction.AI)
+        linkEditor(encryptionButton, EditorAction.ENCRYPTION)
 
         linkEditor(buttonBold, EditorAction.BOLD)
         linkEditor(buttonItalic, EditorAction.ITALIC)
@@ -150,5 +157,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         UNDERLINE("underline"),
         STRIKE_THROUGH("strikeThrough"),
         UNORDERED_LIST("unorderedList"),
+        ENCRYPTION("messageEncryption")
     }
 }
