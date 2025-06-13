@@ -35,6 +35,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -80,6 +81,10 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogAr
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
@@ -185,6 +190,7 @@ class ThreadFragment : Fragment() {
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
         observeSnoozeHeaderVisibility()
+        observePickedEmoji()
 
         observeThreadOpening()
         observeAutoAdvance()
@@ -359,6 +365,7 @@ class ThreadFragment : Fragment() {
                 },
                 onRescheduleClicked = ::rescheduleDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
+                onAddReaction = { navigateToEmojiPicker(it.uid) },
             ),
         )
 
@@ -466,7 +473,10 @@ class ThreadFragment : Fragment() {
                 iconTint = ColorStateList.valueOf(color)
             }
 
-            val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == thread.getDisplayedMessages(mainViewModel.featureFlagsLive.value, localSettings).size
+            val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == thread.getDisplayedMessages(
+                mainViewModel.featureFlagsLive.value,
+                localSettings
+            ).size
             quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
 
             thread.snoozeEndDate?.let { snoozeEndDate ->
@@ -586,6 +596,12 @@ class ThreadFragment : Fragment() {
         threadViewModel.isThreadSnoozeHeaderVisible.observe(viewLifecycleOwner) {
             threadAlertsLayout.isGone = it == ThreadHeaderVisibility.NONE
             snoozeAlert.setActionsVisibility(it == ThreadHeaderVisibility.MESSAGE_AND_ACTIONS)
+        }
+    }
+
+    private fun observePickedEmoji() {
+        getBackNavigationResult<PickedEmojiPayload>(EmojiPickerBottomSheetDialog.PICKED_EMOJI) { (emoji, messageUid) ->
+            mainViewModel.sendEmojiReply(emoji, messageUid)
         }
     }
 
@@ -958,4 +974,12 @@ class ThreadFragment : Fragment() {
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"
     }
+}
+
+private fun Fragment.navigateToEmojiPicker(messageUid: String) {
+    safelyNavigate(
+        resId = R.id.emojiPickerBottomSheetDialog,
+        args = EmojiPickerBottomSheetDialogArgs(messageUid).toBundle(),
+        substituteClassName = ThreadListFragment::class.java.name,
+    )
 }
