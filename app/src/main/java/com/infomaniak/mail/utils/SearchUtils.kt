@@ -158,6 +158,8 @@ class SearchUtils @Inject constructor(
             // TODO: Remove this when the API returns the good value for [Message.hasAttachments]
             if (remoteMessage.hasAttachable) hasAttachable = true
         }
+
+        recomputeMessagesWithContent(messages)
     }
 
     companion object {

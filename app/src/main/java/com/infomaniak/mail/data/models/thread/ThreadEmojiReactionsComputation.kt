@@ -22,11 +22,11 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import io.realm.kotlin.types.RealmDictionary
 
-fun Thread.computeReactionsPerMessageId(): ReactionData {
+fun computeReactionsPerMessageId(allMessages: List<Message>): ReactionData {
     val reactionsPerMessageId = mutableMapOf<String, MutableMap<String, EmojiReactionState>>()
     val messageIds = mutableSetOf<String>()
 
-    for (message in messages) {
+    for (message in allMessages) {
         message.messageId?.let { messageIds += it }
         reactionsPerMessageId.addReactionsOf(message)
     }
