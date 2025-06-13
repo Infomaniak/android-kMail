@@ -95,7 +95,7 @@ class ThreadListAdapter @Inject constructor(
     private var swipingIsAuthorized: Boolean = true
     private var isLoadMoreDisplayed = false
 
-    private var folderRole: FolderRole? = null
+    private var currentFolderRole: FolderRole? = null
     private var multiSelection: MultiSelectionListener<Thread>? = null
     private var isFolderNameVisible: Boolean = false
     private var callbacks: ThreadListAdapterCallbacks? = null
@@ -109,7 +109,7 @@ class ThreadListAdapter @Inject constructor(
         private set
     //endregion
 
-    private val isMultiselectDisabledInThisFolder: Boolean get() = folderRole == FolderRole.SCHEDULED_DRAFTS
+    private val isMultiselectDisabledInThisFolder: Boolean get() = currentFolderRole == FolderRole.SCHEDULED_DRAFTS
 
     init {
         setHasStableIds(true)
@@ -121,7 +121,7 @@ class ThreadListAdapter @Inject constructor(
         multiSelection: MultiSelectionListener<Thread>? = null,
         isFolderNameVisible: Boolean = false,
     ) {
-        this.folderRole = folderRole
+        this.currentFolderRole = folderRole
         this.multiSelection = multiSelection
         this.isFolderNameVisible = isFolderNameVisible
         this.callbacks = callbacks
@@ -235,7 +235,7 @@ class ThreadListAdapter @Inject constructor(
             mailSubject.text = context.formatSubject(subject)
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
 
-            val dateDisplay = computeThreadListDateDisplay(folderRole)
+            val dateDisplay = computeThreadListDateDisplay(currentFolderRole)
             mailDate.text = dateDisplay.formatThreadDate(context, this)
             mailDateIcon.apply {
                 isVisible = dateDisplay.iconRes != null
@@ -281,7 +281,7 @@ class ThreadListAdapter @Inject constructor(
     }
 
     private fun CardviewThreadItemBinding.displaySpamSpecificUi(thread: Thread) {
-        val (mailAddressText, isVisible) = if (folderRole == FolderRole.SPAM) {
+        val (mailAddressText, isVisible) = if (currentFolderRole == FolderRole.SPAM) {
             thread.from.first().quotedEmail() to true
         } else {
             "" to false
@@ -556,14 +556,14 @@ class ThreadListAdapter @Inject constructor(
         val featureFlags = callbacks?.getFeatureFlags?.invoke()
 
         (recyclerView as DragDropSwipeRecyclerView).apply {
-            if (localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)) {
+            if (localSettings.swipeLeft.canDisplay(currentFolderRole, featureFlags, localSettings)) {
                 getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
                     behindSwipedItemBackgroundColor = context.getColor(colorRes)
                     behindSwipedItemIconDrawableId = iconRes
                 }
             }
 
-            if (localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)) {
+            if (localSettings.swipeRight.canDisplay(currentFolderRole, featureFlags, localSettings)) {
                 getSwipeActionUiData(localSettings.swipeRight)?.let { (colorRes, iconRes) ->
                     behindSwipedItemBackgroundSecondaryColor = context.getColor(colorRes)
                     behindSwipedItemIconSecondaryDrawableId = iconRes
@@ -661,7 +661,7 @@ class ThreadListAdapter @Inject constructor(
         formatListJob = lifecycleScope.launch {
 
             val formattedList = runCatchingRealm {
-                formatList(itemList, recyclerView.context, folderRole, localSettings.threadDensity, scope = this)
+                formatList(itemList, recyclerView.context, currentFolderRole, localSettings.threadDensity, scope = this)
             }.getOrDefault(emptyList())
 
             Dispatchers.Main {
@@ -731,7 +731,7 @@ class ThreadListAdapter @Inject constructor(
     }
 
     fun updateFolderRole(newRole: FolderRole?) {
-        folderRole = newRole
+        currentFolderRole = newRole
     }
 
     fun updateSelection() {

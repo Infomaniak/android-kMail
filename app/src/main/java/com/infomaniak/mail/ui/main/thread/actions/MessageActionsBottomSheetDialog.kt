@@ -67,7 +67,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
-            folderRole = mainViewModel.getActionFolderRole(message)
+            folderRole = message.folder.role
 
             setMarkAsReadUi(message.isSeen)
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
