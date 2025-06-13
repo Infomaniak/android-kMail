@@ -239,7 +239,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         HttpClientConfig.customInterceptors = listOf(
             UrlTraceInterceptor(),
             AccessTokenUsageInterceptor(
-                tokenInterceptorListener = tokenInterceptorListener,
                 previousApiCall = localSettings.accessTokenApiCallRecord,
                 updateLastApiCall = { localSettings.accessTokenApiCallRecord = it },
             ),
