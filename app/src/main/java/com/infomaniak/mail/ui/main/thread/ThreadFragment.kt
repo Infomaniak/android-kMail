@@ -438,7 +438,7 @@ class ThreadFragment : Fragment() {
                     return@collect
                 }
 
-                initUi(thread.uid, folderRole = mainViewModel.getActionFolderRole(thread))
+                initUi(thread.uid, folderRole = thread.folderRole)
             }
         }
     }

@@ -93,7 +93,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionMove -> {
                     val navController = findNavController()
                     descriptionDialog.moveWithConfirmationPopup(
-                        folderRole = getActionFolderRole(threads.firstOrNull()),
+                        folderRole = threads.firstOrNull()?.folderRole,
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_MOVE_NAME, threadsCount, isFromBottomSheet = true)
@@ -111,7 +111,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
                 R.id.actionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(
-                        folderRole = getActionFolderRole(threads.firstOrNull()),
+                        folderRole = threads.firstOrNull()?.folderRole,
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, threadsCount, isFromBottomSheet = true)
@@ -120,7 +120,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
                 R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = getActionFolderRole(threads.firstOrNull()),
+                        folderRole = threads.firstOrNull()?.folderRole,
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_DELETE_NAME, threadsCount, isFromBottomSheet = true)

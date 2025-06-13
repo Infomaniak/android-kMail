@@ -81,7 +81,7 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionArchive -> {
                     threadListFragment.descriptionDialog.archiveWithConfirmationPopup(
-                        folderRole = getActionFolderRole(thread = selectedThreads.firstOrNull()),
+                        folderRole = selectedThreads.firstOrNull()?.folderRole,
                         count = selectedThreadsCount,
                     ) {
                         threadListFragment.trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount)
@@ -96,7 +96,7 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionDelete -> threadListFragment.apply {
                     threadListFragment.descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
+                        folderRole = selectedThreads.firstOrNull()?.folderRole,
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
@@ -206,7 +206,7 @@ class ThreadListMultiSelection {
             changeIcon(FAVORITE_INDEX, favoriteIcon)
 
             val isSelectionEmpty = selectedThreads.isEmpty()
-            val isFromArchive = mainViewModel.getActionFolderRole(selectedThreads.firstOrNull()) == FolderRole.ARCHIVE
+            val isFromArchive = selectedThreads.firstOrNull()?.folderRole == FolderRole.ARCHIVE
             for (index in 0 until getButtonCount()) {
                 val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
                 if (shouldDisable) disable(index) else enable(index)

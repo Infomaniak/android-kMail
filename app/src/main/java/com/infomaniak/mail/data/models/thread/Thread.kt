@@ -151,6 +151,9 @@ class Thread : RealmObject, Snoozable {
             return@getOrElse _folders.firstOrNull { uid.contains(it.id) } ?: _folders.first()
         }
 
+
+    val folderRole: FolderRole? get() = folder.role
+
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
 
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {

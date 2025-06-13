@@ -1322,14 +1322,6 @@ class MainViewModel @Inject constructor(
         isDownloadingChanges.postValue(false)
     }
 
-    fun getActionFolderRole(thread: Thread?): FolderRole? {
-        return getActionFolderRole(thread?.let(::listOf))
-    }
-
-    fun getActionFolderRole(message: Message): FolderRole? {
-        return getActionFolderRole(message.threads, message)
-    }
-
 // TODO: Handle this correctly if MultiSelect feature is added in the Search.
     /**
      * Get the FolderRole of a Message or a list of Threads.
@@ -1339,15 +1331,8 @@ class MainViewModel @Inject constructor(
      */
     private fun getActionFolderRole(threads: List<Thread>?, message: Message? = null): FolderRole? {
         return when {
-            message != null -> {
-                message.folder.role
-            }
-            threads?.firstOrNull()?.folderId == FolderController.SEARCH_FOLDER_ID -> {
-                folderController.getFolder(threads.first().folderId)?.role
-            }
-            else -> {
-                threads?.firstOrNull()?.folder?.role
-            }
+            message != null -> message.folder.role
+            else -> threads?.firstOrNull()?.folderRole
         }
     }
 
