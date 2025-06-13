@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.toRealmInstant
@@ -104,6 +105,12 @@ class Thread : RealmObject, Snoozable {
     var numberOfScheduledDrafts: Int = 0
     @Transient
     var isLastInboxMessageSnoozed: Boolean = false
+
+    /**
+     * The list messages where messages that are emoji reactions have been filtered out
+     */
+    @Transient
+    var messagesWithContent = realmListOf<Message>()
     //endregion
 
     val isSeen get() = unseenMessagesCount == 0
@@ -208,6 +215,8 @@ class Thread : RealmObject, Snoozable {
 
         updateThread(lastMessage)
 
+        recomputeMessagesWithContent(messages)
+
         // Remove duplicates in Recipients lists
         val unmanagedFrom = if (from.getRealm<Realm>() == null) from else from.copyFromRealm()
         val unmanagedTo = if (to.getRealm<Realm>() == null) to else to.copyFromRealm()
@@ -303,6 +312,21 @@ class Thread : RealmObject, Snoozable {
         super.manuallyUnsnooze()
         messages.forEach(Message::manuallyUnsnooze)
         duplicates.forEach(Message::manuallyUnsnooze)
+    }
+
+    fun recomputeMessagesWithContent(allMessages: List<Message>) {
+        val (reactionsPerMessageId, messageIds) = computeReactionsPerMessageId(allMessages)
+
+        messagesWithContent.clear()
+        allMessages.forEach { message ->
+            reactionsPerMessageId[message.messageId]?.let { reactions ->
+                message.emojiReactions.overrideWith(reactions)
+            }
+
+            val inReplyTo = message.inReplyTo ?: ""
+            val isHiddenEmojiReaction = message.isReaction && inReplyTo.parseMessagesIds().any { messageIds.contains(it) }
+            if (isHiddenEmojiReaction.not()) messagesWithContent += message
+        }
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
