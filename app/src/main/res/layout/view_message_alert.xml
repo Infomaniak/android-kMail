@@ -19,7 +19,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    tools:theme="@style/BasicMessageAlertView">
 
     <ImageView
         android:id="@+id/icon"
@@ -30,12 +31,10 @@
         app:layout_constraintBottom_toBottomOf="@id/description"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/description"
-        app:tint="@color/iconColor"
         tools:src="@drawable/ic_message_alert_distant_images" />
 
     <TextView
         android:id="@+id/description"
-        style="@style/Label.Secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/alternativeMargin"
@@ -67,7 +66,6 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/action1"
-            style="@style/TextButtonAlerts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="@string/alertBlockedImagesDisplayContent" />
@@ -83,7 +81,6 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/action2"
-            style="@style/TextButtonAlerts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
