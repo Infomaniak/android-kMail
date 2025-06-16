@@ -1,0 +1,3 @@
+- Fix issue when logging in for the 1st time
+- Fix issue when fetching multiple page in the Search
+- Fix a crash when switching between users
