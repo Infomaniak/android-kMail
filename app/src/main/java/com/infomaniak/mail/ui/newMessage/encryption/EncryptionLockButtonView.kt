@@ -119,8 +119,8 @@ class EncryptionLockButtonView @JvmOverloads constructor(
             val count = when (val count = unencryptableRecipientsCount) {
                 null -> null
                 in 1..9 -> count.toString()
-                else -> "$count+"
-            }
+                else -> "9+"
+    }
 
             unencryptedRecipientText.apply {
                 isVisible = count != null
