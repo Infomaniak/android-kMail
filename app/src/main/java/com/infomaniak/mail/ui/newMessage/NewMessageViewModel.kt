@@ -873,7 +873,7 @@ class NewMessageViewModel @Inject constructor(
 
     fun toggleIsEncryptionActivated() {
         val newValue = (isEncryptionActivated.value ?: false).not()
-        isEncryptionActivated.postValue(newValue)
+        isEncryptionActivated.value = newValue
     }
 
     fun updateOtherRecipientsFieldsAreEmpty(cc: List<Recipient>, bcc: List<Recipient>) {

@@ -27,6 +27,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageManager
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
@@ -38,6 +39,8 @@ class EncryptionMessageManager @Inject constructor(
 
     private var _encryptionViewModel: EncryptionViewModel? = null
     private val encryptionViewModel: EncryptionViewModel get() = _encryptionViewModel!!
+
+    private var hasAlreadyAddedUnencryptableRecipients = false
 
     fun init(
         newMessageViewModel: NewMessageViewModel,
@@ -58,15 +61,17 @@ class EncryptionMessageManager @Inject constructor(
     fun observeEncryptionFeatureFlagUpdates() {
         newMessageViewModel.featureFlagsLive.observe(viewLifecycleOwner) { featureFlags ->
             val isEncryptionPossible = featureFlags.contains(FeatureFlag.ENCRYPTION)
-            binding.encryptionButton.isVisible = isEncryptionPossible
+            binding.encryptionLockButtonView.isVisible = isEncryptionPossible
         }
     }
 
     fun observeUnencryptableRecipients() {
         encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipients ->
-            // TODO Replace this by the lock button with the number of unencryptable recipients
-            if (recipients.isNotEmpty()) {
-                val recipientsCount = recipients.count()
+            val recipientsCount = recipients.count()
+            binding.encryptionLockButtonView.unencryptableRecipientsCount = recipientsCount
+
+            if (recipients.isNotEmpty() && !hasAlreadyAddedUnencryptableRecipients) {
+                hasAlreadyAddedUnencryptableRecipients = true
                 snackbarManager.postValue(
                     fragment.resources.getQuantityString(
                         R.plurals.encryptedMessageIncompleteUser,
@@ -79,25 +84,25 @@ class EncryptionMessageManager @Inject constructor(
     }
 
     fun toggleEncryption() {
-        val recipients = newMessageViewModel.allRecipients
-        if (recipients.isNotEmpty()) encryptionViewModel.checkIfEmailsCanBeEncrypted(recipients.map(Recipient::email))
         newMessageViewModel.toggleIsEncryptionActivated()
     }
 
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
-            val (iconRes, tintRes) = if (isEncrypted) {
-                navigateToDiscoveryBottomSheetIfFirstTime()
-                snackbarManager.postValue(fragment.getString(R.string.encryptedMessageSnackbarEncryptionActivated))
-                R.drawable.ic_lock_filled to R.color.encryptionIconColor
-            } else {
-                R.drawable.ic_lock_open_filled to R.color.iconColor
+            val recipients = newMessageViewModel.allRecipients
+            if (isEncrypted && recipients.isNotEmpty()) {
+                encryptionViewModel.checkIfEmailsCanBeEncrypted(recipients.map(Recipient::email))
             }
 
-            binding.encryptionButton.apply {
-                // setIconResource(iconRes)
-                // setIconTintResource(tintRes)
+            val encryptionStatus = if (isEncrypted) {
+                navigateToDiscoveryBottomSheetIfFirstTime()
+                snackbarManager.postValue(fragment.getString(R.string.encryptedMessageSnackbarEncryptionActivated))
+                EncryptionStatus.Encrypted
+            } else {
+                EncryptionStatus.Unencrypted
             }
+
+            binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
         }
     }
 

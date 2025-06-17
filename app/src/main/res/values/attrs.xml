@@ -195,7 +195,7 @@
     </declare-styleable>
 
     <declare-styleable name="EncryptionLockButtonView">
-        <attr name="displayStyle" format="enum">
+        <attr name="encryptionDisplayStyle" format="enum">
             <enum name="chipIcon" value="0" />
             <enum name="toolbarButton" value="1" />
         </attr>
