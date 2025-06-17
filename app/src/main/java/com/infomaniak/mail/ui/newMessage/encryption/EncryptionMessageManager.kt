@@ -95,8 +95,8 @@ class EncryptionMessageManager @Inject constructor(
             }
 
             binding.encryptionButton.apply {
-                setIconResource(iconRes)
-                setIconTintResource(tintRes)
+                // setIconResource(iconRes)
+                // setIconTintResource(tintRes)
             }
         }
     }
