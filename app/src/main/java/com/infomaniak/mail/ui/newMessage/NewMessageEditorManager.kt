@@ -18,10 +18,10 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.content.res.ColorStateList
-import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -90,7 +90,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     }
 
     fun setupEditorFormatActions() = with(binding) {
-        fun linkEditor(view: View, action: EditorAction) {
+        fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
                 trackEvent(MatomoCategory.EditorActions, action.matomoName)
                 newMessageViewModel.editorAction.value = action to null
@@ -100,7 +100,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
         linkEditor(editorAi, EditorAction.AI)
-        linkEditor(encryptionButton, EditorAction.ENCRYPTION)
+        linkEditor(encryptionLockButtonView.encryptionButton, EditorAction.ENCRYPTION)
 
         linkEditor(buttonBold, EditorAction.BOLD)
         linkEditor(buttonItalic, EditorAction.ITALIC)
