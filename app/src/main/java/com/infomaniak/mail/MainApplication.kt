@@ -288,7 +288,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         @OptIn(ExperimentalCoroutinesApi::class)
         val userTokenFlow = AppSettingsController.getCurrentUserIdFlow()
             .mapLatest { id -> id?.let { AccountUtils.getUserById(it)?.apiToken } }
-            .filterNotNull()
             .shareIn(globalCoroutineScope, SharingStarted.Lazily, replay = 1)
 
         override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
