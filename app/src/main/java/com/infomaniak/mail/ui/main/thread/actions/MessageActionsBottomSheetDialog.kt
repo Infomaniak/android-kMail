@@ -44,6 +44,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
+import com.infomaniak.mail.utils.FolderRoleUtils.getActionFolderRole
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -67,7 +68,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
-            folderRole = mainViewModel.getActionFolderRole(message)
+            folderRole = getActionFolderRole(message, mainViewModel.folderController)
 
             setMarkAsReadUi(message.isSeen)
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)

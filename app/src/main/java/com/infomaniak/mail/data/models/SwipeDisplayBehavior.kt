@@ -18,8 +18,9 @@
 package com.infomaniak.mail.data.models
 
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 
 fun interface SwipeDisplayBehavior {
-    fun canDisplay(folderRole: Folder.FolderRole?, featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Boolean
+    fun canDisplay(folderRole: FolderRole?, featureFlags: FeatureFlagSet?, localSettings: LocalSettings): Boolean
 }

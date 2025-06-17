@@ -90,6 +90,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
+import com.infomaniak.mail.utils.FolderRoleUtils.getActionFolderRole
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
@@ -438,7 +439,7 @@ class ThreadFragment : Fragment() {
                     return@collect
                 }
 
-                initUi(thread.uid, folderRole = mainViewModel.getActionFolderRole(thread))
+                initUi(thread.uid, folderRole = getActionFolderRole(thread, mainViewModel.folderController))
             }
         }
     }

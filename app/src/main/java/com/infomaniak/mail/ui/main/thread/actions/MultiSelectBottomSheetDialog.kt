@@ -53,6 +53,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection
 import com.infomaniak.mail.ui.main.folder.ThreadListMultiSelection.Companion.getReadIconAndShortText
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
+import com.infomaniak.mail.utils.FolderRoleUtils.getActionFolderRole
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,7 +94,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionMove -> {
                     val navController = findNavController()
                     descriptionDialog.moveWithConfirmationPopup(
-                        folderRole = getActionFolderRole(threads.firstOrNull()),
+                        folderRole = getActionFolderRole(threads, folderController),
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_MOVE_NAME, threadsCount, isFromBottomSheet = true)
@@ -111,7 +112,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
                 R.id.actionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(
-                        folderRole = getActionFolderRole(threads.firstOrNull()),
+                        folderRole = getActionFolderRole(threads, folderController),
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, threadsCount, isFromBottomSheet = true)
@@ -120,7 +121,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
                 R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = getActionFolderRole(threads.firstOrNull()),
+                        folderRole = getActionFolderRole(threads, folderController),
                         count = threadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_DELETE_NAME, threadsCount, isFromBottomSheet = true)
