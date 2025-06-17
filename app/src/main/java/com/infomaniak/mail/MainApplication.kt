@@ -65,7 +65,10 @@ import io.sentry.android.core.SentryAndroidOptions
 import io.sentry.android.fragment.FragmentLifecycleIntegration
 import io.sentry.android.fragment.FragmentLifecycleState
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.shareIn
 import org.matomo.sdk.Tracker
 import java.util.UUID
 import javax.inject.Inject
@@ -269,7 +272,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         @OptIn(ExperimentalCoroutinesApi::class)
         val userTokenFlow = AppSettingsController.getCurrentUserIdFlow()
             .mapLatest { id -> id?.let { AccountUtils.getUserById(it)?.apiToken } }
-            .filterNotNull()
             .shareIn(globalCoroutineScope, SharingStarted.Lazily, replay = 1)
 
         override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
