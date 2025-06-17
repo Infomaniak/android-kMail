@@ -48,7 +48,9 @@ class EncryptionViewModel @Inject constructor(
             if (apiResponse.isSuccess()) {
                 apiResponse.data?.let { mailboxHostingStatuses ->
                     val unencryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
-                    unencryptableRecipients.postValue(unencryptableEmailAddresses)
+                    val newRecipients = (unencryptableRecipients.value ?: emptyList()) + unencryptableEmailAddresses
+
+                    unencryptableRecipients.postValue(newRecipients)
                 }
             } else {
                 snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
