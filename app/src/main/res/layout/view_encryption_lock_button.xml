@@ -47,7 +47,7 @@
 
 
         <TextView
-            android:id="@+id/uncryptedRecipientText"
+            android:id="@+id/unencryptedRecipientText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|center"
