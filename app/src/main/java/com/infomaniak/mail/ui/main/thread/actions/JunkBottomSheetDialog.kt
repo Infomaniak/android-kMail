@@ -48,8 +48,9 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override val mainViewModel: MainViewModel by activityViewModels()
 
-    private val messageUids: List<String> = navigationArgs.arrayOfThreadAndMessageUids.map { it.messageUid }
-    private val threadUids: List<String> = navigationArgs.arrayOfThreadAndMessageUids.map { it.threadUid }
+    private var messageUids = emptyList<String>()
+    private var threadUids = emptyList<String>()
+
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -60,6 +61,9 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
+
+        threadUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
+        messageUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.messageUid }
 
         mainViewModel.getMessages(messageUids).observe(viewLifecycleOwner) { messages ->
             this@JunkBottomSheetDialog.messagesOfUserToBlock = messages
@@ -88,7 +92,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
                         currentClassName = JunkBottomSheetDialog::class.java.name,
                     )
                 } else {
-                    if(messagesOfUserToBlock.isNotEmpty()){
+                    if (messagesOfUserToBlock.isNotEmpty()) {
                         mainViewModel.messageOfUserToBlock.value = messagesOfUserToBlock
                     }
                 }
