@@ -1382,6 +1382,7 @@ class MainViewModel @Inject constructor(
 
     fun getMessages(messagesUids: List<String>): LiveData<List<Message>> = liveData(ioCoroutineContext) {
         messageController.getMessages(messagesUids)
+        emit(messageController.getMessages(messagesUids))
     }
 
 
