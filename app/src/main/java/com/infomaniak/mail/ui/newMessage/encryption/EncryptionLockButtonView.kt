@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage.encryption
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -34,25 +35,39 @@ class EncryptionLockButtonView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding by lazy { ViewEncryptionLockButtonBinding.inflate(LayoutInflater.from(context), this, true) }
+    private val bindingToolbarButton by lazy { ViewEncryptionLockButtonBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private var displayStyle: DisplayStyle = DisplayStyle.ToolbarButton
+    val encryptionButton = bindingToolbarButton.encryptionButton
+    var unencryptableRecipientsCount: Int? = null
+        set(value) {
+            field = value
+            encryptionStatus = when (value) {
+                null -> EncryptionStatus.Unencrypted
+                0 -> EncryptionStatus.Encrypted
+                else -> EncryptionStatus.PartiallyEncrypted
+            }
+        }
+
     var encryptionStatus: EncryptionStatus = EncryptionStatus.Unencrypted
         set(value) {
             field = value
             setDisplayStyleUi()
         }
 
+    private var displayStyle: EncryptionDisplayStyle = EncryptionDisplayStyle.ToolbarButton
+
     init {
         attrs?.getAttributes(context, R.styleable.EncryptionLockButtonView) {
-            displayStyle = DisplayStyle.entries[getInteger(R.styleable.EncryptionLockButtonView_displayStyle, 0)]
+            displayStyle = EncryptionDisplayStyle.entries[
+                getInteger(R.styleable.EncryptionLockButtonView_encryptionDisplayStyle, 0)
+            ]
             setDisplayStyleUi()
         }
     }
 
     private fun setDisplayStyleUi() = when (displayStyle) {
-        DisplayStyle.ChipIcon -> setChipIconUi()
-        DisplayStyle.ToolbarButton -> setToolbarButtonUi()
+        EncryptionDisplayStyle.ChipIcon -> setChipIconUi()
+        EncryptionDisplayStyle.ToolbarButton -> setToolbarButtonUi()
     }
 
     private fun setChipIconUi() {
@@ -91,19 +106,34 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         }
     }
 
-    private fun setIconUi(@DrawableRes iconRes: Int, @ColorRes iconTintRes: Int, shouldDisplayPastille: Boolean) = with(binding) {
-        encryptionButton.apply {
-            setIconResource(iconRes)
-            setIconTintResource(iconTintRes)
-        }
-        pastille.isVisible = shouldDisplayPastille
-    }
+    @SuppressLint("SetTextI18n")
+    private fun setIconUi(@DrawableRes iconRes: Int, @ColorRes iconTintRes: Int, shouldDisplayPastille: Boolean) {
+        with(bindingToolbarButton) {
+            encryptionButton.apply {
+                setIconResource(iconRes)
+                setIconTintResource(iconTintRes)
+            }
+            pastille.isVisible = shouldDisplayPastille
 
-    private enum class DisplayStyle {
-        ChipIcon, ToolbarButton
+
+            val count = when (val count = unencryptableRecipientsCount) {
+                null -> null
+                in 1..9 -> count.toString()
+                else -> "$count+"
+            }
+
+            unencryptedRecipientText.apply {
+                isVisible = count != null
+                text = count
+            }
+        }
     }
 
     enum class EncryptionStatus {
         Unencrypted, PartiallyEncrypted, Encrypted
+    }
+
+    private enum class EncryptionDisplayStyle {
+        ChipIcon, ToolbarButton
     }
 }

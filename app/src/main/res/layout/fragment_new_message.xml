@@ -688,11 +688,12 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView
-                            android:id="@+id/encryptionButton"
+                            android:id="@+id/encryptionLockButtonView"
                             android:layout_width="@dimen/newMessageToolbarItemWidth"
                             android:layout_height="match_parent"
                             android:contentDescription="@string/encryptedProtectionAdDescription1"
                             android:visibility="gone"
+                            app:encryptionDisplayStyle="toolbarButton"
                             tools:visibility="visible" />
 
                         <com.google.android.material.button.MaterialButton
