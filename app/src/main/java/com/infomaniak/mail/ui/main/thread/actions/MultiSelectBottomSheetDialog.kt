@@ -152,7 +152,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             isMultiSelectOn = false
         }
         
-        binding.reportJunk.setClosingOnClickListener(shouldCloseMultiSelection = true) {
+        binding.reportJunk.setOnClickListener {
             setBackNavigationResult(DIALOG_SHEET_MULTI_JUNK, JunkThreads(threadsUids))
         }
 

@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,10 +36,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
@@ -81,6 +82,7 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogAr
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
@@ -92,7 +94,7 @@ import com.infomaniak.mail.ui.main.thread.actions.*
 import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.Companion.DIALOG_SHEET_MULTI_JUNK
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
-import com.infomaniak.mail.utils.MessageUtils
+import com.infomaniak.mail.utils.JunkMessageThreadData
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
@@ -160,7 +162,7 @@ class ThreadFragment : Fragment() {
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
-    private val currentClassName: String by lazy { ThreadFragment::class.java.name }
+    private val substituteClassName: String by lazy { ThreadListFragment::class.java.name }
 
     private val twoPaneFragment inline get() = parentFragment as TwoPaneFragment
     private val threadAdapter inline get() = binding.messagesList.adapter as ThreadAdapter
@@ -636,11 +638,11 @@ class ThreadFragment : Fragment() {
         }
 
         getBackNavigationResult(DIALOG_SHEET_MULTI_JUNK) { junkThreads: MultiSelectBottomSheetDialog.JunkThreads ->
-            val arrayOfThreadAndMessageUids= threadViewModel.getMessageReplyTo(junkThreads.threadUids).toTypedArray()
-            safeNavigate(
+            val arrayOfThreadAndMessageUids: Array<JunkMessageThreadData> = threadViewModel.getMessageReplyTo(junkThreads.threadUids).toTypedArray()
+            safelyNavigate(
                 resId = R.id.junkBottomSheetDialog,
                 args = JunkBottomSheetDialogArgs(arrayOfThreadAndMessageUids).toBundle(),
-                currentClassName = currentClassName,
+                substituteClassName = substituteClassName,
             )
         }
     }
