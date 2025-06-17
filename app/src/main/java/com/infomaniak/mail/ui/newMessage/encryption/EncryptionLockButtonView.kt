@@ -21,6 +21,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEncryptionLockButtonBinding
 
 class EncryptionLockButtonView @JvmOverloads constructor(
@@ -31,4 +36,74 @@ class EncryptionLockButtonView @JvmOverloads constructor(
 
     private val binding by lazy { ViewEncryptionLockButtonBinding.inflate(LayoutInflater.from(context), this, true) }
 
+    private var displayStyle: DisplayStyle = DisplayStyle.ToolbarButton
+    var encryptionStatus: EncryptionStatus = EncryptionStatus.Unencrypted
+        set(value) {
+            field = value
+            setDisplayStyleUi()
+        }
+
+    init {
+        attrs?.getAttributes(context, R.styleable.EncryptionLockButtonView) {
+            displayStyle = DisplayStyle.entries[getInteger(R.styleable.EncryptionLockButtonView_displayStyle, 0)]
+            setDisplayStyleUi()
+        }
+    }
+
+    private fun setDisplayStyleUi() = when (displayStyle) {
+        DisplayStyle.ChipIcon -> setChipIconUi()
+        DisplayStyle.ToolbarButton -> setToolbarButtonUi()
+    }
+
+    private fun setChipIconUi() {
+        when (encryptionStatus) {
+            EncryptionStatus.Unencrypted -> Unit // This case cannot happen
+            EncryptionStatus.PartiallyEncrypted -> setIconUi(
+                iconRes = R.drawable.ic_lock_open_filled,
+                iconTintRes = R.color.iconColor,
+                shouldDisplayPastille = true,
+            )
+            EncryptionStatus.Encrypted -> setIconUi(
+                iconRes = R.drawable.ic_lock_filled,
+                iconTintRes = R.color.encryptionIconColor,
+                shouldDisplayPastille = false,
+            )
+        }
+    }
+
+    private fun setToolbarButtonUi() {
+        when (encryptionStatus) {
+            EncryptionStatus.Unencrypted -> setIconUi(
+                iconRes = R.drawable.ic_lock_open_filled,
+                iconTintRes = R.color.iconColor,
+                shouldDisplayPastille = false,
+            )
+            EncryptionStatus.PartiallyEncrypted -> setIconUi(
+                iconRes = R.drawable.ic_lock_filled,
+                iconTintRes = R.color.encryptionIconColor,
+                shouldDisplayPastille = true,
+            )
+            EncryptionStatus.Encrypted -> setIconUi(
+                iconRes = R.drawable.ic_lock_filled,
+                iconTintRes = R.color.encryptionIconColor,
+                shouldDisplayPastille = false,
+            )
+        }
+    }
+
+    private fun setIconUi(@DrawableRes iconRes: Int, @ColorRes iconTintRes: Int, shouldDisplayPastille: Boolean) = with(binding) {
+        encryptionButton.apply {
+            setIconResource(iconRes)
+            setIconTintResource(iconTintRes)
+        }
+        pastille.isVisible = shouldDisplayPastille
+    }
+
+    private enum class DisplayStyle {
+        ChipIcon, ToolbarButton
+    }
+
+    enum class EncryptionStatus {
+        Unencrypted, PartiallyEncrypted, Encrypted
+    }
 }
