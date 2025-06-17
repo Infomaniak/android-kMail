@@ -18,6 +18,8 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
+import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +30,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
@@ -57,6 +60,7 @@ import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -147,6 +151,10 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             lifecycleScope.launch { mainViewModel.unsnoozeThreads(threads) }
             isMultiSelectOn = false
         }
+        
+        binding.reportJunk.setClosingOnClickListener(shouldCloseMultiSelection = true) {
+            setBackNavigationResult(DIALOG_SHEET_MULTI_JUNK, JunkThreads(threadsUids))
+        }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
             trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, threadsCount, isFromBottomSheet = true)
@@ -169,7 +177,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
 
         // val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
-        // TODO: When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
+        //  TODO: When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
 
         val favoriteIcon = if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar
         val favoriteText = if (shouldFavorite) R.string.actionStar else R.string.actionUnstar
@@ -215,4 +223,13 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun getFirstVisibleActionItemView(): ActionItemView? {
         return (binding.actionsLayout.children.firstOrNull { it is ActionItemView && it.isVisible } as ActionItemView?)
     }
+
+    @Parcelize
+    data class JunkThreads (val threadUids: List<String>) : Parcelable
+
+    companion object{
+        const val DIALOG_SHEET_MULTI_JUNK = "dialog_sheet_multi_junk"
+    }
+
+
 }

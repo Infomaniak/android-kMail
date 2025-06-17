@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.MessageUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -39,21 +40,12 @@ class ThreadActionsViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
-    private val messageUidToReplyTo
-        inline get() = savedStateHandle.get<String?>(ThreadActionsBottomSheetDialogArgs::messageUidToReplyTo.name)
 
     val threadLive: LiveData<Thread> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj }
         .asLiveData(ioCoroutineContext)
 
     fun getThreadAndMessageUidToReplyTo() = liveData(ioCoroutineContext) {
-        val thread = threadController.getThread(threadUid) ?: run {
-            emit(null)
-            return@liveData
-        }
-
-        val uidToReplyTo = messageUidToReplyTo ?: messageController.getLastMessageToExecuteAction(thread).uid
-
-        emit(thread to uidToReplyTo)
+        emit(MessageUtils.getMessageUidToReply(threadController, messageController, listOf(threadUid)))
     }
 }

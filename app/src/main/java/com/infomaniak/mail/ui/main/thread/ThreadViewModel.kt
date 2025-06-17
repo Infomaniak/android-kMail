@@ -134,6 +134,10 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun getMessageReplyTo(threadUids: List<String>): List<JunkMessageThreadData>{
+        return MessageUtils.getMessageUidToReply(threadController, messageController, threadUids)
+    }
+
     init {
         viewModelScope.launch {
             threadFlow.filterNotNull().collect { thread ->

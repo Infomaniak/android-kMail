@@ -44,6 +44,7 @@ import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.isSnoozed
@@ -51,6 +52,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
+import com.infomaniak.mail.utils.JunkMessageThreadData
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,6 +78,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     @Inject
     lateinit var localSettings: LocalSettings
 
+    @Inject
+    lateinit var threadController: ThreadController
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -93,8 +98,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { result ->
-            result?.let { (thread, messageUidToReply) ->
-                setupListeners(thread, messageUidToReply)
+            result[0]?.let { it ->
+                val thread: Thread? = threadController.getThread(uid = it.threadUid)
+                if (thread != null) {
+                    setupListeners(thread, it, it.messageUid)
+                }
             } ?: findNavController().popBackStack()
         }
     }
@@ -120,7 +128,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         isVisible = true
     }
 
-    private fun setupListeners(thread: Thread, messageUidToReply: String) = with(navigationArgs) {
+    private fun setupListeners(thread: Thread, threadAndMessageUids: JunkMessageThreadData, messageUidToReply: String) = with(navigationArgs) {
         initOnClickListener(
             listener = object : OnActionClick {
                 //region Main actions
@@ -212,11 +220,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 override fun onReportJunk() {
                     if (isFromSpam) {
                         trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = true)
-                        mainViewModel.toggleThreadSpamStatus(threadUid)
+                        mainViewModel.toggleThreadSpamStatus(listOf(threadUid))
                     } else {
                         safeNavigate(
                             resId = R.id.junkBottomSheetDialog,
-                            args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
+                            args = JunkBottomSheetDialogArgs(arrayOf(threadAndMessageUids)).toBundle(),
                             currentClassName = currentClassName,
                         )
                     }

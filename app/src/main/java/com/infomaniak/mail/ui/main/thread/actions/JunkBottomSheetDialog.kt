@@ -44,9 +44,12 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private var binding: BottomSheetJunkBinding by safeBinding()
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
 
-    private var messageOfUserToBlock: Message? = null
+    private var messagesOfUserToBlock: List<Message?> = emptyList()
 
     override val mainViewModel: MainViewModel by activityViewModels()
+
+    private val messageUids: List<String> = navigationArgs.arrayOfThreadAndMessageUids.map { it.messageUid }
+    private val threadUids: List<String> = navigationArgs.arrayOfThreadAndMessageUids.map { it.threadUid }
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -58,13 +61,13 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
-            this@JunkBottomSheetDialog.messageOfUserToBlock = message
-            handleButtons(threadUid, message)
+        mainViewModel.getMessages(messageUids).observe(viewLifecycleOwner) { messages ->
+            this@JunkBottomSheetDialog.messagesOfUserToBlock = messages
+            handleButtons(threadUids, messages)
         }
 
         observeReportPhishingResult()
-        observeExpeditorsResult(threadUid)
+        observeExpeditorsResult(threadUids)
     }
 
     private fun observeReportPhishingResult() {
@@ -74,39 +77,39 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun observeHasMoreThanOneExpeditor(threadUid: String) {
-        mainViewModel.hasMoreThanOneExpeditor(threadUid).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
+    private fun observeHasMoreThanOneExpeditor(threadUids: List<String>) {
+        mainViewModel.hasMoreThanOneExpeditor(threadUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
             binding.blockSender.setClosingOnClickListener {
                 trackBottomSheetThreadActionsEvent("blockUser")
                 if (hasMoreThanOneExpeditor) {
                     safeNavigate(
                         resId = R.id.userToBlockBottomSheetDialog,
-                        args = UserToBlockBottomSheetDialogArgs(threadUid).toBundle(),
+                        args = UserToBlockBottomSheetDialogArgs(threadUids.toTypedArray()).toBundle(),
                         currentClassName = JunkBottomSheetDialog::class.java.name,
                     )
                 } else {
-                    messageOfUserToBlock?.let {
-                        mainViewModel.messageOfUserToBlock.value = messageOfUserToBlock
+                    if(messagesOfUserToBlock.isNotEmpty()){
+                        mainViewModel.messageOfUserToBlock.value = messagesOfUserToBlock
                     }
                 }
             }
         }
     }
 
-    private fun observeExpeditorsResult(threadUid: String) {
-        mainViewModel.hasOtherExpeditors(threadUid).observe(viewLifecycleOwner) { hasOtherExpeditors ->
+    private fun observeExpeditorsResult(threadUids: List<String>) {
+        mainViewModel.hasOtherExpeditors(threadUids).observe(viewLifecycleOwner) { hasOtherExpeditors ->
             if (hasOtherExpeditors) {
-                observeHasMoreThanOneExpeditor(threadUid)
+                observeHasMoreThanOneExpeditor(threadUids)
             } else {
                 binding.blockSender.isGone = true
             }
         }
     }
 
-    private fun handleButtons(threadUid: String, message: Message) = with(binding) {
+    private fun handleButtons(threadUids: List<String>, messages: List<Message>) = with(binding) {
         spam.setClosingOnClickListener {
-            trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = message.folder.role == FolderRole.SPAM)
-            mainViewModel.toggleThreadSpamStatus(threadUid)
+            trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = messages[0].folder.role == FolderRole.SPAM)
+            mainViewModel.toggleThreadSpamStatus(threadUids)
         }
 
         phishing.setOnClickListener {
@@ -114,7 +117,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
-                onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUid, message) },
+                onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUids, messages) },
             )
         }
     }
