@@ -87,6 +87,17 @@ class EncryptionMessageManager @Inject constructor(
         newMessageViewModel.toggleIsEncryptionActivated()
     }
 
+    fun addUnencryptableRecipient(recipient: Recipient) {
+        encryptionViewModel.checkIfEmailsCanBeEncrypted(listOf(recipient.email))
+    }
+
+    fun removeUnencryptableRecipient(recipient: Recipient) {
+        val unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toMutableList()
+        if (unencryptableRecipients?.contains(recipient.email) == true) {
+            encryptionViewModel.unencryptableRecipients.value = unencryptableRecipients.apply { remove(recipient.email) }
+        }
+    }
+
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
             val recipients = newMessageViewModel.allRecipients
