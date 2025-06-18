@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +36,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import androidx.work.Data
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
@@ -105,12 +107,13 @@ import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiv
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.EMOJI_SENT_STATUS
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import java.util.Date
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -619,27 +622,18 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeDraftWorkerResults() {
-        TODO
         WorkerUtils.flushWorkersBefore(context = requireContext(), lifecycleOwner = viewLifecycleOwner) {
 
-            val treatedWorkInfoUuids = mutableSetOf<UUID>()
-            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
+            val runningWorkInfoLiveData = draftsActionsWorkerScheduler.getRunningWorkInfoLiveData()
+            runningWorkInfoLiveData.observe(viewLifecycleOwner) {
                 it.forEach { workInfo ->
-                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
-
-                    with(workInfo.outputData) {
-
-                    }
-                }
-            }
-
-            val treatedFailedWorkInfoUuids = mutableSetOf<UUID>()
-            draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(viewLifecycleOwner) {
-                it.forEach { workInfo ->
-                    if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach
-
-                    with(workInfo.outputData) {
-
+                    workInfo.progress.let {
+                        val emojiSendResult = it.getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
+                        if (emojiSendResult.isSuccess.not()) {
+                            // TODO: Remove the local status of this emoji
+                            threadViewModel
+                        }
+                        Log.e("gibran", "observeDraftWorkerResults - emojiSendResult: ${emojiSendResult}")
                     }
                 }
             }
@@ -1024,3 +1018,5 @@ private fun Fragment.navigateToEmojiPicker(messageUid: String) {
         substituteClassName = ThreadListFragment::class.java.name,
     )
 }
+
+private inline fun <reified T> Data.getSerializable(key: String): T? = getString(key)?.let { Json.decodeFromString(it) }

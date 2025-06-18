@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
@@ -49,6 +50,7 @@ import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmDictionary
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
@@ -106,6 +108,8 @@ class ThreadViewModel @Inject constructor(
         .map { it.obj }
         .asLiveData(ioCoroutineContext)
 
+    private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
         /**
@@ -117,7 +121,14 @@ class ThreadViewModel @Inject constructor(
          */
         combine(threadOpeningModeFlow, threadState.hasSuperCollapsedBlockBeenClicked, featureFlagsFlow) { mode, _, featureFlags ->
             mode to featureFlags
-        }.flatMapLatest { (mode, featureFlags) -> mode.getMessages(featureFlags) }.asLiveData(ioCoroutineContext)
+        }
+            .flatMapLatest { (mode, featureFlags) ->
+                mode.getMessages(featureFlags)
+            }
+            .map { (items, messagesToFetch) ->
+                items.fakeEmojiReactions(fakeReactions.value) to messagesToFetch
+            }
+            .asLiveData(ioCoroutineContext)
 
     val batchedMessages = SingleLiveEvent<List<Any>>()
 
@@ -553,5 +564,30 @@ class ThreadViewModel @Inject constructor(
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
         private const val DELAY_BETWEEN_EACH_BATCHED_MESSAGES = 50L
+    }
+}
+
+private fun ThreadAdapterItems.fakeEmojiReactions(fakeReactions: Map<String, Set<String>>): List<Any> = map { message ->
+    if (message !is Message) return@map message
+
+    val messageId = message.messageId ?: return@map message
+    val localReactions = fakeReactions[messageId] ?: return@map message
+
+    message.emojiReactions.toFakedReactions(localReactions)
+}
+
+private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions: Set<String>) {
+    for (entry in entries) {
+        val (emoji, state) = entry
+        if (state == null) continue
+
+        val shouldFake = emoji in localReactions && !state.hasReacted
+
+        val fakedReaction = EmojiReactionState(
+            count = state.count + if (shouldFake) 1 else 0,
+            hasReacted = state.hasReacted || shouldFake,
+        )
+
+        set(emoji, fakedReaction)
     }
 }

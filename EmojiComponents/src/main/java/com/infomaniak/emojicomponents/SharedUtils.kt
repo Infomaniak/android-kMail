@@ -19,13 +19,3 @@ package com.infomaniak.emojicomponents
 
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.infomaniak.emojicomponents.data.ReactionState
-
-internal fun SnapshotStateMap<String, ReactionState>.updateWithEmoji(emoji: String) {
-    if (this[emoji]?.hasReacted == true) return
-
-    val oldCount = this[emoji]?.count ?: 0
-    this[emoji] = object : ReactionState {
-        override val count: Int = oldCount + 1
-        override val hasReacted: Boolean = true
-    }
-}

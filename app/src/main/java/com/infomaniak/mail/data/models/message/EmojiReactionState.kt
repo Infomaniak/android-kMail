@@ -20,9 +20,14 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.emojicomponents.data.ReactionState
 import io.realm.kotlin.types.EmbeddedRealmObject
 
-class EmojiReactionState : ReactionState, EmbeddedRealmObject {
+class EmojiReactionState() : ReactionState, EmbeddedRealmObject {
     override var count: Int = 0
     override var hasReacted: Boolean = false
+
+    constructor(count: Int, hasReacted: Boolean) : this() {
+        this.count = count
+        this.hasReacted = hasReacted
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
