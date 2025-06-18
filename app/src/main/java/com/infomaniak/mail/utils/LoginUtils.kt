@@ -81,6 +81,22 @@ class LoginUtils @Inject constructor(
         resetLoginButtons()
     }
 
+    suspend fun Fragment.authenticateUser(token: ApiToken, infomaniakLogin: InfomaniakLogin) {
+        val context = requireContext()
+        runCatching {
+            when (val returnValue = LoginActivity.authenticateUser(context, token, mailboxController)) {
+                is User -> return context.loginSuccess(returnValue)
+                is MailboxErrorCode -> context.mailboxError(returnValue)
+                is ApiResponse<*> -> context.apiError(returnValue)
+                else -> context.otherError()
+            }
+            logout(infomaniakLogin, token)
+        }.cancellable().onFailure { exception ->
+            onAuthenticateUserError(ErrorStatus.UNKNOWN)
+            SentryLog.e("authenticateUser", "Failure on getToken", exception)
+        }
+    }
+
     private fun Fragment.authenticateUser(authCode: String, infomaniakLogin: InfomaniakLogin) {
         lifecycleScope.launch {
             runCatching {
