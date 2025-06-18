@@ -45,13 +45,20 @@ fun EmojiReactions(
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
 ) {
+    val localReaction = remember { mutableStateMapOf<String, Boolean>() }
+
     FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-        reactions().forEach { (emoji, state) ->
+        reactions().forEach { originalReaction ->
+            val (emoji, state) = originalReaction.toFakedReaction(localReaction)
+
             ReactionChip(
                 emoji = emoji,
                 reactionCount = { state.count },
                 selected = { state.hasReacted },
-                onClick = { onEmojiClicked(emoji) },
+                onClick = {
+                    localReaction[emoji] = true
+                    onEmojiClicked(emoji)
+                },
                 colors = colors,
                 shape = shape,
             )
@@ -61,6 +68,16 @@ fun EmojiReactions(
             onClick = onAddReactionClick,
             shape = shape,
         )
+    }
+}
+
+private fun Map.Entry<String, ReactionState>.toFakedReaction(localReaction: SnapshotStateMap<String, Boolean>): Pair<String, ReactionState> {
+    val (key, value) = this
+    val shouldFake = key in localReaction && !value.hasReacted
+
+    return key to object : ReactionState {
+        override val count: Int = value.count + if (shouldFake) 1 else 0
+        override val hasReacted: Boolean = value.hasReacted || shouldFake
     }
 }
 

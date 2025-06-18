@@ -100,14 +100,17 @@ import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
 import com.infomaniak.mail.utils.extensions.*
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -131,6 +134,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     @Inject
     lateinit var emailContextualMenuAlertDialog: EmailContextualMenuAlertDialog
@@ -195,6 +201,8 @@ class ThreadFragment : Fragment() {
         observeCurrentFolderName()
         observeSnoozeHeaderVisibility()
         observePickedEmoji()
+
+        observeDraftWorkerResults()
 
         observeThreadOpening()
         observeAutoAdvance()
@@ -607,6 +615,34 @@ class ThreadFragment : Fragment() {
     private fun observePickedEmoji() {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerBottomSheetDialog.PICKED_EMOJI) { (emoji, messageUid) ->
             mainViewModel.sendEmojiReply(emoji, messageUid)
+        }
+    }
+
+    private fun observeDraftWorkerResults() {
+        TODO
+        WorkerUtils.flushWorkersBefore(context = requireContext(), lifecycleOwner = viewLifecycleOwner) {
+
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
+
+                    with(workInfo.outputData) {
+
+                    }
+                }
+            }
+
+            val treatedFailedWorkInfoUuids = mutableSetOf<UUID>()
+            draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach
+
+                    with(workInfo.outputData) {
+
+                    }
+                }
+            }
         }
     }
 

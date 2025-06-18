@@ -701,7 +701,7 @@ class ThreadAdapter(
 
         emojiReactions.bindEmojiReactions(message)
         emojiReactions.setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
-        emojiReactions.setOnEmojiClickListener { emoji ->  threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, message.uid) }
+        emojiReactions.setOnEmojiClickListener { emoji -> threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, message.uid) }
 
         initWebViewClientIfNeeded(
             message,
