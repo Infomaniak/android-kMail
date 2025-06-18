@@ -494,13 +494,14 @@ class ThreadAdapter(
             val isMe = message.from.all(Recipient::isMe)
             val hasPassword = message.encryptionPassword?.isNotBlank() == true
 
-            val (descriptionRes, actionRes) = when {
-                isMe && hasPassword -> R.string.encryptedMessageDescription to R.string.buttonCopyPassword
-                isMe -> R.string.encryptedMessageTitle to null
-                else -> R.string.encryptedMessageReceiverTitle to null
+            val (description, actionRes) = if (isMe && hasPassword) {
+                context.getString(R.string.encryptedMessageHeaderPasswordExpiryDate, message.encryptionPasswordValidity) to
+                        R.string.encryptedButtonSeeConcernedRecipients
+            } else {
+                context.getString(R.string.encryptedMessageHeader) to null
             }
 
-            setDescription(context.getString(descriptionRes))
+            setDescription(description)
             actionRes?.let {
                 setAction1Text(context.getString(it))
                 onAction1 {

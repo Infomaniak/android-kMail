@@ -141,6 +141,10 @@ class Message : RealmObject, Snoozable {
     var isEncrypted: Boolean = false
     @SerialName("encryption_password")
     var encryptionPassword: String? = null
+    @SerialName("crypt_password_validity")
+    var encryptionPasswordValidity: RealmInstant? = null
+    @SerialName("crypt_error")
+    var encryptionError: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
