@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import androidx.work.Data
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
@@ -107,11 +109,13 @@ import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -129,10 +133,13 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
+import com.infomaniak.mail.workers.DraftsActionsWorker
+import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.EMOJI_SENT_STATUS
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import java.util.Date
 import javax.inject.Inject
 import kotlin.math.absoluteValue
@@ -157,6 +164,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     @Inject
     lateinit var emailContextualMenuAlertDialog: EmailContextualMenuAlertDialog
@@ -220,6 +230,8 @@ class ThreadFragment : Fragment() {
         observeCurrentFolderName()
         observeSnoozeHeaderVisibility()
         observePickedEmoji()
+
+        observeDraftWorkerResults()
 
         observeThreadOpening()
         observeAutoAdvance()
@@ -396,7 +408,10 @@ class ThreadFragment : Fragment() {
                 onRescheduleClicked = ::rescheduleDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onAddReaction = { navigateToEmojiPicker(it.uid) },
-                onAddEmoji = { emoji, messageUid -> mainViewModel.sendEmojiReply(emoji, messageUid) },
+                onAddEmoji = { emoji, messageUid ->
+                    threadViewModel.fakeEmojiReply(emoji, messageUid)
+                    mainViewModel.sendEmojiReply(emoji, messageUid)
+                },
             ),
         )
 
@@ -628,6 +643,25 @@ class ThreadFragment : Fragment() {
         }
     }
 
+    private fun observeDraftWorkerResults() {
+        WorkerUtils.flushWorkersBefore(context = requireContext(), lifecycleOwner = viewLifecycleOwner) {
+
+            val runningWorkInfoLiveData = draftsActionsWorkerScheduler.getRunningWorkInfoLiveData()
+            runningWorkInfoLiveData.observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    workInfo.progress.let {
+                        val emojiSendResult = it.getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
+                        if (emojiSendResult.isSuccess.not()) {
+                            // TODO: Remove the local status of this emoji
+                            threadViewModel
+                        }
+                        Log.e("gibran", "observeDraftWorkerResults - emojiSendResult: ${emojiSendResult}")
+                    }
+                }
+            }
+        }
+    }
+
     private fun observeAutoAdvance() {
         mainViewModel.autoAdvanceThreadsUids.observe(viewLifecycleOwner, ::tryToAutoAdvance)
     }
@@ -829,7 +863,9 @@ class ThreadFragment : Fragment() {
 
         val scrollY = threadState.verticalScroll ?: run {
 
-            val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && threadState.isExpandedMap[it.uid] == true }
+            val indexToScroll = threadAdapter.items.indexOfFirst {
+                it is MessageUi && threadState.isExpandedMap[it.message.uid] == true
+            }
 
             // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
             // we want to automatically scroll to the very bottom.
@@ -845,7 +881,10 @@ class ThreadFragment : Fragment() {
                         scope.setExtra("indexToScroll", indexToScroll.toString())
                         scope.setExtra("messageCount", threadAdapter.items.count().toString())
                         scope.setExtra("isExpandedMap", threadState.isExpandedMap.toString())
-                        scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
+                        scope.setExtra(
+                            "isLastMessageDraft",
+                            (threadAdapter.items.lastOrNull() as MessageUi?)?.message?.isDraft.toString()
+                        )
                     }
                     getBottomY()
                 } else {
@@ -1006,3 +1045,5 @@ private fun Fragment.navigateToEmojiPicker(messageUid: String) {
         substituteClassName = ThreadListFragment::class.java.name,
     )
 }
+
+private inline fun <reified T> Data.getSerializable(key: String): T? = getString(key)?.let { Json.decodeFromString(it) }
