@@ -66,8 +66,13 @@ class EncryptionMessageManager @Inject constructor(
         encryptionViewModel.uncryptableRecipients.observe(viewLifecycleOwner) { recipients ->
             // TODO Replace this by the lock button with the number of uncryptable recipients
             if (recipients.isNotEmpty()) {
+                val recipientsCount = recipients.count()
                 snackbarManager.postValue(
-                    fragment.getString(R.string.encryptedMessageAddPasswordDescription1) + recipients.joinToString(" "),
+                    fragment.resources.getQuantityString(
+                        R.plurals.encryptedMessageIncompleteUser,
+                        recipientsCount,
+                        recipientsCount,
+                    ),
                 )
             }
         }
