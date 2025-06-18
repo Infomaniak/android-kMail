@@ -56,7 +56,7 @@ class Folder : RealmObject, Cloneable {
     var path: String = ""
     var name: String = ""
     @SerialName("role")
-    private var _role: String? = null
+    var _role: String? = null // Don't edit this value, it's only public for tests.
     @SerialName("is_favorite")
     var isFavorite: Boolean = false
     @SerialName("unread_count")
