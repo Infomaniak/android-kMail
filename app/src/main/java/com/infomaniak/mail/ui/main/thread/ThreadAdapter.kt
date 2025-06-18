@@ -64,6 +64,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.databinding.ItemSuperCollapsedBlockBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterViewHolder
+import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.HtmlFormatter
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -83,10 +84,10 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.getAttributeColor
+import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.toggleChevron
-import io.realm.kotlin.types.RealmDictionary
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
@@ -137,7 +138,7 @@ class ThreadAdapter(
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (items[position]) {
-            is Message -> DisplayType.MAIL.layout
+            is MessageUi -> DisplayType.MAIL.layout
             else -> DisplayType.SUPER_COLLAPSED_BLOCK.layout
         }
     }.getOrDefault(super.getItemViewType(position))
@@ -165,13 +166,13 @@ class ThreadAdapter(
         }
 
         val item = items[position]
-        if (item is Message && holder is MessageViewHolder) with(holder.binding) {
+        if (item is MessageUi && holder is MessageViewHolder) with(holder.binding) {
             when (payload) {
-                NotifyType.TOGGLE_LIGHT_MODE -> holder.handleToggleLightModePayload(item.uid)
+                NotifyType.TOGGLE_LIGHT_MODE -> holder.handleToggleLightModePayload(item.message.uid)
                 NotifyType.RE_RENDER -> reloadVisibleWebView()
-                NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.uid)
-                NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item)
-                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item)
+                NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.message.uid)
+                NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item.message)
+                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item.emojiReactionState)
             }
         }
     }.getOrDefault(Unit)
@@ -192,27 +193,26 @@ class ThreadAdapter(
         calendarEvent.onlyUpdateAttendance(attendees)
     }
 
-    private fun ItemMessageBinding.handleEmojiReactionPayload(message: Message) {
-        emojiReactions.bindEmojiReactions(message)
+    private fun ItemMessageBinding.handleEmojiReactionPayload(emojiReactions: Map<String, ReactionState>) {
+        this.emojiReactions.bindEmojiReactions(emojiReactions)
     }
 
-    private fun EmojiReactionsView.bindEmojiReactions(message: Message) {
-        val reactions = message.emojiReactions.filterNotNull()
+    private fun EmojiReactionsView.bindEmojiReactions(emojiReactions: Map<String, ReactionState>) {
         isGone = false // reactions.isEmpty()
-        setEmojiReactions(reactions)
+        setEmojiReactions(emojiReactions)
     }
 
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {
 
         val item = items[position]
 
-        holder.binding.root.tag = if (item is SuperCollapsedBlock || (item is Message && item.shouldHideDivider)) {
+        holder.binding.root.tag = if (item is SuperCollapsedBlock || (item is MessageUi && item.message.shouldHideDivider)) {
             UiUtils.IGNORE_DIVIDER_TAG
         } else {
             null
         }
 
-        if (item is Message) {
+        if (item is MessageUi) {
             (holder as MessageViewHolder).bindMail(item, position)
         } else {
             (holder as SuperCollapsedBlockViewHolder).bindSuperCollapsedBlock(item as SuperCollapsedBlock)
@@ -229,18 +229,19 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.bindMail(message: Message, position: Int) {
+    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int) {
 
-        initMapForNewMessage(message, position)
+        initMapForNewMessage(messageUi.message, position)
 
-        bindHeader(message)
-        bindAlerts(message)
-        bindSpam(message)
-        bindCalendarEvent(message)
-        bindAttachments(message)
-        bindContent(message)
+        bindHeader(messageUi.message)
+        bindAlerts(messageUi.message)
+        bindSpam(messageUi.message)
+        bindCalendarEvent(messageUi.message)
+        bindAttachments(messageUi.message)
+        bindContent(messageUi.message)
+        bindEmojiReactions(messageUi)
 
-        onExpandOrCollapseMessage(message, shouldTrack = false)
+        onExpandOrCollapseMessage(messageUi.message, shouldTrack = false)
     }
 
     private fun MessageViewHolder.bindCalendarEvent(message: Message) {
@@ -354,7 +355,7 @@ class ThreadAdapter(
         val isDisplayedInDark =
             context.isNightModeEnabled() && isThemeTheSameForMessageUid(uid) && !isForPrinting
         return if (isForPrinting) {
-            webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, items.first() as Message))
+            webViewUtils.processHtmlForPrint(styledBody, HtmlFormatter.PrintData(context, (items.first() as MessageUi).message))
         } else {
             webViewUtils.processHtmlForDisplay(styledBody, isDisplayedInDark)
         }
@@ -706,10 +707,6 @@ class ThreadAdapter(
         quoteButton.setOnClickListener { toggleWebViews(message) }
         quoteButtonFrameLayout.isVisible = hasQuote
 
-        emojiReactions.bindEmojiReactions(message)
-        emojiReactions.setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
-        emojiReactions.setOnEmojiClickListener { emoji ->  threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, message.uid) }
-
         initWebViewClientIfNeeded(
             message,
             threadAdapterCallbacks?.navigateToNewMessageActivity,
@@ -775,6 +772,14 @@ class ThreadAdapter(
         }
     }
 
+    private fun MessageViewHolder.bindEmojiReactions(messageUi: MessageUi) = with(binding.emojiReactions) {
+        bindEmojiReactions(messageUi.emojiReactionState)
+        setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(messageUi.message) }
+        setOnEmojiClickListener { emoji ->
+            threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, messageUi.message.uid)
+        }
+    }
+
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
         val isExpanded = threadAdapterState.isExpandedMap[message.uid] ?: false
 
@@ -811,7 +816,7 @@ class ThreadAdapter(
     fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessagesUids.contains(messageUid)
 
     fun toggleLightMode(message: Message) {
-        val index = items.indexOf(message)
+        val index = items.indexOfFirstOrNull { it is MessageUi && it.message == message } ?: return
         notifyItemChanged(index, NotifyType.TOGGLE_LIGHT_MODE)
     }
 
@@ -821,7 +826,7 @@ class ThreadAdapter(
 
     fun updateFailedMessages(uids: List<String>) {
         uids.forEach { uid ->
-            val index = items.indexOfFirst { it is Message && it.uid == uid }
+            val index = items.indexOfFirst { it is MessageUi && it.message.uid == uid }
             notifyItemChanged(index, NotifyType.FAILED_MESSAGE)
         }
     }
@@ -831,7 +836,7 @@ class ThreadAdapter(
     }
 
     fun undoUserAttendanceClick(message: Message) {
-        val indexOfMessage = items.indexOfFirst { it is Message && it.uid == message.uid }.takeIf { it >= 0 }
+        val indexOfMessage = items.indexOfFirst { it is MessageUi && it.message.uid == message.uid }.takeIf { it >= 0 }
         indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
     }
 
@@ -854,7 +859,7 @@ class ThreadAdapter(
 
         override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
             return when (oldItem) {
-                is Message -> newItem is Message && newItem.uid == oldItem.uid
+                is MessageUi -> newItem is MessageUi && newItem.message.uid == oldItem.message.uid
                 is SuperCollapsedBlock -> newItem is SuperCollapsedBlock
                 else -> false
             }
@@ -862,11 +867,11 @@ class ThreadAdapter(
 
         override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
             return when (oldItem) {
-                is Message -> {
-                    newItem is Message &&
-                            MessageDiffAspect.AnythingElse.areTheSame(oldItem, newItem) &&
+                is MessageUi -> {
+                    newItem is MessageUi &&
+                            MessageDiffAspect.AnythingElse.areTheSame(oldItem.message, newItem.message) &&
                             MessageDiffAspect.EmojiReactions.areTheSame(oldItem, newItem) &&
-                            MessageDiffAspect.Calendar.areTheSame(oldItem, newItem)
+                            MessageDiffAspect.Calendar.areTheSame(oldItem.message, newItem.message)
                 }
                 is SuperCollapsedBlock -> {
                     newItem is SuperCollapsedBlock &&
@@ -878,13 +883,13 @@ class ThreadAdapter(
 
         override fun getChangePayload(oldItem: Any, newItem: Any): Any? {
 
-            if (oldItem !is Message || newItem !is Message) return null
+            if (oldItem !is MessageUi || newItem !is MessageUi) return null
 
             // TODO: Handle the case where there are multiple aspects that changed at once
             return when {
-                MessageDiffAspect.AnythingElse.areDifferent(oldItem, newItem) -> null // null means "bind the whole item again"
+                MessageDiffAspect.AnythingElse.areDifferent(oldItem.message, newItem.message) -> null // null means "bind the whole item again"
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.ONLY_REBIND_EMOJI_REACTIONS
-                else -> getCalendarEventPayloadOrNull(oldItem, newItem)
+                else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
         }
 
@@ -921,8 +926,8 @@ class ThreadAdapter(
             }
 
             object MessageDiffAspect {
-                data object EmojiReactions : DiffAspect<Message>({
-                    emojiReactions.containsTheSameEmojiValuesAs(it.emojiReactions)
+                data object EmojiReactions : DiffAspect<MessageUi>({
+                    emojiReactionState.containsTheSameEmojiValuesAs(it.emojiReactionState)
                 })
 
                 data object Calendar : DiffAspect<Message>({
@@ -1077,11 +1082,5 @@ class ThreadAdapter(
             HitTestResult.SRC_ANCHOR_TYPE to ContextMenuType.LINK,
             HitTestResult.SRC_IMAGE_ANCHOR_TYPE to ContextMenuType.LINK,
         )
-    }
-}
-
-private fun <T> RealmDictionary<T?>.filterNotNull(): Map<String, T> = buildMap {
-    this@filterNotNull.forEach { (key, value) ->
-        if (value != null) this[key] = value
     }
 }
