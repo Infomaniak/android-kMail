@@ -56,7 +56,6 @@ import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
-import com.infomaniak.mail.utils.FolderRoleUtils.getActionFolderRole
 import com.infomaniak.mail.utils.NotificationUtils.Companion.cancelNotification
 import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
 import com.infomaniak.mail.utils.SharedUtils.Companion.updateSignatures
@@ -88,8 +87,9 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel @Inject constructor(
     application: Application,
     avatarMergedContactData: AvatarMergedContactData,
-    val folderController: FolderController,
     private val addressBookController: AddressBookController,
+    private val folderController: FolderController,
+    private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
@@ -580,7 +580,7 @@ class MainViewModel @Inject constructor(
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         var trashId: String? = null
         var undoResources = emptyList<String>()
-        val shouldPermanentlyDelete = isPermanentDeleteFolder(getActionFolderRole(threads, message, folderController))
+        val shouldPermanentlyDelete = isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(threads, message))
 
         val messages = getMessagesToDelete(threads, message)
         val uids = messages.getUids()
@@ -830,7 +830,7 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
-        val role = getActionFolderRole(threads, message, folderController)
+        val role = folderRoleUtils.getActionFolderRole(threads, message)
         val isFromArchive = role == FolderRole.ARCHIVE
 
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
@@ -1028,7 +1028,7 @@ class MainViewModel @Inject constructor(
         val mailbox = currentMailbox.value!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
-        val destinationFolderRole = if (getActionFolderRole(threads, message, folderController) == FolderRole.SPAM) {
+        val destinationFolderRole = if (folderRoleUtils.getActionFolderRole(threads, message) == FolderRole.SPAM) {
             FolderRole.INBOX
         } else {
             FolderRole.SPAM
@@ -1068,7 +1068,7 @@ class MainViewModel @Inject constructor(
         with(ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)) {
 
             val snackbarTitle = if (isSuccess()) {
-                if (getActionFolderRole(message, folderController) != FolderRole.SPAM) toggleMessageSpamStatus(threadUid, message)
+                if (folderRoleUtils.getActionFolderRole(message) != FolderRole.SPAM) toggleMessageSpamStatus(threadUid, message)
                 R.string.snackbarReportPhishingConfirmation
             } else {
                 translateError()

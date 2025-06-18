@@ -51,7 +51,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
-import com.infomaniak.mail.utils.FolderRoleUtils.getActionFolderRole
+import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.extensions.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,6 +75,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     lateinit var descriptionDialog: DescriptionAlertDialog
 
     @Inject
+    lateinit var folderRoleUtils: FolderRoleUtils
+
+    @Inject
     lateinit var localSettings: LocalSettings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
@@ -82,7 +85,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         threadLive.observe(viewLifecycleOwner) { thread ->
 
-            folderRole = getActionFolderRole(thread, mainViewModel.folderController)
+            folderRole = folderRoleUtils.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
             isFromSpam = folderRole == FolderRole.SPAM
 

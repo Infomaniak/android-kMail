@@ -23,21 +23,24 @@ import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import javax.inject.Inject
 
 // TODO: Handle this correctly if MultiSelect feature is added in the Search.
-object FolderRoleUtils {
+class FolderRoleUtils @Inject constructor(
+    private val folderController: FolderController,
+) {
 
-    fun getActionFolderRole(threads: Collection<Thread>, folderController: FolderController): FolderRole? {
+    fun getActionFolderRole(threads: Collection<Thread>): FolderRole? {
         val thread = threads.firstOrNull() ?: return null
-        return getActionFolderRole(thread, folderController)
+        return getActionFolderRole(thread)
     }
 
-    fun getActionFolderRole(thread: Thread, folderController: FolderController): FolderRole? {
-        return getActionFolderRole(thread.folderId, thread, folderController)
+    fun getActionFolderRole(thread: Thread): FolderRole? {
+        return getActionFolderRole(thread.folderId, thread)
     }
 
-    fun getActionFolderRole(message: Message, folderController: FolderController): FolderRole? {
-        return getActionFolderRole(message.folderId, message, folderController)
+    fun getActionFolderRole(message: Message): FolderRole? {
+        return getActionFolderRole(message.folderId, message)
     }
 
     /**
@@ -46,24 +49,15 @@ object FolderRoleUtils {
      * @param threads The list of Threads to find the FolderRole. They should ALL be from the same Folder. For now, it's
      * always the case. But it could change in the future (for example, if the MultiSelect feature is added in the Search).
      */
-    fun getActionFolderRole(
-        threads: Collection<Thread>,
-        message: Message?,
-        folderController: FolderController,
-    ): FolderRole? {
+    fun getActionFolderRole(threads: Collection<Thread>, message: Message?): FolderRole? {
         val thread = threads.firstOrNull()
         return getActionFolderRole(
             folderId = message?.folderId ?: thread?.folderId ?: return null,
             snoozable = message ?: thread ?: return null,
-            folderController = folderController,
         )
     }
 
-    private fun getActionFolderRole(
-        folderId: String,
-        snoozable: Snoozable,
-        folderController: FolderController,
-    ): FolderRole? {
+    private fun getActionFolderRole(folderId: String, snoozable: Snoozable): FolderRole? {
         val folderRole = folderController.getFolder(folderId)?.role
         return if (folderRole == FolderRole.INBOX && snoozable.isSnoozed()) FolderRole.SNOOZED else folderRole
     }

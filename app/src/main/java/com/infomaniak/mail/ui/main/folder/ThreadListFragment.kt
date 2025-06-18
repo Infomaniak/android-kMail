@@ -74,6 +74,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.SentryDebug.displayForSentry
@@ -109,6 +110,9 @@ class ThreadListFragment : TwoPaneFragment() {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var folderRoleUtils: FolderRoleUtils
 
     @Inject
     lateinit var inAppUpdateManager: InAppUpdateManager
@@ -152,6 +156,7 @@ class ThreadListFragment : TwoPaneFragment() {
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
+            folderRoleUtils = folderRoleUtils,
             threadListFragment = this,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
