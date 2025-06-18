@@ -15,17 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.emojicomponents
+package com.infomaniak.mail.ui.main.thread.models
 
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.mail.data.models.message.Message
 
-internal fun SnapshotStateMap<String, ReactionState>.updateWithEmoji(emoji: String) {
-    if (this[emoji]?.hasReacted == true) return
-
-    val oldCount = this[emoji]?.count ?: 0
-    this[emoji] = object : ReactionState {
-        override val count: Int = oldCount + 1
-        override val hasReacted: Boolean = true
-    }
-}
+data class MessageUi(val message: Message, val emojiReactionState: Map<String, ReactionState>)
