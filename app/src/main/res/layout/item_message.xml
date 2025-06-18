@@ -427,7 +427,8 @@
                 android:visibility="gone"
                 app:icon="@drawable/ic_padlock"
                 tools:action1="@string/buttonCopyPassword"
-                tools:description="@string/encryptedMessageReceiverTitle"
+                tools:action2="@string/encryptedButtonSeeConcernedRecipients"
+                tools:description="@string/encryptedMessageHeaderPasswordExpiryDate"
                 tools:visibility="visible" />
 
         </LinearLayout>
