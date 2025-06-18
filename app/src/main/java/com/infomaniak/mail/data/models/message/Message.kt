@@ -209,6 +209,8 @@ class Message : RealmObject, Snoozable {
 
     val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
+    val allRecipients inline get() = listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray())
+
     inline val folder: Folder
         get() = run {
 
