@@ -18,6 +18,7 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
@@ -69,7 +70,9 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -171,6 +174,8 @@ class DraftsActionsWorker @AssistedInject constructor(
             runCatching {
                 val updatedDraft = uploadAttachmentsWithMutex(draft.localUuid, mailbox, mailboxContentRealm)
                 with(executeDraftAction(updatedDraft, mailbox.uuid)) {
+                    if (draft.action == DraftAction.SEND_REACTION) notifyOfEmojiProgress(draft, draftActionResult = this)
+
                     if (isSuccess) {
                         if (isTargetDraft) {
                             remoteUuidOfTrackedDraft = savedDraftUuid
@@ -513,6 +518,10 @@ class DraftsActionsWorker @AssistedInject constructor(
             workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
+        fun getRunningWorkInfoLiveData(): LiveData<List<WorkInfo>> {
+            return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.RUNNING))
+        }
+
         fun getCompletedWorkInfoLiveData(): LiveData<List<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.SUCCEEDED))
         }
@@ -525,6 +534,9 @@ class DraftsActionsWorker @AssistedInject constructor(
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.SUCCEEDED, State.FAILED))
         }
     }
+
+    @Serializable
+    data class EmojiSendResult(val previousMessageUid: String, val isSuccess: Boolean)
 
     companion object {
         private const val TAG = "DraftsActionsWorker"
@@ -540,5 +552,14 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val SCHEDULED_DRAFT_DATE_KEY = "scheduledDraftDateKey"
         const val UNSCHEDULE_DRAFT_URL_KEY = "unscheduleDraftUrlKey"
         const val IS_SUCCESS = "isSuccess"
+
+        const val EMOJI_SENT_STATUS = "emojiSentStatusKey"
+
+        private suspend fun DraftsActionsWorker.notifyOfEmojiProgress(draft: Draft, draftActionResult: DraftActionResult) {
+            val previousMessageUid = draft.inReplyToUid ?: return // inReplyToUid is always set in the case of an emoji reaction
+            val encodedEmojiSendResult = Json.encodeToString(EmojiSendResult(previousMessageUid, draftActionResult.isSuccess))
+            Log.e("gibran", "notifyOfEmojiProgress - encodedEmojiSendResult: ${encodedEmojiSendResult}")
+            setProgress(workDataOf(EMOJI_SENT_STATUS to encodedEmojiSendResult))
+        }
     }
 }
