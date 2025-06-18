@@ -174,7 +174,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     suspend fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
         return callApi(
-            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html"),
+            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=auto_uncrypt"),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )
