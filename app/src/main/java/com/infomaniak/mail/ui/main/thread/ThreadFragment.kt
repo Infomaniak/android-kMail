@@ -379,8 +379,8 @@ class ThreadFragment : Fragment() {
                 },
                 onRescheduleClicked = ::rescheduleDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
-                onCopyEncryptionPassword = { password ->
-                    requireContext().copyStringToClipboard(password, R.string.snackbarLinkCopiedToClipboard, snackbarManager)
+                onEncryptionSeeConcernedRecipients = { recipients ->
+                    // TODO: Add Bottomsheet to see recipient
                 }
             ),
         )
