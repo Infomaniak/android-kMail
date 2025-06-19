@@ -68,6 +68,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.calendar.Attendee
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
@@ -102,6 +103,7 @@ import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBottomSheetDialogArgs
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
@@ -389,9 +391,7 @@ class ThreadFragment : Fragment() {
                 },
                 onRescheduleClicked = ::rescheduleDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
-                onEncryptionSeeConcernedRecipients = { recipients ->
-                    // TODO: Add Bottomsheet to see recipient
-                }
+                onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
             ),
         )
 
@@ -851,6 +851,13 @@ class ThreadFragment : Fragment() {
         safeNavigate(
             resId = R.id.attendeesBottomSheetDialog,
             args = AttendeesBottomSheetDialogArgs(attendees.toTypedArray()).toBundle(),
+        )
+    }
+
+    private fun navigateToUnencryptableRecipients(recipients: List<Recipient>) {
+        safeNavigate(
+            resId = R.id.unencryptableRecipientsBottomSheetDialog,
+            args = UnencryptableRecipientsBottomSheetDialogArgs(recipients.toTypedArray()).toBundle(),
         )
     }
 
