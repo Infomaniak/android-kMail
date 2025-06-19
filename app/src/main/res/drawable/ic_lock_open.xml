@@ -21,21 +21,18 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="#00000000"
         android:pathData="M6.999,6C6.999,4.608 7.552,3.272 8.537,2.288C9.521,1.303 10.857,0.75 12.249,0.75C13.641,0.75 14.977,1.303 15.961,2.288C16.946,3.272 17.499,4.608 17.499,6V9.75"
         android:strokeWidth="1"
         android:strokeColor="#9F9F9F"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
-        android:fillColor="#00000000"
         android:pathData="M5.5,9.75H19C19,9.75 20.5,9.75 20.5,11.25V21.75C20.5,21.75 20.5,23.25 19,23.25H5.5C5.5,23.25 4,23.25 4,21.75V11.25C4,11.25 4,9.75 5.5,9.75Z"
         android:strokeWidth="1"
         android:strokeColor="#9F9F9F"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
-        android:fillColor="#00000000"
         android:pathData="M12,15V18"
         android:strokeWidth="1"
         android:strokeColor="#9F9F9F"

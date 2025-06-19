@@ -294,7 +294,7 @@
     <string name="encryptedProtectionAdTitle">Encrypt your confidential messages</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Recipients with password (%d)</string>
     <string name="encryptedStatePanelEnable">Your message is protected.</string>
-    <string name="encryptedStatePanelIncomplete">A password is required to finalize the shipment.</string>
+    <string name="encryptedStatePanelIncomplete">A password is required to finalize the sending.</string>
     <string name="encryptedStatePanelStatePartialLabel">Partial</string>
     <string name="encryptedStatePanelTitle">Encryption</string>
     <string name="enterPasswordDescription1">Your password has been changed. If you are not the cause, please contact your administrator.</string>
