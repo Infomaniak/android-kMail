@@ -641,10 +641,10 @@ class ThreadFragment : Fragment() {
             runningWorkInfoLiveData.observe(viewLifecycleOwner) {
                 it.forEach { workInfo ->
                     workInfo.progress.let {
-                        val emojiSendResult = it.getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
+                        val emojiSendResult =
+                            it.getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
                         if (emojiSendResult.isSuccess.not()) {
-                            // TODO: Remove the local status of this emoji
-                            threadViewModel
+                            threadViewModel.undoFakeEmojiReply(emojiSendResult.emoji, emojiSendResult.previousMessageUid)
                         }
                         Log.e("gibran", "observeDraftWorkerResults - emojiSendResult: ${emojiSendResult}")
                     }
