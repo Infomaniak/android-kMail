@@ -44,20 +44,13 @@ fun EmojiReactions(
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
 ) {
-    val localReaction = remember { mutableStateMapOf<String, Boolean>() }
-
     FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
-        reactions().forEach { originalReaction ->
-            val (emoji, state) = originalReaction.toFakedReaction(localReaction)
-
+        reactions().forEach { (emoji, state) ->
             ReactionChip(
                 emoji = emoji,
                 reactionCount = { state.count },
                 selected = { state.hasReacted },
-                onClick = {
-                    localReaction[emoji] = true
-                    onEmojiClicked(emoji)
-                },
+                onClick = { onEmojiClicked(emoji) },
                 colors = colors,
                 shape = shape,
             )
@@ -70,15 +63,15 @@ fun EmojiReactions(
     }
 }
 
-private fun Map.Entry<String, ReactionState>.toFakedReaction(localReaction: SnapshotStateMap<String, Boolean>): Pair<String, ReactionState> {
-    val (key, value) = this
-    val shouldFake = key in localReaction && !value.hasReacted
-
-    return key to object : ReactionState {
-        override val count: Int = value.count + if (shouldFake) 1 else 0
-        override val hasReacted: Boolean = value.hasReacted || shouldFake
-    }
-}
+// private fun Map.Entry<String, ReactionState>.toFakedReaction(localReaction: SnapshotStateMap<String, Boolean>): Pair<String, ReactionState> {
+//     val (key, value) = this
+//     val shouldFake = key in localReaction && !value.hasReacted
+//
+//     return key to object : ReactionState {
+//         override val count: Int = value.count + if (shouldFake) 1 else 0
+//         override val hasReacted: Boolean = value.hasReacted || shouldFake
+//     }
+// }
 
 object EmojiReactionsDefaults {
     val addReactionIcon = Icons.FaceSmileRoundPlus

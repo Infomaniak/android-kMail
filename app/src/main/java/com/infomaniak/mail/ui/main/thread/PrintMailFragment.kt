@@ -30,7 +30,6 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentPrintMailBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadAdapterCallbacks
 import dagger.hilt.android.AndroidEntryPoint
@@ -84,7 +83,7 @@ class PrintMailFragment : Fragment() {
     private fun startPrintingView() {
         printMailViewModel.startPrintingService(
             activityContext = requireActivity(),
-            subject = (threadAdapter.items.single() as Message).subject,
+            subject = (threadAdapter.items.single() as MessageUi).message.subject,
             webView = getWebViewToPrint(),
             onFinish = findNavController()::popBackStack,
         )

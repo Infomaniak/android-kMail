@@ -381,7 +381,10 @@ class ThreadFragment : Fragment() {
                 onRescheduleClicked = ::rescheduleDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onAddReaction = { navigateToEmojiPicker(it.uid) },
-                onAddEmoji = { emoji, messageUid -> mainViewModel.sendEmojiReply(emoji, messageUid) },
+                onAddEmoji = { emoji, messageUid ->
+                    threadViewModel.fakeEmojiReply(emoji, messageUid)
+                    mainViewModel.sendEmojiReply(emoji, messageUid)
+                },
             ),
         )
 
@@ -841,7 +844,9 @@ class ThreadFragment : Fragment() {
 
         val scrollY = threadState.verticalScroll ?: run {
 
-            val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && threadState.isExpandedMap[it.uid] == true }
+            val indexToScroll = threadAdapter.items.indexOfFirst {
+                it is MessageUi && threadState.isExpandedMap[it.message.uid] == true
+            }
 
             // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
             // we want to automatically scroll to the very bottom.
@@ -857,7 +862,10 @@ class ThreadFragment : Fragment() {
                         scope.setExtra("indexToScroll", indexToScroll.toString())
                         scope.setExtra("messageCount", threadAdapter.items.count().toString())
                         scope.setExtra("isExpandedMap", threadState.isExpandedMap.toString())
-                        scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
+                        scope.setExtra(
+                            "isLastMessageDraft",
+                            (threadAdapter.items.lastOrNull() as MessageUi?)?.message?.isDraft.toString()
+                        )
                     }
                     getBottomY()
                 } else {

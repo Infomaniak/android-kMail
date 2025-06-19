@@ -119,16 +119,19 @@ class ThreadViewModel @Inject constructor(
          * As a workaround, [ThreadState.hasSuperCollapsedBlockBeenClicked] is used solely to retrigger the computation.
          * The [ThreadOpeningMode.getMessages] method will independently determine the appropriate value to use.
          */
-        combine(threadOpeningModeFlow, threadState.hasSuperCollapsedBlockBeenClicked, featureFlagsFlow) { mode, _, featureFlags ->
-            mode to featureFlags
-        }
-            .flatMapLatest { (mode, featureFlags) ->
-                mode.getMessages(featureFlags)
+        combine(
+            threadOpeningModeFlow,
+            threadState.hasSuperCollapsedBlockBeenClicked,
+            featureFlagsFlow,
+            fakeReactions,
+            transform = { mode, _, featureFlags, fakeReactions ->
+                Triple(mode, featureFlags, fakeReactions)
+            },
+        ).flatMapLatest { (mode, featureFlags, fakeReactions) ->
+            mode.getMessages(featureFlags).map { (items, messagesToFetch) ->
+                items.toUiMessages(fakeReactions) to messagesToFetch
             }
-            .map { (items, messagesToFetch) ->
-                items.fakeEmojiReactions(fakeReactions.value) to messagesToFetch
-            }
-            .asLiveData(ioCoroutineContext)
+        }.asLiveData(ioCoroutineContext)
 
     val batchedMessages = SingleLiveEvent<List<Any>>()
 
@@ -427,8 +430,8 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun fetchCalendarEvent(item: Any, forceFetch: Boolean): Pair<Message, ApiResponse<CalendarEventResponse>>? {
 
-        if (item !is Message) return null
-        val message: Message = item
+        if (item !is MessageUi) return null
+        val message: Message = item.message
 
         if (!message.isFullyDownloaded()) return null // Only process Messages with Attachments already downloaded
 
@@ -491,6 +494,28 @@ class ThreadViewModel @Inject constructor(
     fun updateCurrentThreadUid(mode: ThreadOpeningMode) {
         viewModelScope.launch {
             _threadOpeningModeFlow.emit(mode)
+        }
+    }
+
+    fun fakeEmojiReply(emoji: String, messageUid: String) {
+        viewModelScope.launch {
+            val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
+
+            // TODO: Optimize memory consumption
+            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
+                set(messageId, getOrDefault(messageId, emptySet()).plus(emoji))
+            }
+        }
+    }
+
+    fun undoFakeEmojiReply(emoji: String, messageUid: String) {
+        viewModelScope.launch {
+            val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
+
+            // TODO: Optimize memory consumption
+            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
+                set(messageId, getOrDefault(messageId, emptySet()).minus(emoji))
+            }
         }
     }
 
@@ -567,27 +592,38 @@ class ThreadViewModel @Inject constructor(
     }
 }
 
-private fun ThreadAdapterItems.fakeEmojiReactions(fakeReactions: Map<String, Set<String>>): List<Any> = map { message ->
-    if (message !is Message) return@map message
-
-    val messageId = message.messageId ?: return@map message
-    val localReactions = fakeReactions[messageId] ?: return@map message
-
-    message.emojiReactions.toFakedReactions(localReactions)
+private fun <E : Any> List<E>.toUiMessages(fakeReactions: Map<String, Set<String>>): List<Any> = map { item ->
+    if (item is Message) {
+        val localReactions = fakeReactions[item.messageId] ?: emptySet()
+        val reactions = item.emojiReactions.toFakedReactions(localReactions)
+        MessageUi(item, reactions)
+    } else {
+        item
+    }
 }
 
-private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions: Set<String>) {
-    for (entry in entries) {
-        val (emoji, state) = entry
-        if (state == null) continue
+data class MessageUi(val message: Message, val emojiReactionStateMap: Map<String, EmojiReactionState>)
 
-        val shouldFake = emoji in localReactions && !state.hasReacted
+private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionState> {
+    return entries
+        .filterOutNullStates()
+        .associate { (emoji, state) ->
+            emoji to fakeReaction(emoji, state, localReactions)
+        }
+}
 
-        val fakedReaction = EmojiReactionState(
-            count = state.count + if (shouldFake) 1 else 0,
-            hasReacted = state.hasReacted || shouldFake,
-        )
+private fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry<String, T>> {
+    @Suppress("UNCHECKED_CAST")
+    return filter { (_, state) -> state != null } as List<Map.Entry<String, T>>
+}
 
-        set(emoji, fakedReaction)
-    }
+private fun fakeReaction(emoji: String, state: EmojiReactionState, localReactions: Set<String>): EmojiReactionState {
+    val shouldFake = emoji in localReactions && !state.hasReacted
+
+    val fakedReaction = EmojiReactionState(
+        count = state.count + if (shouldFake) 1 else 0,
+        hasReacted = state.hasReacted || shouldFake,
+    )
+
+    return fakedReaction
 }
