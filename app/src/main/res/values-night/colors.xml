@@ -99,7 +99,7 @@
     <color name="encryptionTextColor">@color/sovereignBlue200</color>
     <color name="encryptionButtonColor">@color/sovereignBlue300</color>
     <color name="encryptionOnButtonColor">@color/sovereignBlue950</color>
-    <color name="encryptionTextButtonColor">@color/sovereignBlue400</color>
+    <color name="encryptionTextButtonColor">@color/sovereignBlue200</color>
 
     <!-- Thread -->
     <color name="folderTagTextColor">@color/shark</color>
