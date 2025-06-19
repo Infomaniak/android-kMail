@@ -536,7 +536,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     }
 
     @Serializable
-    data class EmojiSendResult(val previousMessageUid: String, val isSuccess: Boolean)
+    data class EmojiSendResult(val previousMessageUid: String, val isSuccess: Boolean, val emoji: String)
 
     companion object {
         private const val TAG = "DraftsActionsWorker"
@@ -557,7 +557,10 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         private suspend fun DraftsActionsWorker.notifyOfEmojiProgress(draft: Draft, draftActionResult: DraftActionResult) {
             val previousMessageUid = draft.inReplyToUid ?: return // inReplyToUid is always set in the case of an emoji reaction
-            val encodedEmojiSendResult = Json.encodeToString(EmojiSendResult(previousMessageUid, draftActionResult.isSuccess))
+            val emoji = draft.emojiReaction ?: return // we always have an emoji in the case of an emoji reaction
+            val encodedEmojiSendResult = Json.encodeToString(
+                EmojiSendResult(previousMessageUid, draftActionResult.isSuccess, emoji)
+            )
             Log.e("gibran", "notifyOfEmojiProgress - encodedEmojiSendResult: ${encodedEmojiSendResult}")
             setProgress(workDataOf(EMOJI_SENT_STATUS to encodedEmojiSendResult))
         }
