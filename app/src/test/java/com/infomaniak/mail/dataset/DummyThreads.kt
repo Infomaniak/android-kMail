@@ -17,20 +17,24 @@
  */
 package com.infomaniak.mail.dataset
 
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.dataset.DummyMessages.messageDraft
 import com.infomaniak.mail.dataset.DummyMessages.messageInbox
 import com.infomaniak.mail.dataset.DummyMessages.messageInboxSnoozed
 
 object DummyThreads {
+    val threadInboxSnoozed = threadOf(messageInbox, messageInboxSnoozed)
+    val threadDraft = threadOf(messageDraft)
+}
 
-    private val mailboxContentRealm = DummyMailboxContent()
+private val mailboxContentRealm = DummyMailboxContent()
 
-    val threadInboxSnoozed = messageInbox.toThread().apply {
-        addMessageWithConditions(messageInboxSnoozed, mailboxContentRealm())
-        recomputeThread()
-    }
-
-    val threadDraft = messageDraft.toThread().apply {
+private fun threadOf(vararg messages: Message): Thread {
+    return messages.first().toThread().apply {
+        messages.takeLast(messages.count() - 1).forEach { message ->
+            addMessageWithConditions(message, mailboxContentRealm())
+        }
         recomputeThread()
     }
 }
