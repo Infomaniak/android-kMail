@@ -93,7 +93,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
 
     private fun onContactAdded(recipient: Recipient, fieldType: FieldType) {
         newMessageViewModel.addRecipientToField(recipient, fieldType)
-        encryptionManager.addUnencryptableRecipient(recipient)
+        if (newMessageViewModel.isEncryptionActivated.value == true) encryptionManager.addUnencryptableRecipient(recipient)
     }
 
     private fun onContactRemoved(recipient: Recipient, fieldType: FieldType) {

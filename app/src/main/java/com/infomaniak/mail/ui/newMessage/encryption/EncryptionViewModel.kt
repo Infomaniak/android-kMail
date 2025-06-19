@@ -44,7 +44,8 @@ class EncryptionViewModel @Inject constructor(
 
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
         viewModelScope.launch(ioDispatcher) {
-            val apiResponse = ApiRepository.isInfomaniakMailboxes(emails)
+            val unknownEncryptionStatusRecipients = emails.filter { uncryptableRecipients.value?.contains(it) != true }
+            val apiResponse = ApiRepository.isInfomaniakMailboxes(unknownEncryptionStatusRecipients)
             if (apiResponse.isSuccess()) {
                 apiResponse.data?.let { mailboxHostingStatuses ->
                     val unencryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
