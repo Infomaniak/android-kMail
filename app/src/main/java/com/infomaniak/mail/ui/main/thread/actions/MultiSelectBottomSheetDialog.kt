@@ -68,10 +68,10 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     private val currentClassName: String by lazy { MultiSelectBottomSheetDialog::class.java.name }
 
     @Inject
-    lateinit var localSettings: LocalSettings
+    lateinit var descriptionDialog: DescriptionAlertDialog
 
     @Inject
-    lateinit var descriptionDialog: DescriptionAlertDialog
+    lateinit var localSettings: LocalSettings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetMultiSelectBinding.inflate(inflater, container, false).also { binding = it }.root

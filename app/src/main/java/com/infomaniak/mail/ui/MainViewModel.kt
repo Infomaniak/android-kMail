@@ -89,6 +89,7 @@ class MainViewModel @Inject constructor(
     avatarMergedContactData: AvatarMergedContactData,
     private val addressBookController: AddressBookController,
     private val folderController: FolderController,
+    private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
@@ -99,17 +100,14 @@ class MainViewModel @Inject constructor(
     private val quotasController: QuotasController,
     private val refreshController: RefreshController,
     private val sharedUtils: SharedUtils,
-    private val threadController: ThreadController,
     private val snackbarManager: SnackbarManager,
+    private val threadController: ThreadController,
     @MailboxInfoRealm private val mailboxInfoRealm: Realm,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
     private var refreshEverythingJob: Job? = null
-
-    @Inject
-    lateinit var localSettings: LocalSettings
 
     val isDownloadingChanges: MutableLiveData<Boolean> = MutableLiveData(false)
     val isMovedToNewFolder = SingleLiveEvent<Boolean>()

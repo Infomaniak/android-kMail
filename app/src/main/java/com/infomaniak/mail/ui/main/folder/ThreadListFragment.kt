@@ -108,19 +108,19 @@ class ThreadListFragment : TwoPaneFragment() {
     private var isFirstTimeRefreshingThreads = true
 
     @Inject
+    lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var inAppUpdateManager: InAppUpdateManager
+
+    @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
 
     @Inject
     lateinit var playServicesUtils: PlayServicesUtils
 
     @Inject
-    lateinit var descriptionDialog: DescriptionAlertDialog
-
-    @Inject
     lateinit var snackbarManager: SnackbarManager
-
-    @Inject
-    lateinit var inAppUpdateManager: InAppUpdateManager
 
     @Inject
     lateinit var titleDialog: TitleAlertDialog

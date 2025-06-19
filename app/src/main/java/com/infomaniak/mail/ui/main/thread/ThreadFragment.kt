@@ -112,34 +112,10 @@ import com.google.android.material.R as RMaterial
 class ThreadFragment : Fragment() {
 
     @Inject
-    lateinit var localSettings: LocalSettings
-
-    @Inject
-    lateinit var informationDialog: InformationAlertDialog
-
-    @Inject
-    lateinit var descriptionDialog: DescriptionAlertDialog
-
-    @Inject
-    lateinit var linkContextualMenuAlertDialog: LinkContextualMenuAlertDialog
-
-    @Inject
-    lateinit var emailContextualMenuAlertDialog: EmailContextualMenuAlertDialog
-
-    @Inject
-    lateinit var phoneContextualMenuAlertDialog: PhoneContextualMenuAlertDialog
+    lateinit var confirmScheduledDraftModificationDialog: ConfirmScheduledDraftModificationDialog
 
     @Inject
     lateinit var confirmationToBlockUserDialog: ConfirmationToBlockUserDialog
-
-    @Inject
-    lateinit var permissionUtils: PermissionUtils
-
-    @Inject
-    lateinit var subjectFormatter: SubjectFormatter
-
-    @Inject
-    lateinit var snackbarManager: SnackbarManager
 
     @Inject
     lateinit var dateAndTimeScheduleDialog: SelectDateAndTimeForScheduledDraftDialog
@@ -148,7 +124,31 @@ class ThreadFragment : Fragment() {
     lateinit var dateAndTimeSnoozeDialog: SelectDateAndTimeForSnoozeDialog
 
     @Inject
-    lateinit var confirmScheduledDraftModificationDialog: ConfirmScheduledDraftModificationDialog
+    lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var emailContextualMenuAlertDialog: EmailContextualMenuAlertDialog
+
+    @Inject
+    lateinit var informationDialog: InformationAlertDialog
+
+    @Inject
+    lateinit var linkContextualMenuAlertDialog: LinkContextualMenuAlertDialog
+
+    @Inject
+    lateinit var localSettings: LocalSettings
+
+    @Inject
+    lateinit var permissionUtils: PermissionUtils
+
+    @Inject
+    lateinit var phoneContextualMenuAlertDialog: PhoneContextualMenuAlertDialog
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
+
+    @Inject
+    lateinit var subjectFormatter: SubjectFormatter
 
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
