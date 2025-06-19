@@ -22,6 +22,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.dataset.DummyThreads.threadDraft
 import com.infomaniak.mail.dataset.DummyThreads.threadInbox
+import com.infomaniak.mail.dataset.DummyThreads.threadSearchInbox
+import com.infomaniak.mail.dataset.DummyThreads.threadSearchSnoozed
 import com.infomaniak.mail.dataset.DummyThreads.threadSent
 import com.infomaniak.mail.dataset.DummyThreads.threadSnoozed
 
@@ -56,8 +58,17 @@ object DummyFolders {
         threads.add(threadSnoozed)
     }
 
+    val folderSearch = Folder().apply {
+        id = FOLDER_SEARCH_ID
+        _role = null
+
+        threads.add(threadSearchInbox)
+        threads.add(threadSearchSnoozed)
+    }
+
     const val FOLDER_INBOX_ID = "FOLDER_INBOX_ID"
     const val FOLDER_SENT_ID = "FOLDER_SENT_ID"
     const val FOLDER_DRAFT_ID = "FOLDER_DRAFT_ID"
     const val FOLDER_SNOOZED_ID = "FOLDER_SNOOZED_ID"
+    const val FOLDER_SEARCH_ID = "FOLDER_SEARCH_ID"
 }

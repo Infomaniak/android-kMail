@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.dataset.DummyFolders.folderDraft
 import com.infomaniak.mail.dataset.DummyFolders.folderInbox
+import com.infomaniak.mail.dataset.DummyFolders.folderSearch
 import com.infomaniak.mail.dataset.DummyFolders.folderSent
 import com.infomaniak.mail.dataset.DummyFolders.folderSnoozed
 import com.infomaniak.mail.dataset.DummyMailboxContent
@@ -30,6 +31,8 @@ import com.infomaniak.mail.dataset.DummyMessages.messageInbox
 import com.infomaniak.mail.dataset.DummyMessages.messageSnoozed
 import com.infomaniak.mail.dataset.DummyThreads.threadDraft
 import com.infomaniak.mail.dataset.DummyThreads.threadInbox
+import com.infomaniak.mail.dataset.DummyThreads.threadSearchInbox
+import com.infomaniak.mail.dataset.DummyThreads.threadSearchSnoozed
 import com.infomaniak.mail.dataset.DummyThreads.threadSnoozed
 import com.infomaniak.mail.utils.FolderRoleUtils
 import io.realm.kotlin.UpdatePolicy
@@ -86,6 +89,18 @@ class FolderRoleUtilsTest {
         assertTrue(folderRole == FolderRole.SNOOZED)
     }
 
+    @Test
+    fun threadSearchInbox_should_be_INBOX() {
+        val folderRole = folderRoleUtils.getActionFolderRole(threadSearchInbox)
+        assertTrue(folderRole == FolderRole.INBOX)
+    }
+
+    @Test
+    fun threadSearchSnoozed_should_be_SNOOZED() {
+        val folderRole = folderRoleUtils.getActionFolderRole(threadSearchSnoozed)
+        assertTrue(folderRole == FolderRole.SNOOZED)
+    }
+
     companion object {
 
         private val mailboxContentRealm = DummyMailboxContent()
@@ -98,6 +113,7 @@ class FolderRoleUtilsTest {
                 copyToRealm(folderSent, UpdatePolicy.ALL)
                 copyToRealm(folderDraft, UpdatePolicy.ALL)
                 copyToRealm(folderSnoozed, UpdatePolicy.ALL)
+                copyToRealm(folderSearch, UpdatePolicy.ALL)
             }
         }
 

@@ -22,7 +22,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_DRAFT_ID
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_INBOX_ID
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_SENT_ID
-import com.infomaniak.mail.dataset.DummyFolders.FOLDER_SNOOZED_ID
 import com.infomaniak.mail.dataset.DummyMessages.messageDraft
 import com.infomaniak.mail.dataset.DummyMessages.messageInbox
 import com.infomaniak.mail.dataset.DummyMessages.messageSent
@@ -32,7 +31,9 @@ object DummyThreads {
     val threadInbox = threadOf(messageInbox, messageSent).apply { folderId = FOLDER_INBOX_ID }
     val threadSent = threadOf(messageSent, messageInbox).apply { folderId = FOLDER_SENT_ID }
     val threadDraft = threadOf(messageDraft).apply { folderId = FOLDER_DRAFT_ID }
-    val threadSnoozed = threadOf(messageSnoozed, messageSent).apply { folderId = FOLDER_SNOOZED_ID }
+    val threadSnoozed = threadOf(messageSnoozed, messageSent).apply { folderId = FOLDER_INBOX_ID }
+    val threadSearchInbox = threadOf(messageInbox, messageSent).apply { folderId = FOLDER_INBOX_ID }
+    val threadSearchSnoozed = threadOf(messageSnoozed, messageSent).apply { folderId = FOLDER_INBOX_ID }
 }
 
 private val mailboxContentRealm = DummyMailboxContent()

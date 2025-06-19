@@ -22,7 +22,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_DRAFT_ID
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_INBOX_ID
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_SENT_ID
-import com.infomaniak.mail.dataset.DummyFolders.FOLDER_SNOOZED_ID
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import java.util.Date
 
@@ -49,7 +48,7 @@ object DummyMessages {
     val messageSnoozed = Message().apply {
         uid = MESSAGE_SNOOZED_ID
         messageId = uid
-        folderId = FOLDER_SNOOZED_ID
+        folderId = FOLDER_INBOX_ID
         snoozeState = SnoozeState.Snoozed
         snoozeEndDate = Date().toRealmInstant()
         snoozeUuid = uid
