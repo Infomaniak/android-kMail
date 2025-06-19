@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 @file:UseSerializers(RealmListKSerializer::class)
+@file:OptIn(TestOnly::class)
 
 package com.infomaniak.mail.data.models
 
@@ -25,6 +26,7 @@ import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.mail.R
+import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.*
 import com.infomaniak.mail.data.models.message.Message
@@ -55,8 +57,9 @@ class Folder : RealmObject, Cloneable {
     var id: String = ""
     var path: String = ""
     var name: String = ""
+    @TestOnly
     @SerialName("role")
-    var _role: String? = null // Don't edit this value, it's only public for tests.
+    var _role: String? = null
     @SerialName("is_favorite")
     var isFavorite: Boolean = false
     @SerialName("unread_count")

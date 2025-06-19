@@ -17,11 +17,13 @@
  */
 package com.infomaniak.mail.dataset
 
+import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.dataset.DummyThreads.threadDraft
 import com.infomaniak.mail.dataset.DummyThreads.threadInboxSnoozed
 
+@OptIn(TestOnly::class)
 object DummyFolders {
 
     val folderInbox = Folder().apply {
