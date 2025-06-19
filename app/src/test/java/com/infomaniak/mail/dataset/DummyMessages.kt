@@ -26,10 +26,6 @@ import java.util.Date
 
 object DummyMessages {
 
-    private const val MESSAGE_INBOX_ID = "MESSAGE_INBOX_ID"
-    private const val MESSAGE_INBOX_SNOOZED_ID = "MESSAGE_INBOX_SNOOZED_ID"
-    private const val MESSAGE_DRAFT_ID = "MESSAGE_DRAFT_ID"
-
     val messageInbox = Message().apply {
         uid = MESSAGE_INBOX_ID
         messageId = uid
@@ -50,4 +46,8 @@ object DummyMessages {
         messageId = uid
         folderId = FOLDER_DRAFT_ID
     }
+
+    private const val MESSAGE_INBOX_ID = "MESSAGE_INBOX_ID"
+    private const val MESSAGE_INBOX_SNOOZED_ID = "MESSAGE_INBOX_SNOOZED_ID"
+    private const val MESSAGE_DRAFT_ID = "MESSAGE_DRAFT_ID"
 }

@@ -24,9 +24,6 @@ import com.infomaniak.mail.dataset.DummyThreads.threadInboxSnoozed
 
 object DummyFolders {
 
-    const val FOLDER_INBOX_ID = "FOLDER_INBOX_ID"
-    const val FOLDER_DRAFT_ID = "FOLDER_DRAFT_ID"
-
     val folderInbox = Folder().apply {
         id = FOLDER_INBOX_ID
         _role = FolderRole.INBOX.name
@@ -42,4 +39,7 @@ object DummyFolders {
         threadDraft.folderId = id
         threads.add(threadDraft)
     }
+
+    const val FOLDER_INBOX_ID = "FOLDER_INBOX_ID"
+    const val FOLDER_DRAFT_ID = "FOLDER_DRAFT_ID"
 }

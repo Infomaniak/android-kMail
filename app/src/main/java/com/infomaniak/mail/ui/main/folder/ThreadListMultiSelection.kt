@@ -46,7 +46,7 @@ import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 class ThreadListMultiSelection {
 
     lateinit var mainViewModel: MainViewModel
-    lateinit var folderRoleUtils: FolderRoleUtils
+    private lateinit var folderRoleUtils: FolderRoleUtils
     private lateinit var threadListFragment: ThreadListFragment
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
