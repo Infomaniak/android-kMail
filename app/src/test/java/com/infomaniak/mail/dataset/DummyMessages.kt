@@ -21,6 +21,8 @@ import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_DRAFT_ID
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_INBOX_ID
+import com.infomaniak.mail.dataset.DummyFolders.FOLDER_SENT_ID
+import com.infomaniak.mail.dataset.DummyFolders.FOLDER_SNOOZED_ID
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import java.util.Date
 
@@ -32,13 +34,10 @@ object DummyMessages {
         folderId = FOLDER_INBOX_ID
     }
 
-    val messageInboxSnoozed = Message().apply {
-        uid = MESSAGE_INBOX_SNOOZED_ID
+    val messageSent = Message().apply {
+        uid = MESSAGE_SENT_ID
         messageId = uid
-        folderId = FOLDER_INBOX_ID
-        snoozeState = SnoozeState.Snoozed
-        snoozeEndDate = Date().toRealmInstant()
-        snoozeUuid = uid
+        folderId = FOLDER_SENT_ID
     }
 
     val messageDraft = Message().apply {
@@ -47,7 +46,17 @@ object DummyMessages {
         folderId = FOLDER_DRAFT_ID
     }
 
+    val messageSnoozed = Message().apply {
+        uid = MESSAGE_SNOOZED_ID
+        messageId = uid
+        folderId = FOLDER_SNOOZED_ID
+        snoozeState = SnoozeState.Snoozed
+        snoozeEndDate = Date().toRealmInstant()
+        snoozeUuid = uid
+    }
+
     private const val MESSAGE_INBOX_ID = "MESSAGE_INBOX_ID"
-    private const val MESSAGE_INBOX_SNOOZED_ID = "MESSAGE_INBOX_SNOOZED_ID"
+    private const val MESSAGE_SENT_ID = "MESSAGE_SENT_ID"
     private const val MESSAGE_DRAFT_ID = "MESSAGE_DRAFT_ID"
+    private const val MESSAGE_SNOOZED_ID = "MESSAGE_SNOOZED_ID"
 }

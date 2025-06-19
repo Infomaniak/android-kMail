@@ -22,12 +22,15 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.dataset.DummyFolders.folderDraft
 import com.infomaniak.mail.dataset.DummyFolders.folderInbox
+import com.infomaniak.mail.dataset.DummyFolders.folderSent
+import com.infomaniak.mail.dataset.DummyFolders.folderSnoozed
 import com.infomaniak.mail.dataset.DummyMailboxContent
 import com.infomaniak.mail.dataset.DummyMessages.messageDraft
 import com.infomaniak.mail.dataset.DummyMessages.messageInbox
-import com.infomaniak.mail.dataset.DummyMessages.messageInboxSnoozed
+import com.infomaniak.mail.dataset.DummyMessages.messageSnoozed
 import com.infomaniak.mail.dataset.DummyThreads.threadDraft
-import com.infomaniak.mail.dataset.DummyThreads.threadInboxSnoozed
+import com.infomaniak.mail.dataset.DummyThreads.threadInbox
+import com.infomaniak.mail.dataset.DummyThreads.threadSnoozed
 import com.infomaniak.mail.utils.FolderRoleUtils
 import io.realm.kotlin.UpdatePolicy
 import org.junit.AfterClass
@@ -54,9 +57,9 @@ class FolderRoleUtilsTest {
     }
 
     @Test
-    fun messageInboxSnoozed_should_be_SNOOZED() {
-        val folderRole = folderRoleUtils.getActionFolderRole(messageInboxSnoozed)
-        assertTrue(folderRole == FolderRole.SNOOZED)
+    fun threadInbox_should_be_INBOX() {
+        val folderRole = folderRoleUtils.getActionFolderRole(threadInbox)
+        assertTrue(folderRole == FolderRole.INBOX)
     }
 
     @Test
@@ -66,15 +69,21 @@ class FolderRoleUtilsTest {
     }
 
     @Test
-    fun threadInboxSnoozed_should_be_SNOOZED() {
-        val folderRole = folderRoleUtils.getActionFolderRole(threadInboxSnoozed)
+    fun threadDraft_should_be_DRAFT() {
+        val folderRole = folderRoleUtils.getActionFolderRole(threadDraft)
+        assertTrue(folderRole == FolderRole.DRAFT)
+    }
+
+    @Test
+    fun messageSnoozed_should_be_SNOOZED() {
+        val folderRole = folderRoleUtils.getActionFolderRole(messageSnoozed)
         assertTrue(folderRole == FolderRole.SNOOZED)
     }
 
     @Test
-    fun threadDraft_should_be_DRAFT() {
-        val folderRole = folderRoleUtils.getActionFolderRole(threadDraft)
-        assertTrue(folderRole == FolderRole.DRAFT)
+    fun threadSnoozed_should_be_SNOOZED() {
+        val folderRole = folderRoleUtils.getActionFolderRole(threadSnoozed)
+        assertTrue(folderRole == FolderRole.SNOOZED)
     }
 
     companion object {
@@ -86,7 +95,9 @@ class FolderRoleUtilsTest {
         fun setup() {
             mailboxContentRealm().writeBlocking {
                 copyToRealm(folderInbox, UpdatePolicy.ALL)
+                copyToRealm(folderSent, UpdatePolicy.ALL)
                 copyToRealm(folderDraft, UpdatePolicy.ALL)
+                copyToRealm(folderSnoozed, UpdatePolicy.ALL)
             }
         }
 

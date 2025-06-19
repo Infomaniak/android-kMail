@@ -21,7 +21,9 @@ import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.dataset.DummyThreads.threadDraft
-import com.infomaniak.mail.dataset.DummyThreads.threadInboxSnoozed
+import com.infomaniak.mail.dataset.DummyThreads.threadInbox
+import com.infomaniak.mail.dataset.DummyThreads.threadSent
+import com.infomaniak.mail.dataset.DummyThreads.threadSnoozed
 
 @OptIn(TestOnly::class)
 object DummyFolders {
@@ -30,18 +32,32 @@ object DummyFolders {
         id = FOLDER_INBOX_ID
         _role = FolderRole.INBOX.name
 
-        threadInboxSnoozed.folderId = id
-        threads.add(threadInboxSnoozed)
+        threads.add(threadInbox)
+    }
+
+    val folderSent = Folder().apply {
+        id = FOLDER_SENT_ID
+        _role = FolderRole.SENT.name
+
+        threads.add(threadSent)
     }
 
     val folderDraft = Folder().apply {
         id = FOLDER_DRAFT_ID
         _role = FolderRole.DRAFT.name
 
-        threadDraft.folderId = id
         threads.add(threadDraft)
     }
 
+    val folderSnoozed = Folder().apply {
+        id = FOLDER_SNOOZED_ID
+        _role = FolderRole.SNOOZED.name
+
+        threads.add(threadSnoozed)
+    }
+
     const val FOLDER_INBOX_ID = "FOLDER_INBOX_ID"
+    const val FOLDER_SENT_ID = "FOLDER_SENT_ID"
     const val FOLDER_DRAFT_ID = "FOLDER_DRAFT_ID"
+    const val FOLDER_SNOOZED_ID = "FOLDER_SNOOZED_ID"
 }
