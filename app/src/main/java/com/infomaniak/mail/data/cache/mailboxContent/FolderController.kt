@@ -44,8 +44,6 @@ class FolderController @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
 ) {
 
-    var testRealm: Realm? = null
-
     //region Get data
     fun getMenuDrawerDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(
@@ -76,7 +74,7 @@ class FolderController @Inject constructor(
     }
 
     fun getFolder(id: String): Folder? {
-        return getFolderQuery(Folder::id.name, id, testRealm ?: mailboxContentRealm()).find()
+        return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).find()
     }
 
     fun getFolder(role: FolderRole): Folder? {

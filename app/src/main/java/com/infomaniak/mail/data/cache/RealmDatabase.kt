@@ -110,10 +110,21 @@ object RealmDatabase {
         }
     }.getOrThrow()
 
-    class MailboxContent {
-        operator fun invoke() = runBlocking(Dispatchers.IO) {
+    open class MailboxContent {
+        open operator fun invoke() = runBlocking(Dispatchers.IO) {
             mailboxContentMutex.withLock {
                 _mailboxContent ?: newMailboxContentInstance.also { _mailboxContent = it }
+            }
+        }
+    }
+
+    // Used for tests only.
+    class TestMailboxContent : MailboxContent() {
+        override operator fun invoke() = runBlocking(Dispatchers.IO) {
+            mailboxContentMutex.withLock {
+                _mailboxContent ?: newMailboxContentInstance(
+                    userId = -42, mailboxId = -1337, loadDataInMemory = true,
+                ).also { _mailboxContent = it }
             }
         }
     }

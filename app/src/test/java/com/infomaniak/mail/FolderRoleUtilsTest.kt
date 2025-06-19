@@ -40,9 +40,8 @@ class FolderRoleUtilsTest {
 
     @Mock
     private val mockContext = mock<Context>()
-    private val mockMailboxContent = mock<RealmDatabase.MailboxContent>()
-    private val realm = RealmDatabase.newMailboxContentInstance(userId = -42, mailboxId = -1337, loadDataInMemory = true)
-    private val folderController = FolderController(mockContext, mockMailboxContent).apply { testRealm = realm }
+    private val mailboxContentRealm = RealmDatabase.TestMailboxContent()
+    private val folderController = FolderController(mockContext, mailboxContentRealm)
     private val folderRoleUtils = FolderRoleUtils(folderController)
 
     //region Messages
@@ -70,7 +69,7 @@ class FolderRoleUtilsTest {
 
     //region Threads
     private val threadInboxSnoozed = messageInbox.toThread().apply {
-        addMessageWithConditions(messageInboxSnoozed, realm)
+        addMessageWithConditions(messageInboxSnoozed, mailboxContentRealm())
         recomputeThread()
     }
 
@@ -98,7 +97,7 @@ class FolderRoleUtilsTest {
     //endregion
 
     private fun setup() {
-        realm.writeBlocking {
+        mailboxContentRealm().writeBlocking {
             copyToRealm(folderInbox, UpdatePolicy.ALL)
             copyToRealm(folderDraft, UpdatePolicy.ALL)
         }
