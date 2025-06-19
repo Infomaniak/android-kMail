@@ -44,6 +44,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.richhtmleditor.StatusCommand.*
@@ -108,6 +109,7 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+    private val encryptionViewModel: EncryptionViewModel by activityViewModels()
 
     private val filePicker = FilePicker(fragment = this).apply {
         initCallback { uris -> newMessageViewModel.importAttachmentsLiveData.value = uris }
@@ -129,6 +131,9 @@ class NewMessageFragment : Fragment() {
 
     @Inject
     lateinit var aiManager: NewMessageAiManager
+
+    @Inject
+    lateinit var encryptionMessageManager: EncryptionMessageManager
 
     @Inject
     lateinit var externalsManager: NewMessageExternalsManager
@@ -207,6 +212,12 @@ class NewMessageFragment : Fragment() {
             observeAiOutput()
             observeAiPromptStatus()
             observeAiFeatureFlagUpdates()
+        }
+
+        with(encryptionMessageManager) {
+            observeEncryptionFeatureFlagUpdates()
+            observeEncryptionActivation()
+            observeUncryptableRecipients()
         }
 
         with(recipientFieldsManager) {
@@ -290,7 +301,15 @@ class NewMessageFragment : Fragment() {
             binding = binding,
             fragment = this@NewMessageFragment,
             aiManager = aiManager,
+            encryptionManager = encryptionMessageManager,
             openFilePicker = filePicker::open,
+        )
+
+        encryptionMessageManager.init(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            encryptionViewModel = encryptionViewModel,
         )
 
         recipientFieldsManager.initValues(
@@ -743,7 +762,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun navigateToScheduleSendBottomSheet() {
-        safeNavigate(
+        safelyNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
