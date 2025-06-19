@@ -43,7 +43,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
     // Every field that is added in this Transient region should be declared in
     // `initLocalValue()` too to avoid loosing data when updating from the API.
     @Transient
-    override var canBeEncrypted: Boolean = false
+    override var canBeEncrypted: Boolean? = null
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -98,7 +98,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
         override fun create(parcel: Parcel): Recipient {
             val email = parcel.readString()!!
             val name = parcel.readString()!!
-            val canBeEncrypted = parcel.customReadBoolean()
+            val canBeEncrypted = runCatching { parcel.customReadBoolean() }.getOrNull()
 
             return Recipient().initLocalValues(email, name, canBeEncrypted)
         }
@@ -106,7 +106,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
         override fun Recipient.write(parcel: Parcel, flags: Int) {
             parcel.writeString(email)
             parcel.writeString(name)
-            parcel.customWriteBoolean(canBeEncrypted)
+            canBeEncrypted?.let(parcel::customWriteBoolean)
         }
     }
 }

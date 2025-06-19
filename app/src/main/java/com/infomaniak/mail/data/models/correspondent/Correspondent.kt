@@ -27,7 +27,7 @@ import io.sentry.Sentry
 interface Correspondent {
     var email: String
     var name: String
-    var canBeEncrypted: Boolean
+    var canBeEncrypted: Boolean?
 
     val initials: String
 
