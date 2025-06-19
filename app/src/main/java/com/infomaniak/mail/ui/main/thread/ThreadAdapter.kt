@@ -834,8 +834,8 @@ class ThreadAdapter(
         recipientOverlayedButton.isVisible = isExpanded
     }
 
-    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String = with(message) {
-        return allRecipients.joinToString { it.displayedName(context) }
+    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String {
+        return message.allRecipients.joinToString { it.displayedName(context) }
     }
 
     fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessagesUids.contains(messageUid)
