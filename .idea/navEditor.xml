@@ -143,18 +143,6 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="aiEngineSettingFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="2208" />
-                            <option name="y" value="1792" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="attachMailboxFragment">
                     <value>
                       <LayoutPositions>
@@ -670,11 +658,6 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_settings_to_aiEngineSetting">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
                             <entry key="action_settings_to_autoAdvanceSettings">
                               <value>
                                 <LayoutPositions />
@@ -905,6 +888,18 @@
                           <Point>
                             <option name="x" value="2208" />
                             <option name="y" value="724" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="uBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
                           </Point>
                         </option>
                       </LayoutPositions>

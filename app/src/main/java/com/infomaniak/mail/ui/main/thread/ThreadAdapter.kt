@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -40,8 +41,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
-import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
-import com.infomaniak.core.utils.format
+import com.infomaniak.core.utils.*
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
@@ -78,6 +78,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.format.FormatStyle
 import java.util.Date
 import com.google.android.material.R as RMaterial
 
@@ -482,24 +483,35 @@ class ThreadAdapter(
             isVisible = true
 
             val isMe = message.from.all(Recipient::isMe)
-            val hasPassword = message.encryptionPassword?.isNotBlank() == true
+            val passwordValidity = message.encryptionPasswordValidity?.toDate()
 
-            val (descriptionRes, actionRes) = when {
-                isMe && hasPassword -> R.string.encryptedMessageDescription to R.string.buttonCopyPassword
-                isMe -> R.string.encryptedMessageTitle to null
-                else -> R.string.encryptedMessageReceiverTitle to null
+            val (description, actionRes) = if (isMe && passwordValidity != null) {
+                getDisplayablePasswordValidity(context, passwordValidity) to R.string.encryptedButtonSeeConcernedRecipients
+            } else {
+                context.getString(R.string.encryptedMessageHeader) to null
             }
 
-            setDescription(context.getString(descriptionRes))
+            setDescription(description)
             actionRes?.let {
                 setAction1Text(context.getString(it))
                 onAction1 {
-                    message.encryptionPassword?.let { password ->
-                        threadAdapterCallbacks?.onCopyEncryptionPassword?.invoke(password)
-                    }
+                    threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(message.allRecipients)
                 }
             } ?: setActionsVisibility(isVisible = false)
         }
+    }
+
+    private fun getDisplayablePasswordValidity(context: Context, passwordValidity: Date): String {
+        val displayableDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            passwordValidity.formatWithLocal(formatData = FormatData.DATE, formatStyle = FormatStyle.SHORT)
+        } else {
+            passwordValidity.format(FORMAT_DATE_SIMPLE)
+        }
+
+        return context.getString(
+            R.string.encryptedMessageHeaderPasswordExpiryDate,
+            displayableDate,
+        )
     }
 
     private fun ItemMessageBinding.bindScheduled(message: Message) {
@@ -812,8 +824,8 @@ class ThreadAdapter(
         recipientOverlayedButton.isVisible = isExpanded
     }
 
-    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String = with(message) {
-        return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
+    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String {
+        return message.allRecipients.joinToString { it.displayedName(context) }
     }
 
     fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessagesUids.contains(messageUid)
@@ -929,7 +941,7 @@ class ThreadAdapter(
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
-        var onCopyEncryptionPassword: ((String) -> Unit)? = null,
+        var onEncryptionSeeConcernedRecipients: ((List<Recipient>) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {
