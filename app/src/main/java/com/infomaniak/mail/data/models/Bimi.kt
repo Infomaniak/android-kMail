@@ -19,6 +19,8 @@ package com.infomaniak.mail.data.models
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.infomaniak.core.extensions.customReadBoolean
+import com.infomaniak.core.extensions.customWriteBoolean
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
@@ -56,11 +58,5 @@ class Bimi() : EmbeddedRealmObject, Parcelable {
             writeString(svgContentUrl)
             customWriteBoolean(isCertified)
         }
-
-        private fun Parcel.customWriteBoolean(value: Boolean) {
-            writeInt(if (value) 1 else 0)
-        }
-
-        private fun Parcel.customReadBoolean(): Boolean = readInt() != 0
     }
 }
