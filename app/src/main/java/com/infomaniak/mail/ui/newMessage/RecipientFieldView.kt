@@ -22,7 +22,6 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.PopupWindow
@@ -77,7 +76,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private val contactPopupWindow by lazy {
         PopupWindow(context).apply {
             contentView = contextMenuBinding.root
-            height = ViewGroup.LayoutParams.WRAP_CONTENT
+            height = LayoutParams.WRAP_CONTENT
 
             val displayMetrics = context.resources.displayMetrics
             val percentageOfScreen = (displayMetrics.widthPixels * MAX_WIDTH_PERCENTAGE).toInt()
@@ -309,7 +308,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled?.invoke(isAutoCompletionOpened)
     }
 
-    private fun addRecipient(email: String, name: String, canBeEncrypted: Boolean) {
+    private fun addRecipient(email: String, name: String, canBeEncrypted: Boolean?) {
 
         if (!email.isEmail()) {
             snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
