@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
@@ -45,6 +46,7 @@ import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 class ThreadListMultiSelection {
 
     lateinit var mainViewModel: MainViewModel
+    private lateinit var folderRoleUtils: FolderRoleUtils
     private lateinit var threadListFragment: ThreadListFragment
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
@@ -54,11 +56,13 @@ class ThreadListMultiSelection {
 
     fun initMultiSelection(
         mainViewModel: MainViewModel,
+        folderRoleUtils: FolderRoleUtils,
         threadListFragment: ThreadListFragment,
         unlockSwipeActionsIfSet: () -> Unit,
         localSettings: LocalSettings,
     ) {
         this.mainViewModel = mainViewModel
+        this.folderRoleUtils = folderRoleUtils
         this.threadListFragment = threadListFragment
         this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
         this.localSettings = localSettings
@@ -81,7 +85,7 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionArchive -> {
                     threadListFragment.descriptionDialog.archiveWithConfirmationPopup(
-                        folderRole = getActionFolderRole(thread = selectedThreads.firstOrNull()),
+                        folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
                         threadListFragment.trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount)
@@ -96,7 +100,7 @@ class ThreadListMultiSelection {
                 }
                 R.id.quickActionDelete -> threadListFragment.apply {
                     threadListFragment.descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = getActionFolderRole(selectedThreads.firstOrNull()),
+                        folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
@@ -206,7 +210,7 @@ class ThreadListMultiSelection {
             changeIcon(FAVORITE_INDEX, favoriteIcon)
 
             val isSelectionEmpty = selectedThreads.isEmpty()
-            val isFromArchive = mainViewModel.getActionFolderRole(selectedThreads.firstOrNull()) == FolderRole.ARCHIVE
+            val isFromArchive = folderRoleUtils.getActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
             for (index in 0 until getButtonCount()) {
                 val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
                 if (shouldDisable) disable(index) else enable(index)

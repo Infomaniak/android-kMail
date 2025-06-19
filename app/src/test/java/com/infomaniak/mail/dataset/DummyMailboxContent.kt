@@ -15,12 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.dataset
 
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
+import com.infomaniak.mail.data.cache.RealmDatabase.MailboxContent
+import com.infomaniak.mail.data.cache.RealmDatabase.newMailboxContentInstance
+import io.realm.kotlin.Realm
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
-fun interface SwipeDisplayBehavior {
-    fun canDisplay(folderRole: FolderRole?, featureFlags: FeatureFlagSet?, localSettings: LocalSettings): Boolean
+private var mailboxContent: Realm? = null
+
+class DummyMailboxContent : MailboxContent() {
+    override operator fun invoke() = runBlocking(Dispatchers.IO) {
+        mailboxContent ?: newMailboxContentInstance(
+            userId = -42, mailboxId = -1337, loadDataInMemory = true,
+        ).also { mailboxContent = it }
+    }
 }

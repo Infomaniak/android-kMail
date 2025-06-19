@@ -150,8 +150,8 @@ class CalendarEventResponseTest {
     }
 
     companion object {
-        val today = RealmInstant.from(1706700836, 0)
-        val inOneHour = RealmInstant.from(1706704436, 0)
-        val tomorrow = RealmInstant.from(1706792315, 0)
+        val today = RealmInstant.from(1_706_700_836L, 0)
+        val inOneHour = RealmInstant.from(1_706_704_436L, 0)
+        val tomorrow = RealmInstant.from(1_706_792_315L, 0)
     }
 }

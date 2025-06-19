@@ -87,8 +87,8 @@ object RealmDatabase {
     val mailboxInfo get() = openRealmOrDropDbAndReboot(RealmConfig.mailboxInfo)
 
     val newMailboxContentInstance get() = newMailboxContentInstance(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-    fun newMailboxContentInstance(userId: Int, mailboxId: Int): Realm {
-        return openRealmOrDropDbAndReboot(RealmConfig.mailboxContent(userId, mailboxId))
+    fun newMailboxContentInstance(userId: Int, mailboxId: Int, loadDataInMemory: Boolean = false): Realm {
+        return openRealmOrDropDbAndReboot(RealmConfig.mailboxContent(userId, mailboxId, loadDataInMemory))
     }
 
     /**
@@ -110,8 +110,8 @@ object RealmDatabase {
         }
     }.getOrThrow()
 
-    class MailboxContent {
-        operator fun invoke() = runBlocking(Dispatchers.IO) {
+    open class MailboxContent {
+        open operator fun invoke() = runBlocking(Dispatchers.IO) {
             mailboxContentMutex.withLock {
                 _mailboxContent ?: newMailboxContentInstance.also { _mailboxContent = it }
             }
@@ -254,7 +254,7 @@ object RealmDatabase {
             .migration(MAILBOX_INFO_MIGRATION)
             .build()
 
-        fun mailboxContent(userId: Int, mailboxId: Int): RealmConfiguration {
+        fun mailboxContent(userId: Int, mailboxId: Int, loadDataInMemory: Boolean = false): RealmConfiguration {
 
             if (mailboxId == DEFAULT_ID) {
                 Sentry.captureMessage("RealmConfiguration problem with mailbox content, default ID is used.", SentryLevel.ERROR)
@@ -263,8 +263,13 @@ object RealmDatabase {
             return RealmConfiguration.Builder(mailboxContentSet)
                 .name(mailboxContentDbName(userId, mailboxId))
                 .schemaVersion(MAILBOX_CONTENT_SCHEMA_VERSION)
+                .loadDataInMemoryIfNeeded(loadDataInMemory)
                 .migration(MAILBOX_CONTENT_MIGRATION)
                 .build()
+        }
+
+        private fun RealmConfiguration.Builder.loadDataInMemoryIfNeeded(loadDataInMemory: Boolean): RealmConfiguration.Builder {
+            return apply { if (loadDataInMemory) inMemory() }
         }
         //endregion
     }

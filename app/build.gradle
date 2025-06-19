@@ -133,6 +133,7 @@ dependencies {
 
     // Test
     testImplementation libs.junit
+    testImplementation libs.mockito.kotlin
     androidTestImplementation libs.ext.junit
 
     // Debug

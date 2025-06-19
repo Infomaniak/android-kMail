@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.annotations
 
-import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
-
-fun interface SwipeDisplayBehavior {
-    fun canDisplay(folderRole: FolderRole?, featureFlags: FeatureFlagSet?, localSettings: LocalSettings): Boolean
-}
+@RequiresOptIn(
+    level = RequiresOptIn.Level.ERROR,
+    message = "Don't access it outside of testing",
+)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.PROPERTY)
+annotation class TestOnly
