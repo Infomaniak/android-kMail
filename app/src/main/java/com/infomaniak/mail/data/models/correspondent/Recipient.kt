@@ -19,6 +19,8 @@ package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.infomaniak.core.extensions.customReadBoolean
+import com.infomaniak.core.extensions.customWriteBoolean
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.extensions.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -96,7 +98,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
         override fun create(parcel: Parcel): Recipient {
             val email = parcel.readString()!!
             val name = parcel.readString()!!
-            val canBeEncrypted = parcel.readBoolean()
+            val canBeEncrypted = parcel.customReadBoolean()
 
             return Recipient().initLocalValues(email, name, canBeEncrypted)
         }
@@ -104,7 +106,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
         override fun Recipient.write(parcel: Parcel, flags: Int) {
             parcel.writeString(email)
             parcel.writeString(name)
-            parcel.writeBoolean(canBeEncrypted)
+            parcel.customWriteBoolean(canBeEncrypted)
         }
     }
 }
