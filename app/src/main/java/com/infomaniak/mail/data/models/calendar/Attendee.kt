@@ -20,6 +20,8 @@ package com.infomaniak.mail.data.models.calendar
 import android.os.Parcel
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import com.infomaniak.core.extensions.customReadBoolean
+import com.infomaniak.core.extensions.customWriteBoolean
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -44,7 +46,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
 
     override var contactedTimes: Int? = null
     override var other: Boolean = false
-    override var canBeEncrypted: Boolean = false
+    override var canBeEncrypted: Boolean? = null
     //endregion
 
     val state get() = AttendanceState.entries.firstOrNull { it.apiValue == _state } ?: AttendanceState.NEEDS_ACTION
@@ -113,11 +115,5 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
             customWriteBoolean(isOrganizer)
             writeString(_state)
         }
-
-        private fun Parcel.customWriteBoolean(value: Boolean) {
-            writeInt(if (value) 1 else 0)
-        }
-
-        private fun Parcel.customReadBoolean(): Boolean = readInt() != 0
     }
 }
