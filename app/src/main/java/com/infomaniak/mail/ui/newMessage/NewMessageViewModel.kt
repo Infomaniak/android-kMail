@@ -178,18 +178,27 @@ class NewMessageViewModel @Inject constructor(
     private var snapshot: DraftSnapshot? = null
 
     val otherRecipientsFieldsAreEmpty = MutableLiveData(true)
+    val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
     val isEditorWebViewFocusedLiveData = MutableLiveData<Boolean>()
 
     val initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
-    val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
-    val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
-    val isSendingAllowed = SingleLiveEvent(false)
-    val isEncryptionActivated = SingleLiveEvent(false)
-    val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
-    // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
-    val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<InitResult>()
+
+    //region Attachments
+    val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
+    val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
+    //endRegion
+
+    //region Encryption
+    val isEncryptionActivated = SingleLiveEvent(false)
+    val encryptionPassword: MutableLiveData<String> = MutableLiveData("")
+    //endregion
+
+    val isSendingAllowed = SingleLiveEvent(false)
+
+    // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
+    val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
