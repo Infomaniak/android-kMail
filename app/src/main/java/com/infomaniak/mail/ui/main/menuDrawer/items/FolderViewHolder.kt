@@ -17,8 +17,9 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.SentryLog
@@ -31,6 +32,7 @@ import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHo
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
+import java.nio.file.Files.delete
 import kotlin.math.min
 
 class FolderViewHolder(
@@ -114,7 +116,20 @@ class FolderViewHolder(
         setCollapsingButtonContentDescription(folderName)
 
         setOnLongClickListener {
-            Toast.makeText(context, "Long click", Toast.LENGTH_SHORT).show()
+            val popup = PopupMenu(context, it)
+            val inflater: MenuInflater = popup.menuInflater
+            inflater.inflate(R.menu.item_menu_settings_folder, popup.menu)
+            popup.show()
+
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.modifySettingsFolder -> {
+                        // TODO: ajouter le dialog
+                        true
+                    }
+                    else -> false
+                }
+            }
             true
         }
 
