@@ -529,6 +529,9 @@ class ThreadViewModel @Inject constructor(
         viewModelScope.launch {
             val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
 
+            // If the value isn't present, there's nothing to remove, so we can exit
+            if (fakeReactions.value[messageId]?.contains(emoji) != true) return@launch
+
             // TODO: Optimize memory consumption
             fakeReactions.value = fakeReactions.value.toMutableMap().apply {
                 set(messageId, getOrDefault(messageId, emptySet()).minus(emoji))

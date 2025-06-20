@@ -22,7 +22,6 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -126,6 +125,7 @@ import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ALL_EMOJI_SENT_STATUS
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.EMOJI_SENT_STATUS
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -133,6 +133,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -637,19 +638,40 @@ class ThreadFragment : Fragment() {
     private fun observeDraftWorkerResults() {
         WorkerUtils.flushWorkersBefore(context = requireContext(), lifecycleOwner = viewLifecycleOwner) {
 
+            // Listening to progress of the worker only lets us react quickly if the user had to upload multiple drafts. This
+            // approach may skip intermediate progress updates if we stop listening and then restart, as it only captures the most
+            // recent state.
             val runningWorkInfoLiveData = draftsActionsWorkerScheduler.getRunningWorkInfoLiveData()
             runningWorkInfoLiveData.observe(viewLifecycleOwner) {
                 it.forEach { workInfo ->
-                    workInfo.progress.let {
-                        val emojiSendResult =
-                            it.getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
-                        if (emojiSendResult.isSuccess.not()) {
-                            threadViewModel.undoFakeEmojiReply(emojiSendResult.emoji, emojiSendResult.previousMessageUid)
-                        }
-                        Log.e("gibran", "observeDraftWorkerResults - emojiSendResult: ${emojiSendResult}")
+                    val emojiSendResult = workInfo.progress
+                        .getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
+
+                    undoFakeEmojiReply(emojiSendResult)
+                }
+            }
+
+            // Listening to the draft results ensures we will get all of the possible emoji results and not miss any unlike when
+            // we listen to the worker's progress.
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
+
+                    val emojiSendResults = workInfo.outputData
+                        .getSerializable<DraftsActionsWorker.EmojiSendResults>(ALL_EMOJI_SENT_STATUS) ?: return@forEach
+
+                    emojiSendResults.results.forEach { emojiSendResult ->
+                        undoFakeEmojiReply(emojiSendResult)
                     }
                 }
             }
+        }
+    }
+
+    private fun undoFakeEmojiReply(emojiSendResult: DraftsActionsWorker.EmojiSendResult) {
+        if (emojiSendResult.isSuccess.not()) {
+            threadViewModel.undoFakeEmojiReply(emojiSendResult.emoji, emojiSendResult.previousMessageUid)
         }
     }
 
