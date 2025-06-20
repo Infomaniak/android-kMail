@@ -527,11 +527,7 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            if (threadState.hasSuperCollapsedBlockBeenClicked.value) {
-                displayBatchedMessages(items)
-            } else {
-                threadAdapter.submitList(items)
-            }
+            threadAdapter.submitList(items)
 
             if (messagesToFetch.isNotEmpty()) fetchMessagesHeavyData(messagesToFetch)
 
