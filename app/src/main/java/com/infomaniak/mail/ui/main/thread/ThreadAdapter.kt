@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(TestOnly::class)
-
 package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
@@ -51,7 +49,6 @@ import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
@@ -821,7 +818,7 @@ class ThreadAdapter(
         indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
     }
 
-    @TestOnly
+    // Only public because it's accessed inside of a test file
     enum class NotifyType {
         TOGGLE_LIGHT_MODE,
         RE_RENDER,
