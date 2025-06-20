@@ -22,5 +22,5 @@ package com.infomaniak.mail.annotations
     message = "Don't access it outside of testing",
 )
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
+@Target(AnnotationTarget.PROPERTY)
 annotation class TestOnly
