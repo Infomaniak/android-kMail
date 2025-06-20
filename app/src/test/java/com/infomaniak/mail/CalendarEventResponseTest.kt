@@ -77,7 +77,7 @@ class CalendarEventResponseTest {
         assertFalse(messageDiffCallback.areContentsTheSame(message, onlyAttendeesChanged))
         assertEquals(
             NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE,
-            messageDiffCallback.getChangePayload(message, onlyAttendeesChanged)
+            messageDiffCallback.getChangePayload(message, onlyAttendeesChanged),
         )
 
         // If both the attendance state and another field has changed, the change must be detected and the associated payload
