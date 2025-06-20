@@ -67,10 +67,12 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeUnencryptableRecipients() {
         encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipients ->
+            if (newMessageViewModel.isEncryptionActivated.value != true) return@observe
+
             val recipientsCount = recipients.count()
             binding.encryptionLockButtonView.unencryptableRecipientsCount = recipientsCount
 
-            if (recipients.isNotEmpty() && !hasAlreadyAddedUnencryptableRecipients) {
+            if (recipientsCount > 0 && !hasAlreadyAddedUnencryptableRecipients) {
                 hasAlreadyAddedUnencryptableRecipients = true
                 snackbarManager.postValue(
                     fragment.resources.getQuantityString(
