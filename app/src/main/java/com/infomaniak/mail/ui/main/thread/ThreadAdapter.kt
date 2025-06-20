@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(TestOnly::class)
+
 package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
@@ -49,11 +51,13 @@ import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
+import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
@@ -817,7 +821,8 @@ class ThreadAdapter(
         indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
     }
 
-    private enum class NotifyType {
+    @TestOnly
+    enum class NotifyType {
         TOGGLE_LIGHT_MODE,
         RE_RENDER,
         FAILED_MESSAGE,
@@ -844,8 +849,8 @@ class ThreadAdapter(
             return when (oldItem) {
                 is Message -> {
                     newItem is Message &&
-                            areMessageContentsTheSameExceptCalendar(oldItem, newItem) &&
-                            newItem.latestCalendarEventResponse == oldItem.latestCalendarEventResponse
+                            MessageDiffAspect.AnythingElse.areTheSame(oldItem, newItem) &&
+                            MessageDiffAspect.Calendar.areTheSame(oldItem, newItem)
                 }
                 is SuperCollapsedBlock -> {
                     newItem is SuperCollapsedBlock &&
@@ -859,24 +864,54 @@ class ThreadAdapter(
 
             if (oldItem !is Message || newItem !is Message) return null
 
-            // If everything but Attendees is the same, then we know the only thing that could've changed is Attendees.
-            return if (everythingButAttendeesIsTheSame(oldItem, newItem)) NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE else null
+            // TODO: Handle the case where there are multiple aspects that changed at once
+            return when {
+                MessageDiffAspect.AnythingElse.areDifferent(oldItem, newItem) -> null // null means "bind the whole item again"
+                else -> {
+                    val oldCalendarEventResponse = oldItem.latestCalendarEventResponse
+                    val newCalendarEventResponse = newItem.latestCalendarEventResponse
+                    when {
+                        oldCalendarEventResponse == null && newCalendarEventResponse == null -> null
+                        oldCalendarEventResponse == null || newCalendarEventResponse == null -> null
+                        MessageDiffAspect.Calendar.Attendees.areDifferent(
+                            oldCalendarEventResponse,
+                            newCalendarEventResponse,
+                        ) -> NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE
+                        else -> null
+                    }
+                }
+            }
         }
 
         companion object {
-            fun everythingButAttendeesIsTheSame(oldMessage: Message, newMessage: Message): Boolean {
-                val newCalendarEventResponse = newMessage.latestCalendarEventResponse
-                val oldCalendarEventResponse = oldMessage.latestCalendarEventResponse
-
-                return (areMessageContentsTheSameExceptCalendar(oldMessage, newMessage) &&
-                        !(newCalendarEventResponse == null && oldCalendarEventResponse == null)
-                        && newCalendarEventResponse?.everythingButAttendeesIsTheSame(oldCalendarEventResponse) == true)
+            sealed class DiffAspect<T>(private val isTheSameAs: T.(T) -> Boolean) {
+                fun areTheSame(message: T, other: T) = message.isTheSameAs(other)
+                fun areDifferent(message: T, other: T) = areTheSame(message, other).not()
             }
 
-            private fun areMessageContentsTheSameExceptCalendar(oldMessage: Message, newMessage: Message): Boolean {
-                return newMessage.body?.value == oldMessage.body?.value &&
-                        newMessage.splitBody == oldMessage.splitBody &&
-                        newMessage.shouldHideDivider == oldMessage.shouldHideDivider
+            object MessageDiffAspect {
+                data object Calendar : DiffAspect<Message>({
+                    val calendarEventResponse = latestCalendarEventResponse
+                    val otherCalendarEventResponse = it.latestCalendarEventResponse
+
+                    when {
+                        calendarEventResponse == null && otherCalendarEventResponse == null -> true
+                        calendarEventResponse == null || otherCalendarEventResponse == null -> false
+                        else -> Attendees.areTheSame(calendarEventResponse, otherCalendarEventResponse)
+                                && AnythingElse.areTheSame(calendarEventResponse, otherCalendarEventResponse)
+                    }
+                }) {
+                    data object Attendees : DiffAspect<CalendarEventResponse>({ attendeesAreTheSame(it) })
+                    data object AnythingElse : DiffAspect<CalendarEventResponse>({ everythingButAttendeesIsTheSame(it) })
+                }
+
+                data object AnythingElse : DiffAspect<Message>({ oldMessage ->
+                    // Checks for any aspect of the message that could change and trigger a whole bind of the item again. Here we
+                    // check for anything that doesn't need to handle bind with precision using a custom payload
+                    body?.value == oldMessage.body?.value &&
+                            splitBody == oldMessage.splitBody &&
+                            shouldHideDivider == oldMessage.shouldHideDivider
+                })
             }
         }
     }
