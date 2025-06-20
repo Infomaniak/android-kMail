@@ -749,10 +749,19 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         messageUid: String? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
-        val destinationFolder = folderController.getFolder(destinationFolderId)!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
+        val destinationFolder = folderController.getFolder(destinationFolderId)!!
+        moveThreadsOrMessageTo(destinationFolder, threads, message)
+    }
+
+    suspend fun moveThreadsOrMessageTo(
+        destinationFolder: Folder,
+        threads: List<Thread>,
+        message: Message? = null,
+    ) {
+        val mailbox = currentMailbox.value!!
+        val threadsUids = threads.map { it.uid }
 
         val messages = sharedUtils.getMessagesToMove(threads, message)
 
@@ -827,34 +836,14 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         message: Message? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
         val role = folderRoleUtils.getActionFolderRole(threads, message)
         val isFromArchive = role == FolderRole.ARCHIVE
-
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
-        val messages = sharedUtils.getMessagesToMove(threads, message)
-
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
-
-        activityDialogLoaderResetTrigger.postValue(Unit)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
-
-            val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messagesFoldersIds,
-                destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
-            )
-        }
-
-        showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
+        moveThreadsOrMessageTo(destinationFolder, threads = threads, message = message)
     }
     //endregion
 
@@ -1242,7 +1231,7 @@ class MainViewModel @Inject constructor(
 
         return appContext.getString(errorMessageRes)
     }
-//endregion
+    //endregion
 
     //region Undo action
     fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
@@ -1272,7 +1261,7 @@ class MainViewModel @Inject constructor(
 
         snackbarManager.postValue(appContext.getString(snackbarTitle))
     }
-//endregion
+    //endregion
 
     //region New Folder
     private suspend fun createNewFolderSync(name: String): String? {
