@@ -157,9 +157,15 @@ class DraftsActionsWorker @AssistedInject constructor(
 
             runCatching {
                 val updatedDraft = uploadAttachmentsWithMutex(draft.localUuid, mailbox, mailboxContentRealm)
-                with(executeDraftAction(updatedDraft, mailbox.uuid)) {
-                    if (draft.action == DraftAction.SEND_REACTION) notifyOfEmojiProgress(draft, draftActionResult = this)
 
+                val executionResult = runCatching { executeDraftAction(updatedDraft, mailbox.uuid) }
+                if (draft.action == DraftAction.SEND_REACTION) {
+                    val isDraftActionSuccess = executionResult.isSuccess && executionResult.getOrThrow().isSuccess
+                    notifyOfEmojiProgress(draft, isSuccess = isDraftActionSuccess)
+                }
+
+                // TODO: Why do we crash here when we've got an error T.T, it means we won't handle other messages that come after
+                with(executionResult.getOrThrow()) {
                     if (isSuccess) {
                         if (isTargetDraft) {
                             remoteUuidOfTrackedDraft = savedDraftUuid
@@ -526,11 +532,11 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         const val EMOJI_SENT_STATUS = "emojiSentStatusKey"
 
-        private suspend fun DraftsActionsWorker.notifyOfEmojiProgress(draft: Draft, draftActionResult: DraftActionResult) {
+        private suspend fun DraftsActionsWorker.notifyOfEmojiProgress(draft: Draft, isSuccess: Boolean) {
             val previousMessageUid = draft.inReplyToUid ?: return // inReplyToUid is always set in the case of an emoji reaction
             val emoji = draft.emojiReaction ?: return // we always have an emoji in the case of an emoji reaction
             val encodedEmojiSendResult = Json.encodeToString(
-                EmojiSendResult(previousMessageUid, draftActionResult.isSuccess, emoji)
+                EmojiSendResult(previousMessageUid, isSuccess, emoji)
             )
             Log.e("gibran", "notifyOfEmojiProgress - encodedEmojiSendResult: ${encodedEmojiSendResult}")
             setProgress(workDataOf(EMOJI_SENT_STATUS to encodedEmojiSendResult))

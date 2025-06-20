@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.lib.core.models.ApiResponse
@@ -1256,6 +1257,7 @@ class MainViewModel @Inject constructor(
 
     //region Emoji reaction
     fun sendEmojiReply(emoji: String, messageUid: String) {
+        Log.v("gibran", "sendEmojiReply - emoji: ${emoji}")
         viewModelScope.launch {
             val previousMessage = messageController.getMessage(messageUid) ?: return@launch
             val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(previousMessage)
