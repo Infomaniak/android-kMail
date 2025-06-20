@@ -276,6 +276,7 @@
     <string name="enableFilterButton">Enable filter</string>
     <string name="enableMultiSelection">Enable multiple selection</string>
     <string name="encryptedButtonSeeConcernedRecipients">See relevant recipients</string>
+    <string name="encryptedMessageAddPasswordButton">Protect with a password</string>
     <string name="encryptedMessageDisableEncryptionButton">Disable encryption</string>
     <string name="encryptedMessageHeader">This message is encrypted.</string>
     <string name="encryptedMessageHeaderPasswordExpiryDate">This message has been encrypted and will expire on %s only for recipients unable to benefit from automatic encryption.</string>
