@@ -73,52 +73,48 @@ class NotificationUtils @Inject constructor(
     private val notificationsJobByMailboxId = mutableMapOf<Int, Job?>()
 
     fun initNotificationChannel() = with(appContext) {
-        if (SDK_INT >= 26) {
-            val channelList = mutableListOf<NotificationChannel>()
+        val channelList = mutableListOf<NotificationChannel>()
 
-            val generalChannel = buildNotificationChannel(
-                getString(R.string.notification_channel_id_general),
-                getString(R.string.notificationGeneralChannelName),
-                NotificationManager.IMPORTANCE_DEFAULT,
-            )
-            channelList.add(generalChannel)
+        val generalChannel = buildNotificationChannel(
+            getString(R.string.notification_channel_id_general),
+            getString(R.string.notificationGeneralChannelName),
+            NotificationManager.IMPORTANCE_DEFAULT,
+        )
+        channelList.add(generalChannel)
 
-            val draftChannel = buildNotificationChannel(
-                getString(R.string.notification_channel_id_draft_service),
-                getString(R.string.notificationSyncDraftChannelName),
-                NotificationManager.IMPORTANCE_MIN,
-            )
-            channelList.add(draftChannel)
+        val draftChannel = buildNotificationChannel(
+            getString(R.string.notification_channel_id_draft_service),
+            getString(R.string.notificationSyncDraftChannelName),
+            NotificationManager.IMPORTANCE_MIN,
+        )
+        channelList.add(draftChannel)
 
-            val syncMessagesChannel = buildNotificationChannel(
-                getString(R.string.notification_channel_id_sync_messages_service),
-                getString(R.string.notificationSyncMessagesChannelName),
-                NotificationManager.IMPORTANCE_MIN,
-            )
-            channelList.add(syncMessagesChannel)
+        val syncMessagesChannel = buildNotificationChannel(
+            getString(R.string.notification_channel_id_sync_messages_service),
+            getString(R.string.notificationSyncMessagesChannelName),
+            NotificationManager.IMPORTANCE_MIN,
+        )
+        channelList.add(syncMessagesChannel)
 
-            createNotificationChannels(channelList)
-        }
+        createNotificationChannels(channelList)
     }
 
     fun initMailNotificationChannel(mailbox: Mailbox) = with(appContext) {
-        if (SDK_INT >= 26) {
-            val groups = mutableListOf<NotificationChannelGroup>()
-            val channels = mutableListOf<NotificationChannel>()
+        val groups = mutableListOf<NotificationChannelGroup>()
+        val channels = mutableListOf<NotificationChannel>()
 
-            val group = NotificationChannelGroup(mailbox.channelGroupId, mailbox.email)
-            groups.add(group)
+        val group = NotificationChannelGroup(mailbox.channelGroupId, mailbox.email)
+        groups.add(group)
 
-            val channel = buildNotificationChannel(
-                channelId = mailbox.channelId,
-                name = getString(R.string.notificationNewMessagesChannelName),
-                importance = NotificationManager.IMPORTANCE_DEFAULT,
-                groupId = group.id,
-            )
-            channels.add(channel)
+        val channel = buildNotificationChannel(
+            channelId = mailbox.channelId,
+            name = getString(R.string.notificationNewMessagesChannelName),
+            importance = NotificationManager.IMPORTANCE_DEFAULT,
+            groupId = group.id,
+        )
+        channels.add(channel)
 
-            createNotificationChannels(channels, groups)
-        }
+        createNotificationChannels(channels, groups)
     }
 
     fun buildGeneralNotification(title: String, description: String? = null): NotificationCompat.Builder {
@@ -360,9 +356,7 @@ class NotificationUtils @Inject constructor(
         val GENERIC_NEW_MAILS_NOTIFICATION_ID = "genericNewMailsNotificationId".hashCode()
 
         fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
-            if (SDK_INT >= 26) {
-                deleteNotificationChannels(mailbox.map { it.channelId })
-            }
+            deleteNotificationChannels(mailbox.map { it.channelId })
         }
     }
 }

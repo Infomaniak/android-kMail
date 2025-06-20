@@ -174,7 +174,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                 detectLeakedClosableObjects()
                 detectLeakedRegistrationObjects()
                 detectFileUriExposure()
-                if (SDK_INT >= 26) detectContentUriWithoutPermission()
+                detectContentUriWithoutPermission()
                 if (SDK_INT >= 29) detectCredentialProtectedWhileLocked()
             }.build()
         )

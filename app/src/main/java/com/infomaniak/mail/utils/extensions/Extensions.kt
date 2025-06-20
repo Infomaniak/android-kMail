@@ -511,7 +511,7 @@ fun Fragment.setSystemBarsColors(
 }
 
 fun Window.updateNavigationBarColor(@ColorInt color: Int) {
-    if (SDK_INT >= 27) navigationBarColor = color
+    navigationBarColor = color
 }
 
 fun Activity.getMainApplication() = (application as MainApplication)

@@ -52,18 +52,15 @@ object UiUtils {
 
     @ColorInt
     fun pointBetweenColors(@ColorInt from: Int, @ColorInt to: Int, percent: Float): Int {
-        return if (SDK_INT >= 26) {
-            val fromColor = from.toColor()
-            val toColor = to.toColor()
-            Color.pack(
-                pointBetweenColor(fromColor.red(), toColor.red(), percent),
-                pointBetweenColor(fromColor.green(), toColor.green(), percent),
-                pointBetweenColor(fromColor.blue(), toColor.blue(), percent),
-                pointBetweenColor(fromColor.alpha(), toColor.alpha(), percent),
-            ).toColorInt()
-        } else {
-            pointBetweenColors25(from, to, percent)
-        }
+        val fromColor = from.toColor()
+        val toColor = to.toColor()
+        return Color.pack(
+            pointBetweenColor(fromColor.red(), toColor.red(), percent),
+            pointBetweenColor(fromColor.green(), toColor.green(), percent),
+            pointBetweenColor(fromColor.blue(), toColor.blue(), percent),
+            pointBetweenColor(fromColor.alpha(), toColor.alpha(), percent),
+        ).toColorInt()
+
     }
 
     private fun pointBetweenColor(from: Float, to: Float, percent: Float): Float = from + percent * (to - from)
