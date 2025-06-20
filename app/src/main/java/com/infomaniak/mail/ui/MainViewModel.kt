@@ -769,11 +769,10 @@ class MainViewModel @Inject constructor(
         threads: List<Thread>,
         message: Message? = null,
         messagesToMove: List<Message>,
+        shouldDisplaySnackbar: Boolean = true,
     ) {
         val mailbox = currentMailbox.value!!
         val threadsUids = threads.map { it.uid }
-
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
         val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messagesToMove.getUids(), destinationFolder.id)
 
@@ -788,9 +787,7 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-
-        showMoveSnackbar(threads, message, messages = messagesToMove, apiResponses, destinationFolder)
+        if (shouldDisplaySnackbar) showMoveSnackbar(threads, message, messages = messagesToMove, apiResponses, destinationFolder)
     }
 
     private fun showMoveSnackbar(
@@ -845,7 +842,6 @@ class MainViewModel @Inject constructor(
         message: Message? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-
         val role = folderRoleUtils.getActionFolderRole(threads, message)
         val isFromArchive = role == FolderRole.ARCHIVE
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
@@ -1023,34 +1019,22 @@ class MainViewModel @Inject constructor(
         message: Message? = null,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-
         val destinationFolderRole = if (folderRoleUtils.getActionFolderRole(threads, message) == FolderRole.SPAM) {
             FolderRole.INBOX
         } else {
             FolderRole.SPAM
         }
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
-
         val messages = getMessagesToSpamOrHam(threads, message)
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
-
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
-                destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
-            )
-        } else {
-            threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        }
-
-        if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
+        moveThreadsOrMessageTo(
+            destinationFolder = destinationFolder,
+            threads = threads,
+            message = message,
+            messagesToMove = messages,
+            shouldDisplaySnackbar = displaySnackbar,
+        )
     }
 
     private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
