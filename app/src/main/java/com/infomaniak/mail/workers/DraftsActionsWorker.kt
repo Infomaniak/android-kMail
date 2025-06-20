@@ -18,12 +18,10 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.lifecycle.LiveData
 import androidx.work.Constraints
-import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
@@ -158,6 +156,11 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         var haveAllDraftsSucceeded = true
 
+        // Keep a list of all results to send them with the worker's result so we are certain to not miss any. With setProgress we
+        // could miss some if we stopped listening midway.
+        // setProgress is still needed as it it lets us provide quick feedback to the user.
+        val emojiSendResults = mutableListOf<EmojiSendResult>()
+
         /**
          * This list is reversed because we'll delete items while looping over it.
          * Doing so for managed Realm objects will lively update the list we're iterating through, making us skip the next item.
@@ -173,9 +176,18 @@ class DraftsActionsWorker @AssistedInject constructor(
 
             runCatching {
                 val updatedDraft = uploadAttachmentsWithMutex(draft.localUuid, mailbox, mailboxContentRealm)
-                with(executeDraftAction(updatedDraft, mailbox.uuid)) {
-                    if (draft.action == DraftAction.SEND_REACTION) notifyOfEmojiProgress(draft, draftActionResult = this)
 
+                val executionResult = runCatching { executeDraftAction(updatedDraft, mailbox.uuid) }
+                if (draft.action == DraftAction.SEND_REACTION) {
+                    val isDraftActionSuccess = executionResult.isSuccess && executionResult.getOrThrow().isSuccess
+
+                    draft.toEmojiSendResult(isDraftActionSuccess)?.let {
+                        notifyOfEmojiProgress(it)
+                        emojiSendResults.add(it)
+                    }
+                }
+
+                with(executionResult.getOrThrow()) {
                     if (isSuccess) {
                         if (isTargetDraft) {
                             remoteUuidOfTrackedDraft = savedDraftUuid
@@ -247,6 +259,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             trackedDraftErrorMessageResId,
             trackedScheduledDraftDate,
             trackedUnscheduledDraftUrl,
+            emojiSendResults,
         )
     }
 
@@ -294,6 +307,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         trackedDraftErrorMessageResId: Int?,
         trackedScheduledDraftDate: String?,
         trackedUnscheduleDraftUrl: String?,
+        emojiSendResults: List<EmojiSendResult>,
     ): Result {
 
         val biggestScheduledMessagesEtop = scheduledMessagesEtops.mapNotNull {
@@ -305,6 +319,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         // Common result values
         val etopPair = BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY to biggestScheduledMessagesEtop
         val userIdPair = RESULT_USER_ID_KEY to userId
+        val emojiPair = ALL_EMOJI_SENT_STATUS to Json.encodeToString(emojiSendResults)
         // We need an array to be able to read a nullable value on the other side
         val isSuccessPair = IS_SUCCESS to arrayOf(isSuccess)
 
@@ -318,6 +333,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
                     etopPair,
                     userIdPair,
+                    emojiPair,
                     isSuccessPair,
                     SCHEDULED_DRAFT_DATE_KEY to trackedScheduledDraftDate,
                     UNSCHEDULE_DRAFT_URL_KEY to trackedUnscheduleDraftUrl,
@@ -332,6 +348,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
                     etopPair,
                     userIdPair,
+                    emojiPair,
                     isSuccessPair,
                 )
             } else {
@@ -538,6 +555,10 @@ class DraftsActionsWorker @AssistedInject constructor(
     @Serializable
     data class EmojiSendResult(val previousMessageUid: String, val isSuccess: Boolean, val emoji: String)
 
+    @Serializable
+    @JvmInline
+    value class EmojiSendResults(val results: List<EmojiSendResult>)
+
     companion object {
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
@@ -554,15 +575,16 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val IS_SUCCESS = "isSuccess"
 
         const val EMOJI_SENT_STATUS = "emojiSentStatusKey"
+        const val ALL_EMOJI_SENT_STATUS = "allEmojiSentStatusKey"
 
-        private suspend fun DraftsActionsWorker.notifyOfEmojiProgress(draft: Draft, draftActionResult: DraftActionResult) {
-            val previousMessageUid = draft.inReplyToUid ?: return // inReplyToUid is always set in the case of an emoji reaction
-            val emoji = draft.emojiReaction ?: return // we always have an emoji in the case of an emoji reaction
-            val encodedEmojiSendResult = Json.encodeToString(
-                EmojiSendResult(previousMessageUid, draftActionResult.isSuccess, emoji)
-            )
-            Log.e("gibran", "notifyOfEmojiProgress - encodedEmojiSendResult: ${encodedEmojiSendResult}")
-            setProgress(workDataOf(EMOJI_SENT_STATUS to encodedEmojiSendResult))
+        private suspend fun DraftsActionsWorker.notifyOfEmojiProgress(emojiSendResult: EmojiSendResult) {
+            setProgress(workDataOf(EMOJI_SENT_STATUS to Json.encodeToString(emojiSendResult)))
+        }
+
+        private fun Draft.toEmojiSendResult(isSuccess: Boolean): EmojiSendResult? {
+            val previousMessageUid = inReplyToUid ?: return null // inReplyToUid is always set in the case of an emoji reaction
+            val emoji = emojiReaction ?: return null // we always have an emoji in the case of an emoji reaction
+            return EmojiSendResult(previousMessageUid, isSuccess, emoji)
         }
     }
 }
