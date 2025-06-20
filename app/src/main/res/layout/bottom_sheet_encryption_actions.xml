@@ -24,7 +24,6 @@
 
     <TextView
         android:id="@+id/encryptionStatusTitle"
-        style="@style/BodySmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawablePadding="@dimen/marginStandardMedium"
@@ -42,7 +41,6 @@
         android:layout_marginBottom="@dimen/alternativeMargin"
         android:paddingHorizontal="@dimen/marginStandardMedium"
         tools:text="Le chiffrement n’est pas pris en charge par 1 utilisateur. Un mot de passe est requis pour finaliser l’envoi." />
-
 
     <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
         android:id="@+id/protectWithPassword"
