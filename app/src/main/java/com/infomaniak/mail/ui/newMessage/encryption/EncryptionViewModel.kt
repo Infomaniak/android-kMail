@@ -45,6 +45,8 @@ class EncryptionViewModel @Inject constructor(
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
         viewModelScope.launch(ioDispatcher) {
             val unknownEncryptionStatusRecipients = emails.filter { unencryptableRecipients.value?.contains(it) != true }
+            if (unknownEncryptionStatusRecipients.isEmpty()) return@launch
+
             val apiResponse = ApiRepository.isInfomaniakMailboxes(unknownEncryptionStatusRecipients)
             if (apiResponse.isSuccess()) {
                 apiResponse.data?.let { mailboxHostingStatuses ->
