@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -111,6 +112,11 @@ class FolderViewHolder(
         )
 
         setCollapsingButtonContentDescription(folderName)
+
+        setOnLongClickListener {
+            Toast.makeText(context, "Long click", Toast.LENGTH_SHORT).show()
+            true
+        }
 
         setOnClickListener {
             context.trackMenuDrawerEvent(trackerName, value = trackerValue)
