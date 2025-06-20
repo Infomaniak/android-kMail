@@ -87,14 +87,7 @@ class CalendarEventResponse() : EmbeddedRealmObject {
             attendees == null && otherAttendees == null -> true
             attendees == null || otherAttendees == null -> false
             attendees.count() != otherAttendees.count() -> false
-            else -> {
-                val mergedAttendees = buildSet {
-                    attendees.forEach { add(it) }
-                    otherAttendees.forEach { add(it) }
-                }
-
-                mergedAttendees.count() == attendees.count()
-            }
+            else -> attendees.containsAll(otherAttendees) && otherAttendees.containsAll(attendees)
         }
     }
 
