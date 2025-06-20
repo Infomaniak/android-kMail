@@ -97,6 +97,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.RealmResults
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -617,26 +618,44 @@ class MainViewModel @Inject constructor(
         message: Message? = null,
         isSwipe: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
-
-        val mailbox = currentMailbox.value!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-        var trashId: String? = null
-        var undoResources = emptyList<String>()
         val shouldPermanentlyDelete = isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(threads, message))
-
+        val deleteFolder = folderController.getFolder(FolderRole.TRASH)!!
         val messages = getMessagesToDelete(threads, message)
-        val uids = messages.getUids()
+
+        if (shouldPermanentlyDelete) {
+            permanentlyDelete(
+                threads = threads,
+                threadsUids = threadsUids,
+                messagesToDelete = messages,
+                message = message,
+                isSwipe = isSwipe,
+            )
+        } else {
+            moveThreadsOrMessageTo(
+                destinationFolder = deleteFolder,
+                messagesToMove = messages,
+                threads = threads,
+                message = message,
+            )
+        }
+    }
+
+    private suspend fun permanentlyDelete(
+        threads: RealmResults<Thread>,
+        threadsUids: List<String>,
+        messagesToDelete: List<Message>,
+        message: Message?,
+        isSwipe: Boolean,
+    ) {
+        val mailbox = currentMailbox.value!!
+        val trashId: String? = null
+        val undoResources = emptyList<String>()
+        val uids = messagesToDelete.getUids()
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = if (shouldPermanentlyDelete) {
-            ApiRepository.deleteMessages(mailbox.uuid, uids)
-        } else {
-            trashId = folderController.getFolder(FolderRole.TRASH)!!.id
-            ApiRepository.moveMessages(mailbox.uuid, uids, trashId).also {
-                undoResources = it.mapNotNull { apiResponse -> apiResponse.data?.undoResource }
-            }
-        }
+        val apiResponses = ApiRepository.deleteMessages(mailbox.uuid, uids)
 
         activityDialogLoaderResetTrigger.postValue(Unit)
 
@@ -645,7 +664,7 @@ class MainViewModel @Inject constructor(
 
             refreshFoldersAsync(
                 mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = trashId),
+                messagesFoldersIds = messagesToDelete.getFoldersIds(exception = trashId),
                 destinationFolderId = trashId,
                 callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
@@ -657,11 +676,9 @@ class MainViewModel @Inject constructor(
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId)
-        if (trashId != null) undoFoldersIds += trashId
+        val undoFoldersIds = messagesToDelete.getFoldersIds(exception = undoDestinationId)
         showDeleteSnackbar(
             apiResponses,
-            shouldPermanentlyDelete,
             message,
             undoResources,
             undoFoldersIds,
@@ -672,27 +689,17 @@ class MainViewModel @Inject constructor(
 
     private fun showDeleteSnackbar(
         apiResponses: List<ApiResponse<*>>,
-        shouldPermanentlyDelete: Boolean,
         message: Message?,
         undoResources: List<String>,
         undoFoldersIds: ImpactedFolders,
         undoDestinationId: String?,
         numberOfImpactedThreads: Int,
     ) {
-
         val snackbarTitle = if (apiResponses.atLeastOneSucceeded()) {
-            val destination = appContext.getString(FolderRole.TRASH.folderNameRes)
-            when {
-                shouldPermanentlyDelete && message == null -> {
-                    appContext.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
-                }
-                shouldPermanentlyDelete && message != null -> {
-                    appContext.getString(R.string.snackbarMessageDeletedPermanently)
-                }
-                !shouldPermanentlyDelete && message == null -> {
-                    appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, numberOfImpactedThreads, destination)
-                }
-                else -> appContext.getString(R.string.snackbarMessageMoved, destination)
+            if (message == null) {
+                appContext.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
+            } else {
+                appContext.getString(R.string.snackbarMessageDeletedPermanently)
             }
         } else {
             appContext.getString(apiResponses.first().translateError())
@@ -794,29 +801,30 @@ class MainViewModel @Inject constructor(
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
         val destinationFolder = folderController.getFolder(destinationFolderId)!!
-        moveThreadsOrMessageTo(destinationFolder, threads, message)
+        val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
+
+        moveThreadsOrMessageTo(destinationFolder, threads, message, messagesToMove)
     }
 
     suspend fun moveThreadsOrMessageTo(
         destinationFolder: Folder,
         threads: List<Thread>,
         message: Message? = null,
+        messagesToMove: List<Message>,
     ) {
         val mailbox = currentMailbox.value!!
         val threadsUids = threads.map { it.uid }
 
-        val messages = sharedUtils.getMessagesToMove(threads, message)
-
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messagesToMove.getUids(), destinationFolder.id)
 
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
             refreshFoldersAsync(
                 mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
+                messagesFoldersIds = messagesToMove.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
                 callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
@@ -824,7 +832,7 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
-        showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
+        showMoveSnackbar(threads, message, messages = messagesToMove, apiResponses, destinationFolder)
     }
 
     private fun showMoveSnackbar(
@@ -884,8 +892,9 @@ class MainViewModel @Inject constructor(
         val isFromArchive = role == FolderRole.ARCHIVE
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
+        val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
 
-        moveThreadsOrMessageTo(destinationFolder, threads = threads, message = message)
+        moveThreadsOrMessageTo(destinationFolder, threads = threads, message = message, messagesToMove = messagesToMove)
     }
     //endregion
 
