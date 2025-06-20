@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,6 +77,25 @@ class CalendarEventResponse() : EmbeddedRealmObject {
         if (c1 == null || c2 == null) return false
 
         return c1.everythingButAttendeesIsTheSame(c2)
+    }
+
+    fun attendeesAreTheSame(other: CalendarEventResponse): Boolean {
+        val attendees = calendarEvent?.attendees
+        val otherAttendees = other.calendarEvent?.attendees
+
+        return when {
+            attendees == null && otherAttendees == null -> true
+            attendees == null || otherAttendees == null -> false
+            attendees.count() != otherAttendees.count() -> false
+            else -> {
+                val mergedAttendees = buildSet {
+                    attendees.forEach { add(it) }
+                    otherAttendees.forEach { add(it) }
+                }
+
+                mergedAttendees.count() == attendees.count()
+            }
+        }
     }
 
     override fun equals(other: Any?): Boolean {

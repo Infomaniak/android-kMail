@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(TestOnly::class)
+
 package com.infomaniak.mail
 
+import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
@@ -25,16 +28,18 @@ import com.infomaniak.mail.data.models.calendar.CalendarEventResponse.Attachment
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.NotifyType
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 
 class CalendarEventResponseTest {
 
     @Test
     fun messageChange_isDetected() {
+        val messageDiffCallback = ThreadAdapter.MessageDiffCallback()
+
         val userStoredEvent1 = getBasicCalendarEvent(AttendanceState.TENTATIVE)
         val response1 = getBasicCalendarEventResponse(userStoredEvent1, false)
         val message = Message().apply {
@@ -44,9 +49,10 @@ class CalendarEventResponseTest {
         }
 
         // If nothing changed at all, no change should be detected
-        assertTrue(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, message))
+        assertTrue(messageDiffCallback.areContentsTheSame(message, message))
 
-        // If data inside the Message have changed, like its heavy data being downloaded, the change must be detected
+        // If data inside the Message have changed, like its heavy data being downloaded, the change must be detected and the
+        // associated payload should be `null` to bind everything again
         val filledBody = Body().apply {
             value = "<html><body>Hello</body></html>"
             type = "text/html"
@@ -56,9 +62,11 @@ class CalendarEventResponseTest {
             splitBody = null
             latestCalendarEventResponse = response1
         }
-        assertFalse(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, otherThingsButAttendeesChanged))
+        assertFalse(messageDiffCallback.areContentsTheSame(message, otherThingsButAttendeesChanged))
+        assertEquals(null, messageDiffCallback.getChangePayload(message, otherThingsButAttendeesChanged))
 
-        // If only the attendance state of Attendees has changed in the Message, the change must NOT be detected
+        // If only the attendance state of Attendees has changed in the Message, the change must be detected and we must detect
+        // the attendees payload to only bind the attendees again
         val userStoredEvent2 = getBasicCalendarEvent(AttendanceState.ACCEPTED)
         val response2 = getBasicCalendarEventResponse(userStoredEvent2, false)
         val onlyAttendeesChanged = Message().apply {
@@ -66,15 +74,21 @@ class CalendarEventResponseTest {
             splitBody = null
             latestCalendarEventResponse = response2
         }
-        assertTrue(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, onlyAttendeesChanged))
+        assertFalse(messageDiffCallback.areContentsTheSame(message, onlyAttendeesChanged))
+        assertEquals(
+            NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE,
+            messageDiffCallback.getChangePayload(message, onlyAttendeesChanged)
+        )
 
-        // If both the attendance state and another field has changed, the change must be detected
+        // If both the attendance state and another field has changed, the change must be detected and the associated payload
+        // should be `null` to bind everything again
         val otherThingsAndAttendeesChanged = Message().apply {
             body = filledBody
             splitBody = null
             latestCalendarEventResponse = response2
         }
-        assertFalse(ThreadAdapter.MessageDiffCallback.everythingButAttendeesIsTheSame(message, otherThingsAndAttendeesChanged))
+        assertFalse(messageDiffCallback.areContentsTheSame(message, otherThingsAndAttendeesChanged))
+        assertEquals(null, messageDiffCallback.getChangePayload(message, otherThingsAndAttendeesChanged))
     }
 
     @Test
