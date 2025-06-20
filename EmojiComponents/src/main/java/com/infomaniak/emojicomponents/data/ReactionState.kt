@@ -15,12 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.annotations
+package com.infomaniak.emojicomponents.data
 
-@RequiresOptIn(
-    level = RequiresOptIn.Level.ERROR,
-    message = "Don't access it outside of testing",
-)
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
-annotation class TestOnly
+interface ReactionState {
+    val count: Int
+    val hasReacted: Boolean
+}
