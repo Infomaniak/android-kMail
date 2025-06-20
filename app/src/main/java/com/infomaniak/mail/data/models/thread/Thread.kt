@@ -21,15 +21,18 @@ package com.infomaniak.mail.data.models.thread
 
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -160,6 +163,10 @@ class Thread : RealmObject, Snoozable {
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
 
+    fun getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): RealmList<Message> {
+        return if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) messagesWithContent else messages
+    }
+
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
 
         val shouldAddMessage = when (FolderController.getFolder(folderId, realm)?.role) {
@@ -193,13 +200,14 @@ class Thread : RealmObject, Snoozable {
     fun recomputeThread(realm: MutableRealm? = null) {
 
         messages.sortBy { it.internalDate }
+        val allMessages = messages
 
-        val lastCurrentFolderMessage = messages.lastOrNull { it.folderId == folderId }
+        val lastCurrentFolderMessage = allMessages.lastOrNull { it.folderId == folderId }
         val lastMessage = if (isFromSearch) {
             // In the search, some threads (such as threads from the snooze folder) won't have any messages with the same folderId
             // as the thread folderId. This is an expected behavior and we don't want to delete it in this case. We just need to
             // fallback on the last message of the thread.
-            lastCurrentFolderMessage ?: messages.lastOrNull()
+            lastCurrentFolderMessage ?: allMessages.lastOrNull()
         } else {
             lastCurrentFolderMessage
         }
@@ -213,9 +221,9 @@ class Thread : RealmObject, Snoozable {
 
         resetThread()
 
-        updateThread(lastMessage)
+        updateThread(lastMessage, allMessages)
 
-        recomputeMessagesWithContent(messages)
+        recomputeMessagesWithContent(allMessages)
 
         // Remove duplicates in Recipients lists
         val unmanagedFrom = if (from.getRealm<Realm>() == null) from else from.copyFromRealm()
@@ -240,7 +248,7 @@ class Thread : RealmObject, Snoozable {
         isLastInboxMessageSnoozed = false
     }
 
-    private fun updateThread(lastMessage: Message) {
+    private fun updateThread(lastMessage: Message, allMessages: RealmList<Message>) {
 
         fun Thread.updateSnoozeStatesBasedOn(message: Message) {
             message.snoozeState?.let {
@@ -250,7 +258,7 @@ class Thread : RealmObject, Snoozable {
             }
         }
 
-        messages.forEach { message ->
+        allMessages.forEach { message ->
             messagesIds += message.messageIds
             if (!message.isSeen) unseenMessagesCount++
             from += message.from
@@ -278,9 +286,9 @@ class Thread : RealmObject, Snoozable {
 
         displayDate = lastMessage.displayDate
         internalDate = lastMessage.internalDate
-        subject = messages.first().subject
+        subject = allMessages.first().subject
 
-        isLastInboxMessageSnoozed = messages.isLastInboxMessageSnoozed()
+        isLastInboxMessageSnoozed = allMessages.isLastInboxMessageSnoozed()
     }
 
     /**
@@ -330,7 +338,6 @@ class Thread : RealmObject, Snoozable {
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
-
         val message = messages.lastOrNull {
             it.folder.role != FolderRole.SENT &&
                     it.folder.role != FolderRole.DRAFT &&
