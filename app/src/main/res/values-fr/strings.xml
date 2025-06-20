@@ -272,6 +272,7 @@
     <string name="enableFilterButton">Activer le filtre</string>
     <string name="enableMultiSelection">Activer la sélection multiple</string>
     <string name="encryptedButtonSeeConcernedRecipients">Voir les destinataires concernés</string>
+    <string name="encryptedMessageAddPasswordButton">Protéger avec un mot de passe</string>
     <string name="encryptedMessageDisableEncryptionButton">Désactiver le chiffrement</string>
     <string name="encryptedMessageHeader">Ce message est chiffré.</string>
     <string name="encryptedMessageHeaderPasswordExpiryDate">Ce message a été chiffré et expirera le %s uniquement pour les destinataires ne pouvant bénéficier du chiffrement automatique.</string>
