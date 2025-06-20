@@ -218,6 +218,10 @@
     <color name="encryptionTextButtonColor">@color/sovereignBlue600</color>
     <color name="encryptionSnackbarActionColor">@color/sovereignBlue300</color>
 
+    <color name="partialEncryptionTagColor">@color/favoriteYellow</color>
+    <color name="validEncryptionTagColor">@color/greenSuccess</color>
+    <color name="onEncryptionTagColor">@color/orca</color>
+
     <!-- Thread -->
     <color name="folderTagTextColor">@color/elephant</color>
     <color name="folderTagBackground">@color/polar_bear</color>

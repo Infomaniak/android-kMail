@@ -62,13 +62,15 @@ class EncryptionActionsBottomSheet : ActionsBottomSheetDialog() {
         val unencryptableRecipientsCount = encryptionViewModel.unencryptableRecipients.value?.count() ?: 0
         val isValidEncryption = unencryptableRecipientsCount == 0 || navigationArgs.password.isNotBlank()
 
+        val tagColor = SubjectFormatter.TagColor(
+            backgroundColorRes = if (isValidEncryption) R.color.validEncryptionTagColor else R.color.partialEncryptionTagColor,
+            textColorRes = R.color.onEncryptionTagColor,
+        )
+
         encryptionStatusTitle.text = context.postfixWithTag(
             original = encryptionStatusTitle.text,
             tagRes = if (isValidEncryption) R.string.settingsEnabled else R.string.encryptedStatePanelStatePartialLabel,
-            tagColor = SubjectFormatter.TagColor(
-                backgroundColorRes = if (isValidEncryption) R.color.greenSuccess else R.color.orangeWarning,
-                textColorRes = R.color.primaryTextColor,
-            )
+            tagColor = tagColor,
         )
 
         encryptionStatusDescription.text = if (isValidEncryption) {
