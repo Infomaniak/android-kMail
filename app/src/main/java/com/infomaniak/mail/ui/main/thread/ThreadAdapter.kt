@@ -867,19 +867,22 @@ class ThreadAdapter(
             // TODO: Handle the case where there are multiple aspects that changed at once
             return when {
                 MessageDiffAspect.AnythingElse.areDifferent(oldItem, newItem) -> null // null means "bind the whole item again"
-                else -> {
-                    val oldCalendarEventResponse = oldItem.latestCalendarEventResponse
-                    val newCalendarEventResponse = newItem.latestCalendarEventResponse
-                    when {
-                        oldCalendarEventResponse == null && newCalendarEventResponse == null -> null
-                        oldCalendarEventResponse == null || newCalendarEventResponse == null -> null
-                        MessageDiffAspect.Calendar.Attendees.areDifferent(
-                            oldCalendarEventResponse,
-                            newCalendarEventResponse,
-                        ) -> NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE
-                        else -> null
-                    }
-                }
+                else -> getCalendarEventPayloadOrNull(oldItem, newItem)
+            }
+        }
+
+        private fun getCalendarEventPayloadOrNull(oldItem: Message, newItem: Message): NotifyType? {
+            val oldCalendarEventResponse = oldItem.latestCalendarEventResponse
+            val newCalendarEventResponse = newItem.latestCalendarEventResponse
+
+            return when {
+                oldCalendarEventResponse == null && newCalendarEventResponse == null -> null
+                oldCalendarEventResponse == null || newCalendarEventResponse == null -> null
+                MessageDiffAspect.Calendar.Attendees.areDifferent(
+                    oldCalendarEventResponse,
+                    newCalendarEventResponse,
+                ) -> NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE
+                else -> null
             }
         }
 
