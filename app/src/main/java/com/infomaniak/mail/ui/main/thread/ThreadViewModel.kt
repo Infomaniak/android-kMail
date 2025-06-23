@@ -110,8 +110,6 @@ class ThreadViewModel @Inject constructor(
             mode
         }.flatMapLatest { mode -> mode.getMessages() }.asLiveData(ioCoroutineContext)
 
-    val batchedMessages = SingleLiveEvent<List<Any>>()
-
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     val failedMessagesUids = SingleLiveEvent<List<String>>()

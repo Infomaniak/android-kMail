@@ -183,7 +183,6 @@ class ThreadFragment : Fragment() {
         observeLightThemeToggle()
         observeThreadLive()
         observeMessagesLive()
-        observeBatchedMessages()
         observeFailedMessages()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
@@ -508,10 +507,6 @@ class ThreadFragment : Fragment() {
 
             fetchCalendarEvents(items)
         }
-    }
-
-    private fun observeBatchedMessages() {
-        threadViewModel.batchedMessages.observe(viewLifecycleOwner, threadAdapter::submitList)
     }
 
     private fun observeFailedMessages() {
