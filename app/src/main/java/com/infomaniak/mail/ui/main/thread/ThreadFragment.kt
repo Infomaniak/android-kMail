@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat.dispatchApplyWindowInsets
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -205,6 +206,7 @@ class ThreadFragment : Fragment() {
             mainAppBar.applyStatusBarInsets(insets)
             appBar.applySideAndBottomSystemInsets(insets, withBottom = false)
             messagesListNestedScrollView.applySideAndBottomSystemInsets(insets)
+            dispatchApplyWindowInsets(binding.quickActionBar, insets)
         }
     }
 
