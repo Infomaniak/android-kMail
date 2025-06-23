@@ -334,7 +334,7 @@ class Thread : RealmObject, Snoozable {
             }
 
             val inReplyTo = message.inReplyTo ?: ""
-            val isHiddenEmojiReaction = message.isReaction && inReplyTo.parseMessagesIds().any { messageIds.contains(it) }
+            val isHiddenEmojiReaction = message.isReaction && inReplyTo.parseMessagesIds().any(messageIds::contains)
             if (isHiddenEmojiReaction.not()) messagesWithContent += message
         }
     }
