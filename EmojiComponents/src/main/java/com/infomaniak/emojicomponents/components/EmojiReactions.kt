@@ -18,6 +18,7 @@
 package com.infomaniak.emojicomponents.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.Surface
@@ -32,6 +33,7 @@ import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.emojicomponents.updateWithEmoji
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EmojiReactions(
     reactions: () -> Map<String, ReactionState>,
