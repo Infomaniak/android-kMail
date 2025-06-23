@@ -271,6 +271,7 @@
     <string name="enableMultiSelection">Aktivieren der Mehrfachauswahl</string>
     <string name="encryptedButtonSeeConcernedRecipients">Betroffene Empfänger ansehen</string>
     <string name="encryptedMessageAddPasswordButton">Mit einem Passwort schützen</string>
+    <string name="encryptedMessageAddPasswordInformation">Ein Passwort ist nur für Benutzer ausserhalb von Infomaniak erforderlich. Für sie verfällt die Nachricht 30 Tage nach dem Absenden.</string>
     <string name="encryptedMessageDisableEncryptionButton">Verschlüsselung deaktivieren</string>
     <string name="encryptedMessageGeneratePasswordContentDescription">Passwort generieren</string>
     <string name="encryptedMessageHeader">Diese Nachricht ist verschlüsselt.</string>
