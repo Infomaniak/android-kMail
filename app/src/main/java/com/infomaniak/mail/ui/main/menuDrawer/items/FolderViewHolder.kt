@@ -125,7 +125,6 @@ class FolderViewHolder(
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.modifySettingsFolder -> {
-                        // TODO: ajouter le dialog
                         modifyNameFolderDialog.show()
                         true
                     }

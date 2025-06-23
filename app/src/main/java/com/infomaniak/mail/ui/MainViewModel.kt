@@ -1281,7 +1281,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun modifyNameFolderSync(name: String) {
-        Log.e("TOTO", "modifyNameFolderSync: salut ")
+        Log.e("TOTO", "modifyNameFolderSync: modifier nom par : $name ")
     }
 
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }

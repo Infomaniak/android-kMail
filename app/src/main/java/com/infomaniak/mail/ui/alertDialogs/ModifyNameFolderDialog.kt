@@ -20,8 +20,12 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.content.Context
 import android.util.Log
 import androidx.annotation.StringRes
+import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
+import com.infomaniak.mail.MatomoMail.trackRenameFolderEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.utils.extensions.getFolderCreationError
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
@@ -31,6 +35,7 @@ import javax.inject.Inject
 class ModifyNameFolderDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val folderController: FolderController,
 ) : InputAlertDialog(activityContext, ioDispatcher) {
 
     fun show(@StringRes confirmButtonText: Int = R.string.buttonValid) = show(
@@ -41,11 +46,11 @@ class ModifyNameFolderDialog @Inject constructor(
 
     fun setCallbacks(onPositiveButtonClicked: (String) -> Unit) = setCallbacks(
         onPositiveButtonClicked = { folderName ->
-            Log.e("TOTO", "setCallbacks positif: $folderName")
+            activityContext.trackRenameFolderEvent("rename")
+            onPositiveButtonClicked(folderName)
         },
         onErrorCheck = { folderName ->
-            Log.e("TOTO", "setCallbacks erreur: $folderName")
-            ""// temporaire
+            activityContext.getFolderCreationError(folderName, folderController)
         },
     )
 }
