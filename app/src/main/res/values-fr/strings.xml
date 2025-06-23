@@ -273,7 +273,9 @@
     <string name="enableMultiSelection">Activer la sélection multiple</string>
     <string name="encryptedButtonSeeConcernedRecipients">Voir les destinataires concernés</string>
     <string name="encryptedMessageAddPasswordButton">Protéger avec un mot de passe</string>
+    <string name="encryptedMessageAddPasswordInformation">Un mot de passe est nécessaire uniquement pour les utilisateurs hors Infomaniak. Pour eux, le message expirera 30 jours après envoi.</string>
     <string name="encryptedMessageDisableEncryptionButton">Désactiver le chiffrement</string>
+    <string name="encryptedMessageGeneratePasswordContentDescription">Générer un mot de passe</string>
     <string name="encryptedMessageHeader">Ce message est chiffré.</string>
     <string name="encryptedMessageHeaderPasswordExpiryDate">Ce message a été chiffré et expirera le %s uniquement pour les destinataires ne pouvant bénéficier du chiffrement automatique.</string>
     <plurals name="encryptedMessageIncompleteUser">
@@ -283,6 +285,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Utilisateurs concernés</string>
     <string name="encryptedMessagePasswordLabel">Partagez ce mot de passe de façon sécurisée (kPaste, kChat, SMS…). Vous ne pourrez plus le copier après l’envoi.</string>
     <string name="encryptedMessageSnackbarEncryptionActivated">Le chiffrement a bien été activé</string>
+    <string name="encryptedMessageSnackbarEncryptionDisabled">Le chiffrement a bien été désactivé</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifier le mot de passe</string>
     <string name="encryptedPasswordProtectionTitle">Protection par mot de passe</string>
     <string name="encryptedProtectionAdDescription">Protégez votre message contre tout accès non autorisé grâce au chiffrement Infomaniak.</string>
@@ -584,6 +587,7 @@
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
+    <string name="snackbarPasswordCopied">Mot de passe copié</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numéro copié dans le presse-papiers</string>
     <string name="snackbarReportPhishingConfirmation">Signalement effectué avec succès</string>
     <string name="snackbarRestorationLaunched">Lancement de la restauration</string>

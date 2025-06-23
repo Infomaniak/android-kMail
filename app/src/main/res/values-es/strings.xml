@@ -271,7 +271,9 @@
     <string name="enableMultiSelection">Activar la selección múltiple</string>
     <string name="encryptedButtonSeeConcernedRecipients">Ver los destinatarios afectados</string>
     <string name="encryptedMessageAddPasswordButton">Proteger con contraseña</string>
+    <string name="encryptedMessageAddPasswordInformation">La contraseña sólo es necesaria para los usuarios externos a Infomaniak. Para ellos, el mensaje caducará 30 días después de su envío.</string>
     <string name="encryptedMessageDisableEncryptionButton">Desactivar el cifrado</string>
+    <string name="encryptedMessageGeneratePasswordContentDescription">Generar contraseña</string>
     <string name="encryptedMessageHeader">Este mensaje está encriptado.</string>
     <string name="encryptedMessageHeaderPasswordExpiryDate">Este mensaje ha sido encriptado y caducará el %s sólo para los destinatarios que no puedan beneficiarse de la encriptación automática.</string>
     <plurals name="encryptedMessageIncompleteUser">
@@ -281,6 +283,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Usuarios afectados</string>
     <string name="encryptedMessagePasswordLabel">Comparta esta contraseña de forma segura (kPaste, kChat, SMS…). No podrás copiarla una vez enviada.</string>
     <string name="encryptedMessageSnackbarEncryptionActivated">Se ha activado el cifrado</string>
+    <string name="encryptedMessageSnackbarEncryptionDisabled">Se ha desactivado el cifrado</string>
     <string name="encryptedMessageUpdatePasswordButton">Cambiar contraseña</string>
     <string name="encryptedPasswordProtectionTitle">Protección mediante contraseña</string>
     <string name="encryptedProtectionAdDescription">Proteja su mensaje contra el acceso no autorizado con el cifrado Infomaniak.</string>
@@ -576,6 +579,7 @@
     <string name="snackbarMessageDeletedPermanently">Mensaje eliminado</string>
     <string name="snackbarMessageMoved">Mensaje trasladado a %s</string>
     <string name="snackbarMoveCancelled">Mudanza cancelada</string>
+    <string name="snackbarPasswordCopied">Contraseña copiada</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Número copiado en el portapapeles</string>
     <string name="snackbarReportPhishingConfirmation">Informado con éxito</string>
     <string name="snackbarRestorationLaunched">Iniciar la restauración</string>
