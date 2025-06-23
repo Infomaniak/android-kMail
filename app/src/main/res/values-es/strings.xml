@@ -34,6 +34,7 @@
     <string name="actionOpenIn">Abrir en</string>
     <string name="actionPhishing">Informar sobre phishing</string>
     <string name="actionPrint">Imprimir</string>
+    <string name="actionRename">Cambie el nombre de</string>
     <string name="actionReply">Respuesta</string>
     <string name="actionReplyAll">Responder a todos</string>
     <string name="actionReportDisplayProblem">Informar de un problema de visualización</string>
@@ -424,6 +425,7 @@
     <string name="readMore">Seguir leyendo</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
     <string name="refreshTokenError">Ha sido desconectado</string>
+    <string name="renameFolder">Cambiar el nombre de la carpeta</string>
     <string name="reportDisplayProblemDescription">¿Aceptas compartir tus datos con nuestros desarrolladores para que puedan ayudarte con tu problema?</string>
     <string name="reportDisplayProblemTitle">Informar de un problema de visualización</string>
     <string name="reportPhishingDescription">Si este mensaje intenta robar información sensible (contraseña, datos bancarios, etc.) y/o suplanta una identidad reconocida, entonces se trata de phishing.\n\nInformándonos de ello, aceleras la detección de mensajes peligrosos para todos nuestros usuarios.\n\nEl informe se enviará a nuestro equipo de seguridad para que lo analice y actúe en consecuencia. Además, el mensaje se moverá automáticamente a la carpeta de spam.</string>
