@@ -291,30 +291,29 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeDraftWorkerResults() {
-        WorkerUtils.flushWorkersBefore(context = this, lifecycleOwner = this) {
+        draftsActionsWorkerScheduler.onCompletedAndFailedResultData {
+            refreshDraftFolderIfNeeded()
+
+            getBooleanArray(DraftsActionsWorker.IS_SUCCESS)?.single()?.let { isSuccess ->
+                if (isSuccess) {
+                    displayCompletedDraftWorkerResults()
+                } else {
+                    val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
+                    displayError(errorRes)
+                }
+            }
+        }
+    }
+
+    private fun DraftsActionsWorker.Scheduler.onCompletedAndFailedResultData(callback: Data.() -> Unit) {
+        WorkerUtils.flushWorkersBefore(context = this@MainActivity, lifecycleOwner = this@MainActivity) {
 
             val treatedWorkInfoUuids = mutableSetOf<UUID>()
-            draftsActionsWorkerScheduler.getCompletedWorkInfoLiveData().observe(this) {
+            getCompletedAndFailedInfoLiveData().observe(this@MainActivity) {
                 it.forEach { workInfo ->
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
 
-                    with(workInfo.outputData) {
-                        refreshDraftFolderIfNeeded()
-                        displayCompletedDraftWorkerResults()
-                    }
-                }
-            }
-
-            val treatedFailedWorkInfoUuids = mutableSetOf<UUID>()
-            draftsActionsWorkerScheduler.getFailedWorkInfoLiveData().observe(this) {
-                it.forEach { workInfo ->
-                    if (!treatedFailedWorkInfoUuids.add(workInfo.id)) return@forEach
-
-                    with(workInfo.outputData) {
-                        refreshDraftFolderIfNeeded()
-                        val errorRes = getInt(DraftsActionsWorker.ERROR_MESSAGE_RESID_KEY, 0)
-                        displayError(errorRes)
-                    }
+                    callback(workInfo.outputData)
                 }
             }
         }

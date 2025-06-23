@@ -295,32 +295,44 @@ class DraftsActionsWorker @AssistedInject constructor(
             dateFormatWithTimezone.parse(it)?.time
         }.maxOrNull()
 
-        return if (haveAllDraftsSucceeded || isTrackedDraftSuccess == true) {
+        val isSuccess = haveAllDraftsSucceeded || isTrackedDraftSuccess == true
+
+        // Common result values
+        val etopPair = BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY to biggestScheduledMessagesEtop
+        val userIdPair = RESULT_USER_ID_KEY to userId
+        // We need an array to be able to read a nullable value on the other side
+        val isSuccessPair = IS_SUCCESS to arrayOf(isSuccess)
+
+        val emptyData = workDataOf(isSuccessPair)
+
+        return if (isSuccess) {
             val outputData = if (isSnackbarFeedbackNeeded) {
                 workDataOf(
                     REMOTE_DRAFT_UUID_KEY to draftLocalUuid?.let { remoteUuidOfTrackedDraft },
                     ASSOCIATED_MAILBOX_UUID_KEY to draftLocalUuid?.let { mailbox.uuid },
                     RESULT_DRAFT_ACTION_KEY to draftLocalUuid?.let { trackedDraftAction?.name },
-                    BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY to biggestScheduledMessagesEtop,
-                    RESULT_USER_ID_KEY to userId,
+                    etopPair,
+                    userIdPair,
+                    isSuccessPair,
                     SCHEDULED_DRAFT_DATE_KEY to trackedScheduledDraftDate,
                     UNSCHEDULE_DRAFT_URL_KEY to trackedUnscheduleDraftUrl,
                 )
             } else {
-                Data.EMPTY
+                emptyData
             }
             Result.success(outputData)
         } else {
             val outputData = if (isSnackbarFeedbackNeeded) {
                 workDataOf(
                     ERROR_MESSAGE_RESID_KEY to trackedDraftErrorMessageResId,
-                    BIGGEST_SCHEDULED_MESSAGES_ETOP_KEY to biggestScheduledMessagesEtop,
-                    RESULT_USER_ID_KEY to userId,
+                    etopPair,
+                    userIdPair,
+                    isSuccessPair,
                 )
             } else {
-                Data.EMPTY
+                emptyData
             }
-            Result.failure(outputData)
+            Result.success(outputData)
         }
     }
 
@@ -527,5 +539,6 @@ class DraftsActionsWorker @AssistedInject constructor(
         const val RESULT_USER_ID_KEY = "resultUserIdKey"
         const val SCHEDULED_DRAFT_DATE_KEY = "scheduledDraftDateKey"
         const val UNSCHEDULE_DRAFT_URL_KEY = "unscheduleDraftUrlKey"
+        const val IS_SUCCESS = "isSuccess"
     }
 }
