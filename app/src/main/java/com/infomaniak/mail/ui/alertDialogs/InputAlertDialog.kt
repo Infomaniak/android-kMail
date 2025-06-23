@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
+import android.text.SpannableStringBuilder
 import android.widget.Button
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -109,11 +110,12 @@ open class InputAlertDialog @Inject constructor(
         onErrorCheck = null
     }
 
-    fun show(@StringRes title: Int, @StringRes hint: Int, @StringRes confirmButtonText: Int) = with(binding) {
+    fun show(@StringRes title: Int, @StringRes hint: Int, @StringRes confirmButtonText: Int, ranameFolderLastName: String? = null) = with(binding) {
         alertDialog.show()
 
         dialogTitle.setText(title)
         textInputLayout.setHint(hint)
+        ranameFolderLastName?.let{ textInput.text = SpannableStringBuilder(ranameFolderLastName) }
         positiveButton.setText(confirmButtonText)
     }
 

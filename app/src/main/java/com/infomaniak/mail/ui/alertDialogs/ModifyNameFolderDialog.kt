@@ -24,6 +24,7 @@ import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackRenameFolderEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.extensions.getFolderCreationError
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -38,10 +39,11 @@ class ModifyNameFolderDialog @Inject constructor(
     private val folderController: FolderController,
 ) : InputAlertDialog(activityContext, ioDispatcher) {
 
-    fun show(@StringRes confirmButtonText: Int = R.string.buttonValid) = show(
+    fun show(ranameFolderLastName: String, @StringRes confirmButtonText: Int = R.string.buttonValid) = show(
         title = R.string.renameFolder,
         hint = R.string.newFolderDialogHint,
         confirmButtonText = confirmButtonText,
+        ranameFolderLastName = ranameFolderLastName,
     )
 
     fun setCallbacks(onPositiveButtonClicked: (String) -> Unit) = setCallbacks(
