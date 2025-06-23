@@ -24,9 +24,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.*
-import com.infomaniak.mail.utils.RealmChangesBinding.OnRealmChanged
-import io.realm.kotlin.notifications.*
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import io.realm.kotlin.notifications.DeletedList
+import io.realm.kotlin.notifications.InitialList
+import io.realm.kotlin.notifications.InitialResults
+import io.realm.kotlin.notifications.ListChange
+import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.notifications.UpdatedList
+import io.realm.kotlin.notifications.UpdatedResults
 import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmObject
 

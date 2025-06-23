@@ -46,7 +46,12 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.actions.DownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.AttachmentExt
+import com.infomaniak.mail.utils.extensions.isPhone
+import com.infomaniak.mail.utils.extensions.isTabletInLandscape
+import com.infomaniak.mail.utils.extensions.isTabletInPortrait
+import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import io.realm.kotlin.types.RealmInstant
 import javax.inject.Inject
 

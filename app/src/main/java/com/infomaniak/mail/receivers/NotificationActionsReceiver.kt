@@ -49,7 +49,11 @@ import com.infomaniak.mail.utils.extensions.getUids
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint

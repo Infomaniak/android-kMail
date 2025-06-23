@@ -19,8 +19,14 @@ package com.infomaniak.mail.data.cache
 
 import android.content.Context
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.AppSettings.Companion.DEFAULT_ID
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Bimi
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.data.models.SwissTransferContainer
+import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
@@ -42,7 +48,6 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.internal.platform.WeakReference
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +55,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
+import java.lang.ref.WeakReference
 
 @Suppress("ObjectPropertyName")
 object RealmDatabase {

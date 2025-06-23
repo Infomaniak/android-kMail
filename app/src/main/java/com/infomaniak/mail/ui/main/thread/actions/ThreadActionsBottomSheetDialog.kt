@@ -53,7 +53,13 @@ import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.animatedNavigation
+import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
+import com.infomaniak.mail.utils.extensions.notYetImplemented
+import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

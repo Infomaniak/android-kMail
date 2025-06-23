@@ -33,7 +33,11 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.extensions.trimmedText
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 

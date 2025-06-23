@@ -22,7 +22,16 @@ import android.os.Build.VERSION.SDK_INT
 import android.text.format.DateUtils
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.infomaniak.core.utils.*
+import com.infomaniak.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
+import com.infomaniak.core.utils.FORMAT_DATE_SHORT_DAY_ONE_CHAR
+import com.infomaniak.core.utils.FORMAT_HOUR_MINUTES
+import com.infomaniak.core.utils.FormatData
+import com.infomaniak.core.utils.format
+import com.infomaniak.core.utils.formatWithLocal
+import com.infomaniak.core.utils.isInTheFuture
+import com.infomaniak.core.utils.isThisYear
+import com.infomaniak.core.utils.isToday
+import com.infomaniak.core.utils.isYesterday
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.Companion.FORMAT_DAY_OF_THE_WEEK
@@ -66,8 +75,6 @@ enum class ThreadListDateDisplay(
         }
     )
 }
-
-private fun RealmInstant.isInTheFuture() = epochSeconds * 1_000L > System.currentTimeMillis()
 
 private fun Context.relativeFormatting(date: RealmInstant) = DateUtils.getRelativeDateTimeString(
     this,

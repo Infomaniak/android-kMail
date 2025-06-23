@@ -58,7 +58,15 @@ import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElemen
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
+import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
+import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
+import com.infomaniak.mail.utils.extensions.setOnClearTextClickListener
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
