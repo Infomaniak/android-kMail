@@ -52,6 +52,12 @@
             app:argType="boolean" />
     </fragment>
 
+    <fragment
+        android:id="@+id/encryptionPasswordFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.encryption.EncryptionPasswordFragment"
+        android:label="EncryptionPasswordFragment"
+        tools:layout="@layout/fragment_encryption_password" />
+
     <dialog
         android:id="@+id/aiDiscoveryBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AiDiscoveryBottomSheetDialog"
@@ -103,5 +109,8 @@
         <argument
             android:name="password"
             app:argType="string" />
+        <action
+            android:id="@+id/action_encryptionActionsBottomSheetDialog_to_encryptionPasswordFragment"
+            app:destination="@id/encryptionPasswordFragment" />
     </dialog>
 </navigation>
