@@ -33,8 +33,8 @@ class ModifyNameFolderDialog @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : InputAlertDialog(activityContext, ioDispatcher) {
 
-    fun show(@StringRes confirmButtonText: Int = R.string.buttonCreate) = show(
-        title = R.string.newFolderDialogTitle,
+    fun show(@StringRes confirmButtonText: Int = R.string.buttonValid) = show(
+        title = R.string.renameFolder,
         hint = R.string.newFolderDialogHint,
         confirmButtonText = confirmButtonText,
     )
