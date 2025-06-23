@@ -44,7 +44,11 @@ import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.animatedNavigation
+import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
+import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
+import com.infomaniak.mail.utils.extensions.observeNotNull
+import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.getDashboardData
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

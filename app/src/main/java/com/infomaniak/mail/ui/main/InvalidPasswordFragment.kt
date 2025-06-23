@@ -26,9 +26,14 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.core.utils.hideProgressCatching
+import com.infomaniak.lib.core.utils.initProgress
+import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.mail.MatomoMail.trackInvalidPasswordMailboxEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentInvalidPasswordBinding

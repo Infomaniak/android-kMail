@@ -22,7 +22,11 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import android.util.AttributeSet
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MotionEvent
+import android.view.View
 import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -31,7 +35,10 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.getResourceIdOrThrow
-import androidx.core.view.*
+import androidx.core.view.forEachIndexed
+import androidx.core.view.get
+import androidx.core.view.isInvisible
+import androidx.core.view.size
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R

@@ -21,7 +21,11 @@
  */
 package com.infomaniak.html.cleaner
 
-import org.jsoup.nodes.*
+import org.jsoup.nodes.DataNode
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
 import org.jsoup.parser.Tag
 import org.jsoup.select.NodeTraversor
 import org.jsoup.select.NodeVisitor

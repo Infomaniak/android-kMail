@@ -29,7 +29,11 @@ import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel

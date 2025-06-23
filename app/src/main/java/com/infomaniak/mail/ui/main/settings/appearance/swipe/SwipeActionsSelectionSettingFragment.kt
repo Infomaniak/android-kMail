@@ -32,7 +32,15 @@ import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.SwipeAction
-import com.infomaniak.mail.data.models.SwipeAction.*
+import com.infomaniak.mail.data.models.SwipeAction.ARCHIVE
+import com.infomaniak.mail.data.models.SwipeAction.DELETE
+import com.infomaniak.mail.data.models.SwipeAction.FAVORITE
+import com.infomaniak.mail.data.models.SwipeAction.MOVE
+import com.infomaniak.mail.data.models.SwipeAction.NONE
+import com.infomaniak.mail.data.models.SwipeAction.QUICKACTIONS_MENU
+import com.infomaniak.mail.data.models.SwipeAction.READ_UNREAD
+import com.infomaniak.mail.data.models.SwipeAction.SNOOZE
+import com.infomaniak.mail.data.models.SwipeAction.SPAM
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.SharedUtils

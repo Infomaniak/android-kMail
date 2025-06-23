@@ -32,7 +32,11 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
-import io.realm.kotlin.query.*
+import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.query.RealmScalarQuery
+import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

@@ -30,8 +30,15 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.hideProgressCatching
+import com.infomaniak.lib.core.utils.initProgress
+import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.showProgressCatching
+import com.infomaniak.lib.core.utils.updateTextColor
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding

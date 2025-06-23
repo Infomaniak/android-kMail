@@ -45,7 +45,12 @@ import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
 import com.infomaniak.mail.utils.FolderRoleUtils
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.animatedNavigation
+import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
+import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

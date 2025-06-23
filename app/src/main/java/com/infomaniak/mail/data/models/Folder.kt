@@ -28,7 +28,11 @@ import com.infomaniak.lib.core.utils.removeAccents
 import com.infomaniak.mail.R
 import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.*
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshStrategy
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.defaultRefreshStrategy
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.inboxRefreshStrategy
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.scheduledDraftRefreshStrategy
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.snoozeRefreshStrategy
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.SentryDebug

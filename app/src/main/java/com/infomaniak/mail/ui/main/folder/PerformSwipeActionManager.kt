@@ -30,7 +30,11 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.main.settings.appearance.swipe.SwipeActionsSettingsFragment
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.animatedNavigation
+import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
+import com.infomaniak.mail.utils.extensions.getAnimatedNavOptions
+import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 
 object PerformSwipeActionManager {
 

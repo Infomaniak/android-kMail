@@ -19,11 +19,17 @@ package com.infomaniak.mail.firebase
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import com.infomaniak.lib.core.api.ApiController.NetworkException
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.firebase.RegisterUserDeviceWorker.Companion.INITIAL_DELAY
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
 import com.infomaniak.mail.workers.BaseCoroutineWorker

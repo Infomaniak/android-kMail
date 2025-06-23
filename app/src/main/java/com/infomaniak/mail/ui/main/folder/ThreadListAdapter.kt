@@ -38,11 +38,22 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.google.android.material.R as RMaterial
 import com.google.android.material.card.MaterialCardView
-import com.infomaniak.core.utils.*
+import com.infomaniak.core.utils.FormatData
+import com.infomaniak.core.utils.format
+import com.infomaniak.core.utils.formatWithLocal
+import com.infomaniak.core.utils.isInTheFuture
+import com.infomaniak.core.utils.isThisYear
+import com.infomaniak.core.utils.isToday
+import com.infomaniak.core.utils.isThisWeek
+import com.infomaniak.core.utils.isThisMonth
+import com.infomaniak.mail.utils.extensions.isLastWeek
+import com.infomaniak.core.utils.isYesterday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.lib.core.R as RCore
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.setMarginsRelative
@@ -66,13 +77,20 @@ import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
-import com.infomaniak.mail.utils.extensions.*
+import com.infomaniak.mail.utils.extensions.formatSubject
+import com.infomaniak.mail.utils.extensions.getAttributeColor
+import com.infomaniak.mail.utils.extensions.isEmail
+import com.infomaniak.mail.utils.extensions.postfixWithTag
+import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.abs
-import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.launch
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here? Same for all adapters in the app?
 class ThreadListAdapter @Inject constructor(
