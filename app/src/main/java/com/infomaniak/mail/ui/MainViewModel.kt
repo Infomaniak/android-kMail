@@ -830,7 +830,7 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         if (shouldDisplaySnackbar) showMoveSnackbar(threads, message, messagesToMove, apiResponses, destinationFolder)
     }
