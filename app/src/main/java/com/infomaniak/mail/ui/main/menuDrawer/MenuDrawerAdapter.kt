@@ -27,6 +27,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
+import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerFragment.MediatorContainer
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder
@@ -47,7 +48,8 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import javax.inject.Inject
 
-class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
+class MenuDrawerAdapter @Inject constructor(var modifyNameFolderDialog: ModifyNameFolderDialog) :
+    ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
 
     private var currentFolderId: String? = null
     private var hasCollapsableDefaultFolder = false
@@ -55,8 +57,12 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     private lateinit var callbacks: MenuDrawerAdapterCallbacks
 
-    operator fun invoke(callbacks: MenuDrawerAdapterCallbacks): MenuDrawerAdapter {
+    operator fun invoke(
+        callbacks: MenuDrawerAdapterCallbacks,
+        modifyNameFolderDialog: ModifyNameFolderDialog
+    ): MenuDrawerAdapter {
         this.callbacks = callbacks
+        this.modifyNameFolderDialog = modifyNameFolderDialog
         return this
     }
 
@@ -197,7 +203,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             ItemType.MAILBOX.ordinal -> MailboxViewHolder(inflater, parent)
             ItemType.INVALID_MAILBOX.ordinal -> InvalidMailboxViewHolder(inflater, parent)
             ItemType.FOLDERS_HEADER.ordinal -> FoldersHeaderViewHolder(inflater, parent)
-            ItemType.FOLDER.ordinal -> FolderViewHolder(inflater, parent)
+            ItemType.FOLDER.ordinal -> FolderViewHolder(inflater, parent, modifyNameFolderDialog)
             ItemType.EMPTY_FOLDERS.ordinal -> EmptyFoldersViewHolder(inflater, parent)
             ItemType.ACTIONS_HEADER.ordinal -> ActionsHeaderViewHolder(inflater, parent)
             ItemType.ACTION.ordinal -> ActionViewHolder(inflater, parent)

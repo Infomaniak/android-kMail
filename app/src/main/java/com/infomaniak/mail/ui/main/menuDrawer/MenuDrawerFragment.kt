@@ -51,6 +51,7 @@ import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
+import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.InvalidPasswordFragmentArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
@@ -82,6 +83,9 @@ class MenuDrawerFragment : Fragment() {
     lateinit var createFolderDialog: CreateFolderDialog
 
     @Inject
+    lateinit var modifyNameFolderDialog: ModifyNameFolderDialog
+
+    @Inject
     lateinit var menuDrawerAdapter: MenuDrawerAdapter
 
     private val currentClassName: String = MenuDrawerFragment::class.java.name
@@ -99,6 +103,7 @@ class MenuDrawerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bindAlertToViewLifecycle(createFolderDialog)
+        bindAlertToViewLifecycle(modifyNameFolderDialog)
 
         setupListeners()
         setupCreateFolderDialog()
@@ -119,6 +124,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setupCreateFolderDialog() {
         createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
+        modifyNameFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::modifyNameFolder)
     }
 
     private fun setupRecyclerView() {
@@ -138,6 +144,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onHelpClicked: () -> Unit = ::onHelpClicked
                 override var onAppVersionClicked: () -> Unit = ::onAppVersionClicked
             },
+            modifyNameFolderDialog
         )
     }
 

@@ -17,10 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuInflater
+import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -28,16 +28,17 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
+import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
-import java.nio.file.Files.delete
 import kotlin.math.min
 
 class FolderViewHolder(
     inflater: LayoutInflater,
     parent: ViewGroup,
+    val modifyNameFolderDialog: ModifyNameFolderDialog
 ) : MenuDrawerViewHolder(ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)) {
 
     override val binding = super.binding as ItemMenuDrawerFolderBinding
@@ -125,6 +126,7 @@ class FolderViewHolder(
                 when (item.itemId) {
                     R.id.modifySettingsFolder -> {
                         // TODO: ajouter le dialog
+                        modifyNameFolderDialog.show()
                         true
                     }
                     else -> false
