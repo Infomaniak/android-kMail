@@ -22,19 +22,22 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.WindowInsets
 import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.getResourceIdOrThrow
-import androidx.core.view.*
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.get
+import androidx.core.view.isGone
+import androidx.core.view.size
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
-import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 
 class BottomQuickActionBarView @JvmOverloads constructor(
     context: Context,
@@ -49,7 +52,6 @@ class BottomQuickActionBarView @JvmOverloads constructor(
 
     init {
         init()
-        handleEdgeToEdge()
     }
 
     fun init(@MenuRes menuRes: Int? = null) {
@@ -97,9 +99,10 @@ class BottomQuickActionBarView @JvmOverloads constructor(
 
     fun getButtonCount() = buttons.count()
 
-    private fun handleEdgeToEdge() {
-        binding.applyWindowInsetsListener { root, insets ->
-            root.applySideAndBottomSystemInsets(insets, withSides = false)
+    override fun onApplyWindowInsets(insets: WindowInsets?): WindowInsets? {
+        insets?.let {
+            binding.root.applySideAndBottomSystemInsets(WindowInsetsCompat.toWindowInsetsCompat(it), withSides = false)
         }
+        return super.onApplyWindowInsets(insets)
     }
 }
