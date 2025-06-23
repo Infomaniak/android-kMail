@@ -148,6 +148,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onHelpClicked: () -> Unit = ::onHelpClicked
                 override var onAppVersionClicked: () -> Unit = ::onAppVersionClicked
             },
+            modifyNameFolderDialog
         )
     }
 
