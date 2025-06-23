@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.newMessage.encryption
 
 import android.app.Application
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -30,6 +31,7 @@ import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.security.SecureRandom
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,5 +61,29 @@ class EncryptionViewModel @Inject constructor(
                 snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
             }
         }
+    }
+
+    fun generatePassword(): String {
+
+        val generator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            SecureRandom.getInstanceStrong()
+        } else {
+            SecureRandom()
+        }
+
+        var generatedPassword = ""
+        val charactersSetCount = PASSWORD_CHARACTERS_SET.count()
+        (0..<PASSWORD_MIN_LENGTH).forEach {
+            generatedPassword += PASSWORD_CHARACTERS_SET[generator.nextInt(charactersSetCount)]
+        }
+
+        return generatedPassword
+    }
+
+    companion object {
+
+        private const val PASSWORD_MIN_LENGTH = 16
+        private const val PASSWORD_CHARACTERS_SET =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?"
     }
 }

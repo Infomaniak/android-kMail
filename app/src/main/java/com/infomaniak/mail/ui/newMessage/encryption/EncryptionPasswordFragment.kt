@@ -22,13 +22,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentEncryptionPasswordBinding
+import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.utils.extensions.copyStringToClipboard
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class EncryptionPasswordFragment : Fragment() {
 
     private var binding: FragmentEncryptionPasswordBinding by safeBinding()
+
+    private val encryptionViewModel: EncryptionViewModel by activityViewModels()
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentEncryptionPasswordBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -37,6 +50,22 @@ class EncryptionPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        setupListeners()
+    }
+
+    private fun setupListeners() = with(binding) {
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        readMoreButton.setOnClickListener { context?.openUrl(ENCRYPTION_FAQ_URL) }
+        copyPasswordButton.setOnClickListener {
+            val password = passwordInput.text
+            requireContext().copyStringToClipboard(password.toString(), R.string.snackbarPasswordCopied, snackbarManager)
+        }
+        passwordInputLayout.setEndIconOnClickListener {
+            encryptionViewModel.generatePassword()
+        }
+    }
+
+    companion object {
+        private const val ENCRYPTION_FAQ_URL = "https://faq.infomaniak.com/1582"
     }
 }
