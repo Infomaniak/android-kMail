@@ -454,7 +454,6 @@
     <string name="settingsAccentColorDescription">Elija el color de acento para la aplicación</string>
     <string name="settingsAccountManagementTitle">Gestión de cuentas</string>
     <string name="settingsAppLock">Bloqueo de aplicaciones</string>
-    <string name="settingsAuthorizeTracking">Autorizar el seguimiento</string>
     <string name="settingsAutoAdvanceDescription">Seleccione qué mostrar cuando se archiva o elimina un mensaje</string>
     <string name="settingsAutoAdvanceFollowingThreadDescription">Mostrar la siguiente conversación al archivar o borrar</string>
     <string name="settingsAutoAdvanceFollowingThreadTitle">Conversación siguiente</string>
@@ -468,9 +467,6 @@
     <string name="settingsAutoAdvanceTitle">Avance automático</string>
     <string name="settingsCancellationPeriodDescription">Tiene la posibilidad de cancelar el envío de su correo electrónico hasta 30 segundos</string>
     <string name="settingsCancellationPeriodTitle">Enviar plazo de anulación</string>
-    <string name="settingsDataManagementDescription">Puede personalizar los datos de uso y funcionamiento que Infomaniak recupera para corregir errores y mejorar la aplicación. Ambas herramientas están alojadas y gestionadas exclusivamente por nosotros.\n\nInfomaniak respeta su privacidad: el código fuente de esta aplicación puede verificarse, la información recopilada es anónima y sus datos personales permanecen estrictamente confidenciales y nunca se comparten con terceros.</string>
-    <string name="settingsDataManagementSourceCode">Ver código fuente</string>
-    <string name="settingsDataManagementTitle">Gestión de datos</string>
     <string name="settingsDefault">Por defecto</string>
     <string name="settingsDelaySeconds">%d segundos</string>
     <string name="settingsDensityOptionCompact">Compacto</string>
@@ -488,8 +484,6 @@
     <string name="settingsMailboxGeneralFolders">Configuración de carpetas</string>
     <string name="settingsMailboxGeneralNotifications">Notificaciones</string>
     <string name="settingsMailboxGeneralSignature">Configuración de la firma</string>
-    <string name="settingsMatomoDescription">Matomo es una herramienta de análisis alojada y gestionada exclusivamente por Infomaniak para comprender cómo se utiliza la aplicación.\n\nEl estudio de estos datos permite a nuestro equipo mejorar continuamente la interfaz de la aplicación.</string>
-    <string name="settingsMatomoTitle">Matomo</string>
     <string name="settingsOptionAlways">Siempre</string>
     <string name="settingsOptionAskMe">Pregúntame</string>
     <string name="settingsOptionDarkTheme">Oscuro</string>
@@ -515,8 +509,6 @@
     <string name="settingsSendAcknowledgement">Solicite un acuse de recibo por cada correo electrónico enviado</string>
     <string name="settingsSendIncludeOriginalMessage">Incluir el mensaje original en la respuesta</string>
     <string name="settingsSendTitle">Enviar</string>
-    <string name="settingsSentryDescription">Sentry es una herramienta alojada y gestionada en exclusiva por Infomaniak para supervisar la estabilidad de la aplicación en tiempo real e informar automáticamente de cualquier error técnico a nuestros desarrolladores.\n\nEstos datos permiten a nuestro equipo corregir y optimizar rápidamente la aplicación, lo que se traduce en una mejor experiencia de usuario para usted.</string>
-    <string name="settingsSentryTitle">Sentry</string>
     <string name="settingsSignatureDescription">Seleccione una firma por defecto</string>
     <string name="settingsSignatureTitle">Firmas</string>
     <string name="settingsSwipeActionNone">Ninguno</string>
