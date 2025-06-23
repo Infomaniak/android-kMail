@@ -76,8 +76,6 @@ enum class ThreadListDateDisplay(
     )
 }
 
-private fun RealmInstant.isInTheFuture() = epochSeconds * 1_000L > System.currentTimeMillis()
-
 private fun Context.relativeFormatting(date: RealmInstant) = DateUtils.getRelativeDateTimeString(
     this,
     date.epochSeconds * 1_000L,
