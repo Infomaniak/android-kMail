@@ -110,8 +110,6 @@ class ThreadViewModel @Inject constructor(
             mode
         }.flatMapLatest { mode -> mode.getMessages() }.asLiveData(ioCoroutineContext)
 
-    val batchedMessages = SingleLiveEvent<List<Any>>()
-
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     val failedMessagesUids = SingleLiveEvent<List<String>>()
@@ -289,25 +287,6 @@ class ThreadViewModel @Inject constructor(
         }
 
         return@withContext message
-    }
-
-    fun displayBatchedMessages(items: List<Any>) = viewModelScope.launch(ioCoroutineContext) {
-
-        tailrec suspend fun sendBatchesRecursively(input: List<Any>, output: MutableList<Any>, batchSize: Int = 1) {
-
-            val batch = input.take(batchSize)
-            output.addAll(batch)
-
-            // We need to post a different list each time, because the `submitList` function in AsyncListDiffer
-            // won't trigger if we send the same list object (https://stackoverflow.com/questions/49726385).
-            batchedMessages.postValue(ArrayList(output))
-
-            if (batch.size < batchSize) return
-            delay(DELAY_BETWEEN_EACH_BATCHED_MESSAGES)
-            sendBatchesRecursively(input.subList(batchSize, input.size), output)
-        }
-
-        sendBatchesRecursively(input = items, output = mutableListOf(), batchSize = 2)
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
@@ -544,6 +523,5 @@ class ThreadViewModel @Inject constructor(
     companion object {
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
-        private const val DELAY_BETWEEN_EACH_BATCHED_MESSAGES = 50L
     }
 }

@@ -183,7 +183,6 @@ class ThreadFragment : Fragment() {
         observeLightThemeToggle()
         observeThreadLive()
         observeMessagesLive()
-        observeBatchedMessages()
         observeFailedMessages()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
@@ -502,20 +501,12 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            if (threadState.hasSuperCollapsedBlockBeenClicked.value) {
-                displayBatchedMessages(items)
-            } else {
-                threadAdapter.submitList(items)
-            }
+            threadAdapter.submitList(items)
 
             if (messagesToFetch.isNotEmpty()) fetchMessagesHeavyData(messagesToFetch)
 
             fetchCalendarEvents(items)
         }
-    }
-
-    private fun observeBatchedMessages() {
-        threadViewModel.batchedMessages.observe(viewLifecycleOwner, threadAdapter::submitList)
     }
 
     private fun observeFailedMessages() {
