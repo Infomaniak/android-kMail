@@ -272,6 +272,7 @@
     <string name="encryptedButtonSeeConcernedRecipients">Betroffene Empfänger ansehen</string>
     <string name="encryptedMessageAddPasswordButton">Mit einem Passwort schützen</string>
     <string name="encryptedMessageDisableEncryptionButton">Verschlüsselung deaktivieren</string>
+    <string name="encryptedMessageGeneratePasswordContentDescription">Passwort generieren</string>
     <string name="encryptedMessageHeader">Diese Nachricht ist verschlüsselt.</string>
     <string name="encryptedMessageHeaderPasswordExpiryDate">Diese Nachricht wurde verschlüsselt und läuft am %s nur bei Empfängern ab, die nicht von der automatischen Verschlüsselung profitieren können.</string>
     <plurals name="encryptedMessageIncompleteUser">
@@ -281,6 +282,7 @@
     <string name="encryptedMessagePasswordConcernedUserTitle">Betroffene Nutzer</string>
     <string name="encryptedMessagePasswordLabel">Teilen Sie dieses Passwort auf sichere Weise mit anderen (kPaste, kChat, SMS…). Nach dem Versenden können Sie es nicht mehr kopieren.</string>
     <string name="encryptedMessageSnackbarEncryptionActivated">Die Verschlüsselung wurde aktiviert</string>
+    <string name="encryptedMessageSnackbarEncryptionDisabled">Die Verschlüsselung wurde deaktiviert</string>
     <string name="encryptedMessageUpdatePasswordButton">Passwort ändern</string>
     <string name="encryptedPasswordProtectionTitle">Passwortschutz</string>
     <string name="encryptedProtectionAdDescription">Schützen Sie Ihre Nachricht mit der Infomaniak-Verschlüsselung vor unbefugtem Zugriff.</string>
@@ -576,6 +578,7 @@
     <string name="snackbarMessageDeletedPermanently">Nachricht gelöscht</string>
     <string name="snackbarMessageMoved">Nachricht an %s verschoben</string>
     <string name="snackbarMoveCancelled">Umzug abgesagt</string>
+    <string name="snackbarPasswordCopied">Passwort kopiert</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Nummer in die Zwischenablage kopiert</string>
     <string name="snackbarReportPhishingConfirmation">Erfolgreich gemeldet</string>
     <string name="snackbarRestorationLaunched">Starten der Wiederherstellung</string>
