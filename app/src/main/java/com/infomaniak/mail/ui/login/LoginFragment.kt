@@ -58,6 +58,7 @@ import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.loginUrl
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -174,6 +175,7 @@ class LoginFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val derivedTokenGenerator: DerivedTokenGenerator = DerivedTokenGeneratorImpl(
                     coroutineScope = this,
+                    tokenRetrievalUrl = "${loginUrl}token",
                     hostAppPackageName = BuildConfig.APPLICATION_ID,
                     clientId = BuildConfig.CLIENT_ID,
                     userAgent = HttpUtils.getUserAgent
