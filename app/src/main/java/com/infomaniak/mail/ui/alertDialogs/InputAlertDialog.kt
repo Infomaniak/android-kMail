@@ -110,12 +110,12 @@ open class InputAlertDialog @Inject constructor(
         onErrorCheck = null
     }
 
-    fun show(@StringRes title: Int, @StringRes hint: Int, @StringRes confirmButtonText: Int, ranameFolderLastName: String? = null) = with(binding) {
+    fun show(@StringRes title: Int, @StringRes hint: Int, @StringRes confirmButtonText: Int, renameFolderLastName: String? = null) = with(binding) {
         alertDialog.show()
 
         dialogTitle.setText(title)
         textInputLayout.setHint(hint)
-        ranameFolderLastName?.let{ textInput.text = SpannableStringBuilder(ranameFolderLastName) }
+        renameFolderLastName?.let{ textInput.text = SpannableStringBuilder(renameFolderLastName) }
         positiveButton.setText(confirmButtonText)
     }
 

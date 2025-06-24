@@ -36,16 +36,15 @@ class ModifyNameFolderDialog @Inject constructor(
 
     private var folderId: String? = null
 
-    fun setFolderId(folderId: String) {
+    fun show(renameFolderLastName: String, folderId: String, @StringRes confirmButtonText: Int = R.string.buttonValid) {
+        show(
+            title = R.string.renameFolder,
+            hint = R.string.newFolderDialogHint,
+            confirmButtonText = confirmButtonText,
+            renameFolderLastName = renameFolderLastName,
+        )
         this.folderId = folderId
     }
-
-    fun show(ranameFolderLastName: String, @StringRes confirmButtonText: Int = R.string.buttonValid) = show(
-        title = R.string.renameFolder,
-        hint = R.string.newFolderDialogHint,
-        confirmButtonText = confirmButtonText,
-        ranameFolderLastName = ranameFolderLastName,
-    )
 
     fun setCallbacks(onPositiveButtonClicked: (String, String) -> Unit) = setCallbacks(
         onPositiveButtonClicked = { folderName ->
