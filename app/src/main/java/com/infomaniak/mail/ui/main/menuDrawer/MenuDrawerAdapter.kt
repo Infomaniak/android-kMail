@@ -58,7 +58,6 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
 
     operator fun invoke(callbacks: MenuDrawerAdapterCallbacks): MenuDrawerAdapter {
         this.callbacks = callbacks
-        this.modifyNameFolderDialog = modifyNameFolderDialog
         return this
     }
 
