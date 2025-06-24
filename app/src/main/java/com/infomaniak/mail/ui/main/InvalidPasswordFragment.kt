@@ -64,7 +64,10 @@ class InvalidPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        enterPasswordDescription2.text = getStringWithBoldArg(R.string.enterPasswordDescription2, navigationArgs.mailboxEmail)
+        enterPasswordDescription2.text = requireContext().getStringWithBoldArg(
+            R.string.enterPasswordDescription2,
+            navigationArgs.mailboxEmail,
+        )
 
         confirmButton.isEnabled = false
 
@@ -101,8 +104,7 @@ class InvalidPasswordFragment : Fragment() {
                 onPositiveButtonClicked = {
                     trackInvalidPasswordMailboxEvent(MatomoName.DetachMailboxConfirm)
                     invalidPasswordViewModel.detachMailbox()
-                },
-            )
+                },)
         }
 
         requestPasswordButton.setOnClickListener {
