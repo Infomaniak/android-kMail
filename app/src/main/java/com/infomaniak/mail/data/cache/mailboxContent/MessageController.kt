@@ -235,7 +235,7 @@ class MessageController @Inject constructor(
 
         fun deleteMessage(context: Context, mailbox: Mailbox, message: Message, realm: MutableRealm) {
 
-            DraftController.getDraftByMessageUid(message.uid, realm)?.let { draft ->
+            DraftController.getDraftByMessageUidBlocking(message.uid, realm)?.let { draft ->
                 if (draft.action == null) {
                     deleteDraftUploadDir(
                         context = context,

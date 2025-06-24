@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.SentryDebug
+import com.infomaniak.mail.utils.extensions.findSuspend
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -61,11 +62,11 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
         return getSearchThreadsQuery(mailboxContentRealm()).asFlow()
     }
 
-    fun getSearchThreadsCount(): Long {
-        return getSearchThreadsQuery(mailboxContentRealm()).count().find()
+    suspend fun getSearchThreadsCount(): Long {
+        return getSearchThreadsQuery(mailboxContentRealm()).count().findSuspend()
     }
 
-    fun getThreads(threadsUids: List<String>): RealmResults<Thread> {
+    suspend fun getThreads(threadsUids: List<String>): RealmResults<Thread> {
         return getThreadsByUids(threadsUids, mailboxContentRealm())
     }
 
@@ -211,8 +212,8 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
             return getThreadQuery(uid, realm).find()
         }
 
-        private fun getThreadsByUids(threadsUids: List<String>, realm: TypedRealm): RealmResults<Thread> {
-            return getThreadsByUidsQuery(threadsUids, realm).find()
+        private suspend fun getThreadsByUids(threadsUids: List<String>, realm: TypedRealm): RealmResults<Thread> {
+            return getThreadsByUidsQuery(threadsUids, realm).findSuspend()
         }
 
         fun getThreadsByMessageIds(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
@@ -352,7 +353,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
         // If we've already got this Message's Draft beforehand, we need to save
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
         private fun Message.getDraftLocalUuid(realm: TypedRealm): String? {
-            return if (isDraft) DraftController.getDraftByMessageUid(uid, realm)?.localUuid else null
+            return if (isDraft) DraftController.getDraftByMessageUidBlocking(uid, realm)?.localUuid else null
         }
 
         fun deleteSearchThreads(realm: MutableRealm) = with(realm) {

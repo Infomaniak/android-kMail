@@ -205,8 +205,8 @@ class MainViewModel @Inject constructor(
     //region Current Mailbox
     private val _currentMailboxObjectId = MutableStateFlow<String?>(null)
 
-    val currentMailbox = _currentMailboxObjectId.mapLatest {
-        it?.let(mailboxController::getMailbox)
+    val currentMailbox = _currentMailboxObjectId.mapLatest { id ->
+        id?.let { mailboxController.getMailbox(it) }
     }.asLiveData(ioCoroutineContext)
 
     private val currentMailboxLive = _currentMailboxObjectId.filterNotNull().flatMapLatest { objectId ->
@@ -265,7 +265,7 @@ class MainViewModel @Inject constructor(
     val currentFolderId get() = _currentFolderId.value
 
     val currentFolder = _currentFolderId.mapLatest {
-        it?.let(folderController::getFolder)
+        it?.let { folderController.getFolder(it) }
     }.asLiveData(ioCoroutineContext)
 
     val currentFolderLive = _currentFolderId.flatMapLatest {
@@ -350,7 +350,7 @@ class MainViewModel @Inject constructor(
         emit(openMailbox())
     }
 
-    private fun openMailbox(): Mailbox? {
+    private suspend fun openMailbox(): Mailbox? {
         SentryLog.d(TAG, "Load current mailbox from local")
 
         val mailbox = mailboxController.getMailboxWithFallback(
@@ -366,7 +366,7 @@ class MainViewModel @Inject constructor(
         selectMailbox(mailbox)
 
         if (currentFolderId == null) {
-            folderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
+            folderController.getFolderBlocking(DEFAULT_SELECTED_FOLDER)?.let { folder ->
                 selectFolder(folder.id)
             }
         }
@@ -425,7 +425,7 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
 
             // Refresh Threads
-            (currentFolderId?.let(folderController::getFolder) ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))
+            (currentFolderId?.let { folderController.getFolder(it) } ?: folderController.getFolderBlocking(DEFAULT_SELECTED_FOLDER))
                 ?.let { folder ->
                     selectFolder(folder.id)
                     viewModelScope.launch(ioCoroutineContext) {
@@ -658,7 +658,7 @@ class MainViewModel @Inject constructor(
             )
         } else {
             moveThreadsOrMessageTo(
-                destinationFolder = folderController.getFolder(FolderRole.TRASH)!!,
+                destinationFolder = folderController.getFolderBlocking(FolderRole.TRASH)!!,
                 threadsUids = threadsUids,
                 threads = threads,
                 message = message,
@@ -744,7 +744,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
 
         if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
-            val draftFolderId = folderController.getFolder(FolderRole.DRAFT)!!.id
+            val draftFolderId = folderController.getFolderBlocking(FolderRole.DRAFT)!!.id
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolderId)))
         }
 
@@ -780,7 +780,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
 
         if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+            val scheduledDraftsFolderId = folderController.getFolderBlocking(FolderRole.SCHEDULED_DRAFTS)!!.id
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
             onSuccess()
         } else {
@@ -793,7 +793,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
 
         if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
+            val scheduledDraftsFolderId = folderController.getFolderBlocking(FolderRole.SCHEDULED_DRAFTS)!!.id
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
         }
 
@@ -802,7 +802,7 @@ class MainViewModel @Inject constructor(
 
     private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
 
-        fun openDraftFolder() = folderController.getFolder(FolderRole.DRAFT)?.id?.let(::openFolder)
+        fun openDraftFolder() = folderController.getFolderBlocking(FolderRole.DRAFT)?.id?.let(::openFolder)
 
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(
@@ -966,7 +966,7 @@ class MainViewModel @Inject constructor(
         val isFromArchive = role == FolderRole.ARCHIVE
 
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
-        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
+        val destinationFolder = folderController.getFolderBlocking(destinationFolderRole)!!
 
         val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
 
@@ -1153,7 +1153,7 @@ class MainViewModel @Inject constructor(
         } else {
             FolderRole.SPAM
         }
-        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
+        val destinationFolder = folderController.getFolderBlocking(destinationFolderRole)!!
 
         val messages = getMessagesToSpamOrHam(threads, message)
 
@@ -1584,7 +1584,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun refreshDraftFolderWhenDraftArrives(scheduledMessageEtop: Long) = viewModelScope.launch(ioCoroutineContext) {
-        val folder = folderController.getFolder(FolderRole.DRAFT)
+        val folder = folderController.getFolderBlocking(FolderRole.DRAFT)
 
         if (folder?.cursor != null) {
 

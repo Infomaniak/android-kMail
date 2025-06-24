@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalSplittiesApi::class)
+
 package com.infomaniak.mail.ui.newMessage
 
 import android.annotation.SuppressLint
@@ -71,6 +73,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
@@ -116,11 +119,13 @@ import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
 import com.google.android.material.R as RMaterial
@@ -234,7 +239,9 @@ class NewMessageFragment : Fragment() {
             observeEditorStatus()
         }
 
-        externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
+        viewLifecycleOwner.lifecycleScope.launch {
+            externalsManager.observeExternals(newMessageViewModel.arrivedFromExistingDraft())
+        }
 
         with(aiManager) {
             observeAiOutput()
@@ -432,7 +439,7 @@ class NewMessageFragment : Fragment() {
 
         initEditorUi()
 
-        setupSendButtons()
+        viewLifecycleOwner.lifecycleScope.launch { setupSendButtons(newMessageViewModel.currentMailbox()) }
         externalsManager.setupExternalBanner()
 
         scrim.setOnClickListener {
@@ -792,14 +799,14 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.deleteAttachment(position)
     }
 
-    private fun setupSendButtons() = with(binding) {
+    private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
             scheduleButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
         scheduleButton.setOnClickListener {
-            if (checkMailboxStorage()) {
+            if (checkMailboxStorage(mailbox)) {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
                     snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
                 } else {
@@ -808,15 +815,16 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        sendButton.setOnClickListener { if (checkMailboxStorage()) tryToSendEmail() }
+        sendButton.setOnClickListener { if (checkMailboxStorage(mailbox)) tryToSendEmail() }
     }
 
-    private fun navigateToScheduleSendBottomSheet() {
+    private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
+        val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
-                isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
+                isCurrentMailboxFree = mailbox.isFreeMailbox,
             ).toBundle(),
         )
     }
@@ -856,8 +864,8 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun checkMailboxStorage(): Boolean {
-        val isMailboxFull = newMessageViewModel.currentMailbox.quotas?.isFull == true
+    private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
+        val isMailboxFull = mailbox.quotas?.isFull == true
         if (isMailboxFull) {
             trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {

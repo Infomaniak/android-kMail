@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalSplittiesApi::class)
+
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
@@ -97,6 +99,8 @@ import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import splitties.coroutines.suspendLazy
+import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
 typealias ThreadAdapterItems = List<Any>
@@ -122,7 +126,9 @@ class ThreadViewModel @Inject constructor(
     private var fetchMessagesJob: Job? = null
     private var fetchCalendarEventJob: Job? = null
 
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    private val mailboxLazy = viewModelScope.suspendLazy {
+        mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
+    }
 
     private val currentMailboxFlow = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -358,7 +364,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.markAsSeen(mailbox, listOf(thread))
+        sharedUtils.markAsSeen(mailboxLazy(), listOf(thread))
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread, featureFlags: Mailbox.FeatureFlagSet) {

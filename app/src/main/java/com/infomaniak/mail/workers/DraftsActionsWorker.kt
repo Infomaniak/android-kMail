@@ -67,6 +67,8 @@ import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -243,7 +245,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         )
 
         mailboxContentRealm.write {
-            val orphans = DraftController.getOrphanDrafts(realm = this)
+            val orphans = DraftController.getOrphanDraftsBlocking(realm = this)
             SentryDebug.sendOrphanDrafts(orphans)
             delete(orphans)
         }
@@ -275,7 +277,7 @@ class DraftsActionsWorker @AssistedInject constructor(
                     it.action = DraftAction.SAVE
                 }
             }
-            executeDraftAction(draftController.getDraft(draft.localUuid)!!, mailbox.uuid)
+            executeDraftAction(Dispatchers.IO { draftController.getDraftBlocking(draft.localUuid)!! }, mailbox.uuid)
         }
     }.cancellable()
 
@@ -495,7 +497,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         }
 
         return executeDraftAction(
-            draft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!,
+            draft = Dispatchers.IO { DraftController.getDraftBlocking(draft.localUuid, mailboxContentRealm)!! },
             mailboxUuid = mailboxUuid,
             isFirstTime = false,
         )
@@ -513,7 +515,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         private val workManager: WorkManager,
     ) {
 
-        fun scheduleWork(draftLocalUuid: String? = null) {
+        suspend fun scheduleWork(draftLocalUuid: String? = null) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (draftController.getDraftsWithActionsCount() == 0L) return

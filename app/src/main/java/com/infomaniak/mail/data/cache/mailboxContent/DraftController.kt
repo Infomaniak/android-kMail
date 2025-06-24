@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.extensions.findSuspend
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -35,24 +36,24 @@ class DraftController @Inject constructor(
 ) {
 
     //region Get data
-    fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
-        return getDraftsWithActionsQuery(realm).find()
+    suspend fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
+        return getDraftsWithActionsQuery(realm).findSuspend()
     }
 
-    fun getDraftsWithActionsCount(): Long {
+    suspend fun getDraftsWithActionsCount(): Long {
         return getDraftsWithActionsCount(mailboxContentRealm())
     }
 
-    fun getAllDrafts(realm: TypedRealm): RealmResults<Draft> {
-        return getDraftsQuery(realm = realm).find()
+    suspend fun getAllDrafts(realm: TypedRealm): RealmResults<Draft> {
+        return getDraftsQuery(realm = realm).findSuspend()
     }
 
-    fun getDraft(localUuid: String): Draft? {
-        return getDraft(localUuid, mailboxContentRealm())
+    fun getDraftBlocking(localUuid: String): Draft? {
+        return getDraftBlocking(localUuid, mailboxContentRealm())
     }
 
     fun getDraftByMessageUid(messageUid: String): Draft? {
-        return getDraftByMessageUid(messageUid, mailboxContentRealm())
+        return getDraftByMessageUidBlocking(messageUid, mailboxContentRealm())
     }
     //endregion
 
@@ -97,19 +98,19 @@ class DraftController @Inject constructor(
         //endregion
 
         //region Get data
-        fun getDraft(localUuid: String, realm: TypedRealm): Draft? {
+        fun getDraftBlocking(localUuid: String, realm: TypedRealm): Draft? {
             return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
         }
 
-        fun getDraftsWithActionsCount(realm: TypedRealm): Long {
-            return getDraftsWithActionsQuery(realm).count().find()
+        suspend fun getDraftsWithActionsCount(realm: TypedRealm): Long {
+            return getDraftsWithActionsQuery(realm).count().findSuspend()
         }
 
-        fun getOrphanDrafts(realm: TypedRealm): RealmResults<Draft> {
+        fun getOrphanDraftsBlocking(realm: TypedRealm): RealmResults<Draft> {
             return getOrphanDraftsQuery(realm).find()
         }
 
-        fun getDraftByMessageUid(messageUid: String, realm: TypedRealm): Draft? {
+        fun getDraftByMessageUidBlocking(messageUid: String, realm: TypedRealm): Draft? {
             return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
         }
         //endregion
@@ -120,7 +121,7 @@ class DraftController @Inject constructor(
         }
 
         fun updateDraft(localUuid: String, realm: MutableRealm, onUpdate: (Draft) -> Unit) {
-            getDraft(localUuid, realm)?.let(onUpdate)
+            getDraftBlocking(localUuid, realm)?.let(onUpdate)
         }
         //endregion
 

@@ -21,6 +21,7 @@ import android.transition.AutoTransition
 import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -38,6 +39,7 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
+import kotlinx.coroutines.launch
 
 class ThreadListMultiSelection {
 
@@ -79,7 +81,7 @@ class ThreadListMultiSelection {
                     toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionArchive -> {
+                R.id.quickActionArchive -> threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
                     threadListFragment.descriptionDialog.archiveWithConfirmationPopup(
                         folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
@@ -94,9 +96,9 @@ class ThreadListMultiSelection {
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionDelete -> threadListFragment.apply {
+                R.id.quickActionDelete -> threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
                     threadListFragment.descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
+                        folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
@@ -206,10 +208,12 @@ class ThreadListMultiSelection {
             changeIcon(FAVORITE_INDEX, favoriteIcon)
 
             val isSelectionEmpty = selectedThreads.isEmpty()
-            val isFromArchive = folderRoleUtils.getActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
-            for (index in 0 until getButtonCount()) {
-                val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
-                if (shouldDisable) disable(index) else enable(index)
+            threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
+                val isFromArchive = folderRoleUtils.getActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
+                for (index in 0 until getButtonCount()) {
+                    val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
+                    if (shouldDisable) disable(index) else enable(index)
+                }
             }
         }
     }
