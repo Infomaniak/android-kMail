@@ -618,9 +618,9 @@ class MainViewModel @Inject constructor(
         message: Message? = null,
         isSwipe: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
+
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         val shouldPermanentlyDelete = isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(threads, message))
-        val deleteFolder = folderController.getFolder(FolderRole.TRASH)!!
         val messages = getMessagesToDelete(threads, message)
 
         if (shouldPermanentlyDelete) {
@@ -633,10 +633,11 @@ class MainViewModel @Inject constructor(
             )
         } else {
             moveThreadsOrMessageTo(
-                destinationFolder = deleteFolder,
-                messagesToMove = messages,
+                destinationFolder = folderController.getFolder(FolderRole.TRASH)!!,
+                threadsUids = threadsUids,
                 threads = threads,
                 message = message,
+                messagesToMove = messages,
             )
         }
     }
@@ -649,7 +650,6 @@ class MainViewModel @Inject constructor(
         isSwipe: Boolean,
     ) {
         val mailbox = currentMailbox.value!!
-        val trashId: String? = null
         val undoResources = emptyList<String>()
         val uids = messagesToDelete.getUids()
 
@@ -664,8 +664,7 @@ class MainViewModel @Inject constructor(
 
             refreshFoldersAsync(
                 mailbox = mailbox,
-                messagesFoldersIds = messagesToDelete.getFoldersIds(exception = trashId),
-                destinationFolderId = trashId,
+                messagesFoldersIds = messagesToDelete.getFoldersIds(),
                 callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
         } else if (isSwipe) {
@@ -678,12 +677,12 @@ class MainViewModel @Inject constructor(
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = messagesToDelete.getFoldersIds(exception = undoDestinationId)
         showDeleteSnackbar(
-            apiResponses,
-            message,
-            undoResources,
-            undoFoldersIds,
-            undoDestinationId,
-            threads.count(),
+            apiResponses = apiResponses,
+            message = message,
+            undoResources = undoResources,
+            undoFoldersIds = undoFoldersIds,
+            undoDestinationId = undoDestinationId,
+            numberOfImpactedThreads = threads.count(),
         )
     }
 
@@ -798,23 +797,23 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         messageUid: String? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
+        val destinationFolder = folderController.getFolder(destinationFolderId)!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
-        val destinationFolder = folderController.getFolder(destinationFolderId)!!
         val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
 
-        moveThreadsOrMessageTo(destinationFolder, threads, message, messagesToMove)
+        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messagesToMove)
     }
 
-    suspend fun moveThreadsOrMessageTo(
+    private suspend fun moveThreadsOrMessageTo(
         destinationFolder: Folder,
+        threadsUids: List<String>,
         threads: List<Thread>,
         message: Message? = null,
         messagesToMove: List<Message>,
         shouldDisplaySnackbar: Boolean = true,
     ) {
         val mailbox = currentMailbox.value!!
-        val threadsUids = threads.map { it.uid }
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
@@ -833,7 +832,7 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
-        if (shouldDisplaySnackbar) showMoveSnackbar(threads, message, messages = messagesToMove, apiResponses, destinationFolder)
+        if (shouldDisplaySnackbar) showMoveSnackbar(threads, message, messagesToMove, apiResponses, destinationFolder)
     }
 
     private fun showMoveSnackbar(
@@ -887,14 +886,18 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         message: Message? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
+
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
+
         val role = folderRoleUtils.getActionFolderRole(threads, message)
         val isFromArchive = role == FolderRole.ARCHIVE
+
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
+
         val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
 
-        moveThreadsOrMessageTo(destinationFolder, threads = threads, message = message, messagesToMove = messagesToMove)
+        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messagesToMove)
     }
     //endregion
 
@@ -1065,22 +1068,19 @@ class MainViewModel @Inject constructor(
         message: Message? = null,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
+
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
+
         val destinationFolderRole = if (folderRoleUtils.getActionFolderRole(threads, message) == FolderRole.SPAM) {
             FolderRole.INBOX
         } else {
             FolderRole.SPAM
         }
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
+
         val messages = getMessagesToSpamOrHam(threads, message)
 
-        moveThreadsOrMessageTo(
-            destinationFolder = destinationFolder,
-            threads = threads,
-            message = message,
-            messagesToMove = messages,
-            shouldDisplaySnackbar = displaySnackbar,
-        )
+        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messages, displaySnackbar)
     }
 
     private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
