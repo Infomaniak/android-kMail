@@ -22,8 +22,6 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.databinding.DialogConfirmationToBlockUserBinding
 import com.infomaniak.mail.databinding.DialogConfirmeDeleteFolderBinding
 import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import dagger.hilt.android.qualifiers.ActivityContext
