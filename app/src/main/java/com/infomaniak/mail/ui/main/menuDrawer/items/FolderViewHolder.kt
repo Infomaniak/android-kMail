@@ -125,6 +125,7 @@ class FolderViewHolder(
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.modifySettingsFolder -> {
+                        modifyNameFolderDialog.setFolderId(folder.id)
                         modifyNameFolderDialog.show(ranameFolderLastName = folder.name)
                         true
                     }

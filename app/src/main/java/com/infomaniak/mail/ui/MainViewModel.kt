@@ -1280,13 +1280,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun modifyNameFolderSync(name: String) {
+    private fun modifyNameFolderSync(folderId: String, name: String): String? {
         Log.e("TOTO", "modifyNameFolderSync: modifier nom par : $name ")
+        return null
     }
 
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
-    fun modifyNameFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(name) }
+    fun modifyNameFolder(name: String, folderId: String) =
+        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
 
     fun moveToNewFolder(
         name: String,

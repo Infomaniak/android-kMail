@@ -18,26 +18,27 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.StringRes
-import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackRenameFolderEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.extensions.getFolderCreationError
 import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-@ActivityScoped
 class ModifyNameFolderDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val folderController: FolderController,
 ) : InputAlertDialog(activityContext, ioDispatcher) {
+
+    private var folderId: String? = null
+
+    fun setFolderId(folderId: String) {
+        this.folderId = folderId
+    }
 
     fun show(ranameFolderLastName: String, @StringRes confirmButtonText: Int = R.string.buttonValid) = show(
         title = R.string.renameFolder,
@@ -46,10 +47,10 @@ class ModifyNameFolderDialog @Inject constructor(
         ranameFolderLastName = ranameFolderLastName,
     )
 
-    fun setCallbacks(onPositiveButtonClicked: (String) -> Unit) = setCallbacks(
+    fun setCallbacks(onPositiveButtonClicked: (String, String) -> Unit) = setCallbacks(
         onPositiveButtonClicked = { folderName ->
             activityContext.trackRenameFolderEvent("rename")
-            onPositiveButtonClicked(folderName)
+            onPositiveButtonClicked(folderName, folderId!!)
         },
         onErrorCheck = { folderName ->
             activityContext.getFolderCreationError(folderName, folderController)
