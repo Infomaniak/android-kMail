@@ -116,23 +116,25 @@ class FolderViewHolder(
 
         setCollapsingButtonContentDescription(folderName)
 
-        setOnLongClickListener {
-            val popup = PopupMenu(context, it)
-            val inflater: MenuInflater = popup.menuInflater
-            inflater.inflate(R.menu.item_menu_settings_folder, popup.menu)
-            popup.show()
+        if(folder.role == null){
+            setOnLongClickListener {
+                val popup = PopupMenu(context, it)
+                val inflater: MenuInflater = popup.menuInflater
+                inflater.inflate(R.menu.item_menu_settings_folder, popup.menu)
+                popup.show()
 
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.modifySettingsFolder -> {
-                        modifyNameFolderDialog.setFolderId(folder.id)
-                        modifyNameFolderDialog.show(ranameFolderLastName = folder.name)
-                        true
+                popup.setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        R.id.modifySettingsFolder -> {
+                            modifyNameFolderDialog.setFolderId(folder.id)
+                            modifyNameFolderDialog.show(ranameFolderLastName = folder.name)
+                            true
+                        }
+                        else -> false
                     }
-                    else -> false
                 }
+                true
             }
-            true
         }
 
         setOnClickListener {
