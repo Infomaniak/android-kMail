@@ -20,8 +20,10 @@ package com.infomaniak.mail.ui.main.menuDrawer
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -138,6 +140,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onFoldersHeaderClicked: (Boolean) -> Unit = ::onFoldersHeaderClicked
                 override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
+                override var onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit = ::onFolderManage
                 override var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
                 override var onActionsHeaderClicked: () -> Unit = ::onActionsHeaderClicked
                 override var onActionClicked: (ActionType) -> Unit = ::onActionClicked
@@ -145,7 +148,6 @@ class MenuDrawerFragment : Fragment() {
                 override var onHelpClicked: () -> Unit = ::onHelpClicked
                 override var onAppVersionClicked: () -> Unit = ::onAppVersionClicked
             },
-            modifyNameFolderDialog
         )
     }
 
@@ -208,6 +210,23 @@ class MenuDrawerFragment : Fragment() {
     private fun onFolderSelected(folderId: String) {
         mainViewModel.openFolder(folderId)
         closeDrawer()
+    }
+
+    private fun onFolderManage(folderId: String, folderName: String, view: View) {
+        val popup = PopupMenu(context, view)
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.item_menu_settings_folder, popup.menu)
+        popup.show()
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.modifySettingsFolder -> {
+                    modifyNameFolderDialog.show(folderName, folderId)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun onFolderCollapsed(folderId: String, shouldCollapse: Boolean) {

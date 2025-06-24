@@ -18,9 +18,8 @@
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
-import android.view.MenuInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -28,7 +27,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
-import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
@@ -38,7 +36,6 @@ import kotlin.math.min
 class FolderViewHolder(
     inflater: LayoutInflater,
     parent: ViewGroup,
-    val modifyNameFolderDialog: ModifyNameFolderDialog
 ) : MenuDrawerViewHolder(ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)) {
 
     override val binding = super.binding as ItemMenuDrawerFolderBinding
@@ -48,6 +45,7 @@ class FolderViewHolder(
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
+        onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
         SentryLog.d("Bind", "Bind Folder : ${folder.name}")
@@ -82,6 +80,7 @@ class FolderViewHolder(
             currentFolderId,
             hasCollapsableFolder,
             onFolderClicked,
+            onFolderLongClicked,
             onCollapseChildrenClicked,
         )
     }
@@ -93,6 +92,7 @@ class FolderViewHolder(
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
+        onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
 
@@ -116,23 +116,9 @@ class FolderViewHolder(
 
         setCollapsingButtonContentDescription(folderName)
 
-        if(folder.role == null){
+        if (folder.role == null) {
             setOnLongClickListener {
-                val popup = PopupMenu(context, it)
-                val inflater: MenuInflater = popup.menuInflater
-                inflater.inflate(R.menu.item_menu_settings_folder, popup.menu)
-                popup.show()
-
-                popup.setOnMenuItemClickListener { item ->
-                    when (item.itemId) {
-                        R.id.modifySettingsFolder -> {
-                            modifyNameFolderDialog.setFolderId(folder.id)
-                            modifyNameFolderDialog.show(ranameFolderLastName = folder.name)
-                            true
-                        }
-                        else -> false
-                    }
-                }
+                onFolderLongClicked.invoke(folder.id, folder.name, it)
                 true
             }
         }

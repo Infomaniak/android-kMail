@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer
 
+import android.view.View
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType
 
@@ -32,6 +33,7 @@ interface MenuDrawerAdapterCallbacks {
     var onCreateFolderClicked: () -> Unit
 
     var onFolderClicked: (folderId: String) -> Unit
+    var onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit
     var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit
 
     var onActionsHeaderClicked: () -> Unit
