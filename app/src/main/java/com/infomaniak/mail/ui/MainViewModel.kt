@@ -85,6 +85,7 @@ import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
+import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
@@ -97,6 +98,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.RealmResults
 import io.sentry.Attachment
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -603,8 +605,8 @@ class MainViewModel @Inject constructor(
         deleteThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
     }
 
-    fun deleteThread(threadUid: String, isSwipe: Boolean = false) {
-        deleteThreadsOrMessage(threadsUids = listOf(threadUid), isSwipe = isSwipe)
+    fun deleteThread(threadUid: String) {
+        deleteThreadsOrMessage(threadsUids = listOf(threadUid))
     }
 
     fun deleteThreads(threadsUids: List<String>) {
@@ -615,28 +617,43 @@ class MainViewModel @Inject constructor(
     private fun deleteThreadsOrMessage(
         threadsUids: List<String>,
         message: Message? = null,
-        isSwipe: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
-        val mailbox = currentMailbox.value!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
-        var trashId: String? = null
-        var undoResources = emptyList<String>()
         val shouldPermanentlyDelete = isPermanentDeleteFolder(folderRoleUtils.getActionFolderRole(threads, message))
-
         val messages = getMessagesToDelete(threads, message)
-        val uids = messages.getUids()
+
+        if (shouldPermanentlyDelete) {
+            permanentlyDelete(
+                threads = threads,
+                threadsUids = threadsUids,
+                messagesToDelete = messages,
+                message = message,
+            )
+        } else {
+            moveThreadsOrMessageTo(
+                destinationFolder = folderController.getFolder(FolderRole.TRASH)!!,
+                threadsUids = threadsUids,
+                threads = threads,
+                message = message,
+                messagesToMove = messages,
+            )
+        }
+    }
+
+    private suspend fun permanentlyDelete(
+        threads: RealmResults<Thread>,
+        threadsUids: List<String>,
+        messagesToDelete: List<Message>,
+        message: Message?,
+    ) {
+        val mailbox = currentMailbox.value!!
+        val undoResources = emptyList<String>()
+        val uids = messagesToDelete.getUids()
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = if (shouldPermanentlyDelete) {
-            ApiRepository.deleteMessages(mailbox.uuid, uids)
-        } else {
-            trashId = folderController.getFolder(FolderRole.TRASH)!!.id
-            ApiRepository.moveMessages(mailbox.uuid, uids, trashId).also {
-                undoResources = it.mapNotNull { apiResponse -> apiResponse.data?.undoResource }
-            }
-        }
+        val apiResponses = ApiRepository.deleteMessages(mailbox.uuid, uids)
 
         activityDialogLoaderResetTrigger.postValue(Unit)
 
@@ -645,54 +662,38 @@ class MainViewModel @Inject constructor(
 
             refreshFoldersAsync(
                 mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = trashId),
-                destinationFolderId = trashId,
+                messagesFoldersIds = messagesToDelete.getFoldersIds(),
                 callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
-        } else if (isSwipe) {
-            // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
-            reassignCurrentThreadsLive()
         }
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId)
-        if (trashId != null) undoFoldersIds += trashId
+        val undoFoldersIds = messagesToDelete.getFoldersIds(exception = undoDestinationId)
         showDeleteSnackbar(
-            apiResponses,
-            shouldPermanentlyDelete,
-            message,
-            undoResources,
-            undoFoldersIds,
-            undoDestinationId,
-            threads.count(),
+            apiResponses = apiResponses,
+            message = message,
+            undoResources = undoResources,
+            undoFoldersIds = undoFoldersIds,
+            undoDestinationId = undoDestinationId,
+            numberOfImpactedThreads = threads.count(),
         )
     }
 
     private fun showDeleteSnackbar(
         apiResponses: List<ApiResponse<*>>,
-        shouldPermanentlyDelete: Boolean,
         message: Message?,
         undoResources: List<String>,
         undoFoldersIds: ImpactedFolders,
         undoDestinationId: String?,
         numberOfImpactedThreads: Int,
     ) {
-
         val snackbarTitle = if (apiResponses.atLeastOneSucceeded()) {
-            val destination = appContext.getString(FolderRole.TRASH.folderNameRes)
-            when {
-                shouldPermanentlyDelete && message == null -> {
-                    appContext.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
-                }
-                shouldPermanentlyDelete && message != null -> {
-                    appContext.getString(R.string.snackbarMessageDeletedPermanently)
-                }
-                !shouldPermanentlyDelete && message == null -> {
-                    appContext.resources.getQuantityString(R.plurals.snackbarThreadMoved, numberOfImpactedThreads, destination)
-                }
-                else -> appContext.getString(R.string.snackbarMessageMoved, destination)
+            if (message == null) {
+                appContext.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, numberOfImpactedThreads)
+            } else {
+                appContext.getString(R.string.snackbarMessageDeletedPermanently)
             }
         } else {
             appContext.getString(apiResponses.first().translateError())
@@ -791,31 +792,42 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         messageUid: String? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
         val destinationFolder = folderController.getFolder(destinationFolderId)!!
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
         val message = messageUid?.let { messageController.getMessage(it)!! }
+        val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
 
-        val messages = sharedUtils.getMessagesToMove(threads, message)
+        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messagesToMove)
+    }
+
+    private suspend fun moveThreadsOrMessageTo(
+        destinationFolder: Folder,
+        threadsUids: List<String>,
+        threads: List<Thread>,
+        message: Message? = null,
+        messagesToMove: List<Message>,
+        shouldDisplaySnackbar: Boolean = true,
+    ) {
+        val mailbox = currentMailbox.value!!
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messagesToMove.getUids(), destinationFolder.id)
 
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
             refreshFoldersAsync(
                 mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
+                messagesFoldersIds = messagesToMove.getFoldersIds(exception = destinationFolder.id),
                 destinationFolderId = destinationFolder.id,
                 callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
         }
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
-        showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
+        if (shouldDisplaySnackbar) showMoveSnackbar(threads, message, messagesToMove, apiResponses, destinationFolder)
     }
 
     private fun showMoveSnackbar(
@@ -869,7 +881,7 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         message: Message? = null,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
+
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
         val role = folderRoleUtils.getActionFolderRole(threads, message)
@@ -878,25 +890,9 @@ class MainViewModel @Inject constructor(
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
-        val messages = sharedUtils.getMessagesToMove(threads, message)
+        val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
 
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
-
-        activityDialogLoaderResetTrigger.postValue(Unit)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
-
-            val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messagesFoldersIds,
-                destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
-            )
-        }
-
-        showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
+        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messagesToMove)
     }
     //endregion
 
@@ -1067,7 +1063,7 @@ class MainViewModel @Inject constructor(
         message: Message? = null,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
+
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
 
         val destinationFolderRole = if (folderRoleUtils.getActionFolderRole(threads, message) == FolderRole.SPAM) {
@@ -1079,22 +1075,7 @@ class MainViewModel @Inject constructor(
 
         val messages = getMessagesToSpamOrHam(threads, message)
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
-
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
-
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
-                destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
-            )
-        } else {
-            threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        }
-
-        if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
+        moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messages, displaySnackbar)
     }
 
     private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
@@ -1284,7 +1265,7 @@ class MainViewModel @Inject constructor(
 
         return appContext.getString(errorMessageRes)
     }
-//endregion
+    //endregion
 
     //region Undo action
     fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
@@ -1314,7 +1295,7 @@ class MainViewModel @Inject constructor(
 
         snackbarManager.postValue(appContext.getString(snackbarTitle))
     }
-//endregion
+    //endregion
 
     //region New Folder
     private suspend fun createNewFolderSync(name: String): String? {
