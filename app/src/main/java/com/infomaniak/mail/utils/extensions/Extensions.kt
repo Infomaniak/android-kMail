@@ -425,7 +425,7 @@ fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
     return folder?.getLocalizedName(context = this) ?: getString(R.string.searchFilterFolder)
 }
 
-const val loginUrl = "https://login.infomaniak.com/"
+const val loginUrl = "https://login.preprod.dev.infomaniak.ch/"
 
 fun Context.getInfomaniakLogin() = InfomaniakLogin(
     context = this,
