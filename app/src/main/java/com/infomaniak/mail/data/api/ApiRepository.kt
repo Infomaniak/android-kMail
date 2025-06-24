@@ -163,6 +163,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.folders(mailboxUuid), POST, mapOf("name" to name))
     }
 
+    suspend fun renameFolder(mailboxUuid: String, folderId: String, name: String): ApiResponse<Folder> {
+        return callApi(ApiRoutes.renameFolder(mailboxUuid, folderId), POST, mapOf("name" to name))
+    }
+
     suspend fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
         return callApi(
             url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html"),

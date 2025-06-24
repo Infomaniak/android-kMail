@@ -128,6 +128,7 @@ class MainViewModel @Inject constructor(
     val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
+    val renameFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
@@ -1280,9 +1281,19 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun modifyNameFolderSync(folderId: String, name: String): String? {
-        Log.e("TOTO", "modifyNameFolderSync: modifier nom par : $name ")
-        return null
+    private suspend fun modifyNameFolderSync(folderId: String, name: String): String? {
+        val mailbox = currentMailbox.value ?: return null
+        val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
+
+        renameFolderResultTrigger.postValue(Unit)
+
+        return if (apiResponse.isSuccess()) {
+            updateFolders(mailbox)
+            apiResponse.data?.id
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
+            null
+        }
     }
 
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
