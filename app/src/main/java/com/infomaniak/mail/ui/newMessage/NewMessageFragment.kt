@@ -246,6 +246,7 @@ class NewMessageFragment : Fragment() {
             observeEncryptionFeatureFlagUpdates()
             observeEncryptionActivation()
             observeUnencryptableRecipients()
+            observeEncryptionPassword()
         }
 
         with(recipientFieldsManager) {
