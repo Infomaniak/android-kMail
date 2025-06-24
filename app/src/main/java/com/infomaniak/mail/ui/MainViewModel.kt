@@ -85,6 +85,7 @@ import com.infomaniak.mail.utils.date.DateFormatUtils.dayOfWeekDateWithoutYear
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
+import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
@@ -604,8 +605,8 @@ class MainViewModel @Inject constructor(
         deleteThreadsOrMessage(threadsUids = listOf(threadUid), message = message)
     }
 
-    fun deleteThread(threadUid: String, isSwipe: Boolean = false) {
-        deleteThreadsOrMessage(threadsUids = listOf(threadUid), isSwipe = isSwipe)
+    fun deleteThread(threadUid: String) {
+        deleteThreadsOrMessage(threadsUids = listOf(threadUid))
     }
 
     fun deleteThreads(threadsUids: List<String>) {
@@ -616,7 +617,6 @@ class MainViewModel @Inject constructor(
     private fun deleteThreadsOrMessage(
         threadsUids: List<String>,
         message: Message? = null,
-        isSwipe: Boolean = false,
     ) = viewModelScope.launch(ioCoroutineContext) {
 
         val threads = threadController.getThreads(threadsUids).ifEmpty { return@launch }
@@ -629,7 +629,6 @@ class MainViewModel @Inject constructor(
                 threadsUids = threadsUids,
                 messagesToDelete = messages,
                 message = message,
-                isSwipe = isSwipe,
             )
         } else {
             moveThreadsOrMessageTo(
@@ -647,7 +646,6 @@ class MainViewModel @Inject constructor(
         threadsUids: List<String>,
         messagesToDelete: List<Message>,
         message: Message?,
-        isSwipe: Boolean,
     ) {
         val mailbox = currentMailbox.value!!
         val undoResources = emptyList<String>()
@@ -667,12 +665,9 @@ class MainViewModel @Inject constructor(
                 messagesFoldersIds = messagesToDelete.getFoldersIds(),
                 callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
-        } else if (isSwipe) {
-            // We need to make the swiped Thread come back, so we reassign the LiveData with Realm values
-            reassignCurrentThreadsLive()
         }
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         val undoDestinationId = message?.folderId ?: threads.first().folderId
         val undoFoldersIds = messagesToDelete.getFoldersIds(exception = undoDestinationId)
@@ -830,7 +825,7 @@ class MainViewModel @Inject constructor(
             )
         }
 
-        threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+        if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         if (shouldDisplaySnackbar) showMoveSnackbar(threads, message, messagesToMove, apiResponses, destinationFolder)
     }

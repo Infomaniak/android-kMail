@@ -107,7 +107,7 @@ object PerformSwipeActionManager {
                 },
                 callback = {
                     if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
-                    mainViewModel.deleteThread(thread.uid, isSwipe = true)
+                    mainViewModel.deleteThread(thread.uid)
                 },
             )
         }
