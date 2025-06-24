@@ -79,7 +79,7 @@ class AccountManagementSettingsFragment : Fragment() {
     }
 
     companion object {
-        private const val URL_REDIRECT_SUCCESSFUL_ACCOUNT_DELETION = "login.infomaniak.com"
+        private const val URL_REDIRECT_SUCCESSFUL_ACCOUNT_DELETION = "login.preprod.dev.infomaniak.ch"
         private const val TERMINATE_ACCOUNT_FULL_URL = "$AUTOLOG_URL/?url=$TERMINATE_ACCOUNT_URL"
     }
 }
