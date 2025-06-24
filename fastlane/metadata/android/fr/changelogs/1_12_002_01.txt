@@ -1,0 +1,2 @@
+- La barre inférieure est désormais correctement affichée au-dessus de la barre de navigation
+- Les actions sur les fils de discussion et les messages sont désormais toujours exécutées sur le bon dossier.

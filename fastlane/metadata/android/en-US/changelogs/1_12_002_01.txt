@@ -1,0 +1,2 @@
+- The bottom bar is now correctly displayed above the navigation bar
+- The actions on Threads & Messages are now always executed on the correct Folder
