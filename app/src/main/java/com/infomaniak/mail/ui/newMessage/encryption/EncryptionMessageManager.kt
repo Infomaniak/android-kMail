@@ -67,6 +67,25 @@ class EncryptionMessageManager @Inject constructor(
         }
     }
 
+    fun observeEncryptionActivation() {
+        newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
+            val recipients = newMessageViewModel.allRecipients
+            if (isEncrypted && recipients.isNotEmpty()) {
+                encryptionViewModel.checkIfEmailsCanBeEncrypted(recipients.map(Recipient::email))
+            }
+
+            val encryptionStatus = if (isEncrypted) {
+                navigateToDiscoveryBottomSheetIfFirstTime()
+                snackbarManager.postValue(fragment.getString(R.string.encryptedMessageSnackbarEncryptionActivated))
+                EncryptionStatus.Encrypted
+            } else {
+                EncryptionStatus.Unencrypted
+            }
+
+            binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
+        }
+    }
+
     fun observeUnencryptableRecipients() {
         encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipients ->
             if (newMessageViewModel.isEncryptionActivated.value != true) return@observe
@@ -84,6 +103,19 @@ class EncryptionMessageManager @Inject constructor(
                     ),
                 )
             }
+        }
+    }
+
+    fun observeEncryptionPassword() {
+        encryptionViewModel.password.observe(viewLifecycleOwner) { password ->
+            val encryptionStatus = if (password.isNotBlank()) {
+                EncryptionStatus.Encrypted
+            } else {
+                EncryptionStatus.PartiallyEncrypted
+            }
+            binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
+
+            newMessageViewModel.encryptionPassword.postValue(password)
         }
     }
 
@@ -107,25 +139,6 @@ class EncryptionMessageManager @Inject constructor(
         val unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toMutableList()
         if (unencryptableRecipients?.contains(recipient.email) == true) {
             encryptionViewModel.unencryptableRecipients.value = unencryptableRecipients.apply { remove(recipient.email) }
-        }
-    }
-
-    fun observeEncryptionActivation() {
-        newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
-            val recipients = newMessageViewModel.allRecipients
-            if (isEncrypted && recipients.isNotEmpty()) {
-                encryptionViewModel.checkIfEmailsCanBeEncrypted(recipients.map(Recipient::email))
-            }
-
-            val encryptionStatus = if (isEncrypted) {
-                navigateToDiscoveryBottomSheetIfFirstTime()
-                snackbarManager.postValue(fragment.getString(R.string.encryptedMessageSnackbarEncryptionActivated))
-                EncryptionStatus.Encrypted
-            } else {
-                EncryptionStatus.Unencrypted
-            }
-
-            binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
         }
     }
 

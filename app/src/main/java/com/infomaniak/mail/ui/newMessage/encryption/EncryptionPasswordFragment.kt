@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -50,7 +51,19 @@ class EncryptionPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupPasswordTextField()
         setupListeners()
+    }
+
+    private fun setupPasswordTextField() = with(binding) {
+        passwordInputLayout.setEndIconOnClickListener {
+            passwordInput.setText(encryptionViewModel.generatePassword())
+        }
+        passwordInput.apply {
+            doOnTextChanged { password, _, _, _ -> encryptionViewModel.password.value = password.toString() }
+            val initialPassword = encryptionViewModel.password.value.takeUnless { it.isNullOrBlank() }
+            setText(initialPassword ?: encryptionViewModel.generatePassword())
+        }
     }
 
     private fun setupListeners() = with(binding) {
@@ -59,9 +72,7 @@ class EncryptionPasswordFragment : Fragment() {
         copyPasswordButton.setOnClickListener {
             val password = passwordInput.text
             requireContext().copyStringToClipboard(password.toString(), R.string.snackbarPasswordCopied, snackbarManager)
-        }
-        passwordInputLayout.setEndIconOnClickListener {
-            encryptionViewModel.generatePassword()
+            findNavController().popBackStack()
         }
     }
 
