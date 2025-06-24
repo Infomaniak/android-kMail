@@ -504,6 +504,7 @@ class NewMessageViewModel @Inject constructor(
             uiBody = uiBodyValue,
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
             isEncrypted = isEncrypted,
+            encryptionPassword = encryptionPassword,
         )
     }
 
@@ -996,6 +997,7 @@ class NewMessageViewModel @Inject constructor(
 
         action = draftAction
         isEncrypted = isEncryptionActivated.value ?: false
+        encryptionPassword = this@NewMessageViewModel.encryptionPassword.value
         identityId = fromLiveData.value?.signature?.id.toString()
 
         to = toLiveData.valueOrEmpty().toRealmList()
@@ -1077,6 +1079,7 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.subject == subjectValue &&
                     draftSnapshot.uiBody == uiBodyValue &&
                     draftSnapshot.isEncrypted == isEncryptionActivated.value &&
+                    draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
                 .mapTo(mutableSetOf()) { it.localUuid }
         } ?: false
@@ -1170,6 +1173,7 @@ class NewMessageViewModel @Inject constructor(
         var uiBody: String,
         val attachmentsLocalUuids: Set<String>,
         var isEncrypted: Boolean,
+        var encryptionPassword: String?,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)

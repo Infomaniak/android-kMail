@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.newMessage.encryption
 
 import android.app.Application
-import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -43,6 +42,7 @@ class EncryptionViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     val unencryptableRecipients: MutableLiveData<List<String>> = MutableLiveData()
+    val password: MutableLiveData<String> = MutableLiveData()
 
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
         viewModelScope.launch(ioDispatcher) {
@@ -64,13 +64,7 @@ class EncryptionViewModel @Inject constructor(
     }
 
     fun generatePassword(): String {
-
-        val generator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            SecureRandom.getInstanceStrong()
-        } else {
-            SecureRandom()
-        }
-
+        val generator = SecureRandom.getInstanceStrong()
         var generatedPassword = ""
         val charactersSetCount = PASSWORD_CHARACTERS_SET.count()
         (0..<PASSWORD_MIN_LENGTH).forEach {
