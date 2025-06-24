@@ -1333,6 +1333,24 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    private suspend fun deleteFolderSync(folderId: String) {
+        val mailbox = currentMailbox.value ?: return
+        val apiResponse = ApiRepository.deleteFolder(mailbox.uuid, folderId)
+
+        if (apiResponse.isSuccess()) {
+            updateFolders(mailbox)
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
+        }
+    }
+
+    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
+
+    fun modifyNameFolder(name: String, folderId: String) =
+        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
+
+    fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) { deleteFolderSync(folderId) }
+
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,

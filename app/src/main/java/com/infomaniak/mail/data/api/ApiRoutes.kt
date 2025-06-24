@@ -147,7 +147,7 @@ object ApiRoutes {
         return "${mailMailbox(mailboxUuid)}/folder?with=ik-static"
     }
 
-    private fun folder(mailboxUuid: String, folderId: String): String {
+    fun folder(mailboxUuid: String, folderId: String): String {
         return "${mailMailbox(mailboxUuid)}/folder/$folderId"
     }
 

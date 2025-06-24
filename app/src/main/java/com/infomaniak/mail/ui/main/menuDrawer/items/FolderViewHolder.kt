@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
