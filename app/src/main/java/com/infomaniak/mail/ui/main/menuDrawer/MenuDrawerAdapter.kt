@@ -47,8 +47,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import javax.inject.Inject
 
-class MenuDrawerAdapter @Inject constructor() :
-    ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
+class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewHolder>(FolderDiffCallback()) {
 
     private var currentFolderId: String? = null
     private var hasCollapsableDefaultFolder = false
@@ -56,9 +55,7 @@ class MenuDrawerAdapter @Inject constructor() :
 
     private lateinit var callbacks: MenuDrawerAdapterCallbacks
 
-    operator fun invoke(
-        callbacks: MenuDrawerAdapterCallbacks,
-    ): MenuDrawerAdapter {
+    operator fun invoke(callbacks: MenuDrawerAdapterCallbacks): MenuDrawerAdapter {
         this.callbacks = callbacks
         return this
     }
