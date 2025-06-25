@@ -24,7 +24,10 @@ import androidx.annotation.StyleableRes
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.res.vectorResource
@@ -41,6 +44,8 @@ class EmojiReactionsView @JvmOverloads constructor(
 ) : AbstractComposeView(context, attrs, defStyleAttr) {
 
     private val reactionsState = mutableStateMapOf<String, ReactionState>()
+    private var isAddReactionEnabled by mutableStateOf(true)
+
     private var addReactionClickListener: (() -> Unit)? = null
     private var onEmojiClickListener: ((emoji: String) -> Unit)? = null
 
@@ -74,6 +79,7 @@ class EmojiReactionsView @JvmOverloads constructor(
                 onEmojiClicked = { emoji -> onEmojiClickListener?.invoke(emoji) },
                 shape = chipCornerRadius?.let { RoundedCornerShape(it) } ?: InputChipDefaults.shape,
                 addReactionIcon = addReactionIcon,
+                isAddReactionEnabled = { isAddReactionEnabled },
                 onAddReactionClick = { addReactionClickListener?.invoke() }
             )
         }
@@ -102,5 +108,9 @@ class EmojiReactionsView @JvmOverloads constructor(
         emojiReactions.forEach { (key, value) ->
             reactionsState[key] = value
         }
+    }
+
+    fun setAddReactionEnabledState(isEnabled: Boolean) {
+        isAddReactionEnabled = isEnabled
     }
 }
