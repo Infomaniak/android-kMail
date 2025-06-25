@@ -137,7 +137,7 @@ class EncryptionMessageManager @Inject constructor(
     }
 
     fun removeUnencryptableRecipient(recipient: Recipient) {
-        val unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toMutableList()
+        val unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toMutableSet()
         if (unencryptableRecipients?.contains(recipient.email) == true) {
             encryptionViewModel.unencryptableRecipients.value = unencryptableRecipients.apply { remove(recipient.email) }
         }
