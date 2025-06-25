@@ -1351,6 +1351,16 @@ class MainViewModel @Inject constructor(
 
     fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) { deleteFolderSync(folderId) }
 
+    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String? {
+        return if (apiResponse.isSuccess()) {
+            updateFolders(mailbox)
+            apiResponse.data?.id
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
+            null
+        }
+    }
+
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,

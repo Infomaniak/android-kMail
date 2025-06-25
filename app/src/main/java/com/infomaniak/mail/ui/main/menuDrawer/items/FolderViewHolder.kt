@@ -28,7 +28,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
-import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
@@ -37,8 +36,7 @@ import kotlin.math.min
 
 class FolderViewHolder(
     inflater: LayoutInflater,
-    parent: ViewGroup,
-    val modifyNameFolderDialog: ModifyNameFolderDialog
+    parent: ViewGroup
 ) : MenuDrawerViewHolder(ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)) {
 
     override val binding = super.binding as ItemMenuDrawerFolderBinding
