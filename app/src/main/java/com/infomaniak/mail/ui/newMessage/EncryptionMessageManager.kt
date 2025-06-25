@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import android.app.Activity
-import android.content.Context
 import androidx.core.view.isVisible
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -26,18 +24,15 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
 @FragmentScoped
 class EncryptionMessageManager @Inject constructor(
-    @ActivityContext private val activityContext: Context,
     private val localSettings: LocalSettings,
     private val snackbarManager: SnackbarManager,
 ) : NewMessageManager() {
 
-    private inline val activity get() = activityContext as Activity
     private var _encryptionViewModel: EncryptionViewModel? = null
     private val encryptionViewModel: EncryptionViewModel get() = _encryptionViewModel!!
 
@@ -90,7 +85,6 @@ class EncryptionMessageManager @Inject constructor(
                 // TODO
             }
         }
-
     }
 
     private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
