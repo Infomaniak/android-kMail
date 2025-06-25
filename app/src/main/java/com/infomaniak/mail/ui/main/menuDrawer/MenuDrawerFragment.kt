@@ -108,7 +108,7 @@ class MenuDrawerFragment : Fragment() {
         bindAlertToViewLifecycle(modifyNameFolderDialog)
 
         setupListeners()
-        setupCreateFolderDialog()
+        setupManageFolderDialog()
         setupRecyclerView()
 
         observeMenuDrawerData()
@@ -125,7 +125,7 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun setupCreateFolderDialog() {
+    private fun setupManageFolderDialog() {
         createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
         modifyNameFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::modifyNameFolder)
     }
