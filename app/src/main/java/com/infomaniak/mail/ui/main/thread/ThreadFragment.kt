@@ -640,6 +640,7 @@ class ThreadFragment : Fragment() {
 
     private fun observePickedEmoji() {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerBottomSheetDialog.PICKED_EMOJI) { (emoji, messageUid) ->
+            threadViewModel.fakeEmojiReply(emoji, messageUid)
             mainViewModel.sendEmojiReply(emoji, messageUid)
         }
     }
