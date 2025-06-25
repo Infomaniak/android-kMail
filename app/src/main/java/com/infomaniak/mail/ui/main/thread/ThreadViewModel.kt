@@ -622,11 +622,24 @@ private fun <E : Any> List<E>.toUiMessages(fakeReactions: Map<String, Set<String
 }
 
 private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions: Set<String>): Map<String, ReactionState> {
-    return entries
+    val fakeReactions = mutableMapOf<String, ReactionState>()
+
+    entries
         .filterOutNullStates()
-        .associate { (emoji, state) ->
+        .associateTo(fakeReactions) { (emoji, state) ->
             emoji to fakeEmojiReactionState(emoji, state, localReactions)
         }
+
+    localReactions.forEach { emoji ->
+        if (emoji !in fakeReactions) {
+            fakeReactions[emoji] = object : ReactionState {
+                override val count = 1
+                override val hasReacted = true
+            }
+        }
+    }
+
+    return fakeReactions
 }
 
 private fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry<String, T>> {
