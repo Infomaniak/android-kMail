@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -45,13 +44,7 @@ class EncryptionViewModel @Inject constructor(
 
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
         viewModelScope.launch(ioDispatcher) {
-            val apiResponse = ApiRepository.isInfomaniakMailbox(emails)
-            Log.e(
-                "TOTO",
-                "checkIfEmailsCanBeEncrypted: ${
-                    apiResponse.data?.toList()?.joinToString { "${it.email} ${it.isInfomaniakHosted}" }
-                }"
-            )
+            val apiResponse = ApiRepository.isInfomaniakMailboxes(emails)
             if (apiResponse.isSuccess()) {
                 apiResponse.data?.let { mailboxHostingStatuses ->
                     val uncryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
