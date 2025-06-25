@@ -1317,21 +1317,6 @@ class MainViewModel @Inject constructor(
         return apiResponseIsSuccess(apiResponse, mailbox)
     }
 
-    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
-
-    fun modifyNameFolder(name: String, folderId: String) =
-        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
-
-    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String?{
-        return if (apiResponse.isSuccess()) {
-            updateFolders(mailbox)
-            apiResponse.data?.id
-        } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
-            null
-        }
-    }
-
     private suspend fun deleteFolderSync(folderId: String) {
         val mailbox = currentMailbox.value ?: return
         val apiResponse = ApiRepository.deleteFolder(mailbox.uuid, folderId)
@@ -1349,6 +1334,16 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
 
     fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) { deleteFolderSync(folderId) }
+
+    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String? {
+        return if (apiResponse.isSuccess()) {
+            updateFolders(mailbox)
+            apiResponse.data?.id
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
+            null
+        }
+    }
 
     fun moveToNewFolder(
         name: String,

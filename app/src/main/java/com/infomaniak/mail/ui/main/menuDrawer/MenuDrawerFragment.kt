@@ -154,8 +154,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onFeedbackClicked: () -> Unit = ::onFeedbackClicked
                 override var onHelpClicked: () -> Unit = ::onHelpClicked
                 override var onAppVersionClicked: () -> Unit = ::onAppVersionClicked
-            },
-            modifyNameFolderDialog
+            }
         )
     }
 
@@ -230,6 +229,10 @@ class MenuDrawerFragment : Fragment() {
             when (item.itemId) {
                 R.id.modifySettingsFolder -> {
                     modifyNameFolderDialog.show(folderName, folderId)
+                    true
+                }
+                R.id.deleteSettingsFolder -> {
+                    confirmDeleteFolderDialog.show(folderId, folderName)
                     true
                 }
                 else -> false
