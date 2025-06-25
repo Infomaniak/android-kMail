@@ -41,7 +41,7 @@ class EncryptionViewModel @Inject constructor(
     private val snackbarManager: SnackbarManager,
 ) : AndroidViewModel(application) {
 
-    val unencryptableRecipients: MutableLiveData<List<String>> = MutableLiveData()
+    val unencryptableRecipients: MutableLiveData<Set<String>> = MutableLiveData()
     val password: MutableLiveData<String> = MutableLiveData()
 
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
@@ -53,7 +53,7 @@ class EncryptionViewModel @Inject constructor(
             if (apiResponse.isSuccess()) {
                 apiResponse.data?.let { mailboxHostingStatuses ->
                     val unencryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
-                    val newRecipients = (unencryptableRecipients.value ?: emptyList()) + unencryptableEmailAddresses
+                    val newRecipients = (unencryptableRecipients.value ?: emptySet()) + unencryptableEmailAddresses
 
                     unencryptableRecipients.postValue(newRecipients)
                 }
