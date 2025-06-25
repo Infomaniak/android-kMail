@@ -200,8 +200,12 @@ class ThreadAdapter(
     }
 
     private fun EmojiReactionsView.bindEmojiReactions(message: MessageUi) {
-        isVisible = message.isReactionsFeatureAvailable && (message.hasEmojis() || message.canBeReactedTo())
+        val canBeReactedTo by lazy { message.canBeReactedTo() }
+
+        isVisible = message.isReactionsFeatureAvailable && (canBeReactedTo || message.hasEmojis())
         setEmojiReactions(message.emojiReactionsState)
+
+        if (message.isReactionsFeatureAvailable) setAddReactionEnabledState(isEnabled = canBeReactedTo)
     }
 
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {

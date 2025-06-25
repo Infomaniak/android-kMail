@@ -17,10 +17,12 @@
  */
 package com.infomaniak.emojicomponents.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -58,8 +60,17 @@ internal fun AddReactionChip(
 @Preview
 @Composable
 private fun AddReactionChipPreview() {
-    AddReactionChip(
-        icon = Icons.FaceSmileRoundPlus,
-        onClick = {},
-    )
+    Surface {
+        Column {
+            AddReactionChip(
+                icon = Icons.FaceSmileRoundPlus,
+                onClick = {},
+            )
+            AddReactionChip(
+                icon = Icons.FaceSmileRoundPlus,
+                onClick = {},
+                enabled = { false }
+            )
+        }
+    }
 }
