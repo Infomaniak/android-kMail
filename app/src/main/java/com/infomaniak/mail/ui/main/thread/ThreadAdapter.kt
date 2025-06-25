@@ -174,7 +174,7 @@ class ThreadAdapter(
                 NotifyType.RE_RENDER -> reloadVisibleWebView()
                 NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.message.uid)
                 NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item.message)
-                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item.emojiReactionState)
+                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item.emojiReactionsState)
             }
         }
     }.getOrDefault(Unit)
@@ -195,8 +195,8 @@ class ThreadAdapter(
         calendarEvent.onlyUpdateAttendance(attendees)
     }
 
-    private fun ItemMessageBinding.handleEmojiReactionPayload(emojiReactions: Map<String, ReactionState>) {
-        this.emojiReactions.bindEmojiReactions(emojiReactions)
+    private fun ItemMessageBinding.handleEmojiReactionPayload(emojiReactionsState: Map<String, ReactionState>) {
+        emojiReactions.bindEmojiReactions(emojiReactionsState)
     }
 
     private fun EmojiReactionsView.bindEmojiReactions(emojiReactions: Map<String, ReactionState>) {
@@ -813,7 +813,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindEmojiReactions(messageUi: MessageUi) = with(binding.emojiReactions) {
-        bindEmojiReactions(messageUi.emojiReactionState)
+        bindEmojiReactions(messageUi.emojiReactionsState)
         setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(messageUi.message) }
         setOnEmojiClickListener { emoji ->
             threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, messageUi.message.uid)
@@ -927,7 +927,8 @@ class ThreadAdapter(
 
             // TODO: Handle the case where there are multiple aspects that changed at once
             return when {
-                MessageDiffAspect.AnythingElse.areDifferent(oldItem.message, newItem.message) -> null // null means "bind the whole item again"
+                // null means "bind the whole item again"
+                MessageDiffAspect.AnythingElse.areDifferent(oldItem.message, newItem.message) -> null
                 MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.ONLY_REBIND_EMOJI_REACTIONS
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
@@ -967,7 +968,7 @@ class ThreadAdapter(
 
             object MessageDiffAspect {
                 data object EmojiReactions : DiffAspect<MessageUi>({
-                    emojiReactionState.containsTheSameEmojiValuesAs(it.emojiReactionState)
+                    emojiReactionsState.containsTheSameEmojiValuesAs(it.emojiReactionsState)
                 })
 
                 data object Calendar : DiffAspect<Message>({
