@@ -20,4 +20,4 @@ package com.infomaniak.mail.ui.main.thread.models
 import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.mail.data.models.message.Message
 
-data class MessageUi(val message: Message, val emojiReactionState: Map<String, ReactionState>)
+data class MessageUi(val message: Message, val emojiReactionsState: Map<String, ReactionState>)
