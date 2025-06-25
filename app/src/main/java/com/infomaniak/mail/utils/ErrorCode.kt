@@ -101,6 +101,10 @@ object ErrorCode {
     const val MAIL_MESSAGE_CANNOT_BE_SNOOZE = "mail__message_cannot_be_snooze"
     //endregion
 
+    //region Encryption
+    const val ENCRYPTION_PASSWORD_IS_REQUIRED = "encryption_password_is_required"
+    //endregion
+
     val apiErrorCodes = listOf(
 
         // Global
@@ -145,6 +149,9 @@ object ErrorCode {
         ApiErrorCode(MAIL_MESSAGE_SNOOZE_ALREADY_SCHEDULED, R.string.errorMessageSnoozeAlreadyScheduled),
         ApiErrorCode(MAIL_MESSAGE_MAX_NUMBER_OF_SCHEDULED_SNOOZE_REACHED, R.string.errorMaxNumberOfScheduledSnoozeReached),
         ApiErrorCode(MAIL_MESSAGE_CANNOT_BE_SNOOZE, R.string.errorMessageCannotBeSnoozed),
+
+        //Encryption
+        ApiErrorCode(ENCRYPTION_PASSWORD_IS_REQUIRED, R.string.encryptedStatePanelIncomplete)
     )
 
     private val ignoredErrorCodesForDrafts = setOf(

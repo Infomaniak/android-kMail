@@ -79,6 +79,7 @@ class EncryptionMessageManager @Inject constructor(
                 snackbarManager.postValue(fragment.getString(R.string.encryptedMessageSnackbarEncryptionActivated))
                 EncryptionStatus.Encrypted
             } else {
+                encryptionViewModel.password.value = ""
                 EncryptionStatus.Unencrypted
             }
 
@@ -108,10 +109,10 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeEncryptionPassword() {
         encryptionViewModel.password.observe(viewLifecycleOwner) { password ->
-            val encryptionStatus = if (password.isNotBlank()) {
-                EncryptionStatus.Encrypted
-            } else {
+            val encryptionStatus = if (password.isNullOrBlank()) {
                 EncryptionStatus.PartiallyEncrypted
+            } else {
+                EncryptionStatus.Encrypted
             }
             binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
 
