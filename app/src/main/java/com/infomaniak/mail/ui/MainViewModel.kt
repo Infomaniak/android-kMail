@@ -1298,20 +1298,14 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
-    //region New Folder
+    //region Manage Folder
     private suspend fun createNewFolderSync(name: String): String? {
         val mailbox = currentMailbox.value ?: return null
         val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
 
         newFolderResultTrigger.postValue(Unit)
 
-        return if (apiResponse.isSuccess()) {
-            updateFolders(mailbox)
-            apiResponse.data?.id
-        } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
-            null
-        }
+        return apiResponseIsSuccess(apiResponse, mailbox)
     }
 
     private suspend fun modifyNameFolderSync(folderId: String, name: String): String? {
@@ -1320,6 +1314,15 @@ class MainViewModel @Inject constructor(
 
         renameFolderResultTrigger.postValue(Unit)
 
+        return apiResponseIsSuccess(apiResponse, mailbox)
+    }
+
+    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
+
+    fun modifyNameFolder(name: String, folderId: String) =
+        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
+
+    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String?{
         return if (apiResponse.isSuccess()) {
             updateFolders(mailbox)
             apiResponse.data?.id
@@ -1328,12 +1331,6 @@ class MainViewModel @Inject constructor(
             null
         }
     }
-
-    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
-
-    fun modifyNameFolder(name: String, folderId: String) =
-        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
-
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,
