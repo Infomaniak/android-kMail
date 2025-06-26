@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.newMessage
+package com.infomaniak.mail.ui.newMessage.encryption
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

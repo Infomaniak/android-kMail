@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2025 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="12dp"
+    android:height="12dp"
+    android:tint="@color/iconColor"
+    android:viewportWidth="12"
+    android:viewportHeight="13">
+    <path
+        android:fillColor="#5466D9"
+        android:fillType="evenOdd"
+        android:pathData="M3,3.965V5.465H2.625C2.372,5.465 2.157,5.529 1.983,5.645C1.812,5.759 1.702,5.909 1.633,6.047C1.564,6.185 1.5,6.398 1.5,6.59C1.5,8.64 1.5,11.84 1.5,11.84C1.5,12.093 1.564,12.308 1.68,12.481C1.794,12.653 1.944,12.762 2.082,12.832C2.221,12.901 2.407,12.965 2.625,12.965H9.375C9.628,12.965 9.843,12.901 10.017,12.785C10.188,12.67 10.32,12.48 10.32,12.48C10.32,12.48 10.5,12.215 10.5,11.84V6.59C10.5,6.337 10.436,6.122 10.32,5.948C10.204,5.775 9.79,5.465 9.375,5.465H9V3.965C9,3.169 8.684,2.406 8.121,1.844C7.559,1.281 6.796,0.965 6,0.965C5.204,0.965 4.441,1.281 3.879,1.844C3.316,2.406 3,3.169 3,3.965ZM6,1.715C5.403,1.715 4.831,1.952 4.409,2.374C3.987,2.796 3.75,3.368 3.75,3.965V5.465H8.25V3.965C8.25,3.368 8.013,2.796 7.591,2.374C7.169,1.952 6.597,1.715 6,1.715ZM6.375,8.465C6.375,8.258 6.207,8.09 6,8.09C5.793,8.09 5.625,8.258 5.625,8.465V9.965C5.625,10.172 5.793,10.34 6,10.34C6.207,10.34 6.375,10.172 6.375,9.965V8.465Z" />
+</vector>
