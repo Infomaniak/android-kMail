@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -29,6 +30,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.network.NetworkAvailability
+import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -73,6 +75,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.DraftInitManager
+import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.NotificationUtils
@@ -1284,38 +1287,75 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Emoji reaction
-    fun sendEmojiReply(emoji: String, messageUid: String) {
+    /**
+     * Wrapper method to send an emoji reaction to the api. This method will check if the emoji reaction is allowed before
+     * initiating an api call. This is the entry point to add an emoji reaction anywhere in the app.
+     *
+     * If sending is allowed, the caller place can fake the emoji reaction locally thanks to [onAllowed].
+     * If sending is not allowed, it will display the error directly to the user and avoid doing the api call.
+     */
+    fun trySendEmojiReply(emoji: String, messageUid: String, reactions: Map<String, ReactionState>, onAllowed: () -> Unit) {
         viewModelScope.launch {
-            val targetMessage = messageController.getMessage(messageUid) ?: return@launch
-            val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(targetMessage)
-            if (hasFailedFetching) return@launch
-            val draftMode = Draft.DraftMode.REPLY_ALL
-
-            val draft = Draft().apply {
-                with(draftInitManager) {
-                    setPreviousMessage(draftMode, fullMessage)
+            when (val status = reactions.getEmojiSendStatus(emoji)) {
+                EmojiSendStatus.Allowed -> {
+                    onAllowed()
+                    sendEmojiReply(emoji, messageUid)
                 }
+                is EmojiSendStatus.NotAllowed -> snackbarManager.postValue(appContext.getString(status.errorMessageRes))
+            }
+        }
+    }
 
-                val quote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
-                body = EMOJI_REACTION_PLACEHOLDER + quote
+    private fun Map<String, ReactionState?>.getEmojiSendStatus(emoji: String): EmojiSendStatus = when {
+        this[emoji]?.hasReacted == true -> EmojiSendStatus.NotAllowed.AlreadyUsed
+        // TODO: Centralize logic with future branch
+        count { it.value?.hasReacted == true } >= 5 -> EmojiSendStatus.NotAllowed.MaxReactionReached
+        else -> EmojiSendStatus.Allowed
+    }
 
-                val currentMailbox = currentMailboxLive.asFlow().first()
-                with(draftInitManager) {
-                    // We don't want to send the HTML code of the signature for an emoji reaction but we still need to send the
-                    // identityId stored in a Signature
-                    val signature = chooseSignature(currentMailbox.email, currentMailbox.signatures, draftMode, fullMessage)
-                    setSignatureIdentity(signature)
-                }
+    /**
+     * The actual logic of sending an emoji reaction to the api. This method initializes a [Draft] instance, stores it into the
+     * database and schedules the [DraftsActionsWorker] so the draft is uploaded on the api.
+     */
+    private suspend fun sendEmojiReply(emoji: String, messageUid: String) {
+        val targetMessage = messageController.getMessage(messageUid) ?: return
+        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(targetMessage)
+        if (hasFailedFetching) return
+        val draftMode = Draft.DraftMode.REPLY_ALL
 
-                mimeType = Utils.TEXT_HTML
-
-                action = Draft.DraftAction.SEND_REACTION
-                emojiReaction = emoji
+        val draft = Draft().apply {
+            with(draftInitManager) {
+                setPreviousMessage(draftMode, fullMessage)
             }
 
-            draftController.upsertDraft(draft)
+            val quote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
+            body = EMOJI_REACTION_PLACEHOLDER + quote
 
-            draftsActionsWorkerScheduler.scheduleWork(draft.localUuid)
+            val currentMailbox = currentMailboxLive.asFlow().first()
+            with(draftInitManager) {
+                // We don't want to send the HTML code of the signature for an emoji reaction but we still need to send the
+                // identityId stored in a Signature
+                val signature = chooseSignature(currentMailbox.email, currentMailbox.signatures, draftMode, fullMessage)
+                setSignatureIdentity(signature)
+            }
+
+            mimeType = Utils.TEXT_HTML
+
+            action = Draft.DraftAction.SEND_REACTION
+            emojiReaction = emoji
+        }
+
+        draftController.upsertDraft(draft)
+
+        draftsActionsWorkerScheduler.scheduleWork(draft.localUuid)
+    }
+
+    private sealed interface EmojiSendStatus {
+        data object Allowed : EmojiSendStatus
+
+        sealed class NotAllowed(@StringRes val errorMessageRes: Int) : EmojiSendStatus {
+            data object AlreadyUsed : NotAllowed(ErrorCode.EmojiReactions.alreadyUsed.translateRes)
+            data object MaxReactionReached : NotAllowed(ErrorCode.EmojiReactions.maxReactionReached.translateRes)
         }
     }
     //endregion

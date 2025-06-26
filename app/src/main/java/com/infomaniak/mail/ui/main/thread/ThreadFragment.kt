@@ -403,8 +403,10 @@ class ThreadFragment : Fragment() {
                 onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
                 onAddReaction = { navigateToEmojiPicker(it.uid) },
                 onAddEmoji = { emoji, messageUid ->
-                    threadViewModel.fakeEmojiReply(emoji, messageUid)
-                    mainViewModel.sendEmojiReply(emoji, messageUid)
+                    val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@ThreadAdapterCallbacks
+                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
+                        threadViewModel.fakeEmojiReply(emoji, messageUid)
+                    })
                 },
             ),
         )
@@ -631,8 +633,10 @@ class ThreadFragment : Fragment() {
 
     private fun observePickedEmoji() {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerBottomSheetDialog.PICKED_EMOJI) { (emoji, messageUid) ->
-            threadViewModel.fakeEmojiReply(emoji, messageUid)
-            mainViewModel.sendEmojiReply(emoji, messageUid)
+            val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@getBackNavigationResult
+            mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
+                threadViewModel.fakeEmojiReply(emoji, messageUid)
+            })
         }
     }
 
