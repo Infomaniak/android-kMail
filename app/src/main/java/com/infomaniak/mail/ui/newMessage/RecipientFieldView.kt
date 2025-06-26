@@ -132,10 +132,10 @@ class RecipientFieldView @JvmOverloads constructor(
 
             contactAdapter = ContactAdapter(
                 usedEmails = mutableSetOf(),
-                onContactClicked = { addRecipient(it.email, it.name) },
+                onContactClicked = { addRecipient(it.email, it.name, it.canBeEncrypted) },
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
-                    addRecipient(email = input, name = input)
+                    addRecipient(email = input, name = input, canBeEncrypted = false)
                 },
                 snackbarManager = snackbarManager,
             )
@@ -309,7 +309,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled?.invoke(isAutoCompletionOpened)
     }
 
-    private fun addRecipient(email: String, name: String) {
+    private fun addRecipient(email: String, name: String, canBeEncrypted: Boolean) {
 
         if (!email.isEmail()) {
             snackbarManager.setValue(context.getString(R.string.addUnknownRecipientInvalidEmail))
@@ -328,7 +328,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
         val recipientIsNew = contactAdapter.addUsedContact(email)
         if (recipientIsNew) {
-            val recipient = Recipient().initLocalValues(email, name)
+            val recipient = Recipient().initLocalValues(email, name, canBeEncrypted)
             contactChipAdapter.addChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()

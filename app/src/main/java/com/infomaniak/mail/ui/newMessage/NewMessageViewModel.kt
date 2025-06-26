@@ -154,6 +154,7 @@ class NewMessageViewModel @Inject constructor(
     val attachmentsLiveData = MutableLiveData<List<Attachment>>()
     val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
+    inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
 
     val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
@@ -183,6 +184,7 @@ class NewMessageViewModel @Inject constructor(
     val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
     val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
     val isSendingAllowed = SingleLiveEvent(false)
+    val isEncryptionActivated = SingleLiveEvent(false)
     val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
@@ -492,6 +494,7 @@ class NewMessageViewModel @Inject constructor(
             subject = subject,
             uiBody = uiBodyValue,
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
+            isEncrypted = isEncrypted,
         )
     }
 
@@ -520,6 +523,8 @@ class NewMessageViewModel @Inject constructor(
             otherRecipientsFieldsAreEmpty.postValue(false)
             initializeFieldsAsOpen.postValue(true)
         }
+
+        isEncryptionActivated.postValue(isEncrypted)
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
@@ -843,14 +848,14 @@ class NewMessageViewModel @Inject constructor(
         recipients: List<Recipient> = emptyList(),
     ) {
 
-        val allRecipients = when (type) {
+        val allDraftRecipients = when (type) {
             FieldType.TO -> recipients + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
             FieldType.CC -> toLiveData.valueOrEmpty() + recipients + bccLiveData.valueOrEmpty()
             FieldType.BCC -> toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + recipients
-            null -> toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
+            null -> allRecipients
         }
 
-        isSendingAllowed.value = if (allRecipients.isNotEmpty()) {
+        isSendingAllowed.value = if (allDraftRecipients.isNotEmpty()) {
             var size = 0L
             var isSizeCorrect = true
             for (attachment in attachments) {
@@ -864,6 +869,11 @@ class NewMessageViewModel @Inject constructor(
         } else {
             false
         }
+    }
+
+    fun toggleIsEncryptionActivated() {
+        val newValue = (isEncryptionActivated.value ?: false).not()
+        isEncryptionActivated.postValue(newValue)
     }
 
     fun updateOtherRecipientsFieldsAreEmpty(cc: List<Recipient>, bcc: List<Recipient>) {
@@ -981,6 +991,7 @@ class NewMessageViewModel @Inject constructor(
     ) {
 
         action = draftAction
+        isEncrypted = isEncryptionActivated.value ?: false
         identityId = fromLiveData.value?.signature?.id.toString()
 
         to = toLiveData.valueOrEmpty().toRealmList()
@@ -1061,6 +1072,7 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.bcc == bccLiveData.valueOrEmpty().toSet() &&
                     draftSnapshot.subject == subjectValue &&
                     draftSnapshot.uiBody == uiBodyValue &&
+                    draftSnapshot.isEncrypted == isEncryptionActivated.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
                 .mapTo(mutableSetOf()) { it.localUuid }
         } ?: false
@@ -1153,6 +1165,7 @@ class NewMessageViewModel @Inject constructor(
         var subject: String?,
         var uiBody: String,
         val attachmentsLocalUuids: Set<String>,
+        var isEncrypted: Boolean,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)
