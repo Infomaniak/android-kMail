@@ -39,17 +39,18 @@ class EncryptionLockButtonView @JvmOverloads constructor(
 
     val encryptionButton get() = binding.encryptionButton
     var unencryptableRecipientsCount: Int? = null
-        set(value) {
-            field = value
-            encryptionStatus = when (value) {
-                null -> EncryptionStatus.Unencrypted
-                0 -> EncryptionStatus.Encrypted
-                else -> EncryptionStatus.PartiallyEncrypted
-            }
-        }
+    // set(value) {
+    //     field = value
+    //     encryptionStatus = when (value) {
+    //         null -> EncryptionStatus.Unencrypted
+    //         0 -> EncryptionStatus.Encrypted
+    //         else -> EncryptionStatus.PartiallyEncrypted
+    //     }
+    // }
 
     var encryptionStatus: EncryptionStatus = EncryptionStatus.Unencrypted
         set(value) {
+            if (value == field) return
             field = value
             setDisplayStyleUi()
         }

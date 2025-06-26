@@ -655,7 +655,11 @@ class NewMessageFragment : Fragment() {
                 shouldInitToField = false
                 binding.toField.initRecipients(it.recipients, it.otherFieldsAreEmpty)
             }
-            updateIsSendingAllowed(type = FieldType.TO, recipients = it.recipients)
+            updateIsSendingAllowed(
+                type = FieldType.TO,
+                recipients = it.recipients,
+                isEncryptionValid = encryptionMessageManager.checkEncryptionCanBeSend(),
+            )
         }
 
         ccLiveData.observe(viewLifecycleOwner) {
@@ -663,7 +667,11 @@ class NewMessageFragment : Fragment() {
                 shouldInitCcField = false
                 binding.ccField.initRecipients(it.recipients)
             }
-            updateIsSendingAllowed(type = FieldType.CC, recipients = it.recipients)
+            updateIsSendingAllowed(
+                type = FieldType.CC,
+                recipients = it.recipients,
+                isEncryptionValid = encryptionMessageManager.checkEncryptionCanBeSend(),
+            )
             updateOtherRecipientsFieldsAreEmpty(cc = it.recipients, bcc = bccLiveData.valueOrEmpty())
         }
 
@@ -672,7 +680,11 @@ class NewMessageFragment : Fragment() {
                 shouldInitBccField = false
                 binding.bccField.initRecipients(it.recipients)
             }
-            updateIsSendingAllowed(type = FieldType.BCC, recipients = it.recipients)
+            updateIsSendingAllowed(
+                type = FieldType.BCC,
+                recipients = it.recipients,
+                isEncryptionValid = encryptionMessageManager.checkEncryptionCanBeSend(),
+            )
             updateOtherRecipientsFieldsAreEmpty(cc = ccLiveData.valueOrEmpty(), bcc = it.recipients)
         }
     }
@@ -702,7 +714,7 @@ class NewMessageFragment : Fragment() {
             if (attachments.isEmpty()) TransitionManager.beginDelayedTransition(binding.root)
             binding.attachmentsRecyclerView.isVisible = attachments.isNotEmpty()
 
-            updateIsSendingAllowed(attachments)
+            updateIsSendingAllowed(attachments, isEncryptionValid = encryptionMessageManager.checkEncryptionCanBeSend())
         }
     }
 

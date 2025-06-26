@@ -504,12 +504,14 @@ class NewMessageViewModel @Inject constructor(
             uiBody = uiBodyValue,
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
             isEncrypted = isEncrypted,
-            encryptionPassword = encryptionPassword,
+            encryptionPassword = encryptionKey,
         )
     }
 
     private fun Draft.initLiveData(signatures: List<Signature>) {
         val draftSignature = signatures.singleOrNull { it.id == identityId?.toInt() }
+
+        encryptionPassword.postValue(encryptionKey)
 
         fromLiveData.postValue(
             UiFrom(
@@ -856,6 +858,7 @@ class NewMessageViewModel @Inject constructor(
         attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty(),
         type: FieldType? = null,
         recipients: List<Recipient> = emptyList(),
+        isEncryptionValid: Boolean = true,
     ) {
 
         val allDraftRecipients = when (type) {
@@ -865,7 +868,7 @@ class NewMessageViewModel @Inject constructor(
             null -> allRecipients
         }
 
-        isSendingAllowed.value = if (allDraftRecipients.isNotEmpty()) {
+        isSendingAllowed.value = if (allDraftRecipients.isNotEmpty() && isEncryptionValid) {
             var size = 0L
             var isSizeCorrect = true
             for (attachment in attachments) {
@@ -997,7 +1000,7 @@ class NewMessageViewModel @Inject constructor(
 
         action = draftAction
         isEncrypted = isEncryptionActivated.value ?: false
-        encryptionPassword = this@NewMessageViewModel.encryptionPassword.value
+        encryptionKey = encryptionPassword.value
         identityId = fromLiveData.value?.signature?.id.toString()
 
         to = toLiveData.valueOrEmpty().toRealmList()

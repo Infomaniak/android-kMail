@@ -41,25 +41,26 @@ class EncryptionViewModel @Inject constructor(
     private val snackbarManager: SnackbarManager,
 ) : AndroidViewModel(application) {
 
-    val unencryptableRecipients: MutableLiveData<Set<String>> = MutableLiveData()
-    val password: MutableLiveData<String> = MutableLiveData()
+    val unencryptableRecipients: MutableLiveData<Set<String>?> = MutableLiveData(null)
+    val password: MutableLiveData<String?> = MutableLiveData(null)
 
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
         viewModelScope.launch(ioDispatcher) {
-            val unknownEncryptionStatusRecipients = emails.filter { unencryptableRecipients.value?.contains(it) != true }
-            if (unknownEncryptionStatusRecipients.isEmpty()) return@launch
+            val apiResponse = ApiRepository.isInfomaniakMailboxes(emails)
+            val currentUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
 
-            val apiResponse = ApiRepository.isInfomaniakMailboxes(unknownEncryptionStatusRecipients)
-            if (apiResponse.isSuccess()) {
+            val newUnencryptableRecipients = if (apiResponse.isSuccess()) {
                 apiResponse.data?.let { mailboxHostingStatuses ->
                     val unencryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
-                    val newRecipients = (unencryptableRecipients.value ?: emptySet()) + unencryptableEmailAddresses
-
-                    unencryptableRecipients.postValue(newRecipients)
-                }
+                    currentUnencryptableRecipients + unencryptableEmailAddresses
+                } ?: currentUnencryptableRecipients
             } else {
+                // In case of error during the encryptable check, we consider all recipients as unencryptable
                 snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
+                currentUnencryptableRecipients + emails
             }
+
+            unencryptableRecipients.postValue(newUnencryptableRecipients)
         }
     }
 
