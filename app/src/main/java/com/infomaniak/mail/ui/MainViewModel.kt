@@ -75,6 +75,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.DraftInitManager
+import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
 import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
@@ -1306,10 +1307,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun Map<String, ReactionState?>.getEmojiSendStatus(emoji: String): EmojiSendStatus = when {
+    private fun Map<String, ReactionState>.getEmojiSendStatus(emoji: String): EmojiSendStatus = when {
         this[emoji]?.hasReacted == true -> EmojiSendStatus.NotAllowed.AlreadyUsed
-        // TODO: Centralize logic with future branch
-        count { it.value?.hasReacted == true } >= 5 -> EmojiSendStatus.NotAllowed.MaxReactionReached
+        hasAvailableReactionSlot().not() -> EmojiSendStatus.NotAllowed.MaxReactionReached
         hasNetwork.not() -> EmojiSendStatus.NotAllowed.NoInternet
         else -> EmojiSendStatus.Allowed
     }
