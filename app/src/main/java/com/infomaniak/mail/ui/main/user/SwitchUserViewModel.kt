@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.user
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.RealmDatabase

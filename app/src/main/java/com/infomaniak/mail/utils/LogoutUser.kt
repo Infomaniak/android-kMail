@@ -20,8 +20,8 @@ package com.infomaniak.mail.utils
 import android.app.NotificationManager
 import android.content.Context
 import androidx.work.WorkManager
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.core.cancellable
-import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.stores.StoresSettingsRepository

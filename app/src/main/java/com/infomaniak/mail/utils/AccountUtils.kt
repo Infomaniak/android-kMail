@@ -18,12 +18,12 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.lib.core.auth.CredentialManager
-import com.infomaniak.lib.core.auth.TokenAuthenticator
-import com.infomaniak.lib.core.models.ApiResponseStatus
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.room.UserDatabase
+import com.infomaniak.core.auth.CredentialManager
+import com.infomaniak.core.auth.TokenAuthenticator
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.auth.networking.HttpClient
+import com.infomaniak.core.auth.room.UserDatabase
+import com.infomaniak.core.network.models.ApiResponseStatus
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -114,7 +114,7 @@ object AccountUtils : CredentialManager() {
         userDatabase.userDao().insert(user)
     }
 
-    suspend fun updateCurrentUser(okHttpClient: OkHttpClient = HttpClient.okHttpClient) {
+    suspend fun updateCurrentUser(okHttpClient: OkHttpClient = HttpClient.okHttpClientWithTokenInterceptor) {
         with(ApiRepository.getUserProfile(okHttpClient)) {
             if (result != ApiResponseStatus.ERROR) requestUser(remoteUser = data ?: return)
         }

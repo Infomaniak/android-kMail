@@ -34,9 +34,9 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.infomaniak.core.cancellable
+import com.infomaniak.core.network.api.ApiController.NetworkException
+import com.infomaniak.core.network.models.ApiResponse
 import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.lib.core.api.ApiController.NetworkException
-import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.R

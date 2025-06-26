@@ -17,9 +17,9 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
@@ -41,6 +41,7 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
+import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getFoldersIds
@@ -248,7 +249,7 @@ class SharedUtils @Inject constructor(
 
         private fun ApiResponse<Boolean>.willNeverSucceed() = error?.let {
             it.code == ErrorCode.MAIL_MESSAGE_NOT_SNOOZED || it.code == ErrorCode.OBJECT_NOT_FOUND
-        } ?: false
+        } == true
 
         /**
          * @param scope Is needed for the thread algorithm that handles cancellation by passing down a scope to everyone.

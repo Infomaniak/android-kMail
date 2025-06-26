@@ -30,7 +30,7 @@ import androidx.lifecycle.Observer
 import coil.ImageLoader
 import coil.imageLoader
 import coil.load
-import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.core.auth.models.user.User
 import com.infomaniak.lib.core.utils.CoilUtils.simpleImageLoader
 import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
 import com.infomaniak.lib.core.utils.getAttributes

@@ -267,6 +267,8 @@ class MenuDrawerFragment : Fragment() {
     private fun onFeedbackClicked() {
 
         if (AccountUtils.currentUser?.isStaff == true) {
+            AccountUtils.currentUser!!
+
             Intent(requireContext(), BugTrackerActivity::class.java).apply {
                 putExtras(
                     BugTrackerActivityArgs(

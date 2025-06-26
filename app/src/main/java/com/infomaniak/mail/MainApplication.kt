@@ -35,13 +35,14 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
 import com.facebook.stetho.Stetho
-import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.auth.TokenInterceptorListener
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.networking.HttpClientConfig
+import com.infomaniak.core.auth.AccessTokenUsageInterceptor
+import com.infomaniak.core.auth.AuthConfiguration
+import com.infomaniak.core.auth.TokenInterceptorListener
+import com.infomaniak.core.auth.models.user.User
+import com.infomaniak.core.auth.networking.HttpClient
+import com.infomaniak.core.network.NetworkConfiguration
+import com.infomaniak.core.network.api.ApiController
+import com.infomaniak.core.network.networking.HttpClientConfig
 import com.infomaniak.lib.core.utils.CoilUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
@@ -144,7 +145,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         enforceAppTheme()
         configureRoomDatabases()
         configureAppReloading()
-        configureInfomaniakCore()
+        // configureInfomaniakCore()
+        configureNetworkModule()
         notificationUtils.initNotificationChannel()
         configureHttpClient()
 
@@ -234,8 +236,21 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
 
     private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).clearStack()
 
-    private fun configureInfomaniakCore() {
-        InfomaniakCore.apply {
+    // private fun configureInfomaniakCore() {
+    //     InfomaniakCore.apply {
+    //         init(
+    //             appId = BuildConfig.APPLICATION_ID,
+    //             appVersionCode = BuildConfig.VERSION_CODE,
+    //             appVersionName = BuildConfig.VERSION_NAME,
+    //             clientId = BuildConfig.CLIENT_ID,
+    //         )
+    //         apiErrorCodes = ErrorCode.apiErrorCodes
+    //         accessType = null
+    //     }
+    // }
+
+    private fun configureAuthModule() {
+        AuthConfiguration.apply {
             init(
                 appId = BuildConfig.APPLICATION_ID,
                 appVersionCode = BuildConfig.VERSION_CODE,
@@ -244,6 +259,17 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             )
             apiErrorCodes = ErrorCode.apiErrorCodes
             accessType = null
+        }
+    }
+
+    private fun configureNetworkModule() {
+        NetworkConfiguration.apply {
+            init(
+                appId = BuildConfig.APPLICATION_ID,
+                appVersionCode = BuildConfig.VERSION_CODE,
+                appVersionName = BuildConfig.VERSION_NAME,
+            )
+            apiErrorCodes = ErrorCode.apiErrorCodes
         }
     }
 
@@ -301,12 +327,12 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         override fun getCurrentUserId(): Int = AccountUtils.currentUserId
     }
 
-    override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
+    override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext) //, tokenInterceptorListener())
 
     fun createSvgImageLoader(): ImageLoader {
         return CoilUtils.newImageLoader(
             applicationContext,
-            tokenInterceptorListener(),
+            // tokenInterceptorListener(),
             customFactories = listOf(SvgDecoder.Factory())
         )
     }

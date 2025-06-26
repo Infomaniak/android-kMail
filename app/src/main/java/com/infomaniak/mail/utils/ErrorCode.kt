@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.lib.core.utils.ApiErrorCode
+import com.infomaniak.core.network.utils.ApiErrorCode
 import com.infomaniak.mail.R
 import com.infomaniak.lib.core.R as RCore
 

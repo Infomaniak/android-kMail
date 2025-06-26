@@ -65,14 +65,14 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.infomaniak.core.network.api.ApiController
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.utils.endOfTheWeek
 import com.infomaniak.core.utils.isEmailRfc5321Compliant
 import com.infomaniak.core.utils.startOfTheDay
 import com.infomaniak.core.utils.startOfTheWeek
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.removeAccents
@@ -527,7 +527,7 @@ fun Context.isUserAlreadySynchronized(): Boolean {
     val uri = kSyncAccountUri(AccountUtils.currentUser!!.login)
     return contentResolver.query(uri, null, null, null, null)?.use { cursor ->
         cursor.count > 0
-    } ?: false
+    } == true
 }
 
 fun TextInputLayout.setOnClearTextClickListener(trackerCallback: () -> Unit) {

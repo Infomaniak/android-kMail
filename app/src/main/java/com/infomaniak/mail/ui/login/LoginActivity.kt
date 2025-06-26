@@ -25,13 +25,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
-import com.infomaniak.lib.core.api.ApiController.toApiError
-import com.infomaniak.lib.core.api.InternalTranslatedErrorCode
-import com.infomaniak.lib.core.auth.TokenAuthenticator.Companion.changeAccessToken
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.models.ApiResponseStatus
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.ErrorCodeTranslated
+import com.infomaniak.core.auth.TokenAuthenticator.Companion.changeAccessToken
+import com.infomaniak.core.network.api.ApiController.toApiError
+import com.infomaniak.core.network.api.InternalTranslatedErrorCode
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.models.ApiResponseStatus
+import com.infomaniak.core.network.utils.ErrorCodeTranslated
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -50,6 +49,7 @@ import com.infomaniak.mail.utils.extensions.getInfomaniakLogin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
+import com.infomaniak.core.auth.networking.HttpClient as AuthHttpClient
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
@@ -109,7 +109,7 @@ class LoginActivity : AppCompatActivity() {
         suspend fun authenticateUser(context: Context, apiToken: ApiToken, mailboxController: MailboxController): Any {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
 
-            val okhttpClient = HttpClient.okHttpClientNoTokenInterceptor.newBuilder().addInterceptor { chain ->
+            val okhttpClient = AuthHttpClient.okHttpClientWithTokenInterceptor.newBuilder().addInterceptor { chain ->
                 val newRequest = changeAccessToken(chain.request(), apiToken)
                 chain.proceed(newRequest)
             }.build()

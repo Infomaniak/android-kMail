@@ -17,26 +17,26 @@
  */
 package com.infomaniak.mail.data.api
 
+import com.infomaniak.core.auth.api.ApiRepositoryCore
+import com.infomaniak.core.auth.networking.HttpClient
 import com.infomaniak.core.cancellable
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
+import com.infomaniak.core.network.api.ApiController
+import com.infomaniak.core.network.api.ApiController.ApiMethod.DELETE
+import com.infomaniak.core.network.api.ApiController.ApiMethod.GET
+import com.infomaniak.core.network.api.ApiController.ApiMethod.PATCH
+import com.infomaniak.core.network.api.ApiController.ApiMethod.POST
+import com.infomaniak.core.network.api.ApiController.ApiMethod.PUT
+import com.infomaniak.core.network.api.ApiController.toApiError
+import com.infomaniak.core.network.api.InternalTranslatedErrorCode
+import com.infomaniak.core.network.models.ApiResponse
+import com.infomaniak.core.network.models.ApiResponseStatus
+import com.infomaniak.core.network.networking.HttpUtils
+import com.infomaniak.core.network.networking.ManualAuthorizationRequired
+import com.infomaniak.core.network.utils.await
 import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
-import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.DELETE
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.GET
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.PATCH
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.POST
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.PUT
-import com.infomaniak.lib.core.api.ApiController.toApiError
-import com.infomaniak.lib.core.api.ApiRepositoryCore
-import com.infomaniak.lib.core.api.InternalTranslatedErrorCode
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.models.ApiResponseStatus
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.networking.HttpUtils
-import com.infomaniak.lib.core.networking.ManualAuthorizationRequired
-import com.infomaniak.lib.core.utils.await
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.AttachmentsToForwardResult
@@ -94,11 +94,12 @@ import com.infomaniak.core.myksuite.ui.network.ApiRoutes as MyKSuiteApiRoutes
 
 object ApiRepository : ApiRepositoryCore() {
 
+    // TODO: Make sure all methods are called with okHttpClientWithTokenInterceptor instead of okHttpClient.
     suspend inline fun <reified T> callApi(
         url: String,
         method: ApiController.ApiMethod,
         body: Any? = null,
-        okHttpClient: OkHttpClient = HttpClient.okHttpClient,
+        okHttpClient: OkHttpClient = HttpClient.okHttpClientWithTokenInterceptor,
     ): T = ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
 
     suspend fun ping(): ApiResponse<String> = callApi(ApiRoutes.ping(), GET)
@@ -140,7 +141,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     suspend fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
-        return callApi(ApiRoutes.mailboxes(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
+        return callApi(ApiRoutes.mailboxes(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor)
     }
 
     suspend fun addNewMailbox(mailAddress: String, password: String): ApiResponse<MailboxLinkedResult> {
@@ -171,7 +172,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html"),
             method = GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
         )
     }
 
@@ -287,7 +288,7 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxUuid: String,
         messagesUids: List<String>,
         destinationId: String,
-        okHttpClient: OkHttpClient = HttpClient.okHttpClient,
+        okHttpClient: OkHttpClient = HttpClient.okHttpClientWithTokenInterceptor,
     ): List<ApiResponse<MoveResult>> {
         return batchOver(messagesUids) {
             callApi(
@@ -334,7 +335,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.getDateOrderedMessagesUids(mailboxUuid, folderId),
             method = GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
         )
     }
 
@@ -347,7 +348,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor),
             method = GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
         )
     }
 
@@ -360,7 +361,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, uids),
             method = GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClientWithTokenInterceptor,
         )
     }
 
@@ -452,7 +453,12 @@ object ApiRepository : ApiRepositoryCore() {
         val messages = if (contextMessage == null) listOf(message) else listOf(contextMessage, message)
 
         val body = getAiBodyFromMessages(messages)
-        return callApi(ApiRoutes.aiConversation(currentMailboxUuid), POST, body, HttpClient.okHttpClientLongTimeout)
+        return callApi(
+            ApiRoutes.aiConversation(currentMailboxUuid),
+            POST,
+            body,
+            HttpClient.okHttpClientLongTimeoutWithTokenInterceptor
+        )
     }
 
     suspend fun aiShortcutWithContext(
@@ -463,7 +469,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(
             url = ApiRoutes.aiShortcutWithContext(contextId, action = shortcut.apiRoute!!, currentMailboxUuid),
             method = PATCH,
-            okHttpClient = HttpClient.okHttpClientLongTimeout,
+            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor,
         )
     }
 
@@ -477,7 +483,7 @@ object ApiRepository : ApiRepositoryCore() {
             url = ApiRoutes.aiShortcutNoContext(shortcut.apiRoute!!, currentMailboxUuid),
             method = POST,
             body = body,
-            okHttpClient = HttpClient.okHttpClientLongTimeout
+            okHttpClient = HttpClient.okHttpClientLongTimeoutWithTokenInterceptor
         )
     }
 
@@ -500,7 +506,7 @@ object ApiRepository : ApiRepositoryCore() {
             .post(formBuilder.build())
             .build()
 
-        val response = HttpClient.okHttpClient.newCall(request).await()
+        val response = HttpClient.okHttpClientWithTokenInterceptor.newCall(request).await()
 
         return ApiController.json.decodeFromString(response.body?.string() ?: "")
 
@@ -518,7 +524,7 @@ object ApiRepository : ApiRepositoryCore() {
             .url(ApiRoutes.resource(resource))
             .headers(HttpUtils.getHeaders(contentType = null))
             .build()
-        return HttpClient.okHttpClient.newBuilder().build().newCall(request).await()
+        return HttpClient.okHttpClientWithTokenInterceptor.newBuilder().build().newCall(request).await()
     }
 
     suspend fun getAttachmentCalendarEvent(resource: String): ApiResponse<CalendarEventResponse> {
@@ -551,7 +557,7 @@ object ApiRepository : ApiRepositoryCore() {
             .get()
             .build()
 
-        return HttpClient.okHttpClient.newCall(request).await()
+        return HttpClient.okHttpClientWithTokenInterceptor.newCall(request).await()
     }
 
     suspend fun getMyKSuiteData(okHttpClient: OkHttpClient): ApiResponse<MyKSuiteData> {
