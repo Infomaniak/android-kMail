@@ -39,14 +39,10 @@ class EncryptionLockButtonView @JvmOverloads constructor(
 
     val encryptionButton get() = binding.encryptionButton
     var unencryptableRecipientsCount: Int? = null
-    // set(value) {
-    //     field = value
-    //     encryptionStatus = when (value) {
-    //         null -> EncryptionStatus.Unencrypted
-    //         0 -> EncryptionStatus.Encrypted
-    //         else -> EncryptionStatus.PartiallyEncrypted
-    //     }
-    // }
+        set(value) {
+            field = value
+            updateUnencryptableCountUi()
+        }
 
     var encryptionStatus: EncryptionStatus = EncryptionStatus.Unencrypted
         set(value) {
@@ -115,17 +111,20 @@ class EncryptionLockButtonView @JvmOverloads constructor(
                 setIconTintResource(iconTintRes)
             }
             pastille.isVisible = shouldDisplayPastille
+            updateUnencryptableCountUi()
+        }
+    }
 
-            val count = when (val count = unencryptableRecipientsCount) {
-                null -> null
-                in 1..9 -> count.toString()
-                else -> "9+"
-            }
+    private fun updateUnencryptableCountUi() {
+        val count = when (val count = unencryptableRecipientsCount) {
+            null -> null
+            in 1..9 -> count.toString()
+            else -> "9+"
+        }
 
-            unencryptedRecipientText.apply {
-                isVisible = count != null
-                text = count
-            }
+        binding.unencryptedRecipientText.apply {
+            isVisible = count != null
+            text = count
         }
     }
 
