@@ -1310,6 +1310,7 @@ class MainViewModel @Inject constructor(
         this[emoji]?.hasReacted == true -> EmojiSendStatus.NotAllowed.AlreadyUsed
         // TODO: Centralize logic with future branch
         count { it.value?.hasReacted == true } >= 5 -> EmojiSendStatus.NotAllowed.MaxReactionReached
+        hasNetwork.not() -> EmojiSendStatus.NotAllowed.NoInternet
         else -> EmojiSendStatus.Allowed
     }
 
@@ -1356,6 +1357,7 @@ class MainViewModel @Inject constructor(
         sealed class NotAllowed(@StringRes val errorMessageRes: Int) : EmojiSendStatus {
             data object AlreadyUsed : NotAllowed(ErrorCode.EmojiReactions.alreadyUsed.translateRes)
             data object MaxReactionReached : NotAllowed(ErrorCode.EmojiReactions.maxReactionReached.translateRes)
+            data object NoInternet : NotAllowed(RCore.string.noConnection)
         }
     }
     //endregion
