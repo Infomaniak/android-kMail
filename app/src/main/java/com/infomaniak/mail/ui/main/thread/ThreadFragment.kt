@@ -230,7 +230,7 @@ class ThreadFragment : Fragment() {
         applyWindowInsetsListener(shouldConsume = false) { _, insets ->
             mainAppBar.applyStatusBarInsets(insets)
             appBar.applySideAndBottomSystemInsets(insets, withBottom = false)
-            messagesListNestedScrollView.applySideAndBottomSystemInsets(insets)
+            messagesListNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
             dispatchApplyWindowInsets(binding.quickActionBar, insets)
         }
     }
