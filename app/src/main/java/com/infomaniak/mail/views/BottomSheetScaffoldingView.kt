@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +28,8 @@ import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomSheetScaffoldingBinding
-import com.infomaniak.lib.core.R as RCore
 
 class BottomSheetScaffoldingView @JvmOverloads constructor(
     context: Context,
@@ -88,8 +86,6 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
                 layoutParams = createMatchWrapLayoutParams()
                 orientation = LinearLayout.VERTICAL
                 if (centerHorizontally) gravity = Gravity.CENTER_HORIZONTAL
-                // Do not add margins to this view because it breaks the height of the RecyclerView. We don't know why yet.
-                setPaddingRelative(bottom = context.resources.getDimensionPixelSize(RCore.dimen.marginStandardMedium))
             }
 
             nestedScrollView.addView(linearLayout)
