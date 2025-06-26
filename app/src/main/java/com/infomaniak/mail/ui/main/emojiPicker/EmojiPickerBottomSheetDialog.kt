@@ -17,11 +17,14 @@
  */
 package com.infomaniak.mail.ui.main.emojiPicker
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.setBackNavigationResult
@@ -33,6 +36,16 @@ class EmojiPickerBottomSheetDialog : BottomSheetDialogFragment() {
 
     private var binding: FragmentEmojiPickerBinding by safeBinding()
     private val navigationArgs: EmojiPickerBottomSheetDialogArgs by navArgs()
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+
+        val behavior = (dialog as BottomSheetDialog).behavior
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior.skipCollapsed = true
+
+        return dialog
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentEmojiPickerBinding.inflate(inflater, container, false).also { binding = it }.root
