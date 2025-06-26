@@ -410,8 +410,10 @@ class ThreadFragment : Fragment() {
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onAddReaction = { navigateToEmojiPicker(it.uid) },
                 onAddEmoji = { emoji, messageUid ->
-                    threadViewModel.fakeEmojiReply(emoji, messageUid)
-                    mainViewModel.sendEmojiReply(emoji, messageUid)
+                    val reactions = threadViewModel.getLocalReactionsFor(messageUid) ?: return@ThreadAdapterCallbacks
+                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
+                        threadViewModel.fakeEmojiReply(emoji, messageUid)
+                    })
                 },
             ),
         )
@@ -640,8 +642,10 @@ class ThreadFragment : Fragment() {
 
     private fun observePickedEmoji() {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerBottomSheetDialog.PICKED_EMOJI) { (emoji, messageUid) ->
-            threadViewModel.fakeEmojiReply(emoji, messageUid)
-            mainViewModel.sendEmojiReply(emoji, messageUid)
+            val reactions = threadViewModel.getLocalReactionsFor(messageUid) ?: return@getBackNavigationResult
+            mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
+                threadViewModel.fakeEmojiReply(emoji, messageUid)
+            })
         }
     }
 
