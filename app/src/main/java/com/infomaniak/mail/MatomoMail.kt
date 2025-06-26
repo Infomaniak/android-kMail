@@ -192,6 +192,10 @@ object MatomoMail : MatomoCore {
         trackEvent("createFolder", name)
     }
 
+    fun Context.trackRenameFolderEvent(name: String) {
+        trackEvent("manageFolder", name)
+    }
+
     fun Context.trackMultiSelectionEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
         trackEvent("multiSelection", name, action)
     }

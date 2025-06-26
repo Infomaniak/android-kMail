@@ -34,6 +34,7 @@
     <string name="actionOpenIn">Ouvrir dans</string>
     <string name="actionPhishing">Signaler comme hameçonnage</string>
     <string name="actionPrint">Imprimer</string>
+    <string name="actionRename">Renommer</string>
     <string name="actionReply">Répondre</string>
     <string name="actionReplyAll">Répondre à tous</string>
     <string name="actionReportDisplayProblem">Signaler un problème d’affichage</string>
@@ -432,6 +433,7 @@
     <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté</string>
+    <string name="renameFolder">Renommer le dossier</string>
     <string name="reportDisplayProblemDescription">Acceptez-vous de partager vos données avec nos développeurs pour qu’ils puissent vous aider concernant votre problème ?</string>
     <string name="reportDisplayProblemTitle">Signaler un problème d’affichage</string>
     <string name="reportPhishingDescription">Si ce message tente de dérober des informations sensibles (mot de passe, données bancaires, etc.) et/ou s’il usurpe une identité reconnue, alors il s’agit d’hameçonnage.\n\nEn nous le signalant, vous accélérez la détection de messages dangereux pour l’ensemble de nos utilisateurs.\n\nLe signalement sera envoyé à notre équipe sécurité pour analyse afin de prendre les mesures nécessaires. L’e-mail sera également déplacé automatiquement dans vos spams.</string>

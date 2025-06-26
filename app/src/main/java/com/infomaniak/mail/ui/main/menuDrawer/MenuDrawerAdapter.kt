@@ -240,6 +240,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
                 currentFolderId = currentFolderId,
                 hasCollapsableFolder = if (item.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder,
                 onFolderClicked = callbacks.onFolderClicked,
+                onFolderLongClicked = callbacks.onFolderLongClicked,
                 onCollapseChildrenClicked = callbacks.onCollapseChildrenClicked,
             )
             is ActionsHeaderViewHolder -> holder.displayActionsHeader(

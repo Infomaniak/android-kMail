@@ -161,6 +161,7 @@ class MainViewModel @Inject constructor(
     val activityDialogLoaderResetTrigger = SingleLiveEvent<Unit>()
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
+    val renameFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
@@ -1297,13 +1298,31 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
-    //region New Folder
+    //region Manage Folder
     private suspend fun createNewFolderSync(name: String): String? {
         val mailbox = currentMailbox.value ?: return null
         val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
 
         newFolderResultTrigger.postValue(Unit)
 
+        return apiResponseIsSuccess(apiResponse, mailbox)
+    }
+
+    private suspend fun modifyNameFolderSync(folderId: String, name: String): String? {
+        val mailbox = currentMailbox.value ?: return null
+        val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
+
+        renameFolderResultTrigger.postValue(Unit)
+
+        return apiResponseIsSuccess(apiResponse, mailbox)
+    }
+
+    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
+
+    fun modifyNameFolder(name: String, folderId: String) =
+        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
+
+    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String?{
         return if (apiResponse.isSuccess()) {
             updateFolders(mailbox)
             apiResponse.data?.id
@@ -1312,9 +1331,6 @@ class MainViewModel @Inject constructor(
             null
         }
     }
-
-    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
-
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,

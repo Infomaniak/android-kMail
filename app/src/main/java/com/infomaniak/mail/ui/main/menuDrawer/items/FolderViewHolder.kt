@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.SentryLog
@@ -44,6 +45,7 @@ class FolderViewHolder(
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
+        onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
         SentryLog.d("Bind", "Bind Folder : ${folder.name}")
@@ -78,6 +80,7 @@ class FolderViewHolder(
             currentFolderId,
             hasCollapsableFolder,
             onFolderClicked,
+            onFolderLongClicked,
             onCollapseChildrenClicked,
         )
     }
@@ -89,6 +92,7 @@ class FolderViewHolder(
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
+        onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
 
@@ -111,6 +115,13 @@ class FolderViewHolder(
         )
 
         setCollapsingButtonContentDescription(folderName)
+
+        if (folder.role == null) {
+            setOnLongClickListener {
+                onFolderLongClicked.invoke(folder.id, folder.name, it)
+                true
+            }
+        }
 
         setOnClickListener {
             context.trackMenuDrawerEvent(trackerName, value = trackerValue)

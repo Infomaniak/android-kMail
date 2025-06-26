@@ -105,6 +105,10 @@ sealed class DecoratedItemView @JvmOverloads constructor(
         binding.root.setOnClickListener(onClickListener)
     }
 
+    override fun setOnLongClickListener(onLongClickListener: OnLongClickListener?) {
+        binding.root.setOnLongClickListener(onLongClickListener)
+    }
+
     open fun setEndIcon(icon: Drawable?, @StringRes contentDescriptionRes: Int?) {
         binding.endIcon.apply {
             isGone = icon == null

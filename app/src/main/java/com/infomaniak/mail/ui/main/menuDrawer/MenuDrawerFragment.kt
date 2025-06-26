@@ -20,8 +20,10 @@ package com.infomaniak.mail.ui.main.menuDrawer
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -51,6 +53,7 @@ import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
+import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.InvalidPasswordFragmentArgs
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
@@ -82,6 +85,9 @@ class MenuDrawerFragment : Fragment() {
     lateinit var createFolderDialog: CreateFolderDialog
 
     @Inject
+    lateinit var modifyNameFolderDialog: ModifyNameFolderDialog
+
+    @Inject
     lateinit var menuDrawerAdapter: MenuDrawerAdapter
 
     private val currentClassName: String = MenuDrawerFragment::class.java.name
@@ -99,15 +105,17 @@ class MenuDrawerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bindAlertToViewLifecycle(createFolderDialog)
+        bindAlertToViewLifecycle(modifyNameFolderDialog)
 
         setupListeners()
-        setupCreateFolderDialog()
+        setupManageFolderDialog()
         setupRecyclerView()
 
         observeMenuDrawerData()
         observeCurrentFolder()
         observeCurrentMailbox()
         observeNewFolderCreation()
+        observeRenameFolder()
     }
 
     private fun setupListeners() {
@@ -117,8 +125,9 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun setupCreateFolderDialog() {
+    private fun setupManageFolderDialog() {
         createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
+        modifyNameFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::modifyNameFolder)
     }
 
     private fun setupRecyclerView() {
@@ -131,6 +140,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onFoldersHeaderClicked: (Boolean) -> Unit = ::onFoldersHeaderClicked
                 override var onCreateFolderClicked: () -> Unit = ::onCreateFolderClicked
                 override var onFolderClicked: (folderId: String) -> Unit = ::onFolderSelected
+                override var onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit = ::onFolderManage
                 override var onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit = ::onFolderCollapsed
                 override var onActionsHeaderClicked: () -> Unit = ::onActionsHeaderClicked
                 override var onActionClicked: (ActionType) -> Unit = ::onActionClicked
@@ -200,6 +210,23 @@ class MenuDrawerFragment : Fragment() {
     private fun onFolderSelected(folderId: String) {
         mainViewModel.openFolder(folderId)
         closeDrawer()
+    }
+
+    private fun onFolderManage(folderId: String, folderName: String, view: View) {
+        val popup = PopupMenu(context, view)
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.item_menu_settings_folder, popup.menu)
+        popup.show()
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.modifySettingsFolder -> {
+                    modifyNameFolderDialog.show(folderName, folderId)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun onFolderCollapsed(folderId: String, shouldCollapse: Boolean) {
@@ -324,6 +351,10 @@ class MenuDrawerFragment : Fragment() {
 
     private fun observeNewFolderCreation() {
         mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetLoadingAndDismiss() }
+    }
+
+    private fun observeRenameFolder() {
+        mainViewModel.renameFolderResultTrigger.observe(viewLifecycleOwner) { modifyNameFolderDialog.resetLoadingAndDismiss() }
     }
 
     override fun onDestroyView() {
