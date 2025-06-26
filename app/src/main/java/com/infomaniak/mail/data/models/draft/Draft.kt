@@ -86,7 +86,7 @@ class Draft : RealmObject {
     @SerialName("encrypted")
     var isEncrypted: Boolean = false
     @SerialName("encryption_password")
-    var encryptionPassword: String? = null
+    var encryptionKey: String? = null
 
     /**
      * We can't have both `delay` & `scheduleDate`. They are mutually exclusive.
