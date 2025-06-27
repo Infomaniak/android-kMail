@@ -77,6 +77,7 @@ import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
 import com.infomaniak.mail.utils.ErrorCode
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.NotificationUtils
@@ -827,7 +828,12 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messagesToMove.getUids(), destinationFolder.id)
+        val apiResponses = ApiRepository.moveMessages(
+            mailboxUuid = mailbox.uuid,
+            messagesUids = messagesToMove.getUids(),
+            destinationId = destinationFolder.id,
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings),
+        )
 
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
