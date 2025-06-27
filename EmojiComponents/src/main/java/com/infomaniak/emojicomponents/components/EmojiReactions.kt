@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,7 +48,11 @@ fun EmojiReactions(
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
 ) {
-    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+    FlowRow(
+        modifier,
+        itemVerticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+    ) {
         reactions().forEach { (emoji, state) ->
             ReactionChip(
                 emoji = emoji,
@@ -61,7 +66,6 @@ fun EmojiReactions(
         AddReactionChip(
             addReactionIcon,
             onClick = onAddReactionClick,
-            shape = shape,
         )
     }
 }

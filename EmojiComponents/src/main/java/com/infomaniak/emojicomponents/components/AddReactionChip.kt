@@ -19,15 +19,14 @@ package com.infomaniak.emojicomponents.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.InputChipDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.icons.FaceSmileRoundPlus
@@ -37,29 +36,22 @@ import com.infomaniak.emojicomponents.icons.Icons
 internal fun AddReactionChip(
     icon: ImageVector,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: () -> Boolean = { true },
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
-    shape: Shape = InputChipDefaults.shape,
 ) {
-    InputChip(
+    IconButton(
+        modifier = modifier.size(38.dp),
         enabled = enabled(),
         onClick = onClick,
-        label = {
+        content = {
             Icon(
                 icon,
                 stringResource(R.string.contentDescriptionAddReaction),
-                modifier = Modifier.size(Margin.Medium),
+                modifier = Modifier.size(Margin.Large),
             )
         },
-        colors = colors.inputChipColors,
-        border = InputChipDefaults.inputChipBorder(
-            enabled = enabled(),
-            selected = false,
-            disabledBorderColor = Color.Transparent,
-            borderColor = Color.Transparent,
-        ),
-        selected = true,
-        shape = shape,
+        colors = IconButtonDefaults.iconButtonColors(contentColor = colors.accentColor),
     )
 }
 
