@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,30 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListKSerializer::class)
-
 package com.infomaniak.mail.data.models.addressBook
 
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
-class AddressBook : RealmObject {
+class ContactGroup : RealmObject {
     @PrimaryKey
-    var uuid: String = ""
     var id: Int = 0
-    @SerialName("default")
-    var isDefault: Boolean = false
-    @SerialName("categories")
-    var contactGroups: RealmList<ContactGroup> = realmListOf<ContactGroup>()
-    @SerialName("is_dynamic_organisation_member_directory")
-    var isDynamicOrganisationMemberDirectory: Boolean = false
+    var name: String = ""
 
     companion object
 }

@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
@@ -191,7 +192,7 @@ object RealmDatabase {
     private object RealmConfig {
 
         //region Configurations versions
-        const val USER_INFO_SCHEMA_VERSION = 4L
+        const val USER_INFO_SCHEMA_VERSION = 8L
         const val MAILBOX_INFO_SCHEMA_VERSION = 9L
         const val MAILBOX_CONTENT_SCHEMA_VERSION = 32L
         //endregion
@@ -210,6 +211,7 @@ object RealmDatabase {
         )
         val userInfoSet = setOf(
             AddressBook::class,
+            ContactGroup::class,
             MergedContact::class,
         )
         val mailboxInfoSet = setOf(
