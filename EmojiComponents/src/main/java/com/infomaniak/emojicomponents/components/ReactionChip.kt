@@ -18,7 +18,12 @@
 package com.infomaniak.emojicomponents.components
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.*
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.InputChipDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableChipColors
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -39,12 +44,7 @@ internal fun ReactionChip(
         onClick = onClick,
         leadingIcon = { Text(emoji) },
         label = { Text(reactionCount().toString()) },
-        colors = InputChipDefaults.inputChipColors(
-            containerColor = colors.containerColor,
-            labelColor = colors.labelColor,
-            selectedContainerColor = colors.selectedContainerColor,
-            selectedLabelColor = colors.selectedLabelColor
-        ),
+        colors = colors.inputChipColors,
         border = InputChipDefaults.inputChipBorder(
             enabled = true,
             selected = selected(),
@@ -56,20 +56,19 @@ internal fun ReactionChip(
 }
 
 data class ReactionChipColors(
-    val containerColor: Color,
-    val labelColor: Color,
-    val selectedContainerColor: Color,
-    val selectedLabelColor: Color,
+    val inputChipColors: SelectableChipColors,
     val accentColor: Color,
 )
 
 object ReactionChipDefaults {
     @Composable
     fun reactionChipColors(): ReactionChipColors = ReactionChipColors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        labelColor = MaterialTheme.colorScheme.onSurface,
-        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        InputChipDefaults.inputChipColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            labelColor = MaterialTheme.colorScheme.onSurface,
+            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
         accentColor = MaterialTheme.colorScheme.primary,
     )
 }
