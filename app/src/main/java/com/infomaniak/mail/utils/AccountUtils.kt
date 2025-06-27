@@ -46,8 +46,8 @@ object AccountUtils : CredentialManager() {
 
     var reloadApp: (suspend () -> Unit)? = null
 
-    fun init() {
-        userDatabase = UserDatabase.getDatabase()
+    fun init(context: Context) {
+        userDatabase = UserDatabase.getDatabase(context)
 
         Sentry.setUser(SentryUser().apply { id = currentUserId.toString() })
     }
