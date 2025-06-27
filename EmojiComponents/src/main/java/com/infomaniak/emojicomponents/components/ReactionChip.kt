@@ -64,14 +64,17 @@ data class ReactionChipColors(
 
 object ReactionChipDefaults {
     @Composable
-    fun reactionChipColors(): ReactionChipColors = ReactionChipColors(
-        InputChipDefaults.inputChipColors(
+    fun reactionChipColors(
+        inputChipColors: SelectableChipColors = InputChipDefaults.inputChipColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             labelColor = MaterialTheme.colorScheme.onSurface,
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
         ),
-        accentColor = MaterialTheme.colorScheme.primary,
+        accentColor: Color = MaterialTheme.colorScheme.primary,
+    ): ReactionChipColors = ReactionChipColors(
+        inputChipColors,
+        accentColor,
     )
 }
 
