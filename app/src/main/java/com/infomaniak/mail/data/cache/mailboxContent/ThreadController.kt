@@ -299,6 +299,7 @@ class ThreadController @Inject constructor(
                                 isDeletedOnApi = false,
                                 latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                 swissTransferFiles = swissTransferFiles,
+                                emojiReactions = localMessage.emojiReactions,
                             )
 
                             if (remoteMessage.hasAttachable) hasAttachableInThread = true

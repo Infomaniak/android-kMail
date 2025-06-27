@@ -52,6 +52,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.copyFromRealm
+import io.realm.kotlin.ext.realmDictionaryOf
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
@@ -659,6 +660,7 @@ class RefreshController @Inject constructor(
             isDeletedOnApi = false,
             latestCalendarEventResponse = null,
             swissTransferFiles = realmListOf(),
+            emojiReactions = realmDictionaryOf(),
         )
     }
     //endregion
