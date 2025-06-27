@@ -18,9 +18,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_gravity="center_horizontal"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal">
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/encryptionButton"
@@ -36,8 +36,8 @@
 
         <ImageView
             android:id="@+id/pastille"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
+            android:layout_width="@dimen/unencryptablePastilleSize"
+            android:layout_height="@dimen/unencryptablePastilleSize"
             android:layout_gravity="top|left"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_pastille"
@@ -60,6 +60,20 @@
             app:layout_constraintTop_toTopOf="@id/pastille"
             tools:ignore="RtlHardcoded,SmallSp"
             tools:text="9+"
+            tools:visibility="visible" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/unencryptedRecipientLoader"
+            android:layout_width="@dimen/unencryptablePastilleSize"
+            android:layout_height="@dimen/unencryptablePastilleSize"
+            android:layout_gravity="top|left"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorInset="0dp"
+            app:indicatorSize="@dimen/unencryptablePastilleSize"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:trackThickness="2dp"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
