@@ -132,9 +132,7 @@ class MenuDrawerFragment : Fragment() {
     private fun setupManageFolderDialog() {
         createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
         modifyNameFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::modifyNameFolder)
-        confirmDeleteFolderDialog.setPositiveButtonCallback {
-            mainViewModel.deleteFolder(it)
-        }
+        confirmDeleteFolderDialog.setPositiveButtonCallback(onPositiveButtonClick = mainViewModel::deleteFolder)
     }
 
     private fun setupRecyclerView() {

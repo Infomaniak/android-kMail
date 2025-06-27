@@ -29,13 +29,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
-        tools:text="Supprimer le dossier ..." />
+        tools:text="@string/deleteFolderDialogTitle" />
 
     <TextView
         android:id="@+id/deleteFolderDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandardMedium"
-        tools:text="Souhaitez-vous supprimer le dossier ... et tout ce qu’il contient? Le contenu du dossier sera définitivement supprimé SANS passer par la corbeille." />
+        tools:text="@string/deleteFolderDialogDescription" />
 
 </LinearLayout>

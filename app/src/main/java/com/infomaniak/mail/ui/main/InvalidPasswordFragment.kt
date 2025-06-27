@@ -104,7 +104,8 @@ class InvalidPasswordFragment : Fragment() {
                 onPositiveButtonClicked = {
                     trackInvalidPasswordMailboxEvent(MatomoName.DetachMailboxConfirm)
                     invalidPasswordViewModel.detachMailbox()
-                },)
+                },
+            )
         }
 
         requestPasswordButton.setOnClickListener {

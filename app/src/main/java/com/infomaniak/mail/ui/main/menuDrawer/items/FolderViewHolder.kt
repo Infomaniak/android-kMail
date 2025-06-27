@@ -36,7 +36,7 @@ import kotlin.math.min
 
 class FolderViewHolder(
     inflater: LayoutInflater,
-    parent: ViewGroup
+    parent: ViewGroup,
 ) : MenuDrawerViewHolder(ItemMenuDrawerFolderBinding.inflate(inflater, parent, false)) {
 
     override val binding = super.binding as ItemMenuDrawerFolderBinding
