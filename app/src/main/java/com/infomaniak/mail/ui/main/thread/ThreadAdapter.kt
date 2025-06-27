@@ -42,6 +42,8 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.utils.format
+import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
@@ -156,7 +158,6 @@ class ThreadAdapter(
     }
 
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int, payloads: MutableList<Any>) = runCatchingRealm {
-
         val payload = payloads.firstOrNull()
         if (payload !is NotifyType) {
             super.onBindViewHolder(holder, position, payloads)
@@ -170,6 +171,7 @@ class ThreadAdapter(
                 NotifyType.RE_RENDER -> reloadVisibleWebView()
                 NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.uid)
                 NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item)
+                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item)
             }
         }
     }.getOrDefault(Unit)
@@ -188,6 +190,16 @@ class ThreadAdapter(
     private fun ItemMessageBinding.handleCalendarAttendancePayload(message: Message) {
         val attendees = message.latestCalendarEventResponse?.calendarEvent?.attendees ?: emptyList()
         calendarEvent.onlyUpdateAttendance(attendees)
+    }
+
+    private fun ItemMessageBinding.handleEmojiReactionPayload(message: Message) {
+        emojiReactions.bindEmojiReactions(message)
+    }
+
+    private fun EmojiReactionsView.bindEmojiReactions(message: Message) {
+        val reactions = message.emojiReactions.filterNotNull()
+        isGone = false // reactions.isEmpty()
+        setEmojiReactions(reactions)
     }
 
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {
@@ -694,12 +706,9 @@ class ThreadAdapter(
         quoteButton.setOnClickListener { toggleWebViews(message) }
         quoteButtonFrameLayout.isVisible = hasQuote
 
-        val reactions = message.emojiReactions.filterNotNull()
-        emojiReactions.apply {
-            isGone = false // reactions.isEmpty()
-            setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
-            setEmojiReactions(reactions)
-        }
+        emojiReactions.bindEmojiReactions(message)
+        emojiReactions.setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
+        emojiReactions.setOnEmojiClickListener { emoji ->  threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, message.uid) }
 
         initWebViewClientIfNeeded(
             message,
@@ -832,6 +841,7 @@ class ThreadAdapter(
         RE_RENDER,
         FAILED_MESSAGE,
         ONLY_REBIND_CALENDAR_ATTENDANCE,
+        ONLY_REBIND_EMOJI_REACTIONS,
     }
 
     enum class ContextMenuType {
@@ -855,6 +865,7 @@ class ThreadAdapter(
                 is Message -> {
                     newItem is Message &&
                             MessageDiffAspect.AnythingElse.areTheSame(oldItem, newItem) &&
+                            MessageDiffAspect.EmojiReactions.areTheSame(oldItem, newItem) &&
                             MessageDiffAspect.Calendar.areTheSame(oldItem, newItem)
                 }
                 is SuperCollapsedBlock -> {
@@ -872,6 +883,7 @@ class ThreadAdapter(
             // TODO: Handle the case where there are multiple aspects that changed at once
             return when {
                 MessageDiffAspect.AnythingElse.areDifferent(oldItem, newItem) -> null // null means "bind the whole item again"
+                MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.ONLY_REBIND_EMOJI_REACTIONS
                 else -> getCalendarEventPayloadOrNull(oldItem, newItem)
             }
         }
@@ -892,12 +904,27 @@ class ThreadAdapter(
         }
 
         companion object {
+            fun Map<String, ReactionState?>.containsTheSameEmojiValuesAs(other: Map<String, ReactionState?>): Boolean {
+                if (this.size != other.size) return false
+
+                for ((emoji, state) in this) {
+                    if (other.containsKey(emoji).not()) return false
+                    if (state != other[emoji]) return false
+                }
+
+                return true
+            }
+
             sealed class DiffAspect<T>(private val isTheSameAs: T.(T) -> Boolean) {
                 fun areTheSame(message: T, other: T) = message.isTheSameAs(other)
                 fun areDifferent(message: T, other: T) = areTheSame(message, other).not()
             }
 
             object MessageDiffAspect {
+                data object EmojiReactions : DiffAspect<Message>({
+                    emojiReactions.containsTheSameEmojiValuesAs(it.emojiReactions)
+                })
+
                 data object Calendar : DiffAspect<Message>({
                     val calendarEventResponse = latestCalendarEventResponse
                     val otherCalendarEventResponse = it.latestCalendarEventResponse
@@ -947,6 +974,7 @@ class ThreadAdapter(
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
         var onAddReaction: ((Message) -> Unit)? = null,
+        var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {
