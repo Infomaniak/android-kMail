@@ -21,7 +21,6 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
@@ -31,7 +30,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -289,14 +287,8 @@ class SharedUtils @Inject constructor(
             localSettings: LocalSettings,
             currentFolderRole: FolderRole?,
         ): Boolean {
-            fun isSnoozeAvailable() = isSnoozeAvailable(mainViewModel.featureFlagsLive.value, localSettings)
+            fun isSnoozeAvailable() = FeatureAvailability.isSnoozeAvailable(mainViewModel.featureFlagsLive.value, localSettings)
             return currentFolderRole == FolderRole.INBOX || currentFolderRole == FolderRole.SNOOZED && isSnoozeAvailable()
-        }
-
-        fun isSnoozeAvailable(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Boolean {
-            fun hasSnoozeFeatureFlag() = featureFlags?.contains(FeatureFlag.SNOOZE) == true
-            fun isConversationMode() = localSettings.threadMode == ThreadMode.CONVERSATION
-            return hasSnoozeFeatureFlag() && isConversationMode()
         }
 
         sealed interface AutomaticUnsnoozeResult {
