@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
 import android.os.Parcelable
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -222,6 +223,7 @@ class ThreadViewModel @Inject constructor(
         messages: RealmResults<Message>,
         threadUid: String,
     ): Pair<ThreadAdapterItems, MessagesWithoutHeavyData> = with(threadState) {
+        Log.v("gibran", "mapRealmMessagesResult - messages.map { it.uid + it.emojiReaction }: ${messages.map { it.uid + it.emojiReaction }}")
 
         if (messages.isEmpty()) return emptyList<Any>() to emptyList()
 

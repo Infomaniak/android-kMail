@@ -720,7 +720,7 @@ class MainViewModel @Inject constructor(
 
     private fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap(messageController::getUnscheduledMessages)
-        else -> messageController.getMessageAndDuplicates(threads.first(), message)
+        else -> messageController.getMessageAndDuplicatesAndEmojiReactions(threads.first(), message)
     }
 
     fun deleteDraft(targetMailboxUuid: String, remoteDraftUuid: String) = viewModelScope.launch(ioCoroutineContext) {
@@ -836,9 +836,15 @@ class MainViewModel @Inject constructor(
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
 
+            // val messagesToMoveImpactedFolders = messagesToMove.getFoldersIds(exception = destinationFolder.id)
+            // val otherImpactedFoldersDueToEmojiReactions =
+            //     messagesToMove.getEmojiReactionImpactedFolders(exception = destinationFolder.id)
+            //
+            // Log.e("gibran", "moveThreadsOrMessageTo - otherImpactedFoldersDueToEmojiReactions: ${otherImpactedFoldersDueToEmojiReactions}")
+            // messagesToMoveImpactedFolders.plusAssign(otherImpactedFoldersDueToEmojiReactions)
             refreshFoldersAsync(
                 mailbox = mailbox,
-                messagesFoldersIds = messagesToMove.getFoldersIds(exception = destinationFolder.id),
+                messagesFoldersIds = messagesToMove.getFoldersIds(exception = destinationFolder.id),//messagesToMoveImpactedFolders,
                 destinationFolderId = destinationFolder.id,
                 callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
             )
@@ -1418,7 +1424,7 @@ class MainViewModel @Inject constructor(
     fun modifyNameFolder(name: String, folderId: String) =
         viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
 
-    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String?{
+    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String? {
         return if (apiResponse.isSuccess()) {
             updateFolders(mailbox)
             apiResponse.data?.id
@@ -1427,6 +1433,7 @@ class MainViewModel @Inject constructor(
             null
         }
     }
+
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,
@@ -1599,6 +1606,12 @@ class MainViewModel @Inject constructor(
         threadController.removeThreadsWithParentalIssues()
     }
 
+    // private fun List<Message>.getOtherMessages(exception: String) {
+    //     forEach {
+    //         messageController.getMessage()
+    //     }
+    // }
+
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
@@ -1607,4 +1620,17 @@ class MainViewModel @Inject constructor(
 
         private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
+}
+
+private fun List<Message>.getEmojiReactionImpactedFolders(exception: String): ImpactedFolders {
+    val otherImpactedFolders = ImpactedFolders()
+
+    forEach { message ->
+        if (message.isReaction) message.threadsDuplicatedIn.forEach { thread ->
+            val localFolderId = thread.folder.id
+            if (localFolderId != exception) otherImpactedFolders += localFolderId
+        }
+    }
+
+    return otherImpactedFolders
 }
