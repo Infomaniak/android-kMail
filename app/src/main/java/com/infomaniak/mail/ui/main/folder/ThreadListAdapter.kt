@@ -628,11 +628,7 @@ class ThreadListAdapter @Inject constructor(
             root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
         } else if (progress > 0.5f && viewHolder.isSwipedOverHalf) {
             viewHolder.isSwipedOverHalf = false
-            if (SDK_INT >= 27) {
-                root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
-            } else {
-                root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            }
+            root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
         }
 
         val cardView = root as MaterialCardView

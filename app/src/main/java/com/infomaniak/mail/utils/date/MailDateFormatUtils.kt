@@ -51,11 +51,7 @@ object MailDateFormatUtils {
     }
 
     fun Date.formatForHeader(): String {
-        return if (SDK_INT >= 26) {
-            formatWithLocal(FormatData.BOTH, FormatStyle.FULL, FormatStyle.SHORT)
-        } else {
-            format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME)
-        }
+        return formatWithLocal(FormatData.BOTH, FormatStyle.FULL, FormatStyle.SHORT)
     }
 
     fun Context.formatDayOfWeekAdaptiveYear(date: Date): String = when {
