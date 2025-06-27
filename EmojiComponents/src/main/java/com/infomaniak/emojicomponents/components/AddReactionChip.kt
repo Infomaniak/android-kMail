@@ -21,7 +21,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -40,7 +42,7 @@ internal fun AddReactionChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: () -> Boolean = { true },
-    colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
+    colors: AddReactionColors = AddReactionChipDefaults.addReactionColors(),
 ) {
     IconButton(
         modifier = modifier.size(38.dp),
@@ -53,8 +55,19 @@ internal fun AddReactionChip(
                 modifier = Modifier.size(Margin.Large),
             )
         },
-        colors = IconButtonDefaults.iconButtonColors(contentColor = colors.accentColor),
+        colors = colors.buttonColors,
     )
+}
+
+data class AddReactionColors(val buttonColors: IconButtonColors)
+
+object AddReactionChipDefaults {
+    @Composable
+    fun addReactionColors(
+        iconButtonColors: IconButtonColors = IconButtonDefaults.iconButtonColors(
+            contentColor = MaterialTheme.colorScheme.primary,
+        ),
+    ): AddReactionColors = AddReactionColors(iconButtonColors)
 }
 
 @Preview
