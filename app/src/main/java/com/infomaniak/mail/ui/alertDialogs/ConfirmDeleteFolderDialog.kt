@@ -22,7 +22,8 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.DialogConfirmeDeleteFolderBinding
+import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.mail.databinding.DialogConfirmDeleteFolderBinding
 import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
@@ -33,9 +34,8 @@ class ConfirmDeleteFolderDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
 ) : BaseAlertDialog(activityContext) {
 
-    // revoir ca
-    private val binding: DialogConfirmeDeleteFolderBinding by lazy {
-        DialogConfirmeDeleteFolderBinding.inflate(activity.layoutInflater)
+    private val binding: DialogConfirmDeleteFolderBinding by lazy {
+        DialogConfirmDeleteFolderBinding.inflate(activity.layoutInflater)
     }
 
     private var onPositiveButtonClick: ((String) -> Unit)? = null
@@ -48,7 +48,7 @@ class ConfirmDeleteFolderDialog @Inject constructor(
             .setPositiveButton(R.string.actionDelete) { _, _ ->
                 folderId?.let { onPositiveButtonClick?.invoke(it) }
             }
-            .setNegativeButton(com.infomaniak.lib.core.R.string.buttonCancel, null)
+            .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
     }
 

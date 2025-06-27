@@ -97,13 +97,17 @@ class InvalidPasswordFragment : Fragment() {
 
         detachMailbox.setOnClickListener {
             trackInvalidPasswordMailboxEvent("detachMailbox")
-            descriptionDialog.show(title = getString(R.string.popupDetachMailboxTitle), description = requireContext().getStringWithBoldArg(
+            descriptionDialog.show(
+                title = getString(R.string.popupDetachMailboxTitle),
+                description = requireContext().getStringWithBoldArg(
                     R.string.popupDetachMailboxDescription,
                     navigationArgs.mailboxEmail
-                ), onPositiveButtonClicked = {
+                ),
+                onPositiveButtonClicked = {
                     trackInvalidPasswordMailboxEvent("detachMailboxConfirm")
                     invalidPasswordViewModel.detachMailbox()
-                },)
+                },
+            )
         }
 
         requestPasswordButton.setOnClickListener {
