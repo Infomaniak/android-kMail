@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
@@ -80,6 +81,7 @@ class EncryptionLockButtonView @JvmOverloads constructor(
                 iconTintRes = R.color.encryptionIconColor,
                 shouldDisplayPastille = false,
             )
+            EncryptionStatus.Loading -> Unit // This case cannot happen
         }
     }
 
@@ -100,13 +102,20 @@ class EncryptionLockButtonView @JvmOverloads constructor(
                 iconTintRes = R.color.encryptionIconColor,
                 shouldDisplayPastille = false,
             )
+            EncryptionStatus.Loading -> with(binding) {
+                encryptionButton.isEnabled = false
+                unencryptedRecipientLoader.isVisible = true
+                pastille.isGone = true
+            }
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun setIconUi(@DrawableRes iconRes: Int, @ColorRes iconTintRes: Int, shouldDisplayPastille: Boolean) {
         with(binding) {
+            unencryptedRecipientLoader.isGone = true
             encryptionButton.apply {
+                isEnabled = true
                 setIconResource(iconRes)
                 setIconTintResource(iconTintRes)
             }
@@ -129,7 +138,7 @@ class EncryptionLockButtonView @JvmOverloads constructor(
     }
 
     enum class EncryptionStatus {
-        Unencrypted, PartiallyEncrypted, Encrypted
+        Unencrypted, Loading, PartiallyEncrypted, Encrypted
     }
 
     private enum class EncryptionDisplayStyle {
