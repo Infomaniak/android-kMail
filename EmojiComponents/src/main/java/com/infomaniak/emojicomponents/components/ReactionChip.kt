@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
 
 @Composable
@@ -50,6 +51,7 @@ internal fun ReactionChip(
             selected = selected(),
             selectedBorderColor = colors.accentColor,
             borderColor = Color.Transparent,
+            selectedBorderWidth = 1.dp,
         ),
         shape = shape,
     )
