@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.lib.core.utils.serializableExtra
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -38,6 +39,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.NotificationPayload
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
@@ -61,6 +63,9 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var folderController: FolderController
+
+    @Inject
+    lateinit var localSettings: LocalSettings
 
     @Inject
     lateinit var mailboxController: MailboxController
@@ -164,7 +169,14 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
             context.trackNotificationActionEvent(matomoValue)
 
-            with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id, okHttpClient)) {
+            val responses = ApiRepository.moveMessages(
+                mailboxUuid = mailbox.uuid,
+                messagesUids = messages.getUids(),
+                destinationId = destinationFolder.id,
+                alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(mailbox.featureFlags, localSettings),
+                okHttpClient = okHttpClient,
+            )
+            with(responses) {
                 if (atLeastOneSucceeded()) {
                     dismissNotification(context, mailbox, notificationId)
                     updateFolders(folders = listOf(message.folder, destinationFolder), mailbox, realm)
