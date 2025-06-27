@@ -595,6 +595,7 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="@dimen/marginStandardMedium"
             android:visibility="gone"
+            app:addReactionDisabledColor="@color/disabledIconColor"
             app:chipCornerRadius="@dimen/chipCornerRadius"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
