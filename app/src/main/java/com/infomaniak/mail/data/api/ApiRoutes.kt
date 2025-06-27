@@ -102,7 +102,7 @@ object ApiRoutes {
         return "${securedProxy()}/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName/external_mail_flag"
     }
 
-    fun isInfomaniakMailboxes(emails: List<String>): String {
+    fun isInfomaniakMailboxes(emails: Set<String>): String {
         return "${securedProxy()}/1/mail_hostings/mailboxes/exist?mailboxes[]=${emails.joinToString("&mailboxes[]=")}"
     }
 

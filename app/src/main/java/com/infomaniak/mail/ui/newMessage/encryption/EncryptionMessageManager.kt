@@ -60,6 +60,7 @@ class EncryptionMessageManager @Inject constructor(
 
         _encryptionViewModel = encryptionViewModel
         observeDraftPassword()
+        observeEmailsCheckingTrigger()
     }
 
     fun observeEncryptionFeatureFlagUpdates() {
@@ -92,8 +93,7 @@ class EncryptionMessageManager @Inject constructor(
                 encryptionViewModel.checkIfEmailsCanBeEncrypted(unknownEncryptionStatusRecipients.map(Recipient::email))
             }
 
-            val isPartialEncryption =
-                isEncrypted && currentUnencryptableRecipients.isNotEmpty() // TODO : put a loader when unencryptable is null
+            val isPartialEncryption = isEncrypted && currentUnencryptableRecipients.isNotEmpty()
             val encryptionStatus = when {
                 isPartialEncryption && encryptionViewModel.password.value.isNullOrBlank() -> EncryptionStatus.PartiallyEncrypted
                 isEncrypted -> {
@@ -112,12 +112,15 @@ class EncryptionMessageManager @Inject constructor(
     }
 
     fun observeUnencryptableRecipients() {
-        encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipients ->
+        encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipientsEmails ->
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = checkEncryptionCanBeSend())
+
+            // Check if the email is still in the draft's recipients (it could have been deleted while being checked)
+            val filteredEmails = recipientsEmails?.filter { email -> newMessageViewModel.allRecipients.any { it.email == email } }
 
             if (newMessageViewModel.isEncryptionActivated.value != true) return@observe
 
-            val recipientsCount = recipients?.count() ?: 0
+            val recipientsCount = filteredEmails?.count() ?: 0
             binding.encryptionLockButtonView.apply {
                 unencryptableRecipientsCount = recipientsCount
                 encryptionStatus = if (recipientsCount > 0 && encryptionViewModel.password.value.isNullOrBlank()) {
@@ -154,6 +157,8 @@ class EncryptionMessageManager @Inject constructor(
     }
 
     fun toggleEncryption() {
+        if (binding.encryptionLockButtonView.encryptionStatus == EncryptionStatus.Loading) return
+
         if (newMessageViewModel.isEncryptionActivated.value == true) {
             fragment.safelyNavigate(
                 NewMessageFragmentDirections.actionNewMessageFragmentToEncryptionActionsBottomSheetDialog(
@@ -173,6 +178,8 @@ class EncryptionMessageManager @Inject constructor(
         val unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toMutableSet()
         if (unencryptableRecipients?.contains(recipient.email) == true) {
             encryptionViewModel.unencryptableRecipients.value = unencryptableRecipients.apply { remove(recipient.email) }
+        } else {
+            encryptionViewModel.cancelEmailCheckingIfNeeded(recipient.email)
         }
     }
 
@@ -201,6 +208,17 @@ class EncryptionMessageManager @Inject constructor(
         if (showEncryptionDiscoveryBottomSheet) {
             showEncryptionDiscoveryBottomSheet = false
             // TODO show discovery screen ?
+        }
+    }
+
+    private fun observeEmailsCheckingTrigger() {
+        encryptionViewModel.isCheckingEmailsTrigger.observe(viewLifecycleOwner) {
+            binding.encryptionLockButtonView.apply {
+                if (encryptionStatus == EncryptionStatus.Encrypted) {
+                    binding.encryptionLockButtonView.isEnabled = false
+                    encryptionStatus = EncryptionStatus.Loading
+                }
+            }
         }
     }
 }

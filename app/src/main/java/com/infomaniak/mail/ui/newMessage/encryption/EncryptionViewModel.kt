@@ -29,6 +29,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
 import javax.inject.Inject
@@ -42,25 +43,47 @@ class EncryptionViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     val unencryptableRecipients: MutableLiveData<Set<String>?> = MutableLiveData(null)
+    val isCheckingEmailsTrigger: MutableLiveData<Unit> = MutableLiveData()
     val password: MutableLiveData<String?> = MutableLiveData(null)
 
-    fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
-        viewModelScope.launch(ioDispatcher) {
-            val apiResponse = ApiRepository.isInfomaniakMailboxes(emails)
-            val currentUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
+    private var emailsCheckingJob: Job? = null
+    private val emailsBeingChecked: MutableSet<String> = mutableSetOf()
 
-            val newUnencryptableRecipients = if (apiResponse.isSuccess()) {
-                apiResponse.data?.let { mailboxHostingStatuses ->
-                    val unencryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
-                    currentUnencryptableRecipients + unencryptableEmailAddresses
-                } ?: currentUnencryptableRecipients
-            } else {
-                // In case of error during the encryptable check, we consider all recipients as unencryptable
-                snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
-                currentUnencryptableRecipients + emails
+    fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
+        emailsCheckingJob?.cancel()
+        emailsBeingChecked.addAll(emails)
+
+        emailsCheckingJob = viewModelScope.launch(ioDispatcher) {
+            isCheckingEmailsTrigger.postValue(Unit)
+
+            val currentUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
+            val newUnencryptableRecipients = try {
+                val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked)
+
+                if (apiResponse.isSuccess()) {
+                    apiResponse.data?.let { mailboxHostingStatuses ->
+                        val unencryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
+                        currentUnencryptableRecipients + unencryptableEmailAddresses
+                    } ?: currentUnencryptableRecipients
+                } else {
+                    // In case of error during the encryptable check, we consider all recipients as unencryptable
+                    snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
+                    currentUnencryptableRecipients + emailsBeingChecked
+                }
+            } finally {
+                currentUnencryptableRecipients + emailsBeingChecked
             }
 
+            emailsBeingChecked.clear()
             unencryptableRecipients.postValue(newUnencryptableRecipients)
+        }
+    }
+
+    fun cancelEmailCheckingIfNeeded(email: String) {
+        if (email in emailsBeingChecked) emailsBeingChecked.remove(email)
+        if (emailsBeingChecked.isEmpty()) {
+            emailsCheckingJob?.cancel()
+            emailsCheckingJob = null
         }
     }
 
