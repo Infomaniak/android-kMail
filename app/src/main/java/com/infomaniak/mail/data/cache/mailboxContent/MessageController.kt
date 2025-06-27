@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import android.util.Log
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -65,6 +66,10 @@ class MessageController @Inject constructor(
         return getMessage(uid, mailboxContentRealm())
     }
 
+    private fun getMessageThatReplyTo(messageId: String): List<Message> {
+        return getMessageThatReplyToQuery(messageId, mailboxContentRealm()).find()
+    }
+
     fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
         fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().find()
 
@@ -106,11 +111,26 @@ class MessageController @Inject constructor(
         return getMessagesAndTheirDuplicates(thread, "$byFolderId AND $isNotScheduledMessage")
     }
 
-    fun getUnscheduledMessages(thread: Thread): List<Message> {
-        return getMessagesAndTheirDuplicates(thread, isNotScheduledMessage)
+    fun getUnscheduledMessages(thread: Thread): Collection<Message> {
+        Log.e("gibran", "getUnscheduledMessages: entered the method", );
+        val originalMessagesToMove = getMessagesAndTheirDuplicates(thread, isNotScheduledMessage)
+        // val otherMessageThatReactToTheseMessages = originalMessagesToMove.flatMap { message ->
+        //     val messageId = message.messageId ?: return@flatMap emptyList()
+        //     getMessageThatReplyTo(messageId)
+        //         .filter { it.inReplyTo?.parseMessagesIds()?.contains(messageId) == true }
+        //         .filter { it.isReaction }
+        // }
+        //
+        // Log.i("gibran", "getUnscheduledMessages - otherMessageThatReactToTheseMessages.map { it.uid + it.emojiReaction }: ${otherMessageThatReactToTheseMessages.map { it.uid + it.emojiReaction }}")
+        //
+        // return originalMessagesToMove.toMutableSet().apply {
+        //     addAll(otherMessageThatReactToTheseMessages)
+        // }
+        return originalMessagesToMove
     }
 
     private fun getMessagesAndTheirDuplicates(thread: Thread, query: String): List<Message> {
+        // val messages = thread.getDisplayedMessages(featureFlags, localSettings).query(query).find()
         val messages = thread.messages.query(query).find()
         val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).find()
         return messages + duplicates
@@ -124,6 +144,22 @@ class MessageController @Inject constructor(
 
     fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
         return listOf(message) + thread.duplicates.query("${Message::messageId.name} == $0", message.messageId).find()
+    }
+
+    /**
+     * When deleting a message that had reactions attached to it, the thread algorithm now considers that the attached reactions
+     * should be displayed in the thread since they don't have a target message anymore which makes them pop for a split second
+     * (or longer with a bad network connection) and we try to fetch them at the api level but the api just deleted them because
+     * of `move_reactions=1` so we can't ever find their body on the api.
+     */
+    fun getMessageAndDuplicatesAndEmojiReactions(thread: Thread, message: Message): List<Message> {
+        // TODO: Doesn't seem to work because of a bad order of refresh or something. But anyway good ordering wouldn't even
+        //  change a thing, it's too concurrent to be a good solution
+        val emojiReactionMessages = thread.messages.query("${Message::inReplyTo.name} CONTAINS[c] $0 && ${Message::emojiReaction.name} != $1", message.messageId, null).find()
+        Log.i("gibran", "getMessageAndDuplicatesAndEmojiReactions - emojiReactionMessages.map { it.uid + it.emojiReaction }: ${emojiReactionMessages.map { it.uid + it.emojiReaction }}")
+        return listOf(message) +
+                thread.duplicates.query("${Message::messageId.name} == $0", message.messageId).find() +
+                emojiReactionMessages
     }
 
     fun searchMessages(
@@ -185,6 +221,10 @@ class MessageController @Inject constructor(
 
         private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
             return getMessagesQuery(uid, realm).first()
+        }
+
+        private fun getMessageThatReplyToQuery(messageId: String, realm: TypedRealm): RealmQuery<Message> {
+            return realm.query<Message>("${Message::inReplyTo.name} CONTAINS[c] $0", messageId)
         }
 
         private fun getMessagesByFolderIdQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
