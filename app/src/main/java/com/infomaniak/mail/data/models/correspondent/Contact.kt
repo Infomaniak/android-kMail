@@ -31,6 +31,8 @@ data class Contact(
     val name: String = "",
     val emails: RealmList<String> = realmListOf(),
     val avatar: String? = null,
+    @SerialName("categories")
+    val remoteContactGroupIds: RealmList<Int> = realmListOf(),
     @SerialName("contacted_times")
     val contactedTimes: Map<String, Int>? = null,
     val other: Boolean,

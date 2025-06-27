@@ -15,14 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(RealmListKSerializer::class)
+
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcelable
 import com.infomaniak.mail.data.api.ApiRoutes
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.serializers.RealmListKSerializer
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.UseSerializers
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED", "PARCELABLE_PRIMARY_CONSTRUCTOR_IS_EMPTY")
@@ -39,6 +46,9 @@ class MergedContact() : RealmObject, Correspondent, Parcelable {
 
     var comesFromApi: Boolean = false // In opposition to coming from the phone's address book
         private set
+    
+    @SerialName("categories")
+    var remoteContactGroupIds: RealmList<Int> = realmListOf()
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
@@ -68,6 +78,8 @@ class MergedContact() : RealmObject, Correspondent, Parcelable {
         this.other = apiContact.other
 
         this.comesFromApi = comesFromApi
+
+        this.remoteContactGroupIds = apiContact.remoteContactGroupIds
 
         // We need an ID which is unique for each pair of email/name. Therefore we stick
         // together the two 32 bits hashcodes to make one unique 64 bits hashcode.
