@@ -297,11 +297,16 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxUuid: String,
         messagesUids: List<String>,
         destinationId: String,
+        alsoMoveReactionMessages: Boolean,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
     ): List<ApiResponse<MoveResult>> {
+        fun createApiRoute(): String {
+            return ApiRoutes.moveMessages(mailboxUuid) + if (alsoMoveReactionMessages) "?move_reactions=1" else ""
+        }
+
         return batchOver(messagesUids) {
             callApi(
-                url = ApiRoutes.moveMessages(mailboxUuid),
+                url = createApiRoute(),
                 method = POST,
                 body = mapOf("uids" to it, "to" to destinationId),
                 okHttpClient = okHttpClient,
