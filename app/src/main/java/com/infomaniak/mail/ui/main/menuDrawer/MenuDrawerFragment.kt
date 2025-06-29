@@ -52,6 +52,7 @@ import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.ConfirmDeleteFolderDialog
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
@@ -86,6 +87,9 @@ class MenuDrawerFragment : Fragment() {
 
     @Inject
     lateinit var modifyNameFolderDialog: ModifyNameFolderDialog
+
+    @Inject
+    lateinit var confirmDeleteFolderDialog: ConfirmDeleteFolderDialog
 
     @Inject
     lateinit var menuDrawerAdapter: MenuDrawerAdapter
@@ -128,6 +132,7 @@ class MenuDrawerFragment : Fragment() {
     private fun setupManageFolderDialog() {
         createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
         modifyNameFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::modifyNameFolder)
+        confirmDeleteFolderDialog.setPositiveButtonCallback(onPositiveButtonClick = mainViewModel::deleteFolder)
     }
 
     private fun setupRecyclerView() {
@@ -147,7 +152,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onFeedbackClicked: () -> Unit = ::onFeedbackClicked
                 override var onHelpClicked: () -> Unit = ::onHelpClicked
                 override var onAppVersionClicked: () -> Unit = ::onAppVersionClicked
-            },
+            }
         )
     }
 
@@ -222,6 +227,10 @@ class MenuDrawerFragment : Fragment() {
             when (item.itemId) {
                 R.id.modifySettingsFolder -> {
                     modifyNameFolderDialog.show(folderName, folderId)
+                    true
+                }
+                R.id.deleteSettingsFolder -> {
+                    confirmDeleteFolderDialog.show(folderId, folderName)
                     true
                 }
                 else -> false
