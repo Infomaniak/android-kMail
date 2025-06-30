@@ -17,6 +17,9 @@
  */
 package com.infomaniak.emojicomponents.components
 
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
@@ -25,11 +28,12 @@ import androidx.compose.material3.SelectableChipColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
 
 @Composable
 internal fun ReactionChip(
@@ -39,22 +43,40 @@ internal fun ReactionChip(
     onClick: () -> Unit,
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
+    onLongPress: (() -> Unit)? = null,
 ) {
-    InputChip(
-        selected = selected(),
-        onClick = onClick,
-        leadingIcon = { Text(emoji) },
-        label = { Text(reactionCount().toString()) },
-        colors = colors.inputChipColors,
-        border = InputChipDefaults.inputChipBorder(
-            enabled = true,
+    val inputChipInteractionSource = remember { MutableInteractionSource() }
+
+    Box {
+        InputChip(
             selected = selected(),
-            selectedBorderColor = colors.accentColor,
-            borderColor = Color.Transparent,
-            selectedBorderWidth = 1.dp,
-        ),
-        shape = shape,
-    )
+            onClick = {}, // Uses the click listener from the Box below instead
+            leadingIcon = { Text(emoji) },
+            label = { Text(reactionCount().toString()) },
+            colors = colors.inputChipColors,
+            border = InputChipDefaults.inputChipBorder(
+                enabled = true,
+                selected = selected(),
+                selectedBorderColor = colors.accentColor,
+                borderColor = Color.Transparent,
+                selectedBorderWidth = 1.dp,
+            ),
+            shape = shape,
+            interactionSource = inputChipInteractionSource,
+        )
+        // We're using this trick to support simple click and long click at the same time on an InputChip. This Box takes the size
+        // of the InputChip, detects the clicks and forwards the interaction ripple to the InputChip
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = { onLongPress?.invoke() },
+                    interactionSource = inputChipInteractionSource,
+                    indication = null,
+                )
+        )
+    }
 }
 
 data class ReactionChipColors(

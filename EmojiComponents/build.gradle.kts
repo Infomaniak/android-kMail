@@ -38,6 +38,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":Core:Avatar"))
     implementation(project(":Core:Compose:Margin"))
     implementation(project(":Core:Compose:MaterialThemeFromXml"))
 
