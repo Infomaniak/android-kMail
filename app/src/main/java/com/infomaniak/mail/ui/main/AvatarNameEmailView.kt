@@ -32,6 +32,8 @@ import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Bimi
+import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -82,9 +84,31 @@ class AvatarNameEmailView @JvmOverloads constructor(
         setNameAndEmail(mergedContact)
     }
 
+    fun setAddressBook(addressBook: AddressBook) = with(binding) {
+        setNameAndSubName(addressBook)
+    }
+
+    fun setContactGroup(contactGroup: ContactGroup) = with(binding) {
+        setNameAndSubName(contactGroup)
+    }
+
     fun setAttendee(attendee: Attendee) = with(binding) {
         attendeeAvatar.setAttendee(attendee)
         setNameAndEmail(attendee)
+    }
+
+    private fun ViewAvatarNameEmailBinding.setNameAndSubName(
+        addressBook: AddressBook,
+    ) {
+        userName.text = "Carnet d'adresses : ${addressBook.name}"
+        userEmail.text = "Organisation : ${addressBook.name}"
+    }
+
+    private fun ViewAvatarNameEmailBinding.setNameAndSubName(
+        contactGroup: ContactGroup,
+    ) {
+        userName.text = "Groupe : ${contactGroup.name}"
+        userEmail.text = "Carnet d'adresses  : ..."
     }
 
     private fun ViewAvatarNameEmailBinding.setNameAndEmail(

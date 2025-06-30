@@ -27,6 +27,9 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -43,7 +46,7 @@ class ContactAdapter(
     private val snackbarManager: SnackbarManager,
 ) : Adapter<ContactViewHolder>() {
 
-    private var allContacts: List<MergedContact> = emptyList()
+    private var allContacts: List<ContactAutocompletable> = emptyList()
     private var matchedContacts = listOf<MatchedContact>()
 
     private var displayAddUnknownContactButton = true
@@ -67,12 +70,26 @@ class ContactAdapter(
 
     private fun ItemContactBinding.bindContact(position: Int) = with(matchedContacts[position]) {
         contactDetails.apply {
-            setMergedContact(contact)
+            if (contact is MergedContact) {
+                setMergedContact(contact)
+            } else if (contact is AddressBook) {
+                setAddressBook(contact)
+            } else if (contact is ContactGroup) {
+                setContactGroup(contact)
+            }
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
         }
 
-        val isAlreadyUsed = usedEmails.contains(contact.email.standardize())
-        if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) }
+        val isAlreadyUsed = if (this.contact is MergedContact) {
+            usedEmails.contains(contact.email.standardize())
+        } else if (this.contact is AddressBook) {
+            usedEmails.contains(contact.name.standardize())
+        } else if (this.contact is ContactGroup) {
+            usedEmails.contains(contact.name.standardize())
+        } else {
+            usedEmails.contains("erro")
+        }
+        if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact as MergedContact) }
         greyedOutState.isVisible = isAlreadyUsed
         root.isEnabled = !isAlreadyUsed
     }
@@ -91,12 +108,13 @@ class ContactAdapter(
 
     override fun getItemCount(): Int = matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
 
-    override fun getItemId(position: Int): Long {
-        return if (getItemViewType(position) == KNOWN_CONTACT.id) matchedContacts[position].contact.id!! else 0L
-    }
+    // I must rewrite this !!!
+    // override fun getItemId(position: Int): Long {
+    //     return if (getItemViewType(position) == KNOWN_CONTACT.id) matchedContacts[position].contact.contactId.toLong() else 0L
+    // }
 
     fun addFirstAvailableItem() {
-        matchedContacts.firstOrNull()?.let { onContactClicked(it.contact) } ?: onAddUnrecognizedContact()
+        matchedContacts.firstOrNull()?.let { onContactClicked(it.contact as MergedContact) } ?: onAddUnrecognizedContact()
     }
 
     fun clear() {
@@ -112,23 +130,50 @@ class ContactAdapter(
             val finalUserList = mutableListOf<MatchedContact>()
             displayAddUnknownContactButton = true
             for (contact in allContacts) {
-                val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
-                val standardizedEmail = contact.email.standardize()
-                val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
-                val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
+                if (contact is MergedContact) {
+                    val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
+                    val standardizedEmail = contact.email.standardize()
+                    val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
+                    val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
 
-                val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
-                if (displayNewContact) displayAddUnknownContactButton = false
+                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
+                    if (displayNewContact) displayAddUnknownContactButton = false
 
-                if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
+                    if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
 
-                if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
+                    if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
+                } else if (contact is AddressBook) {
+                    val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
+                    val standardizedEmail = contact.name.standardize()
+                    val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
+                    val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
+
+                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
+                    if (displayNewContact) displayAddUnknownContactButton = false
+
+                    if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
+
+                    if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
+                } else if (contact is ContactGroup) {
+                    val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
+                    val standardizedEmail = contact.name.standardize()
+                    val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
+                    val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
+
+                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
+                    if (displayNewContact) displayAddUnknownContactButton = false
+
+                    if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
+
+                    if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
+                }
             }
-
+            // I must rewrite this !!!
             return finalUserList.sortedWith(
-                compareByDescending<MatchedContact> { it.contact.contactedTimes }
-                    .thenBy { it.contact.other }
-                    .thenBy { it.contact.name }
+                // compareByDescending<MatchedContact> { it.contact.contactedTimes }
+                //     .thenBy { it.contact.other }
+                //     .thenBy { it.contact.name }
+                compareByDescending<MatchedContact> { it.contact.contactId }
             ).toMutableList()
         }
 
@@ -141,7 +186,9 @@ class ContactAdapter(
         return usedEmails.remove(email.standardize()).also { isSuccess ->
             if (isSuccess) {
                 matchedContacts.forEachIndexed { index, matchedContact ->
-                    if (matchedContact.contact.email == email) notifyItemChanged(index)
+                    if (matchedContact.contact is MergedContact) {
+                        if (matchedContact.contact.email == email) notifyItemChanged(index)
+                    }
                 }
             }
         }
@@ -149,7 +196,7 @@ class ContactAdapter(
 
     fun addUsedContact(email: String) = usedEmails.add(email.standardize())
 
-    fun updateContacts(allContacts: List<MergedContact>) {
+    fun updateContacts(allContacts: List<ContactAutocompletable>) {
         this.allContacts = allContacts
     }
 
@@ -159,7 +206,7 @@ class ContactAdapter(
     }
 
     private data class MatchedContact(
-        val contact: MergedContact,
+        val contact: ContactAutocompletable,
         val nameMatchedStartIndex: Int,
         val emailMatchedStartIndex: Int,
     )

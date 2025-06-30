@@ -23,6 +23,7 @@ import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.provider.ContactsContract.CommonDataKinds.Email
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.mail.data.models.correspondent.Contact
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
@@ -96,15 +97,17 @@ object ContactUtils {
         }
     }
 
-    fun arrangeMergedContacts(contacts: List<MergedContact>): MergedContactDictionary {
+    fun arrangeMergedContacts(contacts: List<ContactAutocompletable>): MergedContactDictionary {
         val contactMap = mutableMapOf<String, MutableMap<String, MergedContact>>()
 
         contacts.forEach { contact ->
-            val mapOfContactsForThisEmail = contactMap[contact.email]
-            if (mapOfContactsForThisEmail == null) {
-                contactMap[contact.email] = mutableMapOf(contact.name to contact)
-            } else {
-                mapOfContactsForThisEmail[contact.name] = contact
+            if (contact is MergedContact) {
+                val mapOfContactsForThisEmail = contactMap[contact.email]
+                if (mapOfContactsForThisEmail == null) {
+                    contactMap[contact.email] = mutableMapOf(contact.name to contact)
+                } else {
+                    mapOfContactsForThisEmail[contact.name] = contact
+                }
             }
         }
 
