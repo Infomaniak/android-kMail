@@ -41,7 +41,7 @@ import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
@@ -295,7 +295,7 @@ class RecipientFieldView @JvmOverloads constructor(
         textInputLayout.isVisible = isTextInputAccessible
     }
 
-    fun updateContacts(allContacts: List<MergedContact>) {
+    fun updateContacts(allContacts: List<ContactAutocompletable>) {
         contactAdapter.updateContacts(allContacts)
     }
 
