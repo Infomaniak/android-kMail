@@ -28,6 +28,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -50,32 +51,34 @@ class EncryptionViewModel @Inject constructor(
     private val emailsBeingChecked: MutableSet<String> = mutableSetOf()
 
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
-        emailsCheckingJob?.cancel()
+        emailsCheckingJob?.cancel(AutoBulkCallCancellationException())
         emailsBeingChecked.addAll(emails)
 
         emailsCheckingJob = viewModelScope.launch(ioDispatcher) {
             isCheckingEmailsTrigger.postValue(Unit)
 
             val currentUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
-            val newUnencryptableRecipients = try {
+            // By default, all the new addresses being checked are considered unencryptable
+            var newUnencryptableRecipients: Set<String> = emailsBeingChecked
+
+            runCatching {
                 val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked)
 
                 if (apiResponse.isSuccess()) {
                     apiResponse.data?.let { mailboxHostingStatuses ->
-                        val unencryptableEmailAddresses = mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
-                        currentUnencryptableRecipients + unencryptableEmailAddresses
-                    } ?: currentUnencryptableRecipients
+                        newUnencryptableRecipients =
+                            mergedContactController.updateEncryptionStatus(mailboxHostingStatuses).toSet()
+                    }
                 } else {
                     // In case of error during the encryptable check, we consider all recipients as unencryptable
                     snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
-                    currentUnencryptableRecipients + emailsBeingChecked
                 }
-            } finally {
-                currentUnencryptableRecipients + emailsBeingChecked
+                clearDataAndPostResult(newUnencryptableRecipients + currentUnencryptableRecipients)
+            }.onFailure { exception ->
+                if (exception is AutoBulkCallCancellationException) throw CancellationException()
+                clearDataAndPostResult(newUnencryptableRecipients + currentUnencryptableRecipients)
+                if (exception is CancellationException) throw exception
             }
-
-            emailsBeingChecked.clear()
-            unencryptableRecipients.postValue(newUnencryptableRecipients)
         }
     }
 
@@ -98,10 +101,17 @@ class EncryptionViewModel @Inject constructor(
         return generatedPassword
     }
 
+    private fun clearDataAndPostResult(recipients: Set<String>) {
+        emailsBeingChecked.clear()
+        unencryptableRecipients.postValue(recipients)
+    }
+
     companion object {
 
         private const val PASSWORD_MIN_LENGTH = 16
         private const val PASSWORD_CHARACTERS_SET =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?"
     }
+
+    private class AutoBulkCallCancellationException : CancellationException()
 }
