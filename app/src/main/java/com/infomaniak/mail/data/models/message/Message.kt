@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
-import com.infomaniak.mail.data.models.EncryptionError
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Snoozable
@@ -140,12 +139,8 @@ class Message : RealmObject, Snoozable {
     var headers: Headers? = null
     @SerialName("encrypted")
     var isEncrypted: Boolean = false
-    @SerialName("encryption_password")
-    var encryptionPassword: String? = null
     @SerialName("crypt_password_validity")
     var encryptionPasswordValidity: RealmInstant? = null
-    @SerialName("crypt_error")
-    private var _encryptionError: String? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
@@ -205,9 +200,6 @@ class Message : RealmObject, Snoozable {
 
     @Ignore
     override var snoozeState: SnoozeState? by apiEnum(::_snoozeState)
-
-    @Ignore
-    val encryptionError: EncryptionError? by apiEnum(::_encryptionError)
 
     val threads by backlinks(Thread::messages)
 

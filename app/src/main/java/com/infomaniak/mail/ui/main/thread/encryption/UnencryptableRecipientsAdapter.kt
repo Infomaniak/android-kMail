@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ItemAvatarNameEmailBinding
 import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsAdapter.UserNameEmailViewHolder
 
-class UnencryptableRecipientsAdapter(private val recipients: List<Recipient>) : Adapter<UserNameEmailViewHolder>() {
+class UnencryptableRecipientsAdapter(private val recipients: Array<Recipient>) : Adapter<UserNameEmailViewHolder>() {
 
     init {
         setHasStableIds(true)

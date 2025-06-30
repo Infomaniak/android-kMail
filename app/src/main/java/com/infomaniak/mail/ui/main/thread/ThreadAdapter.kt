@@ -41,7 +41,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
-import com.infomaniak.core.utils.*
+import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.utils.FORMAT_DATE_SIMPLE
+import com.infomaniak.core.utils.FormatData
+import com.infomaniak.core.utils.format
+import com.infomaniak.core.utils.formatWithLocal
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
@@ -247,7 +251,7 @@ class ThreadAdapter(
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
                     attachment = calendarAttachment,
                     hasAssociatedInfomaniakCalendarEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
-                    shouldStartExpanded = threadAdapterState.isCalendarEventExpandedMap[message.uid] ?: false,
+                    shouldStartExpanded = threadAdapterState.isCalendarEventExpandedMap[message.uid] == true,
                 )
             }
 
@@ -388,7 +392,7 @@ class ThreadAdapter(
             }
 
             userAvatar.loadAvatar(firstSender, message.bimi)
-            certifiedIcon.isVisible = message.bimi?.isCertified ?: false
+            certifiedIcon.isVisible = message.bimi?.isCertified == true
 
             shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
@@ -506,6 +510,8 @@ class ThreadAdapter(
             actionRes?.let {
                 setAction1Text(context.getString(it))
                 onAction1 {
+                    // TODO: See if we add a loader to fetch only the concerned recipient from api
+                    //  or if the back returned directly the good recipient
                     threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(message.allRecipients)
                 }
             } ?: setActionsVisibility(isVisible = false)
@@ -807,7 +813,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
-        val isExpanded = threadAdapterState.isExpandedMap[message.uid] ?: false
+        val isExpanded = threadAdapterState.isExpandedMap[message.uid] == true
 
         if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
 
