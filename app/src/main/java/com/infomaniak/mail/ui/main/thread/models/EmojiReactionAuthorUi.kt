@@ -17,9 +17,40 @@
  */
 package com.infomaniak.mail.ui.main.thread.models
 
+import android.content.Context
+import coil3.imageLoader
+import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.core.avatar.models.AvatarUrlData
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.AvatarTypeUtils.fromUser
+import com.infomaniak.mail.utils.AvatarTypeUtils.getUrlOrInitialsFromCorrespondent
+import com.infomaniak.mail.utils.MergedContactUtils.searchInMergedContact
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 sealed interface EmojiReactionAuthorUi {
-    data class Real(val correspondent: Correspondent) : EmojiReactionAuthorUi
-    data object FakeMe : EmojiReactionAuthorUi
+    fun getName(context: Context): String
+    fun getAvatarType(context: Context, mergedContactDictionary: MergedContactDictionary): AvatarType
+
+    data class Real(val correspondent: Correspondent) : EmojiReactionAuthorUi {
+        override fun getName(context: Context): String = correspondent.displayedName(context)
+
+        override fun getAvatarType(context: Context, mergedContactDictionary: MergedContactDictionary): AvatarType {
+            val mergedContact = searchInMergedContact(correspondent, mergedContactDictionary)
+            return AvatarType.getUrlOrInitialsFromCorrespondent(
+                avatarUrlData = mergedContact?.avatar?.let { AvatarUrlData(it, context.imageLoader) },
+                correspondent = correspondent,
+                context = context,
+            )
+        }
+    }
+
+    data object FakeMe : EmojiReactionAuthorUi {
+        override fun getName(context: Context): String = context.getString(R.string.contactMe)
+
+        override fun getAvatarType(context: Context, mergedContactDictionary: MergedContactDictionary): AvatarType {
+            return AvatarType.fromUser(AccountUtils.currentUser!!, context)
+        }
+    }
 }

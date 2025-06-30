@@ -53,6 +53,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 
     private var addReactionClickListener: (() -> Unit)? = null
     private var onEmojiClickListener: ((emoji: String) -> Unit)? = null
+    private var onLongPress: ((String) -> Unit)? = null
 
     private var chipCornerRadius: Float? = null
     private var addReactionIconRes: Int? = null
@@ -98,6 +99,7 @@ class EmojiReactionsView @JvmOverloads constructor(
                 isAddReactionEnabled = { isAddReactionEnabled },
                 colors = emojiReactionsColors,
                 onAddReactionClick = { addReactionClickListener?.invoke() },
+                onLongPress = onLongPress,
             )
         }
     }
@@ -114,6 +116,10 @@ class EmojiReactionsView @JvmOverloads constructor(
 
     fun setOnEmojiClickListener(listener: (emoji: String) -> Unit) {
         onEmojiClickListener = listener
+    }
+
+    fun setOnLongPressListener(listener: (String) -> Unit) {
+        onLongPress = listener
     }
 
     fun setEmojiReactions(emojiReactions: List<Reaction>) {

@@ -15,21 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread.models
+package com.infomaniak.mail.utils
 
-import android.content.Context
-import com.infomaniak.emojicomponents.data.Reaction
-import com.infomaniak.emojicomponents.data.ReactionDetail
+import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
-data class EmojiReactionStateUi(
-    override val emoji: String,
-    val authors: List<EmojiReactionAuthorUi>,
-    override val hasReacted: Boolean,
-) : Reaction {
-    override val count: Int by authors::size
-
-    fun computeReactionDetail(emoji: String, context: Context, mergedContactDictionary: MergedContactDictionary): List<ReactionDetail> = authors.map {
-        ReactionDetail(name = it.getName(context), emoji = emoji, avatarType = it.getAvatarType(context, mergedContactDictionary))
+object MergedContactUtils {
+    fun searchInMergedContact(correspondent: Correspondent, contacts: MergedContactDictionary): MergedContact? {
+        val recipientsForEmail = contacts[correspondent.email]
+        return recipientsForEmail?.getOrElse(correspondent.name) { recipientsForEmail.entries.elementAt(0).value }
     }
 }
