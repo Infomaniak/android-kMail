@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,11 +69,11 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
      * @param encryptableMailboxesMap key : email of the merged contacts,
      * value : if the contact with this email can receive encrypted message
      *
-     * @return A list of the uncryptable emails
+     * @return A list of the unencryptable emails
      */
     suspend fun updateEncryptionStatus(encryptableMailboxesMap: List<MailboxHostingStatus>): List<String> {
         SentryLog.d(RealmDatabase.TAG, "MergedContacts: Save new data")
-        val uncryptableEmailAddresses: MutableList<String> = mutableListOf()
+        val unencryptableEmailAddresses: MutableList<String> = mutableListOf()
 
         userInfoRealm.write {
             encryptableMailboxesMap.forEach { mailboxStatus ->
@@ -81,11 +81,11 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
                     it.canBeEncrypted = mailboxStatus.isInfomaniakHosted
                 }
 
-                if (!mailboxStatus.isInfomaniakHosted) uncryptableEmailAddresses.add(mailboxStatus.email)
+                if (!mailboxStatus.isInfomaniakHosted) unencryptableEmailAddresses.add(mailboxStatus.email)
             }
         }
 
-        return uncryptableEmailAddresses
+        return unencryptableEmailAddresses
     }
     //endregion
 }
