@@ -81,11 +81,16 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.matomo.sdk.Tracker
+import splitties.init.injectAsAppCtx
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltAndroidApp
 open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
+
+    init {
+        injectAsAppCtx() // Ensures it is always initialized
+    }
 
     val matomoTracker: Tracker by lazy { buildTracker(shouldOptOut = !localSettings.isMatomoTrackingEnabled) }
     var isAppInBackground = true
@@ -224,7 +229,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun configureRoomDatabases() {
-        AccountUtils.init(this)
+        AccountUtils.init()
         myKSuiteDataUtils.initDatabase(this)
     }
 
