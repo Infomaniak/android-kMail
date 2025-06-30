@@ -247,7 +247,7 @@
     <string name="datePickerTitle">Choisir une date et une heure</string>
     <string name="dateTitle">Date :</string>
     <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
-    <string name="deleteFolderDialogDescription">Souhaitez-vous supprimer le dossier %s et tout ce qu’il contient? \nLe contenu du dossier sera définitivement supprimé sans passer par la corbeille.</string>
+    <string name="deleteFolderDialogDescription">Souhaitez-vous supprimer le dossier %s et tout ce qu’il contient ?\nLe contenu du dossier sera définitivement supprimé sans passer par la corbeille.</string>
     <string name="deleteFolderDialogTitle">Supprimer le dossier</string>
     <string name="disabledFeatureFlagDescription">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me\n(limite de stockage, horaire personnalisé, envoi et plus encore…)</string>
     <string name="disabledFeatureFlagTitle">Besoin de plus de stockage et de fonctionnalités ?</string>

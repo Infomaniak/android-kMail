@@ -251,7 +251,7 @@
     <string name="datePickerTitle">Choose a date and time</string>
     <string name="dateTitle">Date:</string>
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
-    <string name="deleteFolderDialogDescription">Would you like to delete the %s folder and everything it contains? \nThe contents of the folder will be permanently deleted without going through the recycle garbage can.</string>
+    <string name="deleteFolderDialogDescription">Would you like to delete the %s folder and everything it contains?\nThe contents of the folder will be permanently deleted without going through the recycle garbage can.</string>
     <string name="deleteFolderDialogTitle">Delete folder</string>
     <string name="disabledFeatureFlagDescription">You will soon be able to unlock the limits of your ik.me email address\n(storage limit, custom schedule, sending and more…)</string>
     <string name="disabledFeatureFlagTitle">Need more storage and features?</string>
