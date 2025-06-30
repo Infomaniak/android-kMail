@@ -35,9 +35,9 @@ class EncryptionLockButtonView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val bindingToolbarButton by lazy { ViewEncryptionLockButtonBinding.inflate(LayoutInflater.from(context), this, true) }
+    private val binding by lazy { ViewEncryptionLockButtonBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    val encryptionButton = bindingToolbarButton.encryptionButton
+    val encryptionButton get() = binding.encryptionButton
     var unencryptableRecipientsCount: Int? = null
         set(value) {
             field = value
@@ -108,19 +108,18 @@ class EncryptionLockButtonView @JvmOverloads constructor(
 
     @SuppressLint("SetTextI18n")
     private fun setIconUi(@DrawableRes iconRes: Int, @ColorRes iconTintRes: Int, shouldDisplayPastille: Boolean) {
-        with(bindingToolbarButton) {
+        with(binding) {
             encryptionButton.apply {
                 setIconResource(iconRes)
                 setIconTintResource(iconTintRes)
             }
             pastille.isVisible = shouldDisplayPastille
 
-
             val count = when (val count = unencryptableRecipientsCount) {
                 null -> null
                 in 1..9 -> count.toString()
                 else -> "9+"
-    }
+            }
 
             unencryptedRecipientText.apply {
                 isVisible = count != null
