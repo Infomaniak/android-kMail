@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.addressBook
 
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmList
@@ -29,16 +30,21 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
-class AddressBook : RealmObject {
+class AddressBook : RealmObject, ContactAutocompletable {
     @PrimaryKey
     var uuid: String = ""
     var id: Int = 0
+
+    var name: String = ""
     @SerialName("default")
     var isDefault: Boolean = false
     @SerialName("categories")
     var contactGroups: RealmList<ContactGroup> = realmListOf<ContactGroup>()
     @SerialName("is_dynamic_organisation_member_directory")
     var isDynamicOrganisationMemberDirectory: Boolean = false
+
+    override var contactId: String = id.toString()
+    override var autocompletableName: String = name
 
     companion object
 }

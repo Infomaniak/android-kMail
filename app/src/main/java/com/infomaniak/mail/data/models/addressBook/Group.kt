@@ -17,15 +17,18 @@
  */
 package com.infomaniak.mail.data.models.addressBook
 
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ContactGroup : RealmObject {
+class ContactGroup : RealmObject, ContactAutocompletable {
     @PrimaryKey
     var id: Int = 0
     var name: String = ""
 
+    override var contactId: String = id.toString()
+    override var autocompletableName: String = name
     companion object
 }
