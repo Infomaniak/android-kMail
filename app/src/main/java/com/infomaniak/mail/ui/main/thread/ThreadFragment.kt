@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -419,6 +420,7 @@ class ThreadFragment : Fragment() {
                         threadViewModel.fakeEmojiReply(emoji, messageUid)
                     })
                 },
+                showEmojiDetails = { messageUid -> navigateToEmojiDetailsBottomSheet(messageUid) }
             ),
         )
 
@@ -1073,6 +1075,15 @@ private fun Fragment.navigateToEmojiPicker(messageUid: String) {
     safelyNavigate(
         resId = R.id.emojiPickerBottomSheetDialog,
         args = EmojiPickerBottomSheetDialogArgs(messageUid).toBundle(),
+        substituteClassName = ThreadListFragment::class.java.name,
+    )
+}
+
+private fun Fragment.navigateToEmojiDetailsBottomSheet(messageUid: String) {
+    Log.e("gibran", "navigateToEmojiDetailsBottomSheet: ", );
+    safelyNavigate(
+        resId = R.id.emojiDetailsBottomSheetDialog,
+        args = EmojiDetailsBottomSheetDialogArgs(messageUid).toBundle(),
         substituteClassName = ThreadListFragment::class.java.name,
     )
 }

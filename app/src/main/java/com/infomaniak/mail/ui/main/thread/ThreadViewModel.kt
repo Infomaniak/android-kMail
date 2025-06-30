@@ -647,7 +647,7 @@ private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions
     return fakeReactions
 }
 
-private fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry<String, T>> {
+fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry<String, T>> {
     @Suppress("UNCHECKED_CAST")
     return filter { (_, state) -> state != null } as List<Map.Entry<String, T>>
 }

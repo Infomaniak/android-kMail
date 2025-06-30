@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +48,7 @@ fun EmojiReactions(
     isAddReactionEnabled: () -> Boolean = { true },
     colors: EmojiReactionsColors = EmojiReactionsDefaults.colors(),
     shape: Shape = InputChipDefaults.shape,
+    onLongPress: ((Offset) -> Unit)? = null,
 ) {
     FlowRow(
         modifier,
@@ -61,6 +63,7 @@ fun EmojiReactions(
                 onClick = { onEmojiClicked(emoji) },
                 colors = colors.reactionChip,
                 shape = shape,
+                onLongPress = onLongPress,
             )
         }
         AddReactionChip(

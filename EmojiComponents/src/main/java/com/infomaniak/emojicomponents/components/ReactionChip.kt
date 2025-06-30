@@ -25,11 +25,11 @@ import androidx.compose.material3.SelectableChipColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
 
 @Composable
 internal fun ReactionChip(
@@ -39,10 +39,13 @@ internal fun ReactionChip(
     onClick: () -> Unit,
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
+    onLongPress: ((Offset) -> Unit)? = null,
 ) {
+    // val inputChipInteractionSource = remember { MutableInteractionSource() }
+
     InputChip(
         selected = selected(),
-        onClick = onClick,
+        onClick = { onLongPress?.invoke(Offset(0)) },
         leadingIcon = { Text(emoji) },
         label = { Text(reactionCount().toString()) },
         colors = colors.inputChipColors,
@@ -54,7 +57,18 @@ internal fun ReactionChip(
             selectedBorderWidth = 1.dp,
         ),
         shape = shape,
+        // interactionSource = inputChipInteractionSource,
     )
+    // Box(
+    //     modifier = Modifier
+    //         .size(intrinsicSize, intrinsicSize)
+    //         .combinedClickable(
+    //             onLongClick = { onLongPress?.invoke(Offset(0)) },
+    //             onClick = { onClick() },
+    //             interactionSource = inputChipInteractionSource,
+    //             indication = null,
+    //         )
+    // )
 }
 
 data class ReactionChipColors(

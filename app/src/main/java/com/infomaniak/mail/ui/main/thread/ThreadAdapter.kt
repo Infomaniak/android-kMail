@@ -23,6 +23,7 @@ import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View.OnClickListener
@@ -782,6 +783,10 @@ class ThreadAdapter(
         setOnEmojiClickListener { emoji ->
             threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, messageUi.message.uid)
         }
+        setOnLongPressListener {
+            Log.e("gibran", "bindEmojiReactions: detected long press", );
+            threadAdapterCallbacks?.showEmojiDetails?.invoke(messageUi.message.uid)
+        }
     }
 
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
@@ -985,6 +990,7 @@ class ThreadAdapter(
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
         var onAddReaction: ((Message) -> Unit)? = null,
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
+        var showEmojiDetails: ((messageUid: String) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {

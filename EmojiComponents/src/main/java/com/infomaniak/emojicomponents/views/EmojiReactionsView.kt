@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AbstractComposeView
@@ -53,6 +54,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 
     private var addReactionClickListener: (() -> Unit)? = null
     private var onEmojiClickListener: ((emoji: String) -> Unit)? = null
+    private var onLongPress: ((Offset) -> Unit)? = null
 
     private var chipCornerRadius: Float? = null
     private var addReactionIconRes: Int? = null
@@ -98,6 +100,7 @@ class EmojiReactionsView @JvmOverloads constructor(
                 isAddReactionEnabled = { isAddReactionEnabled },
                 colors = emojiReactionsColors,
                 onAddReactionClick = { addReactionClickListener?.invoke() },
+                onLongPress = onLongPress,
             )
         }
     }
@@ -112,6 +115,10 @@ class EmojiReactionsView @JvmOverloads constructor(
 
     fun setOnEmojiClickListener(listener: (emoji: String) -> Unit) {
         onEmojiClickListener = listener
+    }
+
+    fun setOnLongPressListener(listener: (Offset) -> Unit) {
+        onLongPress = listener
     }
 
     fun setEmojiReactions(emojiReactions: Map<String, ReactionState>) {

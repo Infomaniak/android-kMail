@@ -143,18 +143,6 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="aiEngineSettingFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="2208" />
-                            <option name="y" value="1792" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="attachMailboxFragment">
                     <value>
                       <LayoutPositions>
@@ -316,6 +304,30 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="2692" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="emojiDetailsBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-398" />
+                            <option name="y" value="231" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="emojiPickerBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
                             <option name="y" value="12" />
                           </Point>
                         </option>
@@ -666,11 +678,6 @@
                               </value>
                             </entry>
                             <entry key="action_settings_to_accountManagementSettings">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_settings_to_aiEngineSetting">
                               <value>
                                 <LayoutPositions />
                               </value>

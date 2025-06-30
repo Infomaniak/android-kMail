@@ -708,7 +708,17 @@
         android:id="@+id/emojiPickerBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog"
         android:label="EmojiPickerBottomSheetDialog"
-        tools:layout="@layout/fragment_emoji_picker" >
+        tools:layout="@layout/fragment_emoji_picker">
+        <argument
+            android:name="messageUid"
+            app:argType="string" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/emojiDetailsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.EmojiDetailsBottomSheetDialog"
+        android:label="EmojiDetailsBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_emoji_details">
         <argument
             android:name="messageUid"
             app:argType="string" />
