@@ -17,9 +17,18 @@
  */
 package com.infomaniak.mail.ui.main.thread.models
 
+import android.content.Context
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 
 sealed interface EmojiReactionAuthorUi {
-    data class Real(val correspondent: Correspondent) : EmojiReactionAuthorUi
-    data object FakeMe : EmojiReactionAuthorUi
+    fun getName(context: Context): String
+
+    data class Real(val correspondent: Correspondent) : EmojiReactionAuthorUi {
+        override fun getName(context: Context): String = correspondent.displayedName(context)
+    }
+
+    data object FakeMe : EmojiReactionAuthorUi {
+        override fun getName(context: Context): String = context.getString(R.string.contactMe)
+    }
 }

@@ -45,6 +45,7 @@ fun EmojiReactions(
     isAddReactionEnabled: () -> Boolean = { true },
     colors: EmojiReactionsColors = EmojiReactionsDefaults.colors(),
     shape: Shape = InputChipDefaults.shape,
+    onLongPress: ((String) -> Unit)? = null,
 ) {
     FlowRow(
         modifier,
@@ -59,6 +60,7 @@ fun EmojiReactions(
                 onClick = { onEmojiClicked(reaction.emoji) },
                 colors = colors.reactionChip,
                 shape = shape,
+                onLongPress = { onLongPress?.invoke(reaction.emoji) },
             )
         }
         AddReactionChip(

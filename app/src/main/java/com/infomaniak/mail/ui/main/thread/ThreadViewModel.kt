@@ -27,6 +27,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.emojicomponents.data.ReactionDetail
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -63,6 +64,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
+import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
@@ -546,6 +548,19 @@ class ThreadViewModel @Inject constructor(
         ?.first
         ?.firstOrNull { it is MessageUi && it.message.uid == messageUid } as? MessageUi)
         ?.emojiReactionsState
+
+    fun getLocalEmojiReactionsDetailsFor(messageUid: String): Map<String, List<ReactionDetail>>? {
+        val reactions = getLocalEmojiReactionsFor(messageUid) ?: return null
+
+        val reactionDetails: Map<String, List<ReactionDetail>> = buildMap {
+            reactions.keys.forEach { emoji ->
+                val reactionDetail = reactions[emoji]?.computeReactionDetail(emoji, appContext)
+                if (reactionDetail != null) put(emoji, reactionDetail)
+            }
+        }
+
+        return reactionDetails
+    }
 
     data class SubjectDataResult(
         val thread: Thread?,

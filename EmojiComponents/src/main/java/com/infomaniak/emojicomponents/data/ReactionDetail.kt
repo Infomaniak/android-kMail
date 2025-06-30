@@ -15,20 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread.models
+package com.infomaniak.emojicomponents.data
 
-import android.content.Context
-import com.infomaniak.emojicomponents.data.Reaction
-import com.infomaniak.emojicomponents.data.ReactionDetail
-
-data class EmojiReactionStateUi(
-    override val emoji: String,
-    val authors: List<EmojiReactionAuthorUi>,
-    override val hasReacted: Boolean,
-) : Reaction {
-    override val count: Int by authors::size
-
-    fun computeReactionDetail(emoji: String, context: Context): List<ReactionDetail> = authors.map {
-        ReactionDetail(name = it.getName(context), emoji = emoji)
-    }
-}
+data class ReactionDetail(val emoji: String, val name: String)
