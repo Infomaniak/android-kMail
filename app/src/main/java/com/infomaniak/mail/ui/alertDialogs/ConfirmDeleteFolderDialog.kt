@@ -58,7 +58,6 @@ class ConfirmDeleteFolderDialog @Inject constructor(
 
     fun show(folderId: String, folderName: String) = with(binding) {
         this@ConfirmDeleteFolderDialog.folderId = folderId
-        deleteFolderTitle.text = activityContext.getString(R.string.deleteFolderDialogTitle)
         deleteFolderDescription.text = activityContext.getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName)
         alertDialog.show()
     }
