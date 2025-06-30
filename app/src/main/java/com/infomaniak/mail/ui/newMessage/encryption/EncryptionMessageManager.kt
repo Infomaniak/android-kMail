@@ -91,7 +91,7 @@ class EncryptionMessageManager @Inject constructor(
         if (newMessageViewModel.isEncryptionActivated.value == true) {
             fragment.safelyNavigate(
                 NewMessageFragmentDirections.actionNewMessageFragmentToEncryptionActionsBottomSheetDialog(
-                    password = newMessageViewModel.encryptionPassword.value ?: ""
+                    password = newMessageViewModel.encryptionPassword.value ?: "",
                 )
             )
         } else {

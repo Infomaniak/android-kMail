@@ -80,6 +80,8 @@ class EncryptionActionsBottomSheet : ActionsBottomSheetDialog() {
         }
 
         protectWithPassword.apply {
+            // Password must be visible when there are users needing password but no password,
+            // or when a password is set even if there are no recipients
             isVisible = !isValidEncryption || navigationArgs.password.isNotBlank()
             val title = if (isValidEncryption) {
                 R.string.encryptedMessageUpdatePasswordButton
