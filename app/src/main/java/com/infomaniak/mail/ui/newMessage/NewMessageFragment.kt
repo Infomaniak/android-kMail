@@ -345,6 +345,7 @@ class NewMessageFragment : Fragment() {
             binding = binding,
             fragment = this@NewMessageFragment,
             externalsManager = externalsManager,
+            encryptionMessageManager = encryptionMessageManager,
         )
     }
 

@@ -98,7 +98,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
         linkEditor(editorAi, EditorAction.AI)
-        linkEditor(encryptionButton, EditorAction.ENCRYPTION)
+        linkEditor(encryptionLockButtonView.encryptionButton, EditorAction.ENCRYPTION)
 
         linkEditor(buttonBold, EditorAction.BOLD)
         linkEditor(buttonItalic, EditorAction.ITALIC)

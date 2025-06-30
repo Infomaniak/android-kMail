@@ -194,6 +194,13 @@
         <attr name="centerHorizontally" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="EncryptionLockButtonView">
+        <attr name="encryptionDisplayStyle" format="enum">
+            <enum name="chipIcon" value="0" />
+            <enum name="toolbarButton" value="1" />
+        </attr>
+    </declare-styleable>
+
     <declare-styleable name="PrimaryPalette">
         <attr name="primary0" format="color" />
         <attr name="primary10" format="color" />
