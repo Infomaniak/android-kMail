@@ -798,7 +798,15 @@ class NewMessageFragment : Fragment() {
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener { if (checkMailboxStorage()) navigateToScheduleSendBottomSheet() }
+        scheduleButton.setOnClickListener {
+            if (checkMailboxStorage()) {
+                if (newMessageViewModel.isEncryptionActivated.value == true) {
+                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
+                } else {
+                    navigateToScheduleSendBottomSheet()
+                }
+            }
+        }
 
         sendButton.setOnClickListener { if (checkMailboxStorage()) tryToSendEmail() }
     }

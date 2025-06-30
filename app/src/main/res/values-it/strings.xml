@@ -284,6 +284,7 @@
     <string name="encryptedMessagePasswordLabel">Condividere questa password in modo sicuro (kPaste, kChat, SMS…). Non sarà possibile copiarla una volta inviata.</string>
     <string name="encryptedMessageSnackbarEncryptionActivated">La crittografia è stata attivata</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">La crittografia è stata disattivata</string>
+    <string name="encryptedMessageSnackbarScheduledUnavailable">Email programmate non disponibili per i messaggi criptati</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifica della password</string>
     <string name="encryptedPasswordProtectionTitle">Protezione con password</string>
     <string name="encryptedProtectionAdDescription">Proteggete i vostri messaggi dall’accesso non autorizzato con la crittografia Infomaniak.</string>

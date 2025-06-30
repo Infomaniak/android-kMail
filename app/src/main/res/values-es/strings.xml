@@ -284,6 +284,7 @@
     <string name="encryptedMessagePasswordLabel">Comparta esta contraseña de forma segura (kPaste, kChat, SMS…). No podrás copiarla una vez enviada.</string>
     <string name="encryptedMessageSnackbarEncryptionActivated">Se ha activado el cifrado</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Se ha desactivado el cifrado</string>
+    <string name="encryptedMessageSnackbarScheduledUnavailable">Los correos electrónicos programados no están disponibles para los mensajes cifrados</string>
     <string name="encryptedMessageUpdatePasswordButton">Cambiar contraseña</string>
     <string name="encryptedPasswordProtectionTitle">Protección mediante contraseña</string>
     <string name="encryptedProtectionAdDescription">Proteja su mensaje contra el acceso no autorizado con el cifrado Infomaniak.</string>
