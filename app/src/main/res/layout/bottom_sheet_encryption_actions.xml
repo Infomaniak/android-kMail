@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2025 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.newMessage.encryption.EncryptionActionsBottomSheet">
+
+    <TextView
+        android:id="@+id/encryptionStatusTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="@dimen/marginStandardMedium"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/marginStandardMedium"
+        android:paddingVertical="@dimen/marginStandardSmall"
+        android:text="@string/encryptedStatePanelTitle"
+        app:drawableStartCompat="@drawable/ic_shield_lock" />
+
+    <TextView
+        android:id="@+id/encryptionStatusDescription"
+        style="@style/BodySmall.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/alternativeMargin"
+        android:paddingHorizontal="@dimen/marginStandardMedium"
+        tools:text="Le chiffrement n’est pas pris en charge par 1 utilisateur. Un mot de passe est requis pour finaliser l’envoi." />
+
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/protectWithPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_lock_password_field"
+        app:iconColor="@color/encryptionIconColor"
+        app:title="@string/encryptedMessageAddPasswordButton"
+        app:visibleDivider="false" />
+
+    <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+        android:id="@+id/disableEncryption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_lock_open"
+        app:iconColor="@color/encryptionIconColor"
+        app:title="@string/encryptedMessageDisableEncryptionButton" />
+
+</com.infomaniak.mail.views.BottomSheetScaffoldingView>
+

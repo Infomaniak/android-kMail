@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.newMessage.encryption
 
 import androidx.core.view.isVisible
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.FeatureFlag
@@ -25,6 +26,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.NewMessageFragment
+import com.infomaniak.mail.ui.newMessage.NewMessageFragmentDirections
 import com.infomaniak.mail.ui.newMessage.NewMessageManager
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
@@ -86,7 +88,15 @@ class EncryptionMessageManager @Inject constructor(
     }
 
     fun toggleEncryption() {
-        newMessageViewModel.toggleIsEncryptionActivated()
+        if (newMessageViewModel.isEncryptionActivated.value == true) {
+            fragment.safelyNavigate(
+                NewMessageFragmentDirections.actionNewMessageFragmentToEncryptionActionsBottomSheetDialog(
+                    password = newMessageViewModel.encryptionPassword.value ?: "",
+                )
+            )
+        } else {
+            newMessageViewModel.isEncryptionActivated.value = true
+        }
     }
 
     fun addUnencryptableRecipient(recipient: Recipient) {
