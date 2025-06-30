@@ -286,6 +286,7 @@
     <string name="encryptedMessagePasswordLabel">Partagez ce mot de passe de façon sécurisée (kPaste, kChat, SMS…). Vous ne pourrez plus le copier après l’envoi.</string>
     <string name="encryptedMessageSnackbarEncryptionActivated">Le chiffrement a bien été activé</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Le chiffrement a bien été désactivé</string>
+    <string name="encryptedMessageSnackbarScheduledUnavailable">L’envoi programmé n’est pas disponible pour les messages chiffrés</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifier le mot de passe</string>
     <string name="encryptedPasswordProtectionTitle">Protection par mot de passe</string>
     <string name="encryptedProtectionAdDescription">Protégez votre message contre tout accès non autorisé grâce au chiffrement Infomaniak.</string>
