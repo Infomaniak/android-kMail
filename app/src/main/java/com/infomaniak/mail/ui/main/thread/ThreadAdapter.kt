@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -42,7 +41,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
-import com.infomaniak.core.utils.FORMAT_DATE_SIMPLE
 import com.infomaniak.core.utils.FormatData
 import com.infomaniak.core.utils.format
 import com.infomaniak.core.utils.formatWithLocal
@@ -518,16 +516,8 @@ class ThreadAdapter(
     }
 
     private fun getDisplayablePasswordValidity(context: Context, passwordValidity: Date): String {
-        val displayableDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            passwordValidity.formatWithLocal(formatData = FormatData.DATE, formatStyle = FormatStyle.SHORT)
-        } else {
-            passwordValidity.format(FORMAT_DATE_SIMPLE)
-        }
-
-        return context.getString(
-            R.string.encryptedMessageHeaderPasswordExpiryDate,
-            displayableDate,
-        )
+        val displayableDate = passwordValidity.formatWithLocal(formatData = FormatData.DATE, formatStyle = FormatStyle.SHORT)
+        return context.getString(R.string.encryptedMessageHeaderPasswordExpiryDate, displayableDate)
     }
 
     private fun ItemMessageBinding.bindScheduled(message: Message) {
