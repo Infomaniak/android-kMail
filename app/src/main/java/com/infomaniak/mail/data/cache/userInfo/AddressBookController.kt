@@ -24,6 +24,7 @@ import com.infomaniak.mail.di.UserInfoRealm
 import com.infomaniak.mail.utils.extensions.update
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import javax.inject.Inject
 
@@ -33,10 +34,16 @@ class AddressBookController @Inject constructor(@UserInfoRealm private val userI
     private fun getDefaultAddressBookQuery(): RealmSingleQuery<AddressBook> {
         return userInfoRealm.query<AddressBook>("${AddressBook::isDefault.name} == true").first()
     }
+
+    private fun getAllAddressBookQuery(): RealmQuery<AddressBook> {
+        return userInfoRealm.query<AddressBook>()
+    }
     //endregion
 
     //region Get data
     fun getDefaultAddressBook() = getDefaultAddressBookQuery().find()!!
+
+    fun getAllAddressBook() = getAllAddressBookQuery().find()
     //endregion
 
     //region Edit data
