@@ -46,5 +46,7 @@ class AddressBook : RealmObject, ContactAutocompletable {
     override var contactId: String = id.toString()
     override var autocompletableName: String = name
 
+    override fun toString(): String = "{$name}"
+
     companion object
 }
