@@ -44,7 +44,7 @@ class UnencryptableRecipientsBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recipients = navigationArgs.unencryptableRecipients.toList()
+        val recipients = navigationArgs.unencryptableRecipients
         root.title = context.getString(R.string.encryptedRecipientRequiringPasswordTitle, recipients.count())
         attendeeRecyclerView.adapter = UnencryptableRecipientsAdapter(recipients)
 
