@@ -93,6 +93,14 @@
     <!-- Scheduled drafts -->
     <color name="scheduledColor">@color/coral_dark</color>
 
+    <!-- Encryption -->
+    <color name="encryptionBackgroundColor">@color/sovereignBlue900</color>
+    <color name="encryptionIconColor">@color/sovereignBlue400</color>
+    <color name="encryptionTextColor">@color/sovereignBlue200</color>
+    <color name="encryptionButtonColor">@color/sovereignBlue300</color>
+    <color name="encryptionOnButtonColor">@color/sovereignBlue950</color>
+    <color name="encryptionTextButtonColor">@color/sovereignBlue200</color>
+
     <!-- Thread -->
     <color name="folderTagTextColor">@color/shark</color>
     <color name="folderTagBackground">@color/orca</color>

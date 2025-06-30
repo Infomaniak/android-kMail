@@ -202,6 +202,10 @@
         <item name="rippleColor">@color/ripple_color_alert_view</item>
     </style>
 
+    <style name="TextButtonEncryptionAlert" parent="TextButtonAlerts">
+        <item name="android:textColor">@color/encryptionTextButtonColor</item>
+    </style>
+
     <style name="IconButtonSmall" parent="Widget.Material3.Button.TextButton">
         <item name="android:insetBottom">0dp</item>
         <item name="android:insetLeft">0dp</item>
@@ -602,5 +606,20 @@
     <style name="AvatarNameEmailPrimary" parent="BodyMedium" />
 
     <style name="AvatarNameEmailSecondary" parent="Body.Secondary" />
+
+    <style name="EncryptionMessageAlertView" parent="BasicMessageAlertView">
+        <item name="android:background">@color/encryptionBackgroundColor</item>
+        <item name="android:textColor">@color/encryptionTextColor</item>
+        <item name="tint">@color/encryptionIconColor</item>
+        <item name="materialButtonStyle">@style/TextButtonEncryptionAlert</item>
+    </style>
+
+    <style name="BasicMessageAlertView">
+        <item name="android:fontFamily">@font/suisseintl_regular</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+        <item name="materialButtonStyle">@style/TextButtonAlerts</item>
+        <item name="tint">@color/iconColor</item>
+    </style>
 
 </resources>

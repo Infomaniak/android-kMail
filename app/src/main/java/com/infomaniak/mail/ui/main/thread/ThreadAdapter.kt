@@ -41,7 +41,9 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.utils.FormatData
 import com.infomaniak.core.utils.format
+import com.infomaniak.core.utils.formatWithLocal
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
@@ -88,6 +90,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.format.FormatStyle
 import java.util.Date
 import com.google.android.material.R as RMaterial
 
@@ -245,7 +248,7 @@ class ThreadAdapter(
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
                     attachment = calendarAttachment,
                     hasAssociatedInfomaniakCalendarEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
-                    shouldStartExpanded = threadAdapterState.isCalendarEventExpandedMap[message.uid] ?: false,
+                    shouldStartExpanded = threadAdapterState.isCalendarEventExpandedMap[message.uid] == true,
                 )
             }
 
@@ -386,7 +389,7 @@ class ThreadAdapter(
             }
 
             userAvatar.loadAvatar(firstSender, message.bimi)
-            certifiedIcon.isVisible = message.bimi?.isCertified ?: false
+            certifiedIcon.isVisible = message.bimi?.isCertified == true
 
             shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
@@ -492,24 +495,29 @@ class ThreadAdapter(
             isVisible = true
 
             val isMe = message.from.all(Recipient::isMe)
-            val hasPassword = message.encryptionPassword?.isNotBlank() == true
+            val passwordValidity = message.encryptionPasswordValidity?.toDate()
 
-            val (descriptionRes, actionRes) = when {
-                isMe && hasPassword -> R.string.encryptedMessageDescription to R.string.buttonCopyPassword
-                isMe -> R.string.encryptedMessageTitle to null
-                else -> R.string.encryptedMessageReceiverTitle to null
+            val (description, actionRes) = if (isMe && passwordValidity != null) {
+                getDisplayablePasswordValidity(context, passwordValidity) to R.string.encryptedButtonSeeConcernedRecipients
+            } else {
+                context.getString(R.string.encryptedMessageHeader) to null
             }
 
-            setDescription(context.getString(descriptionRes))
+            setDescription(description)
             actionRes?.let {
                 setAction1Text(context.getString(it))
                 onAction1 {
-                    message.encryptionPassword?.let { password ->
-                        threadAdapterCallbacks?.onCopyEncryptionPassword?.invoke(password)
-                    }
+                    // TODO: See if we add a loader to fetch only the concerned recipient from api
+                    //  or if the back returned directly the good recipient
+                    threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(message.allRecipients)
                 }
             } ?: setActionsVisibility(isVisible = false)
         }
+    }
+
+    private fun getDisplayablePasswordValidity(context: Context, passwordValidity: Date): String {
+        val displayableDate = passwordValidity.formatWithLocal(formatData = FormatData.DATE, formatStyle = FormatStyle.SHORT)
+        return context.getString(R.string.encryptedMessageHeaderPasswordExpiryDate, displayableDate)
     }
 
     private fun ItemMessageBinding.bindScheduled(message: Message) {
@@ -794,7 +802,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
-        val isExpanded = threadAdapterState.isExpandedMap[message.uid] ?: false
+        val isExpanded = threadAdapterState.isExpandedMap[message.uid] == true
 
         if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded)
 
@@ -822,8 +830,8 @@ class ThreadAdapter(
         recipientOverlayedButton.isVisible = isExpanded
     }
 
-    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String = with(message) {
-        return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
+    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String {
+        return message.allRecipients.joinToString { it.displayedName(context) }
     }
 
     fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessagesUids.contains(messageUid)
@@ -939,7 +947,7 @@ class ThreadAdapter(
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
-        var onCopyEncryptionPassword: ((String) -> Unit)? = null,
+        var onEncryptionSeeConcernedRecipients: ((List<Recipient>) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {

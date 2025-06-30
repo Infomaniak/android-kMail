@@ -45,8 +45,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.getBackNavigationResult
+import com.infomaniak.lib.core.utils.isNightModeEnabled
+import com.infomaniak.lib.core.utils.setMargins
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
 import com.infomaniak.lib.richhtmleditor.StatusCommand.CREATE_LINK
 import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
@@ -81,6 +85,8 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.HtmlUtils.processCids
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.SentryDebug
@@ -239,7 +245,7 @@ class NewMessageFragment : Fragment() {
         with(encryptionMessageManager) {
             observeEncryptionFeatureFlagUpdates()
             observeEncryptionActivation()
-            observeUncryptableRecipients()
+            observeUnencryptableRecipients()
         }
 
         with(recipientFieldsManager) {
