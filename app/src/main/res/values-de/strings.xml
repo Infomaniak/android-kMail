@@ -284,6 +284,7 @@
     <string name="encryptedMessagePasswordLabel">Teilen Sie dieses Passwort auf sichere Weise mit anderen (kPaste, kChat, SMS…). Nach dem Versenden können Sie es nicht mehr kopieren.</string>
     <string name="encryptedMessageSnackbarEncryptionActivated">Die Verschlüsselung wurde aktiviert</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Die Verschlüsselung wurde deaktiviert</string>
+    <string name="encryptedMessageSnackbarScheduledUnavailable">Geplante E-Mails für verschlüsselte Nachrichten nicht verfügbar</string>
     <string name="encryptedMessageUpdatePasswordButton">Passwort ändern</string>
     <string name="encryptedPasswordProtectionTitle">Passwortschutz</string>
     <string name="encryptedProtectionAdDescription">Schützen Sie Ihre Nachricht mit der Infomaniak-Verschlüsselung vor unbefugtem Zugriff.</string>
