@@ -62,9 +62,9 @@ class EncryptionMessageManager @Inject constructor(
         }
     }
 
-    fun observeUncryptableRecipients() {
-        encryptionViewModel.uncryptableRecipients.observe(viewLifecycleOwner) { recipients ->
-            // TODO Replace this by the lock button with the number of uncryptable recipients
+    fun observeUnencryptableRecipients() {
+        encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipients ->
+            // TODO Replace this by the lock button with the number of unencryptable recipients
             if (recipients.isNotEmpty()) {
                 val recipientsCount = recipients.count()
                 snackbarManager.postValue(
