@@ -33,7 +33,7 @@ import kotlinx.serialization.UseSerializers
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED", "PARCELABLE_PRIMARY_CONSTRUCTOR_IS_EMPTY")
-class MergedContact() : RealmObject, Correspondent, Parcelable {
+class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parcelable {
     @PrimaryKey
     var id: Long? = null
         private set
@@ -63,6 +63,9 @@ class MergedContact() : RealmObject, Correspondent, Parcelable {
      *   - The user has sent a message first to this contact.
      */
     var other: Boolean = false
+
+    override var contactId : String = id.toString()
+    override var autocompletableName : String = name
 
     constructor(
         email: String,
@@ -112,4 +115,8 @@ class MergedContact() : RealmObject, Correspondent, Parcelable {
     }
 
     override fun toString(): String = "{$avatar, $email, $name}"
+
+    override fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable): Boolean {
+        return contactId == contactAutoCompletable.contactId
+    }
 }

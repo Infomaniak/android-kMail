@@ -30,7 +30,7 @@ import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
-open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
+open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable, ContactAutocompletable {
 
     override var email: String = ""
     override var name: String = ""
@@ -49,6 +49,12 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
+
+    override var contactedTimes: Int? = null
+    override var other: Boolean = false
+
+    override var contactId : String = name + email
+    override var autocompletableName : String = name
 
     fun initLocalValues(email: String? = null, name: String? = null): Recipient {
         email?.let { this.email = it }
@@ -93,5 +99,9 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
             parcel.writeString(email)
             parcel.writeString(name)
         }
+    }
+
+    override fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable): Boolean {
+        return contactId == contactAutoCompletable.contactId
     }
 }
