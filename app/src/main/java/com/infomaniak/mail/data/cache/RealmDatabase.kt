@@ -49,6 +49,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +58,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.lang.ref.WeakReference
+import kotlin.reflect.KClass
 
 @Suppress("ObjectPropertyName")
 object RealmDatabase {
@@ -192,7 +194,7 @@ object RealmDatabase {
     private object RealmConfig {
 
         //region Configurations versions
-        const val USER_INFO_SCHEMA_VERSION = 10L
+        const val USER_INFO_SCHEMA_VERSION = 13L
         const val MAILBOX_INFO_SCHEMA_VERSION = 9L
         const val MAILBOX_CONTENT_SCHEMA_VERSION = 32L
         //endregion
@@ -210,9 +212,9 @@ object RealmDatabase {
             AppSettings::class,
         )
         val userInfoSet = setOf(
-            AddressBook::class,
-            ContactGroup::class,
-            MergedContact::class,
+            AddressBook::class as KClass<out RealmObject>,
+            ContactGroup::class as KClass<out RealmObject>,
+            MergedContact::class as KClass<out RealmObject>,
         )
         val mailboxInfoSet = setOf(
             Mailbox::class,
