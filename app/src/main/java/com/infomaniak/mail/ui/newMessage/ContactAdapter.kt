@@ -27,14 +27,17 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes.contact
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.KNOWN_CONTACT
-import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.UNKNOWN_CONTACT
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.AutocompletableAdressBook
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.AutocompletableContact
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.AutocompletableGroup
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.UnknownContact
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.utils.extensions.standardize
 
@@ -61,37 +64,65 @@ class ContactAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < matchedContacts.count()) KNOWN_CONTACT.id else UNKNOWN_CONTACT.id
+        return if (position < matchedContacts.count()) {
+            if (matchedContacts[position].contact is MergedContact) {
+                AutocompletableContact.id
+            } else if (matchedContacts[position].contact is AddressBook) {
+                AutocompletableAdressBook.id
+            } else {
+                AutocompletableGroup.id
+            }
+        } else {
+            UnknownContact.id
+        }
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
-        if (getItemViewType(position) == KNOWN_CONTACT.id) bindContact(position) else bindAddNewUser()
+        if (getItemViewType(position) == AutocompletableContact.id) {
+            bindContact(position, matchedContacts[position].contact as MergedContact)
+        } else if (getItemViewType(position) == AutocompletableAdressBook.id) {
+            bindAdressBook(position, matchedContacts[position].contact as AddressBook)
+        } else if (getItemViewType(position) == AutocompletableGroup.id) {
+            bindGroup(position, matchedContacts[position].contact as ContactGroup)
+        } else {
+            bindAddNewUser()
+        }
     }
 
-    private fun ItemContactBinding.bindContact(position: Int) = with(matchedContacts[position]) {
+    private fun ItemContactBinding.bindContact(position: Int, contact: MergedContact) = with(matchedContacts[position]) {
         contactDetails.apply {
-            if (contact is MergedContact) {
-                setMergedContact(contact)
-            } else if (contact is AddressBook) {
-                setAddressBook(contact)
-            } else if (contact is ContactGroup) {
-                setContactGroup(contact)
-            }
+            setMergedContact(contact)
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
         }
 
-        val isAlreadyUsed = if (this.contact is MergedContact) {
-            usedEmails.contains(contact.email.standardize())
-        } else if (this.contact is AddressBook) {
-            usedEmails.contains(contact.name.standardize())
-        } else if (this.contact is ContactGroup) {
-            usedEmails.contains(contact.name.standardize())
-        } else {
-            usedEmails.contains("erro")
+        val isAlreadyUsed = usedEmails.contains(contact.email.standardize())
+
+        if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) } else root.setOnClickListener(null)
+        setVisuallyUsed(isAlreadyUsed)
+    }
+
+    private fun ItemContactBinding.bindAdressBook(position: Int, contact: AddressBook) = with(matchedContacts[position]) {
+        contactDetails.apply {
+            setAddressBook(contact)
+            highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
         }
-        if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact as MergedContact) }
-        greyedOutState.isVisible = isAlreadyUsed
-        root.isEnabled = !isAlreadyUsed
+
+        root.setOnClickListener { onContactClicked(contact as MergedContact) }
+
+    }
+
+    private fun ItemContactBinding.bindGroup(position: Int, contact: ContactGroup) = with(matchedContacts[position]) {
+        contactDetails.apply {
+            setContactGroup(contact)
+            highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
+        }
+
+        root.setOnClickListener { onContactClicked(contact as MergedContact) }
+
+    }
+    private fun ItemContactBinding.setVisuallyUsed(isVisuallyUsed: Boolean) {
+        greyedOutState.isVisible = isVisuallyUsed
+        root.isEnabled = !isVisuallyUsed
     }
 
     private fun ItemContactBinding.bindAddNewUser() {
@@ -110,7 +141,7 @@ class ContactAdapter(
 
     // I must rewrite this !!!
     // override fun getItemId(position: Int): Long {
-    //     return if (getItemViewType(position) == KNOWN_CONTACT.id) matchedContacts[position].contact.contactId.toLong() else 0L
+    //     return if (getItemViewType(position) == AutocompletableContact.id) matchedContacts[position].contact.contactId.toLong() else 0L
     // }
 
     fun addFirstAvailableItem() {
@@ -201,8 +232,10 @@ class ContactAdapter(
     }
 
     private enum class ContactType(val id: Int) {
-        KNOWN_CONTACT(0),
-        UNKNOWN_CONTACT(1),
+        AutocompletableContact(0),
+        AutocompletableGroup(1),
+        AutocompletableAdressBook(2),
+        UnknownContact(3),
     }
 
     private data class MatchedContact(
