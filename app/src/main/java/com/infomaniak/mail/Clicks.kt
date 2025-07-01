@@ -22,20 +22,20 @@ import androidx.core.view.isVisible
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-suspend fun View.awaitOneLongClick(
+suspend fun View.awaitOneClick(
     disableAfterClick: Boolean = true,
     hideAfterClick: Boolean = false,
 ) = try {
     if (disableAfterClick) isEnabled = true
     if (hideAfterClick) isVisible = true
     suspendCancellableCoroutine<Unit> { continuation ->
-        setOnLongClickListener {
-            setOnLongClickListener(null)
-            continuation.resume(Unit); true
+        setOnClickListener {
+            setOnClickListener(null)
+            continuation.resume(Unit)
         }
     }
 } finally {
-    setOnLongClickListener(null)
+    setOnClickListener(null)
     if (disableAfterClick) isEnabled = false
     if (hideAfterClick) isVisible = false
 }
