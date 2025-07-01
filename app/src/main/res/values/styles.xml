@@ -366,6 +366,11 @@
         <item name="chipBackgroundColor">@color/chip_contact_background_color</item>
     </style>
 
+    <style name="EncryptionEmailAddressChip" parent="ChipNoIcons">
+        <item name="android:textColor">@color/encryptionIconColor</item>
+        <item name="chipBackgroundColor">@color/encryptionBackgroundColor</item>
+    </style>
+
     <style name="SearchFilterChip" parent="ChipNoIcons">
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_width">wrap_content</item>
@@ -547,6 +552,15 @@
         <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
     </style>
 
+    <!-- Encryption -->
+
+    <style name="EncryptionMessageAlertView" parent="BasicMessageAlertView">
+        <item name="android:background">@color/encryptionBackgroundColor</item>
+        <item name="android:textColor">@color/encryptionTextColor</item>
+        <item name="tint">@color/encryptionIconColor</item>
+        <item name="materialButtonStyle">@style/TextButtonEncryptionAlert</item>
+    </style>
+
     <!-- Other -->
 
     <style name="ExtendedFloatingActionButtonStyle" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
@@ -606,13 +620,6 @@
     <style name="AvatarNameEmailPrimary" parent="BodyMedium" />
 
     <style name="AvatarNameEmailSecondary" parent="Body.Secondary" />
-
-    <style name="EncryptionMessageAlertView" parent="BasicMessageAlertView">
-        <item name="android:background">@color/encryptionBackgroundColor</item>
-        <item name="android:textColor">@color/encryptionTextColor</item>
-        <item name="tint">@color/encryptionIconColor</item>
-        <item name="materialButtonStyle">@style/TextButtonEncryptionAlert</item>
-    </style>
 
     <style name="BasicMessageAlertView">
         <item name="android:fontFamily">@font/suisseintl_regular</item>

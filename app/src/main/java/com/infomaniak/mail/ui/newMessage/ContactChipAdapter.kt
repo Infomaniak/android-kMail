@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -24,6 +25,8 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.ui.newMessage.RecipientFieldView.Companion.setChipStyle
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
 
 class ContactChipAdapter(
     val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,
@@ -31,6 +34,7 @@ class ContactChipAdapter(
 ) : Adapter<ContactChipAdapter.ContactChipViewHolder>() {
 
     private val recipients = mutableSetOf<Recipient>()
+    private var encryptionStatus = EncryptionStatus.Unencrypted
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactChipViewHolder {
         return ContactChipViewHolder(ChipContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -42,7 +46,7 @@ class ContactChipAdapter(
             text = recipient.getNameOrEmail()
             setOnClickListener { openContextMenu(recipient, root) }
             setOnBackspaceListener { onBackspace(recipient) }
-            setChipStyle(recipient.isDisplayedAsExternal)
+            setChipStyle(recipient.isDisplayedAsExternal, encryptionStatus)
         }
     }
 
@@ -62,6 +66,12 @@ class ContactChipAdapter(
         val index = recipients.indexOf(recipient)
         recipients.remove(recipient)
         notifyItemRemoved(index)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun toggleEncryption(encryptionStatus: EncryptionStatus) {
+        this.encryptionStatus = encryptionStatus
+        notifyDataSetChanged() // We need to recompute whole collection to set new style
     }
 
     class ContactChipViewHolder(val binding: ChipContactBinding) : ViewHolder(binding.root)
