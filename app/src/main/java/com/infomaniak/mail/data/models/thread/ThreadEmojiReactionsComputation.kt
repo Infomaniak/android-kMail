@@ -38,16 +38,17 @@ private fun MutableMap<String, MutableMap<String, EmojiReactionState>>.addReacti
     val emoji = message.emojiReaction ?: return
 
     val replyToIds = message.inReplyTo?.parseMessagesIds() ?: emptyList()
-    replyToIds.forEach { replyToId ->
+    for (replyToId in replyToIds) {
         val emojis = getOrPut(replyToId) { emptyEmojiReaction(emoji) }
 
         if (emojis.containsKey(emoji).not()) {
             emojis[emoji] = EmojiReactionState()
         }
 
+        val from = message.from.firstOrNull() ?: continue
         emojis[emoji]!!.apply {
-            count += 1
-            hasReacted = hasReacted || message.from.any { it.isMe() }
+            authors.add(from)
+            hasReacted = hasReacted || from.isMe()
         }
     }
 }
