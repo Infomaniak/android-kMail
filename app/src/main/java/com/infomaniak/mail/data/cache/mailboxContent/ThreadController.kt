@@ -50,9 +50,7 @@ import kotlinx.coroutines.flow.Flow
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
-class ThreadController @Inject constructor(
-    private val mailboxContentRealm: RealmDatabase.MailboxContent,
-) {
+class ThreadController @Inject constructor(private val mailboxContentRealm: RealmDatabase.MailboxContent) {
 
     //region Get data
     fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
