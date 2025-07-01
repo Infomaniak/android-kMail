@@ -119,22 +119,19 @@ class EncryptionLockButtonView @JvmOverloads constructor(
                 setIconResource(iconRes)
                 setIconTintResource(iconTintRes)
             }
-            pastille.isVisible = shouldDisplayPastille
             updateUnencryptableCountUi()
+            unencryptableGroup.isVisible = shouldDisplayPastille
         }
     }
 
     private fun updateUnencryptableCountUi() {
         val count = when (val count = unencryptableRecipientsCount) {
-            null -> null
+            null, 0 -> null
             in 1..9 -> count.toString()
             else -> "9+"
         }
 
-        binding.unencryptedRecipientText.apply {
-            isVisible = count != null
-            text = count
-        }
+        binding.unencryptedRecipientText.text = count
     }
 
     enum class EncryptionStatus {

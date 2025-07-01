@@ -53,13 +53,19 @@
             android:layout_gravity="top|center"
             android:textColor="@color/onColorfulBackground"
             android:textSize="8sp"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/pastille"
             app:layout_constraintEnd_toEndOf="@id/pastille"
             app:layout_constraintStart_toStartOf="@id/pastille"
             app:layout_constraintTop_toTopOf="@id/pastille"
             tools:ignore="RtlHardcoded,SmallSp"
-            tools:text="9+"
+            tools:text="9+" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/unencryptableGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="pastille,unencryptedRecipientText"
             tools:visibility="visible" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
