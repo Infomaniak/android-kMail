@@ -95,13 +95,15 @@ class EncryptionMessageManager @Inject constructor(
             }
 
             val encryptionStatus = when {
-                isEncrypted && isEncryptionValid -> {
+                isEncrypted && (isEncryptionValid || recipients.isEmpty()) -> {
                     // The encryption is valid : either all auto encryptable recipients, or some unencryptable but with a password
                     navigateToDiscoveryBottomSheetIfFirstTime()
                     EncryptionStatus.Encrypted
                 }
-                isEncrypted && currentUnencryptableRecipients == null -> EncryptionStatus.Loading // First call have not ended yet
-                isEncrypted -> EncryptionStatus.PartiallyEncrypted // Encryption activated but not valid
+                isEncrypted && currentUnencryptableRecipients?.isNotEmpty() == true -> {
+                    EncryptionStatus.PartiallyEncrypted // Encryption activated but not valid
+                }
+                isEncrypted -> EncryptionStatus.Loading // First call have not ended yet
                 else -> {
                     // User has disabled encryption
                     encryptionViewModel.password.value = ""
