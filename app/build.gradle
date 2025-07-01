@@ -94,6 +94,7 @@ dependencies {
     implementation project(':Core:Coil')
     implementation project(':Core:Compose:MaterialThemeFromXml')
     implementation project(':Core:CrossAppLogin')
+    implementation project(':Core:CrossAppLoginUI')
     implementation project(':Core:FragmentNavigation')
     implementation project(':Core:Legacy')
     implementation project(':Core:Legacy:AppLock')
