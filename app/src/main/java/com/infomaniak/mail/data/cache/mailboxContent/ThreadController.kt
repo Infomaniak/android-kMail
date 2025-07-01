@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
+import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -134,7 +135,7 @@ class ThreadController @Inject constructor(
         private const val TAG = "ThreadController"
 
         /**
-         * Keep the snooze state condition of [Snoozable.isSnoozed] the same as
+         * Keep the snooze state condition of [isSnoozed] the same as
          * the condition used in [ThreadController.Companion.isSnoozedState].
          *
          * Checking for [Snoozable.snoozeEndDate] and [Snoozable.snoozeUuid] on top of [Snoozable.snoozeState] mimics the
