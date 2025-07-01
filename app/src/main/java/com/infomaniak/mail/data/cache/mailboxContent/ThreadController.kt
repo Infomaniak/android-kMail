@@ -30,9 +30,7 @@ import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.ErrorCode
-import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -48,15 +46,12 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmScalarQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 class ThreadController @Inject constructor(
-    private val searchUtils: SearchUtils,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     //region Get data
