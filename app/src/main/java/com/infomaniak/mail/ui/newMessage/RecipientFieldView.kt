@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.PopupWindow
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -45,6 +46,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.extensions.isEmail
@@ -283,7 +285,7 @@ class RecipientFieldView @JvmOverloads constructor(
             isGone = isTextInputAccessible
             val recipient = contactChipAdapter.getRecipients().firstOrNull()
             text = recipient?.getNameOrEmail() ?: ""
-            setChipStyle(recipient?.isDisplayedAsExternal == true)
+            setChipStyle(recipient?.isDisplayedAsExternal == true, EncryptionStatus.Unencrypted) // TODO fix this encryptionStatus
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
@@ -292,6 +294,13 @@ class RecipientFieldView @JvmOverloads constructor(
 
         transparentButton.isGone = isTextInputAccessible
         textInputLayout.isVisible = isTextInputAccessible
+    }
+
+    fun applyEncryptionStyle(encryptionStatus: EncryptionStatus) = with(binding) {
+        val isExternal = contactChipAdapter.getRecipients().firstOrNull()?.isDisplayedAsExternal == true
+        singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus)
+        plusChip.setChipStyle(displayAsExternal = false, encryptionStatus)
+        contactChipAdapter.toggleEncryption(encryptionStatus)
     }
 
     fun updateContacts(allContacts: List<MergedContact>) {
@@ -440,17 +449,56 @@ class RecipientFieldView @JvmOverloads constructor(
         private const val EXTERNAL_CHIP_STROKE_WIDTH = 1
         private const val NO_STROKE = 0.0f
 
-        fun Chip.setChipStyle(displayAsExternal: Boolean) {
-            if (displayAsExternal) {
-                chipBackgroundColor = context.getColorStateList(R.color.chip_contact_background_color_external)
-                setTextColor(context.getColorStateList(R.color.chip_contact_text_color_external))
-                chipStrokeColor = ColorStateList.valueOf(context.getColor(R.color.externalTagBackground))
-                chipStrokeWidth = EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
-            } else {
-                chipBackgroundColor = context.getColorStateList(R.color.chip_contact_background_color)
-                setTextColor(context.getColorStateList(R.color.chip_contact_text_color))
-                chipStrokeColor = null
-                chipStrokeWidth = NO_STROKE
+        fun Chip.setChipStyle(displayAsExternal: Boolean, encryptionStatus: EncryptionStatus) = when {
+            displayAsExternal -> ChipStyle(
+                backgroundColor = R.color.chip_contact_background_color_external,
+                textColor = R.color.chip_contact_text_color_external,
+                strokeColor = R.color.externalTagBackground,
+            )
+            encryptionStatus == EncryptionStatus.Encrypted -> {
+                setIconStartPaddingResource(com.infomaniak.lib.core.R.dimen.marginStandardVerySmall)
+                ChipStyle(
+                    backgroundColor = R.color.encryptionBackgroundColor,
+                    textColor = R.color.encryptionTextColor,
+                    encryptionIcon = R.drawable.ic_lock_filled,
+                    encryptionIconTint = R.color.encryptionIconColor,
+                )
+            }
+            encryptionStatus == EncryptionStatus.PartiallyEncrypted -> ChipStyle(
+                backgroundColor = R.color.chip_contact_background_color_external,
+                textColor = R.color.chip_contact_text_color_external,
+                encryptionIcon = R.drawable.ic_lock_open_filled_pastille,
+            )
+            else -> ChipStyle(
+                backgroundColor = R.color.chip_contact_background_color,
+                textColor = R.color.chip_contact_text_color,
+            )
+        }.applyTo(this)
+    }
+
+    private data class ChipStyle(
+        val backgroundColor: Int,
+        val textColor: Int,
+        val strokeColor: Int? = null,
+        val encryptionIcon: Int? = null,
+        val encryptionIconTint: Int? = null,
+    ) {
+
+        fun applyTo(chip: Chip) {
+            val (color, width) = strokeColor?.let {
+                ColorStateList.valueOf(chip.context.getColor(it)) to EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
+            } ?: (null to NO_STROKE)
+
+            chip.apply {
+                chipBackgroundColor = context.getColorStateList(backgroundColor)
+                setTextColor(context.getColorStateList(textColor))
+
+                chipStrokeWidth = width
+                chipStrokeColor = color
+
+                chipIcon = encryptionIcon?.let { ResourcesCompat.getDrawable(resources, encryptionIcon, null) }
+                encryptionIconTint?.let(::setChipIconTintResource)
+                setChipIconSizeResource(R.dimen.mediumIconSize)
             }
         }
     }

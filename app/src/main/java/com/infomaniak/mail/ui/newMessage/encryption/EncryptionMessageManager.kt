@@ -81,6 +81,7 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
+            applyEncryptionStyleOnContactChip(if (isEncrypted) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted)
             val isEncryptionValid = checkEncryptionCanBeSend()
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
 
@@ -224,5 +225,11 @@ class EncryptionMessageManager @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun applyEncryptionStyleOnContactChip(encryptionStatus: EncryptionStatus) {
+        binding.toField.applyEncryptionStyle(encryptionStatus)
+        binding.ccField.applyEncryptionStyle(encryptionStatus)
+        binding.bccField.applyEncryptionStyle(encryptionStatus)
     }
 }
