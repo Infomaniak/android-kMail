@@ -100,6 +100,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private fun ViewAvatarNameEmailBinding.setNameAndSubName(
         addressBook: AddressBook,
     ) {
+        userAvatar.loadNotUserAvatar()
         userName.text = "Carnet d'adresses : ${addressBook.name}"
         userEmail.text = "Organisation : ${addressBook.name}"
     }
@@ -107,6 +108,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private fun ViewAvatarNameEmailBinding.setNameAndSubName(
         contactGroup: ContactGroup,
     ) {
+        userAvatar.loadNotUserAvatar()
         userName.text = "Groupe : ${contactGroup.name}"
         userEmail.text = "Carnet d'adresses  : ..."
     }
