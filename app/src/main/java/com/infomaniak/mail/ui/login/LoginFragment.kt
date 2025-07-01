@@ -100,26 +100,26 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        //TODO: For cross app login implementation, look at:
-        // Pre-heat (i.e. `DynamicLazyMap`) getting app/device integrity attestation token if we know we might need it,
-        // that is, we have no accounts yet, and there are other friend apps.
+        // TODO: For cross app login implementation, look at:
+        //  Pre-heat (i.e. `DynamicLazyMap`) getting app/device integrity attestation token if we know we might need it,
+        //  that is, we have no accounts yet, and there are other friend apps.
         //
-        //TODO:
-        // Pre-heat getting external accounts.
-        // Pre-heat checking tokens (by retrieving the profile)
-        // If there are external accounts with at least a valid token, pre-heat app/device integrity attestation token
-        // Pre-heat getting images
+        // TODO:
+        //  Pre-heat getting external accounts.
+        //  Pre-heat checking tokens (by retrieving the profile)
+        //  If there are external accounts with at least a valid token, pre-heat app/device integrity attestation token
+        //  Pre-heat getting images
         //
-        //TODO:
-        // Display all retrieved accounts, and gray out the ones with definitely stale tokens.
-        //TODO:
-        // On "Continue with this/these account(s)", in parallel:
-        // a. Attempt syncing shared app id now.
-        // b. With auto retries on network issues, attempt tokens derivation for selected accounts.
+        // TODO:
+        //  Display all retrieved accounts, and gray out the ones with definitely stale tokens.
+        // TODO:
+        //  On "Continue with this/these account(s)", in parallel:
+        //  a. Attempt syncing shared app id now.
+        //  b. With auto retries on network issues, attempt tokens derivation for selected accounts.
 
-        //TODO: See those files:
-        // LoginUtils.kt, LoginActivity.kt, this one (LoginFragment.kt), and NewAccountFragment.kt
-        // IntroPagerAdapter.kt and IntroFragment.kt
+        // TODO: See those files:
+        //  LoginUtils.kt, LoginActivity.kt, this one (LoginFragment.kt), and NewAccountFragment.kt
+        //  IntroPagerAdapter.kt and IntroFragment.kt
 
         applyWindowInsetsListener(shouldConsume = false) { root, insets ->
             root.applySideAndBottomSystemInsets(insets)
