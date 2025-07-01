@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import androidx.annotation.CallSuper
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import io.realm.kotlin.types.RealmInstant
 
 interface Snoozable {
@@ -37,7 +38,7 @@ interface Snoozable {
 }
 
 /**
- * Keep the snooze state condition of [Snoozable.isSnoozed] the same as
+ * Keep the snooze state condition of [isSnoozed] the same as
  * the condition used in [ThreadController.Companion.isSnoozedState].
  */
 fun Snoozable.isSnoozed() = snoozeState == SnoozeState.Snoozed && snoozeEndDate != null && snoozeUuid != null
