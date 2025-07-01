@@ -38,7 +38,11 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
-import com.infomaniak.mail.data.models.message.*
+import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.EmojiReactionState
+import com.infomaniak.mail.data.models.message.Headers
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -190,7 +194,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 4L
         const val MAILBOX_INFO_SCHEMA_VERSION = 9L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 33L // Emoji reactions
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 34L // Emoji reactions
         //endregion
 
         //region Configurations names

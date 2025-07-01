@@ -17,14 +17,9 @@
  */
 package com.infomaniak.mail.ui.main.thread.models
 
-import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
+import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.mail.data.models.correspondent.Correspondent
 
-data class MessageUi(
-    val message: Message,
-    val emojiReactionsState: Map<String, EmojiReactionStateUi>,
-    val isReactionsFeatureAvailable: Boolean,
-) {
-    fun hasEmojis(): Boolean = emojiReactionsState.isNotEmpty()
-    fun canBeReactedTo(): Boolean = message.isValidReactionTarget && emojiReactionsState.hasAvailableReactionSlot()
+data class EmojiReactionStateUi(val authors: List<Correspondent>, override val hasReacted: Boolean) : ReactionState {
+    override val count: Int by authors::size
 }
