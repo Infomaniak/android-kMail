@@ -53,6 +53,7 @@
     <string name="addUnknownRecipientAlreadyUsed">El correo electrónico ya está utilizado</string>
     <string name="addUnknownRecipientInvalidEmail">El correo electrónico no es válido</string>
     <string name="addUnknownRecipientTitle">Añadir un destinatario</string>
+    <string name="addressBookTitle">Libreta de direcciones: %s</string>
     <string name="aiButtonInsert">Inserte</string>
     <string name="aiButtonRefine">Afinar</string>
     <string name="aiButtonRetry">Reintentar</string>
@@ -362,6 +363,7 @@
     </plurals>
     <string name="fromTitle">De:</string>
     <string name="googlePlayServicesAreRequired">Se requieren los servicios de Google Play</string>
+    <string name="groupContactsTitle">Grupo: %s</string>
     <string name="inboxFolder">Bandeja de entrada</string>
     <string name="lastSelectedSchedule">Último horario seleccionado</string>
     <string name="laterThisMorning">Más tarde esta mañana</string>
@@ -447,6 +449,7 @@
     <string name="onBoardingTitle2">Ahorre tiempo con las acciones de deslizamiento</string>
     <string name="onBoardingTitle3">Pulse un mensaje durante unos segundos para seleccionar varios mensajes</string>
     <string name="onBoardingTitle4">¡Póngase en marcha!</string>
+    <string name="organizationName">Organización: %s</string>
     <string name="pendingMessagesFolder">Mensajes pendientes</string>
     <string name="pickerNoSelection">Sin selección</string>
     <string name="popupDetachMailboxDescription">¿Estás seguro de que quieres separar la dirección %s?</string>
