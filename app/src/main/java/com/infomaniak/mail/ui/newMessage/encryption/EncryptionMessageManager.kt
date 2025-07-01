@@ -81,27 +81,29 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
-            newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = checkEncryptionCanBeSend())
+            val isEncryptionValid = checkEncryptionCanBeSend()
+            newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
 
             val recipients = newMessageViewModel.allRecipients
 
-            val currentUnencryptableRecipients = encryptionViewModel.unencryptableRecipients.value ?: emptySet()
+            val currentUnencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
             val unknownEncryptionStatusRecipients = recipients.filter {
-                currentUnencryptableRecipients.contains(it.email) != true
+                currentUnencryptableRecipients?.contains(it.email) != true
             }
             if (isEncrypted && unknownEncryptionStatusRecipients.isNotEmpty()) {
                 encryptionViewModel.checkIfEmailsCanBeEncrypted(unknownEncryptionStatusRecipients.map(Recipient::email))
             }
 
-            val isPartialEncryption = isEncrypted && currentUnencryptableRecipients.isNotEmpty()
             val encryptionStatus = when {
-                isPartialEncryption && encryptionViewModel.password.value.isNullOrBlank() -> EncryptionStatus.PartiallyEncrypted
-                isEncrypted -> {
+                isEncrypted && isEncryptionValid -> {
+                    // The encryption is valid : either all auto encryptable recipients, or some unencryptable but with a password
                     navigateToDiscoveryBottomSheetIfFirstTime()
-                    snackbarManager.postValue(fragment.getString(R.string.encryptedMessageSnackbarEncryptionActivated))
                     EncryptionStatus.Encrypted
                 }
+                isEncrypted && currentUnencryptableRecipients == null -> EncryptionStatus.Loading // First call have not ended yet
+                isEncrypted -> EncryptionStatus.PartiallyEncrypted // Encryption activated but not valid
                 else -> {
+                    // User has disabled encryption
                     encryptionViewModel.password.value = ""
                     EncryptionStatus.Unencrypted
                 }
