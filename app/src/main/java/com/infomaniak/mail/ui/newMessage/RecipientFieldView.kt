@@ -46,6 +46,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
@@ -119,6 +120,8 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onCopyContactAddress: ((Recipient) -> Unit)? = null
     private var gotFocus: (() -> Unit)? = null
     private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)? = null
+    private var getMergedContactFromContactGroup: ((ContactGroup) -> List<MergedContact>)? = null
+    private var getGroupFromAdressBook: ((AddressBook) -> List<ContactGroup>)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -158,7 +161,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
             contactAdapter = ContactAdapter(
                 usedEmails = mutableSetOf(),
-                onContactClicked = { addRecipient(it.email, it.name) },
+                onContactClicked = { contactCliked(it) },
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
                     addRecipient(email = input, name = input)
@@ -363,6 +366,26 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled?.invoke(isAutoCompletionOpened)
     }
 
+    private fun contactCliked(contact: ContactAutocompletable) {
+        var listOfContact: List<MergedContact> = emptyList()
+        if (contact is MergedContact) {
+            listOfContact = listOf(contact)
+        } else if (contact is ContactGroup) {
+            listOfContact = getMergedContactFromContactGroup?.invoke(contact)!!
+        } else if (contact is AddressBook) {
+            val listOfGroup = getGroupFromAdressBook?.invoke(contact)
+            if (listOfGroup != null) {
+                for (group in listOfGroup) {
+                    listOfContact = getMergedContactFromContactGroup?.invoke(group)!!
+                }
+
+            }
+        }
+        for (mergedContact in listOfContact) {
+            addRecipient(mergedContact.email, mergedContact.name)
+        }
+    }
+
     private fun addRecipient(email: String, name: String) {
 
         if (!email.isEmail()) {
@@ -415,7 +438,9 @@ class RecipientFieldView @JvmOverloads constructor(
         onCopyContactAddressCallback: ((Recipient) -> Unit),
         gotFocusCallback: (() -> Unit),
         onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
-        getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?
+        getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?,
+        getMergedContactFromContactGroupCallback: (ContactGroup) -> List<MergedContact>,
+        getGroupFromAdressBookCallback: (AddressBook) -> List<ContactGroup>
     ) {
 
         val margin = context.resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
@@ -431,6 +456,8 @@ class RecipientFieldView @JvmOverloads constructor(
         onContactRemoved = onContactRemovedCallback
         onCopyContactAddress = onCopyContactAddressCallback
         getAddressBookWithGroup = getAddressBookWithGroupCallback
+        getMergedContactFromContactGroup = getMergedContactFromContactGroupCallback
+        getGroupFromAdressBook = getGroupFromAdressBookCallback
 
         gotFocus = gotFocusCallback
     }

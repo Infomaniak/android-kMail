@@ -43,7 +43,7 @@ import com.infomaniak.mail.utils.extensions.standardize
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
     private val usedEmails: MutableSet<String>,
-    private val onContactClicked: (item: MergedContact) -> Unit,
+    private val onContactClicked: (item: ContactAutocompletable) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
     private val snackbarManager: SnackbarManager,
     private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)?
@@ -111,7 +111,7 @@ class ContactAdapter(
                 prefixSizeOfEmail = getLengthStringTitle(context.getString(R.string.organizationName)) ?: 0
             )
         }
-        root.setOnClickListener { onContactClicked(contact as MergedContact) }
+        root.setOnClickListener { onContactClicked(contact) }
     }
 
     private fun ItemContactBinding.bindGroup(position: Int, contact: ContactGroup) = with(matchedContacts[position]) {
@@ -125,7 +125,7 @@ class ContactAdapter(
                 prefixSizeOfEmail = getLengthStringTitle(context.getString(R.string.addressBookTitle)) ?: 0
             )
         }
-        root.setOnClickListener { onContactClicked(contact as MergedContact) }
+        root.setOnClickListener { onContactClicked(contact) }
     }
 
     fun getLengthStringTitle(title: String): Int? {

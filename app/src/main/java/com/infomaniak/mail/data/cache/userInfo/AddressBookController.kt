@@ -44,6 +44,10 @@ class AddressBookController @Inject constructor(@UserInfoRealm private val userI
         val myContactGroup = userInfoRealm.query<ContactGroup>("id == $0", contactGroup.id).first().find()!!
         return userInfoRealm.query<AddressBook>("ANY ${AddressBook::contactGroups.name} == $0", myContactGroup).first()
     }
+
+    private fun getGroupFromAdressBookQuery(addressBook: AddressBook): RealmSingleQuery<AddressBook> {
+        return userInfoRealm.query<AddressBook>("${AddressBook::id.name} == $0", addressBook.id).first()
+    }
     //endregion
 
     //region Get data
@@ -52,6 +56,9 @@ class AddressBookController @Inject constructor(@UserInfoRealm private val userI
     fun getAllAddressBook() = getAllAddressBookQuery().find()
 
     fun getAddressBookWithGroup(contactGroup: ContactGroup) = getAddressBookWithGroupQuery(contactGroup).find()
+
+    fun getGroupFromAdressBook(addressBook: AddressBook) =
+        getGroupFromAdressBookQuery(addressBook).find()?.contactGroups?.map { it }!!
     //endregion
 
     //region Edit data
