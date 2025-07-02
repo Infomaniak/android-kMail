@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.userInfo
 
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.di.UserInfoRealm
 import com.infomaniak.mail.utils.extensions.update
@@ -39,11 +40,21 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
             .sort(MergedContact::name.name)
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
     }
+
+    private fun getMergedContactFromContactGroupQuery(contact: ContactGroup): RealmQuery<MergedContact> {
+        return userInfoRealm.query<MergedContact>("${MergedContact::remoteContactGroupIds.name} == $0", contact.id)
+            .sort(MergedContact::name.name)
+            .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
+    }
     //endregion
 
     //region Get data
     fun getSortedMergedContacts(): RealmResults<MergedContact> {
         return getMergedContactsQuery().find()
+    }
+
+    fun getMergedContactFromContactGroup(contact: ContactGroup): List<MergedContact> {
+        return getMergedContactFromContactGroupQuery(contact).find().map { it }
     }
 
     fun getMergedContactsAsync(): Flow<ResultsChange<MergedContact>> {
