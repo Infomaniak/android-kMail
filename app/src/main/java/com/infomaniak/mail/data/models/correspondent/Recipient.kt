@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
+import android.os.Parcelable
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.extensions.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -29,7 +30,7 @@ import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
-open class Recipient : EmbeddedRealmObject, Correspondent {
+open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
 
     override var email: String = ""
     override var name: String = ""
@@ -48,9 +49,6 @@ open class Recipient : EmbeddedRealmObject, Correspondent {
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
-
-    override var contactedTimes: Int? = null
-    override var other: Boolean = false
 
     fun initLocalValues(email: String? = null, name: String? = null): Recipient {
 

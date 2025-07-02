@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models.correspondent
 
+import android.os.Parcelable
 import com.infomaniak.mail.data.api.ApiRoutes
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
@@ -25,7 +26,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED", "PARCELABLE_PRIMARY_CONSTRUCTOR_IS_EMPTY")
-class MergedContact() : RealmObject, Correspondent {
+class MergedContact() : RealmObject, Correspondent, Parcelable {
     @PrimaryKey
     var id: Long? = null
         private set
@@ -41,8 +42,16 @@ class MergedContact() : RealmObject, Correspondent {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    override var contactedTimes: Int? = null
-    override var other: Boolean = false
+    var contactedTimes: Int? = null
+
+    /**
+     * This value represents a contact that is not in the user's contact list,
+     * but with whom the user has communicated in the past. This communication
+     * could be either:
+     *   - The user has replied to a message from this contact.
+     *   - The user has sent a message first to this contact.
+     */
+    var other: Boolean = false
 
     constructor(
         email: String,

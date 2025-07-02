@@ -18,29 +18,17 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.content.Context
-import android.os.Parcelable
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.sentry.Sentry
 
-interface Correspondent : Parcelable {
-    var email: String
-    var name: String
+interface Correspondent {
+    val email: String
+    val name: String
 
     val initials: String
-
-    var contactedTimes: Int?
-
-    /**
-     * This value represents a contact that is not in the user's contact list,
-     * but with whom the user has communicated in the past. This communication
-     * could be either:
-     *   - The user has replied to a message from this contact.
-     *   - The user has sent a message first to this contact.
-     */
-    var other: Boolean
 
     fun isMe(): Boolean {
         val userEmail = AccountUtils.currentMailboxEmail?.lowercase()

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.calendar
 
 import android.os.Parcel
+import android.os.Parcelable
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.infomaniak.mail.R
@@ -31,7 +32,7 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-class Attendee() : EmbeddedRealmObject, Correspondent {
+class Attendee() : EmbeddedRealmObject, Correspondent, Parcelable {
 
     //region Remote data
     @SerialName("address")
@@ -41,9 +42,6 @@ class Attendee() : EmbeddedRealmObject, Correspondent {
     var isOrganizer: Boolean = false
     @SerialName("state")
     private var _state: String = ""
-
-    override var contactedTimes: Int? = null
-    override var other: Boolean = false
     //endregion
 
     val state get() = AttendanceState.entries.firstOrNull { it.apiValue == _state } ?: AttendanceState.NEEDS_ACTION
