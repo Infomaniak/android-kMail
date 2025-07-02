@@ -44,3 +44,10 @@ interface Snoozable {
 fun Snoozable.isSnoozed() = snoozeState == SnoozeState.Snoozed && snoozeEndDate != null && snoozeUuid != null
 
 fun Snoozable.isUnsnoozed() = snoozeState == SnoozeState.Unsnoozed && snoozeEndDate != null
+
+fun Snoozable.isSnoozeMalformed(): Boolean {
+    fun Snoozable.isSnoozedMalformed() = snoozeState == SnoozeState.Snoozed && (snoozeEndDate == null || snoozeUuid == null)
+    fun Snoozable.isUnsnoozedMalformed() = snoozeState == SnoozeState.Unsnoozed && snoozeEndDate == null
+
+    return isSnoozedMalformed() || isUnsnoozedMalformed()
+}
