@@ -180,17 +180,6 @@ class LoginFragment : Fragment() {
 
         nextButton.setOnClickListener { introViewpager.currentItem += 1 }
 
-        connectButton.apply {
-            initProgress(viewLifecycleOwner, getCurrentOnPrimary())
-            setOnClickListener {
-                updateTextColor(getCurrentOnPrimary())
-                isEnabled = false
-                signInButton.isEnabled = false
-                connectButtonProgressTimer.start()
-                openLoginWebView()
-            }
-        }
-
         signInButton.setOnClickListener {
             safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
         }
@@ -267,12 +256,19 @@ class LoginFragment : Fragment() {
 
             introViewModel.initDerivedTokenGenerator(coroutineScope = this)
 
-            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
-            if (accounts.isNotEmpty()) {
-                introViewModel.crossLoginAccounts.postValue(accounts)
+            binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
 
-                repeatWhileActive {
-                    binding.connectButton.awaitOneClick()
+            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
+            if (accounts.isNotEmpty()) introViewModel.crossLoginAccounts.value = accounts
+
+            repeatWhileActive {
+                binding.connectButton.awaitOneClick()
+                connectButtonProgressTimer.start()
+                if (accounts.isEmpty()) {
+                    binding.connectButton.updateTextColor(getCurrentOnPrimary())
+                    binding.signInButton.isEnabled = false
+                    openLoginWebView()
+                } else {
                     handleCrossAppLogin()
                 }
             }
