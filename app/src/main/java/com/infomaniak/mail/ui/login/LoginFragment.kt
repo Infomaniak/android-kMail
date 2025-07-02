@@ -200,6 +200,7 @@ class LoginFragment : Fragment() {
 
         handleOnBackPressed()
 
+        observePrimaryColor()
         observeCrossLoginAccounts()
         setCrossLoginClickListener()
         initCrossLogin()
@@ -213,6 +214,12 @@ class LoginFragment : Fragment() {
     private fun handleOnBackPressed() = with(requireActivity()) {
         onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             if (getViewPagerCurrentItem() == 0) finish() else goBackAPage()
+        }
+    }
+
+    private fun observePrimaryColor() {
+        introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, _) ->
+            binding.crossLoginSelection.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
         }
     }
 
