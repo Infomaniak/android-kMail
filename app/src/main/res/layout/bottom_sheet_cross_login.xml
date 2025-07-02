@@ -26,6 +26,11 @@
     <com.infomaniak.core.crossloginui.views.CrossLoginListAccountsView
         android:id="@+id/crossLoginBottomSheet"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:crossLoginBackgroundColor="@color/background"
+        app:crossLoginButtonStrokeColor="@color/commonColor2"
+        app:crossLoginDescriptionColor="@color/secondaryTextColor"
+        app:crossLoginPrimaryColor="@color/primary"
+        app:crossLoginTitleColor="@color/primaryTextColor" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>
