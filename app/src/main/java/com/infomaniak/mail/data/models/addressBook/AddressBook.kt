@@ -38,6 +38,8 @@ class AddressBook : RealmObject, ContactAutocompletable {
     var name: String = ""
     @SerialName("default")
     var isDefault: Boolean = false
+    @SerialName("account_name")
+    var organization: String = ""
     @SerialName("categories")
     var contactGroups: RealmList<ContactGroup> = realmListOf<ContactGroup>()
     @SerialName("is_dynamic_organisation_member_directory")
