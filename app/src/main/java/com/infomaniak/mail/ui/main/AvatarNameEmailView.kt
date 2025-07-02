@@ -101,7 +101,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private fun ViewAvatarNameEmailBinding.setNameAndSubName(
         addressBook: AddressBook,
     ) {
-        userAvatar.loadAdressBookAvatar()
+        userAvatar.loadTeamsUserAvatar()
         userName.text = context.getString(R.string.addressBookTitle, addressBook.name)
         userEmail.text = context.getString(R.string.organizationName, addressBook.organization)
     }
@@ -110,7 +110,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
         contactGroup: ContactGroup,
         addressBookName: String? = ""
     ) {
-        userAvatar.loadGroupAvatar()
+        userAvatar.loadTeamsUserAvatar()
         userName.text = context.getString(R.string.groupContactsTitle, contactGroup.name)
         userEmail.text = context.getString(R.string.addressBookTitle, addressBookName)
     }
