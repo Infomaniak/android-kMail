@@ -103,7 +103,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     ) {
         userAvatar.loadAdressBookAvatar()
         userName.text = context.getString(R.string.addressBookTitle, addressBook.name)
-        userEmail.text = context.getString(R.string.organizationName, addressBook.name)
+        userEmail.text = context.getString(R.string.organizationName, addressBook.organization)
     }
 
     private fun ViewAvatarNameEmailBinding.setNameAndSubName(

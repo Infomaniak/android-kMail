@@ -188,7 +188,7 @@ class ContactAdapter(
                     if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
                 } else if (contact is AddressBook) {
                     val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
-                    val standardizedEmail = contact.name.standardize()
+                    val standardizedEmail = contact.organization.standardize()
                     val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
                     val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
 
