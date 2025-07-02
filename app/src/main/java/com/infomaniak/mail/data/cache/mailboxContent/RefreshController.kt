@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
 import com.infomaniak.mail.data.models.getMessages.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
+import com.infomaniak.mail.data.models.isSnoozeOrUnsnoozeMalformed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -47,6 +48,7 @@ import com.infomaniak.mail.utils.SharedUtils.Companion.AutomaticUnsnoozeResult
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.throwErrorAsException
+import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -55,6 +57,7 @@ import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -531,6 +534,7 @@ class RefreshController @Inject constructor(
         scope.ensureActive()
 
         return apiResponse.data?.messages?.let { messages ->
+            reportMalformedSnoozeMessages(messages)
 
             return@let write {
 
@@ -540,6 +544,20 @@ class RefreshController @Inject constructor(
                 return@write handleAddedMessages(scope, upToDateFolder, messages, isConversationMode)
             }
         } ?: emptySet()
+    }
+
+    private fun reportMalformedSnoozeMessages(messages: List<Message>) {
+        messages.forEach { message ->
+            if (message.isSnoozeOrUnsnoozeMalformed()) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.WARNING
+                    scope.setExtra("snoozeState", message.snoozeState?.apiValue)
+                    scope.setExtra("snoozeUuid", message.snoozeUuid)
+                    scope.setExtra("snoozeEndDate", message.snoozeEndDate?.toDate().toString())
+                    Sentry.captureMessage("Message contains malformed snooze or unsnooze information")
+                }
+            }
+        }
     }
     //endregion
 
