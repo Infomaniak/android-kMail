@@ -201,7 +201,15 @@ class ContactAdapter(
 
                 } else if (contact is ContactGroup) {
                     val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
-                    val standardizedEmail = getAddressBookWithGroup?.invoke(contact)?.name?.standardize() ?: ""
+                    val addressBook: AddressBook = getAddressBookWithGroup?.invoke(contact)!!
+
+
+                    val standardizedEmail =
+                        if (addressBook.isDynamicOrganisationMemberDirectory == true) {
+                            addressBook.organization.standardize()
+                        }else {
+                            addressBook.name.standardize()
+                        }
                     val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
                     val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
 
