@@ -189,7 +189,7 @@ class LoginFragment : Fragment() {
 
         handleOnBackPressed()
 
-        observePrimaryColor()
+        observeAccentColor()
         observeCrossLoginAccounts()
         setCrossLoginClickListener()
         initCrossLogin()
@@ -206,9 +206,10 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun observePrimaryColor() {
+    private fun observeAccentColor() {
         introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, _) ->
             binding.crossLoginSelection.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
+            binding.crossLoginSelection.setOnPrimaryColor(newAccentColor.getOnPrimary(requireContext()))
         }
     }
 

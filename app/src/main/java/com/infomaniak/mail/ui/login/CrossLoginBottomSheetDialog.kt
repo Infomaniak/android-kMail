@@ -43,14 +43,15 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
-        observePrimaryColor()
+        observeAccentColor()
         observeCrossLoginAccounts()
         setCrossLoginClicksListeners()
     }
 
-    private fun observePrimaryColor() {
+    private fun observeAccentColor() {
         introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, _) ->
             binding.crossLoginBottomSheet.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
+            binding.crossLoginBottomSheet.setOnPrimaryColor(newAccentColor.getOnPrimary(requireContext()))
         }
     }
 
