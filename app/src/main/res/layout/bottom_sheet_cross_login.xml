@@ -27,10 +27,11 @@
         android:id="@+id/crossLoginBottomSheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:crossLoginBackgroundColor="@color/background"
+        app:crossLoginAvatarStrokeColor="@color/background"
         app:crossLoginButtonStrokeColor="@color/commonColor2"
         app:crossLoginDescriptionColor="@color/secondaryTextColor"
-        app:crossLoginPrimaryColor="@color/primary"
-        app:crossLoginTitleColor="@color/primaryTextColor" />
+        app:crossLoginTitleColor="@color/primaryTextColor"
+        tools:crossLoginOnPrimaryColor="?attr/colorOnPrimary"
+        tools:crossLoginPrimaryColor="?attr/colorPrimary" />
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>
