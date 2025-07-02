@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes.contact
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
@@ -46,6 +45,7 @@ class ContactAdapter(
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
     private val snackbarManager: SnackbarManager,
+    private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)?
 ) : Adapter<ContactViewHolder>() {
 
     private var allContacts: List<ContactAutocompletable> = emptyList()
@@ -93,7 +93,6 @@ class ContactAdapter(
             setMergedContact(contact)
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
         }
-
         val isAlreadyUsed = usedEmails.contains(contact.email.standardize())
 
         if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) } else root.setOnClickListener(null)
@@ -103,22 +102,36 @@ class ContactAdapter(
     private fun ItemContactBinding.bindAdressBook(position: Int, contact: AddressBook) = with(matchedContacts[position]) {
         contactDetails.apply {
             setAddressBook(contact)
-            highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
+            highlight(
+                nameMatchedStartIndex,
+                emailMatchedStartIndex,
+                searchQuery.standardize().count(),
+                prefixSizeOfName = getLengthStringTitle(context.getString(R.string.addressBookTitle)) ?: 0,
+                prefixSizeOfEmail = getLengthStringTitle(context.getString(R.string.organizationName)) ?: 0
+            )
         }
-
         root.setOnClickListener { onContactClicked(contact as MergedContact) }
-
     }
 
     private fun ItemContactBinding.bindGroup(position: Int, contact: ContactGroup) = with(matchedContacts[position]) {
         contactDetails.apply {
-            setContactGroup(contact)
-            highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
+            setContactGroup(contact, getAddressBookWithGroup?.invoke(contact))
+            highlight(
+                nameMatchedStartIndex,
+                emailMatchedStartIndex,
+                searchQuery.standardize().count(),
+                prefixSizeOfName = getLengthStringTitle(context.getString(R.string.groupContactsTitle)) ?: 0,
+                prefixSizeOfEmail = getLengthStringTitle(context.getString(R.string.addressBookTitle)) ?: 0
+            )
         }
-
         root.setOnClickListener { onContactClicked(contact as MergedContact) }
-
     }
+
+    fun getLengthStringTitle(title: String): Int? {
+        val regex = """.*: """.toRegex()
+        return regex.find(title)?.groups[0]?.value?.length
+    }
+
     private fun ItemContactBinding.setVisuallyUsed(isVisuallyUsed: Boolean) {
         greyedOutState.isVisible = isVisuallyUsed
         root.isEnabled = !isVisuallyUsed
@@ -184,9 +197,10 @@ class ContactAdapter(
                     if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
 
                     if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
+
                 } else if (contact is ContactGroup) {
                     val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
-                    val standardizedEmail = contact.name.standardize()
+                    val standardizedEmail = getAddressBookWithGroup?.invoke(contact)?.name?.standardize() ?: ""
                     val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
                     val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
 
