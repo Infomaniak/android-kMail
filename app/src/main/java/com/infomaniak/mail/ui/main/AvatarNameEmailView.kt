@@ -89,7 +89,8 @@ class AvatarNameEmailView @JvmOverloads constructor(
     }
 
     fun setContactGroup(contactGroup: ContactGroup, addressBook: AddressBook?) = with(binding) {
-        setNameAndSubName(contactGroup, addressBook?.name)
+
+        setNameAndSubName(contactGroup, if(addressBook?.isDynamicOrganisationMemberDirectory == true) addressBook.organization else addressBook?.name)
     }
 
     fun setAttendee(attendee: Attendee) = with(binding) {
