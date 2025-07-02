@@ -64,6 +64,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -347,6 +348,14 @@ class NewMessageViewModel @Inject constructor(
 
     fun getAddressBookWithName(contactGroup: ContactGroup): AddressBook? {
         return addressBookController.getAddressBookWithGroup(contactGroup)
+    }
+
+    fun getMergedContactFromContactGroup(contactGroup: ContactGroup): List<MergedContact> {
+        return mergedContactController.getMergedContactFromContactGroup(contactGroup)
+    }
+
+    fun getGroupFromAdressBook(addressBook: AddressBook): List<ContactGroup> {
+        return addressBookController.getGroupFromAdressBook(addressBook)
     }
 
     private fun initSignature(draft: Draft, signature: Signature) {
