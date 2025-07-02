@@ -82,15 +82,16 @@
             android:layout_marginHorizontal="@dimen/marginStandard"
             android:layout_marginTop="@dimen/marginStandardSmall"
             android:visibility="gone"
-            app:crossLoginBackgroundColor="@color/background"
+            app:crossLoginAvatarStrokeColor="@color/background"
             app:crossLoginButtonStrokeColor="@color/commonColor2"
             app:crossLoginDescriptionColor="@color/secondaryTextColor"
-            app:crossLoginPrimaryColor="@color/primary"
             app:crossLoginTitleColor="@color/primaryTextColor"
             app:layout_constraintBottom_toTopOf="@id/connectButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
+            tools:crossLoginOnPrimaryColor="?attr/colorOnPrimary"
+            tools:crossLoginPrimaryColor="?attr/colorPrimary"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
