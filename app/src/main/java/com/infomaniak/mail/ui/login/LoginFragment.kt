@@ -40,12 +40,14 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.lib.core.utils.updateTextColor
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.colorStateList
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
@@ -150,6 +152,7 @@ class LoginFragment : Fragment() {
             initProgress(viewLifecycleOwner, getCurrentOnPrimary())
             setOnClickListener {
                 updateTextColor(getCurrentOnPrimary())
+                isEnabled = false
                 signInButton.isEnabled = false
                 connectButtonProgressTimer.start()
                 requireContext().trackAccountEvent("openLoginWebview")
@@ -192,7 +195,10 @@ class LoginFragment : Fragment() {
 
         animateColorChange(oldPrimary, newPrimary) { color ->
             dotsIndicator.selectedDotColor = color
-            connectButton.setBackgroundColor(color)
+            connectButton.backgroundTintList = colorStateList {
+                addForState(state = android.R.attr.state_enabled, color = color)
+                addForRemainingStates(color = requireContext().getColor(R.color.backgroundDisabledPrimaryButton))
+            }
             nextButton.backgroundTintList = ColorStateList.valueOf(color)
             signInButton.setTextColor(color)
             signInButton.rippleColor = ColorStateList.valueOf(ripple)
