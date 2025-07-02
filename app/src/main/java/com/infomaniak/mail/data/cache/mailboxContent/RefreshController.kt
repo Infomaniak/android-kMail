@@ -19,6 +19,8 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
 import com.infomaniak.core.cancellable
+import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
+import com.infomaniak.core.utils.format
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -35,7 +37,7 @@ import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
 import com.infomaniak.mail.data.models.getMessages.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
-import com.infomaniak.mail.data.models.isSnoozeOrUnsnoozeMalformed
+import com.infomaniak.mail.data.models.isSnoozeMalformed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -548,13 +550,15 @@ class RefreshController @Inject constructor(
 
     private fun reportMalformedSnoozeMessages(messages: List<Message>) {
         messages.forEach { message ->
-            if (message.isSnoozeOrUnsnoozeMalformed()) {
+            if (message.isSnoozeMalformed()) {
                 Sentry.withScope { scope ->
+                    val date = message.snoozeEndDate?.toDate()?.format(FORMAT_DATE_WITH_TIMEZONE)
+
                     scope.level = SentryLevel.WARNING
-                    scope.setExtra("snoozeState", message.snoozeState?.apiValue)
+                    scope.setTag("snoozeState", message.snoozeState?.apiValue)
                     scope.setExtra("snoozeUuid", message.snoozeUuid)
-                    scope.setExtra("snoozeEndDate", message.snoozeEndDate?.toDate().toString())
-                    Sentry.captureMessage("Message contains malformed snooze or unsnooze information")
+                    scope.setExtra("snoozeEndDate", date)
+                    Sentry.captureMessage("Message contains malformed snoozed or unsnoozed information")
                 }
             }
         }
