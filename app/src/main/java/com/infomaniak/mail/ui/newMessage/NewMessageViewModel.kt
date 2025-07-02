@@ -61,6 +61,8 @@ import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -341,6 +343,10 @@ class NewMessageViewModel @Inject constructor(
         )
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
+    }
+
+    fun getAddressBookWithName(contactGroup: ContactGroup): AddressBook? {
+        return addressBookController.getAddressBookWithGroup(contactGroup)
     }
 
     private fun initSignature(draft: Draft, signature: Signature) {

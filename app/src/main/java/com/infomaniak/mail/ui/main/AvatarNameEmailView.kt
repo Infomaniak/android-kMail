@@ -88,8 +88,8 @@ class AvatarNameEmailView @JvmOverloads constructor(
         setNameAndSubName(addressBook)
     }
 
-    fun setContactGroup(contactGroup: ContactGroup) = with(binding) {
-        setNameAndSubName(contactGroup)
+    fun setContactGroup(contactGroup: ContactGroup, addressBook: AddressBook?) = with(binding) {
+        setNameAndSubName(contactGroup, addressBook?.name)
     }
 
     fun setAttendee(attendee: Attendee) = with(binding) {
@@ -101,16 +101,17 @@ class AvatarNameEmailView @JvmOverloads constructor(
         addressBook: AddressBook,
     ) {
         userAvatar.loadAdressBookAvatar()
-        userName.text = "Carnet d'adresses : ${addressBook.name}"
-        userEmail.text = "Organisation : ${addressBook.name}"
+        userName.text = context.getString(R.string.addressBookTitle, addressBook.name)
+        userEmail.text = context.getString(R.string.organizationName, addressBook.name)
     }
 
     private fun ViewAvatarNameEmailBinding.setNameAndSubName(
         contactGroup: ContactGroup,
+        addressBookName: String? = ""
     ) {
         userAvatar.loadGroupAvatar()
-        userName.text = "Groupe : ${contactGroup.name}"
-        userEmail.text = "Carnet d'adresses  : ..."
+        userName.text = context.getString(R.string.groupContactsTitle, contactGroup.name)
+        userEmail.text = context.getString(R.string.addressBookTitle, addressBookName)
     }
 
     private fun ViewAvatarNameEmailBinding.setNameAndEmail(
@@ -138,10 +139,17 @@ class AvatarNameEmailView @JvmOverloads constructor(
         binding.root.setOnClickListener(onClickListener)
     }
 
-    fun highlight(nameStartIndex: Int, emailStartIndex: Int, length: Int) = with(binding) {
-        if (nameStartIndex >= 0) userName.highlight(nameStartIndex, nameStartIndex + length)
-        if (emailStartIndex >= 0 && userEmail.text.isNotBlank()) userEmail.highlight(emailStartIndex, emailStartIndex + length)
-    }
+    fun highlight(nameStartIndex: Int, emailStartIndex: Int, length: Int, prefixSizeOfName: Int = 0, prefixSizeOfEmail: Int = 0) =
+        with(binding) {
+            if (nameStartIndex >= 0) userName.highlight(
+                prefixSizeOfName + nameStartIndex,
+                prefixSizeOfName + nameStartIndex + length
+            )
+            if (emailStartIndex >= 0 && userEmail.text.isNotBlank()) userEmail.highlight(
+                prefixSizeOfEmail + emailStartIndex,
+                prefixSizeOfEmail + emailStartIndex + length
+            )
+        }
 
     private fun TextView.highlight(
         startIndex: Int,

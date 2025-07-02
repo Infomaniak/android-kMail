@@ -34,6 +34,7 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.chip.Chip
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -42,6 +43,8 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
@@ -115,6 +118,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onContactAdded: ((Recipient) -> Unit)? = null
     private var onCopyContactAddress: ((Recipient) -> Unit)? = null
     private var gotFocus: (() -> Unit)? = null
+    private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -160,6 +164,7 @@ class RecipientFieldView @JvmOverloads constructor(
                     addRecipient(email = input, name = input)
                 },
                 snackbarManager = snackbarManager,
+                getAddressBookWithGroup = { getAddressBookWithGroup?.invoke(it) },
             )
 
             contactChipAdapter = ContactChipAdapter(
@@ -410,6 +415,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onCopyContactAddressCallback: ((Recipient) -> Unit),
         gotFocusCallback: (() -> Unit),
         onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+        getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?
     ) {
 
         val margin = context.resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
@@ -424,6 +430,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onContactAdded = onContactAddedCallback
         onContactRemoved = onContactRemovedCallback
         onCopyContactAddress = onCopyContactAddressCallback
+        getAddressBookWithGroup = getAddressBookWithGroupCallback
 
         gotFocus = gotFocusCallback
     }
