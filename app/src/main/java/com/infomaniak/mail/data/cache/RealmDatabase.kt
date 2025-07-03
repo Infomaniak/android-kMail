@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
@@ -48,6 +49,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +58,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.lang.ref.WeakReference
+import kotlin.reflect.KClass
 
 @Suppress("ObjectPropertyName")
 object RealmDatabase {
@@ -191,7 +194,7 @@ object RealmDatabase {
     private object RealmConfig {
 
         //region Configurations versions
-        const val USER_INFO_SCHEMA_VERSION = 4L
+        const val USER_INFO_SCHEMA_VERSION = 16L
         const val MAILBOX_INFO_SCHEMA_VERSION = 9L
         const val MAILBOX_CONTENT_SCHEMA_VERSION = 30L
         //endregion
@@ -209,8 +212,9 @@ object RealmDatabase {
             AppSettings::class,
         )
         val userInfoSet = setOf(
-            AddressBook::class,
-            MergedContact::class,
+            AddressBook::class as KClass<out RealmObject>,
+            ContactGroup::class as KClass<out RealmObject>,
+            MergedContact::class as KClass<out RealmObject>,
         )
         val mailboxInfoSet = setOf(
             Mailbox::class,

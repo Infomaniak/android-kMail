@@ -34,6 +34,7 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.chip.Chip
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -41,6 +42,9 @@ import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
@@ -93,6 +97,9 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onContactAdded: ((Recipient) -> Unit)? = null
     private var onCopyContactAddress: ((Recipient) -> Unit)? = null
     private var gotFocus: (() -> Unit)? = null
+    private var getAddressBookWithGroup: ((ContactGroup) -> AddressBook?)? = null
+    private var getMergedContactFromContactGroup: ((ContactGroup) -> List<MergedContact>)? = null
+    private var getMergedContactFromAddressBook: ((AddressBook) -> List<MergedContact>)? = null
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -132,12 +139,13 @@ class RecipientFieldView @JvmOverloads constructor(
 
             contactAdapter = ContactAdapter(
                 usedEmails = mutableSetOf(),
-                onContactClicked = { addRecipient(it.email, it.name) },
+                onContactClicked = { contactCliked(it) },
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
                     addRecipient(email = input, name = input)
                 },
                 snackbarManager = snackbarManager,
+                getAddressBookWithGroup = { getAddressBookWithGroup?.invoke(it) },
             )
 
             contactChipAdapter = ContactChipAdapter(
@@ -295,7 +303,7 @@ class RecipientFieldView @JvmOverloads constructor(
         textInputLayout.isVisible = isTextInputAccessible
     }
 
-    fun updateContacts(allContacts: List<MergedContact>) {
+    fun updateContacts(allContacts: List<ContactAutocompletable>) {
         contactAdapter.updateContacts(allContacts)
     }
 
@@ -307,6 +315,24 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun closeAutoCompletion() {
         isAutoCompletionOpened = false
         onAutoCompletionToggled?.invoke(isAutoCompletionOpened)
+    }
+
+    private fun contactCliked(contact: ContactAutocompletable) {
+        var listOfContact: List<MergedContact> = emptyList()
+        when (contact) {
+            is MergedContact -> {
+                listOfContact = listOf(contact)
+            }
+            is ContactGroup -> {
+                listOfContact = getMergedContactFromContactGroup?.invoke(contact)!!
+            }
+            is AddressBook -> {
+                listOfContact = getMergedContactFromAddressBook?.invoke(contact)!!
+            }
+        }
+        for (mergedContact in listOfContact) {
+            addRecipient(mergedContact.email, mergedContact.name)
+        }
     }
 
     private fun addRecipient(email: String, name: String) {
@@ -353,14 +379,21 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
+    data class CallBackRecipientField(
+        val onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
+        val onContactAddedCallback: ((Recipient) -> Unit),
+        val onContactRemovedCallback: ((Recipient) -> Unit),
+        val onCopyContactAddressCallback: ((Recipient) -> Unit),
+        val gotFocusCallback: (() -> Unit),
+        val onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+        val getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?,
+        val getMergedContactFromContactGroupCallback: (ContactGroup) -> List<MergedContact>,
+        val getMergedContactFromAddressBookCallback: (AddressBook) -> List<MergedContact>
+    )
+
     fun initRecipientField(
         autoComplete: RecyclerView,
-        onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
-        onContactAddedCallback: ((Recipient) -> Unit),
-        onContactRemovedCallback: ((Recipient) -> Unit),
-        onCopyContactAddressCallback: ((Recipient) -> Unit),
-        gotFocusCallback: (() -> Unit),
-        onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+        callBackRecipientField: CallBackRecipientField
     ) {
 
         val margin = context.resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
@@ -370,13 +403,19 @@ class RecipientFieldView @JvmOverloads constructor(
         autoCompletedContacts.addItemDecoration(divider)
         autoCompletedContacts.adapter = contactAdapter
 
-        onToggleEverything = onToggleEverythingCallback
-        onAutoCompletionToggled = onAutoCompletionToggledCallback
-        onContactAdded = onContactAddedCallback
-        onContactRemoved = onContactRemovedCallback
-        onCopyContactAddress = onCopyContactAddressCallback
+        with(callBackRecipientField) {
+            onToggleEverything = onToggleEverythingCallback
+            onAutoCompletionToggled = onAutoCompletionToggledCallback
+            onContactAdded = onContactAddedCallback
+            onContactRemoved = onContactRemovedCallback
+            onCopyContactAddress = onCopyContactAddressCallback
+            getAddressBookWithGroup = getAddressBookWithGroupCallback
+            getMergedContactFromContactGroup = getMergedContactFromContactGroupCallback
+            getMergedContactFromAddressBook = getMergedContactFromAddressBookCallback
 
-        gotFocus = gotFocusCallback
+            gotFocus = gotFocusCallback
+        }
+
     }
 
     fun clearField() = binding.textInput.setText("")
