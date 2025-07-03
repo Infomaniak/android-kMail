@@ -24,7 +24,7 @@ import kotlin.coroutines.resume
 
 suspend fun View.awaitOneLongClick(
     disableAfterClick: Boolean = true,
-    hideAfterClick: Boolean = false
+    hideAfterClick: Boolean = false,
 ) = try {
     if (disableAfterClick) isEnabled = true
     if (hideAfterClick) isVisible = true
