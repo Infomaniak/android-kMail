@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.ui.newMessage.RecipientFieldView.Companion.setChipStyle
-import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
 
 class ContactChipAdapter(
@@ -33,8 +32,14 @@ class ContactChipAdapter(
     val onBackspace: (Recipient) -> Unit,
 ) : Adapter<ContactChipAdapter.ContactChipViewHolder>() {
 
+    var unencryptableRecipients: Set<String>? = null
+        set(value) {
+            field = value
+            updateUnencryptableRecipients(value)
+        }
+
     private val recipients = mutableSetOf<Recipient>()
-    private var encryptionStatus = EncryptionStatus.Unencrypted
+    private var isEncryptionActivated = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactChipViewHolder {
         return ContactChipViewHolder(ChipContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -42,6 +47,13 @@ class ContactChipAdapter(
 
     override fun onBindViewHolder(holder: ContactChipViewHolder, position: Int): Unit = with(holder.binding) {
         val recipient = recipients.elementAt(position)
+        val encryptionStatus = when {
+            !isEncryptionActivated -> EncryptionStatus.Unencrypted
+            unencryptableRecipients == null -> EncryptionStatus.Loading
+            unencryptableRecipients?.contains(recipient.email) == true -> EncryptionStatus.PartiallyEncrypted
+            else -> EncryptionStatus.Encrypted
+        }
+
         root.apply {
             text = recipient.getNameOrEmail()
             setOnClickListener { openContextMenu(recipient, root) }
@@ -69,9 +81,18 @@ class ContactChipAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun toggleEncryption(encryptionStatus: EncryptionStatus) {
-        this.encryptionStatus = encryptionStatus
+    fun toggleEncryption(isEncryptionActivated: Boolean, unencryptableRecipients: Set<String>?) {
+        this.isEncryptionActivated = isEncryptionActivated
+        this.unencryptableRecipients = unencryptableRecipients
         notifyDataSetChanged() // We need to recompute whole collection to set new style
+    }
+
+    private fun updateUnencryptableRecipients(unencryptableRecipients: Set<String>?) {
+        recipients.forEachIndexed { index, recipient ->
+            unencryptableRecipients?.let { unencryptableEmails ->
+                if (recipient.email in unencryptableRecipients) notifyItemChanged(index)
+            }
+        }
     }
 
     class ContactChipViewHolder(val binding: ChipContactBinding) : ViewHolder(binding.root)

@@ -67,6 +67,18 @@ class RecipientFieldView @JvmOverloads constructor(
     private var contactAdapter: ContactAdapter
     private var contactChipAdapter: ContactChipAdapter
 
+    var isEncryptionActivated: Boolean = false
+        set(value) {
+            field = value
+            applyEncryptionStyle()
+        }
+    var unencryptableRecipients: Set<String>? = null
+        set(value) {
+            field = value
+            contactChipAdapter.unencryptableRecipients = value
+            setSingleChipStyle()
+        }
+
     private lateinit var popupRecipient: Recipient
     private var popupDeletesTheCollapsedChip = false
 
@@ -285,8 +297,14 @@ class RecipientFieldView @JvmOverloads constructor(
         singleChip.root.apply {
             isGone = isTextInputAccessible
             val recipient = contactChipAdapter.getRecipients().firstOrNull()
+            val firstRecipientStatus = when {
+                !isEncryptionActivated -> EncryptionStatus.Unencrypted
+                unencryptableRecipients == null -> EncryptionStatus.Loading
+                unencryptableRecipients?.contains(recipient?.email) == true -> EncryptionStatus.PartiallyEncrypted
+                else -> EncryptionStatus.Encrypted
+            }
             text = recipient?.getNameOrEmail() ?: ""
-            setChipStyle(recipient?.isDisplayedAsExternal == true, EncryptionStatus.Unencrypted) // TODO fix this encryptionStatus
+            setChipStyle(recipient?.isDisplayedAsExternal == true, firstRecipientStatus)
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
@@ -297,15 +315,31 @@ class RecipientFieldView @JvmOverloads constructor(
         textInputLayout.isVisible = isTextInputAccessible
     }
 
-    fun applyEncryptionStyle(encryptionStatus: EncryptionStatus) = with(binding) {
-        val isExternal = contactChipAdapter.getRecipients().firstOrNull()?.isDisplayedAsExternal == true
-        singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus)
-        plusChip.setChipStyle(displayAsExternal = false, encryptionStatus)
-        contactChipAdapter.toggleEncryption(encryptionStatus)
+    fun applyEncryptionStyle() = with(binding) {
+        val plusChipStatus = if (isEncryptionActivated) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted
+
+        setSingleChipStyle()
+        plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipStatus)
+        contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients)
     }
 
     fun updateContacts(allContacts: List<MergedContact>) {
         contactAdapter.updateContacts(allContacts)
+    }
+
+    private fun setSingleChipStyle() {
+
+        val firstRecipient = contactChipAdapter.getRecipients().firstOrNull()
+        val isExternal = firstRecipient?.isDisplayedAsExternal == true
+        val isFirstRecipientUnencryptable = unencryptableRecipients?.contains(firstRecipient?.email) == true
+
+        val firstRecipientStatus = when {
+            !isEncryptionActivated -> EncryptionStatus.Unencrypted
+            isFirstRecipientUnencryptable -> EncryptionStatus.PartiallyEncrypted
+            else -> EncryptionStatus.Encrypted
+        }
+
+        binding.singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus = firstRecipientStatus)
     }
 
     private fun openAutoCompletion() {
@@ -451,13 +485,8 @@ class RecipientFieldView @JvmOverloads constructor(
         private const val NO_STROKE = 0.0f
 
         fun Chip.setChipStyle(displayAsExternal: Boolean, encryptionStatus: EncryptionStatus) = when {
-            displayAsExternal -> ChipStyle(
-                backgroundColor = R.color.chip_contact_background_color_external,
-                textColor = R.color.chip_contact_text_color_external,
-                strokeColor = R.color.externalTagBackground,
-            )
-            encryptionStatus == EncryptionStatus.Encrypted -> {
-                setIconStartPaddingResource(com.infomaniak.lib.core.R.dimen.marginStandardVerySmall)
+            encryptionStatus == EncryptionStatus.Encrypted ||
+                    encryptionStatus == EncryptionStatus.Loading -> {
                 ChipStyle(
                     backgroundColor = R.color.encryptionBackgroundColor,
                     textColor = R.color.encryptionTextColor,
@@ -466,9 +495,14 @@ class RecipientFieldView @JvmOverloads constructor(
                 )
             }
             encryptionStatus == EncryptionStatus.PartiallyEncrypted -> ChipStyle(
+                backgroundColor = R.color.encryptionBackgroundColor,
+                textColor = R.color.encryptionTextColor,
+                encryptionIcon = R.drawable.ic_lock_open_filled_pastille,
+            )
+            displayAsExternal -> ChipStyle(
                 backgroundColor = R.color.chip_contact_background_color_external,
                 textColor = R.color.chip_contact_text_color_external,
-                encryptionIcon = R.drawable.ic_lock_open_filled_pastille,
+                strokeColor = R.color.externalTagBackground,
             )
             else -> ChipStyle(
                 backgroundColor = R.color.chip_contact_background_color,
@@ -491,15 +525,16 @@ class RecipientFieldView @JvmOverloads constructor(
             } ?: (null to NO_STROKE)
 
             chip.apply {
-                chipBackgroundColor = context.getColorStateList(backgroundColor)
                 setTextColor(context.getColorStateList(textColor))
+                setChipBackgroundColorResource(backgroundColor)
 
                 chipStrokeWidth = width
                 chipStrokeColor = color
 
                 chipIcon = encryptionIcon?.let { ResourcesCompat.getDrawable(resources, encryptionIcon, null) }
-                encryptionIconTint?.let(::setChipIconTintResource)
-                setChipIconSizeResource(R.dimen.mediumIconSize)
+                chipIconTint = encryptionIconTint?.let(context::getColorStateList)
+                setChipIconSizeResource(R.dimen.iconImageSize)
+                setIconStartPaddingResource(com.infomaniak.lib.core.R.dimen.marginStandardVerySmall)
             }
         }
     }

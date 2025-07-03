@@ -81,7 +81,7 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
-            applyEncryptionStyleOnContactChip(if (isEncrypted) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted)
+            applyEncryptionStyleOnContactChip(isEncrypted)
             val isEncryptionValid = checkEncryptionCanBeSend()
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
 
@@ -119,6 +119,10 @@ class EncryptionMessageManager @Inject constructor(
     fun observeUnencryptableRecipients() {
         encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipientsEmails ->
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = checkEncryptionCanBeSend())
+
+            binding.toField.unencryptableRecipients = recipientsEmails
+            binding.ccField.unencryptableRecipients = recipientsEmails
+            binding.bccField.unencryptableRecipients = recipientsEmails
 
             // Check if the email is still in the draft's recipients (it could have been deleted while being checked)
             val filteredEmails = recipientsEmails?.filter { email -> newMessageViewModel.allRecipients.any { it.email == email } }
@@ -227,9 +231,9 @@ class EncryptionMessageManager @Inject constructor(
         }
     }
 
-    private fun applyEncryptionStyleOnContactChip(encryptionStatus: EncryptionStatus) {
-        binding.toField.applyEncryptionStyle(encryptionStatus)
-        binding.ccField.applyEncryptionStyle(encryptionStatus)
-        binding.bccField.applyEncryptionStyle(encryptionStatus)
+    private fun applyEncryptionStyleOnContactChip(isEncryptionActivated: Boolean) {
+        binding.toField.isEncryptionActivated = isEncryptionActivated
+        binding.ccField.isEncryptionActivated = isEncryptionActivated
+        binding.bccField.isEncryptionActivated = isEncryptionActivated
     }
 }
