@@ -368,17 +368,21 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun contactCliked(contact: ContactAutocompletable) {
         var listOfContact: List<MergedContact> = emptyList()
-        if (contact is MergedContact) {
-            listOfContact = listOf(contact)
-        } else if (contact is ContactGroup) {
-            listOfContact = getMergedContactFromContactGroup?.invoke(contact)!!
-        } else if (contact is AddressBook) {
-            val listOfGroup = getGroupFromAdressBook?.invoke(contact)
-            if (listOfGroup != null) {
-                for (group in listOfGroup) {
-                    listOfContact = getMergedContactFromContactGroup?.invoke(group)!!
-                }
+        when (contact) {
+            is MergedContact -> {
+                listOfContact = listOf(contact)
+            }
+            is ContactGroup -> {
+                listOfContact = getMergedContactFromContactGroup?.invoke(contact)!!
+            }
+            is AddressBook -> {
+                val listOfGroup = getGroupFromAdressBook?.invoke(contact)
+                if (listOfGroup != null) {
+                    for (group in listOfGroup) {
+                        listOfContact = getMergedContactFromContactGroup?.invoke(group)!!
+                    }
 
+                }
             }
         }
         for (mergedContact in listOfContact) {
@@ -430,17 +434,21 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
+    data class callBackRecipientField(
+        val onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
+        val onContactAddedCallback: ((Recipient) -> Unit),
+        val onContactRemovedCallback: ((Recipient) -> Unit),
+        val onCopyContactAddressCallback: ((Recipient) -> Unit),
+        val gotFocusCallback: (() -> Unit),
+        val onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+        val getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?,
+        val getMergedContactFromContactGroupCallback: (ContactGroup) -> List<MergedContact>,
+        val getGroupFromAdressBookCallback: (AddressBook) -> List<ContactGroup>
+    )
+
     fun initRecipientField(
         autoComplete: RecyclerView,
-        onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
-        onContactAddedCallback: ((Recipient) -> Unit),
-        onContactRemovedCallback: ((Recipient) -> Unit),
-        onCopyContactAddressCallback: ((Recipient) -> Unit),
-        gotFocusCallback: (() -> Unit),
-        onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
-        getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?,
-        getMergedContactFromContactGroupCallback: (ContactGroup) -> List<MergedContact>,
-        getGroupFromAdressBookCallback: (AddressBook) -> List<ContactGroup>
+        callBackRecipientField: callBackRecipientField
     ) {
 
         val margin = context.resources.getDimensionPixelSize(R.dimen.dividerHorizontalPadding)
@@ -450,16 +458,19 @@ class RecipientFieldView @JvmOverloads constructor(
         autoCompletedContacts.addItemDecoration(divider)
         autoCompletedContacts.adapter = contactAdapter
 
-        onToggleEverything = onToggleEverythingCallback
-        onAutoCompletionToggled = onAutoCompletionToggledCallback
-        onContactAdded = onContactAddedCallback
-        onContactRemoved = onContactRemovedCallback
-        onCopyContactAddress = onCopyContactAddressCallback
-        getAddressBookWithGroup = getAddressBookWithGroupCallback
-        getMergedContactFromContactGroup = getMergedContactFromContactGroupCallback
-        getGroupFromAdressBook = getGroupFromAdressBookCallback
+        with(callBackRecipientField) {
+            onToggleEverything = onToggleEverythingCallback
+            onAutoCompletionToggled = onAutoCompletionToggledCallback
+            onContactAdded = onContactAddedCallback
+            onContactRemoved = onContactRemovedCallback
+            onCopyContactAddress = onCopyContactAddressCallback
+            getAddressBookWithGroup = getAddressBookWithGroupCallback
+            getMergedContactFromContactGroup = getMergedContactFromContactGroupCallback
+            getGroupFromAdressBook = getGroupFromAdressBookCallback
 
-        gotFocus = gotFocusCallback
+            gotFocus = gotFocusCallback
+        }
+
     }
 
     fun clearField() = binding.textInput.setText("")

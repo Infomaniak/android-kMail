@@ -82,14 +82,19 @@ class ContactAdapter(
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
-        if (getItemViewType(position) == AutocompletableContact.id) {
-            bindContact(position, matchedContacts[position].contact as MergedContact)
-        } else if (getItemViewType(position) == AutocompletableAdressBook.id) {
-            bindAdressBook(position, matchedContacts[position].contact as AddressBook)
-        } else if (getItemViewType(position) == AutocompletableGroup.id) {
-            bindGroup(position, matchedContacts[position].contact as ContactGroup)
-        } else {
-            bindAddNewUser()
+        when {
+            getItemViewType(position) == AutocompletableContact.id -> {
+                bindContact(position, matchedContacts[position].contact as MergedContact)
+            }
+            getItemViewType(position) == AutocompletableAdressBook.id -> {
+                bindAdressBook(position, matchedContacts[position].contact as AddressBook)
+            }
+            getItemViewType(position) == AutocompletableGroup.id -> {
+                bindGroup(position, matchedContacts[position].contact as ContactGroup)
+            }
+            else -> {
+                bindAddNewUser()
+            }
         }
     }
 
@@ -173,57 +178,51 @@ class ContactAdapter(
 
     fun searchContacts(text: CharSequence) {
 
+        fun setMatchedContact(
+            contact: ContactAutocompletable,
+            nameMatched: String,
+            emailMatched: String,
+            searchTerm: String
+        ): MatchedContact? {
+            val nameMatchedIndex = nameMatched.standardize().indexOf(searchTerm)
+            val standardizedEmail = emailMatched.standardize()
+            val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
+            val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
+
+            val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
+            if (displayNewContact) displayAddUnknownContactButton = false
+
+            return if (matches) MatchedContact(contact, nameMatchedIndex, emailMatchedIndex) else null
+        }
+
         fun performFiltering(constraint: CharSequence): List<MatchedContact> {
             val searchTerm = constraint.standardize()
 
             val finalUserList = mutableListOf<MatchedContact>()
             displayAddUnknownContactButton = true
             for (contact in allContacts) {
-                if (contact is MergedContact) {
-                    val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
-                    val standardizedEmail = contact.email.standardize()
-                    val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
-                    val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
+                var matchedContact: MatchedContact? = null
+                when (contact) {
+                    is MergedContact -> {
+                        matchedContact = setMatchedContact(contact, contact.name, contact.email, searchTerm)
+                    }
+                    is AddressBook -> {
+                        matchedContact = setMatchedContact(contact, contact.name, contact.organization, searchTerm)
+                    }
+                    is ContactGroup -> {
+                        val addressBook: AddressBook = getAddressBookWithGroup?.invoke(contact)!!
 
-                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
-                    if (displayNewContact) displayAddUnknownContactButton = false
-
-                    if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
-
-                    if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
-                } else if (contact is AddressBook) {
-                    val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
-                    val standardizedEmail = contact.organization.standardize()
-                    val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
-                    val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
-
-                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
-                    if (displayNewContact) displayAddUnknownContactButton = false
-
-                    if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
-
-                    if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
-
-                } else if (contact is ContactGroup) {
-                    val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
-                    val addressBook: AddressBook = getAddressBookWithGroup?.invoke(contact)!!
-
-                    val standardizedEmail =
-                        if (addressBook.isDynamicOrganisationMemberDirectory == true) {
-                            addressBook.organization.standardize()
-                        } else {
-                            addressBook.name.standardize()
-                        }
-                    val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
-                    val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
-
-                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
-                    if (displayNewContact) displayAddUnknownContactButton = false
-
-                    if (matches) finalUserList.add(MatchedContact(contact, nameMatchedIndex, emailMatchedIndex))
-
-                    if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
+                        val addressBookName =
+                            if (addressBook.isDynamicOrganisationMemberDirectory == true) {
+                                addressBook.organization.standardize()
+                            } else {
+                                addressBook.name.standardize()
+                            }
+                        matchedContact = setMatchedContact(contact, contact.name, addressBookName, searchTerm)
+                    }
                 }
+                if (matchedContact != null) finalUserList.add(matchedContact)
+                if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
             }
             return finalUserList.sortedWith(
                 compareByDescending<MatchedContact> { it.contact.contactId }
@@ -239,9 +238,7 @@ class ContactAdapter(
         return usedEmails.remove(email.standardize()).also { isSuccess ->
             if (isSuccess) {
                 matchedContacts.forEachIndexed { index, matchedContact ->
-                    if (matchedContact.contact is MergedContact) {
-                        if (matchedContact.contact.email == email) notifyItemChanged(index)
-                    }
+                    if (matchedContact.contact is MergedContact && matchedContact.contact.email == email) notifyItemChanged(index)
                 }
             }
         }
