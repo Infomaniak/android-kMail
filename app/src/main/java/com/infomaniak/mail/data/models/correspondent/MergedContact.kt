@@ -51,7 +51,7 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
     var remoteContactGroupIds: RealmList<Int> = realmListOf()
 
     @SerialName("addressbook_id")
-    var addressbookId: Int? = null
+    var addressbookId: RealmList<Int?> = realmListOf()
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
@@ -87,7 +87,7 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
 
         this.remoteContactGroupIds = apiContact.remoteContactGroupIds
 
-        this.addressbookId = apiContact.addressbookId
+        this.addressbookId = realmListOf(apiContact.addressbookId)
 
         // We need an ID which is unique for each pair of email/name. Therefore we stick
         // together the two 32 bits hashcodes to make one unique 64 bits hashcode.
@@ -117,6 +117,8 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
             avatar = apiContact.avatar
             comesFromApi = true
         }
+        addressbookId += realmListOf(apiContact.addressbookId)
+        remoteContactGroupIds += apiContact.remoteContactGroupIds
     }
 
     override fun toString(): String = "{$avatar, $email, $name}"
