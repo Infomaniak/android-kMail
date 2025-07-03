@@ -55,9 +55,6 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable, ContactAu
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    override var contactedTimes: Int? = null
-    override var other: Boolean = false
-
     override var contactId : String = name + email
     override var autocompletableName : String = name
 
