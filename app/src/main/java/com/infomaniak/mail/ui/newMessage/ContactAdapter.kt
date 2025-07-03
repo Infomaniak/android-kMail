@@ -64,16 +64,20 @@ class ContactAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
+        return getItemViewTypeEnum(position).id
+    }
+
+    private fun getItemViewTypeEnum(position: Int): ContactType {
         return if (position < matchedContacts.count()) {
             if (matchedContacts[position].contact is MergedContact) {
-                AutocompletableContact.id
+                AutocompletableContact
             } else if (matchedContacts[position].contact is AddressBook) {
-                AutocompletableAdressBook.id
+                AutocompletableAdressBook
             } else {
-                AutocompletableGroup.id
+                AutocompletableGroup
             }
         } else {
-            UnknownContact.id
+            UnknownContact
         }
     }
 
@@ -152,10 +156,11 @@ class ContactAdapter(
 
     override fun getItemCount(): Int = matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
 
-    // I must rewrite this !!!
-    // override fun getItemId(position: Int): Long {
-    //     return if (getItemViewType(position) == AutocompletableContact.id) matchedContacts[position].contact.contactId.toLong() else 0L
-    // }
+    override fun getItemId(position: Int): Long {
+        val viewType = getItemViewTypeEnum(position)
+        val contactIdHash = if (viewType == UnknownContact) 0 else matchedContacts[position].contact.contactId.hashCode()
+        return (viewType.id.toLong() shl Int.SIZE_BITS) + contactIdHash
+    }
 
     fun addFirstAvailableItem() {
         matchedContacts.firstOrNull()?.let { onContactClicked(it.contact as MergedContact) } ?: onAddUnrecognizedContact()
@@ -203,11 +208,10 @@ class ContactAdapter(
                     val nameMatchedIndex = contact.name.standardize().indexOf(searchTerm)
                     val addressBook: AddressBook = getAddressBookWithGroup?.invoke(contact)!!
 
-
                     val standardizedEmail =
                         if (addressBook.isDynamicOrganisationMemberDirectory == true) {
                             addressBook.organization.standardize()
-                        }else {
+                        } else {
                             addressBook.name.standardize()
                         }
                     val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
@@ -221,11 +225,7 @@ class ContactAdapter(
                     if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
                 }
             }
-            // I must rewrite this !!!
             return finalUserList.sortedWith(
-                // compareByDescending<MatchedContact> { it.contact.contactedTimes }
-                //     .thenBy { it.contact.other }
-                //     .thenBy { it.contact.name }
                 compareByDescending<MatchedContact> { it.contact.contactId }
             ).toMutableList()
         }
