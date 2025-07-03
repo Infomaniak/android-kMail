@@ -450,6 +450,7 @@
     <string name="onBoardingTitle3">Pulse un mensaje durante unos segundos para seleccionar varios mensajes</string>
     <string name="onBoardingTitle4">¡Póngase en marcha!</string>
     <string name="organizationName">Organización: %s</string>
+    <string name="otherOrganisation">Otros</string>
     <string name="pendingMessagesFolder">Mensajes pendientes</string>
     <string name="pickerNoSelection">Sin selección</string>
     <string name="popupDetachMailboxDescription">¿Estás seguro de que quieres separar la dirección %s?</string>

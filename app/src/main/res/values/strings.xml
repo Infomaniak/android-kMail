@@ -456,6 +456,7 @@
     <string name="onBoardingTitle3">Press a message for a few seconds to select multiple messages</string>
     <string name="onBoardingTitle4">Get started!</string>
     <string name="organizationName">Organization: %s</string>
+    <string name="otherOrganisation">Other</string>
     <string name="pendingMessagesFolder">Pending messages</string>
     <string name="pickerNoSelection">No selection</string>
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>

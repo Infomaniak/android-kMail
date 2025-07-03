@@ -458,6 +458,7 @@
     <string name="onBoardingTitle3">Appuyez quelques secondes sur un message pour en sélectionner plusieurs</string>
     <string name="onBoardingTitle4">Lancez vous !</string>
     <string name="organizationName">Organisation : %s</string>
+    <string name="otherOrganisation">Autre</string>
     <string name="pendingMessagesFolder">Messages en attente</string>
     <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
