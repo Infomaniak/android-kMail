@@ -22,6 +22,31 @@ import android.util.StateSet
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 
+/**
+ * **IMPORTANT**: Make sure to not use `android.R.attr.enabled` or friends,
+ * but the `state_` prefixed attributes, like `android.R.attr.state_enabled`.
+ *
+ * Here are all the supported state attributes:
+ * [android.R.attr.state_window_focused]
+ * [android.R.attr.state_selected]
+ * [android.R.attr.state_focused]
+ * [android.R.attr.state_enabled]
+ * [android.R.attr.state_pressed]
+ * [android.R.attr.state_activated]
+ * [android.R.attr.state_accelerated]
+ * [android.R.attr.state_hovered]
+ * [android.R.attr.state_drag_can_accept]
+ * [android.R.attr.state_drag_hovered]
+ * [android.R.attr.state_checked]
+ *
+ * Example usage:
+ * ```kotlin
+ * someView.backgroundTintList = colorStateList {
+ *     addForState(android.R.attr.state_enabled, someColor)
+ *     addForRemainingStates(disabledColor)
+ * }
+ * ```
+ */
 inline fun colorStateList(block: ColorStateListBuilder.() -> Unit): ColorStateList {
     return ColorStateListBuilder().apply(block).build()
 }
