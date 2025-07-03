@@ -90,7 +90,10 @@ class AvatarNameEmailView @JvmOverloads constructor(
 
     fun setContactGroup(contactGroup: ContactGroup, addressBook: AddressBook?) = with(binding) {
 
-        setNameAndSubName(contactGroup, if(addressBook?.isDynamicOrganisationMemberDirectory == true) addressBook.organization else addressBook?.name)
+        setNameAndSubName(
+            contactGroup,
+            if (addressBook?.isDynamicOrganisationMemberDirectory == true) addressBook.organization else addressBook?.name
+        )
     }
 
     fun setAttendee(attendee: Attendee) = with(binding) {
@@ -101,8 +104,12 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private fun ViewAvatarNameEmailBinding.setNameAndSubName(
         addressBook: AddressBook,
     ) {
+        if (addressBook.isDynamicOrganisationMemberDirectory) {
+            userName.text = context.getString(R.string.addressBookTitle, addressBook.organization)
+        } else {
+            userName.text = context.getString(R.string.addressBookTitle, addressBook.name)
+        }
         userAvatar.loadTeamsUserAvatar()
-        userName.text = context.getString(R.string.addressBookTitle, addressBook.name)
         userEmail.text = context.getString(R.string.organizationName, addressBook.organization)
     }
 
