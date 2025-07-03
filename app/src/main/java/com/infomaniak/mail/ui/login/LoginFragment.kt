@@ -29,7 +29,15 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
+import com.infomaniak.core.Xor
+import com.infomaniak.core.login.crossapp.CrossAppLogin
+import com.infomaniak.core.login.crossapp.DerivedTokenGenerator
+import com.infomaniak.core.login.crossapp.DerivedTokenGeneratorImpl
+import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.context
@@ -39,7 +47,9 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.lib.core.utils.updateTextColor
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
+import com.infomaniak.mail.awaitOneLongClick
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
@@ -48,10 +58,13 @@ import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.loginUrl
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
@@ -87,6 +100,26 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+        //TODO: For cross app login implementation, look at:
+        // Pre-heat (i.e. `DynamicLazyMap`) getting app/device integrity attestation token if we know we might need it,
+        // that is, we have no accounts yet, and there are other friend apps.
+        //
+        //TODO:
+        // Pre-heat getting external accounts.
+        // Pre-heat checking tokens (by retrieving the profile)
+        // If there are external accounts with at least a valid token, pre-heat app/device integrity attestation token
+        // Pre-heat getting images
+        //
+        //TODO:
+        // Display all retrieved accounts, and gray out the ones with definitely stale tokens.
+        //TODO:
+        // On "Continue with this/these account(s)", in parallel:
+        // a. Attempt syncing shared app id now.
+        // b. With auto retries on network issues, attempt tokens derivation for selected accounts.
+
+        //TODO: See those files:
+        // LoginUtils.kt, LoginActivity.kt, this one (LoginFragment.kt), and NewAccountFragment.kt
+        // IntroPagerAdapter.kt and IntroFragment.kt
 
         applyWindowInsetsListener(shouldConsume = false) { root, insets ->
             root.applySideAndBottomSystemInsets(insets)
@@ -134,6 +167,36 @@ class LoginFragment : Fragment() {
                 connectButtonProgressTimer.start()
                 requireContext().trackAccountEvent("openLoginWebview")
                 loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            @OptIn(ExperimentalSerializationApi::class)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val derivedTokenGenerator: DerivedTokenGenerator = DerivedTokenGeneratorImpl(
+                    coroutineScope = this,
+                    tokenRetrievalUrl = "${loginUrl}token",
+                    hostAppPackageName = BuildConfig.APPLICATION_ID,
+                    clientId = BuildConfig.CLIENT_ID,
+                    userAgent = HttpUtils.getUserAgent
+                )
+                val crossAppLogin = CrossAppLogin.forContext(requireContext())
+                val externalAccounts = crossAppLogin.retrieveAccountsFromOtherApps()
+                connectButton.text = "${externalAccounts.size} accounts"
+                connectButton.awaitOneLongClick()
+                println("Got ${externalAccounts.size} accounts from other apps:")
+                println("Accounts retrieved: $externalAccounts")
+                externalAccounts.firstOrNull()?.let { account ->
+                    when (val result = derivedTokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
+                        is Xor.First -> with(loginUtils) {
+                            authenticateUser(token = result.value, infomaniakLogin = loginActivity.infomaniakLogin)
+                        }
+                        is Xor.Second -> {
+                            println(result.value)
+                            connectButton.text = "Ooops"
+                        }
+                    }
+                }
             }
         }
 
