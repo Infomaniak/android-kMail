@@ -82,6 +82,7 @@ class EncryptionMessageManager @Inject constructor(
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
             applyEncryptionStyleOnContactChip(isEncrypted)
+            applyEncryptionStyleOnContactChip(isEncryptionActivated = isEncrypted)
             val isEncryptionValid = checkEncryptionCanBeSend()
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
 
@@ -120,9 +121,7 @@ class EncryptionMessageManager @Inject constructor(
         encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipientsEmails ->
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = checkEncryptionCanBeSend())
 
-            binding.toField.unencryptableRecipients = recipientsEmails
-            binding.ccField.unencryptableRecipients = recipientsEmails
-            binding.bccField.unencryptableRecipients = recipientsEmails
+            applyEncryptionStyleOnContactChip(unencryptableRecipients = recipientsEmails)
 
             // Check if the email is still in the draft's recipients (it could have been deleted while being checked)
             val filteredEmails = recipientsEmails?.filter { email -> newMessageViewModel.allRecipients.any { it.email == email } }
@@ -160,6 +159,7 @@ class EncryptionMessageManager @Inject constructor(
                 EncryptionStatus.Encrypted
             }
             binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
+            applyEncryptionStyleOnContactChip(encryptionPassword = password ?: "")
 
             password?.let(newMessageViewModel.encryptionPassword::postValue)
         }
@@ -231,9 +231,25 @@ class EncryptionMessageManager @Inject constructor(
         }
     }
 
-    private fun applyEncryptionStyleOnContactChip(isEncryptionActivated: Boolean) {
-        binding.toField.isEncryptionActivated = isEncryptionActivated
-        binding.ccField.isEncryptionActivated = isEncryptionActivated
-        binding.bccField.isEncryptionActivated = isEncryptionActivated
+    private fun applyEncryptionStyleOnContactChip(
+        isEncryptionActivated: Boolean? = null,
+        unencryptableRecipients: Set<String>? = null,
+        encryptionPassword: String? = null,
+    ) = with(binding) {
+        isEncryptionActivated?.let {
+            toField.isEncryptionActivated = it
+            ccField.isEncryptionActivated = it
+            bccField.isEncryptionActivated = it
+        }
+        unencryptableRecipients?.let {
+            toField.unencryptableRecipients = it
+            ccField.unencryptableRecipients = it
+            bccField.unencryptableRecipients = it
+        }
+        encryptionPassword?.let {
+            toField.encryptionPassword = it
+            ccField.encryptionPassword = it
+            bccField.encryptionPassword = it
+        }
     }
 }

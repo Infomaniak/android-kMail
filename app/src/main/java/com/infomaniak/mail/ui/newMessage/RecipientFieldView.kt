@@ -47,6 +47,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptableView
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.UiUtils
@@ -61,22 +62,27 @@ class RecipientFieldView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr), EncryptableView {
 
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
     private var contactAdapter: ContactAdapter
     private var contactChipAdapter: ContactChipAdapter
 
-    var isEncryptionActivated: Boolean = false
+    override var isEncryptionActivated: Boolean = false
         set(value) {
             field = value
             applyEncryptionStyle()
         }
-    var unencryptableRecipients: Set<String>? = null
+    override var unencryptableRecipients: Set<String>? = null
         set(value) {
             field = value
             contactChipAdapter.unencryptableRecipients = value
             setSingleChipStyle()
+        }
+    override var encryptionPassword: String = ""
+        set(value) {
+            field = value
+            applyEncryptionStyle()
         }
 
     private lateinit var popupRecipient: Recipient
@@ -300,7 +306,7 @@ class RecipientFieldView @JvmOverloads constructor(
             val firstRecipientStatus = when {
                 !isEncryptionActivated -> EncryptionStatus.Unencrypted
                 unencryptableRecipients == null -> EncryptionStatus.Loading
-                unencryptableRecipients?.contains(recipient?.email) == true -> EncryptionStatus.PartiallyEncrypted
+                recipient?.isUnencryptable == true -> EncryptionStatus.PartiallyEncrypted
                 else -> EncryptionStatus.Encrypted
             }
             text = recipient?.getNameOrEmail() ?: ""
@@ -320,7 +326,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
         setSingleChipStyle()
         plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipStatus)
-        contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients)
+        contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients, encryptionPassword)
     }
 
     fun updateContacts(allContacts: List<MergedContact>) {
@@ -331,11 +337,10 @@ class RecipientFieldView @JvmOverloads constructor(
 
         val firstRecipient = contactChipAdapter.getRecipients().firstOrNull()
         val isExternal = firstRecipient?.isDisplayedAsExternal == true
-        val isFirstRecipientUnencryptable = unencryptableRecipients?.contains(firstRecipient?.email) == true
 
         val firstRecipientStatus = when {
             !isEncryptionActivated -> EncryptionStatus.Unencrypted
-            isFirstRecipientUnencryptable -> EncryptionStatus.PartiallyEncrypted
+            firstRecipient?.isUnencryptable == true -> EncryptionStatus.PartiallyEncrypted
             else -> EncryptionStatus.Encrypted
         }
 
