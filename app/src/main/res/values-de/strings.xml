@@ -450,6 +450,7 @@
     <string name="onBoardingTitle3">Drücken Sie einige Sekunden auf eine Nachricht, um mehrere auszuwählen</string>
     <string name="onBoardingTitle4">Los geht’s!</string>
     <string name="organizationName">Organisation: %s</string>
+    <string name="otherOrganisation">Andere</string>
     <string name="pendingMessagesFolder">Anhängige Nachrichten</string>
     <string name="pickerNoSelection">Keine Auswahl</string>
     <string name="popupDetachMailboxDescription">Sind Sie sicher, dass Sie die Adresse %s lösen möchten?</string>

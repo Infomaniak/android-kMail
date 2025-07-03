@@ -450,6 +450,7 @@
     <string name="onBoardingTitle3">Premi un messaggio per alcuni secondi per selezionare più messaggi</string>
     <string name="onBoardingTitle4">Inizia!</string>
     <string name="organizationName">Organizzazione: %s</string>
+    <string name="otherOrganisation">Altro</string>
     <string name="pendingMessagesFolder">Messaggi in sospeso</string>
     <string name="pickerNoSelection">Nessuna selezione</string>
     <string name="popupDetachMailboxDescription">Sei sicuro di voler staccare l’indirizzo %s?</string>
