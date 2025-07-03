@@ -52,6 +52,7 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
+import com.infomaniak.mail.utils.CrossLoginAccount
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.colorStateList
@@ -220,24 +221,38 @@ class LoginFragment : Fragment() {
 
         val accounts = introViewModel.crossLoginAccounts.value?.filter { it.isSelected } ?: return
         val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
+
         var firstAccountToken: ApiToken? = null
+        val accountsAndTokens = mutableMapOf<CrossLoginAccount, ApiToken?>()
+
         accounts.forEach { account ->
-            SentryLog.i(TAG, "Trying to log account: ${account.email} | ${account.tokens}")
-            when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
+            val token = when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
                 is Xor.First -> {
-                    SentryLog.i(TAG, "Succeeded to log account: ${account.email}")
-                    if (firstAccountToken == null) {
-                        firstAccountToken = result.value
-                    } else {
-                        authenticateToken(token = result.value, withRedirection = false)
-                    }
+                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.email}")
+                    if (firstAccountToken == null) firstAccountToken = result.value
+                    result.value
                 }
                 is Xor.Second -> {
-                    SentryLog.e(TAG, "Failed to log account ${account.email}, with reason: ${result.value}")
+                    SentryLog.e(TAG, "Failed to derive token for account ${account.email}, with reason: ${result.value}")
+                    null
                 }
             }
+            accountsAndTokens.put(account, token)
         }
-        firstAccountToken?.let { authenticateToken(token = it, withRedirection = true) }
+
+        val currentlySelectedInAnAppToken = accountsAndTokens.firstNotNullOfOrNull { (account, token) ->
+            if (account.isCurrentlySelectedInAnApp) token else null
+        }
+
+        val remainingTokens = accountsAndTokens
+            .filterNot { (_, token) -> token == currentlySelectedInAnAppToken }
+            .values
+
+        remainingTokens.forEach { token ->
+            token?.let { authenticateToken(token = it, withRedirection = false) }
+        }
+
+        (currentlySelectedInAnAppToken ?: firstAccountToken)?.let { authenticateToken(token = it, withRedirection = true) }
     }
 
     private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
