@@ -67,7 +67,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     fun setupAutoCompletionFields() = with(binding) {
         toField.initRecipientField(
             autoComplete = autoCompleteTo,
-            callBackRecipientField = RecipientFieldView.callBackRecipientField(
+            callBackRecipientField = RecipientFieldView.CallBackRecipientField(
                 onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
                 onContactAddedCallback = { recipient -> onContactAdded(recipient, TO) },
                 onContactRemovedCallback = { recipient -> onContactRemoved(recipient, TO) },
@@ -76,13 +76,13 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 onToggleEverythingCallback = ::openAdvancedFields,
                 getAddressBookWithGroupCallback = ::getAddressBookWithGroup,
                 getMergedContactFromContactGroupCallback = ::getMergedContactFromContactGroup,
-                getGroupFromAdressBookCallback = ::getGroupFromAdressBook,
+                getMergedContactFromAddressBookCallback = ::getMergedContactFromAddressBook,
             ),
         )
 
         ccField.initRecipientField(
             autoComplete = autoCompleteCc,
-            callBackRecipientField = RecipientFieldView.callBackRecipientField(
+            callBackRecipientField = RecipientFieldView.CallBackRecipientField(
                 onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
                 onContactAddedCallback = { recipient -> onContactAdded(recipient, CC) },
                 onContactRemovedCallback = { recipient -> onContactRemoved(recipient, CC) },
@@ -90,13 +90,13 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 gotFocusCallback = { fieldGotFocus(CC) },
                 getAddressBookWithGroupCallback = ::getAddressBookWithGroup,
                 getMergedContactFromContactGroupCallback = ::getMergedContactFromContactGroup,
-                getGroupFromAdressBookCallback = ::getGroupFromAdressBook,
+                getMergedContactFromAddressBookCallback = ::getMergedContactFromAddressBook,
             )
         )
 
         bccField.initRecipientField(
             autoComplete = autoCompleteBcc,
-            callBackRecipientField = RecipientFieldView.callBackRecipientField(
+            callBackRecipientField = RecipientFieldView.CallBackRecipientField(
                 onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
                 onContactAddedCallback = { recipient -> onContactAdded(recipient, BCC) },
                 onContactRemovedCallback = { recipient -> onContactRemoved(recipient, BCC) },
@@ -104,7 +104,7 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 gotFocusCallback = { fieldGotFocus(BCC) },
                 getAddressBookWithGroupCallback = ::getAddressBookWithGroup,
                 getMergedContactFromContactGroupCallback = ::getMergedContactFromContactGroup,
-                getGroupFromAdressBookCallback = ::getGroupFromAdressBook,
+                getMergedContactFromAddressBookCallback = ::getMergedContactFromAddressBook,
             )
         )
     }
@@ -127,8 +127,8 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
         return newMessageViewModel.getMergedContactFromContactGroup(contactGroup)
     }
 
-    private fun getGroupFromAdressBook(addressBook: AddressBook): List<ContactGroup> {
-        return newMessageViewModel.getGroupFromAdressBook(addressBook)
+    private fun getMergedContactFromAddressBook(addressBook: AddressBook): List<MergedContact> {
+        return newMessageViewModel.getMergedContactFromAddressBook(addressBook)
     }
 
     private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(binding) {

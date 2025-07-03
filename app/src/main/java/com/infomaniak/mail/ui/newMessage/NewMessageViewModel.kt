@@ -354,8 +354,8 @@ class NewMessageViewModel @Inject constructor(
         return mergedContactController.getMergedContactFromContactGroup(contactGroup)
     }
 
-    fun getGroupFromAdressBook(addressBook: AddressBook): List<ContactGroup> {
-        return addressBookController.getGroupFromAdressBook(addressBook)
+    fun getMergedContactFromAddressBook(addressBook: AddressBook): List<MergedContact> {
+        return mergedContactController.getMergedContactFromAddressBook(addressBook)
     }
 
     private fun initSignature(draft: Draft, signature: Signature) {
