@@ -45,9 +45,12 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
 
     var comesFromApi: Boolean = false // In opposition to coming from the phone's address book
         private set
-    
+
     @SerialName("categories")
     var remoteContactGroupIds: RealmList<Int> = realmListOf()
+
+    @SerialName("addressbook_id")
+    var addressbookId: Int? = null
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
@@ -63,8 +66,8 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
      */
     var other: Boolean = false
 
-    override var contactId : String = id.toString()
-    override var autocompletableName : String = name
+    override var contactId: String = id.toString()
+    override var autocompletableName: String = name
 
     constructor(
         email: String,
@@ -82,6 +85,8 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
         this.comesFromApi = comesFromApi
 
         this.remoteContactGroupIds = apiContact.remoteContactGroupIds
+
+        this.addressbookId = apiContact.addressbookId
 
         // We need an ID which is unique for each pair of email/name. Therefore we stick
         // together the two 32 bits hashcodes to make one unique 64 bits hashcode.

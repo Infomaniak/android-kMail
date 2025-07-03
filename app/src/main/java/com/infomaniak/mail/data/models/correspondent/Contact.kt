@@ -33,6 +33,8 @@ data class Contact(
     val avatar: String? = null,
     @SerialName("categories")
     val remoteContactGroupIds: RealmList<Int> = realmListOf(),
+    @SerialName("addressbook_id")
+    var addressbookId: Int? = null,
     @SerialName("contacted_times")
     val contactedTimes: Map<String, Int>? = null,
     val other: Boolean,
