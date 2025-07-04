@@ -42,6 +42,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
 import com.infomaniak.mail.utils.extensions.animatedNavigation
@@ -132,9 +133,12 @@ class SettingsFragment : Fragment() {
     }
 
     private fun openMyKSuiteDashboard(myKSuiteData: MyKSuiteData) {
+
+        val user = AccountUtils.currentUser ?: return
+
         trackMyKSuiteEvent(MatomoMyKSuite.OPEN_DASHBOARD_NAME)
 
-        val args = MyKSuiteDashboardFragmentArgs(dashboardData = getDashboardData(myKSuiteData))
+        val args = MyKSuiteDashboardFragmentArgs(dashboardData = getDashboardData(myKSuiteData, user))
         animatedNavigation(resId = R.id.myKSuiteDashboardFragment, args = args.toBundle())
     }
 

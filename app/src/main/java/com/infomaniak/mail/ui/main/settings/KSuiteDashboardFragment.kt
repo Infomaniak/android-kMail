@@ -22,6 +22,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.getDashboardData
@@ -43,7 +44,7 @@ class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {
 
         myKSuiteViewModel.refreshMyKSuite()
         myKSuiteViewModel.myKSuiteDataResult.observeNotNull(viewLifecycleOwner) { myKSuiteData ->
-            resetContent(dashboardData = getDashboardData(myKSuiteData))
+            AccountUtils.currentUser?.let { resetContent(dashboardData = getDashboardData(myKSuiteData, user = it)) }
         }
     }
 }
