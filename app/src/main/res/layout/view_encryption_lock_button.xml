@@ -25,6 +25,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/encryptionButton"
         style="@style/IconButton"
+        app:iconSize="@dimen/iconButtonSize"
         tools:icon="@drawable/ic_lock_filled"
         tools:iconTint="@color/encryptionIconColor" />
 
