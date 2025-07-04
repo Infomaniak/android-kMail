@@ -67,7 +67,7 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
             val newList = introViewModel.crossLoginAccounts.value
                 ?.toMutableList()
-                ?.apply { forEach { if (it.email == uiAccount.email) it.isSelected = !it.isSelected } }
+                ?.onEach { if (it.email == uiAccount.email) it.isSelected = !it.isSelected }
                 ?: return@setOnAccountClickedListener
 
             introViewModel.crossLoginAccounts.postValue(newList)
