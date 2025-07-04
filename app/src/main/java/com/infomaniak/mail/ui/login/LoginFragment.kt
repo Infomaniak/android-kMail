@@ -29,7 +29,12 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
+import com.infomaniak.core.Xor
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.context
@@ -39,12 +44,14 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.lib.core.utils.updateTextColor
+import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
+import com.infomaniak.mail.utils.CrossLoginAccount
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.colorStateList
@@ -54,9 +61,12 @@ import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
+@OptIn(ExperimentalSerializationApi::class)
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
 
@@ -169,6 +179,8 @@ class LoginFragment : Fragment() {
         }
 
         handleOnBackPressed()
+
+        initCrossLogin()
     }
 
     override fun onDestroyView() {
@@ -180,6 +192,66 @@ class LoginFragment : Fragment() {
         onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             if (getViewPagerCurrentItem() == 0) finish() else goBackAPage()
         }
+    }
+
+    private fun initCrossLogin() = viewLifecycleOwner.lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+            introViewModel.initDerivedTokenGenerator(coroutineScope = this)
+
+            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
+            if (accounts.isNotEmpty()) {
+                introViewModel.crossLoginAccounts.postValue(accounts)
+
+                // TODO: Uncomment this when the UI is ready
+                // repeatWhileActive {
+                //     binding.connectButton.awaitOneClick()
+                //     handleCrossAppLogin()
+                // }
+            }
+        }
+    }
+
+    private suspend fun handleCrossAppLogin() {
+
+        suspend fun authenticateToken(token: ApiToken, withRedirection: Boolean): Unit = with(loginUtils) {
+            authenticateUser(token, loginActivity.infomaniakLogin, withRedirection)
+        }
+
+        val accounts = introViewModel.crossLoginAccounts.value?.filter { it.isSelected } ?: return
+        val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
+
+        var firstAccountToken: ApiToken? = null
+        val accountsAndTokens = mutableMapOf<CrossLoginAccount, ApiToken?>()
+
+        accounts.forEach { account ->
+            val token = when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
+                is Xor.First -> {
+                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.email}")
+                    if (firstAccountToken == null) firstAccountToken = result.value
+                    result.value
+                }
+                is Xor.Second -> {
+                    SentryLog.e(TAG, "Failed to derive token for account ${account.email}, with reason: ${result.value}")
+                    null
+                }
+            }
+            accountsAndTokens.put(account, token)
+        }
+
+        val currentlySelectedInAnAppToken = accountsAndTokens.firstNotNullOfOrNull { (account, token) ->
+            if (account.isCurrentlySelectedInAnApp) token else null
+        }
+
+        val remainingTokens = accountsAndTokens
+            .filterNot { (_, token) -> token == currentlySelectedInAnAppToken }
+            .values
+
+        remainingTokens.forEach { token ->
+            token?.let { authenticateToken(token = it, withRedirection = false) }
+        }
+
+        (currentlySelectedInAnAppToken ?: firstAccountToken)?.let { authenticateToken(token = it, withRedirection = true) }
     }
 
     private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
@@ -246,4 +318,8 @@ class LoginFragment : Fragment() {
     }
 
     private fun getCurrentOnPrimary(): Int? = introViewModel.updatedAccentColor.value?.first?.getOnPrimary(requireContext())
+
+    companion object {
+        private val TAG = LoginFragment::class.java.simpleName
+    }
 }
