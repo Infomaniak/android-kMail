@@ -43,7 +43,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
-import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.EmojiReactionState
@@ -51,6 +50,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
+import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthor
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.AccountUtils
@@ -644,7 +644,7 @@ private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions
     localReactions.forEach { emoji ->
         if (emoji !in fakeReactions) {
             fakeReactions[emoji] = EmojiReactionStateUi(
-                authors = listOf(createMe()),
+                authors = listOf(EmojiReactionAuthor.FakeMe),
                 hasReacted = true,
             )
         }
@@ -661,22 +661,11 @@ private fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry
 private fun fakeEmojiReactionState(emoji: String, state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
     val shouldFake = emoji in localReactions && !state.hasReacted
 
+    val authors = state.authors.mapTo(mutableListOf<EmojiReactionAuthor>(), EmojiReactionAuthor::Real)
     val fakedReaction = EmojiReactionStateUi(
-        authors = if (shouldFake) state.authors + createMe() else state.authors,
+        authors = if (shouldFake) authors + EmojiReactionAuthor.FakeMe else authors,
         hasReacted = state.hasReacted || shouldFake,
     )
 
     return fakedReaction
 }
-
-/**
- * Data class is needed instead of just an anonymous class to have the equals method for free for comparing instances
- */
-private data class FakeCorrespondent(override val email: String, override val name: String) : Correspondent {
-    override val initials: String by lazy { computeInitials() }
-}
-
-private fun createMe(): Correspondent = FakeCorrespondent(
-    email = AccountUtils.currentMailboxEmail ?: "",
-    name = AccountUtils.currentUser?.displayName ?: "",
-)
