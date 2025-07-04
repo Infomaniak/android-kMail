@@ -32,7 +32,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.security.SecureRandom
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,7 +44,6 @@ class EncryptionViewModel @Inject constructor(
 
     val unencryptableRecipients: MutableLiveData<Set<String>?> = MutableLiveData(null)
     val isCheckingEmailsTrigger: MutableLiveData<Unit> = MutableLiveData()
-    val password: MutableLiveData<String?> = MutableLiveData(null)
 
     private var emailsCheckingJob: Job? = null
     private val emailsBeingChecked: MutableSet<String> = mutableSetOf()
@@ -90,27 +88,9 @@ class EncryptionViewModel @Inject constructor(
         }
     }
 
-    fun generatePassword(): String {
-        val generator = SecureRandom.getInstanceStrong()
-        var generatedPassword = ""
-        val charactersSetCount = PASSWORD_CHARACTERS_SET.count()
-        (0..<PASSWORD_MIN_LENGTH).forEach {
-            generatedPassword += PASSWORD_CHARACTERS_SET[generator.nextInt(charactersSetCount)]
-        }
-
-        return generatedPassword
-    }
-
     private fun clearDataAndPostResult(recipients: Set<String>) {
         emailsBeingChecked.clear()
         unencryptableRecipients.postValue(recipients)
-    }
-
-    companion object {
-
-        private const val PASSWORD_MIN_LENGTH = 16
-        private const val PASSWORD_CHARACTERS_SET =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?"
     }
 
     private class AutoBulkCallCancellationException : CancellationException()

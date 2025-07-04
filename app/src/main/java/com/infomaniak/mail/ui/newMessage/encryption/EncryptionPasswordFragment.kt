@@ -30,8 +30,10 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentEncryptionPasswordBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import dagger.hilt.android.AndroidEntryPoint
+import java.security.SecureRandom
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,7 +41,7 @@ class EncryptionPasswordFragment : Fragment() {
 
     private var binding: FragmentEncryptionPasswordBinding by safeBinding()
 
-    private val encryptionViewModel: EncryptionViewModel by activityViewModels()
+    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -57,12 +59,12 @@ class EncryptionPasswordFragment : Fragment() {
 
     private fun setupPasswordTextField() = with(binding) {
         passwordInputLayout.setEndIconOnClickListener {
-            passwordInput.setText(encryptionViewModel.generatePassword())
+            passwordInput.setText(generatePassword())
         }
         passwordInput.apply {
-            doOnTextChanged { password, _, _, _ -> encryptionViewModel.password.value = password.toString() }
-            val initialPassword = encryptionViewModel.password.value.takeUnless { it.isNullOrBlank() }
-            setText(initialPassword ?: encryptionViewModel.generatePassword())
+            doOnTextChanged { password, _, _, _ -> newMessageViewModel.encryptionPassword.value = password.toString() }
+            val initialPassword = newMessageViewModel.encryptionPassword.value.takeUnless { it.isNullOrBlank() }
+            setText(initialPassword ?: generatePassword())
         }
     }
 
@@ -76,7 +78,21 @@ class EncryptionPasswordFragment : Fragment() {
         }
     }
 
+    private fun generatePassword(): String {
+        val generator = SecureRandom.getInstanceStrong()
+        var generatedPassword = ""
+        val charactersSetCount = PASSWORD_CHARACTERS_SET.count()
+        (0..<PASSWORD_MIN_LENGTH).forEach {
+            generatedPassword += PASSWORD_CHARACTERS_SET[generator.nextInt(charactersSetCount)]
+        }
+
+        return generatedPassword
+    }
+
     companion object {
         private const val ENCRYPTION_FAQ_URL = "https://faq.infomaniak.com/1582"
+        private const val PASSWORD_MIN_LENGTH = 16
+        private const val PASSWORD_CHARACTERS_SET =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?"
     }
 }
