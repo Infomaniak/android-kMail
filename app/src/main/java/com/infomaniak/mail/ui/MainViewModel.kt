@@ -162,6 +162,7 @@ class MainViewModel @Inject constructor(
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val renameFolderResultTrigger = MutableLiveData<Unit>()
+    val deleteFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
@@ -1317,12 +1318,27 @@ class MainViewModel @Inject constructor(
         return apiResponseIsSuccess(apiResponse, mailbox)
     }
 
+    private suspend fun deleteFolderSync(folderId: String) {
+        val mailbox = currentMailbox.value ?: return
+        val apiResponse = ApiRepository.deleteFolder(mailbox.uuid, folderId)
+
+        deleteFolderResultTrigger.postValue(Unit)
+
+        if (apiResponse.isSuccess()) {
+            updateFolders(mailbox)
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
+        }
+    }
+
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
     fun modifyNameFolder(name: String, folderId: String) =
         viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
 
-    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String?{
+    fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) { deleteFolderSync(folderId) }
+
+    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String? {
         return if (apiResponse.isSuccess()) {
             updateFolders(mailbox)
             apiResponse.data?.id
@@ -1331,6 +1347,7 @@ class MainViewModel @Inject constructor(
             null
         }
     }
+
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,

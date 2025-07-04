@@ -15,17 +15,27 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/modifySettingsFolder"
-        android:icon="@drawable/ic_editor_text_options"
-        android:title="@string/actionRename"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/marginStandard"
+    android:paddingVertical="@dimen/marginStandardSmall">
+
+    <TextView
+        android:id="@+id/deleteFolderTitle"
+        style="@style/BottomSheetTitle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-    <item
-        android:id="@+id/deleteSettingsFolder"
-        android:icon="@drawable/ic_editor_text_options"
-        android:title="@string/actionDelete"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginStandard"
+        android:text="@string/deleteFolderDialogTitle" />
+
+    <TextView
+        android:id="@+id/deleteFolderDescription"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</menu>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        tools:text="@string/deleteFolderDialogDescription" />
+
+</LinearLayout>

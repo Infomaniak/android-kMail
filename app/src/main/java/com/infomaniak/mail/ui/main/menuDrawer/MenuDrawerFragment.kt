@@ -52,6 +52,7 @@ import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.ConfirmDeleteFolderDialog
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
@@ -88,6 +89,9 @@ class MenuDrawerFragment : Fragment() {
     lateinit var modifyNameFolderDialog: ModifyNameFolderDialog
 
     @Inject
+    lateinit var confirmDeleteFolderDialog: ConfirmDeleteFolderDialog
+
+    @Inject
     lateinit var menuDrawerAdapter: MenuDrawerAdapter
 
     private val currentClassName: String = MenuDrawerFragment::class.java.name
@@ -116,6 +120,7 @@ class MenuDrawerFragment : Fragment() {
         observeCurrentMailbox()
         observeNewFolderCreation()
         observeRenameFolder()
+        observeDeleteFolder()
     }
 
     private fun setupListeners() {
@@ -128,6 +133,7 @@ class MenuDrawerFragment : Fragment() {
     private fun setupManageFolderDialog() {
         createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
         modifyNameFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::modifyNameFolder)
+        confirmDeleteFolderDialog.setPositiveButtonCallback(onPositiveButtonClick = mainViewModel::deleteFolder)
     }
 
     private fun setupRecyclerView() {
@@ -221,7 +227,13 @@ class MenuDrawerFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.modifySettingsFolder -> {
+                    context?.trackCreateFolderEvent("rename")
                     modifyNameFolderDialog.show(folderName, folderId)
+                    true
+                }
+                R.id.deleteSettingsFolder -> {
+                    context?.trackCreateFolderEvent("delete")
+                    confirmDeleteFolderDialog.show(folderId, folderName)
                     true
                 }
                 else -> false
@@ -355,6 +367,10 @@ class MenuDrawerFragment : Fragment() {
 
     private fun observeRenameFolder() {
         mainViewModel.renameFolderResultTrigger.observe(viewLifecycleOwner) { modifyNameFolderDialog.resetLoadingAndDismiss() }
+    }
+
+    private fun observeDeleteFolder() {
+        mainViewModel.deleteFolderResultTrigger.observe(viewLifecycleOwner) { confirmDeleteFolderDialog.resetLoadingAndDismiss() }
     }
 
     override fun onDestroyView() {
