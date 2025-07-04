@@ -163,6 +163,7 @@ class MainViewModel @Inject constructor(
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val renameFolderResultTrigger = MutableLiveData<Unit>()
+    val deleteFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
@@ -1336,6 +1337,8 @@ class MainViewModel @Inject constructor(
     private suspend fun deleteFolderSync(folderId: String) {
         val mailbox = currentMailbox.value ?: return
         val apiResponse = ApiRepository.deleteFolder(mailbox.uuid, folderId)
+
+        deleteFolderResultTrigger.postValue(Unit)
 
         if (apiResponse.isSuccess()) {
             updateFolders(mailbox)

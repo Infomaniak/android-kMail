@@ -17,13 +17,11 @@
  */
 package com.infomaniak.mail.ui.alertDialogs
 
+import android.R.attr.description
+import android.R.attr.negativeButtonText
+import android.R.attr.positiveButtonText
 import android.content.Context
-import androidx.appcompat.app.AlertDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as RCore
-import com.infomaniak.mail.databinding.DialogConfirmDeleteFolderBinding
 import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
@@ -32,34 +30,18 @@ import javax.inject.Inject
 @ActivityScoped
 class ConfirmDeleteFolderDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
-) : BaseAlertDialog(activityContext) {
-
-    private val binding: DialogConfirmDeleteFolderBinding by lazy {
-        DialogConfirmDeleteFolderBinding.inflate(activity.layoutInflater)
-    }
+) : DescriptionAlertDialog(activityContext) {
 
     private var onPositiveButtonClick: ((String) -> Unit)? = null
 
-    private var folderId: String? = null
-
-    override val alertDialog: AlertDialog = with(binding) {
-        MaterialAlertDialogBuilder(context)
-            .setView(root)
-            .setPositiveButton(R.string.actionDelete) { _, _ ->
-                folderId?.let { onPositiveButtonClick?.invoke(it) }
-            }
-            .setNegativeButton(RCore.string.buttonCancel, null)
-            .create()
-    }
-
-    override fun resetCallbacks() {
-        onPositiveButtonClick = null
-    }
-
     fun show(folderId: String, folderName: String) = with(binding) {
-        this@ConfirmDeleteFolderDialog.folderId = folderId
-        deleteFolderDescription.text = activityContext.getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName)
-        alertDialog.show()
+        show(
+            title = activityContext.getString(R.string.deleteFolderDialogTitle),
+            description = activityContext.getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName),
+            positiveButtonText = R.string.buttonYes,
+            negativeButtonText = R.string.buttonNo,
+            onPositiveButtonClicked = { onPositiveButtonClick?.invoke(folderId) }
+        )
     }
 
     fun setPositiveButtonCallback(onPositiveButtonClick: (String) -> Unit) {

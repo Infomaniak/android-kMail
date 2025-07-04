@@ -57,6 +57,7 @@ open class DescriptionAlertDialog @Inject constructor(
         onPositiveButtonClicked = null
         onNegativeButtonClicked = null
         onCancelled = null
+        resetLoadingAndDismiss()
     }
 
     fun show(

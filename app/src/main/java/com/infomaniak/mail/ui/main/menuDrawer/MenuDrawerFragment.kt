@@ -120,6 +120,7 @@ class MenuDrawerFragment : Fragment() {
         observeCurrentMailbox()
         observeNewFolderCreation()
         observeRenameFolder()
+        observeDeleteFolder()
     }
 
     private fun setupListeners() {
@@ -152,7 +153,7 @@ class MenuDrawerFragment : Fragment() {
                 override var onFeedbackClicked: () -> Unit = ::onFeedbackClicked
                 override var onHelpClicked: () -> Unit = ::onHelpClicked
                 override var onAppVersionClicked: () -> Unit = ::onAppVersionClicked
-            }
+            },
         )
     }
 
@@ -364,6 +365,10 @@ class MenuDrawerFragment : Fragment() {
 
     private fun observeRenameFolder() {
         mainViewModel.renameFolderResultTrigger.observe(viewLifecycleOwner) { modifyNameFolderDialog.resetLoadingAndDismiss() }
+    }
+
+    private fun observeDeleteFolder() {
+        mainViewModel.deleteFolderResultTrigger.observe(viewLifecycleOwner) { confirmDeleteFolderDialog.resetLoadingAndDismiss() }
     }
 
     override fun onDestroyView() {
