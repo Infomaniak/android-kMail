@@ -537,6 +537,11 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun getLocalReactionsFor(messageUid: String) = (messagesLive.value
+        ?.first
+        ?.firstOrNull { it is MessageUi && it.message.uid == messageUid } as? MessageUi)
+        ?.emojiReactionsState
+
     data class SubjectDataResult(
         val thread: Thread?,
         val mergedContacts: MergedContactDictionary?,
