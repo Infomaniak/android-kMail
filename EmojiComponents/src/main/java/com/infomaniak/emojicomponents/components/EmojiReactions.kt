@@ -45,7 +45,7 @@ fun EmojiReactions(
     modifier: Modifier = Modifier,
     addReactionIcon: ImageVector = EmojiReactionsDefaults.addReactionIcon,
     isAddReactionEnabled: () -> Boolean = { true },
-    colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
+    colors: EmojiReactionsColors = EmojiReactionsDefaults.colors(),
     shape: Shape = InputChipDefaults.shape,
 ) {
     FlowRow(
@@ -59,7 +59,7 @@ fun EmojiReactions(
                 reactionCount = { state.count },
                 selected = { state.hasReacted },
                 onClick = { onEmojiClicked(emoji) },
-                colors = colors,
+                colors = colors.reactionChip,
                 shape = shape,
             )
         }
@@ -67,12 +67,27 @@ fun EmojiReactions(
             addReactionIcon,
             onClick = onAddReactionClick,
             enabled = isAddReactionEnabled,
+            colors = colors.addReaction,
         )
     }
 }
 
+data class EmojiReactionsColors(
+    val reactionChip: ReactionChipColors,
+    val addReaction: AddReactionColors,
+)
+
 object EmojiReactionsDefaults {
     val addReactionIcon = Icons.FaceSmileRoundPlus
+
+    @Composable
+    fun colors(
+        reactionChipColors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
+        addReactionColors: AddReactionColors = AddReactionChipDefaults.addReactionColors(),
+    ): EmojiReactionsColors = EmojiReactionsColors(
+        reactionChipColors,
+        addReactionColors,
+    )
 }
 
 @Preview
