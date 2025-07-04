@@ -31,6 +31,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageFragmentDirections
 import com.infomaniak.mail.ui.newMessage.NewMessageManager
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
+import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
@@ -59,7 +60,6 @@ class EncryptionMessageManager @Inject constructor(
         )
 
         _encryptionViewModel = encryptionViewModel
-        observeDraftPassword()
         observeEmailsCheckingTrigger()
     }
 
@@ -70,18 +70,8 @@ class EncryptionMessageManager @Inject constructor(
         }
     }
 
-    fun observeDraftPassword() {
-        newMessageViewModel.encryptionPassword.distinctUntilChanged().observe(viewLifecycleOwner) { draftPassword ->
-            if (draftPassword.isNullOrBlank() || encryptionViewModel.password.value != null) return@observe
-
-            // We initialize the encryption password to the value of the already existing password stored in the draft
-            encryptionViewModel.password.value = draftPassword
-        }
-    }
-
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
-            applyEncryptionStyleOnContactChip(isEncrypted)
             applyEncryptionStyleOnContactChip(isEncryptionActivated = isEncrypted)
             val isEncryptionValid = checkEncryptionCanBeSend()
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
@@ -108,7 +98,7 @@ class EncryptionMessageManager @Inject constructor(
                 isEncrypted -> EncryptionStatus.Loading // First call have not ended yet
                 else -> {
                     // User has disabled encryption
-                    encryptionViewModel.password.value = ""
+                    newMessageViewModel.encryptionPassword.value = ""
                     EncryptionStatus.Unencrypted
                 }
             }
@@ -131,7 +121,7 @@ class EncryptionMessageManager @Inject constructor(
             val recipientsCount = filteredEmails?.count() ?: 0
             binding.encryptionLockButtonView.apply {
                 unencryptableRecipientsCount = recipientsCount
-                encryptionStatus = if (recipientsCount > 0 && encryptionViewModel.password.value.isNullOrBlank()) {
+                encryptionStatus = if (recipientsCount > 0 && newMessageViewModel.encryptionPassword.value.isNullOrBlank()) {
                     EncryptionStatus.PartiallyEncrypted
                 } else {
                     EncryptionStatus.Encrypted
@@ -152,16 +142,16 @@ class EncryptionMessageManager @Inject constructor(
     }
 
     fun observeEncryptionPassword() {
-        encryptionViewModel.password.distinctUntilChanged().observe(viewLifecycleOwner) { password ->
-            val encryptionStatus = if (password.isNullOrBlank()) {
+        newMessageViewModel.encryptionPassword.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { password ->
+            val encryptionStatus = if (password.isBlank()) {
                 EncryptionStatus.PartiallyEncrypted
             } else {
                 EncryptionStatus.Encrypted
             }
             binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
-            applyEncryptionStyleOnContactChip(encryptionPassword = password ?: "")
+            applyEncryptionStyleOnContactChip(encryptionPassword = password)
 
-            password?.let(newMessageViewModel.encryptionPassword::postValue)
+            newMessageViewModel.encryptionPassword.postValue(password)
         }
     }
 
@@ -208,7 +198,7 @@ class EncryptionMessageManager @Inject constructor(
             !isEncryptionActivated -> true // Encryption is not activated, doesn't need to block the draft sending
             currentUnencryptableRecipients == null -> false // The call to know if recipient can be encrypted is still processing
             currentUnencryptableRecipients.isEmpty() -> true // Only auto-encryptable recipients
-            encryptionViewModel.password.value?.isNotBlank() == true -> true // A password has been provided
+            newMessageViewModel.encryptionPassword.value?.isNotBlank() == true -> true // A password has been provided
             else -> false // Some unencryptable recipients without password
         }
     }
