@@ -29,6 +29,7 @@
         android:layout_height="match_parent"
         app:crossLoginAvatarStrokeColor="@color/background"
         app:crossLoginButtonStrokeColor="@color/commonColor2"
+        app:crossLoginButtonType="Mail"
         app:crossLoginDescriptionColor="@color/secondaryTextColor"
         app:crossLoginTitleColor="@color/primaryTextColor"
         tools:crossLoginOnPrimaryColor="?attr/colorOnPrimary"
