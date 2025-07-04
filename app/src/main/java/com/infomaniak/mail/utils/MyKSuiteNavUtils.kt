@@ -27,7 +27,8 @@ import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
 import com.infomaniak.core.myksuite.ui.screens.MyKSuiteDashboardScreenData
 import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils
 import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
-import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorResBasedOnId
+import com.infomaniak.core.useravatar.extensions.getBackgroundColorResBasedOnId
+import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.R
 
@@ -42,17 +43,19 @@ fun Activity.openMyKSuiteUpgradeBottomSheet(navController: NavController, matomo
     navController.openMyKSuiteUpgradeBottomSheet(KSuiteApp.Mail)
 }
 
-fun Fragment.getDashboardData(myKSuiteData: MyKSuiteData): MyKSuiteDashboardScreenData {
+fun Fragment.getDashboardData(myKSuiteData: MyKSuiteData, user: User): MyKSuiteDashboardScreenData {
+
     val backgroundColor = requireContext().getBackgroundColorResBasedOnId(
-        id = AccountUtils.currentUser?.id ?: -1,
+        id = user.id.toString().hashCode(),
         array = R.array.AvatarColors,
     )
 
     return MyKSuiteUiUtils.getDashboardData(
         context = requireContext(),
         myKSuiteData = myKSuiteData,
-        avatarUri = AccountUtils.currentUser?.avatar,
-        userInitials = AccountUtils.currentUser?.getInitials(),
+        userId = user.id.toString(),
+        avatarUri = user.avatar,
+        userInitials = user.getInitials(),
         iconColor = requireContext().getColor(R.color.onColorfulBackground),
         userInitialsBackgroundColor = backgroundColor,
     )
