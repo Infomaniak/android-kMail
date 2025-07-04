@@ -32,6 +32,7 @@ data class CrossLoginAccount(
 
     //region Common
     val name: String,
+    val initials: String,
     val email: String,
     val avatarUrl: String?,
     //endregion
@@ -50,6 +51,7 @@ fun ExternalAccount.toCrossLoginAccount(): CrossLoginAccount {
         tokens = tokens,
         isCurrentlySelectedInAnApp = isCurrentlySelectedInAnApp,
         name = fullName,
+        initials = initials,
         email = email,
         avatarUrl = avatarUrl,
     )
@@ -60,6 +62,7 @@ fun List<CrossLoginAccount>.toUiAccounts(): List<CrossLoginUiAccount> = map { it
 fun CrossLoginAccount.toUiAccount(): CrossLoginUiAccount {
     return CrossLoginUiAccount(
         name = name,
+        initials = initials,
         email = email,
         avatarUrl = avatarUrl,
         isSelected = isSelected,
