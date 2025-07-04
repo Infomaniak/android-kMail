@@ -84,6 +84,7 @@
             android:visibility="gone"
             app:crossLoginAvatarStrokeColor="@color/background"
             app:crossLoginButtonStrokeColor="@color/commonColor2"
+            app:crossLoginButtonType="Mail"
             app:crossLoginDescriptionColor="@color/secondaryTextColor"
             app:crossLoginTitleColor="@color/primaryTextColor"
             app:layout_constraintBottom_toTopOf="@id/connectButton"
