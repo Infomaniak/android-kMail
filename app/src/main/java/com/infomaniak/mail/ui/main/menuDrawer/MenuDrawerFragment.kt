@@ -227,10 +227,12 @@ class MenuDrawerFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.modifySettingsFolder -> {
+                    context?.trackCreateFolderEvent("rename")
                     modifyNameFolderDialog.show(folderName, folderId)
                     true
                 }
                 R.id.deleteSettingsFolder -> {
+                    context?.trackCreateFolderEvent("delete")
                     confirmDeleteFolderDialog.show(folderId, folderName)
                     true
                 }

@@ -21,6 +21,7 @@ import android.R.attr.description
 import android.R.attr.negativeButtonText
 import android.R.attr.positiveButtonText
 import android.content.Context
+import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -45,6 +46,7 @@ class ConfirmDeleteFolderDialog @Inject constructor(
     }
 
     fun setPositiveButtonCallback(onPositiveButtonClick: (String) -> Unit) {
+        activityContext.trackCreateFolderEvent("deleteConfirm")
         this.onPositiveButtonClick = onPositiveButtonClick
     }
 }
