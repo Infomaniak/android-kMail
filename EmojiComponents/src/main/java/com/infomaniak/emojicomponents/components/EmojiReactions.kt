@@ -44,6 +44,7 @@ fun EmojiReactions(
     onAddReactionClick: () -> Unit,
     modifier: Modifier = Modifier,
     addReactionIcon: ImageVector = EmojiReactionsDefaults.addReactionIcon,
+    isAddReactionEnabled: () -> Boolean = { true },
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
 ) {
@@ -65,6 +66,7 @@ fun EmojiReactions(
         AddReactionChip(
             addReactionIcon,
             onClick = onAddReactionClick,
+            enabled = isAddReactionEnabled,
         )
     }
 }
