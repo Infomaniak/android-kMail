@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.utils
 
+import com.infomaniak.core.crossloginui.data.CrossLoginUiAccount
 import com.infomaniak.core.login.crossapp.ExternalAccount
 import kotlinx.serialization.ExperimentalSerializationApi
 
@@ -31,6 +32,7 @@ data class CrossLoginAccount(
 
     //region Common
     val name: String,
+    val initials: String,
     val email: String,
     val avatarUrl: String?,
     //endregion
@@ -40,6 +42,8 @@ data class CrossLoginAccount(
     //endregion
 )
 
+fun List<CrossLoginAccount>.selectedCount(): Int = count { it.isSelected }
+
 fun List<ExternalAccount>.toCrossLoginAccounts(): List<CrossLoginAccount> = map { it.toCrossLoginAccount() }
 
 fun ExternalAccount.toCrossLoginAccount(): CrossLoginAccount {
@@ -47,7 +51,20 @@ fun ExternalAccount.toCrossLoginAccount(): CrossLoginAccount {
         tokens = tokens,
         isCurrentlySelectedInAnApp = isCurrentlySelectedInAnApp,
         name = fullName,
+        initials = initials,
         email = email,
         avatarUrl = avatarUrl,
+    )
+}
+
+fun List<CrossLoginAccount>.toUiAccounts(): List<CrossLoginUiAccount> = map { it.toUiAccount() }
+
+fun CrossLoginAccount.toUiAccount(): CrossLoginUiAccount {
+    return CrossLoginUiAccount(
+        name = name,
+        initials = initials,
+        email = email,
+        avatarUrl = avatarUrl,
+        isSelected = isSelected,
     )
 }

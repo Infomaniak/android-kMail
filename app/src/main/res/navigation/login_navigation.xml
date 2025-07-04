@@ -29,6 +29,9 @@
         <action
             android:id="@+id/action_loginFragment_to_newAccountFragment"
             app:destination="@id/newAccountFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_crossLoginBottomSheetDialog"
+            app:destination="@id/crossLoginBottomSheetDialog" />
     </fragment>
 
     <fragment
@@ -49,5 +52,11 @@
             android:name="position"
             app:argType="integer" />
     </fragment>
+
+    <dialog
+        android:id="@+id/crossLoginBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.login.CrossLoginBottomSheetDialog"
+        android:label="CrossLoginBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_cross_login" />
 
 </navigation>
