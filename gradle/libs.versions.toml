@@ -48,7 +48,6 @@ navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradl
 play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
 realm-kotlin-base = { module = "io.realm.kotlin:library-base", version.ref = "realmKotlin" }
 rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", version.ref = "richHtmlEditor" }
-sentry-android-fragment = { module = "io.sentry:sentry-android-fragment", version.ref = "sentryAndroidFragment" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 work-concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "workConcurrentFutures" }
 # Unit tests

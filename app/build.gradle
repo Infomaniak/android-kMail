@@ -105,6 +105,7 @@ dependencies {
     implementation project(':Core:Network')
     implementation project(':Core:UserAvatar')
     implementation project(':EmojiComponents')
+    implementation project(':Core:SentryConfig')
     implementation project(':HtmlCleaner')
 
     implementation libs.rich.html.editor
@@ -133,7 +134,7 @@ dependencies {
     kapt libs.hilt.compiler
     kapt libs.hilt.compiler.androidx
 
-    implementation libs.sentry.android.fragment
+    implementation core.sentry.android.fragment
 
     // Not used directly in the code, but coil3 injects it automatically simply when it's present as a dependency in the project
     implementation core.coil.svg
