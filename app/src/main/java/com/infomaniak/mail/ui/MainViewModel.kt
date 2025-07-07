@@ -1310,32 +1310,20 @@ class MainViewModel @Inject constructor(
         return apiResponseIsSuccess(apiResponse, mailbox)
     }
 
-    private suspend fun modifyNameFolderSync(folderId: String, name: String): String? {
-        val mailbox = currentMailbox.value ?: return null
-        val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
-
-        renameFolderResultTrigger.postValue(Unit)
-
-        return apiResponseIsSuccess(apiResponse, mailbox)
-    }
-
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
     fun modifyNameFolder(name: String, folderId: String) =
-        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
+        viewModelScope.launch(ioCoroutineContext) {
+            val mailbox = currentMailbox.value!!
+            val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
 
-    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String? {
-        return if (apiResponse.isSuccess()) {
-            updateFolders(mailbox)
-            apiResponse.data?.id
-        } else {
-            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
-            null
+            renameFolderResultTrigger.postValue(Unit)
+
+            apiResponseIsSuccess(apiResponse, mailbox)
         }
-    }
 
-    private suspend fun deleteFolderSync(folderId: String) {
-        val mailbox = currentMailbox.value ?: return
+    fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value!!
         val apiResponse = ApiRepository.deleteFolder(mailbox.uuid, folderId)
 
         deleteFolderResultTrigger.postValue(Unit)
@@ -1346,13 +1334,6 @@ class MainViewModel @Inject constructor(
             snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
         }
     }
-
-    fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
-
-    fun modifyNameFolder(name: String, folderId: String) =
-        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
-
-    fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) { deleteFolderSync(folderId) }
 
     private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String? {
         return if (apiResponse.isSuccess()) {
