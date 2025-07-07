@@ -28,8 +28,10 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentEncryptionPasswordBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.ContactChipAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +44,11 @@ class EncryptionPasswordFragment : Fragment() {
     private var binding: FragmentEncryptionPasswordBinding by safeBinding()
 
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+    private val encryptionViewModel: EncryptionViewModel by activityViewModels()
+
+    private val contactChipAdapter: ContactChipAdapter by lazy {
+        ContactChipAdapter(openContextMenu = { _, _ -> }, onBackspace = {})
+    }
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -53,8 +60,18 @@ class EncryptionPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupUnencryptableRecipientsChips()
         setupPasswordTextField()
         setupListeners()
+    }
+
+    private fun setupUnencryptableRecipientsChips() {
+        with(contactChipAdapter) {
+            binding.userChipsRecyclerView.adapter = this
+            unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
+            isEncryptionActivated = true
+            unencryptableRecipients?.forEach { addChip(Recipient().initLocalValues(email = it)) }
+        }
     }
 
     private fun setupPasswordTextField() = with(binding) {
