@@ -44,6 +44,7 @@ class IntroViewModel @Inject constructor(
     val updatedAccentColor = MutableLiveData(localSettings.accentColor to localSettings.accentColor)
 
     val crossLoginAccounts = MutableLiveData(emptyList<CrossLoginAccount>())
+    val crossLoginSelectedIds = MutableLiveData(emptySet<Int>())
 
     var derivedTokenGenerator: DerivedTokenGenerator? = null
         private set
