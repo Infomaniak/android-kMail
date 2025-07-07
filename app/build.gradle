@@ -103,9 +103,10 @@ dependencies {
     implementation project(':Core:Matomo')
     implementation project(':Core:MyKSuite')
     implementation project(':Core:Network')
+    implementation project(':Core:Sentry')
     implementation project(':Core:UserAvatar')
-    implementation project(':EmojiComponents')
     implementation project(':Core:SentryConfig')
+    implementation project(':EmojiComponents')
     implementation project(':HtmlCleaner')
 
     implementation libs.rich.html.editor
