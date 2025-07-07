@@ -53,7 +53,7 @@ fun Fragment.getDashboardData(myKSuiteData: MyKSuiteData, user: User): MyKSuiteD
     return MyKSuiteUiUtils.getDashboardData(
         context = requireContext(),
         myKSuiteData = myKSuiteData,
-        userId = user.id.toString(),
+        userId = user.id,
         avatarUri = user.avatar,
         userInitials = user.getInitials(),
         iconColor = requireContext().getColor(R.color.onColorfulBackground),
