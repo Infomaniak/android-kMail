@@ -34,6 +34,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.core.Xor
+import com.infomaniak.core.crossloginui.data.CrossLoginAccount
+import com.infomaniak.core.crossloginui.previews.accountsPreviewData
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.login.crossapp.DerivedTokenGenerator.Issue
 import com.infomaniak.core.utils.awaitOneClick
@@ -259,7 +261,23 @@ class LoginFragment : Fragment() {
 
             binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
 
-            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
+            // val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
+            // TODO: retirer le code de test
+            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext()).toMutableList().apply {
+                addAll(
+                    accountsPreviewData.map {
+                        CrossLoginAccount(
+                            tokens = setOf("I'm a token"),
+                            isCurrentlySelectedInAnApp = false,
+                            id = it.id,
+                            name = it.name,
+                            initials = it.initials,
+                            email = it.email,
+                            url = it.url,
+                        )
+                    },
+                )
+            }
 
             if (accounts.isNotEmpty()) {
                 introViewModel.crossLoginAccounts.value = accounts
