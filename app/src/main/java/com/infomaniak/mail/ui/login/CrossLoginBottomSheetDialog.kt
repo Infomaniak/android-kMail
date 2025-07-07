@@ -28,7 +28,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetCrossLoginBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
-import com.infomaniak.mail.utils.toUiAccounts
+import com.infomaniak.mail.utils.uiAccounts
 
 class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -45,6 +45,7 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
         observeAccentColor()
         observeCrossLoginAccounts()
+        observeCrossLoginSelectedIds()
         setCrossLoginClicksListeners()
     }
 
@@ -57,21 +58,17 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun observeCrossLoginAccounts() {
         introViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
-            binding.crossLoginBottomSheet.setAccounts(accounts.toUiAccounts())
+            binding.crossLoginBottomSheet.setAccounts(accounts.uiAccounts())
+        }
+    }
+
+    private fun observeCrossLoginSelectedIds() {
+        introViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
+            binding.crossLoginBottomSheet.setSelectedIds(ids)
         }
     }
 
     private fun setCrossLoginClicksListeners() {
-
-        binding.crossLoginBottomSheet.setOnAccountClickedListener { uiAccount ->
-
-            val newList = introViewModel.crossLoginAccounts.value
-                ?.toMutableList()
-                ?.onEach { if (it.email == uiAccount.email) it.isSelected = !it.isSelected }
-                ?: return@setOnAccountClickedListener
-
-            introViewModel.crossLoginAccounts.postValue(newList)
-        }
 
         binding.crossLoginBottomSheet.setOnAnotherAccountClickedListener {
             parentFragmentManager.setFragmentResult(
@@ -81,7 +78,8 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
             findNavController().popBackStack()
         }
 
-        binding.crossLoginBottomSheet.setOnCloseClickedListener {
+        binding.crossLoginBottomSheet.setOnSaveClickedListener { selectedIds ->
+            introViewModel.crossLoginSelectedIds.value = selectedIds
             findNavController().popBackStack()
         }
     }
