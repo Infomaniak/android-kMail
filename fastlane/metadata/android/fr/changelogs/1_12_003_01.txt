@@ -1,0 +1,2 @@
+- Ajout de la possibilité de renommer un dossier
+- Suppression d'un clignotement lors du déplacement d'un fil de discussion dans un autre dossier

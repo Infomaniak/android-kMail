@@ -1,0 +1,2 @@
+- Add the possibility to rename a folder
+- Remove a blink when moving a thread into another folder
