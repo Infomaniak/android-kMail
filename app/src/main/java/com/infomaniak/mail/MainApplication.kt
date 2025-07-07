@@ -35,7 +35,7 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
 import com.facebook.stetho.Stetho
-import com.infomaniak.core.sentryconfig.SentryConfig.configureSentry
+import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
