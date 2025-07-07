@@ -65,6 +65,7 @@ import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType.INFOMANIAK
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.AndroidEntryPoint
@@ -233,7 +234,13 @@ class MenuDrawerFragment : Fragment() {
                 }
                 R.id.deleteSettingsFolder -> {
                     context?.trackCreateFolderEvent("delete")
-                    confirmDeleteFolderDialog.show(folderId, folderName)
+                    confirmDeleteFolderDialog.show(
+                        title = requireContext().getString(R.string.deleteFolderDialogTitle),
+                        description = requireContext().getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName),
+                        positiveButtonText = R.string.buttonYes,
+                        negativeButtonText = R.string.buttonNo,
+                        onPositiveButtonClicked = { confirmDeleteFolderDialog.onPositiveButtonClick?.invoke(folderId) }
+                    )
                     true
                 }
                 else -> false
