@@ -64,8 +64,7 @@ import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import com.infomaniak.mail.utils.extensions.statusBar
-import com.infomaniak.mail.utils.selectedCount
-import com.infomaniak.mail.utils.toUiAccounts
+import com.infomaniak.mail.utils.uiAccounts
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -192,6 +191,7 @@ class LoginFragment : Fragment() {
 
         observeAccentColor()
         observeCrossLoginAccounts()
+        observeCrossLoginSelectedIds()
         setCrossLoginClickListener()
         initCrossLogin()
     }
@@ -216,22 +216,21 @@ class LoginFragment : Fragment() {
 
     private fun observeCrossLoginAccounts() {
         introViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
+            SentryLog.i(TAG, "Got ${accounts.count()} accounts from other apps")
+            binding.crossLoginSelection.setAccounts(accounts.uiAccounts())
+        }
+    }
 
-            SentryLog.i(TAG, "Got ${accounts.size} accounts from other apps")
-            SentryLog.i(TAG, "Retrieved accounts: ${accounts.map { it.email }}")
+    private fun observeCrossLoginSelectedIds() {
+        introViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
+            if (ids.isEmpty()) return@observe
 
-            binding.crossLoginSelection.setAccounts(accounts.toUiAccounts())
-            val selectedCount = accounts.selectedCount()
-
-            if (selectedCount > 0) {
-                SentryLog.i(TAG, "User selected $selectedCount accounts")
-                SentryLog.i(TAG, "Selected accounts: ${accounts.map { it.email }}")
-                binding.connectButton.text = requireContext().resources.getQuantityString(
-                    RCrossLogin.plurals.buttonContinueWithAccounts,
-                    selectedCount,
-                    selectedCount,
-                )
-            }
+            val count = ids.count()
+            SentryLog.i(TAG, "User selected $count accounts")
+            binding.crossLoginSelection.setSelectedIds(ids)
+            binding.connectButton.text = requireContext().resources.getQuantityString(
+                RCrossLogin.plurals.buttonContinueWithAccounts, count, count,
+            )
         }
     }
 
@@ -260,7 +259,11 @@ class LoginFragment : Fragment() {
             binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
 
             val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
-            if (accounts.isNotEmpty()) introViewModel.crossLoginAccounts.value = accounts
+
+            if (accounts.isNotEmpty()) {
+                introViewModel.crossLoginAccounts.value = accounts
+                introViewModel.crossLoginSelectedIds.value = accounts.map { it.uiAccount.id }.toSet()
+            }
 
             repeatWhileActive {
                 binding.connectButton.awaitOneClick()
@@ -282,7 +285,9 @@ class LoginFragment : Fragment() {
             authenticateUser(token, loginActivity.infomaniakLogin, withRedirection)
         }
 
-        val accounts = introViewModel.crossLoginAccounts.value?.filter { it.isSelected } ?: return
+        val accounts = introViewModel.crossLoginAccounts.value
+            ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.uiAccount.id) == true }
+            ?: return
         val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
 
         var firstAccountToken: ApiToken? = null
@@ -291,12 +296,12 @@ class LoginFragment : Fragment() {
         accounts.forEach { account ->
             val token = when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
                 is Xor.First -> {
-                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.email}")
+                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.uiAccount.id}")
                     if (firstAccountToken == null) firstAccountToken = result.value
                     result.value
                 }
                 is Xor.Second -> {
-                    SentryLog.e(TAG, "Failed to derive token for account ${account.email}, with reason: ${result.value}")
+                    SentryLog.e(TAG, "Failed to derive token for account ${account.uiAccount.id}, with reason: ${result.value}")
                     null
                 }
             }

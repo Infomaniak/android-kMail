@@ -24,26 +24,10 @@ import com.infomaniak.core.login.crossapp.ExternalAccount
 import kotlinx.serialization.ExperimentalSerializationApi
 
 data class CrossLoginAccount(
-
-    //region Backend only
     val tokens: Set<String>,
     val isCurrentlySelectedInAnApp: Boolean,
-    //endregion
-
-    //region Common
-    val id: Int,
-    val name: String,
-    val initials: String,
-    val email: String,
-    val avatarUrl: String?,
-    //endregion
-
-    //region Frontend only
-    var isSelected: Boolean = true,
-    //endregion
+    val uiAccount: CrossLoginUiAccount,
 )
-
-fun List<CrossLoginAccount>.selectedCount(): Int = count { it.isSelected }
 
 fun List<ExternalAccount>.toCrossLoginAccounts(): List<CrossLoginAccount> = map { it.toCrossLoginAccount() }
 
@@ -51,23 +35,14 @@ fun ExternalAccount.toCrossLoginAccount(): CrossLoginAccount {
     return CrossLoginAccount(
         tokens = tokens,
         isCurrentlySelectedInAnApp = isCurrentlySelectedInAnApp,
-        id = id,
-        name = fullName,
-        initials = initials,
-        email = email,
-        avatarUrl = avatarUrl,
+        uiAccount = CrossLoginUiAccount(
+            id = id,
+            name = fullName,
+            initials = initials,
+            email = email,
+            url = avatarUrl,
+        ),
     )
 }
 
-fun List<CrossLoginAccount>.toUiAccounts(): List<CrossLoginUiAccount> = map { it.toUiAccount() }
-
-fun CrossLoginAccount.toUiAccount(): CrossLoginUiAccount {
-    return CrossLoginUiAccount(
-        id = id,
-        name = name,
-        initials = initials,
-        email = email,
-        avatarUrl = avatarUrl,
-        isSelected = isSelected,
-    )
-}
+fun List<CrossLoginAccount>.uiAccounts(): List<CrossLoginUiAccount> = map { it.uiAccount }
