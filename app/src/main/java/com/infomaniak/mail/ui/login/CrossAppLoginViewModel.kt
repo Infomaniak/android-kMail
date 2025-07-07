@@ -22,6 +22,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.core.crossloginui.previews.accountsPreviewData
 import com.infomaniak.core.login.crossapp.CrossAppLogin
 import com.infomaniak.core.login.crossapp.DerivedTokenGenerator
 import com.infomaniak.core.login.crossapp.DerivedTokenGeneratorImpl
@@ -73,7 +74,8 @@ class CrossAppLoginViewModel : ViewModel() {
             coroutineScope = this + Dispatchers.Default
         )
         hostActivity.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            _availableAccounts.emit(crossAppLogin.retrieveAccountsFromOtherApps())
+            // TODO: Remove the ` + accountsPreviewData` in this line, it's only here to add test data
+            _availableAccounts.emit(crossAppLogin.retrieveAccountsFromOtherApps() + accountsPreviewData)
         }
         awaitCancellation() // Should never be reached. Unfortunately, `repeatOnLifecycle` doesn't return `Nothing`.
     }
