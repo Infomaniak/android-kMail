@@ -18,9 +18,6 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
-import com.infomaniak.mail.R
-import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -28,12 +25,4 @@ import javax.inject.Inject
 @ActivityScoped
 class ConfirmDeleteFolderDialog @Inject constructor(
     @ActivityContext private val activityContext: Context,
-) : DescriptionAlertDialog(activityContext) {
-
-    var onPositiveButtonClick: ((String) -> Unit)? = null
-
-    fun setPositiveButtonCallback(onPositiveButtonClick: (String) -> Unit) {
-        activityContext.trackCreateFolderEvent("deleteConfirm")
-        this.onPositiveButtonClick = onPositiveButtonClick
-    }
-}
+) : DescriptionAlertDialog(activityContext)

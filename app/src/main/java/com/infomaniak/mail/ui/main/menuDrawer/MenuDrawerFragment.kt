@@ -41,6 +41,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
+import com.infomaniak.mail.MatomoMail.trackManageFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
@@ -119,9 +120,7 @@ class MenuDrawerFragment : Fragment() {
         observeMenuDrawerData()
         observeCurrentFolder()
         observeCurrentMailbox()
-        observeNewFolderCreation()
-        observeRenameFolder()
-        observeDeleteFolder()
+        observeManageFolder()
     }
 
     private fun setupListeners() {
@@ -134,7 +133,6 @@ class MenuDrawerFragment : Fragment() {
     private fun setupManageFolderDialog() {
         createFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::createNewFolder)
         modifyNameFolderDialog.setCallbacks(onPositiveButtonClicked = mainViewModel::modifyNameFolder)
-        confirmDeleteFolderDialog.setPositiveButtonCallback(onPositiveButtonClick = mainViewModel::deleteFolder)
     }
 
     private fun setupRecyclerView() {
@@ -228,18 +226,21 @@ class MenuDrawerFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.modifySettingsFolder -> {
-                    context?.trackCreateFolderEvent("rename")
-                    modifyNameFolderDialog.show(folderName, folderId)
+                    context?.trackManageFolderEvent("rename")
+                    modifyNameFolderDialog.setFolderIdAndShow(folderName, folderId)
                     true
                 }
                 R.id.deleteSettingsFolder -> {
-                    context?.trackCreateFolderEvent("delete")
+                    context?.trackManageFolderEvent("delete")
                     confirmDeleteFolderDialog.show(
                         title = requireContext().getString(R.string.deleteFolderDialogTitle),
                         description = requireContext().getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName),
                         positiveButtonText = R.string.buttonYes,
                         negativeButtonText = R.string.buttonNo,
-                        onPositiveButtonClicked = { confirmDeleteFolderDialog.onPositiveButtonClick?.invoke(folderId) }
+                        onPositiveButtonClicked = {
+                            context?.trackManageFolderEvent("deleteConfirm")
+                            mainViewModel.deleteFolder(folderId)
+                        }
                     )
                     true
                 }
@@ -368,15 +369,9 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun observeNewFolderCreation() {
+    private fun observeManageFolder() {
         mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetLoadingAndDismiss() }
-    }
-
-    private fun observeRenameFolder() {
         mainViewModel.renameFolderResultTrigger.observe(viewLifecycleOwner) { modifyNameFolderDialog.resetLoadingAndDismiss() }
-    }
-
-    private fun observeDeleteFolder() {
         mainViewModel.deleteFolderResultTrigger.observe(viewLifecycleOwner) { confirmDeleteFolderDialog.resetLoadingAndDismiss() }
     }
 
