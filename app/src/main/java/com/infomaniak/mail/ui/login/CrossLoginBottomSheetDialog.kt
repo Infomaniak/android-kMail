@@ -28,7 +28,6 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetCrossLoginBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
-import com.infomaniak.mail.utils.uiAccounts
 
 class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -58,7 +57,7 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun observeCrossLoginAccounts() {
         introViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
-            binding.crossLoginBottomSheet.setAccounts(accounts.uiAccounts())
+            binding.crossLoginBottomSheet.setAccounts(accounts)
         }
     }
 

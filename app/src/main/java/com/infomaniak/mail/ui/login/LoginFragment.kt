@@ -35,6 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.core.Xor
+import com.infomaniak.core.crossloginui.data.CrossLoginAccount
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -56,7 +57,6 @@ import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.login.CrossLoginBottomSheetDialog.Companion.ON_ANOTHER_ACCOUNT_CLICKED_KEY
-import com.infomaniak.mail.utils.CrossLoginAccount
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.colorStateList
@@ -64,7 +64,6 @@ import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import com.infomaniak.mail.utils.extensions.statusBar
-import com.infomaniak.mail.utils.uiAccounts
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -217,7 +216,7 @@ class LoginFragment : Fragment() {
     private fun observeCrossLoginAccounts() {
         introViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
             SentryLog.i(TAG, "Got ${accounts.count()} accounts from other apps")
-            binding.crossLoginSelection.setAccounts(accounts.uiAccounts())
+            binding.crossLoginSelection.setAccounts(accounts)
         }
     }
 
@@ -262,7 +261,7 @@ class LoginFragment : Fragment() {
 
             if (accounts.isNotEmpty()) {
                 introViewModel.crossLoginAccounts.value = accounts
-                introViewModel.crossLoginSelectedIds.value = accounts.map { it.uiAccount.id }.toSet()
+                introViewModel.crossLoginSelectedIds.value = accounts.map { it.id }.toSet()
             }
 
             repeatWhileActive {
@@ -286,7 +285,7 @@ class LoginFragment : Fragment() {
         }
 
         val accounts = introViewModel.crossLoginAccounts.value
-            ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.uiAccount.id) == true }
+            ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.id) == true }
             ?: return
         val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
 
@@ -296,12 +295,12 @@ class LoginFragment : Fragment() {
         accounts.forEach { account ->
             val token = when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
                 is Xor.First -> {
-                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.uiAccount.id}")
+                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.id}")
                     if (firstAccountToken == null) firstAccountToken = result.value
                     result.value
                 }
                 is Xor.Second -> {
-                    SentryLog.e(TAG, "Failed to derive token for account ${account.uiAccount.id}, with reason: ${result.value}")
+                    SentryLog.e(TAG, "Failed to derive token for account ${account.id}, with reason: ${result.value}")
                     null
                 }
             }
