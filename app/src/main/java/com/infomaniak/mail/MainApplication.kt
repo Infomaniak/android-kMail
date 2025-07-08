@@ -188,10 +188,11 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
             isDebug = BuildConfig.DEBUG,
             isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled,
             isErrorException = { exception: Throwable? ->
-                val isAccessDeniedException = exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED
-                val isNotAuthorizedException = exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED
-
-                isAccessDeniedException || isNotAuthorizedException
+                when {
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> true
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> true
+                    else -> false
+                }
             },
         )
     }
