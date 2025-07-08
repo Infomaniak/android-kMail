@@ -26,7 +26,6 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -150,7 +149,7 @@ class LoginFragment : Fragment() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
                     val showConnectButton = position == introPagerAdapter.itemCount - 1
-                    nextButton.isInvisible = showConnectButton
+                    nextButton.isGone = showConnectButton
                     connectButton.isVisible = showConnectButton
 
                     if (showConnectButton) {
