@@ -135,15 +135,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         if (BuildConfig.DEBUG) configureDebugMode()
-        /**
-         * Reasons to discard Sentry events :
-         * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
-         * - [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
-         */
-        this.configureSentry(BuildConfig.DEBUG, localSettings.isSentryTrackingEnabled, { exception: Throwable? ->
-            exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED
-                    || exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED
-        })
+
+        configSentry()
         enforceAppTheme()
         configureRoomDatabases()
         configureAppReloading()
@@ -183,6 +176,25 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         )
 
         MatomoMail.addTrackingCallbackForDebugLog()
+    }
+
+
+    /**
+     * Reasons to discard Sentry events :
+     * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
+     * - [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
+     */
+    private fun configSentry() {
+        this.configureSentry(
+            isDebug = BuildConfig.DEBUG,
+            isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled,
+            isErrorException = { exception: Throwable? ->
+                val isAccessDeniedException = exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED
+                val isNotAuthorizedException = exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED
+
+                isAccessDeniedException || isNotAuthorizedException
+            },
+        )
     }
 
     private fun enforceAppTheme() {
