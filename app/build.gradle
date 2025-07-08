@@ -4,8 +4,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.kapt)
-    id 'kotlin-parcelize'
-    id 'androidx.navigation.safeargs.kotlin'
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.realm.kotlin)
 }
 

@@ -1,16 +1,16 @@
 [versions]
 androidGradlePlugin = "8.8.2"
 coilSvg = "2.7.0"
-compose = "1.8.2"
+compose = "1.8.3"
 desugarJDK = "2.1.5"
 dotsindicator = "5.1.0"
 dragDropSwipeRecyclerView = "1.0.0"
-firebaseMessagingKtx = "24.1.1"
+firebaseMessagingKtx = "24.1.2"
 flexbox = "3.0.0"
 googleServices = "4.4.2"
 hiltAndroid = "2.56.2"
 hiltAndroidx = "1.2.0"
-jsoup = "1.20.1"
+jsoup = "1.21.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 kotlin = "2.0.21" # Keep the same version as the one in Core
@@ -30,9 +30,9 @@ workVersion = "2.9.1" # Keep the same version as the one in Core
 
 [libraries]
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilSvg" }
-compose-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "compose" }
+compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "compose" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
-desugar-jdk = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJDK" }
+desugar-jdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJDK" }
 dragdropswipe-recyclerview = { module = "com.github.infomaniak:DragDropSwipeRecyclerview", version.ref = "dragDropSwipeRecyclerView" }
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
@@ -46,7 +46,7 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
-play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServices" }
+play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
 realm-kotlin-base = { module = "io.realm.kotlin:library-base", version.ref = "realmKotlin" }
 rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", version.ref = "richHtmlEditor" }
 sentry-android-fragment = { module = "io.sentry:sentry-android-fragment", version.ref = "sentryAndroidFragment" }
@@ -67,3 +67,5 @@ jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serializati
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 realm-kotlin = { id = "io.realm.kotlin", version.ref = "realmKotlin" }
+kotlin-parcelize = { id = "kotlin-parcelize" }
+navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
