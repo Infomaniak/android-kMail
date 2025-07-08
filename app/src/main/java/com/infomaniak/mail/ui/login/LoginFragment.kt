@@ -37,6 +37,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.core.Xor
 import com.infomaniak.core.crossloginui.data.CrossLoginAccount
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.utils.awaitOneClick
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils
@@ -51,7 +52,6 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.awaitOneClick
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
