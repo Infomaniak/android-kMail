@@ -27,7 +27,7 @@ import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.ui.WebViewActivity
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.MatomoMail.ADD_MAILBOX_NAME
+import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.trackNoValidMailboxesEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNoValidMailboxesBinding
@@ -87,7 +87,7 @@ class NoValidMailboxesFragment : Fragment(), MailboxListFragment {
         }
 
         attachNewMailboxButton.setOnClickListener {
-            trackNoValidMailboxesEvent(ADD_MAILBOX_NAME)
+            trackNoValidMailboxesEvent(MatomoName.AddMailbox.toString())
             safeNavigate(NoValidMailboxesFragmentDirections.actionNoValidMailboxesFragmentToAttachMailboxFragment())
         }
     }

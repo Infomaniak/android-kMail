@@ -57,8 +57,7 @@ import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
 import com.infomaniak.lib.richhtmleditor.StatusCommand.STRIKE_THROUGH
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNDERLINE
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNORDERED_LIST
-import com.infomaniak.mail.MatomoMail.CUSTOM_SCHEDULE_CONFIRM
-import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
@@ -270,7 +269,7 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
-                    trackScheduleSendEvent(CUSTOM_SCHEDULE_CONFIRM)
+                    trackScheduleSendEvent(MatomoName.CustomSchedule.toString())
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
                     scheduleDraft(timestamp)
                 },
@@ -384,7 +383,7 @@ class NewMessageFragment : Fragment() {
             onAttachmentClicked = {
                 if (it !is Attachment) return@AttachmentAdapter
 
-                trackAttachmentActionsEvent(OPEN_FROM_DRAFT_NAME)
+                trackAttachmentActionsEvent(MatomoName.OpenFromDraft.toString())
                 it.openAttachment(
                     context = requireContext(),
                     navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->

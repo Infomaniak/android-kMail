@@ -42,8 +42,7 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.Sc
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
-import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
@@ -287,7 +286,7 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun setSearchBarUi() = with(binding.searchBar) {
-        searchInputLayout.setOnClearTextClickListener { trackSearchEvent(SEARCH_DELETE_NAME) }
+        searchInputLayout.setOnClearTextClickListener { trackSearchEvent(MatomoName.DeleteSearch.toString()) }
 
         searchTextInput.apply {
             showKeyboard()
@@ -299,7 +298,7 @@ class SearchFragment : TwoPaneFragment() {
 
             handleEditorSearchAction { query ->
                 searchViewModel.searchQuery(query, saveInHistory = true)
-                context.trackSearchEvent(SEARCH_VALIDATE_NAME)
+                context.trackSearchEvent(MatomoName.ValidateSearch.toString())
             }
         }
     }

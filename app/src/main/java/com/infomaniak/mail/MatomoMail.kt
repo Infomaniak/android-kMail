@@ -36,44 +36,6 @@ object MatomoMail : MatomoCore {
     override val Context.tracker: Tracker get() = (this as MainApplication).matomoTracker
     override val siteId = 9
 
-    //region Tracker category
-    private const val THREAD_ACTION_CATEGORY = "threadActions"
-    private const val THREAD_BOTTOM_SHEET_ACTION_CATEGORY = "bottomSheetThreadActions"
-    //endregion
-
-    //region Tracker name
-    const val OPEN_ACTION_BOTTOM_SHEET = "openBottomSheet"
-    const val OPEN_FROM_DRAFT_NAME = "openFromDraft"
-    const val OPEN_LOCAL_DRAFT = "openLocalDraft"
-    const val ACTION_OPEN_NAME = "open"
-    const val ACTION_REPLY_NAME = "reply"
-    const val ACTION_REPLY_ALL_NAME = "replyAll"
-    const val ACTION_FORWARD_NAME = "forward"
-    const val ACTION_DELETE_NAME = "delete"
-    const val ACTION_ARCHIVE_NAME = "archive"
-    const val ACTION_MARK_AS_SEEN_NAME = "markAsSeen"
-    const val ACTION_MOVE_NAME = "move"
-    const val ACTION_FAVORITE_NAME = "favorite"
-    const val ACTION_SPAM_NAME = "spam"
-    const val ACTION_PRINT_NAME = "print"
-    const val ACTION_SHARE_LINK_NAME = "shareLink"
-    const val ACTION_SAVE_TO_KDRIVE_NAME = "saveInkDrive"
-    const val ACTION_SNOOZE_NAME = "snooze"
-    const val ACTION_MODIFY_SNOOZE_NAME = "modifySnooze"
-    const val ACTION_CANCEL_SNOOZE_NAME = "cancelSnooze"
-    const val ADD_MAILBOX_NAME = "addMailbox"
-    const val DISCOVER_LATER = "discoverLater"
-    const val DISCOVER_NOW = "discoverNow"
-    const val SEARCH_FOLDER_FILTER_NAME = "folderFilter"
-    const val SEARCH_DELETE_NAME = "deleteSearch"
-    const val SEARCH_VALIDATE_NAME = "validateSearch"
-    const val SWITCH_MAILBOX_NAME = "switchMailbox"
-    const val LAST_SELECTED_SCHEDULE = "lastSelectedSchedule"
-    const val CUSTOM_SCHEDULE = "customSchedule"
-    const val CUSTOM_SCHEDULE_CONFIRM = "customScheduleConfirm"
-    const val SCHEDULED_CUSTOM_DATE = "scheduledCustomDate"
-    const val SNOOZE_CUSTOM_DATE = "snoozeCustomDate"
-    //endregion
     enum class MatomoCategory(name: String) {
         Account("account"),
         MenuDrawer("menuDrawer"),
@@ -133,7 +95,7 @@ object MatomoMail : MatomoCore {
         ManageFolder("manageFolder"),
     }
 
-    enum class MatomoName(name: String){
+    enum class MatomoName(name: String) {
         OpenLoginWebview("openLoginWebview"),
         OpenCreationWebview("openCreationWebview"),
         LoggedIn("loggedIn"),
@@ -463,19 +425,19 @@ object MatomoMail : MatomoCore {
     }
 
     fun Fragment.trackBottomSheetThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = THREAD_BOTTOM_SHEET_ACTION_CATEGORY, name = name, value = value?.toMailActionValue())
+        trackEvent(category = MatomoCategory.BottomSheetThreadActions.toString(), name = name, value = value?.toMailActionValue())
     }
 
     private fun Fragment.trackBottomSheetMultiSelectThreadActionsEvent(name: String, value: Int) {
-        trackEvent(category = THREAD_BOTTOM_SHEET_ACTION_CATEGORY, name = name, value = value.toFloat())
+        trackEvent(category = MatomoCategory.BottomSheetThreadActions.toString(), name = name, value = value.toFloat())
     }
 
     fun Fragment.trackThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = THREAD_ACTION_CATEGORY, name = name, value = value?.toMailActionValue())
+        trackEvent(category = MatomoCategory.ThreadActions.toString(), name = name, value = value?.toMailActionValue())
     }
 
     private fun Fragment.trackMultiSelectThreadActionsEvent(name: String, value: Int) {
-        trackEvent(category = THREAD_ACTION_CATEGORY, name = name, value = value.toFloat())
+        trackEvent(category = MatomoCategory.ThreadActions.toString(), name = name, value = value.toFloat())
     }
 
     fun Fragment.trackMessageActionsEvent(name: String) {

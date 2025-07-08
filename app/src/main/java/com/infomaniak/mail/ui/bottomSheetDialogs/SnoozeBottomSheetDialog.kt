@@ -19,9 +19,7 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.setBackNavigationResult
-import com.infomaniak.mail.MatomoMail.CUSTOM_SCHEDULE
-import com.infomaniak.mail.MatomoMail.LAST_SELECTED_SCHEDULE
-import com.infomaniak.mail.MatomoMail.SNOOZE_CUSTOM_DATE
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
@@ -44,7 +42,7 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
 
     override fun onLastScheduleOptionClicked() {
         if (lastSelectedEpoch != null) {
-            trackSnoozeEvent(LAST_SELECTED_SCHEDULE)
+            trackSnoozeEvent(MatomoName.LastSelectedSchedule.toString())
             setBackNavigationResult(SNOOZE_RESULT, lastSelectedEpoch)
         }
     }
@@ -56,9 +54,9 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
 
     override fun onCustomScheduleOptionClicked() {
         if (navigationArgs.isCurrentMailboxFree) {
-            openMyKSuiteUpgradeBottomSheet(SNOOZE_CUSTOM_DATE)
+            openMyKSuiteUpgradeBottomSheet(MatomoName.SnoozeCustomDate.toString())
         } else {
-            trackSnoozeEvent(CUSTOM_SCHEDULE)
+            trackSnoozeEvent(MatomoName.CustomSchedule.toString())
             setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)
         }
     }

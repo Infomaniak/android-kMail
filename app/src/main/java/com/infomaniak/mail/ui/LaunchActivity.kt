@@ -25,8 +25,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.lib.core.extensions.setDefaultLocaleIfNeeded
 import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.ACTION_OPEN_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.MatomoMail.trackShortcutEvent
 import com.infomaniak.mail.MatomoMail.trackUserId
@@ -105,11 +104,11 @@ class LaunchActivity : AppCompatActivity() {
         val replyToMessageUid = navigationArgs?.replyToMessageUid
         when {
             openThreadUid != null -> {
-                applicationContext.trackNotificationActionEvent(ACTION_OPEN_NAME)
+                applicationContext.trackNotificationActionEvent(MatomoName.Open.toString())
                 launchMainActivityToThreadList(ThreadListFragmentArgs(openThreadUid).toBundle())
             }
             replyToMessageUid != null -> {
-                applicationContext.trackNotificationActionEvent(ACTION_REPLY_NAME)
+                applicationContext.trackNotificationActionEvent(MatomoName.Reply.toString())
                 launchMainActivityToThreadList(
                     ThreadListFragmentArgs(
                         replyToMessageUid = replyToMessageUid,

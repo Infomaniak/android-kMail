@@ -31,7 +31,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -156,7 +156,7 @@ abstract class TwoPaneFragment : Fragment() {
 
     fun navigateToThread(thread: Thread) {
         if (thread.isOnlyOneDraft) {
-            trackNewMessageEvent(OPEN_FROM_DRAFT_NAME)
+            trackNewMessageEvent(MatomoName.OpenFromDraft.toString())
             twoPaneViewModel.openDraft(thread)
         } else {
             openThreadAndResetItsState(thread.uid)

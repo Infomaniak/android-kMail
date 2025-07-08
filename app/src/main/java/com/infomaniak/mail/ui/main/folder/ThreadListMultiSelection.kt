@@ -24,11 +24,7 @@ import androidx.core.view.isVisible
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
-import com.infomaniak.mail.MatomoMail.OPEN_ACTION_BOTTOM_SHEET
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -79,7 +75,7 @@ class ThreadListMultiSelection {
 
             when (menuId) {
                 R.id.quickActionUnread -> {
-                    threadListFragment.trackMultiSelectActionEvent(ACTION_MARK_AS_SEEN_NAME, selectedThreadsCount)
+                    threadListFragment.trackMultiSelectActionEvent(MatomoName.MarkAsSeen.toString(), selectedThreadsCount)
                     toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
                     isMultiSelectOn = false
                 }
@@ -88,13 +84,13 @@ class ThreadListMultiSelection {
                         folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
-                        threadListFragment.trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, selectedThreadsCount)
+                        threadListFragment.trackMultiSelectActionEvent(MatomoName.Archive.toString(), selectedThreadsCount)
                         archiveThreads(selectedThreadsUids)
                         isMultiSelectOn = false
                     }
                 }
                 R.id.quickActionFavorite -> {
-                    threadListFragment.trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, selectedThreadsCount)
+                    threadListFragment.trackMultiSelectActionEvent(MatomoName.Favorite.toString(), selectedThreadsCount)
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
@@ -103,13 +99,13 @@ class ThreadListMultiSelection {
                         folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
-                        trackMultiSelectActionEvent(ACTION_DELETE_NAME, selectedThreadsCount)
+                        trackMultiSelectActionEvent(MatomoName.Delete.toString(), selectedThreadsCount)
                         deleteThreads(selectedThreadsUids)
                         isMultiSelectOn = false
                     }
                 }
                 R.id.quickActionMenu -> {
-                    threadListFragment.trackMultiSelectActionEvent(OPEN_ACTION_BOTTOM_SHEET, selectedThreadsCount)
+                    threadListFragment.trackMultiSelectActionEvent(MatomoName.OpenBottomSheet.toString(), selectedThreadsCount)
                     val direction = if (selectedThreadsCount == 1) {
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                             threadUid = selectedThreadsUids.single(),

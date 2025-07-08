@@ -20,8 +20,7 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
-import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
-import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
+import com.infomaniak.mail.MatomoMail.MatomoName
 
 abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
@@ -43,14 +42,14 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         actionButton.apply {
             setText(positiveButtonRes)
             setOnClickListener {
-                trackMatomoWithCategory(DISCOVER_NOW)
+                trackMatomoWithCategory(MatomoName.DiscoverNow.toString())
                 onPositiveButtonClicked()
                 dismiss()
             }
         }
 
         secondaryActionButton.setOnClickListener {
-            trackMatomoWithCategory(DISCOVER_LATER)
+            trackMatomoWithCategory(MatomoName.DiscoverLater.toString())
             dismiss()
         }
     }
@@ -58,7 +57,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
     abstract fun onPositiveButtonClicked()
 
     override fun onCancel(dialog: DialogInterface) {
-        trackMatomoWithCategory(DISCOVER_LATER)
+        trackMatomoWithCategory(MatomoName.DiscoverLater.toString())
         super.onCancel(dialog)
     }
 }

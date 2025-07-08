@@ -52,7 +52,7 @@ import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
 import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -548,7 +548,7 @@ class MainActivity : BaseActivity() {
     private fun initAppUpdateManager() {
         inAppUpdateManager.init(
             onUserChoice = { isWantingUpdate ->
-                trackInAppUpdateEvent(if (isWantingUpdate) MatomoMail.DISCOVER_NOW else MatomoMail.DISCOVER_LATER)
+                trackInAppUpdateEvent(if (isWantingUpdate) MatomoName.DiscoverNow.toString() else MatomoName.DiscoverLater.toString())
             },
             onInstallStart = { trackInAppUpdateEvent("installUpdate") },
             onInstallFailure = { snackbarManager.setValue(getString(RCore.string.errorUpdateInstall)) },

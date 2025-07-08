@@ -23,7 +23,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
-import com.infomaniak.mail.MatomoMail.SWITCH_MAILBOX_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
@@ -90,12 +90,12 @@ class MailboxesAdapter(
     }
 
     private fun ItemSelectableMailboxBinding.displaySimpleMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
-        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackAccountEvent(SWITCH_MAILBOX_NAME) }
+        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackAccountEvent(MatomoName.SwitchMailbox.toString()) }
         setSelectedState(isCurrentMailbox)
     }
 
     private fun ItemMenuDrawerMailboxBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
-        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackMenuDrawerEvent(SWITCH_MAILBOX_NAME) }
+        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackMenuDrawerEvent(MatomoName.SwitchMailbox.toString()) }
 
         unreadCount = mailbox.unreadCountDisplay.count
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille

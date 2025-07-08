@@ -29,8 +29,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
-import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMoveSearchEvent
 import com.infomaniak.mail.R
@@ -129,7 +128,7 @@ class MoveFragment : Fragment() {
 
     private fun setupSearchBar() = with(binding) {
 
-        searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
+        searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(MatomoName.DeleteSearch.toString()) }
 
         searchTextInput.apply {
             doOnTextChanged { newQuery, _, _, _ ->
@@ -142,7 +141,7 @@ class MoveFragment : Fragment() {
 
             handleEditorSearchAction { query ->
                 moveViewModel.filterFolders(query, shouldDebounce = false)
-                trackMoveSearchEvent(SEARCH_VALIDATE_NAME)
+                trackMoveSearchEvent(MatomoName.ValidateSearch.toString())
             }
         }
     }
