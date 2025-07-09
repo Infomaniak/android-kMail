@@ -90,7 +90,7 @@ class MoveFragment : Fragment() {
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener {
-            trackCreateFolderEvent("fromMove")
+            trackCreateFolderEvent(MatomoName.FromMove)
             createFolderDialog.show(confirmButtonText = R.string.newFolderDialogMovePositiveButton)
         }
     }
@@ -128,20 +128,20 @@ class MoveFragment : Fragment() {
 
     private fun setupSearchBar() = with(binding) {
 
-        searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(MatomoName.DeleteSearch.toString()) }
+        searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(MatomoName.DeleteSearch) }
 
         searchTextInput.apply {
             doOnTextChanged { newQuery, _, _, _ ->
                 moveViewModel.filterFolders(newQuery, shouldDebounce = true)
                 if (!moveViewModel.hasAlreadyTrackedSearch) {
-                    trackMoveSearchEvent("executeSearch")
+                    trackMoveSearchEvent(MatomoName.ExecuteSearch)
                     moveViewModel.hasAlreadyTrackedSearch = true
                 }
             }
 
             handleEditorSearchAction { query ->
                 moveViewModel.filterFolders(query, shouldDebounce = false)
-                trackMoveSearchEvent(MatomoName.ValidateSearch.toString())
+                trackMoveSearchEvent(MatomoName.ValidateSearch)
             }
         }
     }

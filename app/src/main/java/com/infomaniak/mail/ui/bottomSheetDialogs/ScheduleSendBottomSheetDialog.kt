@@ -42,7 +42,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
 
     override fun onLastScheduleOptionClicked() {
         if (lastSelectedEpoch != null) {
-            trackScheduleSendEvent(MatomoName.LastSelectedSchedule.toString())
+            trackScheduleSendEvent(MatomoName.LastSelectedSchedule)
             setBackNavigationResult(SCHEDULE_DRAFT_RESULT, lastSelectedEpoch)
         }
     }
@@ -56,7 +56,7 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
         if (navigationArgs.isCurrentMailboxFree) {
             openMyKSuiteUpgradeBottomSheet(MatomoName.ScheduledCustomDate.toString())
         } else {
-            trackScheduleSendEvent(MatomoName.CustomSchedule.toString())
+            trackScheduleSendEvent(MatomoName.CustomSchedule)
             setBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER, true)
         }
     }

@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -234,7 +235,7 @@ class NewMessageAiManager @Inject constructor(
     }
 
     fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
-        context.trackAiWriterEvent(name = if (becauseOfGeneration) "generate" else "dismissPromptWithoutGenerating")
+        context.trackAiWriterEvent(name = if (becauseOfGeneration) MatomoName.Generate else MatomoName.DismissPromptWithoutGenerating)
         aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(
             isOpened = false,
             becauseOfGeneration = becauseOfGeneration,

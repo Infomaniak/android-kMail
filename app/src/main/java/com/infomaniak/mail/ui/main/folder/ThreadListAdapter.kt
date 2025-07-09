@@ -58,6 +58,7 @@ import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -356,7 +357,7 @@ class ThreadListAdapter @Inject constructor(
     ): Boolean {
         val shouldOpen = !listener.isEnabled
         if (shouldOpen) {
-            context.trackMultiSelectionEvent("enable", action)
+            context.trackMultiSelectionEvent(MatomoName.Enable, action)
             listener.isEnabled = true
         }
         return shouldOpen

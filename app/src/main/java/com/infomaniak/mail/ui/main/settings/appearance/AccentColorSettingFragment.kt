@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.color.DynamicColors
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -67,7 +68,7 @@ class AccentColorSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, accentColor ->
             chooseColor(accentColor as AccentColor)
-            trackEvent("settingsAccentColor", accentColor.toString())
+            trackEvent(MatomoCategory.SettingsAccentColor.toString(), accentColor.toString())
         }
     }
 

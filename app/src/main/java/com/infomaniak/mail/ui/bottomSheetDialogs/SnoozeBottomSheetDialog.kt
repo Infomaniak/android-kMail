@@ -42,7 +42,7 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
 
     override fun onLastScheduleOptionClicked() {
         if (lastSelectedEpoch != null) {
-            trackSnoozeEvent(MatomoName.LastSelectedSchedule.toString())
+            trackSnoozeEvent(MatomoName.LastSelectedSchedule)
             setBackNavigationResult(SNOOZE_RESULT, lastSelectedEpoch)
         }
     }
@@ -56,7 +56,7 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
         if (navigationArgs.isCurrentMailboxFree) {
             openMyKSuiteUpgradeBottomSheet(MatomoName.SnoozeCustomDate.toString())
         } else {
-            trackSnoozeEvent(MatomoName.CustomSchedule.toString())
+            trackSnoozeEvent(MatomoName.CustomSchedule)
             setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)
         }
     }

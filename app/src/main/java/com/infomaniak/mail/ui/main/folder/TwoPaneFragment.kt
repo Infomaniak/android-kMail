@@ -156,7 +156,7 @@ abstract class TwoPaneFragment : Fragment() {
 
     fun navigateToThread(thread: Thread) {
         if (thread.isOnlyOneDraft) {
-            trackNewMessageEvent(MatomoName.OpenFromDraft.toString())
+            trackNewMessageEvent(MatomoName.OpenFromDraft)
             twoPaneViewModel.openDraft(thread)
         } else {
             openThreadAndResetItsState(thread.uid)

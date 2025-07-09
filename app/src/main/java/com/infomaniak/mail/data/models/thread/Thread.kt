@@ -371,13 +371,13 @@ class Thread : RealmObject, Snoozable {
 
     override fun hashCode(): Int = uid.hashCode()
 
-    enum class ThreadFilter(val matomoValue: String) {
-        ALL(MatomoName.FolderFilter.toString()),
-        SEEN("readFilter"),
-        UNSEEN("unreadFilter"),
-        STARRED("favoriteFilter"),
-        ATTACHMENTS("attachmentFilter"),
-        FOLDER(MatomoName.FolderFilter.toString()),
+    enum class ThreadFilter(val matomoValue: MatomoName) {
+        ALL(MatomoName.FolderFilter),
+        SEEN(MatomoName.ReadFilter),
+        UNSEEN(MatomoName.UnreadFilter),
+        STARRED(MatomoName.FavoriteFilter),
+        ATTACHMENTS(MatomoName.AttachmentFilter),
+        FOLDER(MatomoName.FolderFilter),
     }
 
     companion object {

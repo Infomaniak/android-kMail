@@ -44,8 +44,7 @@ import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.lib.core.utils.parcelableArrayListExtra
 import com.infomaniak.lib.core.utils.parcelableExtra
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.mail.MatomoMail
-import com.infomaniak.mail.MatomoName
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
@@ -527,12 +526,12 @@ class NewMessageViewModel @Inject constructor(
 
         @Suppress("UNUSED_PARAMETER")
         fun trackOpenLocal(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
-            appContext.trackNewMessageEvent(MatomoName.OpenLocalDraft.toString(), TrackerAction.DATA, value = 1.0f)
+            appContext.trackNewMessageEvent(MatomoName.OpenLocalDraft, TrackerAction.DATA, value = 1.0f)
         }
 
         @Suppress("UNUSED_PARAMETER")
         fun trackOpenRemote(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
-            appContext.trackNewMessageEvent(MatomoName.OpenLocalDraft.toString(), TrackerAction.DATA, value = 0.0f)
+            appContext.trackNewMessageEvent(MatomoName.OpenLocalDraft, TrackerAction.DATA, value = 0.0f)
         }
 
         return getLatestLocalDraft(localUuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
@@ -816,8 +815,8 @@ class NewMessageViewModel @Inject constructor(
 
         recipientsLiveData.removeRecipientThenSetValue(recipient)
 
-        appContext.trackNewMessageEvent("deleteRecipient")
-        if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent("deleteRecipient")
+        appContext.trackNewMessageEvent(MatomoName.DeleteRecipient)
+        if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent(MatomoName.DeleteRecipient)
     }
 
     fun deleteAttachment(position: Int) = viewModelScope.launch(ioCoroutineContext) {

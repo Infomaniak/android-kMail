@@ -75,7 +75,7 @@ class ThreadListMultiSelection {
 
             when (menuId) {
                 R.id.quickActionUnread -> {
-                    threadListFragment.trackMultiSelectActionEvent(MatomoName.MarkAsSeen.toString(), selectedThreadsCount)
+                    threadListFragment.trackMultiSelectActionEvent(MatomoName.MarkAsSeen, selectedThreadsCount)
                     toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
                     isMultiSelectOn = false
                 }
@@ -84,13 +84,13 @@ class ThreadListMultiSelection {
                         folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
-                        threadListFragment.trackMultiSelectActionEvent(MatomoName.Archive.toString(), selectedThreadsCount)
+                        threadListFragment.trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
                         archiveThreads(selectedThreadsUids)
                         isMultiSelectOn = false
                     }
                 }
                 R.id.quickActionFavorite -> {
-                    threadListFragment.trackMultiSelectActionEvent(MatomoName.Favorite.toString(), selectedThreadsCount)
+                    threadListFragment.trackMultiSelectActionEvent(MatomoName.Favorite, selectedThreadsCount)
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
@@ -99,13 +99,13 @@ class ThreadListMultiSelection {
                         folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
-                        trackMultiSelectActionEvent(MatomoName.Delete.toString(), selectedThreadsCount)
+                        trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
                         deleteThreads(selectedThreadsUids)
                         isMultiSelectOn = false
                     }
                 }
                 R.id.quickActionMenu -> {
-                    threadListFragment.trackMultiSelectActionEvent(MatomoName.OpenBottomSheet.toString(), selectedThreadsCount)
+                    threadListFragment.trackMultiSelectActionEvent(MatomoName.OpenBottomSheet, selectedThreadsCount)
                     val direction = if (selectedThreadsCount == 1) {
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
                             threadUid = selectedThreadsUids.single(),

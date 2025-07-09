@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.newMessage
 
 import androidx.core.view.isGone
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -85,13 +86,13 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
         var externalRecipientQuantity = 0
 
         closeButton.setOnClickListener {
-            context.trackExternalEvent("bannerManuallyClosed")
+            context.trackExternalEvent(MatomoName.BannerManuallyClosed)
             newMessageViewModel.isExternalBannerManuallyClosed = true
             externalBanner.isGone = true
         }
 
         informationButton.setOnClickListener {
-            context.trackExternalEvent("bannerInfo")
+            context.trackExternalEvent(MatomoName.BannerInfo)
 
             val description = resources.getQuantityString(
                 R.plurals.externalDialogDescriptionRecipient,

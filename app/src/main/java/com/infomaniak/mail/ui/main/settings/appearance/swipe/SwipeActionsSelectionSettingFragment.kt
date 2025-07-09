@@ -27,6 +27,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
@@ -102,7 +103,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         }
 
         trackEvent(
-            category = "settingsSwipeActions",
+            category = MatomoCategory.SettingsSwipeActions.toString(),
             name = "${swipeAction.matomoValue}Swipe",
             value = (navigationArgs.titleResId == R.string.settingsSwipeLeft).toFloat(),
         )

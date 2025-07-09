@@ -95,7 +95,7 @@ class MailboxesAdapter(
     }
 
     private fun ItemMenuDrawerMailboxBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
-        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackMenuDrawerEvent(MatomoName.SwitchMailbox.toString()) }
+        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackMenuDrawerEvent(MatomoName.SwitchMailbox) }
 
         unreadCount = mailbox.unreadCountDisplay.count
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille

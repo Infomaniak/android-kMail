@@ -25,6 +25,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.removeAccents
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.annotations.TestOnly
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -182,20 +183,20 @@ class Folder : RealmObject, Cloneable {
         @StringRes val folderNameRes: Int,
         @DrawableRes val folderIconRes: Int,
         val order: Int,
-        val matomoValue: String,
+        val matomoValue: MatomoName,
         val refreshStrategy: RefreshStrategy = defaultRefreshStrategy,
         val folderSort: FolderSort = FolderSort.Default,
         val groupMessagesBySection: Boolean = true,
     ) {
-        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 10, "inboxFolder", inboxRefreshStrategy),
-        COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 9, "commercialFolder"),
-        SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 8, "socialNetworksFolder"),
-        SENT(R.string.sentFolder, R.drawable.ic_send, 7, "sentFolder"),
+        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 10, MatomoName.InboxFolder, inboxRefreshStrategy),
+        COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 9, MatomoName.CommercialFolder),
+        SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 8, MatomoName.SocialNetworksFolder),
+        SENT(R.string.sentFolder, R.drawable.ic_send, 7, MatomoName.SentFolder),
         SNOOZED(
             folderNameRes = R.string.snoozedFolder,
             folderIconRes = R.drawable.ic_alarm_clock,
             order = 6,
-            matomoValue = "snoozedFolder",
+            matomoValue = MatomoName.SnoozedFolder,
             refreshStrategy = snoozeRefreshStrategy,
             folderSort = FolderSort.Snooze,
             groupMessagesBySection = false,
@@ -204,15 +205,15 @@ class Folder : RealmObject, Cloneable {
             folderNameRes = R.string.scheduledMessagesFolder,
             folderIconRes = R.drawable.ic_schedule_send,
             order = 5,
-            matomoValue = "scheduledDraftsFolder",
+            matomoValue = MatomoName.ScheduledDraftsFolder,
             refreshStrategy = scheduledDraftRefreshStrategy,
             folderSort = FolderSort.Scheduled,
             groupMessagesBySection = false,
         ),
-        DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftFolder"),
-        SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, "spamFolder"),
-        TRASH(R.string.trashFolder, R.drawable.ic_bin, 2, "trashFolder"),
-        ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 1, "archiveFolder"),
+        DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, MatomoName.DraftFolder),
+        SPAM(R.string.spamFolder, R.drawable.ic_spam, 3, MatomoName.SpamFolder),
+        TRASH(R.string.trashFolder, R.drawable.ic_bin, 2, MatomoName.TrashFolder),
+        ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 1, MatomoName.ArchiveFolder),
     }
 
     class FolderSort private constructor(

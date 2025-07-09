@@ -34,6 +34,7 @@ import com.infomaniak.core.utils.isWeekend
 import com.infomaniak.core.utils.tomorrow
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.MIN_SELECTABLE_DATE_MINUTES
@@ -148,16 +149,28 @@ enum class ScheduleOption(
     private val hour: HourOfTheDay,
     @StringRes val titleRes: Int,
     @DrawableRes val iconRes: Int,
-    val matomoValue: String,
+    val matomoValue: MatomoName,
 ) {
-    LaterThisMorning(Today, Morning, R.string.laterThisMorning, R.drawable.ic_morning_sunrise_schedule, "laterThisMorning"),
-    ThisAfternoon(Today, Afternoon, R.string.thisAfternoon, R.drawable.ic_afternoon_schedule, "thisAfternoon"),
-    ThisEvening(Today, Evening, R.string.thisEvening, R.drawable.ic_evening_schedule, "thisEvening"),
-    TomorrowMorning(Tomorrow, Morning, R.string.tomorrowMorning, R.drawable.ic_morning_schedule, "tomorrowMorning"),
-    NextMondayMorning(NextMonday, Morning, R.string.nextMonday, R.drawable.ic_arrow_return, "nextMonday"),
+    LaterThisMorning(
+        Today,
+        Morning,
+        R.string.laterThisMorning,
+        R.drawable.ic_morning_sunrise_schedule,
+        MatomoName.LaterThisMorning
+    ),
+    ThisAfternoon(Today, Afternoon, R.string.thisAfternoon, R.drawable.ic_afternoon_schedule, MatomoName.ThisAfternoon),
+    ThisEvening(Today, Evening, R.string.thisEvening, R.drawable.ic_evening_schedule, MatomoName.ThisEvening),
+    TomorrowMorning(Tomorrow, Morning, R.string.tomorrowMorning, R.drawable.ic_morning_schedule, MatomoName.TomorrowMorning),
+    NextMondayMorning(NextMonday, Morning, R.string.nextMonday, R.drawable.ic_arrow_return, MatomoName.NextMonday),
 
-    MondayMorning(NextMonday, Morning, R.string.mondayMorning, R.drawable.ic_morning_schedule, "nextMondayMorning"),
-    MondayAfternoon(NextMonday, Afternoon, R.string.mondayAfternoon, R.drawable.ic_afternoon_schedule, "nextMondayAfternoon");
+    MondayMorning(NextMonday, Morning, R.string.mondayMorning, R.drawable.ic_morning_schedule, MatomoName.NextMondayMorning),
+    MondayAfternoon(
+        NextMonday,
+        Afternoon,
+        R.string.mondayAfternoon,
+        R.drawable.ic_afternoon_schedule,
+        MatomoName.NextMondayAfternoon
+    );
 
     fun date(): Date = day.getDate().getTimeAtHour(hour.hourOfTheDay)
     fun canBeDisplayedAt(date: Date): Boolean = date.time < minimalDisplayTime()

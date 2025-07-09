@@ -233,7 +233,7 @@ class ThreadFragment : Fragment() {
         mainViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) {
             setPositiveButtonCallback { messageOfUserToBlock ->
                 messageOfUserToBlock?.let {
-                    trackBlockUserAction("confirmSelectedUser")
+                    trackBlockUserAction(MatomoName.ConfirmSelectedUser)
                     mainViewModel.blockUser(messageOfUserToBlock)
                 }
             }
@@ -330,7 +330,7 @@ class ThreadFragment : Fragment() {
                 onAttachmentOptionsClicked = ::navigateToAttachmentActions,
                 onDownloadAllClicked = ::downloadAllAttachments,
                 onReplyClicked = { message ->
-                    trackMessageActionsEvent(MatomoName.Reply.toString())
+                    trackMessageActionsEvent(MatomoName.Reply)
                     replyTo(message)
                 },
                 onMenuClicked = { message -> message.navigateToActionsBottomSheet() },
@@ -394,7 +394,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun openDraft(message: Message) {
-        trackNewMessageEvent(MatomoName.OpenFromDraft.toString())
+        trackNewMessageEvent(MatomoName.OpenFromDraft)
         twoPaneViewModel.navigateToNewMessage(
             arrivedFromExistingDraft = true,
             draftLocalUuid = message.draftLocalUuid,
@@ -404,14 +404,14 @@ class ThreadFragment : Fragment() {
     }
 
     private fun deleteDraft(message: Message) {
-        trackMessageActionsEvent("deleteDraft")
+        trackMessageActionsEvent(MatomoName.DeleteDraft)
         mainViewModel.currentMailbox.value?.let { mailbox -> threadViewModel.deleteDraft(message, mailbox) }
     }
 
     private fun onAttachableClicked(attachable: Attachable) {
         when (attachable) {
             is Attachment -> {
-                trackAttachmentActionsEvent(MatomoName.Open.toString())
+                trackAttachmentActionsEvent(MatomoName.Open)
                 attachable.openAttachment(
                     context = requireContext(),
                     navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
@@ -425,7 +425,7 @@ class ThreadFragment : Fragment() {
                 )
             }
             is SwissTransferFile -> {
-                trackAttachmentActionsEvent("openSwissTransfer")
+                trackAttachmentActionsEvent(MatomoName.OpenSwissTransfer)
                 downloadSwissTransferFile(swissTransferFile = attachable)
             }
         }
@@ -496,11 +496,11 @@ class ThreadFragment : Fragment() {
 
             snoozeAlert.apply {
                 onAction1 {
-                    trackSnoozeEvent(MatomoName.ModifySnooze.toString())
+                    trackSnoozeEvent(MatomoName.ModifySnooze)
                     navigateToSnoozeBottomSheet(SnoozeScheduleType.Modify(thread.uid))
                 }
                 onAction2 {
-                    trackSnoozeEvent(MatomoName.CancelSnooze.toString())
+                    trackSnoozeEvent(MatomoName.CancelSnooze)
                     unsnoozeThread(thread)
                 }
             }
@@ -610,7 +610,7 @@ class ThreadFragment : Fragment() {
             dateAndTimeScheduleDialog.show(
                 positiveButtonResId = R.string.buttonModify,
                 onDateSelected = { timestamp ->
-                    trackScheduleSendEvent(MatomoName.CustomScheduleConfirm.toString())
+                    trackScheduleSendEvent(MatomoName.CustomScheduleConfirm)
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
                     mainViewModel.rescheduleDraft(Date(timestamp))
                 },
@@ -630,7 +630,7 @@ class ThreadFragment : Fragment() {
             dateAndTimeSnoozeDialog.show(
                 positiveButtonResId = twoPaneViewModel.snoozeScheduleType?.positiveButtonResId,
                 onDateSelected = { timestamp ->
-                    trackSnoozeEvent(MatomoName.CustomScheduleConfirm.toString())
+                    trackSnoozeEvent(MatomoName.CustomScheduleConfirm)
                     localSettings.lastSelectedSnoozeEpochMillis = timestamp
                     executeSavedSnoozeScheduleType(timestamp)
                 },
@@ -681,7 +681,7 @@ class ThreadFragment : Fragment() {
         }
 
         iconFavorite.setOnClickListener {
-            trackThreadActionsEvent(MatomoName.Favorite.toString(), threadViewModel.threadLive.value!!.isFavorite)
+            trackThreadActionsEvent(MatomoName.Favorite, threadViewModel.threadLive.value!!.isFavorite)
             mainViewModel.toggleThreadFavoriteStatus(threadUid)
         }
 
@@ -696,27 +696,27 @@ class ThreadFragment : Fragment() {
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
                 R.id.quickActionReply -> {
-                    trackThreadActionsEvent(MatomoName.Reply.toString())
+                    trackThreadActionsEvent(MatomoName.Reply)
                     threadViewModel.clickOnQuickActionBar(menuId)
                 }
                 R.id.quickActionForward -> {
-                    trackThreadActionsEvent(MatomoName.Forward.toString())
+                    trackThreadActionsEvent(MatomoName.Forward)
                     threadViewModel.clickOnQuickActionBar(menuId)
                 }
                 R.id.quickActionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
-                        trackThreadActionsEvent(MatomoName.Archive.toString(), isFromArchive)
+                        trackThreadActionsEvent(MatomoName.Archive, isFromArchive)
                         mainViewModel.archiveThread(threadUid)
                     }
                 }
                 R.id.quickActionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
-                        trackThreadActionsEvent(MatomoName.Delete.toString())
+                        trackThreadActionsEvent(MatomoName.Delete)
                         mainViewModel.deleteThread(threadUid)
                     }
                 }
                 R.id.quickActionMenu -> {
-                    trackThreadActionsEvent(MatomoName.OpenBottomSheet.toString())
+                    trackThreadActionsEvent(MatomoName.OpenBottomSheet)
                     threadViewModel.clickOnQuickActionBar(menuId)
                 }
             }
@@ -735,7 +735,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun downloadAllAttachments(message: Message) {
-        trackAttachmentActionsEvent("downloadAll")
+        trackAttachmentActionsEvent(MatomoName.DownloadAll)
 
         val truncatedSubject = message.subject?.let { it.substring(0..min(MAXIMUM_SUBJECT_LENGTH, it.lastIndex)) }
 
@@ -885,7 +885,7 @@ class ThreadFragment : Fragment() {
                     mainViewModel.modifyScheduledDraft(
                         unscheduleDraftUrl = unscheduleDraftUrl,
                         onSuccess = {
-                            trackNewMessageEvent(MatomoName.OpenFromDraft.toString())
+                            trackNewMessageEvent(MatomoName.OpenFromDraft)
                             twoPaneViewModel.navigateToNewMessage(
                                 arrivedFromExistingDraft = true,
                                 draftResource = draftResource,

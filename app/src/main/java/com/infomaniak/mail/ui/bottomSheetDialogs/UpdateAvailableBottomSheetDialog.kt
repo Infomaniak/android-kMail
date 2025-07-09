@@ -45,7 +45,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
         infoIllustration.setBackgroundResource(R.drawable.ic_update_logo)
 
         actionButton.apply {
-            trackAppUpdateEvent(MatomoName.DiscoverNow.toString())
+            trackAppUpdateEvent(MatomoName.DiscoverNow)
             setText(RCore.string.buttonUpdate)
             setOnClickListener {
                 storesViewModel.set(StoresSettingsRepository.IS_USER_WANTING_UPDATES_KEY, true)
@@ -55,7 +55,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
         }
 
         secondaryActionButton.setOnClickListener {
-            trackAppUpdateEvent(MatomoName.DiscoverLater.toString())
+            trackAppUpdateEvent(MatomoName.DiscoverLater)
             storesViewModel.set(StoresSettingsRepository.IS_USER_WANTING_UPDATES_KEY, false)
             dismiss()
         }

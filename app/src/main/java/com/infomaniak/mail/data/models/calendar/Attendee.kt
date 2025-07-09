@@ -21,6 +21,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -64,12 +65,12 @@ class Attendee() : EmbeddedRealmObject, Correspondent, Parcelable {
         val apiValue: String,
         @DrawableRes val icon: Int?,
         @ColorRes val iconColor: Int?,
-        val matomoValue: String?,
+        val matomoValue: MatomoName?,
     ) {
-        ACCEPTED("ACCEPTED", R.drawable.ic_check_rounded, R.color.greenSuccess, "replyYes"),
+        ACCEPTED("ACCEPTED", R.drawable.ic_check_rounded, R.color.greenSuccess, MatomoName.ReplyYes),
         NEEDS_ACTION("NEEDS-ACTION", null, null, null),
-        TENTATIVE("TENTATIVE", R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText, "replyMaybe"),
-        DECLINED("DECLINED", R.drawable.ic_calendar_no, R.color.redDestructiveAction, "replyNo"),
+        TENTATIVE("TENTATIVE", R.drawable.ic_calendar_maybe, R.color.iconColorSecondaryText, MatomoName.ReplyMaybe),
+        DECLINED("DECLINED", R.drawable.ic_calendar_no, R.color.redDestructiveAction, MatomoName.ReplyNo),
     }
 
     override fun equals(other: Any?): Boolean {

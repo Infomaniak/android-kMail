@@ -24,6 +24,7 @@ import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.lib.core.utils.serializableExtra
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
@@ -98,7 +99,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     private fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) {
         // Undo action
         if (action == UNDO_ACTION) {
-            context.trackNotificationActionEvent("cancelClicked")
+            context.trackNotificationActionEvent(MatomoName.CancelClicked)
             executeUndoAction(payload)
             return
         }
@@ -106,12 +107,12 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         // Other actions
         val (folderRole, undoNotificationTitle, matomoValue) = when (action) {
             ARCHIVE_ACTION -> {
-                context.trackNotificationActionEvent("archiveClicked")
-                Triple(FolderRole.ARCHIVE, R.string.notificationTitleArchive, "archiveExecuted")
+                context.trackNotificationActionEvent(MatomoName.ArchiveClicked)
+                Triple(FolderRole.ARCHIVE, R.string.notificationTitleArchive, MatomoName.ArchiveExecuted)
             }
             DELETE_ACTION -> {
-                context.trackNotificationActionEvent("deleteClicked")
-                Triple(FolderRole.TRASH, R.string.notificationTitleDelete, "deleteExecuted")
+                context.trackNotificationActionEvent(MatomoName.DeleteClicked)
+                Triple(FolderRole.TRASH, R.string.notificationTitleDelete, MatomoName.DeleteExecuted)
             }
             else -> null
         } ?: return
@@ -134,7 +135,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         context: Context,
         folderRole: FolderRole,
         @StringRes undoNotificationTitle: Int,
-        matomoValue: String,
+        matomoValue: MatomoName,
         payload: NotificationPayload,
     ) = with(payload) {
 

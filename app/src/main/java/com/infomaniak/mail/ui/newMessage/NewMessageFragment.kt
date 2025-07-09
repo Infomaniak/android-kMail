@@ -269,7 +269,7 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
-                    trackScheduleSendEvent(MatomoName.CustomSchedule.toString())
+                    trackScheduleSendEvent(MatomoName.CustomSchedule)
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
                     scheduleDraft(timestamp)
                 },
@@ -383,7 +383,7 @@ class NewMessageFragment : Fragment() {
             onAttachmentClicked = {
                 if (it !is Attachment) return@AttachmentAdapter
 
-                trackAttachmentActionsEvent(MatomoName.OpenFromDraft.toString())
+                trackAttachmentActionsEvent(MatomoName.OpenFromDraft)
                 it.openAttachment(
                     context = requireContext(),
                     navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
@@ -493,7 +493,7 @@ class NewMessageFragment : Fragment() {
             )
         }
         removeSignature.setOnClickListener {
-            trackNewMessageEvent("deleteSignature")
+            trackNewMessageEvent(MatomoName.DeleteSignature)
             newMessageViewModel.uiSignatureLiveData.value = null
         }
 
@@ -509,7 +509,7 @@ class NewMessageFragment : Fragment() {
             )
         }
         removeQuote.setOnClickListener {
-            trackNewMessageEvent("deleteQuote")
+            trackNewMessageEvent(MatomoName.DeleteQuote)
             removeInlineAttachmentsUsedInQuote()
             newMessageViewModel.uiQuoteLiveData.value = null
         }
@@ -582,7 +582,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onSignatureClicked(signature: Signature) {
-        trackNewMessageEvent("switchIdentity")
+        trackNewMessageEvent(MatomoName.SwitchIdentity)
         newMessageViewModel.fromLiveData.value = UiFrom(signature)
         addressListPopupWindow?.dismiss()
     }
@@ -753,7 +753,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onDeleteAttachment(position: Int) {
-        trackAttachmentActionsEvent("delete")
+        trackAttachmentActionsEvent(MatomoName.Delete)
         newMessageViewModel.deleteAttachment(position)
     }
 
@@ -796,14 +796,14 @@ class NewMessageFragment : Fragment() {
         }
 
         if (isSubjectBlank()) {
-            trackNewMessageEvent("sendWithoutSubject")
+            trackNewMessageEvent(MatomoName.SendWithoutSubject)
             descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
                 description = getString(R.string.emailWithoutSubjectDescription),
                 displayLoader = false,
                 positiveButtonText = R.string.buttonContinue,
                 onPositiveButtonClicked = {
-                    trackNewMessageEvent("sendWithoutSubjectConfirm")
+                    trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
                     sendEmail()
                 },
                 onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
@@ -816,7 +816,7 @@ class NewMessageFragment : Fragment() {
     private fun checkMailboxStorage(): Boolean {
         val isMailboxFull = newMessageViewModel.currentMailbox.quotas?.isFull == true
         if (isMailboxFull) {
-            trackNewMessageEvent("trySendingWithMailboxFull")
+            trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
                 openMyKSuiteUpgradeBottomSheet("notEnoughStorageUpgrade")
             }

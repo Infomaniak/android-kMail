@@ -82,7 +82,7 @@ class SearchFragment : TwoPaneFragment() {
         RecentSearchAdapter(
             searchQueries = localSettings.recentSearches.toMutableList(),
             onSearchQueryClicked = {
-                trackSearchEvent("fromHistory")
+                trackSearchEvent(MatomoName.FromHistory)
                 with(binding.searchBar.searchTextInput) {
                     setText(it)
                     setSelection(it.count())
@@ -90,7 +90,7 @@ class SearchFragment : TwoPaneFragment() {
                 }
             },
             onSearchQueryDeleted = { history ->
-                trackSearchEvent("deleteFromHistory")
+                trackSearchEvent(MatomoName.DeleteFromHistory)
                 val isThereHistory = history.isNotEmpty()
                 localSettings.recentSearches = history
                 updateHistoryEmptyStateVisibility(isThereHistory)
@@ -286,7 +286,7 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun setSearchBarUi() = with(binding.searchBar) {
-        searchInputLayout.setOnClearTextClickListener { trackSearchEvent(MatomoName.DeleteSearch.toString()) }
+        searchInputLayout.setOnClearTextClickListener { trackSearchEvent(MatomoName.DeleteSearch) }
 
         searchTextInput.apply {
             showKeyboard()
@@ -298,7 +298,7 @@ class SearchFragment : TwoPaneFragment() {
 
             handleEditorSearchAction { query ->
                 searchViewModel.searchQuery(query, saveInHistory = true)
-                context.trackSearchEvent(MatomoName.ValidateSearch.toString())
+                context.trackSearchEvent(MatomoName.ValidateSearch)
             }
         }
     }

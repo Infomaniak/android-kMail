@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -47,7 +48,7 @@ class DetailedRecipientAdapter(
         fillInUserNameAndEmail(recipient, name, emailAddress, ignoreIsMe = true)
 
         name.setOnClickListener {
-            context.trackMessageEvent("selectRecipient")
+            context.trackMessageEvent(MatomoName.SelectRecipient)
             onContactClicked?.invoke(recipient, bimi)
         }
     }

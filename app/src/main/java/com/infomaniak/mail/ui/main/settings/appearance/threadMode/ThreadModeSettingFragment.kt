@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -71,7 +72,7 @@ class ThreadModeSettingFragment : Fragment() {
                 description = getString(R.string.settingsThreadModeWarningDescription),
                 displayLoader = false,
                 onPositiveButtonClicked = {
-                    trackEvent("settingsThreadMode", threadMode.matomoValue)
+                    trackEvent(MatomoCategory.SettingsThreadMode.toString(), threadMode.matomoValue)
                     localSettings.threadMode = threadMode
                     threadModeSettingViewModel.dropAllMailboxesContentThenReloadApp()
                 },

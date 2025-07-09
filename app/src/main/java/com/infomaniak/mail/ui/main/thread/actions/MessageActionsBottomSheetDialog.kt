@@ -88,7 +88,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         initOnClickListener(object : OnActionClick {
             //region Main actions
             override fun onReply() {
-                trackBottomSheetMessageActionsEvent(MatomoName.Reply.toString())
+                trackBottomSheetMessageActionsEvent(MatomoName.Reply)
                 safeNavigateToNewMessageActivity(
                     draftMode = DraftMode.REPLY,
                     previousMessageUid = messageUid,
@@ -98,7 +98,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onReplyAll() {
-                trackBottomSheetMessageActionsEvent(MatomoName.ReplyAll.toString())
+                trackBottomSheetMessageActionsEvent(MatomoName.ReplyAll)
                 safeNavigateToNewMessageActivity(
                     draftMode = DraftMode.REPLY_ALL,
                     previousMessageUid = messageUid,
@@ -108,7 +108,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onForward() {
-                trackBottomSheetMessageActionsEvent(MatomoName.Forward.toString())
+                trackBottomSheetMessageActionsEvent(MatomoName.Forward)
                 safeNavigateToNewMessageActivity(
                     draftMode = DraftMode.FORWARD,
                     previousMessageUid = messageUid,
@@ -119,7 +119,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onDelete() {
                 descriptionDialog.deleteWithConfirmationPopup(message.folder.role, count = 1) {
-                    trackBottomSheetMessageActionsEvent(MatomoName.Delete.toString())
+                    trackBottomSheetMessageActionsEvent(MatomoName.Delete)
                     mainViewModel.deleteMessage(threadUid, message)
                 }
             }
@@ -128,19 +128,19 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             //region Actions
             override fun onArchive() {
                 descriptionDialog.archiveWithConfirmationPopup(message.folder.role, count = 1) {
-                    trackBottomSheetMessageActionsEvent(MatomoName.Archive.toString(), message.folder.role == FolderRole.ARCHIVE)
+                    trackBottomSheetMessageActionsEvent(MatomoName.Archive, message.folder.role == FolderRole.ARCHIVE)
                     mainViewModel.archiveMessage(threadUid, message)
                 }
             }
 
             override fun onReadUnread() {
-                trackBottomSheetMessageActionsEvent(MatomoName.MarkAsSeen.toString(), message.isSeen)
+                trackBottomSheetMessageActionsEvent(MatomoName.MarkAsSeen, message.isSeen)
                 mainViewModel.toggleMessageSeenStatus(threadUid, message)
                 twoPaneViewModel.closeThread()
             }
 
             override fun onMove() {
-                trackBottomSheetMessageActionsEvent(MatomoName.Move.toString())
+                trackBottomSheetMessageActionsEvent(MatomoName.Move)
                 val navController = findNavController()
                 descriptionDialog.moveWithConfirmationPopup(message.folder.role, count = 1) {
                     navController.animatedNavigation(
@@ -158,14 +158,14 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             override fun onCancelSnooze() = Unit
 
             override fun onFavorite() {
-                trackBottomSheetMessageActionsEvent(MatomoName.Favorite.toString(), message.isFavorite)
+                trackBottomSheetMessageActionsEvent(MatomoName.Favorite, message.isFavorite)
                 mainViewModel.toggleMessageFavoriteStatus(threadUid, message)
             }
 
             override fun onReportJunk() = Unit
 
             override fun onPrint() {
-                trackBottomSheetMessageActionsEvent(MatomoName.Print.toString())
+                trackBottomSheetMessageActionsEvent(MatomoName.Print)
                 safeNavigate(
                     resId = R.id.printMailFragment,
                     args = PrintMailFragmentArgs(messageUid).toBundle(),
@@ -175,13 +175,13 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             override fun onShare() {
                 activity?.apply {
-                    trackBottomSheetThreadActionsEvent(MatomoName.ShareLink.toString())
+                    trackBottomSheetThreadActionsEvent(MatomoName.ShareLink)
                     mainViewModel.shareThreadUrl(message.uid)
                 }
             }
 
             override fun onSaveToKDrive() {
-                trackBottomSheetThreadActionsEvent(MatomoName.SaveToKDrive.toString())
+                trackBottomSheetThreadActionsEvent(MatomoName.SaveToKDrive)
                 navigateToDownloadMessagesProgressDialog(
                     messageUids = listOf(messageUid),
                     currentClassName = MessageActionsBottomSheetDialog::class.java.name,

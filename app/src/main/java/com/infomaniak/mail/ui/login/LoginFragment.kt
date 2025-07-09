@@ -39,6 +39,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.lib.core.utils.updateTextColor
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
@@ -132,7 +133,7 @@ class LoginFragment : Fragment() {
                 updateTextColor(getCurrentOnPrimary())
                 signInButton.isEnabled = false
                 connectButtonProgressTimer.start()
-                requireContext().trackAccountEvent("openLoginWebview")
+                requireContext().trackAccountEvent(MatomoName.OpenLoginWebview.toString())
                 loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
             }
         }

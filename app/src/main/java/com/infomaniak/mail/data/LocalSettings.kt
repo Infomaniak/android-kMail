@@ -29,6 +29,7 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SharedValues
 import com.infomaniak.lib.core.utils.sharedValue
 import com.infomaniak.lib.core.utils.transaction
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.SwipeAction
 import com.google.android.material.R as RMaterial
@@ -151,16 +152,16 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         MESSAGE(R.string.settingsOptionThreadModeMessage, "message"),
     }
 
-    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: String) {
-        ALWAYS("true", R.string.settingsOptionAlways, "always"),
-        ASK_ME("false", R.string.settingsOptionAskMe, "askMe"),
+    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: MatomoName) {
+        ALWAYS("true", R.string.settingsOptionAlways, MatomoName.Always),
+        ASK_ME("false", R.string.settingsOptionAskMe, MatomoName.AskMe),
     }
 
-    enum class AutoAdvanceMode(val matomoValue: String, @StringRes val localisedNameRes: Int) {
-        PREVIOUS_THREAD("previousThread", R.string.settingsAutoAdvancePreviousThreadDescription),
-        FOLLOWING_THREAD("followingThread", R.string.settingsAutoAdvanceFollowingThreadDescription),
-        THREADS_LIST("listOfThread", R.string.settingsAutoAdvanceListOfThreadsDescription),
-        NATURAL_THREAD("naturalThread", R.string.settingsAutoAdvanceNaturalThreadDescription),
+    enum class AutoAdvanceMode(val matomoValue: MatomoName, @StringRes val localisedNameRes: Int) {
+        PREVIOUS_THREAD(MatomoName.PreviousThread, R.string.settingsAutoAdvancePreviousThreadDescription),
+        FOLLOWING_THREAD(MatomoName.FollowingThread, R.string.settingsAutoAdvanceFollowingThreadDescription),
+        THREADS_LIST(MatomoName.ListOfThread, R.string.settingsAutoAdvanceListOfThreadsDescription),
+        NATURAL_THREAD(MatomoName.NaturalThread, R.string.settingsAutoAdvanceNaturalThreadDescription),
     }
 
     companion object {

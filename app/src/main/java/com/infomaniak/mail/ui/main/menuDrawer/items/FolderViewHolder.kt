@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
@@ -61,7 +62,7 @@ class FolderViewHolder(
             val indentLevel = folder.path.split(folder.separator).size - 1
             RoleDependantParameters(
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
-                trackerName = "customFolder",
+                trackerName = MatomoName.CustomFolder,
                 trackerValue = indentLevel.toFloat(),
                 folderIndent = min(indentLevel, MAX_SUB_FOLDERS_INDENT),
             )
@@ -131,7 +132,7 @@ class FolderViewHolder(
 
     private data class RoleDependantParameters(
         @DrawableRes var iconId: Int,
-        var trackerName: String,
+        var trackerName: MatomoName,
         var trackerValue: Float?,
         var folderIndent: Int,
     )

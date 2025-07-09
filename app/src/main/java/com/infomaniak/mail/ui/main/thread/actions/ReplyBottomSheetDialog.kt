@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
@@ -57,8 +58,8 @@ open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
             )
 
             trackEvent(
-                "replyBottomSheet",
-                if (id == R.id.actionReply) MatomoName.Reply.toString() else MatomoName.ReplyAll.toString()
+                MatomoCategory.ReplyBottomSheet,
+                if (id == R.id.actionReply) MatomoName.Reply else MatomoName.ReplyAll
             )
         }
     }

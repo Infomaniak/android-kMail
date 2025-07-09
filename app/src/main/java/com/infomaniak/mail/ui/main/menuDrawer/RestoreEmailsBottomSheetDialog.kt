@@ -36,6 +36,7 @@ import com.infomaniak.lib.core.utils.hideProgressCatching
 import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showProgressCatching
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackRestoreMailsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetRestoreEmailsBinding
@@ -65,7 +66,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
         observeBackups()
 
         datePickerText.setOnItemClickListener { _, _, _, _ ->
-            trackRestoreMailsEvent("selectDate", TrackerAction.INPUT)
+            trackRestoreMailsEvent(MatomoName.SelectDate, TrackerAction.INPUT)
             restoreMailsButton.isEnabled = true
         }
 
@@ -116,7 +117,7 @@ class RestoreEmailsBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun restoreEmails() {
-        trackRestoreMailsEvent("restore", TrackerAction.CLICK)
+        trackRestoreMailsEvent(MatomoName.Restore, TrackerAction.CLICK)
 
         val date = autoCompleteTextView.text.toString()
         val formattedDate = formattedDates?.get(date) ?: date

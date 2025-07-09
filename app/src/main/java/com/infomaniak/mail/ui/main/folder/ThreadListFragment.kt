@@ -56,6 +56,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteEvent
@@ -416,12 +417,12 @@ class ThreadListFragment : TwoPaneFragment() {
     private fun setupListeners() = with(binding) {
 
         toolbar.setNavigationOnClickListener {
-            trackMenuDrawerEvent("openByButton")
+            trackMenuDrawerEvent(MatomoName.OpenByButton)
             (requireActivity() as MainActivity).openDrawerLayout()
         }
 
         cancel.setOnClickListener {
-            context.trackMultiSelectionEvent("cancel")
+            context.trackMultiSelectionEvent(MatomoName.Cancel)
             mainViewModel.isMultiSelectOn = false
         }
         selectAll.setOnClickListener {
@@ -442,7 +443,7 @@ class ThreadListFragment : TwoPaneFragment() {
         userAvatar.setOnClickListener { safeNavigate(resId = R.id.accountBottomSheetDialog) }
 
         newMessageFab.setOnClickListener {
-            trackNewMessageEvent("openFromFab")
+            trackNewMessageEvent(MatomoName.OpenFromFab)
             safeNavigateToNewMessageActivity()
         }
 
@@ -528,7 +529,7 @@ class ThreadListFragment : TwoPaneFragment() {
                 storageLevel = storageBannerStatus
                 setupListener(
                     onCloseButtonClicked = {
-                        trackMyKSuiteEvent("closeStorageWarningBanner")
+                        trackMyKSuiteEvent(MatomoName.CloseStorageWarningBanner.toString())
                         binding.myKSuiteStorageBanner.isGone = true
                         resetStorageBannerAppLaunches()
                     }

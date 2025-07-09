@@ -81,6 +81,7 @@ object MatomoMail : MatomoCore {
         AppReview("appReview"),
         AppUpdate("appUpdate"),
         InAppUpdate("inAppUpdate"),
+        InAppReview("inAppReview"),
         KeyboardShortcutActions("keyboardShortcutActions"),
         EasterEgg("easterEgg"),
         CalendarEvent("calendarEvent"),
@@ -376,12 +377,32 @@ object MatomoMail : MatomoCore {
         Rename("rename"),
         RenameConfirm("renameConfirm"),
         DeleteConfirm("deleteConfirm"),
+        DeleteQuote("deleteQuote"),
+        OpenRecipientsFields("openRecipientsFields"),
     }
 
 
     @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build
     fun Context.trackDestination(navDestination: NavDestination) = with(navDestination) {
         trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
+    }
+
+    fun Fragment.trackEvent(
+        category: MatomoCategory,
+        name: MatomoName,
+        action: TrackerAction = TrackerAction.CLICK,
+        value: Float? = null
+    ) {
+        context?.trackEvent(category, name, action, value)
+    }
+
+    fun Context.trackEvent(
+        category: MatomoCategory,
+        name: MatomoName,
+        action: TrackerAction = TrackerAction.CLICK,
+        value: Float? = null
+    ) {
+        trackEvent(category.toString(), name.toString(), action, value)
     }
 
     fun Context.trackSendingDraftEvent(
@@ -393,7 +414,11 @@ object MatomoMail : MatomoCore {
     ) {
         trackNewMessageEvent(action.matomoValue)
         if (action == DraftAction.SEND) {
-            val trackerData = listOf("numberOfTo" to to, "numberOfCc" to cc, "numberOfBcc" to bcc)
+            val trackerData = listOf(
+                MatomoName.NumberOfTo to to,
+                MatomoName.NumberOfCc to cc,
+                MatomoName.NumberOfBcc to bcc
+            )
             trackerData.forEach { (eventName, recipients) ->
                 trackNewMessageEvent(eventName, TrackerAction.DATA, recipients.size.toFloat())
             }
@@ -406,156 +431,156 @@ object MatomoMail : MatomoCore {
                     }
                 }
 
-                trackExternalEvent("emailSentWithExternals", TrackerAction.DATA, externalRecipientCount > 0)
-                trackExternalEvent("emailSentExternalQuantity", TrackerAction.DATA, externalRecipientCount.toFloat())
+                trackExternalEvent(MatomoName.EmailSentWithExternals, TrackerAction.DATA, externalRecipientCount > 0)
+                trackExternalEvent(MatomoName.EmailSentExternalQuantity, TrackerAction.DATA, externalRecipientCount.toFloat())
             }
         }
     }
 
-    fun Fragment.trackContactActionsEvent(name: String) {
-        trackEvent("contactActions", name)
+    fun Fragment.trackContactActionsEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.ContactActions, name)
     }
 
-    fun Fragment.trackAttachmentActionsEvent(name: String) {
-        trackEvent("attachmentActions", name)
+    fun Fragment.trackAttachmentActionsEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.AttachmentActions, name)
     }
 
-    fun Fragment.trackBottomSheetMessageActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = "bottomSheetMessageActions", name = name, value = value?.toMailActionValue())
+    fun Fragment.trackBottomSheetMessageActionsEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(category = MatomoCategory.BottomSheetMessageActions, name = name, value = value?.toMailActionValue())
     }
 
-    fun Fragment.trackBottomSheetThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = MatomoCategory.BottomSheetThreadActions.toString(), name = name, value = value?.toMailActionValue())
+    fun Fragment.trackBottomSheetThreadActionsEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(category = MatomoCategory.BottomSheetThreadActions, name = name, value = value?.toMailActionValue())
     }
 
-    private fun Fragment.trackBottomSheetMultiSelectThreadActionsEvent(name: String, value: Int) {
-        trackEvent(category = MatomoCategory.BottomSheetThreadActions.toString(), name = name, value = value.toFloat())
+    private fun Fragment.trackBottomSheetMultiSelectThreadActionsEvent(name: MatomoName, value: Int) {
+        val trackerName = "${if (value == 1) "bulkSingle" else "bulk"}${name.toString().capitalizeFirstChar()}"
+        trackEvent(category = MatomoCategory.BottomSheetThreadActions.toString(), name = trackerName, value = value.toFloat())
     }
 
-    fun Fragment.trackThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = MatomoCategory.ThreadActions.toString(), name = name, value = value?.toMailActionValue())
+    fun Fragment.trackThreadActionsEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(category = MatomoCategory.ThreadActions, name = name, value = value?.toMailActionValue())
     }
 
-    private fun Fragment.trackMultiSelectThreadActionsEvent(name: String, value: Int) {
-        trackEvent(category = MatomoCategory.ThreadActions.toString(), name = name, value = value.toFloat())
+    private fun Fragment.trackMultiSelectThreadActionsEvent(name: MatomoName, value: Int) {
+        val trackerName = "${if (value == 1) "bulkSingle" else "bulk"}${name.toString().capitalizeFirstChar()}"
+        trackEvent(category = MatomoCategory.ThreadActions.toString(), name = trackerName, value = value.toFloat())
     }
 
-    fun Fragment.trackMessageActionsEvent(name: String) {
-        trackEvent("messageActions", name)
+    fun Fragment.trackMessageActionsEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.MessageActions, name)
     }
 
-    fun Fragment.trackBlockUserAction(name: String) {
+    fun Fragment.trackBlockUserAction(name: MatomoName) {
         requireContext().trackBlockUserAction(name)
     }
 
-    fun Context.trackBlockUserAction(name: String) {
-        trackEvent("blockUserAction", name)
+    fun Context.trackBlockUserAction(name: MatomoName) {
+        trackEvent(MatomoCategory.BlockUserAction, name)
     }
 
-    fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
+    fun Fragment.trackSearchEvent(name: MatomoName, value: Boolean? = null) {
         context?.trackSearchEvent(name, value)
     }
 
-    fun Fragment.trackMoveSearchEvent(name: String) {
-        trackEvent("moveSearch", name)
+    fun Fragment.trackMoveSearchEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.MoveSearch, name)
     }
 
-    fun Context.trackMessageEvent(name: String, value: Boolean? = null) {
-        trackEvent("message", name, value = value?.toFloat())
+    fun Context.trackMessageEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(MatomoCategory.Message, name, value = value?.toFloat())
     }
 
-    fun Context.trackSearchEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = "search", name = name, value = value?.toFloat())
+    fun Context.trackSearchEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(category = MatomoCategory.Search, name = name, value = value?.toFloat())
     }
 
-    fun Context.trackNotificationActionEvent(name: String) {
-        trackEvent(category = "notificationActions", name = name)
+    fun Context.trackNotificationActionEvent(name: MatomoName) {
+        trackEvent(category = MatomoCategory.NotificationActions, name = name)
     }
 
-    fun Fragment.trackNewMessageEvent(name: String) {
+    fun Fragment.trackNewMessageEvent(name: MatomoName) {
         context?.trackNewMessageEvent(name)
     }
 
-    fun Context.trackNewMessageEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
-        trackEvent("newMessage", name, action, value)
+    fun Context.trackNewMessageEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.NewMessage, name, action, value)
     }
 
-    fun Fragment.trackMenuDrawerEvent(name: String, value: Boolean? = null) {
+    fun Fragment.trackMenuDrawerEvent(name: MatomoName, value: Boolean? = null) {
         context?.trackMenuDrawerEvent(name, value = value?.toFloat())
     }
 
-    fun Context.trackMenuDrawerEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
-        trackEvent("menuDrawer", name, action, value)
+    fun Context.trackMenuDrawerEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.MenuDrawer, name, action, value)
     }
 
-    fun Fragment.trackCreateFolderEvent(name: String) {
+    fun Fragment.trackCreateFolderEvent(name: MatomoName) {
         context?.trackCreateFolderEvent(name)
     }
 
-    fun Context.trackCreateFolderEvent(name: String) {
-        trackEvent("createFolder", name)
+    fun Context.trackCreateFolderEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.CreateFolder, name)
     }
 
-    fun Context.trackRenameFolderEvent(name: String) {
-        trackEvent("manageFolder", name)
+    fun Context.trackRenameFolderEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.ManageFolder, name)
     }
 
-    fun Context.trackMultiSelectionEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("multiSelection", name, action)
+    fun Context.trackMultiSelectionEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent(MatomoCategory.MultiSelection, name, action)
     }
 
-    fun Fragment.trackMultiSelectActionEvent(name: String, value: Int, isFromBottomSheet: Boolean = false) {
-        val trackerName = "${if (value == 1) "bulkSingle" else "bulk"}${name.capitalizeFirstChar()}"
-
+    fun Fragment.trackMultiSelectActionEvent(name: MatomoName, value: Int, isFromBottomSheet: Boolean = false) {
         if (isFromBottomSheet) {
-            trackBottomSheetMultiSelectThreadActionsEvent(trackerName, value)
+            trackBottomSheetMultiSelectThreadActionsEvent(name, value)
         } else {
-            trackMultiSelectThreadActionsEvent(trackerName, value)
+            trackMultiSelectThreadActionsEvent(name, value)
         }
     }
 
-    fun Context.trackUserInfo(name: String, value: Int? = null) {
-        trackEvent("userInfo", name, TrackerAction.DATA, value?.toFloat())
+    fun Context.trackUserInfo(name: MatomoName, value: Int? = null) {
+        trackEvent(MatomoCategory.UserInfo, name, TrackerAction.DATA, value?.toFloat())
     }
 
     fun Fragment.trackOnBoardingEvent(name: String) {
-        trackEvent("onboarding", name)
+        trackEvent(MatomoCategory.Onboarding.toString(), name)
     }
 
     fun Fragment.trackThreadListEvent(name: String) {
-        trackEvent("threadList", name)
+        trackEvent(MatomoCategory.ThreadList.toString(), name)
     }
 
-    fun Fragment.trackRestoreMailsEvent(name: String, action: TrackerAction) {
-        trackEvent("restoreEmailsBottomSheet", name, action)
+    fun Fragment.trackRestoreMailsEvent(name: MatomoName, action: TrackerAction) {
+        trackEvent(MatomoCategory.RestoreEmailsBottomSheet, name, action)
     }
 
-    fun Fragment.trackNoValidMailboxesEvent(name: String) {
-        trackEvent("noValidMailboxes", name)
+    fun Fragment.trackNoValidMailboxesEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.NoValidMailboxes, name)
     }
 
-    fun Fragment.trackInvalidPasswordMailboxEvent(name: String) {
-        trackEvent("invalidPasswordMailbox", name)
+    fun Fragment.trackInvalidPasswordMailboxEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.InvalidPasswordMailbox, name)
     }
 
-    fun Context.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
-        trackEvent("externals", name, action, value)
+    fun Context.trackExternalEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.Externals, name, action, value)
     }
 
-    fun Context.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Boolean) {
-        trackEvent("externals", name, action, value.toFloat())
+    fun Context.trackExternalEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Boolean) {
+        trackEvent(MatomoCategory.Externals, name, action, value.toFloat())
     }
 
-    fun Fragment.trackAiWriterEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+    fun Fragment.trackAiWriterEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK) {
         context?.trackAiWriterEvent(name, action)
     }
 
-    fun Context.trackAiWriterEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("aiWriter", name, action)
+    fun Context.trackAiWriterEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent(MatomoCategory.AiWriter, name, action)
     }
 
-    fun Fragment.trackSyncAutoConfigEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("syncAutoConfig", name, action)
+    fun Fragment.trackSyncAutoConfigEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent(MatomoCategory.SyncAutoConfig, name, action)
     }
 
     fun Fragment.trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
@@ -563,47 +588,47 @@ object MatomoMail : MatomoCore {
     }
 
     fun Context.trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("easterEgg", name, action)
+        trackEvent(MatomoCategory.EasterEgg.toString(), name, action)
     }
 
-    fun Activity.trackAppReviewEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("appReview", name, action)
+    fun Activity.trackAppReviewEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent(MatomoCategory.AppReview, name, action)
     }
 
-    fun Fragment.trackAppUpdateEvent(name: String) {
-        trackEvent("appUpdate", name)
+    fun Fragment.trackAppUpdateEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.AppUpdate, name)
     }
 
-    fun Context.trackInAppUpdateEvent(name: String) {
-        trackEvent("inAppUpdate", name)
+    fun Context.trackInAppUpdateEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.InAppUpdate, name)
     }
 
-    fun Context.trackInAppReviewEvent(name: String) {
-        trackEvent("inAppReview", name)
+    fun Context.trackInAppReviewEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.InAppReview, name)
     }
 
-    fun View.trackCalendarEventEvent(name: String, value: Boolean? = null) {
-        context.trackEvent("calendarEvent", name, value = value?.toFloat())
+    fun View.trackCalendarEventEvent(name: MatomoName, value: Boolean? = null) {
+        context.trackEvent(MatomoCategory.CalendarEvent, name, value = value?.toFloat())
     }
 
     fun Context.trackShortcutEvent(name: String) {
-        trackEvent("homeScreenShortcuts", name)
+        trackEvent(MatomoCategory.HomeScreenShortcuts.toString(), name)
     }
 
-    fun Fragment.trackAutoAdvanceEvent(name: String) {
-        trackEvent("settingsAutoAdvance", name)
+    fun Fragment.trackAutoAdvanceEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.SettingsAutoAdvance, name)
     }
 
-    fun Fragment.trackScheduleSendEvent(name: String) {
-        trackEvent("scheduleSend", name)
+    fun Fragment.trackScheduleSendEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.ScheduleSend, name)
     }
 
-    fun Context.trackScheduleSendEvent(name: String) {
-        trackEvent("scheduleSend", name)
+    fun Context.trackScheduleSendEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.ScheduleSend, name)
     }
 
-    fun Fragment.trackSnoozeEvent(name: String) {
-        trackEvent("snooze", name)
+    fun Fragment.trackSnoozeEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.Snooze, name)
     }
 
     fun Fragment.trackMyKSuiteEvent(name: String) {

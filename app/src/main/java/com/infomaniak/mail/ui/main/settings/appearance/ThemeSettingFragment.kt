@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -66,7 +67,7 @@ class ThemeSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, theme ->
             chooseTheme(theme as Theme)
-            trackEvent("settingsTheme", theme.toString())
+            trackEvent(MatomoCategory.SettingsTheme.toString(), theme.toString())
         }
     }
 

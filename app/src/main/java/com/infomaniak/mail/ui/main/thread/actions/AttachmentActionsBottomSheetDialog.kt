@@ -27,6 +27,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.data.models.Attachment
@@ -82,7 +83,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun setupListeners(attachment: Attachable) = with(binding) {
         if (attachment is Attachment) {
             openWithItem.setClosingOnClickListener {
-                trackAttachmentActionsEvent("openFromBottomsheet")
+                trackAttachmentActionsEvent(MatomoName.OpenFromBottomsheet)
                 attachment.openAttachment(
                     context = context,
                     navigateToDownloadProgressDialog = ::navigateToDownloadProgressDialog,
@@ -90,7 +91,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 )
             }
             kDriveItem.setClosingOnClickListener {
-                trackAttachmentActionsEvent("saveToKDrive")
+                trackAttachmentActionsEvent(MatomoName.SaveToKDrive)
                 attachment.executeIntent(
                     context = context,
                     intentType = AttachmentIntentType.SAVE_TO_DRIVE,
@@ -100,7 +101,7 @@ class AttachmentActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         deviceItem.setOnClickListener {
-            trackAttachmentActionsEvent("download")
+            trackAttachmentActionsEvent(MatomoName.Download)
             scheduleDownloadManager(attachment.downloadUrl, attachment.name)
         }
     }

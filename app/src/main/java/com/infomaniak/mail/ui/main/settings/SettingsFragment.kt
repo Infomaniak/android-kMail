@@ -34,6 +34,8 @@ import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showToast
+import com.infomaniak.mail.MatomoMail.MatomoCategory
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteEvent
@@ -189,7 +191,7 @@ class SettingsFragment : Fragment() {
             isVisible = LockActivity.hasBiometrics()
             isChecked = localSettings.isAppLocked
             setOnClickListener {
-                trackEvent("settingsGeneral", "lock", value = isChecked.toFloat())
+                trackEvent(MatomoCategory.SettingsGeneral, MatomoName.Lock, value = isChecked.toFloat())
                 // Reverse switch (before official parameter changed) by silent click
                 requireActivity().silentlyReverseSwitch(toggle!!) { isChecked ->
                     localSettings.isAppLocked = isChecked
@@ -199,12 +201,12 @@ class SettingsFragment : Fragment() {
         }
 
         settingsNotifications.setOnClickListener {
-            trackEvent("settingsNotifications", "openNotificationSettings")
+            trackEvent(MatomoCategory.SettingsNotifications, MatomoName.OpenNotificationSettings)
             requireContext().openAppNotificationSettings()
         }
 
         settingsSyncAutoConfig.setOnClickListener {
-            trackSyncAutoConfigEvent("openFromSettings")
+            trackSyncAutoConfigEvent(MatomoName.OpenFromSettings)
             launchSyncAutoConfigActivityForResult()
         }
 

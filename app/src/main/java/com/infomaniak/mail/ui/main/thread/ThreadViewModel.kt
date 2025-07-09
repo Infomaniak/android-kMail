@@ -29,6 +29,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -327,12 +328,12 @@ class ThreadViewModel @Inject constructor(
 
         val nbMessages = thread.messages.count()
 
-        appContext.trackUserInfo("nbMessagesInThread", nbMessages)
+        appContext.trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
 
         when (nbMessages) {
             0 -> SentryDebug.sendEmptyThread(thread, "No Message in the Thread when opening it", mailboxContentRealm())
-            1 -> appContext.trackUserInfo("oneMessagesInThread")
-            else -> appContext.trackUserInfo("multipleMessagesInThread", nbMessages)
+            1 -> appContext.trackUserInfo(MatomoName.OneMessagesInThread)
+            else -> appContext.trackUserInfo(MatomoName.MultipleMessagesInThread, nbMessages)
         }
     }
 

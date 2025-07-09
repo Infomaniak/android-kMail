@@ -25,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -65,18 +66,18 @@ class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
     private fun setupListeners() = with(binding) {
 
         writeMail.setClosingOnClickListener {
-            trackContactActionsEvent("writeEmail")
+            trackContactActionsEvent(MatomoName.WriteEmail)
             safeNavigateToNewMessageActivity(
                 args = NewMessageActivityArgs(recipient = navigationArgs.recipient).toBundle(),
                 currentClassName = currentClassName,
             )
         }
         addToContacts.setClosingOnClickListener {
-            trackContactActionsEvent("addToContacts")
+            trackContactActionsEvent(MatomoName.AddToContacts)
             mainViewModel.addContact(navigationArgs.recipient)
         }
         copyAddress.setClosingOnClickListener {
-            trackContactActionsEvent("copyEmailAddress")
+            trackContactActionsEvent(MatomoName.CopyEmailAddress)
             copyRecipientEmailToClipboard(navigationArgs.recipient, snackbarManager)
         }
     }
