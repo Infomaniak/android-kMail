@@ -23,19 +23,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.infomaniak.lib.core.BuildConfig.AUTOLOG_URL
 import com.infomaniak.lib.core.BuildConfig.TERMINATE_ACCOUNT_URL
-import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.ui.WebViewActivity
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.mail.databinding.FragmentAccountManagementSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -59,7 +54,6 @@ class AccountManagementSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
-        handleEdgeToEdge()
 
         setUi()
         setDeleteAccountClickListener()
@@ -81,17 +75,6 @@ class AccountManagementSettingsFragment : Fragment() {
                 urlToQuit = URL_REDIRECT_SUCCESSFUL_ACCOUNT_DELETION,
                 activityResultLauncher = resultActivityResultLauncher,
             )
-        }
-    }
-
-    private fun handleEdgeToEdge() = with(binding) {
-        ViewCompat.setOnApplyWindowInsetsListener(informationBlockView) { view, insets ->
-            with(insets.safeArea()) {
-                view.setMargins(
-                    bottom = context?.resources?.getDimension(R.dimen.marginStandard)?.toInt()
-                )
-            }
-            WindowInsetsCompat.CONSUMED
         }
     }
 
