@@ -47,7 +47,7 @@ import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptableView
-import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionStatus
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.extensions.isEmail

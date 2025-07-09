@@ -134,10 +134,6 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         binding.unencryptedRecipientText.text = count
     }
 
-    enum class EncryptionStatus {
-        Unencrypted, Loading, PartiallyEncrypted, Encrypted
-    }
-
     private enum class EncryptionDisplayStyle {
         ChipIcon, ToolbarButton
     }
