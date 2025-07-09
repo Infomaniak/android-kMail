@@ -28,6 +28,12 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEncryptionLockButtonBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.invoke
+import kotlinx.coroutines.launch
 
 class EncryptionLockButtonView @JvmOverloads constructor(
     context: Context,
@@ -36,6 +42,7 @@ class EncryptionLockButtonView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewEncryptionLockButtonBinding.inflate(LayoutInflater.from(context), this, true) }
+    private var loadingJob: Job? = null
 
     val encryptionButton get() = binding.encryptionButton
     var unencryptableRecipientsCount: Int? = null
@@ -52,6 +59,8 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         }
 
     private fun setToolbarButtonUi() {
+        resetLoadingJob()
+
         when (encryptionStatus) {
             EncryptionStatus.Unencrypted -> setIconUi(
                 iconRes = R.drawable.ic_lock_open_filled,
@@ -70,8 +79,7 @@ class EncryptionLockButtonView @JvmOverloads constructor(
             )
             EncryptionStatus.Loading -> with(binding) {
                 encryptionButton.isEnabled = false
-                unencryptedRecipientLoader.isVisible = true
-                pastille.isGone = true
+                loadWithDelay()
             }
         }
     }
@@ -98,5 +106,23 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         }
 
         binding.unencryptedRecipientText.text = count
+    }
+
+    /**
+     * Add a delay before displaying the loader, to avoid small blink at draft's opening
+     */
+    private fun loadWithDelay() {
+        loadingJob = CoroutineScope(Dispatchers.Default).launch {
+            delay(200)
+            Dispatchers.Main {
+                binding.unencryptedRecipientLoader.isVisible = true
+                binding.unencryptableGroup.isGone = true
+            }
+        }
+    }
+
+    private fun resetLoadingJob() {
+        loadingJob?.cancel()
+        loadingJob = null
     }
 }
