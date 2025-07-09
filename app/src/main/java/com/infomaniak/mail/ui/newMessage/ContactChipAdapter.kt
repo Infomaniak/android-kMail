@@ -29,8 +29,8 @@ import com.infomaniak.mail.ui.newMessage.encryption.EncryptableView
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionStatus
 
 class ContactChipAdapter(
-    val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,
-    val onBackspace: (Recipient) -> Unit,
+    val openContextMenu: ((Recipient, BackspaceAwareChip) -> Unit)? = null,
+    val onBackspace: ((Recipient) -> Unit)? = null,
 ) : Adapter<ContactChipAdapter.ContactChipViewHolder>(), EncryptableView {
 
     override var isEncryptionActivated = false
@@ -54,8 +54,8 @@ class ContactChipAdapter(
 
         root.apply {
             text = recipient.getNameOrEmail()
-            setOnClickListener { openContextMenu(recipient, root) }
-            setOnBackspaceListener { onBackspace(recipient) }
+            setOnClickListener { openContextMenu?.invoke(recipient, root) }
+            setOnBackspaceListener { onBackspace?.invoke(recipient) }
             setChipStyle(recipient.isDisplayedAsExternal, encryptionStatus)
         }
     }

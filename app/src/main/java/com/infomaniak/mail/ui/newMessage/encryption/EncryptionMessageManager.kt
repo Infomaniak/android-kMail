@@ -71,7 +71,7 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
-            applyEncryptionStyleOnContactChip(isEncryptionActivated = isEncrypted)
+            applyEncryptionStyleOnRecipientFields(isEncryptionActivated = isEncrypted)
             val isEncryptionValid = checkEncryptionCanBeSend()
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
 
@@ -110,7 +110,7 @@ class EncryptionMessageManager @Inject constructor(
         encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipientsEmails ->
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = checkEncryptionCanBeSend())
 
-            applyEncryptionStyleOnContactChip(unencryptableRecipients = recipientsEmails)
+            applyEncryptionStyleOnRecipientFields(unencryptableRecipients = recipientsEmails)
 
             // Check if the email is still in the draft's recipients (it could have been deleted while being checked)
             val filteredEmails = recipientsEmails?.filter { email -> newMessageViewModel.allRecipients.any { it.email == email } }
@@ -148,7 +148,7 @@ class EncryptionMessageManager @Inject constructor(
                 EncryptionStatus.Encrypted
             }
             binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
-            applyEncryptionStyleOnContactChip(encryptionPassword = password)
+            applyEncryptionStyleOnRecipientFields(encryptionPassword = password)
 
             newMessageViewModel.encryptionPassword.postValue(password)
         }
@@ -220,7 +220,7 @@ class EncryptionMessageManager @Inject constructor(
         }
     }
 
-    private fun applyEncryptionStyleOnContactChip(
+    private fun applyEncryptionStyleOnRecipientFields(
         isEncryptionActivated: Boolean? = null,
         unencryptableRecipients: Set<String>? = null,
         encryptionPassword: String? = null,
