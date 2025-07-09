@@ -366,11 +366,6 @@
         <item name="chipBackgroundColor">@color/chip_contact_background_color</item>
     </style>
 
-    <style name="EncryptionEmailAddressChip" parent="ChipNoIcons">
-        <item name="android:textColor">@color/encryptionIconColor</item>
-        <item name="chipBackgroundColor">@color/encryptionBackgroundColor</item>
-    </style>
-
     <style name="SearchFilterChip" parent="ChipNoIcons">
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_width">wrap_content</item>
