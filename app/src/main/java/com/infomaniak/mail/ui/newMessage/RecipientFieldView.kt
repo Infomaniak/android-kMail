@@ -55,6 +55,7 @@ import com.infomaniak.mail.utils.extensions.toggleChevron
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.min
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class RecipientFieldView @JvmOverloads constructor(
@@ -493,14 +494,14 @@ class RecipientFieldView @JvmOverloads constructor(
                 ChipStyle(
                     backgroundColor = R.color.encryptionBackgroundColor,
                     textColor = R.color.encryptionTextColor,
-                    encryptionIcon = R.drawable.ic_lock_filled,
-                    encryptionIconTint = R.color.encryptionIconColor,
+                    icon = R.drawable.ic_lock_filled,
+                    iconTint = R.color.encryptionIconColor,
                 )
             }
             encryptionStatus == EncryptionStatus.PartiallyEncrypted -> ChipStyle(
                 backgroundColor = R.color.encryptionBackgroundColor,
                 textColor = R.color.encryptionTextColor,
-                encryptionIcon = R.drawable.ic_lock_open_filled_pastille,
+                icon = R.drawable.ic_lock_open_filled_pastille,
             )
             displayAsExternal -> ChipStyle(
                 backgroundColor = R.color.chip_contact_background_color_external,
@@ -518,27 +519,25 @@ class RecipientFieldView @JvmOverloads constructor(
         val backgroundColor: Int,
         val textColor: Int,
         val strokeColor: Int? = null,
-        val encryptionIcon: Int? = null,
-        val encryptionIconTint: Int? = null,
+        val icon: Int? = null,
+        val iconTint: Int? = null,
     ) {
 
-        fun applyTo(chip: Chip) {
+        fun applyTo(chip: Chip) = chip.apply {
             val (color, width) = strokeColor?.let {
-                ColorStateList.valueOf(chip.context.getColor(it)) to EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
+                ColorStateList.valueOf(context.getColor(it)) to EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
             } ?: (null to NO_STROKE)
 
-            chip.apply {
-                setTextColor(context.getColorStateList(textColor))
-                setChipBackgroundColorResource(backgroundColor)
+            chipStrokeWidth = width
+            chipStrokeColor = color
 
-                chipStrokeWidth = width
-                chipStrokeColor = color
+            setTextColor(context.getColorStateList(textColor))
+            setChipBackgroundColorResource(backgroundColor)
 
-                chipIcon = encryptionIcon?.let { ResourcesCompat.getDrawable(resources, encryptionIcon, null) }
-                chipIconTint = encryptionIconTint?.let(context::getColorStateList)
-                setChipIconSizeResource(R.dimen.iconImageSize)
-                setIconStartPaddingResource(com.infomaniak.lib.core.R.dimen.marginStandardVerySmall)
-            }
+            chipIcon = icon?.let { ResourcesCompat.getDrawable(resources, it, null) }
+            chipIconTint = iconTint?.let(context::getColorStateList)
+            setChipIconSizeResource(R.dimen.iconImageSize)
+            setIconStartPaddingResource(RCore.dimen.marginStandardVerySmall)
         }
     }
 }
