@@ -33,15 +33,11 @@ class ContactChipAdapter(
     val onBackspace: (Recipient) -> Unit,
 ) : Adapter<ContactChipAdapter.ContactChipViewHolder>(), EncryptableView {
 
+    override var isEncryptionActivated = false
     override var unencryptableRecipients: Set<String>? = null
-        set(value) {
-            field = value
-            updateUnencryptableRecipients(value)
-        }
+    override var encryptionPassword = ""
 
     private val recipients = mutableSetOf<Recipient>()
-    override var isEncryptionActivated = false
-    override var encryptionPassword = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactChipViewHolder {
         return ContactChipViewHolder(ChipContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -90,10 +86,18 @@ class ContactChipAdapter(
         notifyDataSetChanged() // We need to recompute whole collection to set new style
     }
 
-    private fun updateUnencryptableRecipients(unencryptableRecipients: Set<String>?) {
-        recipients.forEachIndexed { index, recipient ->
-            unencryptableRecipients?.let { unencryptableEmails ->
-                if (recipient.email in unencryptableRecipients) notifyItemChanged(index)
+    fun updateUnencryptableRecipients(unencryptableRecipients: Set<String>?) {
+        val alreadyUnencryptableRecipients = this.unencryptableRecipients ?: emptySet()
+        this.unencryptableRecipients = unencryptableRecipients
+        // No need to recompute unencryptable items if a password is already set or the encryption is not activated
+        if (!isEncryptionActivated || encryptionPassword.isNotBlank()) return
+
+        unencryptableRecipients?.let { newUnencryptableRecipients ->
+            recipients.forEachIndexed { index, recipient ->
+                // Only recompute items that weren't already in the same state to avoid making them blink
+                if (recipient.email in newUnencryptableRecipients && recipient.email !in alreadyUnencryptableRecipients) {
+                    notifyItemChanged(index)
+                }
             }
         }
     }

@@ -68,8 +68,8 @@ class EncryptionPasswordFragment : Fragment() {
     private fun setupUnencryptableRecipientsChips() {
         with(contactChipAdapter) {
             binding.userChipsRecyclerView.adapter = this
-            unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
             isEncryptionActivated = true
+            unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
             unencryptableRecipients?.forEach { addChip(Recipient().initLocalValues(email = it)) }
         }
     }

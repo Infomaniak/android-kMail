@@ -75,7 +75,7 @@ class RecipientFieldView @JvmOverloads constructor(
     override var unencryptableRecipients: Set<String>? = null
         set(value) {
             field = value
-            contactChipAdapter.unencryptableRecipients = value
+            contactChipAdapter.updateUnencryptableRecipients(value)
             setSingleChipStyle()
         }
     override var encryptionPassword: String = ""
@@ -321,9 +321,8 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun applyEncryptionStyle() = with(binding) {
-        val plusChipStatus = if (isEncryptionActivated) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted
-
         setSingleChipStyle()
+        val plusChipStatus = if (isEncryptionActivated) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted
         plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipStatus)
         contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients, encryptionPassword)
     }
