@@ -26,7 +26,6 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEncryptionLockButtonBinding
 
@@ -49,41 +48,8 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         set(value) {
             if (value == field) return
             field = value
-            setDisplayStyleUi()
+            setToolbarButtonUi()
         }
-
-    private var displayStyle: EncryptionDisplayStyle = EncryptionDisplayStyle.ToolbarButton
-
-    init {
-        attrs?.getAttributes(context, R.styleable.EncryptionLockButtonView) {
-            displayStyle = EncryptionDisplayStyle.entries[
-                getInteger(R.styleable.EncryptionLockButtonView_encryptionDisplayStyle, 0)
-            ]
-            setDisplayStyleUi()
-        }
-    }
-
-    private fun setDisplayStyleUi() = when (displayStyle) {
-        EncryptionDisplayStyle.ChipIcon -> setChipIconUi()
-        EncryptionDisplayStyle.ToolbarButton -> setToolbarButtonUi()
-    }
-
-    private fun setChipIconUi() {
-        when (encryptionStatus) {
-            EncryptionStatus.Unencrypted -> Unit // This case cannot happen
-            EncryptionStatus.PartiallyEncrypted -> setIconUi(
-                iconRes = R.drawable.ic_lock_open_filled,
-                iconTintRes = R.color.iconColor,
-                shouldDisplayPastille = true,
-            )
-            EncryptionStatus.Encrypted -> setIconUi(
-                iconRes = R.drawable.ic_lock_filled,
-                iconTintRes = R.color.encryptionIconColor,
-                shouldDisplayPastille = false,
-            )
-            EncryptionStatus.Loading -> Unit // This case cannot happen
-        }
-    }
 
     private fun setToolbarButtonUi() {
         when (encryptionStatus) {
@@ -132,9 +98,5 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         }
 
         binding.unencryptedRecipientText.text = count
-    }
-
-    private enum class EncryptionDisplayStyle {
-        ChipIcon, ToolbarButton
     }
 }
