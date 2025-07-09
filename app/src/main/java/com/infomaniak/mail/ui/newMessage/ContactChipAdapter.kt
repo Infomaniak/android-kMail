@@ -26,7 +26,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.ui.newMessage.RecipientFieldView.Companion.setChipStyle
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptableView
-import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionStatus
 
 class ContactChipAdapter(
     val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,

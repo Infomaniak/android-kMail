@@ -30,7 +30,6 @@ import com.infomaniak.mail.ui.newMessage.NewMessageFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageFragmentDirections
 import com.infomaniak.mail.ui.newMessage.NewMessageManager
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
-import com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView.EncryptionStatus
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
