@@ -74,7 +74,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
@@ -288,7 +287,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         @OptIn(ExperimentalCoroutinesApi::class)
         val userTokenFlow = AppSettingsController.getCurrentUserIdFlow()
             .mapLatest { id -> id?.let { AccountUtils.getUserById(it)?.apiToken } }
-            .filterNotNull()
             .shareIn(globalCoroutineScope, SharingStarted.Lazily, replay = 1)
 
         override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
@@ -301,7 +299,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
             refreshTokenError(AccountUtils.currentUser!!)
         }
 
-        override suspend fun getApiToken(): ApiToken? = userTokenFlow.first()
+        override suspend fun getUserApiToken(): ApiToken? = userTokenFlow.first()
 
         override fun getCurrentUserId(): Int = AccountUtils.currentUserId
     }
