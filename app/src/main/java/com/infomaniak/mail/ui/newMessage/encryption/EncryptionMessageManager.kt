@@ -146,11 +146,7 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeEncryptionPassword() {
         newMessageViewModel.encryptionPassword.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { password ->
-            val encryptionStatus = if (password.isBlank()) {
-                EncryptionStatus.PartiallyEncrypted
-            } else {
-                EncryptionStatus.Encrypted
-            }
+            val encryptionStatus = if (password.isBlank()) EncryptionStatus.PartiallyEncrypted else EncryptionStatus.Encrypted
             binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
             applyEncryptionStyleOnRecipientFields(encryptionPassword = password)
 
