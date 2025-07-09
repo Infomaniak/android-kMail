@@ -46,9 +46,7 @@ class EncryptionPasswordFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
 
-    private val contactChipAdapter: ContactChipAdapter by lazy {
-        ContactChipAdapter(openContextMenu = { _, _ -> }, onBackspace = {})
-    }
+    private val contactChipAdapter: ContactChipAdapter by lazy { ContactChipAdapter() }
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -66,8 +64,7 @@ class EncryptionPasswordFragment : Fragment() {
     }
 
     private fun setupUnencryptableRecipientsChips() {
-        with(contactChipAdapter) {
-            binding.userChipsRecyclerView.adapter = this
+        binding.userChipsRecyclerView.adapter = contactChipAdapter.apply {
             isEncryptionActivated = true
             unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
             unencryptableRecipients?.forEach { addChip(Recipient().initLocalValues(email = it)) }
