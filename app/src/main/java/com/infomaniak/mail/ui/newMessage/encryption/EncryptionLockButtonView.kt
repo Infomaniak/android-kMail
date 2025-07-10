@@ -26,14 +26,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEncryptionLockButtonBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.invoke
-import kotlinx.coroutines.launch
 
 class EncryptionLockButtonView @JvmOverloads constructor(
     context: Context,
@@ -42,7 +37,14 @@ class EncryptionLockButtonView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewEncryptionLockButtonBinding.inflate(LayoutInflater.from(context), this, true) }
-    private var loadingJob: Job? = null
+
+    private val loadingDelayTimer by lazy {
+        // Add a delay before displaying the loader, to avoid small blink at draft's opening
+        Utils.createRefreshTimer {
+            binding.unencryptedRecipientLoader.isVisible = true
+            binding.unencryptableGroup.isGone = true
+        }
+    }
 
     val encryptionButton get() = binding.encryptionButton
     var unencryptableRecipientsCount: Int? = null
@@ -58,8 +60,13 @@ class EncryptionLockButtonView @JvmOverloads constructor(
             setToolbarButtonUi()
         }
 
+    override fun onDetachedFromWindow() {
+        loadingDelayTimer.cancel()
+        super.onDetachedFromWindow()
+    }
+
     private fun setToolbarButtonUi() {
-        resetLoadingJob()
+        loadingDelayTimer.cancel()
 
         when (encryptionStatus) {
             EncryptionStatus.Unencrypted -> setIconUi(
@@ -79,7 +86,7 @@ class EncryptionLockButtonView @JvmOverloads constructor(
             )
             EncryptionStatus.Loading -> with(binding) {
                 encryptionButton.isEnabled = false
-                loadWithDelay()
+                loadingDelayTimer.start()
             }
         }
     }
@@ -106,23 +113,5 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         }
 
         binding.unencryptedRecipientText.text = count
-    }
-
-    /**
-     * Add a delay before displaying the loader, to avoid small blink at draft's opening
-     */
-    private fun loadWithDelay() {
-        loadingJob = CoroutineScope(Dispatchers.Default).launch {
-            delay(200)
-            Dispatchers.Main {
-                binding.unencryptedRecipientLoader.isVisible = true
-                binding.unencryptableGroup.isGone = true
-            }
-        }
-    }
-
-    private fun resetLoadingJob() {
-        loadingJob?.cancel()
-        loadingJob = null
     }
 }
