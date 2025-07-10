@@ -56,15 +56,15 @@ class EncryptionViewModel @Inject constructor(
         emailsCheckingJob = viewModelScope.launch(ioDispatcher) {
             isCheckingEmailsTrigger.postValue(Unit)
 
-            val currentUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
-            // By default, all the new addresses being checked are considered unencryptable
-            var newUnencryptableRecipients: Set<String> = emailsBeingChecked
-
             runCatching {
                 val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked)
 
+                // By default, all the new addresses being checked are considered unencryptable
+                var newUnencryptableRecipients: Set<String> = emailsBeingChecked
+
                 if (apiResponse.isSuccess()) {
                     apiResponse.data?.let { mailboxHostingStatuses ->
+                        // TODO: Remove that when caching data
                         newUnencryptableRecipients =
                             mergedContactController.updateEncryptionStatus(mailboxHostingStatuses).toSet()
                     }
@@ -72,10 +72,14 @@ class EncryptionViewModel @Inject constructor(
                     // In case of error during the encryptable check, we consider all recipients as unencryptable
                     snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
                 }
-                clearDataAndPostResult(newUnencryptableRecipients + currentUnencryptableRecipients)
+                val existingUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
+                clearDataAndPostResult(newUnencryptableRecipients + existingUnencryptableRecipients)
             }.onFailure { exception ->
+                // We don't post result here as a new check will be executed
                 if (exception is AutoBulkCallCancellationException) throw CancellationException()
-                clearDataAndPostResult(newUnencryptableRecipients + currentUnencryptableRecipients)
+
+                val existingUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
+                clearDataAndPostResult(emailsBeingChecked + existingUnencryptableRecipients)
                 if (exception is CancellationException) throw exception
             }
         }
