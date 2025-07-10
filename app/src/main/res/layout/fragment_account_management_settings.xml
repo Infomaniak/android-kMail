@@ -80,7 +80,6 @@
                 app:titleColor="@color/redDestructiveAction" />
 
             <com.infomaniak.mail.views.InformationBlockView
-                android:id="@+id/informationBlockView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
