@@ -26,7 +26,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEncryptionLockButtonBinding
 
@@ -37,6 +37,14 @@ class EncryptionLockButtonView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding by lazy { ViewEncryptionLockButtonBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    private val loadingDelayTimer by lazy {
+        // Add a delay before displaying the loader, to avoid small blink at draft's opening
+        Utils.createRefreshTimer {
+            binding.unencryptedRecipientLoader.isVisible = true
+            binding.unencryptableGroup.isGone = true
+        }
+    }
 
     val encryptionButton get() = binding.encryptionButton
     var unencryptableRecipientsCount: Int? = null
@@ -49,43 +57,17 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         set(value) {
             if (value == field) return
             field = value
-            setDisplayStyleUi()
+            setToolbarButtonUi()
         }
 
-    private var displayStyle: EncryptionDisplayStyle = EncryptionDisplayStyle.ToolbarButton
-
-    init {
-        attrs?.getAttributes(context, R.styleable.EncryptionLockButtonView) {
-            displayStyle = EncryptionDisplayStyle.entries[
-                getInteger(R.styleable.EncryptionLockButtonView_encryptionDisplayStyle, 0)
-            ]
-            setDisplayStyleUi()
-        }
-    }
-
-    private fun setDisplayStyleUi() = when (displayStyle) {
-        EncryptionDisplayStyle.ChipIcon -> setChipIconUi()
-        EncryptionDisplayStyle.ToolbarButton -> setToolbarButtonUi()
-    }
-
-    private fun setChipIconUi() {
-        when (encryptionStatus) {
-            EncryptionStatus.Unencrypted -> Unit // This case cannot happen
-            EncryptionStatus.PartiallyEncrypted -> setIconUi(
-                iconRes = R.drawable.ic_lock_open_filled,
-                iconTintRes = R.color.iconColor,
-                shouldDisplayPastille = true,
-            )
-            EncryptionStatus.Encrypted -> setIconUi(
-                iconRes = R.drawable.ic_lock_filled,
-                iconTintRes = R.color.encryptionIconColor,
-                shouldDisplayPastille = false,
-            )
-            EncryptionStatus.Loading -> Unit // This case cannot happen
-        }
+    override fun onDetachedFromWindow() {
+        loadingDelayTimer.cancel()
+        super.onDetachedFromWindow()
     }
 
     private fun setToolbarButtonUi() {
+        loadingDelayTimer.cancel()
+
         when (encryptionStatus) {
             EncryptionStatus.Unencrypted -> setIconUi(
                 iconRes = R.drawable.ic_lock_open_filled,
@@ -104,8 +86,7 @@ class EncryptionLockButtonView @JvmOverloads constructor(
             )
             EncryptionStatus.Loading -> with(binding) {
                 encryptionButton.isEnabled = false
-                unencryptedRecipientLoader.isVisible = true
-                pastille.isGone = true
+                loadingDelayTimer.start()
             }
         }
     }
@@ -132,9 +113,5 @@ class EncryptionLockButtonView @JvmOverloads constructor(
         }
 
         binding.unencryptedRecipientText.text = count
-    }
-
-    private enum class EncryptionDisplayStyle {
-        ChipIcon, ToolbarButton
     }
 }
