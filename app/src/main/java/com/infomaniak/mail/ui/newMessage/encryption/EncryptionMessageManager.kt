@@ -127,7 +127,11 @@ class EncryptionMessageManager @Inject constructor(
                 }
             }
 
-            if (recipientsCount > 0 && !hasAlreadyAddedUnencryptableRecipients) {
+            if (
+                recipientsCount > 0 &&
+                newMessageViewModel.encryptionPassword.value.isNullOrBlank() &&
+                !hasAlreadyAddedUnencryptableRecipients
+            ) {
                 hasAlreadyAddedUnencryptableRecipients = true
                 snackbarManager.postValue(
                     fragment.resources.getQuantityString(
