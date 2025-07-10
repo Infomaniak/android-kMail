@@ -229,20 +229,10 @@ class EncryptionMessageManager @Inject constructor(
         unencryptableRecipients: Set<String>? = null,
         encryptionPassword: String? = null,
     ) = with(binding) {
-        isEncryptionActivated?.let {
-            toField.isEncryptionActivated = it
-            ccField.isEncryptionActivated = it
-            bccField.isEncryptionActivated = it
-        }
-        unencryptableRecipients?.let {
-            toField.unencryptableRecipients = it
-            ccField.unencryptableRecipients = it
-            bccField.unencryptableRecipients = it
-        }
-        encryptionPassword?.let {
-            toField.encryptionPassword = it
-            ccField.encryptionPassword = it
-            bccField.encryptionPassword = it
+        listOf(toField, ccField, bccField).forEach { field ->
+            isEncryptionActivated?.let { field.isEncryptionActivated = it }
+            unencryptableRecipients?.let { field.unencryptableRecipients = it }
+            encryptionPassword?.let { field.encryptionPassword = it }
         }
     }
 }
