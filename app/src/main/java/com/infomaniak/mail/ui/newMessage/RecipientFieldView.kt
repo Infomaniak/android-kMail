@@ -322,13 +322,6 @@ class RecipientFieldView @JvmOverloads constructor(
         textInputLayout.isVisible = isTextInputAccessible
     }
 
-    fun applyEncryptionStyle() = with(binding) {
-        setSingleChipStyle()
-        val plusChipStatus = if (isEncryptionActivated) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted
-        plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipStatus)
-        contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients, encryptionPassword)
-    }
-
     fun updateContacts(allContacts: List<MergedContact>) {
         contactAdapter.updateContacts(allContacts)
     }
@@ -345,6 +338,13 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         binding.singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus = firstRecipientStatus)
+    }
+
+    private fun applyEncryptionStyle() = with(binding) {
+        setSingleChipStyle()
+        val plusChipStatus = if (isEncryptionActivated) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted
+        plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipStatus)
+        contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients, encryptionPassword)
     }
 
     private fun openAutoCompletion() {
