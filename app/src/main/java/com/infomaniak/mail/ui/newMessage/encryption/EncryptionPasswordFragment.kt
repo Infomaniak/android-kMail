@@ -34,6 +34,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.ContactChipAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
+import com.infomaniak.mail.utils.extensions.shareString
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -85,8 +86,8 @@ class EncryptionPasswordFragment : Fragment() {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         readMoreButton.setOnClickListener { context?.openUrl(ENCRYPTION_FAQ_URL) }
         copyPasswordButton.setOnClickListener {
-            val password = passwordInput.text
-            requireContext().copyStringToClipboard(password.toString(), R.string.snackbarPasswordCopied, snackbarManager)
+            val password = passwordInput.text?.toString()
+            if (password?.isNotBlank() == true) requireContext().shareString(password)
             findNavController().popBackStack()
         }
     }
