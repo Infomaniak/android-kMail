@@ -283,8 +283,7 @@
         <item quantity="other">Le chiffrement n’est pas pris en charge par %d utilisateurs.</item>
     </plurals>
     <string name="encryptedMessagePasswordConcernedUserTitle">Utilisateurs concernés</string>
-    <string name="encryptedMessagePasswordLabel">Partagez ce mot de passe de façon sécurisée (kPaste, kChat, SMS…). Vous ne pourrez plus le copier après l’envoi.</string>
-    <string name="encryptedMessageSnackbarEncryptionActivated">Le chiffrement a bien été activé</string>
+    <string name="encryptedMessagePasswordLabel">Partagez ce mot de passe par message privé. Vous ne pourrez plus le copier après l’envoi.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Le chiffrement a bien été désactivé</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">L’envoi programmé n’est pas disponible pour les messages chiffrés</string>
     <string name="encryptedMessageUpdatePasswordButton">Modifier le mot de passe</string>

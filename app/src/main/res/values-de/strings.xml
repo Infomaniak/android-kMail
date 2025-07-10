@@ -281,8 +281,7 @@
         <item quantity="other">Die Verschlüsselung wird von %d Benutzern nicht unterstützt.</item>
     </plurals>
     <string name="encryptedMessagePasswordConcernedUserTitle">Betroffene Nutzer</string>
-    <string name="encryptedMessagePasswordLabel">Teilen Sie dieses Passwort auf sichere Weise mit anderen (kPaste, kChat, SMS…). Nach dem Versenden können Sie es nicht mehr kopieren.</string>
-    <string name="encryptedMessageSnackbarEncryptionActivated">Die Verschlüsselung wurde aktiviert</string>
+    <string name="encryptedMessagePasswordLabel">Teilen Sie dieses Passwort per privater Nachricht mit. Sie können es nicht mehr kopieren, sobald Sie es gesendet haben.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Die Verschlüsselung wurde deaktiviert</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Geplante E-Mails für verschlüsselte Nachrichten nicht verfügbar</string>
     <string name="encryptedMessageUpdatePasswordButton">Passwort ändern</string>
