@@ -28,8 +28,11 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentEncryptionPasswordBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.ContactChipAdapter
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -39,7 +42,10 @@ class EncryptionPasswordFragment : Fragment() {
 
     private var binding: FragmentEncryptionPasswordBinding by safeBinding()
 
+    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
+
+    private val contactChipAdapter: ContactChipAdapter by lazy { ContactChipAdapter() }
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -51,8 +57,17 @@ class EncryptionPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupUnencryptableRecipientsChips()
         setupPasswordTextField()
         setupListeners()
+    }
+
+    private fun setupUnencryptableRecipientsChips() {
+        binding.userChipsRecyclerView.adapter = contactChipAdapter.apply {
+            isEncryptionActivated = true
+            unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
+            unencryptableRecipients?.forEach { addChip(Recipient().initLocalValues(email = it)) }
+        }
     }
 
     private fun setupPasswordTextField() = with(binding) {
@@ -60,8 +75,8 @@ class EncryptionPasswordFragment : Fragment() {
             passwordInput.setText(encryptionViewModel.generatePassword())
         }
         passwordInput.apply {
-            doOnTextChanged { password, _, _, _ -> encryptionViewModel.password.value = password.toString() }
-            val initialPassword = encryptionViewModel.password.value.takeUnless { it.isNullOrBlank() }
+            doOnTextChanged { password, _, _, _ -> newMessageViewModel.encryptionPassword.value = password.toString() }
+            val initialPassword = newMessageViewModel.encryptionPassword.value.takeUnless { it.isNullOrBlank() }
             setText(initialPassword ?: encryptionViewModel.generatePassword())
         }
     }

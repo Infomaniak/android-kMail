@@ -45,7 +45,6 @@ class EncryptionViewModel @Inject constructor(
 
     val unencryptableRecipients: MutableLiveData<Set<String>?> = MutableLiveData(null)
     val isCheckingEmailsTrigger: MutableLiveData<Unit> = MutableLiveData()
-    val password: MutableLiveData<String?> = MutableLiveData(null)
 
     private var emailsCheckingJob: Job? = null
     private val emailsBeingChecked: MutableSet<String> = mutableSetOf()
@@ -94,7 +93,7 @@ class EncryptionViewModel @Inject constructor(
         val generator = SecureRandom.getInstanceStrong()
         var generatedPassword = ""
         val charactersSetCount = PASSWORD_CHARACTERS_SET.count()
-        (0..<PASSWORD_MIN_LENGTH).forEach {
+        (0..<PASSWORD_MIN_LENGTH).forEach { _ ->
             generatedPassword += PASSWORD_CHARACTERS_SET[generator.nextInt(charactersSetCount)]
         }
 
@@ -106,12 +105,11 @@ class EncryptionViewModel @Inject constructor(
         unencryptableRecipients.postValue(recipients)
     }
 
-    companion object {
+    private class AutoBulkCallCancellationException : CancellationException()
 
+    companion object {
         private const val PASSWORD_MIN_LENGTH = 16
         private const val PASSWORD_CHARACTERS_SET =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?"
     }
-
-    private class AutoBulkCallCancellationException : CancellationException()
 }
