@@ -46,7 +46,7 @@ class EncryptionPasswordFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
 
-    private val contactChipAdapter: ContactChipAdapter by lazy { ContactChipAdapter() }
+    private val contactChipAdapter: ContactChipAdapter by lazy { ContactChipAdapter(canChipsBeEnabled = false) }
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
