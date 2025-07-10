@@ -69,7 +69,7 @@ class FetchMessagesManager @Inject constructor(
         scope: CoroutineScope,
         userId: Int,
         mailbox: Mailbox,
-        sentryMessageUid: String? = null,
+        notificationMessageUidToLog: String? = null,
         mailboxContentRealm: Realm? = null,
     ): Boolean {
         coroutineScope = scope
@@ -112,7 +112,7 @@ class FetchMessagesManager @Inject constructor(
                         reason = "RefreshThreads failed",
                         userId = userId,
                         mailboxId = mailbox.mailboxId,
-                        messageUid = sentryMessageUid,
+                        messageUid = notificationMessageUidToLog,
                         mailbox = mailbox,
                         throwable = throwable,
                     )
@@ -156,6 +156,10 @@ class FetchMessagesManager @Inject constructor(
             return true
         }
 
+        notificationMessageUidToLog?.let { notificationMessageUidToLog ->
+            logNotFetchedMessageUid(threadsWithNewMessages, notificationMessageUidToLog, userId, mailbox)
+        }
+
         // Notify Threads with new Messages
         val unReadThreadsCount = threadsWithNewMessages.count()
         var hasShownNotification = false
@@ -166,7 +170,7 @@ class FetchMessagesManager @Inject constructor(
                 realm = realm,
                 unReadThreadsCount = unReadThreadsCount,
                 isLastMessage = index == threadsWithNewMessages.lastIndex,
-                sentryMessageUid = sentryMessageUid,
+                sentryMessageUid = notificationMessageUidToLog,
                 okHttpClient = okHttpClient,
             ).let {
                 if (it) hasShownNotification = true
@@ -175,6 +179,28 @@ class FetchMessagesManager @Inject constructor(
 
         realm.close()
         return hasShownNotification
+    }
+
+    private fun logNotFetchedMessageUid(
+        threadsWithNewMessages: List<Thread>,
+        notificationMessageUidToLog: String?,
+        userId: Int,
+        mailbox: Mailbox
+    ) {
+        val hasSentryMessageBeenFetched = threadsWithNewMessages.any { thread ->
+            thread.messages.any { message ->
+                message.uid == notificationMessageUidToLog
+            }
+        }
+
+        if (hasSentryMessageBeenFetched.not()) {
+            SentryDebug.sendMissingMessageUidInRealm(
+                userId,
+                mailbox.mailboxId,
+                notificationMessageUidToLog,
+                mailbox,
+            )
+        }
     }
 
     private suspend fun Thread.showThreadNotification(
