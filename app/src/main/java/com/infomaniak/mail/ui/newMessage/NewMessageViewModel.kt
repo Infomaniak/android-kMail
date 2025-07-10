@@ -191,8 +191,8 @@ class NewMessageViewModel @Inject constructor(
     //endRegion
 
     //region Encryption
-    val isEncryptionActivated = MutableLiveData(false)
-    val encryptionPassword: MutableLiveData<String> = MutableLiveData("")
+    val isEncryptionActivated = SingleLiveEvent(false)
+    val encryptionPassword: SingleLiveEvent<String> = SingleLiveEvent("")
     //endregion
 
     val isSendingAllowed = SingleLiveEvent(false)

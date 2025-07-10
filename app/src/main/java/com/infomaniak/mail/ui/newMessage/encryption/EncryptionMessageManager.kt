@@ -30,6 +30,7 @@ import com.infomaniak.mail.ui.newMessage.NewMessageFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageFragmentDirections
 import com.infomaniak.mail.ui.newMessage.NewMessageManager
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
+import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
@@ -59,7 +60,29 @@ class EncryptionMessageManager @Inject constructor(
         )
 
         _encryptionViewModel = encryptionViewModel
-        observeEmailsCheckingTrigger()
+    }
+
+    fun observeEncryptionData() {
+        Utils.waitInitMediator(
+            newMessageViewModel.isEncryptionActivated,
+            encryptionViewModel.unencryptableRecipients,
+            newMessageViewModel.encryptionPassword,
+            encryptionViewModel.isCheckingEmails,
+        ) {
+            @Suppress("UNCHECKED_CAST")
+            EncryptionData(
+                isEncrypted = it[0] as Boolean,
+                unencryptableRecipients = it[1] as Set<String>?,
+                password = it[2] as String?,
+                isCheckingEmails = it[3] as Boolean,
+            )
+        }.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { encryptionData ->
+            val isEncryptionValid = checkEncryptionCanBeSend() && !encryptionData.isCheckingEmails
+            newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
+
+            applyEncryptionStyleOnRecipientFields(encryptionData)
+            binding.encryptionLockButtonView.encryptionStatus = encryptionData.computeEncryptionStatus()
+        }
     }
 
     fun observeEncryptionFeatureFlagUpdates() {
@@ -71,61 +94,31 @@ class EncryptionMessageManager @Inject constructor(
 
     fun observeEncryptionActivation() {
         newMessageViewModel.isEncryptionActivated.observe(viewLifecycleOwner) { isEncrypted ->
-            applyEncryptionStyleOnRecipientFields(isEncryptionActivated = isEncrypted)
-            val isEncryptionValid = checkEncryptionCanBeSend()
-            newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
+            if (!isEncrypted) {
+                newMessageViewModel.encryptionPassword.value = ""
+                return@observe
+            }
+
+            navigateToDiscoveryBottomSheetIfFirstTime()
 
             val recipients = newMessageViewModel.allRecipients
-
             val currentUnencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
             val unknownEncryptionStatusRecipients = recipients.filter {
                 currentUnencryptableRecipients?.contains(it.email) != true
             }
-            if (isEncrypted && unknownEncryptionStatusRecipients.isNotEmpty()) {
+
+            if (unknownEncryptionStatusRecipients.isNotEmpty()) {
                 encryptionViewModel.checkIfEmailsCanBeEncrypted(unknownEncryptionStatusRecipients.map(Recipient::email))
             }
-
-            val encryptionStatus = when {
-                isEncrypted && (isEncryptionValid || recipients.isEmpty()) -> {
-                    // The encryption is valid : either all auto encryptable recipients, or some unencryptable but with a password
-                    navigateToDiscoveryBottomSheetIfFirstTime()
-                    EncryptionStatus.Encrypted
-                }
-                isEncrypted && currentUnencryptableRecipients?.isNotEmpty() == true -> {
-                    EncryptionStatus.PartiallyEncrypted // Encryption activated but not valid
-                }
-                isEncrypted -> EncryptionStatus.Loading // First call have not ended yet
-                else -> {
-                    // User has disabled encryption
-                    newMessageViewModel.encryptionPassword.value = ""
-                    EncryptionStatus.Unencrypted
-                }
-            }
-
-            binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
         }
     }
 
     fun observeUnencryptableRecipients() {
         encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipientsEmails ->
-            newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = checkEncryptionCanBeSend())
-
-            applyEncryptionStyleOnRecipientFields(unencryptableRecipients = recipientsEmails)
-
-            // Check if the email is still in the draft's recipients (it could have been deleted while being checked)
-            val filteredEmails = recipientsEmails?.filter { email -> newMessageViewModel.allRecipients.any { it.email == email } }
-
             if (newMessageViewModel.isEncryptionActivated.value != true) return@observe
 
-            val recipientsCount = filteredEmails?.count() ?: 0
-            binding.encryptionLockButtonView.apply {
-                unencryptableRecipientsCount = recipientsCount
-                encryptionStatus = if (recipientsCount > 0 && newMessageViewModel.encryptionPassword.value.isNullOrBlank()) {
-                    EncryptionStatus.PartiallyEncrypted
-                } else {
-                    EncryptionStatus.Encrypted
-                }
-            }
+            val recipientsCount = recipientsEmails?.count() ?: 0
+            binding.encryptionLockButtonView.unencryptableRecipientsCount = recipientsCount
 
             if (
                 recipientsCount > 0 &&
@@ -141,16 +134,6 @@ class EncryptionMessageManager @Inject constructor(
                     ),
                 )
             }
-        }
-    }
-
-    fun observeEncryptionPassword() {
-        newMessageViewModel.encryptionPassword.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { password ->
-            val encryptionStatus = if (password.isBlank()) EncryptionStatus.PartiallyEncrypted else EncryptionStatus.Encrypted
-            binding.encryptionLockButtonView.encryptionStatus = encryptionStatus
-            applyEncryptionStyleOnRecipientFields(encryptionPassword = password)
-
-            newMessageViewModel.encryptionPassword.postValue(password)
         }
     }
 
@@ -209,26 +192,27 @@ class EncryptionMessageManager @Inject constructor(
         }
     }
 
-    private fun observeEmailsCheckingTrigger() {
-        encryptionViewModel.isCheckingEmailsTrigger.observe(viewLifecycleOwner) {
-            binding.encryptionLockButtonView.apply {
-                if (encryptionStatus == EncryptionStatus.Encrypted) {
-                    binding.encryptionLockButtonView.isEnabled = false
-                    encryptionStatus = EncryptionStatus.Loading
-                }
-            }
+    private fun applyEncryptionStyleOnRecipientFields(encryptionData: EncryptionData) = with(binding) {
+        listOf(toField, ccField, bccField).forEach { field ->
+            field.isEncryptionActivated = encryptionData.isEncrypted
+            encryptionData.unencryptableRecipients?.let { field.unencryptableRecipients = it }
+            encryptionData.password?.let { field.encryptionPassword = it }
         }
     }
 
-    private fun applyEncryptionStyleOnRecipientFields(
-        isEncryptionActivated: Boolean? = null,
-        unencryptableRecipients: Set<String>? = null,
-        encryptionPassword: String? = null,
-    ) = with(binding) {
-        listOf(toField, ccField, bccField).forEach { field ->
-            isEncryptionActivated?.let { field.isEncryptionActivated = it }
-            unencryptableRecipients?.let { field.unencryptableRecipients = it }
-            encryptionPassword?.let { field.encryptionPassword = it }
+    private data class EncryptionData(
+        val isEncrypted: Boolean,
+        val unencryptableRecipients: Set<String>?,
+        val password: String?,
+        val isCheckingEmails: Boolean,
+    ) {
+        fun computeEncryptionStatus() = when {
+            !isEncrypted -> EncryptionStatus.Unencrypted
+            unencryptableRecipients?.isNotEmpty() == true && password.isNullOrBlank() -> {
+                EncryptionStatus.PartiallyEncrypted // Encryption activated but not valid
+            }
+            isCheckingEmails -> EncryptionStatus.Loading
+            else -> EncryptionStatus.Encrypted
         }
     }
 }
