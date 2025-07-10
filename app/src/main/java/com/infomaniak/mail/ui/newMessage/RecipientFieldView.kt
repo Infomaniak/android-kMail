@@ -539,6 +539,8 @@ class RecipientFieldView @JvmOverloads constructor(
             chipIconTint = iconTint?.let(context::getColorStateList)
             setChipIconSizeResource(R.dimen.iconImageSize)
             setIconStartPaddingResource(RCore.dimen.marginStandardVerySmall)
+            val textStartPadding = if (icon == null) RCore.dimen.marginStandardSmall else RCore.dimen.marginStandardVerySmall
+            setTextStartPaddingResource(textStartPadding)
         }
     }
 }
