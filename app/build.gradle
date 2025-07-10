@@ -31,16 +31,16 @@ android {
         setProperty "archivesBaseName", "infomaniak-mail-$versionName ($versionCode)"
 
         buildConfigField 'String', 'CLIENT_ID', '"E90BC22D-67A8-452C-BE93-28DA33588CA4"'
-        buildConfigField 'String', 'CREATE_ACCOUNT_URL', '"https://welcome.preprod.dev.infomaniak.ch/signup/ikmail?app=true"'
-        buildConfigField 'String', 'CREATE_ACCOUNT_SUCCESS_HOST', '"ksuite.preprod.dev.infomaniak.ch"'
-        buildConfigField 'String', 'CREATE_ACCOUNT_CANCEL_HOST', '"welcome.preprod.dev.infomaniak.ch"'
-        buildConfigField 'String', 'IMPORT_EMAILS_URL', '"https://import-email.preprod.dev.infomaniak.ch"'
-        // buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
-        buildConfigField 'String', 'MAIL_API', '"https://mail.preprod.dev.infomaniak.ch"' // Pre-production environment
+        buildConfigField 'String', 'CREATE_ACCOUNT_URL', '"https://welcome.infomaniak.com/signup/ikmail?app=true"'
+        buildConfigField 'String', 'CREATE_ACCOUNT_SUCCESS_HOST', '"ksuite.infomaniak.com"'
+        buildConfigField 'String', 'CREATE_ACCOUNT_CANCEL_HOST', '"welcome.infomaniak.com"'
+        buildConfigField 'String', 'IMPORT_EMAILS_URL', '"https://import-email.infomaniak.com"'
+        buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
+        // buildConfigField 'String', 'MAIL_API', '"https://mail.preprod.dev.infomaniak.ch"' // Pre-production environment
         buildConfigField 'String', 'SHOP_URL', '"https://ik.me"'
-        buildConfigField 'String', 'CHATBOT_URL', '"https://www.preprod.dev.infomaniak.ch/chatbot"'
-        buildConfigField 'String', 'FAQ_URL', '"https://www.preprod.dev.infomaniak.ch/fr/support/faq/admin2/service-mail"'
-        buildConfigField 'String', 'MANAGE_SIGNATURES_URL', '"https://mail.preprod.dev.infomaniak.ch/0/settings/signatures"'
+        buildConfigField 'String', 'CHATBOT_URL', '"https://www.infomaniak.com/chatbot"'
+        buildConfigField 'String', 'FAQ_URL', '"https://www.infomaniak.com/fr/support/faq/admin2/service-mail"'
+        buildConfigField 'String', 'MANAGE_SIGNATURES_URL', '"https://mail.infomaniak.com/0/settings/signatures"'
 
         buildConfigField 'String', 'BUGTRACKER_MAIL_BUCKET_ID', '"app_mail"'
         buildConfigField 'String', 'BUGTRACKER_MAIL_PROJECT_NAME', '"mail"'
