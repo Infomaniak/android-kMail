@@ -33,6 +33,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.infomaniak.core.cancellable
+import com.infomaniak.lib.core.api.ApiController.NetworkException
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
@@ -51,6 +52,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -105,7 +107,9 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         var hasShownNotification = false
 
-        val workerResult = runCatching {
+        var workerFailureThrowable: Throwable? = null
+
+        runCatching {
             MessageController.getMessage(messageUid, mailboxContentRealm)?.let {
                 // If the Message is already in Realm, it means we already fetched it when we received a previous Notification.
                 // So we've already shown it in a previous batch of Notifications.
@@ -118,15 +122,21 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             SentryLog.i(TAG, "Work finished")
             Result.success()
         }.cancellable().getOrElse {
+            workerFailureThrowable = it
             Result.failure()
         }.also {
             if (!hasShownNotification) displayGenericNewMailsNotification()
             mailboxContentRealm.close()
+
+            // We don't want to log to Sentry if the error is a common outcome.
+            when (workerFailureThrowable) {
+                is CancellationException,
+                is NetworkException -> Unit
+                else -> {
+                    checkIfNotificationMessageUidIsInRealm(messageUid, mailboxContentRealm)
+                }
+            }
         }
-
-        checkIfNotificationMessageUidIsInRealm(messageUid, mailboxContentRealm)
-
-        return@withContext workerResult
     }
 
     private fun checkIfNotificationMessageUidIsInRealm(messageUid: String, mailboxContentRealm: Realm) {
