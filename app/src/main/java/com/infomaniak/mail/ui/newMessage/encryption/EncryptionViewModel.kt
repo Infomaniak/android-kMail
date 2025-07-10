@@ -22,6 +22,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.di.IoDispatcher
@@ -44,7 +45,7 @@ class EncryptionViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     val unencryptableRecipients: MutableLiveData<Set<String>?> = MutableLiveData(null)
-    val isCheckingEmailsTrigger: MutableLiveData<Unit> = MutableLiveData()
+    val isCheckingEmails: SingleLiveEvent<Boolean> = SingleLiveEvent(false)
 
     private var emailsCheckingJob: Job? = null
     private val emailsBeingChecked: MutableSet<String> = mutableSetOf()
@@ -54,7 +55,7 @@ class EncryptionViewModel @Inject constructor(
         emailsBeingChecked.addAll(emails)
 
         emailsCheckingJob = viewModelScope.launch(ioDispatcher) {
-            isCheckingEmailsTrigger.postValue(Unit)
+            isCheckingEmails.postValue(true)
 
             runCatching {
                 val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked)
@@ -107,6 +108,7 @@ class EncryptionViewModel @Inject constructor(
     private fun clearDataAndPostResult(recipients: Set<String>) {
         emailsBeingChecked.clear()
         unencryptableRecipients.postValue(recipients)
+        isCheckingEmails.postValue(false)
     }
 
     private class AutoBulkCallCancellationException : CancellationException()
