@@ -79,6 +79,7 @@ class RecipientFieldView @JvmOverloads constructor(
             field = value
             contactChipAdapter.updateUnencryptableRecipients(value)
             setSingleChipStyle()
+            setPlusChipStyle()
         }
     override var encryptionPassword: String = ""
         set(value) {
@@ -304,18 +305,13 @@ class RecipientFieldView @JvmOverloads constructor(
         singleChip.root.apply {
             isGone = isTextInputAccessible
             val recipient = contactChipAdapter.getRecipients().firstOrNull()
-            val firstRecipientStatus = when {
-                !isEncryptionActivated -> EncryptionStatus.Unencrypted
-                unencryptableRecipients == null -> EncryptionStatus.Loading
-                recipient?.isUnencryptable == true -> EncryptionStatus.PartiallyEncrypted
-                else -> EncryptionStatus.Encrypted
-            }
             text = recipient?.getNameOrEmail() ?: ""
-            setChipStyle(recipient?.isDisplayedAsExternal == true, firstRecipientStatus)
+            setSingleChipStyle()
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
             text = "+${contactChipAdapter.itemCount - 1}"
+            setPlusChipStyle()
         }
 
         transparentButton.isGone = isTextInputAccessible
@@ -340,10 +336,22 @@ class RecipientFieldView @JvmOverloads constructor(
         binding.singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus = firstRecipientStatus)
     }
 
+    private fun setPlusChipStyle() {
+
+        val recipientsExceptFirst = contactChipAdapter.getRecipients().drop(1)
+
+        val plusChipEncryptionStatus = when {
+            !isEncryptionActivated -> EncryptionStatus.Unencrypted
+            recipientsExceptFirst.any { it.isUnencryptable } -> EncryptionStatus.PartiallyEncrypted
+            else -> EncryptionStatus.Encrypted
+        }
+
+        binding.plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipEncryptionStatus)
+    }
+
     private fun applyEncryptionStyle() = with(binding) {
         setSingleChipStyle()
-        val plusChipStatus = if (isEncryptionActivated) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted
-        plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipStatus)
+        setPlusChipStyle()
         contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients, encryptionPassword)
     }
 
