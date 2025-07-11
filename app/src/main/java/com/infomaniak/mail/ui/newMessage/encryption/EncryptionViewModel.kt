@@ -42,6 +42,8 @@ class EncryptionViewModel @Inject constructor(
     private val snackbarManager: SnackbarManager,
 ) : AndroidViewModel(application) {
 
+    // We keep a list here instead of a set, because each recipient can be added in several field (Eg. To, CC, BCC) so there can
+    // be several "instance" of the recipient that are unencryptable
     val unencryptableRecipients: MutableLiveData<List<String>?> = MutableLiveData(null)
     val isCheckingEmails: SingleLiveEvent<Boolean> = SingleLiveEvent(false)
 
