@@ -505,12 +505,12 @@ class ThreadAdapter(
 
             setDescription(description)
             actionRes?.let {
-                setAction1Text(context.getString(it))
-                onAction1 {
-                    // TODO: See if we add a loader to fetch only the concerned recipient from api
-                    //  or if the back returned directly the good recipient
-                    threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(message.allRecipients)
-                }
+                // TODO: Put this back when the back will have put the encryption information in prod
+                //     setAction1Text(context.getString(it))
+                //     onAction1 {
+                //         threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(message.allRecipients)
+                //     }
+                setActionsVisibility(isVisible = false)
             } ?: setActionsVisibility(isVisible = false)
         }
     }
