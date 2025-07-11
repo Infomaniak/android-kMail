@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,17 +68,14 @@ class ContactAdapter(
     }
 
     private fun getItemViewTypeEnum(position: Int): ContactType {
-        return if (position < matchedContacts.count()) {
-            if (matchedContacts[position].contact is MergedContact) {
-                AutocompletableContact
-            } else if (matchedContacts[position].contact is AddressBook) {
-                AutocompletableAdressBook
-            } else {
-                AutocompletableGroup
-            }
-        } else {
-            UnknownContact
+        if (position >= matchedContacts.count()) return UnknownContact
+
+        return when (matchedContacts[position].contact) {
+            is MergedContact -> AutocompletableContact
+            is AddressBook -> AutocompletableAdressBook
+            else -> AutocompletableGroup
         }
+
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
@@ -106,6 +103,7 @@ class ContactAdapter(
         val isAlreadyUsed = usedEmails.contains(contact.email.standardize())
 
         if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) } else root.setOnClickListener(null)
+        
         setVisuallyUsed(isAlreadyUsed)
     }
 
