@@ -104,16 +104,18 @@ class AvatarNameEmailView @JvmOverloads constructor(
     private fun ViewAvatarNameEmailBinding.setNameAndSubName(
         addressBook: AddressBook,
     ) {
-        if (addressBook.isDynamicOrganisationMemberDirectory) {
-            userName.text = context.getString(R.string.addressBookTitle, addressBook.organization)
+        userName.text = if (addressBook.isDynamicOrganisationMemberDirectory) {
+            context.getString(R.string.addressBookTitle, addressBook.organization)
         } else {
-            userName.text = context.getString(R.string.addressBookTitle, addressBook.name)
+            context.getString(R.string.addressBookTitle, addressBook.name)
         }
+
         userAvatar.loadTeamsUserAvatar()
-        if (addressBook.organization != "") {
-            userEmail.text = context.getString(R.string.organizationName, addressBook.organization)
+
+        userEmail.text = if (addressBook.organization != "") {
+            context.getString(R.string.organizationName, addressBook.organization)
         } else {
-            userEmail.text = context.getString(R.string.organizationName, context.getString(R.string.otherOrganisation))
+            context.getString(R.string.organizationName, context.getString(R.string.otherOrganisation))
         }
     }
 
@@ -157,6 +159,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
                 prefixSizeOfName + nameStartIndex,
                 prefixSizeOfName + nameStartIndex + length
             )
+            
             if (emailStartIndex >= 0 && userEmail.text.isNotBlank()) userEmail.highlight(
                 prefixSizeOfEmail + emailStartIndex,
                 prefixSizeOfEmail + emailStartIndex + length
