@@ -97,8 +97,4 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable, ContactAu
             parcel.writeString(name)
         }
     }
-
-    override fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable): Boolean {
-        return contactId == contactAutoCompletable.contactId
-    }
 }

@@ -21,7 +21,7 @@ interface ContactAutocompletable {
     var contactId: String
     var autocompletableName: String
 
-    fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable): Boolean {
-        return false
+    fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable): Boolean{
+        return contactId == contactAutoCompletable.contactId
     }
 }
