@@ -51,7 +51,7 @@ class SwitchUserViewModel @Inject constructor(
 
     fun switchAccount(user: User) = viewModelScope.launch(ioDispatcher) {
         if (user.id != AccountUtils.currentUserId) {
-            trackAccountEvent(MatomoName.Switch.value)
+            trackAccountEvent(MatomoName.Switch)
             RealmDatabase.backupPreviousRealms()
             myKSuiteDataUtils.myKSuite = null
             AccountUtils.currentUser = user

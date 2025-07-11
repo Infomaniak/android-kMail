@@ -74,7 +74,7 @@ class AttachMailboxFragment : Fragment() {
             initProgress(viewLifecycleOwner)
 
             setOnClickListener {
-                trackAccountEvent(MatomoName.AddMailboxConfirm.value)
+                trackAccountEvent(MatomoName.AddMailboxConfirm)
                 attachMailboxButtonProgressTimer.start()
                 attachMailbox()
             }

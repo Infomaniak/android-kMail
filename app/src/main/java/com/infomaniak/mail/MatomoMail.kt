@@ -35,6 +35,7 @@ object MatomoMail : Matomo {
     override val siteId = 9
 
     enum class MatomoCategory(val value: String) {
+        Account("account"),
         AiWriter("aiWriter"),
         AppUpdate("appUpdate"),
         AttachmentActions("attachmentActions"),
@@ -341,6 +342,10 @@ object MatomoMail : Matomo {
     //endregion
 
     //region Track specific events
+    fun trackAccountEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.Account, name)
+    }
+
     fun trackSendingDraftEvent(
         action: DraftAction,
         to: List<Recipient>,

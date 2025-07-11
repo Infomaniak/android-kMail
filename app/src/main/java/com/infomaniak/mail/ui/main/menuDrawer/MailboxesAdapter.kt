@@ -90,7 +90,7 @@ class MailboxesAdapter(
     }
 
     private fun ItemSelectableMailboxBinding.displaySimpleMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
-        displayValidMailbox(mailbox, isCurrentMailbox) { trackAccountEvent(MatomoName.SwitchMailbox.value) }
+        displayValidMailbox(mailbox, isCurrentMailbox) { trackAccountEvent(MatomoName.SwitchMailbox) }
         setSelectedState(isCurrentMailbox)
     }
 

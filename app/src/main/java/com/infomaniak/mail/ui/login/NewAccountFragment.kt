@@ -90,7 +90,7 @@ class NewAccountFragment : Fragment() {
 
         createNewAddressButton.setOnClickListener {
             createNewAddressButton.isEnabled = false
-            trackAccountEvent(MatomoName.OpenCreationWebview.value)
+            trackAccountEvent(MatomoName.OpenCreationWebview)
             loginActivity.infomaniakLogin.startCreateAccountWebView(
                 resultLauncher = createAccountResultLauncher,
                 createAccountUrl = BuildConfig.CREATE_ACCOUNT_URL,

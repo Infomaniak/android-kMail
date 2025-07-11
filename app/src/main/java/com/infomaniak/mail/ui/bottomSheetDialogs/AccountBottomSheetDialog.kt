@@ -93,7 +93,7 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
         recyclerViewAccount.adapter = accountsAdapter
         addAccount.setOnClickListener { safeNavigate(resId = R.id.attachMailboxFragment) }
         logout.setOnClickListener {
-            trackAccountEvent(MatomoName.LogOut.value)
+            trackAccountEvent(MatomoName.LogOut)
             descriptionDialog.show(
                 title = getString(R.string.confirmLogoutTitle),
                 description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
@@ -102,7 +102,7 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
             )
         }
         addAccount.setOnClickListener {
-            trackAccountEvent(MatomoName.Add.value)
+            trackAccountEvent(MatomoName.Add)
             context.launchLoginActivity()
         }
         observeAccounts()
@@ -113,7 +113,7 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun logoutCurrentUser() = lifecycleScope.launch(ioDispatcher) {
-        trackAccountEvent(MatomoName.LogOutConfirm.value)
+        trackAccountEvent(MatomoName.LogOutConfirm)
         logoutUser(user = AccountUtils.currentUser!!)
     }
 
