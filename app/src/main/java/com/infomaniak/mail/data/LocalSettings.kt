@@ -147,17 +147,17 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         override fun toString() = name.lowercase()
     }
 
-    enum class ThreadMode(@StringRes val localisedNameRes: Int, val matomoValue: String) {
-        CONVERSATION(R.string.settingsOptionThreadModeConversation, "conversation"),
-        MESSAGE(R.string.settingsOptionThreadModeMessage, "message"),
+    enum class ThreadMode(@StringRes val localisedNameRes: Int, val matomoName: MatomoName) {
+        CONVERSATION(R.string.settingsOptionThreadModeConversation, MatomoName.Conversation),
+        MESSAGE(R.string.settingsOptionThreadModeMessage, MatomoName.Message),
     }
 
-    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoValue: MatomoName) {
+    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int, val matomoName: MatomoName) {
         ALWAYS("true", R.string.settingsOptionAlways, MatomoName.Always),
         ASK_ME("false", R.string.settingsOptionAskMe, MatomoName.AskMe),
     }
 
-    enum class AutoAdvanceMode(val matomoValue: MatomoName, @StringRes val localisedNameRes: Int) {
+    enum class AutoAdvanceMode(val matomoName: MatomoName, @StringRes val localisedNameRes: Int) {
         PREVIOUS_THREAD(MatomoName.PreviousThread, R.string.settingsAutoAdvancePreviousThreadDescription),
         FOLLOWING_THREAD(MatomoName.FollowingThread, R.string.settingsAutoAdvanceFollowingThreadDescription),
         THREADS_LIST(MatomoName.ListOfThread, R.string.settingsAutoAdvanceListOfThreadsDescription),

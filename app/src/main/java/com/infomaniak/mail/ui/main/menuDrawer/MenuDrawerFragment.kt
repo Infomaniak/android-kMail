@@ -39,9 +39,7 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.MatomoName
-import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
@@ -236,10 +234,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun onActionsHeaderClicked() {
-        context?.trackMenuDrawerEvent(
-            MatomoName.AdvancedActions,
-            value = (!menuDrawerViewModel.areActionsExpanded.value!!).toFloat()
-        )
+        trackMenuDrawerEvent(MatomoName.AdvancedActions, value = !menuDrawerViewModel.areActionsExpanded.value!!)
         menuDrawerViewModel.toggleActionsCollapsingState()
     }
 
@@ -302,7 +297,7 @@ class MenuDrawerFragment : Fragment() {
         ConfettiUtils.onEasterEggConfettiClicked(
             container = (activity as? MainActivity)?.getConfettiContainer(),
             type = INFOMANIAK,
-            matomoValue = MatomoCategory.MenuDrawer.toString(),
+            matomoValue = "menuDrawer",
         )
     }
 

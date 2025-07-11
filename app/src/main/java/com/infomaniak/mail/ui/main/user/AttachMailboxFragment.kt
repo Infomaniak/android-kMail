@@ -36,6 +36,7 @@ import com.infomaniak.lib.core.utils.initProgress
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.showProgressCatching
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentAttachMailboxBinding
@@ -73,7 +74,7 @@ class AttachMailboxFragment : Fragment() {
             initProgress(viewLifecycleOwner)
 
             setOnClickListener {
-                context.trackAccountEvent("addMailboxConfirm")
+                trackAccountEvent(MatomoName.AddMailboxConfirm.value)
                 attachMailboxButtonProgressTimer.start()
                 attachMailbox()
             }

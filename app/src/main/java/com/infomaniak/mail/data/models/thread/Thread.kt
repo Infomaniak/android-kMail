@@ -371,7 +371,7 @@ class Thread : RealmObject, Snoozable {
 
     override fun hashCode(): Int = uid.hashCode()
 
-    enum class ThreadFilter(val matomoValue: MatomoName) {
+    enum class ThreadFilter(val matomoName: MatomoName) {
         ALL(MatomoName.FolderFilter),
         SEEN(MatomoName.ReadFilter),
         UNSEEN(MatomoName.UnreadFilter),

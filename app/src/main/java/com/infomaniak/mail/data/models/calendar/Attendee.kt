@@ -65,7 +65,7 @@ class Attendee() : EmbeddedRealmObject, Correspondent, Parcelable {
         val apiValue: String,
         @DrawableRes val icon: Int?,
         @ColorRes val iconColor: Int?,
-        val matomoValue: MatomoName?,
+        val matomoName: MatomoName?,
     ) {
         ACCEPTED("ACCEPTED", R.drawable.ic_check_rounded, R.color.greenSuccess, MatomoName.ReplyYes),
         NEEDS_ACTION("NEEDS-ACTION", null, null, null),

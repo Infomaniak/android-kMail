@@ -67,7 +67,7 @@ class ThemeSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, theme ->
             chooseTheme(theme as Theme)
-            trackEvent(MatomoCategory.SettingsTheme.toString(), theme.toString())
+            trackEvent(MatomoCategory.SettingsTheme.value, theme.toString())
         }
     }
 

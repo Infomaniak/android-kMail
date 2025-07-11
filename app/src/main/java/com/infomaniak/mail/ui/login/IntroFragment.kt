@@ -33,6 +33,7 @@ import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -138,7 +139,7 @@ class IntroFragment : Fragment() {
                 localSettings.accentColor = newSelectedAccentColor
                 triggerUiUpdateWhenAnimationEnd(newSelectedAccentColor, oldSelectedAccentColor)
 
-                trackOnBoardingEvent("switchColor${newSelectedAccentColor.toString().capitalizeFirstChar()}")
+                trackOnBoardingEvent("${MatomoName.SwitchColor.value}${newSelectedAccentColor.toString().capitalizeFirstChar()}")
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) = Unit

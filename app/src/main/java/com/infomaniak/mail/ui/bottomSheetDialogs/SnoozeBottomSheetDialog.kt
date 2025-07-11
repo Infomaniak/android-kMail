@@ -48,13 +48,13 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
     }
 
     override fun onScheduleOptionClicked(dateItem: ScheduleOption) {
-        trackSnoozeEvent(dateItem.matomoValue)
+        trackSnoozeEvent(dateItem.matomoName)
         setBackNavigationResult(SNOOZE_RESULT, dateItem.date().time)
     }
 
     override fun onCustomScheduleOptionClicked() {
         if (navigationArgs.isCurrentMailboxFree) {
-            openMyKSuiteUpgradeBottomSheet(MatomoName.SnoozeCustomDate.toString())
+            openMyKSuiteUpgradeBottomSheet(MatomoName.SnoozeCustomDate.value)
         } else {
             trackSnoozeEvent(MatomoName.CustomSchedule)
             setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)

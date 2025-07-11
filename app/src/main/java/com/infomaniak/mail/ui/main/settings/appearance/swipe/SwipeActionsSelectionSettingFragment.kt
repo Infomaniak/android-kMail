@@ -103,8 +103,8 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         }
 
         trackEvent(
-            category = MatomoCategory.SettingsSwipeActions.toString(),
-            name = "${swipeAction.matomoValue}Swipe",
+            category = MatomoCategory.SettingsSwipeActions.value,
+            name = "${swipeAction.matomoName.value}Swipe",
             value = (navigationArgs.titleResId == R.string.settingsSwipeLeft).toFloat(),
         )
     }

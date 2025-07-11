@@ -168,7 +168,7 @@ class AiViewModel @Inject constructor(
 
     fun getLastMessage(): String = history.last().content
 
-    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?, val matomoValue: MatomoName) {
+    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?, val matomoName: MatomoName) {
         MODIFY(R.id.modify, null, MatomoName.Edit),
         REGENERATE(R.id.regenerate, "redraw", MatomoName.Regenerate),
         SHORTEN(R.id.shorten, "shorten", MatomoName.Shorten),

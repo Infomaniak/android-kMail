@@ -22,6 +22,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -29,7 +30,6 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
-import com.infomaniak.mail.utils.extensions.appContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -51,7 +51,7 @@ class SwitchUserViewModel @Inject constructor(
 
     fun switchAccount(user: User) = viewModelScope.launch(ioDispatcher) {
         if (user.id != AccountUtils.currentUserId) {
-            appContext.trackAccountEvent("switch")
+            trackAccountEvent(MatomoName.Switch.value)
             RealmDatabase.backupPreviousRealms()
             myKSuiteDataUtils.myKSuite = null
             AccountUtils.currentUser = user

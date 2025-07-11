@@ -410,7 +410,7 @@ class ThreadAdapter(
 
         val listener: OnClickListener? = message.sender?.let { recipient ->
             OnClickListener {
-                context.trackMessageEvent(MatomoName.SelectAvatar)
+                trackMessageEvent(MatomoName.SelectAvatar)
                 threadAdapterCallbacks?.onContactClicked?.invoke(recipient, message.bimi)
             }
         }
@@ -453,7 +453,7 @@ class ThreadAdapter(
             val isExpanded = message.detailsAreExpanded
             recipientChevron.toggleChevron(!isExpanded)
             messageDetails.isVisible = isExpanded
-            context.trackMessageEvent(MatomoName.OpenDetails, isExpanded)
+            trackMessageEvent(MatomoName.OpenDetails, isExpanded)
         }
     }
 
@@ -476,7 +476,7 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
         message.draftResource?.let { draftResource ->
             scheduleAlert.onAction1 {
-                context.trackScheduleSendEvent(MatomoName.ModifySnooze)
+                trackScheduleSendEvent(MatomoName.ModifySnooze)
                 threadAdapterCallbacks?.onRescheduleClicked?.invoke(
                     draftResource,
                     message.displayDate.takeIf { message.isScheduledDraft }?.epochSeconds?.times(1_000),
@@ -485,7 +485,7 @@ class ThreadAdapter(
         }
 
         scheduleAlert.onAction2 {
-            context.trackScheduleSendEvent(MatomoName.CancelSnooze)
+            trackScheduleSendEvent(MatomoName.CancelSnooze)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
         }
 
@@ -760,7 +760,7 @@ class ThreadAdapter(
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
         val isExpanded = threadAdapterState.isExpandedMap[message.uid] ?: false
 
-        if (shouldTrack) context.trackMessageEvent(MatomoName.OpenMessage, isExpanded)
+        if (shouldTrack) trackMessageEvent(MatomoName.OpenMessage, isExpanded)
 
         setHeaderState(message, isExpanded)
         content.isVisible = isExpanded

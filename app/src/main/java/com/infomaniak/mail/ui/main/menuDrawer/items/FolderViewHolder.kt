@@ -54,7 +54,7 @@ class FolderViewHolder(
         val roleDependantParameters = folder.role?.let {
             RoleDependantParameters(
                 iconId = it.folderIconRes,
-                trackerName = it.matomoValue,
+                trackerName = it.matomoName,
                 trackerValue = null,
                 folderIndent = 0,
             )
@@ -125,7 +125,7 @@ class FolderViewHolder(
         }
 
         setOnClickListener {
-            context.trackMenuDrawerEvent(trackerName, value = trackerValue)
+            trackMenuDrawerEvent(trackerName, value = trackerValue)
             onFolderClicked.invoke(folder.id)
         }
     }

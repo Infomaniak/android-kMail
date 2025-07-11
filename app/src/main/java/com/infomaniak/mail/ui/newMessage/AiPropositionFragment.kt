@@ -36,7 +36,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
@@ -206,16 +206,15 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun trackInsertionType() {
-        if (navigationArgs.isBodyBlank) {
-            trackAiWriterEvent(MatomoName.InsertProposition, TrackerAction.DATA)
-        } else {
-            trackAiWriterEvent(MatomoName.ReplaceProposition, TrackerAction.DATA)
-        }
+        trackAiWriterEvent(
+            name = if (navigationArgs.isBodyBlank) MatomoName.InsertProposition else MatomoName.ReplaceProposition,
+            action = TrackerAction.DATA,
+        )
     }
 
     private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
         val shortcut = Shortcut.entries.find { it.menuId == menuItemId }!!
-        trackAiWriterEvent(shortcut.matomoValue)
+        trackAiWriterEvent(shortcut.matomoName)
 
         if (shortcut == Shortcut.MODIFY) {
             aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)

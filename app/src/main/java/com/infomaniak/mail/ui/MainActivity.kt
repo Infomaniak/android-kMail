@@ -40,9 +40,9 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
@@ -330,7 +330,7 @@ class MainActivity : BaseActivity() {
             if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
                 trackNewMessageEvent(MatomoName.TrySendingWithDailyLimitReached)
                 snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                    openMyKSuiteUpgradeBottomSheet(navController, "dailyLimitReachedUpgrade")
+                    openMyKSuiteUpgradeBottomSheet(navController, MatomoName.DailyLimitReachedUpgrade.value)
                 }
             } else {
                 snackbarManager.setValue(getString(errorRes))
@@ -581,7 +581,7 @@ class MainActivity : BaseActivity() {
                 playAnimation()
             }
             Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
-            trackEasterEggEvent("xmas${Date().year()}")
+            trackEasterEggEvent("${MatomoName.Xmas.value}${Date().year()}")
         }
     }
 

@@ -184,7 +184,7 @@ class SearchFragment : TwoPaneFragment() {
                 override var onFlushClicked: ((String) -> Unit)? = null
 
                 override var onLoadMoreClicked: () -> Unit = {
-                    trackThreadListEvent("loadMore")
+                    trackThreadListEvent(MatomoName.LoadMore)
                     mainViewModel.getOnePageOfOldMessages()
                 }
 
@@ -252,7 +252,7 @@ class SearchFragment : TwoPaneFragment() {
     private fun onFolderSelected(folder: Folder?, title: String) {
         updateFolderDropDownUi(folder, title)
         searchViewModel.selectFolder(folder)
-        trackSearchEvent(ThreadFilter.FOLDER.matomoValue, folder != null)
+        trackSearchEvent(ThreadFilter.FOLDER.matomoName, folder != null)
     }
 
     private fun updateFolderDropDownUi(folder: Folder?, title: String) = with(binding) {
@@ -298,7 +298,7 @@ class SearchFragment : TwoPaneFragment() {
 
             handleEditorSearchAction { query ->
                 searchViewModel.searchQuery(query, saveInHistory = true)
-                context.trackSearchEvent(MatomoName.ValidateSearch)
+                trackSearchEvent(MatomoName.ValidateSearch)
             }
         }
     }

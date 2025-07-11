@@ -90,12 +90,12 @@ class MailboxesAdapter(
     }
 
     private fun ItemSelectableMailboxBinding.displaySimpleMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
-        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackAccountEvent(MatomoName.SwitchMailbox.toString()) }
+        displayValidMailbox(mailbox, isCurrentMailbox) { trackAccountEvent(MatomoName.SwitchMailbox.value) }
         setSelectedState(isCurrentMailbox)
     }
 
     private fun ItemMenuDrawerMailboxBinding.displayMenuDrawerMailbox(mailbox: Mailbox, isCurrentMailbox: Boolean) = with(root) {
-        displayValidMailbox(mailbox, isCurrentMailbox) { context.trackMenuDrawerEvent(MatomoName.SwitchMailbox) }
+        displayValidMailbox(mailbox, isCurrentMailbox) { trackMenuDrawerEvent(MatomoName.SwitchMailbox) }
 
         unreadCount = mailbox.unreadCountDisplay.count
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille

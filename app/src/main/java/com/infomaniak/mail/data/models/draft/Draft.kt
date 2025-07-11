@@ -143,7 +143,7 @@ class Draft : RealmObject {
         }
     }
 
-    enum class DraftAction(val apiCallValue: String, val matomoValue: MatomoName) {
+    enum class DraftAction(val apiCallValue: String, val matomoName: MatomoName) {
         SAVE("save", MatomoName.SaveDraft),
         SEND("send", MatomoName.SendMail),
         SCHEDULE("schedule", MatomoName.ScheduleDraft),

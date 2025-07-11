@@ -79,7 +79,7 @@ class ThreadListDensitySettingFragment : Fragment() {
             localSettings.threadDensity = listDensity
             listDensityImage.setImageResource(resId)
 
-            trackEvent(MatomoCategory.SettingsDensity.toString(), listDensity.toString())
+            trackEvent(MatomoCategory.SettingsDensity.value, listDensity.toString())
         }
     }
 

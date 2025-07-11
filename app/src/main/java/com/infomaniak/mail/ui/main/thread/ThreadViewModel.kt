@@ -58,7 +58,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
-import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
@@ -328,12 +327,12 @@ class ThreadViewModel @Inject constructor(
 
         val nbMessages = thread.messages.count()
 
-        appContext.trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
+        trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
 
         when (nbMessages) {
             0 -> SentryDebug.sendEmptyThread(thread, "No Message in the Thread when opening it", mailboxContentRealm())
-            1 -> appContext.trackUserInfo(MatomoName.OneMessagesInThread)
-            else -> appContext.trackUserInfo(MatomoName.MultipleMessagesInThread, nbMessages)
+            1 -> trackUserInfo(MatomoName.OneMessagesInThread)
+            else -> trackUserInfo(MatomoName.MultipleMessagesInThread, nbMessages)
         }
     }
 

@@ -202,7 +202,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: AttendanceState) {
         setOnClickListener {
-            trackCalendarEventEvent(attendanceState.matomoValue!!)
+            trackCalendarEventEvent(attendanceState.matomoName!!)
 
             // Do nothing if it was already selected
             if (isChecked) {

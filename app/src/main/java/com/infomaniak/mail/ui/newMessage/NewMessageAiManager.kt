@@ -235,7 +235,7 @@ class NewMessageAiManager @Inject constructor(
     }
 
     fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
-        context.trackAiWriterEvent(name = if (becauseOfGeneration) MatomoName.Generate else MatomoName.DismissPromptWithoutGenerating)
+        trackAiWriterEvent(name = if (becauseOfGeneration) MatomoName.Generate else MatomoName.DismissPromptWithoutGenerating)
         aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(
             isOpened = false,
             becauseOfGeneration = becauseOfGeneration,

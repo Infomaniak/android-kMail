@@ -29,7 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.extensions.goToPlayStore
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName

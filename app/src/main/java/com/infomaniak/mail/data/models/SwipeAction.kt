@@ -31,29 +31,29 @@ enum class SwipeAction(
     @StringRes val nameRes: Int,
     @ColorRes val colorRes: Int,
     @DrawableRes val iconRes: Int?,
-    val matomoValue: String,
+    val matomoName: MatomoName,
     private val swipeDisplayBehavior: SwipeDisplayBehavior = alwaysDisplay,
 ) : SwipeDisplayBehavior by swipeDisplayBehavior {
-    DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, MatomoName.Delete.toString()),
-    ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, MatomoName.Archive.toString()),
+    DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin, MatomoName.Delete),
+    ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder, MatomoName.Archive),
     READ_UNREAD(
         R.string.settingsSwipeActionReadUnread,
         R.color.swipeReadUnread,
         R.drawable.ic_envelope,
-        MatomoName.MarkAsSeen.toString(),
+        MatomoName.MarkAsSeen,
     ),
-    MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, MatomoName.Move.toString()),
-    FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, MatomoName.Favorite.toString()),
-    SNOOZE(R.string.actionSnooze, R.color.swipeSnooze, R.drawable.ic_alarm_clock, MatomoName.Snooze.toString(), snoozeDisplay),
-    SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, MatomoName.Spam.toString()),
+    MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move, MatomoName.Move),
+    FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star, MatomoName.Favorite),
+    SNOOZE(R.string.actionSnooze, R.color.swipeSnooze, R.drawable.ic_alarm_clock, MatomoName.Snooze, snoozeDisplay),
+    SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam, MatomoName.Spam),
     QUICKACTIONS_MENU(
         R.string.settingsSwipeActionQuickActionsMenu,
         R.color.swipeQuickActionMenu,
         R.drawable.ic_param_dots,
-        "quickActions",
+        MatomoName.QuickActions,
     ),
-    TUTORIAL(R.string.settingsSwipeActionToDefine, R.color.progressbarTrackColor, null, "tutorial"),
-    NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null, "none", neverDisplay);
+    TUTORIAL(R.string.settingsSwipeActionToDefine, R.color.progressbarTrackColor, null, MatomoName.Tutorial),
+    NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null, MatomoName.None, neverDisplay);
 
     @ColorInt
     fun getBackgroundColor(context: Context): Int = context.getColor(colorRes)

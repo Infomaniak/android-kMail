@@ -85,7 +85,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     fun setupEditorFormatActions() = with(binding) {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
-                context.trackEvent(MatomoCategory.EditorActions, action.matomoValue)
+                trackEvent(MatomoCategory.EditorActions, action.matomoName)
                 newMessageViewModel.editorAction.value = action to null
             }
         }
@@ -142,7 +142,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         }
     }
 
-    enum class EditorAction(val matomoValue: MatomoName) {
+    enum class EditorAction(val matomoName: MatomoName) {
         ATTACHMENT(MatomoName.ImportFile),
         CAMERA(MatomoName.ImportFromCamera),
         LINK(MatomoName.AddLink),

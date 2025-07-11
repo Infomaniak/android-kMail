@@ -1332,6 +1332,7 @@ class MainViewModel @Inject constructor(
             null
         }
     }
+
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,
@@ -1402,10 +1403,10 @@ class MainViewModel @Inject constructor(
 
     fun selectOrUnselectAll() {
         if (isEverythingSelected) {
-            appContext.trackMultiSelectionEvent(MatomoName.None)
+            trackMultiSelectionEvent(MatomoName.None)
             selectedThreads.clear()
         } else {
-            appContext.trackMultiSelectionEvent(MatomoName.All)
+            trackMultiSelectionEvent(MatomoName.All)
             currentThreadsLive.value?.list?.forEach { thread -> selectedThreads.add(thread) }
         }
 

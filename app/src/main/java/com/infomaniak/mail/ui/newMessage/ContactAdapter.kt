@@ -80,7 +80,7 @@ class ContactAdapter(
     private fun ItemContactBinding.bindAddNewUser() {
         contactDetails.setAutocompleteUnknownContact(searchQuery)
         root.setOnClickListener {
-            context.trackNewMessageEvent(MatomoName.AddNewRecipient)
+            trackNewMessageEvent(MatomoName.AddNewRecipient)
             if (usedEmails.contains(searchQuery)) {
                 snackbarManager.setValue(context.getString(R.string.addUnknownRecipientAlreadyUsed))
             } else {

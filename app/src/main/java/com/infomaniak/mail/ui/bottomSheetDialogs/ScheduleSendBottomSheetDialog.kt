@@ -48,13 +48,13 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
     }
 
     override fun onScheduleOptionClicked(dateItem: ScheduleOption) {
-        trackScheduleSendEvent(dateItem.matomoValue)
+        trackScheduleSendEvent(dateItem.matomoName)
         setBackNavigationResult(SCHEDULE_DRAFT_RESULT, dateItem.date().time)
     }
 
     override fun onCustomScheduleOptionClicked() {
         if (navigationArgs.isCurrentMailboxFree) {
-            openMyKSuiteUpgradeBottomSheet(MatomoName.ScheduledCustomDate.toString())
+            openMyKSuiteUpgradeBottomSheet(MatomoName.ScheduledCustomDate.value)
         } else {
             trackScheduleSendEvent(MatomoName.CustomSchedule)
             setBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER, true)

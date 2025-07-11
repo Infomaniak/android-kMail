@@ -28,6 +28,7 @@ import com.infomaniak.core.utils.year
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
@@ -92,7 +93,7 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
         recyclerViewAccount.adapter = accountsAdapter
         addAccount.setOnClickListener { safeNavigate(resId = R.id.attachMailboxFragment) }
         logout.setOnClickListener {
-            requireContext().trackAccountEvent("logOut")
+            trackAccountEvent(MatomoName.LogOut.value)
             descriptionDialog.show(
                 title = getString(R.string.confirmLogoutTitle),
                 description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
@@ -101,7 +102,7 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
             )
         }
         addAccount.setOnClickListener {
-            context.trackAccountEvent("add")
+            trackAccountEvent(MatomoName.Add.value)
             context.launchLoginActivity()
         }
         observeAccounts()
@@ -112,7 +113,7 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun logoutCurrentUser() = lifecycleScope.launch(ioDispatcher) {
-        requireContext().trackAccountEvent("logOutConfirm")
+        trackAccountEvent(MatomoName.LogOutConfirm.value)
         logoutUser(user = AccountUtils.currentUser!!)
     }
 
@@ -141,6 +142,6 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
 
         halloween.playAnimation()
         captureMessage("Easter egg Halloween has been triggered! Woohoo!")
-        trackEasterEggEvent("halloween${Date().year()}")
+        trackEasterEggEvent("${MatomoName.Halloween.value}${Date().year()}")
     }
 }

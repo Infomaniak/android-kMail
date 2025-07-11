@@ -76,7 +76,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
         R.string.externalTag,
         TagColor(R.color.externalTagBackground, R.color.externalTagOnBackground),
     ) {
-        appContext.trackExternalEvent(MatomoName.ThreadTag)
+        trackExternalEvent(MatomoName.ThreadTag)
 
         val description = appContext.resources.getQuantityString(
             R.plurals.externalDialogDescriptionExpeditor,

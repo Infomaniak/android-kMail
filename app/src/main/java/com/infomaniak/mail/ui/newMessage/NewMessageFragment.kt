@@ -44,6 +44,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -818,7 +819,7 @@ class NewMessageFragment : Fragment() {
         if (isMailboxFull) {
             trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
-                openMyKSuiteUpgradeBottomSheet("notEnoughStorageUpgrade")
+                openMyKSuiteUpgradeBottomSheet(MatomoMyKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME)
             }
         }
 

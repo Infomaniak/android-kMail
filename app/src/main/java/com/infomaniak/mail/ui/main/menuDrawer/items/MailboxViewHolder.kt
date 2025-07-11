@@ -44,7 +44,7 @@ class MailboxViewHolder(
         isPastilleDisplayed = mailbox.unreadCountDisplay.shouldDisplayPastille
 
         setOnClickListener {
-            context.trackMenuDrawerEvent(MatomoName.SwitchMailbox)
+            trackMenuDrawerEvent(MatomoName.SwitchMailbox)
             onValidMailboxClicked(mailbox.mailboxId)
         }
     }

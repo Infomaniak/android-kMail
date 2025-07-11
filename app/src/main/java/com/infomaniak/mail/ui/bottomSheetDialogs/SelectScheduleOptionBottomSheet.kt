@@ -149,7 +149,7 @@ enum class ScheduleOption(
     private val hour: HourOfTheDay,
     @StringRes val titleRes: Int,
     @DrawableRes val iconRes: Int,
-    val matomoValue: MatomoName,
+    val matomoName: MatomoName,
 ) {
     LaterThisMorning(
         Today,

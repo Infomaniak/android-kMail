@@ -133,7 +133,7 @@ class LoginFragment : Fragment() {
                 updateTextColor(getCurrentOnPrimary())
                 signInButton.isEnabled = false
                 connectButtonProgressTimer.start()
-                requireContext().trackAccountEvent(MatomoName.OpenLoginWebview.toString())
+                trackAccountEvent(MatomoName.OpenLoginWebview.value)
                 loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
             }
         }

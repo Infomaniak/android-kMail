@@ -60,7 +60,7 @@ class ExternalContentSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, enum ->
             val externalContent = enum as ExternalContent
-            trackEvent(MatomoCategory.SettingsDisplayExternalContent, externalContent.matomoValue)
+            trackEvent(MatomoCategory.SettingsDisplayExternalContent, externalContent.matomoName)
             localSettings.externalContent = externalContent
         }
     }

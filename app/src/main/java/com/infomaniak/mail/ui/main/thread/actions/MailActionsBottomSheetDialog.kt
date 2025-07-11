@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -91,7 +92,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
         share.setClosingOnClickListener(shouldCloseMultiSelection) {
             if (mainViewModel.currentMailbox.value?.isFreeMailbox == true) {
-                openMyKSuiteUpgradeBottomSheet("shareEmail", ThreadListFragment::class.java.name)
+                openMyKSuiteUpgradeBottomSheet(MatomoName.ShareEmail.value, ThreadListFragment::class.java.name)
             } else {
                 onClickListener.onShare()
             }

@@ -186,7 +186,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun setToggleRelatedListeners() = with(binding) {
         if (canCollapseEverything) chevron.setOnClickListener {
-            context.trackMessageEvent(MatomoName.OpenRecipientsFields, isSelfCollapsed)
+            trackMessageEvent(MatomoName.OpenRecipientsFields, isSelfCollapsed)
             isEverythingCollapsed = !isEverythingCollapsed
             if (isSelfCollapsed) textInput.hideKeyboard()
         }

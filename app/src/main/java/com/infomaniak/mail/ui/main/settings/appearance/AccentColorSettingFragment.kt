@@ -68,7 +68,7 @@ class AccentColorSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, accentColor ->
             chooseColor(accentColor as AccentColor)
-            trackEvent(MatomoCategory.SettingsAccentColor.toString(), accentColor.toString())
+            trackEvent(MatomoCategory.SettingsAccentColor.value, accentColor.toString())
         }
     }
 

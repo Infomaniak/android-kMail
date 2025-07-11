@@ -86,13 +86,13 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
         var externalRecipientQuantity = 0
 
         closeButton.setOnClickListener {
-            context.trackExternalEvent(MatomoName.BannerManuallyClosed)
+            trackExternalEvent(MatomoName.BannerManuallyClosed)
             newMessageViewModel.isExternalBannerManuallyClosed = true
             externalBanner.isGone = true
         }
 
         informationButton.setOnClickListener {
-            context.trackExternalEvent(MatomoName.BannerInfo)
+            trackExternalEvent(MatomoName.BannerInfo)
 
             val description = resources.getQuantityString(
                 R.plurals.externalDialogDescriptionRecipient,

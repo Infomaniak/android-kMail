@@ -45,7 +45,7 @@ class CreateFolderDialog @Inject constructor(
 
     fun setCallbacks(onPositiveButtonClicked: (String) -> Unit) = setCallbacks(
         onPositiveButtonClicked = { folderName ->
-            activityContext.trackCreateFolderEvent(MatomoName.Confirm)
+            trackCreateFolderEvent(MatomoName.Confirm)
             onPositiveButtonClicked(folderName)
         },
         onErrorCheck = { folderName ->

@@ -99,25 +99,25 @@ class NotificationActionsReceiver : BroadcastReceiver() {
     private fun handleNotificationIntent(context: Context, payload: NotificationPayload, action: String) {
         // Undo action
         if (action == UNDO_ACTION) {
-            context.trackNotificationActionEvent(MatomoName.CancelClicked)
+            trackNotificationActionEvent(MatomoName.CancelClicked)
             executeUndoAction(payload)
             return
         }
 
         // Other actions
-        val (folderRole, undoNotificationTitle, matomoValue) = when (action) {
+        val (folderRole, undoNotificationTitle, matomoName) = when (action) {
             ARCHIVE_ACTION -> {
-                context.trackNotificationActionEvent(MatomoName.ArchiveClicked)
+                trackNotificationActionEvent(MatomoName.ArchiveClicked)
                 Triple(FolderRole.ARCHIVE, R.string.notificationTitleArchive, MatomoName.ArchiveExecuted)
             }
             DELETE_ACTION -> {
-                context.trackNotificationActionEvent(MatomoName.DeleteClicked)
+                trackNotificationActionEvent(MatomoName.DeleteClicked)
                 Triple(FolderRole.TRASH, R.string.notificationTitleDelete, MatomoName.DeleteExecuted)
             }
             else -> null
         } ?: return
 
-        executeAction(context, folderRole, undoNotificationTitle, matomoValue, payload)
+        executeAction(context, folderRole, undoNotificationTitle, matomoName, payload)
     }
 
     private fun executeUndoAction(payload: NotificationPayload) {
@@ -135,7 +135,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         context: Context,
         folderRole: FolderRole,
         @StringRes undoNotificationTitle: Int,
-        matomoValue: MatomoName,
+        matomoName: MatomoName,
         payload: NotificationPayload,
     ) = with(payload) {
 
@@ -163,7 +163,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
             val destinationFolder = folderController.getFolder(folderRole) ?: return@launch
             val okHttpClient = AccountUtils.getHttpClient(userId)
 
-            context.trackNotificationActionEvent(matomoValue)
+            trackNotificationActionEvent(matomoName)
 
             with(ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id, okHttpClient)) {
                 if (atLeastOneSucceeded()) {

@@ -51,7 +51,7 @@ class DataManagementMatomoSettingFragment : Fragment() {
         setOnClickListener {
             val hasUserOptIn = isChecked
             localSettings.isMatomoTrackingEnabled = hasUserOptIn
-            MatomoMail.shouldOptOut(requireContext().applicationContext, !hasUserOptIn)
+            MatomoMail.tracker.isOptOut = !hasUserOptIn
         }
     }
 }

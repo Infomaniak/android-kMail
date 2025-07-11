@@ -18,7 +18,7 @@
 package com.infomaniak.mail.ui.main.folder
 
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.MatomoCore
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -55,7 +55,7 @@ object PerformSwipeActionManager {
             return true
         }
 
-        trackEvent(MatomoCategory.SwipeActions.toString(), swipeAction.matomoValue, MatomoCore.TrackerAction.DRAG)
+        trackEvent(MatomoCategory.SwipeActions, swipeAction.matomoName, TrackerAction.DRAG)
 
         val shouldKeepItemBecauseOfAction = performSwipeAction(
             swipeAction = swipeAction,

@@ -72,7 +72,7 @@ class ThreadModeSettingFragment : Fragment() {
                 description = getString(R.string.settingsThreadModeWarningDescription),
                 displayLoader = false,
                 onPositiveButtonClicked = {
-                    trackEvent(MatomoCategory.SettingsThreadMode.toString(), threadMode.matomoValue)
+                    trackEvent(MatomoCategory.SettingsThreadMode, threadMode.matomoName)
                     localSettings.threadMode = threadMode
                     threadModeSettingViewModel.dropAllMailboxesContentThenReloadApp()
                 },

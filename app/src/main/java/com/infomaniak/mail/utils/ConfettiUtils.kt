@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import android.view.ViewGroup
 import com.infomaniak.lib.confetti.CommonConfetti
 import com.infomaniak.lib.confetti.ConfettiSource
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.isInPortrait
@@ -65,7 +66,7 @@ object ConfettiUtils {
             scope.setTag("from", matomoValue)
         }
 
-        trackEasterEggEvent("confetti$matomoValue")
+        trackEasterEggEvent("${MatomoName.Confetti.value}${matomoValue}")
 
         val none = 0.0f
         val verySlow = resources.getDimensionPixelOffset(RConfetti.dimen.confetti_velocity_very_slow).toFloat()

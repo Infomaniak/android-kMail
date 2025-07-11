@@ -104,11 +104,11 @@ class LaunchActivity : AppCompatActivity() {
         val replyToMessageUid = navigationArgs?.replyToMessageUid
         when {
             openThreadUid != null -> {
-                applicationContext.trackNotificationActionEvent(MatomoName.Open)
+                trackNotificationActionEvent(MatomoName.Open)
                 launchMainActivityToThreadList(ThreadListFragmentArgs(openThreadUid).toBundle())
             }
             replyToMessageUid != null -> {
-                applicationContext.trackNotificationActionEvent(MatomoName.Reply)
+                trackNotificationActionEvent(MatomoName.Reply)
                 launchMainActivityToThreadList(
                     ThreadListFragmentArgs(
                         replyToMessageUid = replyToMessageUid,
