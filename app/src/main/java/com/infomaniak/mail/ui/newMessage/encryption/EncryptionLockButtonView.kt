@@ -60,6 +60,10 @@ class EncryptionLockButtonView @JvmOverloads constructor(
             setToolbarButtonUi()
         }
 
+    init {
+        setToolbarButtonUi()
+    }
+
     override fun onDetachedFromWindow() {
         loadingDelayTimer.cancel()
         super.onDetachedFromWindow()
