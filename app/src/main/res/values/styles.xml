@@ -557,9 +557,9 @@
     </style>
 
     <style name="TextButtonPrimary.EncryptionButton">
-        <item name="iconTint">@color/encryption_on_primary_color_disabled</item>
-        <item name="android:textColor">@color/encryption_on_primary_color_disabled</item>
-        <item name="backgroundTint">@color/encryption_primary_color_disabled</item>
+        <item name="iconTint">@color/encryption_on_primary_color</item>
+        <item name="android:textColor">@color/encryption_on_primary_color</item>
+        <item name="backgroundTint">@color/encryption_primary_color</item>
     </style>
 
     <!-- Other -->
