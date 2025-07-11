@@ -556,6 +556,12 @@
         <item name="materialButtonStyle">@style/TextButtonEncryptionAlert</item>
     </style>
 
+    <style name="TextButtonPrimary.EncryptionButton">
+        <item name="iconTint">@color/encryption_on_primary_color_disabled</item>
+        <item name="android:textColor">@color/encryption_on_primary_color_disabled</item>
+        <item name="backgroundTint">@color/encryption_primary_color_disabled</item>
+    </style>
+
     <!-- Other -->
 
     <style name="ExtendedFloatingActionButtonStyle" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
