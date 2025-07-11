@@ -1015,7 +1015,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun toggleThreadSpamStatus(threadUids: List<String>) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = threadUids)
+        // toggleThreadsOrMessageSpamStatus(threadsUids = threadUids)
+        Log.e("TOTO", "toggleThreadSpamStatus: je suis dans SPAM avec : $threadUids")
     }
 
     fun toggleThreadsSpamStatus(threadsUids: List<String>) {
@@ -1041,20 +1042,22 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+        // Kylian: Api call spam
+        // val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
+        //
+        // if (apiResponses.atLeastOneSucceeded()) {
+        //     refreshFoldersAsync(
+        //         mailbox = mailbox,
+        //         messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
+        //         destinationFolderId = destinationFolder.id,
+        //         callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
+        //     )
+        // } else {
+        //     threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
+        // }
+        Log.e("TOTO", "toggleThreadsOrMessageSpamStatus: spam")
 
-        if (apiResponses.atLeastOneSucceeded()) {
-            refreshFoldersAsync(
-                mailbox = mailbox,
-                messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id),
-                destinationFolderId = destinationFolder.id,
-                callbacks = RefreshCallbacks(onStart = ::onDownloadStart, onStop = { onDownloadStop(threadsUids) }),
-            )
-        } else {
-            threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
-        }
-
-        if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
+        // if (displaySnackbar) showMoveSnackbar(threads, message, messages, apiResponses, destinationFolder)
     }
 
     private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
@@ -1065,8 +1068,8 @@ class MainViewModel @Inject constructor(
 
     //region Phishing
     fun reportPhishing(threadUids: List<String>, messages: List<Message>) = viewModelScope.launch(ioCoroutineContext) {
-        val mailboxUuid = currentMailbox.value?.uuid!!
-        // Kylian:
+        // val mailboxUuid = currentMailbox.value?.uuid!!
+        // Kylian: Api call Phishing
         // with(ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)) {
         //
         //     val snackbarTitle = if (isSuccess()) {
@@ -1079,10 +1082,10 @@ class MainViewModel @Inject constructor(
         //     reportPhishingTrigger.postValue(Unit)
         //     snackbarManager.postValue(appContext.getString(snackbarTitle))
         // }
-        val snackbarTitle = R.string.snackbarReportPhishingConfirmation
-        snackbarManager.postValue(appContext.getString(snackbarTitle))
-        reportPhishingTrigger.postValue(Unit)
-        Log.e("TOTO-callApi", "reportPhishing: ")
+        // val snackbarTitle = R.string.snackbarReportPhishingConfirmation
+        // snackbarManager.postValue(appContext.getString(snackbarTitle))
+        // reportPhishingTrigger.postValue(Unit)
+        Log.e("TOTO", "reportPhishing: je suis dans PHISING avec $threadUids , $messages")
 
     }
     //endregion
@@ -1381,7 +1384,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun getMessages(messagesUids: List<String>): LiveData<List<Message>> = liveData(ioCoroutineContext) {
-        messageController.getMessages(messagesUids)
+        Log.e("TOTO", "getMessages: on est dans getMessage (live)")
         emit(messageController.getMessages(messagesUids))
     }
 
@@ -1403,7 +1406,6 @@ class MainViewModel @Inject constructor(
                 ?.count { !it.isMe() } ?: 0)
         }
         emit(numberOfExpeditors > 1)
-        Log.e("TOTO", "hasMoreThanOneExpeditor: Test numberOfExpeditors > 1 : ${numberOfExpeditors > 1}")
     }
 
     fun getMessagesFromUniqueExpeditors(threadUids: List<String>) = liveData(ioCoroutineContext) {

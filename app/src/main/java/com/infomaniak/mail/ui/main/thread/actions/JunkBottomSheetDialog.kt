@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -65,6 +66,8 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         threadUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
         messageUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.messageUid }
 
+
+        Log.e("TOTO", "onViewCreated: $threadUids et $messageUids")
         mainViewModel.getMessages(messageUids).observe(viewLifecycleOwner) { messages ->
             this@JunkBottomSheetDialog.messagesOfUserToBlock = messages
             handleButtons(threadUids, messages)
@@ -112,11 +115,13 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun handleButtons(threadUids: List<String>, messages: List<Message>) = with(binding) {
         spam.setClosingOnClickListener {
+            Log.e("TOTO", "handleButtons: cliquer sur le button SPAM \n avec $threadUids ,$messageUids")
             trackBottomSheetThreadActionsEvent(ACTION_SPAM_NAME, value = messages[0].folder.role == FolderRole.SPAM)
             mainViewModel.toggleThreadSpamStatus(threadUids)
         }
 
         phishing.setOnClickListener {
+            Log.e("TOTO", "handleButtons: cliquer sur le button PHISHING \n avec $threadUids ,$messageUids")
             trackBottomSheetThreadActionsEvent("signalPhishing")
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),

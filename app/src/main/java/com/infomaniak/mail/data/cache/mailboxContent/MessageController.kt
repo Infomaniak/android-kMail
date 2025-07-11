@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
+import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
@@ -58,6 +59,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
     }
 
     fun getMessages(uids: List<String>): List<Message>{
+        Log.e("TOTO", "getMessages: on est dans getMessage ")
         return getMessagesByUids(uids, mailboxContentRealm())
     }
 
