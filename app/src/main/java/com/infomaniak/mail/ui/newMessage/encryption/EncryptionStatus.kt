@@ -17,6 +17,32 @@
  */
 package com.infomaniak.mail.ui.newMessage.encryption
 
-enum class EncryptionStatus {
-    Unencrypted, Loading, PartiallyEncrypted, Encrypted
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import com.infomaniak.mail.R
+
+enum class EncryptionStatus(
+    @DrawableRes val iconRes: Int,
+    @ColorRes val iconTintRes: Int,
+    val shouldDisplayPastille: Boolean = false,
+    val isLoading: Boolean = false,
+) {
+    Unencrypted(
+        iconRes = R.drawable.ic_lock_open_filled,
+        iconTintRes = R.color.iconColor,
+    ),
+    Loading(
+        iconRes = R.drawable.ic_lock_filled,
+        iconTintRes = R.color.encryptionIconColor,
+        isLoading = true,
+    ),
+    PartiallyEncrypted(
+        iconRes = R.drawable.ic_lock_filled,
+        iconTintRes = R.color.encryptionIconColor,
+        shouldDisplayPastille = true,
+    ),
+    Encrypted(
+        iconRes = R.drawable.ic_lock_filled,
+        iconTintRes = R.color.encryptionIconColor,
+    ),
 }
