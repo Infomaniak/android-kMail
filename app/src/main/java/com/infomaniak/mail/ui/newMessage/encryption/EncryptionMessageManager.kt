@@ -72,7 +72,7 @@ class EncryptionMessageManager @Inject constructor(
             @Suppress("UNCHECKED_CAST")
             EncryptionData(
                 isEncrypted = it[0] as Boolean,
-                unencryptableRecipients = it[1] as Set<String>?,
+                unencryptableRecipients = it[1] as List<String>?,
                 password = it[2] as String?,
                 isCheckingEmails = it[3] as Boolean,
             )
@@ -117,7 +117,7 @@ class EncryptionMessageManager @Inject constructor(
         encryptionViewModel.unencryptableRecipients.observe(viewLifecycleOwner) { recipientsEmails ->
             if (newMessageViewModel.isEncryptionActivated.value != true) return@observe
 
-            val recipientsCount = recipientsEmails?.count() ?: 0
+            val recipientsCount = recipientsEmails?.toSet()?.count() ?: 0
             binding.encryptionLockButtonView.unencryptableRecipientsCount = recipientsCount
 
             if (
@@ -156,7 +156,7 @@ class EncryptionMessageManager @Inject constructor(
     }
 
     fun removeUnencryptableRecipient(recipient: Recipient) {
-        val unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toMutableSet()
+        val unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toMutableList()
         if (unencryptableRecipients?.contains(recipient.email) == true) {
             encryptionViewModel.unencryptableRecipients.value = unencryptableRecipients.apply { remove(recipient.email) }
         } else {
@@ -195,14 +195,14 @@ class EncryptionMessageManager @Inject constructor(
     private fun applyEncryptionStyleOnRecipientFields(encryptionData: EncryptionData) = with(binding) {
         listOf(toField, ccField, bccField).forEach { field ->
             field.isEncryptionActivated = encryptionData.isEncrypted
-            encryptionData.unencryptableRecipients?.let { field.unencryptableRecipients = it }
+            encryptionData.unencryptableRecipients?.let { field.unencryptableRecipients = it.toSet() }
             encryptionData.password?.let { field.encryptionPassword = it }
         }
     }
 
     private data class EncryptionData(
         val isEncrypted: Boolean,
-        val unencryptableRecipients: Set<String>?,
+        val unencryptableRecipients: List<String>?,
         val password: String?,
         val isCheckingEmails: Boolean,
     ) {
