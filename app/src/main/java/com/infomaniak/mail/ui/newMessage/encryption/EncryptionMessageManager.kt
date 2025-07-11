@@ -77,7 +77,7 @@ class EncryptionMessageManager @Inject constructor(
                 isCheckingEmails = it[3] as Boolean,
             )
         }.distinctUntilChanged().observeNotNull(viewLifecycleOwner) { encryptionData ->
-            val isEncryptionValid = checkEncryptionCanBeSend() && !encryptionData.isCheckingEmails
+            val isEncryptionValid = checkEncryptionCanBeSend(encryptionData.isCheckingEmails)
             newMessageViewModel.updateIsSendingAllowed(isEncryptionValid = isEncryptionValid)
 
             applyEncryptionStyleOnRecipientFields(encryptionData)
@@ -172,15 +172,16 @@ class EncryptionMessageManager @Inject constructor(
      * E.G. Activated but without information if recipient can be auto encrypted or not, or with unencryptable recipients but
      * without having a password provided
      */
-    fun checkEncryptionCanBeSend(): Boolean {
+    fun checkEncryptionCanBeSend(isCheckingEmails: Boolean = false): Boolean {
         val currentUnencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
         val isEncryptionActivated = newMessageViewModel.isEncryptionActivated.value == true
 
         return when {
             !isEncryptionActivated -> true // Encryption is not activated, doesn't need to block the draft sending
-            currentUnencryptableRecipients == null -> false // The call to know if recipient can be encrypted is still processing
-            currentUnencryptableRecipients.isEmpty() -> true // Only auto-encryptable recipients
             newMessageViewModel.encryptionPassword.value?.isNotBlank() == true -> true // A password has been provided
+            currentUnencryptableRecipients == null -> false // The call to know if recipient can be encrypted is still processing
+            isCheckingEmails -> false
+            currentUnencryptableRecipients.isEmpty() -> true // Only auto-encryptable recipients
             else -> false // Some unencryptable recipients without password
         }
     }
@@ -208,7 +209,8 @@ class EncryptionMessageManager @Inject constructor(
     ) {
         fun computeEncryptionStatus() = when {
             !isEncrypted -> EncryptionStatus.Unencrypted
-            unencryptableRecipients?.isNotEmpty() == true && password.isNullOrBlank() -> {
+            password?.isNotBlank() == true -> EncryptionStatus.Encrypted
+            unencryptableRecipients?.isNotEmpty() == true -> {
                 EncryptionStatus.PartiallyEncrypted // Encryption activated but not valid
             }
             isCheckingEmails -> EncryptionStatus.Loading
