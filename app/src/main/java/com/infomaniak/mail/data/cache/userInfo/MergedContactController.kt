@@ -49,7 +49,7 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
     }
 
     private fun getMergedContactFromAddressBookQuery(contact: AddressBook): RealmQuery<MergedContact> {
-        return userInfoRealm.query<MergedContact>("${MergedContact::addressbookId.name} == $0", contact.id)
+        return userInfoRealm.query<MergedContact>("${MergedContact::addressbookIds.name} == $0", contact.id)
             .sort(MergedContact::name.name)
             .sort(MergedContact::comesFromApi.name, Sort.DESCENDING)
     }
