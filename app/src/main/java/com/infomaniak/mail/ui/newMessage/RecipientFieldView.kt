@@ -34,7 +34,6 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.chip.Chip
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
@@ -161,7 +160,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
             contactAdapter = ContactAdapter(
                 usedEmails = mutableSetOf(),
-                onContactClicked = { contactCliked(it) },
+                onContactClicked = ::contactCliked,
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
                     addRecipient(email = input, name = input)
@@ -367,18 +366,13 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun contactCliked(contact: ContactAutocompletable) {
-        var listOfContact: List<MergedContact> = emptyList()
-        when (contact) {
-            is MergedContact -> {
-                listOfContact = listOf(contact)
-            }
-            is ContactGroup -> {
-                listOfContact = getMergedContactFromContactGroup?.invoke(contact)!!
-            }
-            is AddressBook -> {
-                listOfContact = getMergedContactFromAddressBook?.invoke(contact)!!
-            }
+        val listOfContact = when (contact) {
+            is MergedContact -> listOf(contact)
+            is ContactGroup -> getMergedContactFromContactGroup?.invoke(contact)!!
+            is AddressBook -> getMergedContactFromAddressBook?.invoke(contact)!!
+            else -> emptyList()
         }
+
         for (mergedContact in listOfContact) {
             addRecipient(mergedContact.email, mergedContact.name)
         }
