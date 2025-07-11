@@ -120,10 +120,6 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
         addressbookId += realmListOf(apiContact.addressbookId)
         remoteContactGroupIds += apiContact.remoteContactGroupIds
     }
-
+    
     override fun toString(): String = "{$avatar, $email, $name}"
-
-    override fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable): Boolean {
-        return contactId == contactAutoCompletable.contactId
-    }
 }

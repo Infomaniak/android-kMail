@@ -33,5 +33,6 @@ class ContactGroup : RealmObject, ContactAutocompletable {
 
     override fun toString(): String = "{$name}"
 
+    override fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable) = false
     companion object
 }

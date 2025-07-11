@@ -34,7 +34,6 @@ class AddressBook : RealmObject, ContactAutocompletable {
     @PrimaryKey
     var uuid: String = ""
     var id: Int = 0
-
     var name: String = ""
     @SerialName("default")
     var isDefault: Boolean = false
@@ -49,6 +48,8 @@ class AddressBook : RealmObject, ContactAutocompletable {
     override var autocompletableName: String = name
 
     override fun toString(): String = "{$name}"
+
+    override fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable) = false
 
     companion object
 }
