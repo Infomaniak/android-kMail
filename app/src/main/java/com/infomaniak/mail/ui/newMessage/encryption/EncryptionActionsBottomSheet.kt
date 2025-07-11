@@ -61,7 +61,7 @@ class EncryptionActionsBottomSheet : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        val unencryptableRecipientsCount = encryptionViewModel.unencryptableRecipients.value?.count() ?: 0
+        val unencryptableRecipientsCount = encryptionViewModel.unencryptableRecipients.value?.toSet()?.count() ?: 0
         val isValidEncryption = unencryptableRecipientsCount == 0 || navigationArgs.password.isNotBlank()
 
         val tagColor = SubjectFormatter.TagColor(

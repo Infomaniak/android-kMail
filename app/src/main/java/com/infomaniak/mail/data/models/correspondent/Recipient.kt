@@ -19,8 +19,6 @@ package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.infomaniak.core.extensions.customReadBoolean
-import com.infomaniak.core.extensions.customWriteBoolean
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.extensions.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -37,15 +35,6 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
     override var email: String = ""
     override var name: String = ""
 
-    //region Local data (Transient)
-
-    // ------------- !IMPORTANT! -------------
-    // Every field that is added in this Transient region should be declared in
-    // `initLocalValue()` too to avoid loosing data when updating from the API.
-    @Transient
-    override var canBeEncrypted: Boolean? = null
-    //endregion
-
     //region UI data (Transient & Ignore)
     // Only indicates how to display the Recipient chip when composing a new Message.
     // `isExternal()` could return true even if this value is false.
@@ -61,11 +50,9 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    fun initLocalValues(email: String? = null, name: String? = null, canBeEncrypted: Boolean? = null): Recipient {
-
+    fun initLocalValues(email: String? = null, name: String? = null): Recipient {
         email?.let { this.email = it }
         name?.let { this.name = it }
-        canBeEncrypted?.let { this.canBeEncrypted = it }
 
         return this
     }
@@ -98,15 +85,13 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
         override fun create(parcel: Parcel): Recipient {
             val email = parcel.readString()!!
             val name = parcel.readString()!!
-            val canBeEncrypted = runCatching { parcel.customReadBoolean() }.getOrNull()
 
-            return Recipient().initLocalValues(email, name, canBeEncrypted)
+            return Recipient().initLocalValues(email, name)
         }
 
         override fun Recipient.write(parcel: Parcel, flags: Int) {
             parcel.writeString(email)
             parcel.writeString(name)
-            canBeEncrypted?.let(parcel::customWriteBoolean)
         }
     }
 }

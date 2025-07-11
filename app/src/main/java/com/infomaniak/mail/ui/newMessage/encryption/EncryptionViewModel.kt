@@ -24,7 +24,6 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.utils.extensions.appContext
@@ -40,7 +39,6 @@ import javax.inject.Inject
 class EncryptionViewModel @Inject constructor(
     application: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val mergedContactController: MergedContactController,
     private val snackbarManager: SnackbarManager,
 ) : AndroidViewModel(application) {
 
@@ -61,13 +59,15 @@ class EncryptionViewModel @Inject constructor(
                 val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked)
 
                 // By default, all the new addresses being checked are considered unencryptable
-                var newUnencryptableRecipients: List<String> = emailsBeingChecked.toList()
+                val newUnencryptableRecipients: MutableList<String> = emails.toMutableList()
 
                 if (apiResponse.isSuccess()) {
                     apiResponse.data?.let { mailboxHostingStatuses ->
-                        // TODO: Remove that when caching data
-                        newUnencryptableRecipients =
-                            mergedContactController.updateEncryptionStatus(mailboxHostingStatuses)
+                        mailboxHostingStatuses.forEach { mailboxStatus ->
+                            if (mailboxStatus.isInfomaniakHosted) {
+                                newUnencryptableRecipients.removeAll { it == mailboxStatus.email }
+                            }
+                        }
                     }
                 } else {
                     // In case of error during the encryptable check, we consider all recipients as unencryptable
