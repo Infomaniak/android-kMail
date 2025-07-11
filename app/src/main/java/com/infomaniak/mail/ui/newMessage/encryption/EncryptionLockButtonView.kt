@@ -84,24 +84,36 @@ class EncryptionLockButtonView @JvmOverloads constructor(
                 iconTintRes = R.color.encryptionIconColor,
                 shouldDisplayPastille = false,
             )
-            EncryptionStatus.Loading -> with(binding) {
-                encryptionButton.isEnabled = false
-                loadingDelayTimer.start()
-            }
+            EncryptionStatus.Loading -> setIconUi(
+                iconRes = R.drawable.ic_lock_filled,
+                iconTintRes = R.color.encryptionIconColor,
+                shouldDisplayPastille = false,
+                isLoading = true,
+            )
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setIconUi(@DrawableRes iconRes: Int, @ColorRes iconTintRes: Int, shouldDisplayPastille: Boolean) {
+    private fun setIconUi(
+        @DrawableRes iconRes: Int,
+        @ColorRes iconTintRes: Int,
+        shouldDisplayPastille: Boolean,
+        isLoading: Boolean = false,
+    ) {
         with(binding) {
-            unencryptedRecipientLoader.isGone = true
             encryptionButton.apply {
                 isEnabled = true
                 setIconResource(iconRes)
                 setIconTintResource(iconTintRes)
             }
             updateUnencryptableCountUi()
-            unencryptableGroup.isVisible = shouldDisplayPastille
+            unencryptableGroup.isVisible = shouldDisplayPastille && !isLoading
+
+            unencryptedRecipientLoader.isVisible = isLoading
+            if (isLoading) {
+                encryptionButton.isEnabled = false
+                loadingDelayTimer.start()
+            }
         }
     }
 

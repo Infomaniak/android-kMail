@@ -22,6 +22,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.di.IoDispatcher
@@ -44,7 +45,7 @@ class EncryptionViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     val unencryptableRecipients: MutableLiveData<Set<String>?> = MutableLiveData(null)
-    val isCheckingEmailsTrigger: MutableLiveData<Unit> = MutableLiveData()
+    val isCheckingEmails: SingleLiveEvent<Boolean> = SingleLiveEvent(false)
 
     private var emailsCheckingJob: Job? = null
     private val emailsBeingChecked: MutableSet<String> = mutableSetOf()
@@ -54,17 +55,17 @@ class EncryptionViewModel @Inject constructor(
         emailsBeingChecked.addAll(emails)
 
         emailsCheckingJob = viewModelScope.launch(ioDispatcher) {
-            isCheckingEmailsTrigger.postValue(Unit)
-
-            val currentUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
-            // By default, all the new addresses being checked are considered unencryptable
-            var newUnencryptableRecipients: Set<String> = emailsBeingChecked
+            isCheckingEmails.postValue(true)
 
             runCatching {
                 val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked)
 
+                // By default, all the new addresses being checked are considered unencryptable
+                var newUnencryptableRecipients: Set<String> = emailsBeingChecked
+
                 if (apiResponse.isSuccess()) {
                     apiResponse.data?.let { mailboxHostingStatuses ->
+                        // TODO: Remove that when caching data
                         newUnencryptableRecipients =
                             mergedContactController.updateEncryptionStatus(mailboxHostingStatuses).toSet()
                     }
@@ -72,10 +73,14 @@ class EncryptionViewModel @Inject constructor(
                     // In case of error during the encryptable check, we consider all recipients as unencryptable
                     snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
                 }
-                clearDataAndPostResult(newUnencryptableRecipients + currentUnencryptableRecipients)
+                val existingUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
+                clearDataAndPostResult(newUnencryptableRecipients + existingUnencryptableRecipients)
             }.onFailure { exception ->
+                // We don't post result here as a new check will be executed
                 if (exception is AutoBulkCallCancellationException) throw CancellationException()
-                clearDataAndPostResult(newUnencryptableRecipients + currentUnencryptableRecipients)
+
+                val existingUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
+                clearDataAndPostResult(emailsBeingChecked + existingUnencryptableRecipients)
                 if (exception is CancellationException) throw exception
             }
         }
@@ -103,6 +108,7 @@ class EncryptionViewModel @Inject constructor(
     private fun clearDataAndPostResult(recipients: Set<String>) {
         emailsBeingChecked.clear()
         unencryptableRecipients.postValue(recipients)
+        isCheckingEmails.postValue(false)
     }
 
     private class AutoBulkCallCancellationException : CancellationException()
