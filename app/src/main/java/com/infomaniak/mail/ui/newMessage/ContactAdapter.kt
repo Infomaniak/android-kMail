@@ -176,59 +176,58 @@ class ContactAdapter(
         notifyDataSetChanged()
     }
 
-    fun searchContacts(text: CharSequence) {
+    private fun setMatchedContact(
+        contact: ContactAutocompletable,
+        nameMatched: String,
+        emailMatched: String,
+        searchTerm: String
+    ): MatchedContact? {
+        val nameMatchedIndex = nameMatched.standardize().indexOf(searchTerm)
+        val standardizedEmail = emailMatched.standardize()
+        val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
+        val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
 
-        fun setMatchedContact(
-            contact: ContactAutocompletable,
-            nameMatched: String,
-            emailMatched: String,
-            searchTerm: String
-        ): MatchedContact? {
-            val nameMatchedIndex = nameMatched.standardize().indexOf(searchTerm)
-            val standardizedEmail = emailMatched.standardize()
-            val emailMatchedIndex = standardizedEmail.indexOf(searchTerm)
-            val matches = nameMatchedIndex >= 0 || emailMatchedIndex >= 0
+        val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
+        if (displayNewContact) displayAddUnknownContactButton = false
 
-            val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
-            if (displayNewContact) displayAddUnknownContactButton = false
+        return if (matches) MatchedContact(contact, nameMatchedIndex, emailMatchedIndex) else null
+    }
 
-            return if (matches) MatchedContact(contact, nameMatchedIndex, emailMatchedIndex) else null
-        }
+    private fun performFiltering(constraint: CharSequence): List<MatchedContact> {
+        val searchTerm = constraint.standardize()
 
-        fun performFiltering(constraint: CharSequence): List<MatchedContact> {
-            val searchTerm = constraint.standardize()
-
-            val finalUserList = mutableListOf<MatchedContact>()
-            displayAddUnknownContactButton = true
-            for (contact in allContacts) {
-                var matchedContact: MatchedContact? = null
-                when (contact) {
-                    is MergedContact -> {
-                        matchedContact = setMatchedContact(contact, contact.name, contact.email, searchTerm)
-                    }
-                    is AddressBook -> {
-                        matchedContact = setMatchedContact(contact, contact.name, contact.organization, searchTerm)
-                    }
-                    is ContactGroup -> {
-                        val addressBook: AddressBook = getAddressBookWithGroup?.invoke(contact)!!
-
-                        val addressBookName =
-                            if (addressBook.isDynamicOrganisationMemberDirectory == true) {
-                                addressBook.organization.standardize()
-                            } else {
-                                addressBook.name.standardize()
-                            }
-                        matchedContact = setMatchedContact(contact, contact.name, addressBookName, searchTerm)
-                    }
+        val finalUserList = mutableListOf<MatchedContact>()
+        displayAddUnknownContactButton = true
+        for (contact in allContacts) {
+            var matchedContact: MatchedContact? = null
+            when (contact) {
+                is MergedContact -> {
+                    matchedContact = setMatchedContact(contact, contact.name, contact.email, searchTerm)
                 }
-                if (matchedContact != null) finalUserList.add(matchedContact)
-                if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
-            }
-            return finalUserList.sortedWith(
-                compareByDescending<MatchedContact> { it.contact.contactId }
-            ).toMutableList()
-        }
+                is AddressBook -> {
+                    matchedContact = setMatchedContact(contact, contact.name, contact.organization, searchTerm)
+                }
+                is ContactGroup -> {
+                    val addressBook: AddressBook = getAddressBookWithGroup?.invoke(contact)!!
 
+                    val addressBookName =
+                        if (addressBook.isDynamicOrganisationMemberDirectory) {
+                            addressBook.organization.standardize()
+                        } else {
+                            addressBook.name.standardize()
+                        }
+                    matchedContact = setMatchedContact(contact, contact.name, addressBookName, searchTerm)
+                }
+            }
+            if (matchedContact != null) finalUserList.add(matchedContact)
+            if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
+        }
+        return finalUserList.sortedWith(
+            compareByDescending<MatchedContact> { it.contact.contactId }
+        ).toMutableList()
+    }
+
+    fun searchContacts(text: CharSequence) {
         searchQuery = text.toString()
         matchedContacts = performFiltering(text)
         notifyDataSetChanged()
