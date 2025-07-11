@@ -26,6 +26,8 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.MatomoCategory
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.databinding.FragmentDataManagementSettingsBinding
 import com.infomaniak.mail.utils.UiUtils.saveFocusWhenNavigatingBack
@@ -61,7 +63,7 @@ class DataManagementSettingsFragment : Fragment() {
             animatedNavigation(DataManagementSettingsFragmentDirections.actionDataManagementToSentrySetting())
         }
         dataManagementSourceCodeButton.setOnClickListener {
-            trackEvent("settingsDataManagement", "showSourceCode")
+            trackEvent(MatomoCategory.SettingsDataManagement, MatomoName.ShowSourceCode)
             context.openUrl(BuildConfig.GITHUB_REPO_URL)
         }
     }

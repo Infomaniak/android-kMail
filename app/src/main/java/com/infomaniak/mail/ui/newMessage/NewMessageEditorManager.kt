@@ -22,6 +22,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
+import com.infomaniak.mail.MatomoMail.MatomoCategory
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -83,7 +85,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     fun setupEditorFormatActions() = with(binding) {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
-                context.trackEvent("editorActions", action.matomoValue)
+                trackEvent(MatomoCategory.EditorActions, action.matomoName)
                 newMessageViewModel.editorAction.value = action to null
             }
         }
@@ -140,15 +142,15 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         }
     }
 
-    enum class EditorAction(val matomoValue: String) {
-        ATTACHMENT("importFile"),
-        CAMERA("importFromCamera"),
-        LINK("addLink"),
-        AI("aiWriter"),
-        BOLD("bold"),
-        ITALIC("italic"),
-        UNDERLINE("underline"),
-        STRIKE_THROUGH("strikeThrough"),
-        UNORDERED_LIST("unorderedList"),
+    enum class EditorAction(val matomoName: MatomoName) {
+        ATTACHMENT(MatomoName.ImportFile),
+        CAMERA(MatomoName.ImportFromCamera),
+        LINK(MatomoName.AddLink),
+        AI(MatomoName.AiWriter),
+        BOLD(MatomoName.Bold),
+        ITALIC(MatomoName.Italic),
+        UNDERLINE(MatomoName.Underline),
+        STRIKE_THROUGH(MatomoName.StrikeThrough),
+        UNORDERED_LIST(MatomoName.UnorderedList),
     }
 }

@@ -33,6 +33,7 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.lib.login.InfomaniakLogin.TokenResult
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.di.IoDispatcher
@@ -116,7 +117,7 @@ class LoginUtils @Inject constructor(
     }
 
     private suspend fun Context.loginSuccess(user: User) {
-        trackAccountEvent("loggedIn")
+        trackAccountEvent(MatomoName.LoggedIn)
         ioDispatcher {
             mailboxController.getFirstValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
         }

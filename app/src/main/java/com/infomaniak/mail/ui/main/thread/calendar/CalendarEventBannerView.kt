@@ -18,22 +18,18 @@
 package com.infomaniak.mail.ui.main.thread.calendar
 
 import android.content.Context
-import android.os.Build.VERSION.SDK_INT
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
-import com.infomaniak.core.utils.FORMAT_FULL_DATE
-import com.infomaniak.core.utils.FORMAT_HOUR_MINUTES
 import com.infomaniak.core.utils.FormatData
 import com.infomaniak.core.utils.addDays
-import com.infomaniak.core.utils.format
 import com.infomaniak.core.utils.formatWithLocal
 import com.infomaniak.core.utils.isSameDayAs
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCalendarEventEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -84,7 +80,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
             noButton.handleChoiceButtonBehavior(AttendanceState.DECLINED)
 
             attendeesButton.apply {
-                setOnClickListener { trackCalendarEventEvent("attendees", attendeesButton.isChecked) }
+                setOnClickListener { trackCalendarEventEvent(MatomoName.Attendees, attendeesButton.isChecked) }
                 addOnCheckedChangeListener { _, isChecked ->
                     attendeesSubMenu.isVisible = isChecked
                     onAttendeesButtonClicked?.invoke(isChecked)
@@ -127,7 +123,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
         setAttendanceUi(calendarEvent.attendees, shouldDisplayReplyOptions)
 
         addToCalendarButton.setOnClickListener {
-            trackCalendarEventEvent("openInMyCalendar")
+            trackCalendarEventEvent(MatomoName.OpenInMyCalendar)
             attachment.openAttachment(context, navigateToDownloadProgressDialog ?: return@setOnClickListener, snackbarManager)
         }
     }
@@ -186,7 +182,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
         displayOrganizer(attendees)
         allAttendeesButton.setOnClickListener {
-            trackCalendarEventEvent("seeAllAttendees")
+            trackCalendarEventEvent(MatomoName.SeeAllAttendees)
             navigateToAttendeesBottomSheet?.invoke(attendees)
         }
         manyAvatarsView.setAttendees(attendees)
@@ -206,7 +202,7 @@ class CalendarEventBannerView @JvmOverloads constructor(
 
     private fun MaterialButton.handleChoiceButtonBehavior(attendanceState: AttendanceState) {
         setOnClickListener {
-            trackCalendarEventEvent(attendanceState.matomoValue!!)
+            trackCalendarEventEvent(attendanceState.matomoName!!)
 
             // Do nothing if it was already selected
             if (isChecked) {

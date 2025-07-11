@@ -29,8 +29,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
-import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMoveSearchEvent
 import com.infomaniak.mail.R
@@ -91,7 +90,7 @@ class MoveFragment : Fragment() {
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener {
-            trackCreateFolderEvent("fromMove")
+            trackCreateFolderEvent(MatomoName.FromMove)
             createFolderDialog.show(confirmButtonText = R.string.newFolderDialogMovePositiveButton)
         }
     }
@@ -129,20 +128,20 @@ class MoveFragment : Fragment() {
 
     private fun setupSearchBar() = with(binding) {
 
-        searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(SEARCH_DELETE_NAME) }
+        searchInputLayout.setOnClearTextClickListener { trackMoveSearchEvent(MatomoName.DeleteSearch) }
 
         searchTextInput.apply {
             doOnTextChanged { newQuery, _, _, _ ->
                 moveViewModel.filterFolders(newQuery, shouldDebounce = true)
                 if (!moveViewModel.hasAlreadyTrackedSearch) {
-                    trackMoveSearchEvent("executeSearch")
+                    trackMoveSearchEvent(MatomoName.ExecuteSearch)
                     moveViewModel.hasAlreadyTrackedSearch = true
                 }
             }
 
             handleEditorSearchAction { query ->
                 moveViewModel.filterFolders(query, shouldDebounce = false)
-                trackMoveSearchEvent(SEARCH_VALIDATE_NAME)
+                trackMoveSearchEvent(MatomoName.ValidateSearch)
             }
         }
     }

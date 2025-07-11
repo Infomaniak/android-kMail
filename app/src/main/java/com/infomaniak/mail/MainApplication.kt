@@ -48,7 +48,6 @@ import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.stores.AppUpdateScheduler
-import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -79,7 +78,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.matomo.sdk.Tracker
 import splitties.init.injectAsAppCtx
 import java.util.UUID
 import javax.inject.Inject
@@ -91,7 +89,6 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         injectAsAppCtx() // Ensures it is always initialized
     }
 
-    val matomoTracker: Tracker by lazy { buildTracker(shouldOptOut = !localSettings.isMatomoTrackingEnabled) }
     var isAppInBackground = true
         private set
 
@@ -182,6 +179,8 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
                 if (SDK_INT >= 29) detectCredentialProtectedWhileLocked()
             }.build()
         )
+
+        MatomoMail.addTrackingCallbackForDebugLog()
     }
 
     private fun configureSentry() {

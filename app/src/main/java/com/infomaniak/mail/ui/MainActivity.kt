@@ -40,9 +40,9 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
@@ -53,6 +53,7 @@ import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.MatomoMail.trackEvent
@@ -185,13 +186,13 @@ class MainActivity : BaseActivity() {
         }
 
         override fun onDrawerOpened(drawerView: View) {
-            if (hasDragged) trackMenuDrawerEvent("openByGesture", TrackerAction.DRAG)
+            if (hasDragged) trackMenuDrawerEvent(MatomoName.OpenByGesture, TrackerAction.DRAG)
             colorSystemBarsWithMenuDrawer(UiUtils.FULLY_SLID)
             binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment?>()?.onDrawerOpened()
         }
 
         override fun onDrawerClosed(drawerView: View) {
-            if (hasDragged) trackMenuDrawerEvent("closeByGesture", TrackerAction.DRAG)
+            if (hasDragged) trackMenuDrawerEvent(MatomoName.CloseByGesture, TrackerAction.DRAG)
             binding.menuDrawerFragmentContainer.getFragment<MenuDrawerFragment?>()?.closeDropdowns()
         }
 
@@ -271,9 +272,9 @@ class MainActivity : BaseActivity() {
 
     private fun initAppReviewManager() {
         inAppReviewManager.init(
-            onDialogShown = { trackInAppReviewEvent("presentAlert") },
-            onUserWantToReview = { trackInAppReviewEvent("like") },
-            onUserWantToGiveFeedback = { trackInAppReviewEvent("dislike") },
+            onDialogShown = { trackInAppReviewEvent(MatomoName.PresentAlert) },
+            onUserWantToReview = { trackInAppReviewEvent(MatomoName.Like) },
+            onUserWantToGiveFeedback = { trackInAppReviewEvent(MatomoName.Dislike) },
         )
     }
 
@@ -327,9 +328,9 @@ class MainActivity : BaseActivity() {
                     errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_DAILY_LIMIT_REACHED)
 
             if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
-                trackNewMessageEvent("trySendingWithDailyLimitReached")
+                trackNewMessageEvent(MatomoName.TrySendingWithDailyLimitReached)
                 snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                    openMyKSuiteUpgradeBottomSheet(navController, "dailyLimitReachedUpgrade")
+                    openMyKSuiteUpgradeBottomSheet(navController, MatomoName.DailyLimitReachedUpgrade.value)
                 }
             } else {
                 snackbarManager.setValue(getString(errorRes))
@@ -379,7 +380,7 @@ class MainActivity : BaseActivity() {
             title = getString(R.string.snackbarDraftSaved),
             buttonTitle = R.string.actionDelete,
             customBehavior = {
-                trackEvent("snackbar", "deleteDraft")
+                trackEvent(MatomoMail.MatomoCategory.Snackbar, MatomoName.DeleteDraft)
                 mainViewModel.deleteDraft(associatedMailboxUuid, remoteDraftUuid)
             },
         )
@@ -487,7 +488,7 @@ class MainActivity : BaseActivity() {
             activity = this,
             getAnchor = ::getAnchor,
             onUndoData = {
-                trackEvent("snackbar", "undo")
+                trackEvent(MatomoMail.MatomoCategory.Snackbar, MatomoName.Undo)
                 mainViewModel.undoAction(it)
             },
         )
@@ -548,9 +549,9 @@ class MainActivity : BaseActivity() {
     private fun initAppUpdateManager() {
         inAppUpdateManager.init(
             onUserChoice = { isWantingUpdate ->
-                trackInAppUpdateEvent(if (isWantingUpdate) MatomoMail.DISCOVER_NOW else MatomoMail.DISCOVER_LATER)
+                trackInAppUpdateEvent(if (isWantingUpdate) MatomoName.DiscoverNow else MatomoName.DiscoverLater)
             },
-            onInstallStart = { trackInAppUpdateEvent("installUpdate") },
+            onInstallStart = { trackInAppUpdateEvent(MatomoName.InstallUpdate) },
             onInstallFailure = { snackbarManager.setValue(getString(RCore.string.errorUpdateInstall)) },
             onInAppUpdateUiChange = { isUpdateDownloaded ->
                 SentryLog.d(StoreUtils.APP_UPDATE_TAG, "Must display update button : $isUpdateDownloaded")
@@ -580,7 +581,7 @@ class MainActivity : BaseActivity() {
                 playAnimation()
             }
             Sentry.captureMessage("Easter egg XMas has been triggered! Woohoo!")
-            trackEasterEggEvent("xmas${Date().year()}")
+            trackEasterEggEvent("${MatomoName.Xmas.value}${Date().year()}")
         }
     }
 

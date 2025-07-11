@@ -21,6 +21,7 @@ package com.infomaniak.mail.data.models.draft
 
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import io.realm.kotlin.ext.realmListOf
@@ -142,10 +143,10 @@ class Draft : RealmObject {
         }
     }
 
-    enum class DraftAction(val apiCallValue: String, val matomoValue: String) {
-        SAVE("save", "saveDraft"),
-        SEND("send", "sendMail"),
-        SCHEDULE("schedule", "scheduleDraft"),
+    enum class DraftAction(val apiCallValue: String, val matomoName: MatomoName) {
+        SAVE("save", MatomoName.SaveDraft),
+        SEND("send", MatomoName.SendMail),
+        SCHEDULE("schedule", MatomoName.ScheduleDraft),
     }
 
     enum class DraftMode {

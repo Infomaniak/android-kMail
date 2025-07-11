@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -69,7 +70,7 @@ class SyncOnboardingFragment : Fragment() {
     }
 
     private fun setupClickListener() {
-        val trackerName = if (syncAutoConfigViewModel.isSyncAppUpToDate()) "configureReady" else "configureInstall"
+        val trackerName = if (syncAutoConfigViewModel.isSyncAppUpToDate()) MatomoName.ConfigureReady else MatomoName.ConfigureInstall
         binding.continueButton.setOnClickListener {
             trackSyncAutoConfigEvent(trackerName)
             safeNavigate(SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncConfigureFragment())

@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
@@ -167,13 +168,13 @@ class AiViewModel @Inject constructor(
 
     fun getLastMessage(): String = history.last().content
 
-    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?, val matomoValue: String) {
-        MODIFY(R.id.modify, null, "edit"),
-        REGENERATE(R.id.regenerate, "redraw", "regenerate"),
-        SHORTEN(R.id.shorten, "shorten", "shorten"),
-        LENGTHEN(R.id.lengthen, "develop", "expand"),
-        SERIOUS_TONE(R.id.seriousTone, "tune-professional", "seriousWriting"),
-        FRIENDLY_TONE(R.id.friendlyTone, "tune-friendly", "friendlyWriting"),
+    enum class Shortcut(@IdRes val menuId: Int, val apiRoute: String?, val matomoName: MatomoName) {
+        MODIFY(R.id.modify, null, MatomoName.Edit),
+        REGENERATE(R.id.regenerate, "redraw", MatomoName.Regenerate),
+        SHORTEN(R.id.shorten, "shorten", MatomoName.Shorten),
+        LENGTHEN(R.id.lengthen, "develop", MatomoName.Expand),
+        SERIOUS_TONE(R.id.seriousTone, "tune-professional", MatomoName.SeriousWriting),
+        FRIENDLY_TONE(R.id.friendlyTone, "tune-friendly", MatomoName.FriendlyWriting),
     }
 
     enum class PropositionStatus(@StringRes val errorRes: Int?) {

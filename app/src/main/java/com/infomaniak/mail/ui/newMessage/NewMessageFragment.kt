@@ -44,6 +44,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -57,8 +58,7 @@ import com.infomaniak.lib.richhtmleditor.StatusCommand.ITALIC
 import com.infomaniak.lib.richhtmleditor.StatusCommand.STRIKE_THROUGH
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNDERLINE
 import com.infomaniak.lib.richhtmleditor.StatusCommand.UNORDERED_LIST
-import com.infomaniak.mail.MatomoMail.CUSTOM_SCHEDULE_CONFIRM
-import com.infomaniak.mail.MatomoMail.OPEN_FROM_DRAFT_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
@@ -270,7 +270,7 @@ class NewMessageFragment : Fragment() {
         getBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER) { _: Boolean ->
             dateAndTimeScheduleDialog.show(
                 onDateSelected = { timestamp ->
-                    trackScheduleSendEvent(CUSTOM_SCHEDULE_CONFIRM)
+                    trackScheduleSendEvent(MatomoName.CustomSchedule)
                     localSettings.lastSelectedScheduleEpochMillis = timestamp
                     scheduleDraft(timestamp)
                 },
@@ -384,7 +384,7 @@ class NewMessageFragment : Fragment() {
             onAttachmentClicked = {
                 if (it !is Attachment) return@AttachmentAdapter
 
-                trackAttachmentActionsEvent(OPEN_FROM_DRAFT_NAME)
+                trackAttachmentActionsEvent(MatomoName.OpenFromDraft)
                 it.openAttachment(
                     context = requireContext(),
                     navigateToDownloadProgressDialog = { attachment, attachmentIntentType ->
@@ -494,7 +494,7 @@ class NewMessageFragment : Fragment() {
             )
         }
         removeSignature.setOnClickListener {
-            trackNewMessageEvent("deleteSignature")
+            trackNewMessageEvent(MatomoName.DeleteSignature)
             newMessageViewModel.uiSignatureLiveData.value = null
         }
 
@@ -510,7 +510,7 @@ class NewMessageFragment : Fragment() {
             )
         }
         removeQuote.setOnClickListener {
-            trackNewMessageEvent("deleteQuote")
+            trackNewMessageEvent(MatomoName.DeleteQuote)
             removeInlineAttachmentsUsedInQuote()
             newMessageViewModel.uiQuoteLiveData.value = null
         }
@@ -583,7 +583,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onSignatureClicked(signature: Signature) {
-        trackNewMessageEvent("switchIdentity")
+        trackNewMessageEvent(MatomoName.SwitchIdentity)
         newMessageViewModel.fromLiveData.value = UiFrom(signature)
         addressListPopupWindow?.dismiss()
     }
@@ -754,7 +754,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun onDeleteAttachment(position: Int) {
-        trackAttachmentActionsEvent("delete")
+        trackAttachmentActionsEvent(MatomoName.Delete)
         newMessageViewModel.deleteAttachment(position)
     }
 
@@ -797,14 +797,14 @@ class NewMessageFragment : Fragment() {
         }
 
         if (isSubjectBlank()) {
-            trackNewMessageEvent("sendWithoutSubject")
+            trackNewMessageEvent(MatomoName.SendWithoutSubject)
             descriptionDialog.show(
                 title = getString(R.string.emailWithoutSubjectTitle),
                 description = getString(R.string.emailWithoutSubjectDescription),
                 displayLoader = false,
                 positiveButtonText = R.string.buttonContinue,
                 onPositiveButtonClicked = {
-                    trackNewMessageEvent("sendWithoutSubjectConfirm")
+                    trackNewMessageEvent(MatomoName.SendWithoutSubjectConfirm)
                     sendEmail()
                 },
                 onCancel = { if (scheduled) newMessageViewModel.resetScheduledDate() },
@@ -817,9 +817,9 @@ class NewMessageFragment : Fragment() {
     private fun checkMailboxStorage(): Boolean {
         val isMailboxFull = newMessageViewModel.currentMailbox.quotas?.isFull == true
         if (isMailboxFull) {
-            trackNewMessageEvent("trySendingWithMailboxFull")
+            trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
-                openMyKSuiteUpgradeBottomSheet("notEnoughStorageUpgrade")
+                openMyKSuiteUpgradeBottomSheet(MatomoMyKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME)
             }
         }
 

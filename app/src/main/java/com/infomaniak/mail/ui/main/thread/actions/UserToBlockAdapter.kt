@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBlockUserAction
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
@@ -45,7 +45,7 @@ class UserToBlockAdapter(
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
         contactDetails.setCorrespondent(messagesToRecipients[position].second)
         root.setOnClickListener {
-            context.trackBlockUserAction("selectUser")
+            trackBlockUserAction(MatomoName.SelectUser)
             onClickListener(messagesToRecipients[position].first)
         }
     }

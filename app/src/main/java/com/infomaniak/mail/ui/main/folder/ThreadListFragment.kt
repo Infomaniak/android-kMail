@@ -56,6 +56,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteEvent
@@ -340,26 +341,26 @@ class ThreadListFragment : TwoPaneFragment() {
 
                 override var onFlushClicked: ((dialogTitle: String) -> Unit)? = { dialogTitle ->
                     val trackerName = when {
-                        isCurrentFolderRole(FolderRole.TRASH) -> "emptyTrash"
-                        isCurrentFolderRole(FolderRole.DRAFT) -> "emptyDraft"
-                        isCurrentFolderRole(FolderRole.SPAM) -> "emptySpam"
+                        isCurrentFolderRole(FolderRole.TRASH) -> MatomoName.EmptyTrash
+                        isCurrentFolderRole(FolderRole.DRAFT) -> MatomoName.EmptyDraft
+                        isCurrentFolderRole(FolderRole.SPAM) -> MatomoName.EmptySpam
                         else -> null
                     }
 
-                    trackerName?.let { trackThreadListEvent(it) }
+                    trackerName?.let(::trackThreadListEvent)
 
                     descriptionDialog.show(
                         title = dialogTitle,
                         description = getString(R.string.threadListEmptyFolderAlertDescription),
                         onPositiveButtonClicked = {
-                            trackThreadListEvent("${trackerName}Confirm")
+                            trackerName?.let { trackThreadListEvent("${it.value}Confirm") }
                             mainViewModel.flushFolder()
                         },
                     )
                 }
 
                 override var onLoadMoreClicked: () -> Unit = {
-                    trackThreadListEvent("loadMore")
+                    trackThreadListEvent(MatomoName.LoadMore)
                     mainViewModel.getOnePageOfOldMessages()
                 }
 
@@ -416,12 +417,12 @@ class ThreadListFragment : TwoPaneFragment() {
     private fun setupListeners() = with(binding) {
 
         toolbar.setNavigationOnClickListener {
-            trackMenuDrawerEvent("openByButton")
+            trackMenuDrawerEvent(MatomoName.OpenByButton)
             (requireActivity() as MainActivity).openDrawerLayout()
         }
 
         cancel.setOnClickListener {
-            context.trackMultiSelectionEvent("cancel")
+            trackMultiSelectionEvent(MatomoName.Cancel)
             mainViewModel.isMultiSelectOn = false
         }
         selectAll.setOnClickListener {
@@ -442,7 +443,7 @@ class ThreadListFragment : TwoPaneFragment() {
         userAvatar.setOnClickListener { safeNavigate(resId = R.id.accountBottomSheetDialog) }
 
         newMessageFab.setOnClickListener {
-            trackNewMessageEvent("openFromFab")
+            trackNewMessageEvent(MatomoName.OpenFromFab)
             safeNavigateToNewMessageActivity()
         }
 
@@ -515,7 +516,7 @@ class ThreadListFragment : TwoPaneFragment() {
     private fun setupUnreadCountChip() = with(binding) {
         unreadCountChip.apply {
             setOnClickListener {
-                trackThreadListEvent("unreadFilter")
+                trackThreadListEvent(MatomoName.UnreadFilter)
                 isCloseIconVisible = isChecked
                 mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
             }
@@ -528,7 +529,7 @@ class ThreadListFragment : TwoPaneFragment() {
                 storageLevel = storageBannerStatus
                 setupListener(
                     onCloseButtonClicked = {
-                        trackMyKSuiteEvent("closeStorageWarningBanner")
+                        trackMyKSuiteEvent(MatomoName.CloseStorageWarningBanner.value)
                         binding.myKSuiteStorageBanner.isGone = true
                         resetStorageBannerAppLaunches()
                     }

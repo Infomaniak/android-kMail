@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
@@ -89,7 +90,7 @@ class NewAccountFragment : Fragment() {
 
         createNewAddressButton.setOnClickListener {
             createNewAddressButton.isEnabled = false
-            requireContext().trackAccountEvent("openCreationWebview")
+            trackAccountEvent(MatomoName.OpenCreationWebview)
             loginActivity.infomaniakLogin.startCreateAccountWebView(
                 resultLauncher = createAccountResultLauncher,
                 createAccountUrl = BuildConfig.CREATE_ACCOUNT_URL,

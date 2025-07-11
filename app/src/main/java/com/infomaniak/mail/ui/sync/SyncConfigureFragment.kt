@@ -29,9 +29,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.extensions.goToPlayStore
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSyncConfigureBinding
@@ -71,16 +72,16 @@ class SyncConfigureFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         installButton.setOnClickListener {
-            trackSyncAutoConfigEvent("openPlayStore")
+            trackSyncAutoConfigEvent(MatomoName.OpenPlayStore)
             context.goToPlayStore(SyncAutoConfigViewModel.SYNC_PACKAGE)
         }
 
         startButton.setOnClickListener {
             if (requireContext().isUserAlreadySynchronized()) {
-                trackSyncAutoConfigEvent("alreadySynchronized", TrackerAction.DATA)
+                trackSyncAutoConfigEvent(MatomoName.AlreadySynchronized, TrackerAction.DATA)
                 goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_ALREADY_SYNC)
             } else {
-                trackSyncAutoConfigEvent("openSyncApp")
+                trackSyncAutoConfigEvent(MatomoName.OpenSyncApp)
                 syncAutoConfigViewModel.configureUserAutoSync { intent ->
                     startActivity(intent)
                     goBackToThreadList(MainActivity.SYNC_AUTO_CONFIG_SUCCESS)

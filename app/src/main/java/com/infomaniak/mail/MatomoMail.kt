@@ -18,78 +18,348 @@
 package com.infomaniak.mail
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
+import com.infomaniak.core.matomo.Matomo
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
-import com.infomaniak.lib.core.MatomoCore
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import org.matomo.sdk.Tracker
 
-object MatomoMail : MatomoCore {
+object MatomoMail : Matomo {
 
-    override val Context.tracker: Tracker get() = (this as MainApplication).matomoTracker
+    override val tracker: Tracker by lazy(::buildTracker)
     override val siteId = 9
 
-    //region Tracker category
-    private const val THREAD_ACTION_CATEGORY = "threadActions"
-    private const val THREAD_BOTTOM_SHEET_ACTION_CATEGORY = "bottomSheetThreadActions"
-    //endregion
-
-    //region Tracker name
-    const val OPEN_ACTION_BOTTOM_SHEET = "openBottomSheet"
-    const val OPEN_FROM_DRAFT_NAME = "openFromDraft"
-    const val OPEN_LOCAL_DRAFT = "openLocalDraft"
-    const val ACTION_OPEN_NAME = "open"
-    const val ACTION_REPLY_NAME = "reply"
-    const val ACTION_REPLY_ALL_NAME = "replyAll"
-    const val ACTION_FORWARD_NAME = "forward"
-    const val ACTION_DELETE_NAME = "delete"
-    const val ACTION_ARCHIVE_NAME = "archive"
-    const val ACTION_MARK_AS_SEEN_NAME = "markAsSeen"
-    const val ACTION_MOVE_NAME = "move"
-    const val ACTION_FAVORITE_NAME = "favorite"
-    const val ACTION_SPAM_NAME = "spam"
-    const val ACTION_PRINT_NAME = "print"
-    const val ACTION_SHARE_LINK_NAME = "shareLink"
-    const val ACTION_SAVE_TO_KDRIVE_NAME = "saveInkDrive"
-    const val ACTION_SNOOZE_NAME = "snooze"
-    const val ACTION_MODIFY_SNOOZE_NAME = "modifySnooze"
-    const val ACTION_CANCEL_SNOOZE_NAME = "cancelSnooze"
-    const val ADD_MAILBOX_NAME = "addMailbox"
-    const val DISCOVER_LATER = "discoverLater"
-    const val DISCOVER_NOW = "discoverNow"
-    const val SEARCH_FOLDER_FILTER_NAME = "folderFilter"
-    const val SEARCH_DELETE_NAME = "deleteSearch"
-    const val SEARCH_VALIDATE_NAME = "validateSearch"
-    const val SWITCH_MAILBOX_NAME = "switchMailbox"
-    const val LAST_SELECTED_SCHEDULE = "lastSelectedSchedule"
-    const val CUSTOM_SCHEDULE = "customSchedule"
-    const val CUSTOM_SCHEDULE_CONFIRM = "customScheduleConfirm"
-    const val SCHEDULED_CUSTOM_DATE = "scheduledCustomDate"
-    const val SNOOZE_CUSTOM_DATE = "snoozeCustomDate"
-    //endregion
-
-    @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build
-    fun Context.trackDestination(navDestination: NavDestination) = with(navDestination) {
-        trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
+    enum class MatomoCategory(val value: String) {
+        Account("account"),
+        AiWriter("aiWriter"),
+        AppUpdate("appUpdate"),
+        AttachmentActions("attachmentActions"),
+        BlockUserAction("blockUserAction"),
+        BottomSheetMessageActions("bottomSheetMessageActions"),
+        BottomSheetThreadActions("bottomSheetThreadActions"),
+        CalendarEvent("calendarEvent"),
+        ContactActions("contactActions"),
+        CreateFolder("createFolder"),
+        EasterEgg("easterEgg"),
+        EditorActions("editorActions"),
+        Externals("externals"),
+        HomeScreenShortcuts("homeScreenShortcuts"),
+        InAppReview("inAppReview"),
+        InAppUpdate("inAppUpdate"),
+        InvalidPasswordMailbox("invalidPasswordMailbox"),
+        ManageFolder("manageFolder"),
+        MenuDrawer("menuDrawer"),
+        Message("message"),
+        MessageActions("messageActions"),
+        MoveSearch("moveSearch"),
+        MultiSelection("multiSelection"),
+        NewMessage("newMessage"),
+        NoValidMailboxes("noValidMailboxes"),
+        NotificationActions("notificationActions"),
+        Onboarding("onboarding"),
+        ReplyBottomSheet("replyBottomSheet"),
+        RestoreEmailsBottomSheet("restoreEmailsBottomSheet"),
+        ScheduleSend("scheduleSend"),
+        Search("search"),
+        SettingsAccentColor("settingsAccentColor"),
+        SettingsAutoAdvance("settingsAutoAdvance"),
+        SettingsCancelPeriod("settingsCancelPeriod"),
+        SettingsDataManagement("settingsDataManagement"),
+        SettingsDensity("settingsDensity"),
+        SettingsDisplayExternalContent("settingsDisplayExternalContent"),
+        SettingsForwardMode("settingsForwardMode"),
+        SettingsGeneral("settingsGeneral"),
+        SettingsNotifications("settingsNotifications"),
+        SettingsSend("settingsSend"),
+        SettingsSwipeActions("settingsSwipeActions"),
+        SettingsTheme("settingsTheme"),
+        SettingsThreadMode("settingsThreadMode"),
+        Snackbar("snackbar"),
+        Snooze("snooze"),
+        SwipeActions("swipeActions"),
+        SyncAutoConfig("syncAutoConfig"),
+        ThreadActions("threadActions"),
+        ThreadList("threadList"),
+        UserInfo("userInfo"),
     }
 
-    fun Context.trackSendingDraftEvent(
+    enum class MatomoName(val value: String) {
+        Acknowledgement("acknowledgement"),
+        Add("add"),
+        AddLink("addLink"),
+        AddLinkConfirm("addLinkConfirm"),
+        AddMailbox("addMailbox"),
+        AddMailboxConfirm("addMailboxConfirm"),
+        AddNewRecipient("addNewRecipient"),
+        AddToContacts("addToContacts"),
+        AdvancedActions("advancedActions"),
+        AiWriter("aiWriter"),
+        All("all"),
+        AlreadySynchronized("alreadySynchronized"),
+        Always("always"),
+        Archive("archive"),
+        ArchiveClicked("archiveClicked"),
+        ArchiveExecuted("archiveExecuted"),
+        ArchiveFolder("archiveFolder"),
+        ArchiveSwipe("archiveSwipe"),
+        AskMe("askMe"),
+        Attachment("attachment"),
+        AttachmentFilter("attachmentFilter"),
+        Attendees("attendees"),
+        BannerInfo("bannerInfo"),
+        BannerManuallyClosed("bannerManuallyClosed"),
+        BlockUser("blockUser"),
+        Bold("bold"),
+        Cancel("cancel"),
+        CancelClicked("cancelClicked"),
+        CancelSnooze("cancelSnooze"),
+        CloseByGesture("closeByGesture"),
+        CloseStorageWarningBanner("closeStorageWarningBanner"),
+        CollapseFolder("collapseFolder"),
+        ColorFolder("colorFolder"),
+        CommercialFolder("commercialFolder"),
+        Confetti("confetti"),
+        ConfigureInstall("configureInstall"),
+        ConfigureReady("configureReady"),
+        Confirm("confirm"),
+        ConfirmSelectedUser("confirmSelectedUser"),
+        Conversation("conversation"),
+        ConvertToDropbox("convertToDropbox"),
+        CopyEmailAddress("copyEmailAddress"),
+        CustomFolder("customFolder"),
+        CustomFolders("customFolders"),
+        CustomSchedule("customSchedule"),
+        CustomScheduleConfirm("customScheduleConfirm"),
+        DailyLimitReachedUpgrade("dailyLimitReachedUpgrade"),
+        Delete("delete"),
+        DeleteClicked("deleteClicked"),
+        DeleteConfirm("deleteConfirm"),
+        DeleteDraft("deleteDraft"),
+        DeleteExecuted("deleteExecuted"),
+        DeleteFromHistory("deleteFromHistory"),
+        DeleteQuote("deleteQuote"),
+        DeleteRecipient("deleteRecipient"),
+        DeleteSearch("deleteSearch"),
+        DeleteSignature("deleteSignature"),
+        DeleteSwipe("deleteSwipe"),
+        DetachMailbox("detachMailbox"),
+        DetachMailboxConfirm("detachMailboxConfirm"),
+        DiscoverLater("discoverLater"),
+        DiscoverNow("discoverNow"),
+        Dislike("dislike"),
+        DismissError("dismissError"),
+        DismissPromptWithoutGenerating("dismissPromptWithoutGenerating"),
+        DismissProposition("dismissProposition"),
+        Download("download"),
+        DownloadAll("downloadAll"),
+        DraftFolder("draftFolder"),
+        Edit("edit"),
+        EmailSentExternalQuantity("emailSentExternalQuantity"),
+        EmailSentWithExternals("emailSentWithExternals"),
+        EmptyDraft("emptyDraft"),
+        EmptySignature("emptySignature"),
+        EmptySpam("emptySpam"),
+        EmptyTrash("emptyTrash"),
+        Enable("enable"),
+        ExecuteSearch("executeSearch"),
+        Expand("expand"),
+        Favorite("favorite"),
+        FavoriteFilter("favoriteFilter"),
+        FavoriteSwipe("favoriteSwipe"),
+        Feedback("feedback"),
+        FifteenSecond("15s"),
+        FolderFilter("folderFilter"),
+        FollowingThread("followingThread"),
+        Forward("forward"),
+        FriendlyWriting("friendlyWriting"),
+        FromHistory("fromHistory"),
+        FromMenuDrawer("fromMenuDrawer"),
+        FromMove("fromMove"),
+        Generate("generate"),
+        Halloween("halloween"),
+        Help("help"),
+        ImportEmails("importEmails"),
+        ImportFile("importFile"),
+        ImportFromCamera("importFromCamera"),
+        InboxFolder("inboxFolder"),
+        IncludeOriginalInReply("includeOriginalInReply"),
+        Inline("inline"),
+        InsertProposition("insertProposition"),
+        InstallUpdate("installUpdate"),
+        Italic("italic"),
+        KeepSubject("keepSubject"),
+        LastSelectedSchedule("lastSelectedSchedule"),
+        LaterThisMorning("laterThisMorning"),
+        Like("like"),
+        ListOfThread("listOfThread"),
+        LoadMore("loadMore"),
+        Lock("lock"),
+        LogOut("logOut"),
+        LogOutConfirm("logOutConfirm"),
+        LoggedIn("loggedIn"),
+        Mailboxes("mailboxes"),
+        MarkAsSeen("markAsSeen"),
+        Message("message"),
+        ModifySnooze("modifySnooze"),
+        Move("move"),
+        MoveSwipe("moveSwipe"),
+        MultipleMessagesInThread("multipleMessagesInThread"),
+        NaturalThread("naturalThread"),
+        NbMailboxes("nbMailboxes"),
+        NbMessagesInThread("nbMessagesInThread"),
+        NextMonday("nextMonday"),
+        NextMondayAfternoon("nextMondayAfternoon"),
+        NextMondayMorning("nextMondayMorning"),
+        None("none"),
+        NoneSwipe("noneSwipe"),
+        NumberOfBcc("numberOfBcc"),
+        NumberOfCc("numberOfCc"),
+        NumberOfTo("numberOfTo"),
+        OneMessagesInThread("oneMessagesInThread"),
+        Open("open"),
+        OpenBottomSheet("openBottomSheet"),
+        OpenByButton("openByButton"),
+        OpenByGesture("openByGesture"),
+        OpenCreationWebview("openCreationWebview"),
+        OpenDashboard("openDashboard"),
+        OpenDetails("openDetails"),
+        OpenFromBottomsheet("openFromBottomsheet"),
+        OpenFromDraft("openFromDraft"),
+        OpenFromFab("openFromFab"),
+        OpenFromMenuDrawer("openFromMenuDrawer"),
+        OpenFromSettings("openFromSettings"),
+        OpenInMyCalendar("openInMyCalendar"),
+        OpenLocalDraft("openLocalDraft"),
+        OpenLoginWebview("openLoginWebview"),
+        OpenMessage("openMessage"),
+        OpenNotificationSettings("openNotificationSettings"),
+        OpenPlayStore("openPlayStore"),
+        OpenRecipientsFields("openRecipientsFields"),
+        OpenSwissTransfer("openSwissTransfer"),
+        OpenSyncApp("openSyncApp"),
+        Postpone("postpone"),
+        PostponeSwipe("postponeSwipe"),
+        PresentAlert("presentAlert"),
+        PreviousThread("previousThread"),
+        Print("print"),
+        PrintCancelled("printCancelled"),
+        PrintValidated("printValidated"),
+        QuickActions("quickActions"),
+        QuickActionsSwipe("quickActionsSwipe"),
+        ReadFAQ("readFAQ"),
+        ReadFilter("readFilter"),
+        Refine("refine"),
+        Regenerate("regenerate"),
+        Rename("rename"),
+        RenameConfirm("renameConfirm"),
+        ReplaceProposition("replaceProposition"),
+        ReplacePropositionConfirm("replacePropositionConfirm"),
+        ReplacePropositionDialog("replacePropositionDialog"),
+        ReplaceSubjectConfirm("replaceSubjectConfirm"),
+        ReplaceSubjectDialog("replaceSubjectDialog"),
+        Reply("reply"),
+        ReplyAll("replyAll"),
+        ReplyMaybe("replyMaybe"),
+        ReplyNo("replyNo"),
+        ReplyYes("replyYes"),
+        RequestPassword("requestPassword"),
+        Restore("restore"),
+        RestoreEmails("restoreEmails"),
+        Retry("retry"),
+        SaveDraft("saveDraft"),
+        SaveInkDrive("saveInkDrive"),
+        SaveToKDrive("saveToKDrive"),
+        ScheduleDraft("scheduleDraft"),
+        ScheduledCustomDate("scheduledCustomDate"),
+        ScheduledDraftsFolder("scheduledDraftsFolder"),
+        SeeAllAttendees("seeAllAttendees"),
+        SelectAvatar("selectAvatar"),
+        SelectContact("selectContact"),
+        SelectDate("selectDate"),
+        SelectRecipient("selectRecipient"),
+        SelectUser("selectUser"),
+        SendMail("sendMail"),
+        SendReaction("sendReaction"),
+        SendWithoutSubject("sendWithoutSubject"),
+        SendWithoutSubjectConfirm("sendWithoutSubjectConfirm"),
+        SentFolder("sentFolder"),
+        SeriousWriting("seriousWriting"),
+        ShareEmail("shareEmail"),
+        ShareLink("shareLink"),
+        Shorten("shorten"),
+        ShowSourceCode("showSourceCode"),
+        SignalPhishing("signalPhishing "),
+        Snooze("snooze"),
+        SnoozeCustomDate("snoozeCustomDate"),
+        SnoozedFolder("snoozedFolder"),
+        SocialNetworksFolder("socialNetworksFolder"),
+        Spam("spam"),
+        SpamFolder("spamFolder"),
+        SpamSwipe("spamSwipe"),
+        StrikeThrough("strikeThrough"),
+        Switch("switch"),
+        SwitchAccount("switchAccount"),
+        SwitchColor("switchColor"),
+        SwitchIdentity("switchIdentity"),
+        SwitchMailbox("switchMailbox"),
+        TenSecond("10s"),
+        ThirtySecond("30s"),
+        ThisAfternoon("thisAfternoon"),
+        ThisEvening("thisEvening"),
+        ThreadTag("threadTag"),
+        TomorrowMorning("tomorrowMorning"),
+        TrashFolder("trashFolder"),
+        TrySendingWithDailyLimitReached("trySendingWithDailyLimitReached"),
+        TrySendingWithMailboxFull("trySendingWithMailboxFull"),
+        Tutorial("tutorial"),
+        TwentyFiveSecond("25s"),
+        TwentySecond("20s"),
+        Underline("underline"),
+        Undo("undo"),
+        UnorderedList("unorderedList"),
+        UnreadFilter("unreadFilter"),
+        UpdatePassword("updatePassword"),
+        ValidateSearch("validateSearch"),
+        WriteEmail("writeEmail"),
+        Xmas("xmas"),
+        ZeroSecond("0s"),
+    }
+
+    //region Track global events
+    fun trackEvent(
+        category: MatomoCategory,
+        name: MatomoName,
+        action: TrackerAction = TrackerAction.CLICK,
+        value: Float? = null,
+    ) {
+        trackEvent(category.value, name.value, action, value)
+    }
+    //endregion
+
+    //region Track specific events
+    fun trackAccountEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.Account, name)
+    }
+
+    fun trackSendingDraftEvent(
         action: DraftAction,
         to: List<Recipient>,
         cc: List<Recipient>,
         bcc: List<Recipient>,
         externalMailFlagEnabled: Boolean,
     ) {
-        trackNewMessageEvent(action.matomoValue)
+        trackNewMessageEvent(action.matomoName)
         if (action == DraftAction.SEND) {
-            val trackerData = listOf("numberOfTo" to to, "numberOfCc" to cc, "numberOfBcc" to bcc)
+            val trackerData = listOf(
+                MatomoName.NumberOfTo to to,
+                MatomoName.NumberOfCc to cc,
+                MatomoName.NumberOfBcc to bcc
+            )
             trackerData.forEach { (eventName, recipients) ->
                 trackNewMessageEvent(eventName, TrackerAction.DATA, recipients.size.toFloat())
             }
@@ -102,215 +372,195 @@ object MatomoMail : MatomoCore {
                     }
                 }
 
-                trackExternalEvent("emailSentWithExternals", TrackerAction.DATA, externalRecipientCount > 0)
-                trackExternalEvent("emailSentExternalQuantity", TrackerAction.DATA, externalRecipientCount.toFloat())
+                trackExternalEvent(MatomoName.EmailSentWithExternals, TrackerAction.DATA, (externalRecipientCount > 0).toFloat())
+                trackExternalEvent(MatomoName.EmailSentExternalQuantity, TrackerAction.DATA, externalRecipientCount.toFloat())
             }
         }
     }
 
-    fun Fragment.trackContactActionsEvent(name: String) {
-        trackEvent("contactActions", name)
+    fun trackContactActionsEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.ContactActions, name)
     }
 
-    fun Fragment.trackAttachmentActionsEvent(name: String) {
-        trackEvent("attachmentActions", name)
+    fun trackAttachmentActionsEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.AttachmentActions, name)
     }
 
-    fun Fragment.trackBottomSheetMessageActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = "bottomSheetMessageActions", name = name, value = value?.toMailActionValue())
+    fun trackBottomSheetMessageActionsEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(MatomoCategory.BottomSheetMessageActions, name, value = value?.toMailActionValue())
     }
 
-    fun Fragment.trackBottomSheetThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = THREAD_BOTTOM_SHEET_ACTION_CATEGORY, name = name, value = value?.toMailActionValue())
+    fun trackBottomSheetThreadActionsEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(MatomoCategory.BottomSheetThreadActions, name, value = value?.toMailActionValue())
     }
 
-    private fun Fragment.trackBottomSheetMultiSelectThreadActionsEvent(name: String, value: Int) {
-        trackEvent(category = THREAD_BOTTOM_SHEET_ACTION_CATEGORY, name = name, value = value.toFloat())
+    private fun trackBottomSheetMultiSelectThreadActionsEvent(name: MatomoName, value: Int) {
+        val trackerName = "${if (value == 1) "bulkSingle" else "bulk"}${name.value.capitalizeFirstChar()}"
+        trackEvent(MatomoCategory.BottomSheetThreadActions.value, trackerName, value = value.toFloat())
     }
 
-    fun Fragment.trackThreadActionsEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = THREAD_ACTION_CATEGORY, name = name, value = value?.toMailActionValue())
+    fun trackThreadActionsEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(MatomoCategory.ThreadActions, name, value = value?.toMailActionValue())
     }
 
-    private fun Fragment.trackMultiSelectThreadActionsEvent(name: String, value: Int) {
-        trackEvent(category = THREAD_ACTION_CATEGORY, name = name, value = value.toFloat())
+    private fun trackMultiSelectThreadActionsEvent(name: MatomoName, value: Int) {
+        val trackerName = "${if (value == 1) "bulkSingle" else "bulk"}${name.value.capitalizeFirstChar()}"
+        trackEvent(MatomoCategory.ThreadActions.value, trackerName, value = value.toFloat())
     }
 
-    fun Fragment.trackMessageActionsEvent(name: String) {
-        trackEvent("messageActions", name)
+    fun trackMessageActionsEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.MessageActions, name)
     }
 
-    fun Fragment.trackBlockUserAction(name: String) {
-        requireContext().trackBlockUserAction(name)
+    fun trackBlockUserAction(name: MatomoName) {
+        trackEvent(MatomoCategory.BlockUserAction, name)
     }
 
-    fun Context.trackBlockUserAction(name: String) {
-        trackEvent("blockUserAction", name)
+    fun trackMoveSearchEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.MoveSearch, name)
     }
 
-    fun Fragment.trackSearchEvent(name: String, value: Boolean? = null) {
-        context?.trackSearchEvent(name, value)
+    fun trackMessageEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(MatomoCategory.Message, name, value = value?.toFloat())
     }
 
-    fun Fragment.trackMoveSearchEvent(name: String) {
-        trackEvent("moveSearch", name)
+    fun trackSearchEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(MatomoCategory.Search, name, value = value?.toFloat())
     }
 
-    fun Context.trackMessageEvent(name: String, value: Boolean? = null) {
-        trackEvent("message", name, value = value?.toFloat())
+    fun trackNotificationActionEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.NotificationActions, name)
     }
 
-    fun Context.trackSearchEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = "search", name = name, value = value?.toFloat())
+    fun trackNewMessageEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.NewMessage, name, action, value)
     }
 
-    fun Context.trackNotificationActionEvent(name: String) {
-        trackEvent(category = "notificationActions", name = name)
+    fun trackMenuDrawerEvent(name: MatomoName, value: Boolean? = null) {
+        trackMenuDrawerEvent(name, value = value?.toFloat())
     }
 
-    fun Fragment.trackNewMessageEvent(name: String) {
-        context?.trackNewMessageEvent(name)
+    fun trackMenuDrawerEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.MenuDrawer, name, action, value)
     }
 
-    fun Context.trackNewMessageEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
-        trackEvent("newMessage", name, action, value)
+    fun trackCreateFolderEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.CreateFolder, name)
     }
 
-    fun Fragment.trackMenuDrawerEvent(name: String, value: Boolean? = null) {
-        context?.trackMenuDrawerEvent(name, value = value?.toFloat())
+    fun trackRenameFolderEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.ManageFolder, name)
     }
 
-    fun Context.trackMenuDrawerEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
-        trackEvent("menuDrawer", name, action, value)
+    fun trackMultiSelectionEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent(MatomoCategory.MultiSelection, name, action)
     }
 
-    fun Fragment.trackCreateFolderEvent(name: String) {
-        context?.trackCreateFolderEvent(name)
-    }
-
-    fun Context.trackCreateFolderEvent(name: String) {
-        trackEvent("createFolder", name)
-    }
-
-    fun Context.trackRenameFolderEvent(name: String) {
-        trackEvent("manageFolder", name)
-    }
-
-    fun Context.trackMultiSelectionEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("multiSelection", name, action)
-    }
-
-    fun Fragment.trackMultiSelectActionEvent(name: String, value: Int, isFromBottomSheet: Boolean = false) {
-        val trackerName = "${if (value == 1) "bulkSingle" else "bulk"}${name.capitalizeFirstChar()}"
-
+    fun trackMultiSelectActionEvent(name: MatomoName, value: Int, isFromBottomSheet: Boolean = false) {
         if (isFromBottomSheet) {
-            trackBottomSheetMultiSelectThreadActionsEvent(trackerName, value)
+            trackBottomSheetMultiSelectThreadActionsEvent(name, value)
         } else {
-            trackMultiSelectThreadActionsEvent(trackerName, value)
+            trackMultiSelectThreadActionsEvent(name, value)
         }
     }
 
-    fun Context.trackUserInfo(name: String, value: Int? = null) {
-        trackEvent("userInfo", name, TrackerAction.DATA, value?.toFloat())
+    fun trackUserInfo(name: MatomoName, value: Int? = null) {
+        trackEvent(MatomoCategory.UserInfo, name, TrackerAction.DATA, value?.toFloat())
     }
 
-    fun Fragment.trackOnBoardingEvent(name: String) {
-        trackEvent("onboarding", name)
+    fun trackOnBoardingEvent(name: String) {
+        trackEvent(MatomoCategory.Onboarding.value, name)
     }
 
-    fun Fragment.trackThreadListEvent(name: String) {
-        trackEvent("threadList", name)
+    fun trackThreadListEvent(name: MatomoName) {
+        trackThreadListEvent(name.value)
     }
 
-    fun Fragment.trackRestoreMailsEvent(name: String, action: TrackerAction) {
-        trackEvent("restoreEmailsBottomSheet", name, action)
+    fun trackThreadListEvent(name: String) {
+        trackEvent(MatomoCategory.ThreadList.value, name)
     }
 
-    fun Fragment.trackNoValidMailboxesEvent(name: String) {
-        trackEvent("noValidMailboxes", name)
+    fun trackRestoreMailsEvent(name: MatomoName, action: TrackerAction) {
+        trackEvent(MatomoCategory.RestoreEmailsBottomSheet, name, action)
     }
 
-    fun Fragment.trackInvalidPasswordMailboxEvent(name: String) {
-        trackEvent("invalidPasswordMailbox", name)
+    fun trackNoValidMailboxesEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.NoValidMailboxes, name)
     }
 
-    fun Context.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
-        trackEvent("externals", name, action, value)
+    fun trackInvalidPasswordMailboxEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.InvalidPasswordMailbox, name)
     }
 
-    fun Context.trackExternalEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Boolean) {
-        trackEvent("externals", name, action, value.toFloat())
+    fun trackExternalEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent(MatomoCategory.Externals, name, action, value)
     }
 
-    fun Fragment.trackAiWriterEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        context?.trackAiWriterEvent(name, action)
+    fun trackAiWriterEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent(MatomoCategory.AiWriter, name, action)
     }
 
-    fun Context.trackAiWriterEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("aiWriter", name, action)
+    fun trackSyncAutoConfigEvent(name: MatomoName, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent(MatomoCategory.SyncAutoConfig, name, action)
     }
 
-    fun Fragment.trackSyncAutoConfigEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("syncAutoConfig", name, action)
+    fun trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
+        trackEvent(MatomoCategory.EasterEgg.value, name, action)
     }
 
-    fun Fragment.trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        context?.trackEasterEggEvent(name, action)
+    fun trackAppUpdateEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.AppUpdate, name)
     }
 
-    fun Context.trackEasterEggEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("easterEgg", name, action)
+    fun trackInAppUpdateEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.InAppUpdate, name)
     }
 
-    fun Activity.trackAppReviewEvent(name: String, action: TrackerAction = TrackerAction.CLICK) {
-        trackEvent("appReview", name, action)
+    fun trackInAppReviewEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.InAppReview, name)
     }
 
-    fun Fragment.trackAppUpdateEvent(name: String) {
-        trackEvent("appUpdate", name)
+    fun trackCalendarEventEvent(name: MatomoName, value: Boolean? = null) {
+        trackEvent(MatomoCategory.CalendarEvent, name, value = value?.toFloat())
     }
 
-    fun Context.trackInAppUpdateEvent(name: String) {
-        trackEvent("inAppUpdate", name)
+    fun trackShortcutEvent(name: String) {
+        trackEvent(MatomoCategory.HomeScreenShortcuts.value, name)
     }
 
-    fun Context.trackInAppReviewEvent(name: String) {
-        trackEvent("inAppReview", name)
+    fun trackAutoAdvanceEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.SettingsAutoAdvance, name)
     }
 
-    fun View.trackCalendarEventEvent(name: String, value: Boolean? = null) {
-        context.trackEvent("calendarEvent", name, value = value?.toFloat())
+    fun trackScheduleSendEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.ScheduleSend, name)
     }
 
-    fun Context.trackShortcutEvent(name: String) {
-        trackEvent("homeScreenShortcuts", name)
+    fun trackSnoozeEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.Snooze, name)
     }
 
-    fun Fragment.trackAutoAdvanceEvent(name: String) {
-        trackEvent("settingsAutoAdvance", name)
-    }
-
-    fun Fragment.trackScheduleSendEvent(name: String) {
-        trackEvent("scheduleSend", name)
-    }
-
-    fun Context.trackScheduleSendEvent(name: String) {
-        trackEvent("scheduleSend", name)
-    }
-
-    fun Fragment.trackSnoozeEvent(name: String) {
-        trackEvent("snooze", name)
-    }
-
-    fun Fragment.trackMyKSuiteEvent(name: String) {
+    fun trackMyKSuiteEvent(name: String) {
         trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE, name)
     }
 
-    fun Context.trackMyKSuiteUpgradeBottomSheetEvent(name: String) {
+    fun trackMyKSuiteUpgradeBottomSheetEvent(name: String) {
         trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE_UPGRADE_BOTTOMSHEET, name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
     // conditions are inverted (ex: if the condition is `message.isSpam`, then we want to unspam)
     private fun Boolean.toMailActionValue() = (!this).toFloat()
+    //endregion
+
+    //region Track screens
+    @SuppressLint("RestrictedApi") // This `SuppressLint` is there so the CI can build
+    fun Context.trackDestination(navDestination: NavDestination) = with(navDestination) {
+        trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
+    }
+
+    fun Fragment.trackScreen() {
+        trackScreen(path = this::class.java.name, title = this::class.java.simpleName)
+    }
+    //endregion
 }

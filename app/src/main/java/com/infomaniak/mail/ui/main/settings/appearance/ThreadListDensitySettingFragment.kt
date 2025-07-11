@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -78,7 +79,7 @@ class ThreadListDensitySettingFragment : Fragment() {
             localSettings.threadDensity = listDensity
             listDensityImage.setImageResource(resId)
 
-            trackEvent("settingsDensity", listDensity.toString())
+            trackEvent(MatomoCategory.SettingsDensity.value, listDensity.toString())
         }
     }
 

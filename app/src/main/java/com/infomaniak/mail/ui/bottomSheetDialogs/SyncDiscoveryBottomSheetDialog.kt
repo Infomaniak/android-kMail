@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
@@ -27,7 +28,7 @@ class SyncDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
     override val descriptionRes = R.string.syncCalendarsAndContactsDescription
     override val illustrationRes = R.drawable.illustration_discover_sync
     override val positiveButtonRes = R.string.buttonStart
-    override val trackMatomoWithCategory: (name: String) -> Unit = { trackSyncAutoConfigEvent(it) }
+    override val trackMatomoWithCategory: (name: MatomoName) -> Unit = { trackSyncAutoConfigEvent(it) }
 
     override fun onPositiveButtonClicked() {
         launchSyncAutoConfigActivityForResult()

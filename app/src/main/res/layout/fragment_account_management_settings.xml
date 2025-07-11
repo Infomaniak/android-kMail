@@ -84,10 +84,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginTop="@dimen/marginStandard"
+                android:layout_marginBottom="@dimen/marginStandard"
                 app:icon="@drawable/ic_warning"
                 app:showCloseIcon="false"
-                app:title="@string/deleteAccountWarning"
-                android:layout_marginBottom="@dimen/marginStandard" />
+                app:title="@string/deleteAccountWarning" />
 
         </LinearLayout>
 

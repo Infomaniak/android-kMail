@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -59,7 +60,7 @@ class ExternalContentSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, enum ->
             val externalContent = enum as ExternalContent
-            trackEvent("settingsExternalContent", externalContent.matomoValue)
+            trackEvent(MatomoCategory.SettingsDisplayExternalContent, externalContent.matomoName)
             localSettings.externalContent = externalContent
         }
     }

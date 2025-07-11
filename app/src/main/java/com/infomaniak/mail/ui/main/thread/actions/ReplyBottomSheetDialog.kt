@@ -23,8 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.MatomoMail.ACTION_REPLY_ALL_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_REPLY_NAME
+import com.infomaniak.mail.MatomoMail.MatomoCategory
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -57,7 +57,10 @@ open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
                 shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
             )
 
-            trackEvent("replyBottomSheet", if (id == R.id.actionReply) ACTION_REPLY_NAME else ACTION_REPLY_ALL_NAME)
+            trackEvent(
+                MatomoCategory.ReplyBottomSheet,
+                if (id == R.id.actionReply) MatomoName.Reply else MatomoName.ReplyAll
+            )
         }
     }
 }

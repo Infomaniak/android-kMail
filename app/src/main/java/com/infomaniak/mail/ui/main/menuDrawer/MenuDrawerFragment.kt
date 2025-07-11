@@ -39,7 +39,7 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.MatomoMail.toFloat
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
@@ -166,7 +166,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onMailboxesHeaderClicked() = with(menuDrawerViewModel) {
         val isExpanded = !areMailboxesExpanded.value!!
-        trackMenuDrawerEvent("mailboxes", isExpanded)
+        trackMenuDrawerEvent(MatomoName.Mailboxes, isExpanded)
         areMailboxesExpanded.value = isExpanded
     }
 
@@ -198,12 +198,12 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun onFoldersHeaderClicked(isCollapsed: Boolean) {
-        trackMenuDrawerEvent("customFolders", !isCollapsed)
+        trackMenuDrawerEvent(MatomoName.CustomFolders, !isCollapsed)
         menuDrawerViewModel.areCustomFoldersExpanded.value = !isCollapsed
     }
 
     private fun onCreateFolderClicked() {
-        trackCreateFolderEvent("fromMenuDrawer")
+        trackCreateFolderEvent(MatomoName.FromMenuDrawer)
         createFolderDialog.show()
     }
 
@@ -234,7 +234,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun onActionsHeaderClicked() {
-        context?.trackMenuDrawerEvent("advancedActions", value = (!menuDrawerViewModel.areActionsExpanded.value!!).toFloat())
+        trackMenuDrawerEvent(MatomoName.AdvancedActions, value = !menuDrawerViewModel.areActionsExpanded.value!!)
         menuDrawerViewModel.toggleActionsCollapsingState()
     }
 
@@ -248,19 +248,19 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun onSyncAutoConfigClicked() {
-        trackSyncAutoConfigEvent("openFromMenuDrawer")
+        trackSyncAutoConfigEvent(MatomoName.OpenFromMenuDrawer)
         launchSyncAutoConfigActivityForResult()
         closeDrawer()
     }
 
     private fun onImportMailsClicked() {
-        trackMenuDrawerEvent("importEmails")
+        trackMenuDrawerEvent(MatomoName.ImportEmails)
         context?.openUrl(BuildConfig.IMPORT_EMAILS_URL)
         closeDrawer()
     }
 
     private fun onRestoreMailsClicked() {
-        trackMenuDrawerEvent("restoreEmails")
+        trackMenuDrawerEvent(MatomoName.RestoreEmails)
         safeNavigate(R.id.restoreEmailsBottomSheetDialog, currentClassName = currentClassName)
     }
 
@@ -279,7 +279,7 @@ class MenuDrawerFragment : Fragment() {
                 )
             }.also(::startActivity)
         } else {
-            trackMenuDrawerEvent("feedback")
+            trackMenuDrawerEvent(MatomoName.Feedback)
             context?.openUrl(requireContext().getString(R.string.urlUserReportAndroid))
         }
 
@@ -288,7 +288,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onHelpClicked() {
         ShortcutManagerCompat.reportShortcutUsed(requireContext(), Shortcuts.SUPPORT.id)
-        trackMenuDrawerEvent("help")
+        trackMenuDrawerEvent(MatomoName.Help)
         context?.openUrl(BuildConfig.CHATBOT_URL)
         closeDrawer()
     }
@@ -297,7 +297,7 @@ class MenuDrawerFragment : Fragment() {
         ConfettiUtils.onEasterEggConfettiClicked(
             container = (activity as? MainActivity)?.getConfettiContainer(),
             type = INFOMANIAK,
-            matomoValue = "MenuDrawer",
+            matomoValue = "menuDrawer",
         )
     }
 

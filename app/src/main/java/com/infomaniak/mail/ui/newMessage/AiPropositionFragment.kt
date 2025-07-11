@@ -36,7 +36,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import com.infomaniak.core.matomo.Matomo.TrackerAction
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -77,7 +78,7 @@ class AiPropositionFragment : Fragment() {
 
     private val replacementDialog by lazy {
         createReplaceContentDialog(onPositiveButtonClicked = {
-            trackAiWriterEvent("replacePropositionConfirm")
+            trackAiWriterEvent(MatomoName.ReplacePropositionConfirm)
             choosePropositionAndPopBack()
         })
     }
@@ -128,18 +129,18 @@ class AiPropositionFragment : Fragment() {
             if (navigationArgs.isBodyBlank) {
                 choosePropositionAndPopBack()
             } else {
-                trackAiWriterEvent("replacePropositionDialog")
+                trackAiWriterEvent(MatomoName.ReplacePropositionDialog)
                 replacementDialog.show()
             }
         }
 
         refineButton.setOnClickListener {
-            trackAiWriterEvent("refine")
+            trackAiWriterEvent(MatomoName.Refine)
             refinePopupMenu.show()
         }
 
         retryButton.setOnClickListener {
-            trackAiWriterEvent("retry")
+            trackAiWriterEvent(MatomoName.Retry)
             aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(
                 isOpened = true,
                 shouldResetPrompt = aiViewModel.aiPropositionStatusLiveData.value != PropositionStatus.CONTEXT_TOO_LONG,
@@ -148,7 +149,7 @@ class AiPropositionFragment : Fragment() {
         }
 
         errorBlock.setOnCloseListener {
-            trackAiWriterEvent("dismissError")
+            trackAiWriterEvent(MatomoName.DismissError)
             TransitionManager.beginDelayedTransition(nestedScrollView, ChangeBounds())
             errorBlock.isGone = true
         }
@@ -167,7 +168,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun trackDismissalAndPopBack() {
-        trackAiWriterEvent("dismissProposition")
+        trackAiWriterEvent(MatomoName.DismissProposition)
         findNavController().popBackStack()
     }
 
@@ -184,7 +185,7 @@ class AiPropositionFragment : Fragment() {
         if (subject == null || navigationArgs.isSubjectBlank) {
             applyProposition(subject, content)
         } else {
-            trackAiWriterEvent("replaceSubjectDialog")
+            trackAiWriterEvent(MatomoName.ReplaceSubjectDialog)
             subjectReplacementDialog.show(
                 title = getString(R.string.aiReplaceSubjectTitle),
                 description = getString(R.string.aiReplaceSubjectDescription, subject),
@@ -193,11 +194,11 @@ class AiPropositionFragment : Fragment() {
                 positiveButtonText = R.string.aiReplacementDialogPositiveButton,
                 negativeButtonText = R.string.buttonNo,
                 onPositiveButtonClicked = {
-                    trackAiWriterEvent("replaceSubjectConfirm")
+                    trackAiWriterEvent(MatomoName.ReplaceSubjectConfirm)
                     applyProposition(subject, content)
                 },
                 onNegativeButtonClicked = {
-                    trackAiWriterEvent("keepSubject")
+                    trackAiWriterEvent(MatomoName.KeepSubject)
                     applyProposition(null, content)
                 },
             )
@@ -205,16 +206,15 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun trackInsertionType() {
-        if (navigationArgs.isBodyBlank) {
-            trackAiWriterEvent("insertProposition", TrackerAction.DATA)
-        } else {
-            trackAiWriterEvent("replaceProposition", TrackerAction.DATA)
-        }
+        trackAiWriterEvent(
+            name = if (navigationArgs.isBodyBlank) MatomoName.InsertProposition else MatomoName.ReplaceProposition,
+            action = TrackerAction.DATA,
+        )
     }
 
     private fun onMenuItemClicked(menuItemId: Int) = with(aiViewModel) {
         val shortcut = Shortcut.entries.find { it.menuId == menuItemId }!!
-        trackAiWriterEvent(shortcut.matomoValue)
+        trackAiWriterEvent(shortcut.matomoName)
 
         if (shortcut == Shortcut.MODIFY) {
             aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true, shouldResetPrompt = false)

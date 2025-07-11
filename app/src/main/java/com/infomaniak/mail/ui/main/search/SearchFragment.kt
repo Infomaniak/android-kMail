@@ -42,8 +42,7 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.Sc
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.mail.MatomoMail.SEARCH_DELETE_NAME
-import com.infomaniak.mail.MatomoMail.SEARCH_VALIDATE_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.MatomoMail.trackThreadListEvent
 import com.infomaniak.mail.R
@@ -83,7 +82,7 @@ class SearchFragment : TwoPaneFragment() {
         RecentSearchAdapter(
             searchQueries = localSettings.recentSearches.toMutableList(),
             onSearchQueryClicked = {
-                trackSearchEvent("fromHistory")
+                trackSearchEvent(MatomoName.FromHistory)
                 with(binding.searchBar.searchTextInput) {
                     setText(it)
                     setSelection(it.count())
@@ -91,7 +90,7 @@ class SearchFragment : TwoPaneFragment() {
                 }
             },
             onSearchQueryDeleted = { history ->
-                trackSearchEvent("deleteFromHistory")
+                trackSearchEvent(MatomoName.DeleteFromHistory)
                 val isThereHistory = history.isNotEmpty()
                 localSettings.recentSearches = history
                 updateHistoryEmptyStateVisibility(isThereHistory)
@@ -185,7 +184,7 @@ class SearchFragment : TwoPaneFragment() {
                 override var onFlushClicked: ((String) -> Unit)? = null
 
                 override var onLoadMoreClicked: () -> Unit = {
-                    trackThreadListEvent("loadMore")
+                    trackThreadListEvent(MatomoName.LoadMore)
                     mainViewModel.getOnePageOfOldMessages()
                 }
 
@@ -253,7 +252,7 @@ class SearchFragment : TwoPaneFragment() {
     private fun onFolderSelected(folder: Folder?, title: String) {
         updateFolderDropDownUi(folder, title)
         searchViewModel.selectFolder(folder)
-        trackSearchEvent(ThreadFilter.FOLDER.matomoValue, folder != null)
+        trackSearchEvent(ThreadFilter.FOLDER.matomoName, folder != null)
     }
 
     private fun updateFolderDropDownUi(folder: Folder?, title: String) = with(binding) {
@@ -287,7 +286,7 @@ class SearchFragment : TwoPaneFragment() {
     }
 
     private fun setSearchBarUi() = with(binding.searchBar) {
-        searchInputLayout.setOnClearTextClickListener { trackSearchEvent(SEARCH_DELETE_NAME) }
+        searchInputLayout.setOnClearTextClickListener { trackSearchEvent(MatomoName.DeleteSearch) }
 
         searchTextInput.apply {
             showKeyboard()
@@ -299,7 +298,7 @@ class SearchFragment : TwoPaneFragment() {
 
             handleEditorSearchAction { query ->
                 searchViewModel.searchQuery(query, saveInHistory = true)
-                context.trackSearchEvent(SEARCH_VALIDATE_NAME)
+                trackSearchEvent(MatomoName.ValidateSearch)
             }
         }
     }

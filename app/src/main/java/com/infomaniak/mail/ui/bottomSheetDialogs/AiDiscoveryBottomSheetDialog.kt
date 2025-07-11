@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager.LayoutParams
 import androidx.fragment.app.activityViewModels
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
@@ -34,7 +35,7 @@ class AiDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
     override val descriptionRes = R.string.aiDiscoveryDescription
     override val illustrationRes = R.drawable.illustration_discover_ai
     override val positiveButtonRes = R.string.buttonTry
-    override val trackMatomoWithCategory: (name: String) -> Unit = { trackAiWriterEvent(it) }
+    override val trackMatomoWithCategory: (name: MatomoName) -> Unit = { trackAiWriterEvent(it) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -34,9 +34,9 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.cancellable
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.lib.core.utils.getFileNameAndSize
@@ -44,7 +44,7 @@ import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.lib.core.utils.parcelableArrayListExtra
 import com.infomaniak.lib.core.utils.parcelableExtra
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.mail.MatomoMail.OPEN_LOCAL_DRAFT
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackSendingDraftEvent
@@ -526,12 +526,12 @@ class NewMessageViewModel @Inject constructor(
 
         @Suppress("UNUSED_PARAMETER")
         fun trackOpenLocal(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
-            appContext.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 1.0f)
+            trackNewMessageEvent(MatomoName.OpenLocalDraft, TrackerAction.DATA, value = 1.0f)
         }
 
         @Suppress("UNUSED_PARAMETER")
         fun trackOpenRemote(draft: Draft) { // Unused but required to use references inside the `also` block, used for readability
-            appContext.trackNewMessageEvent(OPEN_LOCAL_DRAFT, TrackerAction.DATA, value = 0.0f)
+            trackNewMessageEvent(MatomoName.OpenLocalDraft, TrackerAction.DATA, value = 0.0f)
         }
 
         return getLatestLocalDraft(localUuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
@@ -815,8 +815,8 @@ class NewMessageViewModel @Inject constructor(
 
         recipientsLiveData.removeRecipientThenSetValue(recipient)
 
-        appContext.trackNewMessageEvent("deleteRecipient")
-        if (recipient.isDisplayedAsExternal) appContext.trackExternalEvent("deleteRecipient")
+        trackNewMessageEvent(MatomoName.DeleteRecipient)
+        if (recipient.isDisplayedAsExternal) trackExternalEvent(MatomoName.DeleteRecipient)
     }
 
     fun deleteAttachment(position: Int) = viewModelScope.launch(ioCoroutineContext) {
@@ -958,7 +958,7 @@ class NewMessageViewModel @Inject constructor(
         showDraftToastToUser(action, isFinishing, isTaskRoot)
         startWorkerCallback()
 
-        appContext.trackSendingDraftEvent(
+        trackSendingDraftEvent(
             action = action,
             to = toLiveData.valueOrEmpty(),
             cc = ccLiveData.valueOrEmpty(),

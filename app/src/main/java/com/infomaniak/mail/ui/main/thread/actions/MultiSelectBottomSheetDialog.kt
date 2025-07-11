@@ -29,16 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.setBackNavigationResult
-import com.infomaniak.mail.MatomoMail.ACTION_ARCHIVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_CANCEL_SNOOZE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_DELETE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_FAVORITE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_MARK_AS_SEEN_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_MODIFY_SNOOZE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_MOVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_SAVE_TO_KDRIVE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_SNOOZE_NAME
-import com.infomaniak.mail.MatomoMail.ACTION_SPAM_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -104,7 +95,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         folderRole = folderRoleUtils.getActionFolderRole(threads),
                         count = threadsCount,
                     ) {
-                        trackMultiSelectActionEvent(ACTION_MOVE_NAME, threadsCount, isFromBottomSheet = true)
+                        trackMultiSelectActionEvent(MatomoName.Move, threadsCount, isFromBottomSheet = true)
                         navController.animatedNavigation(
                             directions = ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(
                                 threadsUids = threadsUids.toTypedArray(),
@@ -114,7 +105,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     }
                 }
                 R.id.actionReadUnread -> {
-                    trackMultiSelectActionEvent(ACTION_MARK_AS_SEEN_NAME, threadsCount, isFromBottomSheet = true)
+                    trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
                     toggleThreadsSeenStatus(threadsUids, shouldRead)
                 }
                 R.id.actionArchive -> {
@@ -122,7 +113,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         folderRole = folderRoleUtils.getActionFolderRole(threads),
                         count = threadsCount,
                     ) {
-                        trackMultiSelectActionEvent(ACTION_ARCHIVE_NAME, threadsCount, isFromBottomSheet = true)
+                        trackMultiSelectActionEvent(MatomoName.Archive, threadsCount, isFromBottomSheet = true)
                         archiveThreads(threadsUids)
                     }
                 }
@@ -131,7 +122,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         folderRole = folderRoleUtils.getActionFolderRole(threads),
                         count = threadsCount,
                     ) {
-                        trackMultiSelectActionEvent(ACTION_DELETE_NAME, threadsCount, isFromBottomSheet = true)
+                        trackMultiSelectActionEvent(MatomoName.Delete, threadsCount, isFromBottomSheet = true)
                         deleteThreads(threadsUids)
                     }
                 }
@@ -139,37 +130,37 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         binding.snooze.setOnClickListener {
-            trackMultiSelectActionEvent(ACTION_SNOOZE_NAME, threadsCount, isFromBottomSheet = true)
+            trackMultiSelectActionEvent(MatomoName.Snooze, threadsCount, isFromBottomSheet = true)
             isMultiSelectOn = false
             setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze(threadsUids))
         }
 
         binding.modifySnooze.setOnClickListener {
-            trackMultiSelectActionEvent(ACTION_MODIFY_SNOOZE_NAME, threadsCount, isFromBottomSheet = true)
+            trackMultiSelectActionEvent(MatomoName.ModifySnooze, threadsCount, isFromBottomSheet = true)
             isMultiSelectOn = false
             setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Modify(threadsUids))
         }
 
         binding.cancelSnooze.setClosingOnClickListener {
-            trackMultiSelectActionEvent(ACTION_CANCEL_SNOOZE_NAME, threadsCount, isFromBottomSheet = true)
+            trackMultiSelectActionEvent(MatomoName.CancelSnooze, threadsCount, isFromBottomSheet = true)
             lifecycleScope.launch { mainViewModel.unsnoozeThreads(threads) }
             isMultiSelectOn = false
         }
 
         binding.spam.setClosingOnClickListener(shouldCloseMultiSelection = true) {
-            trackMultiSelectActionEvent(ACTION_SPAM_NAME, threadsCount, isFromBottomSheet = true)
+            trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
             toggleThreadsSpamStatus(threadsUids)
             isMultiSelectOn = false
         }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
-            trackMultiSelectActionEvent(ACTION_FAVORITE_NAME, threadsCount, isFromBottomSheet = true)
+            trackMultiSelectActionEvent(MatomoName.Favorite, threadsCount, isFromBottomSheet = true)
             toggleThreadsFavoriteStatus(threadsUids, shouldFavorite)
             isMultiSelectOn = false
         }
 
         binding.saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection = true) {
-            trackMultiSelectActionEvent(ACTION_SAVE_TO_KDRIVE_NAME, threadsCount, isFromBottomSheet = true)
+            trackMultiSelectActionEvent(MatomoName.SaveToKDrive, threadsCount, isFromBottomSheet = true)
             navigateToDownloadMessagesProgressDialog(
                 messageUids = threads.flatMap { it.messages }.map { it.uid },
                 currentClassName = MultiSelectBottomSheetDialog::class.java.name,

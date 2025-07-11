@@ -26,8 +26,7 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getAppName
 import com.infomaniak.lib.stores.StoresSettingsRepository
 import com.infomaniak.lib.stores.StoresViewModel
-import com.infomaniak.mail.MatomoMail.DISCOVER_LATER
-import com.infomaniak.mail.MatomoMail.DISCOVER_NOW
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAppUpdateEvent
 import com.infomaniak.mail.R
 import com.infomaniak.lib.core.R as RCore
@@ -46,7 +45,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
         infoIllustration.setBackgroundResource(R.drawable.ic_update_logo)
 
         actionButton.apply {
-            trackAppUpdateEvent(DISCOVER_NOW)
+            trackAppUpdateEvent(MatomoName.DiscoverNow)
             setText(RCore.string.buttonUpdate)
             setOnClickListener {
                 storesViewModel.set(StoresSettingsRepository.IS_USER_WANTING_UPDATES_KEY, true)
@@ -56,7 +55,7 @@ class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
         }
 
         secondaryActionButton.setOnClickListener {
-            trackAppUpdateEvent(DISCOVER_LATER)
+            trackAppUpdateEvent(MatomoName.DiscoverLater)
             storesViewModel.set(StoresSettingsRepository.IS_USER_WANTING_UPDATES_KEY, false)
             dismiss()
         }

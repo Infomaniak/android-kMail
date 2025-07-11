@@ -40,6 +40,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.R as RMaterial
 import com.google.android.material.card.MaterialCardView
+import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.FormatData
 import com.infomaniak.core.utils.format
 import com.infomaniak.core.utils.formatWithLocal
@@ -52,12 +53,12 @@ import com.infomaniak.mail.utils.extensions.isLastWeek
 import com.infomaniak.core.utils.isYesterday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.R as RCore
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -356,7 +357,7 @@ class ThreadListAdapter @Inject constructor(
     ): Boolean {
         val shouldOpen = !listener.isEnabled
         if (shouldOpen) {
-            context.trackMultiSelectionEvent("enable", action)
+            trackMultiSelectionEvent(MatomoName.Enable, action)
             listener.isEnabled = true
         }
         return shouldOpen

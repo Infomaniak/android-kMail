@@ -39,6 +39,7 @@ import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -185,7 +186,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun setToggleRelatedListeners() = with(binding) {
         if (canCollapseEverything) chevron.setOnClickListener {
-            context.trackMessageEvent("openRecipientsFields", isSelfCollapsed)
+            trackMessageEvent(MatomoName.OpenRecipientsFields, isSelfCollapsed)
             isEverythingCollapsed = !isEverythingCollapsed
             if (isSelfCollapsed) textInput.hideKeyboard()
         }

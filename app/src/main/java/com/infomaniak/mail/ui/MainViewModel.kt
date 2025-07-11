@@ -34,6 +34,7 @@ import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -1322,7 +1323,7 @@ class MainViewModel @Inject constructor(
     fun modifyNameFolder(name: String, folderId: String) =
         viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
 
-    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String?{
+    private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String? {
         return if (apiResponse.isSuccess()) {
             updateFolders(mailbox)
             apiResponse.data?.id
@@ -1331,6 +1332,7 @@ class MainViewModel @Inject constructor(
             null
         }
     }
+
     fun moveToNewFolder(
         name: String,
         threadsUids: List<String>,
@@ -1401,10 +1403,10 @@ class MainViewModel @Inject constructor(
 
     fun selectOrUnselectAll() {
         if (isEverythingSelected) {
-            appContext.trackMultiSelectionEvent("none")
+            trackMultiSelectionEvent(MatomoName.None)
             selectedThreads.clear()
         } else {
-            appContext.trackMultiSelectionEvent("all")
+            trackMultiSelectionEvent(MatomoName.All)
             currentThreadsLive.value?.list?.forEach { thread -> selectedThreads.add(thread) }
         }
 

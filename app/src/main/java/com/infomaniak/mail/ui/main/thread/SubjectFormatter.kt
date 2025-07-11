@@ -24,6 +24,7 @@ import android.text.TextPaint
 import android.text.TextUtils.TruncateAt
 import androidx.annotation.ColorRes
 import androidx.core.content.res.ResourcesCompat
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackExternalEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
@@ -75,7 +76,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
         R.string.externalTag,
         TagColor(R.color.externalTagBackground, R.color.externalTagOnBackground),
     ) {
-        appContext.trackExternalEvent("threadTag")
+        trackExternalEvent(MatomoName.ThreadTag)
 
         val description = appContext.resources.getQuantityString(
             R.plurals.externalDialogDescriptionExpeditor,

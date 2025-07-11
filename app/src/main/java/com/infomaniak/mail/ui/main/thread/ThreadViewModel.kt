@@ -29,6 +29,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackUserInfo
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -57,7 +58,6 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
-import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
@@ -327,12 +327,12 @@ class ThreadViewModel @Inject constructor(
 
         val nbMessages = thread.messages.count()
 
-        appContext.trackUserInfo("nbMessagesInThread", nbMessages)
+        trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
 
         when (nbMessages) {
             0 -> SentryDebug.sendEmptyThread(thread, "No Message in the Thread when opening it", mailboxContentRealm())
-            1 -> appContext.trackUserInfo("oneMessagesInThread")
-            else -> appContext.trackUserInfo("multipleMessagesInThread", nbMessages)
+            1 -> trackUserInfo(MatomoName.OneMessagesInThread)
+            else -> trackUserInfo(MatomoName.MultipleMessagesInThread, nbMessages)
         }
     }
 

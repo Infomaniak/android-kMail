@@ -35,6 +35,7 @@ import com.infomaniak.lib.core.utils.ErrorCodeTranslated
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackDestination
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackUserInfo
@@ -131,7 +132,7 @@ class LoginActivity : AppCompatActivity() {
                 apiResponse.data?.isEmpty() == true -> MailboxErrorCode.NO_MAILBOX
                 else -> {
                     apiResponse.data?.let { mailboxes ->
-                        context.trackUserInfo("nbMailboxes", mailboxes.count())
+                        trackUserInfo(MatomoName.NbMailboxes, mailboxes.count())
                         AccountUtils.addUser(user)
                         mailboxController.updateMailboxes(mailboxes)
                         return@let if (mailboxes.none { it.isAvailable }) MailboxErrorCode.NO_VALID_MAILBOX else user

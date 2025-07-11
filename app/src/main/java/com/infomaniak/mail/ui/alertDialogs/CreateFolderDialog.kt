@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
 import androidx.annotation.StringRes
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -44,7 +45,7 @@ class CreateFolderDialog @Inject constructor(
 
     fun setCallbacks(onPositiveButtonClicked: (String) -> Unit) = setCallbacks(
         onPositiveButtonClicked = { folderName ->
-            activityContext.trackCreateFolderEvent("confirm")
+            trackCreateFolderEvent(MatomoName.Confirm)
             onPositiveButtonClicked(folderName)
         },
         onErrorCheck = { folderName ->

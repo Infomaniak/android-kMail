@@ -20,7 +20,7 @@
 package com.infomaniak.mail.data.models.thread
 
 import com.infomaniak.core.utils.apiEnum
-import com.infomaniak.mail.MatomoMail.SEARCH_FOLDER_FILTER_NAME
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Bimi
@@ -371,13 +371,13 @@ class Thread : RealmObject, Snoozable {
 
     override fun hashCode(): Int = uid.hashCode()
 
-    enum class ThreadFilter(val matomoValue: String) {
-        ALL(SEARCH_FOLDER_FILTER_NAME),
-        SEEN("readFilter"),
-        UNSEEN("unreadFilter"),
-        STARRED("favoriteFilter"),
-        ATTACHMENTS("attachmentFilter"),
-        FOLDER(SEARCH_FOLDER_FILTER_NAME),
+    enum class ThreadFilter(val matomoName: MatomoName) {
+        ALL(MatomoName.FolderFilter),
+        SEEN(MatomoName.ReadFilter),
+        UNSEEN(MatomoName.UnreadFilter),
+        STARRED(MatomoName.FavoriteFilter),
+        ATTACHMENTS(MatomoName.AttachmentFilter),
+        FOLDER(MatomoName.FolderFilter),
     }
 
     companion object {
