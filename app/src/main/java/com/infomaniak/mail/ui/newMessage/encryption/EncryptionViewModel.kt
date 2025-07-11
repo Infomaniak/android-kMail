@@ -46,7 +46,7 @@ class EncryptionViewModel @Inject constructor(
     val isCheckingEmails: SingleLiveEvent<Boolean> = SingleLiveEvent(false)
 
     private var emailsCheckingJob: Job? = null
-    private val emailsBeingChecked: MutableSet<String> = mutableSetOf()
+    private val emailsBeingChecked: MutableList<String> = mutableListOf()
 
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
         emailsCheckingJob?.cancel(AutoBulkCallCancellationException())
@@ -56,23 +56,7 @@ class EncryptionViewModel @Inject constructor(
             isCheckingEmails.postValue(true)
 
             runCatching {
-                val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked)
-
-                // By default, all the new addresses being checked are considered unencryptable
-                val newUnencryptableRecipients: MutableList<String> = emails.toMutableList()
-
-                if (apiResponse.isSuccess()) {
-                    apiResponse.data?.let { mailboxHostingStatuses ->
-                        mailboxHostingStatuses.forEach { mailboxStatus ->
-                            if (mailboxStatus.isInfomaniakHosted) {
-                                newUnencryptableRecipients.removeAll { it == mailboxStatus.email }
-                            }
-                        }
-                    }
-                } else {
-                    // In case of error during the encryptable check, we consider all recipients as unencryptable
-                    snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
-                }
+                val newUnencryptableRecipients = computeUnencryptableAddressesFromApi()
                 val existingUnencryptableRecipients = unencryptableRecipients.value ?: emptyList()
                 clearDataAndPostResult(newUnencryptableRecipients + existingUnencryptableRecipients)
             }.onFailure { exception ->
@@ -84,6 +68,30 @@ class EncryptionViewModel @Inject constructor(
                 if (exception is CancellationException) throw exception
             }
         }
+    }
+
+    /**
+     * Takes the [emailsBeingChecked] list and check with the API if it can be encrypted.
+     *
+     * @return a list of new encryptable recipients
+     */
+    private suspend fun computeUnencryptableAddressesFromApi(): List<String> {
+        // By default, all the new addresses are considered unencryptable
+        val newUnencryptableRecipients = emailsBeingChecked
+
+        val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked.toSet())
+        if (apiResponse.isSuccess()) {
+            apiResponse.data?.let { mailboxHostingStatuses ->
+                mailboxHostingStatuses.forEach { mailboxStatus ->
+                    if (mailboxStatus.isInfomaniakHosted) newUnencryptableRecipients.removeAll { it == mailboxStatus.email }
+                }
+            }
+        } else {
+            // In case of error during the encryptable check, we consider all recipients as unencryptable
+            snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
+        }
+
+        return newUnencryptableRecipients
     }
 
     fun cancelEmailCheckingIfNeeded(email: String) {
