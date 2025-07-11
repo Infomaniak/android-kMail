@@ -79,8 +79,10 @@ class EmojiReactionsView @JvmOverloads constructor(
         }
     }
 
-    @Suppress("DeprecatedCallableAddReplaceWith")
-    @Deprecated("Use the other methods to set click listeners when a reaction is clicked and when the add reaction button is clicked")
+    /**
+     * Calling this method is ambiguous. You should choose between detecting clicks on existing emojis or on the "add" button
+     */
+    @AmbiguousClickListener
     override fun setOnClickListener(listener: OnClickListener?) = super.setOnClickListener(listener)
 
     fun setOnAddReactionClickListener(listener: () -> Unit) {
@@ -92,3 +94,11 @@ class EmojiReactionsView @JvmOverloads constructor(
         reactionsState.putAll(emojiReactions)
     }
 }
+
+@RequiresOptIn(
+    level = RequiresOptIn.Level.ERROR,
+    message = "Use the other methods to set click listeners when a reaction is clicked and when the add reaction button is clicked"
+)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+private annotation class AmbiguousClickListener
