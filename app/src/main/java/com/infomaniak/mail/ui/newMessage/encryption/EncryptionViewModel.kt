@@ -65,8 +65,8 @@ class EncryptionViewModel @Inject constructor(
                 // We don't post result here as a new check will be executed
                 if (exception is AutoBulkCallCancellationException) throw CancellationException()
 
-                val existingUnencryptableRecipients = unencryptableRecipients.value ?: emptySet()
-                clearDataAndPostResult(emailsBeingChecked.toList() + existingUnencryptableRecipients)
+                val existingUnencryptableRecipients = unencryptableRecipients.value ?: emptyList()
+                clearDataAndPostResult(emailsBeingChecked + existingUnencryptableRecipients)
                 if (exception is CancellationException) throw exception
             }
         }
@@ -75,7 +75,7 @@ class EncryptionViewModel @Inject constructor(
     /**
      * Takes the [emailsBeingChecked] list and check with the API if it can be encrypted.
      *
-     * @return a list of new encryptable recipients
+     * @return a list of the new unencryptable recipients
      */
     private suspend fun computeUnencryptableAddressesFromApi(): List<String> {
         // By default, all the new addresses are considered unencryptable
