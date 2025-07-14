@@ -23,7 +23,6 @@ navigation = "2.8.9"
 playServices = "18.7.2"
 realmKotlin = "3.0.0"
 richHtmlEditor = "0.2.0"
-sentryAndroidFragment = "8.11.1" # TODO: Upgrade once SwissTransfer updates Sentry Gradle plugin past 5.5.0
 webkit = "1.14.0"
 workConcurrentFutures = "1.2.0"
 

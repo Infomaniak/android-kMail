@@ -184,7 +184,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
      * - [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
      */
     private fun configSentry() {
-        this.configureSentry(
+        configureSentry(
             isDebug = BuildConfig.DEBUG,
             isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled,
             isFilteredException = { exception: Throwable? ->
