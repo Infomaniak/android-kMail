@@ -22,9 +22,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.MatomoName
-import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackEditorActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
@@ -92,12 +91,7 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     fun setupEditorFormatActions() = with(binding) {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
-                val trackerName = when {
-                    action != EditorAction.ENCRYPTION -> action.matomoName
-                    newMessageViewModel.isEncryptionActivated.value == true -> MatomoName.OpenEncryptionActions
-                    else -> MatomoName.EncryptionActivation
-                }
-                trackEvent(MatomoCategory.EditorActions, trackerName)
+                trackEditorActionEvent(action, isEncryptionActivated = newMessageViewModel.isEncryptionActivated.value == true)
                 newMessageViewModel.editorAction.value = action to null
             }
         }

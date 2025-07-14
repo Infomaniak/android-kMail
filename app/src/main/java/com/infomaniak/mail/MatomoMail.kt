@@ -27,6 +27,7 @@ import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import org.matomo.sdk.Tracker
 
 object MatomoMail : Matomo {
@@ -557,6 +558,15 @@ object MatomoMail : Matomo {
 
     fun trackEncryptionEvent(name: MatomoName) {
         trackEvent(MatomoCategory.Encryption, name)
+    }
+
+    fun trackEditorActionEvent(action: EditorAction, isEncryptionActivated: Boolean) {
+        val name = when {
+            action != EditorAction.ENCRYPTION -> action.matomoName
+            isEncryptionActivated == true -> MatomoName.OpenEncryptionActions
+            else -> MatomoName.EncryptionActivation
+        }
+        trackEvent(MatomoCategory.EditorActions, name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
