@@ -27,6 +27,7 @@ import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction
 import org.matomo.sdk.Tracker
 
 object MatomoMail : Matomo {
@@ -47,6 +48,7 @@ object MatomoMail : Matomo {
         CreateFolder("createFolder"),
         EasterEgg("easterEgg"),
         EditorActions("editorActions"),
+        Encryption("encryption"),
         Externals("externals"),
         HomeScreenShortcuts("homeScreenShortcuts"),
         InAppReview("inAppReview"),
@@ -149,6 +151,7 @@ object MatomoMail : Matomo {
         DeleteSwipe("deleteSwipe"),
         DetachMailbox("detachMailbox"),
         DetachMailboxConfirm("detachMailboxConfirm"),
+        Disable("disable"),
         DiscoverLater("discoverLater"),
         DiscoverNow("discoverNow"),
         Dislike("dislike"),
@@ -166,7 +169,7 @@ object MatomoMail : Matomo {
         EmptySpam("emptySpam"),
         EmptyTrash("emptyTrash"),
         Enable("enable"),
-        Encryption("encryption"),
+        EncryptionActivation("encryptionActivation"),
         ExecuteSearch("executeSearch"),
         Expand("expand"),
         Favorite("favorite"),
@@ -182,6 +185,7 @@ object MatomoMail : Matomo {
         FromMenuDrawer("fromMenuDrawer"),
         FromMove("fromMove"),
         Generate("generate"),
+        GeneratePassword("generatePassword"),
         Halloween("halloween"),
         Help("help"),
         ImportEmails("importEmails"),
@@ -229,6 +233,7 @@ object MatomoMail : Matomo {
         OpenCreationWebview("openCreationWebview"),
         OpenDashboard("openDashboard"),
         OpenDetails("openDetails"),
+        OpenEncryptionActions("openEncryptionActions"),
         OpenFromBottomsheet("openFromBottomsheet"),
         OpenFromDraft("openFromDraft"),
         OpenFromFab("openFromFab"),
@@ -279,6 +284,7 @@ object MatomoMail : Matomo {
         ScheduledCustomDate("scheduledCustomDate"),
         ScheduledDraftsFolder("scheduledDraftsFolder"),
         SeeAllAttendees("seeAllAttendees"),
+        SeePassword("seePassword"),
         SelectAvatar("selectAvatar"),
         SelectContact("selectContact"),
         SelectDate("selectDate"),
@@ -292,6 +298,7 @@ object MatomoMail : Matomo {
         SeriousWriting("seriousWriting"),
         ShareEmail("shareEmail"),
         ShareLink("shareLink"),
+        SharePassword("sharePassword"),
         Shorten("shorten"),
         ShowSourceCode("showSourceCode"),
         SignalPhishing("signalPhishing "),
@@ -547,6 +554,19 @@ object MatomoMail : Matomo {
 
     fun trackMyKSuiteUpgradeBottomSheetEvent(name: String) {
         trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE_UPGRADE_BOTTOMSHEET, name)
+    }
+
+    fun trackEncryptionEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.Encryption, name)
+    }
+
+    fun trackEditorActionEvent(action: EditorAction, isEncryptionActivated: Boolean) {
+        val name = when {
+            action != EditorAction.ENCRYPTION -> action.matomoName
+            isEncryptionActivated == true -> MatomoName.OpenEncryptionActions
+            else -> MatomoName.EncryptionActivation
+        }
+        trackEvent(MatomoCategory.EditorActions, name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions

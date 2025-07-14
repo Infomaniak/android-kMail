@@ -27,6 +27,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentEncryptionPasswordBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -71,6 +73,7 @@ class EncryptionPasswordFragment : Fragment() {
 
     private fun setupPasswordTextField() = with(binding) {
         passwordInputLayout.setEndIconOnClickListener {
+            MatomoMail.trackEncryptionEvent(MatomoName.GeneratePassword)
             passwordInput.setText(encryptionViewModel.generatePassword())
         }
         passwordInput.apply {
@@ -85,8 +88,12 @@ class EncryptionPasswordFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        readMoreButton.setOnClickListener { context?.openUrl(ENCRYPTION_FAQ_URL) }
+        readMoreButton.setOnClickListener {
+            MatomoMail.trackEncryptionEvent(MatomoName.ReadFAQ)
+            context?.openUrl(ENCRYPTION_FAQ_URL)
+        }
         sharePasswordButton.setOnClickListener {
+            MatomoMail.trackEncryptionEvent(MatomoName.SharePassword)
             val password = passwordInput.text?.toString()
             if (password?.isNotBlank() == true) requireContext().shareString(password)
             findNavController().popBackStack()

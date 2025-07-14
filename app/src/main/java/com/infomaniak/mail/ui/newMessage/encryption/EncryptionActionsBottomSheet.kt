@@ -30,6 +30,8 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.mail.MatomoMail
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetEncryptionActionsBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -122,12 +124,14 @@ class EncryptionActionsBottomSheet : ActionsBottomSheetDialog() {
 
     private fun setupListeners() {
         binding.protectWithPassword.setClosingOnClickListener {
+            MatomoMail.trackEncryptionEvent(MatomoName.SeePassword)
             safelyNavigate(
                 resId = R.id.encryptionPasswordFragment,
                 substituteClassName = NewMessageFragment::class.java.name,
             )
         }
         binding.disableEncryption.setClosingOnClickListener {
+            MatomoMail.trackEncryptionEvent(MatomoName.Disable)
             newMessageViewModel.isEncryptionActivated.postValue(false)
             snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarEncryptionDisabled))
         }
