@@ -1312,9 +1312,8 @@ class MainViewModel @Inject constructor(
 
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
-    fun modifyNameFolder(name: String, folderId: String) =
-        viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = currentMailbox.value!!
+    fun modifyNameFolder(name: String, folderId: String) = viewModelScope.launch(ioCoroutineContext) {
+            val mailbox = currentMailbox.value ?: return@launch
             val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
 
             renameFolderResultTrigger.postValue(Unit)
@@ -1323,7 +1322,7 @@ class MainViewModel @Inject constructor(
         }
 
     fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) {
-        val mailbox = currentMailbox.value!!
+        val mailbox = currentMailbox.value ?: return@launch
         val apiResponse = ApiRepository.deleteFolder(mailbox.uuid, folderId)
 
         deleteFolderResultTrigger.postValue(Unit)
