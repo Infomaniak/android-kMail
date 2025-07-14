@@ -325,7 +325,7 @@ class Thread : RealmObject, Snoozable {
     }
 
     fun recomputeMessagesWithContent(allMessages: List<Message>) {
-        val (reactionsPerMessageId, messageIds) = computeReactionsPerMessageId(allMessages)
+        val (reactionsPerMessageId, threadMessageIds) = computeReactionsPerMessageId(allMessages)
 
         messagesWithContent.clear()
         allMessages.forEach { message ->
@@ -333,10 +333,14 @@ class Thread : RealmObject, Snoozable {
                 message.emojiReactions.overrideWith(reactions)
             }
 
-            val inReplyTo = message.inReplyTo ?: ""
-            val isHiddenEmojiReaction = message.isReaction && inReplyTo.parseMessagesIds().any(messageIds::contains)
+            val targetMessageIds = message.inReplyTo ?: ""
+            val isHiddenEmojiReaction = message.isReaction && isTargetMessageInThread(targetMessageIds, threadMessageIds)
             if (isHiddenEmojiReaction.not()) messagesWithContent += message
         }
+    }
+
+    private fun isTargetMessageInThread(targetMessageIds: String, threadMessageIds: Set<String>): Boolean {
+        return targetMessageIds.parseMessagesIds().any(threadMessageIds::contains)
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
