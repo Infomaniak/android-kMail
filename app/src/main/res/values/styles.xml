@@ -405,15 +405,15 @@
     <style name="BottomSheetDialogTheme" parent="BottomSheetDialogThemeBase" />
 
     <style name="BottomSheetDialogThemeModalStyle" parent="Widget.Material3.BottomSheet">
-        <item name="backgroundTint">@color/backgroundColorSecondary</item>
+        <item name="backgroundTint">@color/bottomSheetBackgroundColor</item>
         <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
     </style>
 
     <style name="BottomSheetDialogThemeShapeAppearanceOverlay">
         <item name="cornerSizeBottomLeft">0dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
-        <item name="cornerSizeTopLeft">10dp</item>
-        <item name="cornerSizeTopRight">10dp</item>
+        <item name="cornerSizeTopLeft">@dimen/bottomSheetCornerSize</item>
+        <item name="cornerSizeTopRight">@dimen/bottomSheetCornerSize</item>
     </style>
 
     <style name="BottomSheetTitle" parent="BodyMedium" />

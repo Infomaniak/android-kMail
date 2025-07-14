@@ -47,6 +47,9 @@
     <dimen name="threadHorizontalMargin">@dimen/marginStandardMedium</dimen>
     <dimen name="newMessageToolbarItemWidth">64dp</dimen>
     <dimen name="newMessageToolbarHeight">48dp</dimen>
+    <dimen name="bottomSheetCornerSize">10dp</dimen>
+    <dimen name="bottomSheetDragHandleHeight">48dp</dimen>
+    <dimen name="bottomSheetBottomPadding">16dp</dimen>
 
     <!-- Menu Drawer -->
     <dimen name="decoratedItemViewHeight">48dp</dimen>
