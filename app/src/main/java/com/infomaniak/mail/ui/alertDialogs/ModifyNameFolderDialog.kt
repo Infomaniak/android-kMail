@@ -49,7 +49,7 @@ class ModifyNameFolderDialog @Inject constructor(
 
     fun setCallbacks(onPositiveButtonClicked: (String, String) -> Unit) = setCallbacks(
         onPositiveButtonClicked = { folderName ->
-            trackManageFolderEvent(MatomoName.Rename)
+            trackManageFolderEvent(MatomoName.RenameConfirm)
             folderId?.let { onPositiveButtonClicked(folderName, it) }
         },
         onErrorCheck = { folderName ->
