@@ -172,6 +172,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.renameFolder(mailboxUuid, folderId), POST, mapOf("name" to name))
     }
 
+    suspend fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
+    }
+
     suspend fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
         return callApi(
             url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=auto_uncrypt"),

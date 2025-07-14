@@ -456,7 +456,7 @@ object MatomoMail : Matomo {
         trackEvent(MatomoCategory.CreateFolder, name)
     }
 
-    fun trackRenameFolderEvent(name: MatomoName) {
+    fun trackManageFolderEvent(name: MatomoName) {
         trackEvent(MatomoCategory.ManageFolder, name)
     }
 
