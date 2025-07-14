@@ -47,6 +47,7 @@ object MatomoMail : Matomo {
         CreateFolder("createFolder"),
         EasterEgg("easterEgg"),
         EditorActions("editorActions"),
+        Encryption("encryption"),
         Externals("externals"),
         HomeScreenShortcuts("homeScreenShortcuts"),
         InAppReview("inAppReview"),
@@ -149,6 +150,7 @@ object MatomoMail : Matomo {
         DeleteSwipe("deleteSwipe"),
         DetachMailbox("detachMailbox"),
         DetachMailboxConfirm("detachMailboxConfirm"),
+        Disable("disable"),
         DiscoverLater("discoverLater"),
         DiscoverNow("discoverNow"),
         Dislike("dislike"),
@@ -280,6 +282,7 @@ object MatomoMail : Matomo {
         ScheduledCustomDate("scheduledCustomDate"),
         ScheduledDraftsFolder("scheduledDraftsFolder"),
         SeeAllAttendees("seeAllAttendees"),
+        SeePassword("seePassword"),
         SelectAvatar("selectAvatar"),
         SelectContact("selectContact"),
         SelectDate("selectDate"),
@@ -548,6 +551,10 @@ object MatomoMail : Matomo {
 
     fun trackMyKSuiteUpgradeBottomSheetEvent(name: String) {
         trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE_UPGRADE_BOTTOMSHEET, name)
+    }
+
+    fun trackEncryptionEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.Encryption, name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
