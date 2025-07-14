@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.dagger.hilt)
+    alias(core.plugins.compose.compiler)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.kapt)
@@ -71,6 +72,7 @@ android {
     buildFeatures {
         buildConfig true
         viewBinding true
+        compose true
     }
 
     flavorDimensions += 'distribution'
@@ -131,7 +133,11 @@ dependencies {
     coreLibraryDesugaring libs.desugar.jdk
 
     // Compose
+    implementation platform(core.compose.bom)
     implementation libs.compose.ui.android
+    implementation core.compose.runtime
+    implementation core.compose.material3
+    implementation core.compose.ui.tooling.preview
 
     // Test
     testImplementation libs.junit
