@@ -49,6 +49,7 @@ val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.replaceOriginalDateWithDisplayDateAfterTwentyFourthMigration()
     migrationContext.deserializeSnoozeUuidDirectlyAfterTwentyFifthMigration()
     migrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndTwentyEightMigration()
+    migrationContext.initMessagesWithContentToTheOldMessagesListAfterThirtiethMigration()
 }
 
 // Migrate to version #1
@@ -242,6 +243,21 @@ private fun MigrationContext.initIsLastInboxMessageSnoozedAfterTwentySeventhAndT
                 }
 
                 newThread.set(propertyName = "isLastInboxMessageSnoozed", value = isSnoozed)
+            }
+        }
+    }
+}
+//endregion
+
+// Migrate from version #30
+private fun MigrationContext.initMessagesWithContentToTheOldMessagesListAfterThirtiethMigration() {
+
+    if (oldRealm.schemaVersion() <= 30L) {
+        enumerate(className = "Thread") { _: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.let { newThread ->
+                // Initialize messagesWithContent by copying the existing messages
+                val messages = newThread.getObjectList(propertyName = "messages")
+                newThread.set(propertyName = "messagesWithContent", value = messages)
             }
         }
     }
