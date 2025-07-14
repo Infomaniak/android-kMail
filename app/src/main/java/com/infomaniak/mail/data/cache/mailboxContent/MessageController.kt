@@ -57,6 +57,10 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
         return getMessage(uid, mailboxContentRealm())
     }
 
+    fun getMessages(uids: List<String>): List<Message> {
+        return getMessagesByUids(uids, mailboxContentRealm())
+    }
+
     fun getLastMessageToExecuteAction(thread: Thread): Message = with(thread) {
 
         fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().find()
@@ -186,7 +190,7 @@ class MessageController @Inject constructor(private val mailboxContentRealm: Rea
             return getMessageQuery(uid, realm).find()
         }
 
-        fun getMessagesByUids(messagesUids: List<String>, realm: MutableRealm): List<Message> {
+        fun getMessagesByUids(messagesUids: List<String>, realm: TypedRealm): List<Message> {
             return realm.query<Message>("${Message::uid.name} IN $0", messagesUids).find()
         }
 
