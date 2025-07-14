@@ -25,8 +25,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -47,11 +49,13 @@ fun MailBottomSheetScaffold(
     isVisible: () -> Boolean,
     onDismissRequest: () -> Unit,
     title: String? = null,
+    sheetState: SheetState = rememberModalBottomSheetState(),
     content: @Composable (ColumnScope.() -> Unit),
 ) {
     if (isVisible()) {
         val bottomSheetCornerSize = dimensionResource(R.dimen.bottomSheetCornerSize)
         ModalBottomSheet(
+            sheetState = sheetState,
             onDismissRequest = onDismissRequest,
             shape = RoundedCornerShape(topStart = bottomSheetCornerSize, topEnd = bottomSheetCornerSize),
             containerColor = colorResource(R.color.bottomSheetBackgroundColor),
@@ -79,6 +83,7 @@ fun MailBottomSheetScaffold(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 private fun Preview() {

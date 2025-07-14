@@ -19,12 +19,17 @@ package com.infomaniak.mail.ui.components.views
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
 import com.infomaniak.mail.ui.components.MailBottomSheetScaffold
+import kotlinx.coroutines.launch
 
 abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
     context: Context,
@@ -32,7 +37,8 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : AbstractComposeView(context, attrs, defStyleAttr) {
 
-    var isVisible by mutableStateOf(false)
+    private var isVisible by mutableStateOf(false)
+    private var startHidingAnimation by mutableStateOf(false)
 
     @Composable
     abstract fun BottomSheetContent()
@@ -41,11 +47,31 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
         isVisible = true
     }
 
+    protected fun hideBottomSheet() {
+        startHidingAnimation = true
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     final override fun Content() {
+        val sheetState = rememberModalBottomSheetState()
+        val scope = rememberCoroutineScope()
+
+        LaunchedEffect(startHidingAnimation) {
+            if (startHidingAnimation.not()) return@LaunchedEffect
+
+            scope.launch {
+                sheetState.hide()
+            }.invokeOnCompletion {
+                isVisible = false
+                startHidingAnimation = false
+            }
+        }
+
         MailBottomSheetScaffold(
             isVisible = { isVisible },
             onDismissRequest = { isVisible = false },
+            sheetState = sheetState,
             content = { BottomSheetContent() }
         )
     }
