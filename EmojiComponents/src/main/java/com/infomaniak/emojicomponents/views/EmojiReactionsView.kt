@@ -65,15 +65,7 @@ class EmojiReactionsView @JvmOverloads constructor(
     }
 
     fun setEmojiReactions(emojiReactions: Map<String, ReactionState>) {
-        // Remove keys that are no more
-        val keysToRemove = reactionsState.keys - emojiReactions.keys
-        keysToRemove.forEach { key ->
-            reactionsState.remove(key)
-        }
-
-        // Add new keys or update existing keys
-        emojiReactions.forEach { (key, value) ->
-            reactionsState[key] = value
-        }
+        reactionsState.clear()
+        reactionsState.putAll(emojiReactions)
     }
 }
