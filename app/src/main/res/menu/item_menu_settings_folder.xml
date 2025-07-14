@@ -18,6 +18,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/modifySettingsFolder"
+        android:icon="@drawable/ic_editor_text_options"
+        android:title="@string/actionRename"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     <item

@@ -226,19 +226,19 @@ class MenuDrawerFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.modifySettingsFolder -> {
-                    context?.trackManageFolderEvent("rename")
+                    trackManageFolderEvent(MatomoName.Rename)
                     modifyNameFolderDialog.setFolderIdAndShow(folderName, folderId)
                     true
                 }
                 R.id.deleteSettingsFolder -> {
-                    context?.trackManageFolderEvent("delete")
+                    trackManageFolderEvent(MatomoName.Delete)
                     confirmDeleteFolderDialog.show(
                         title = requireContext().getString(R.string.deleteFolderDialogTitle),
-                        description = requireContext().getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName),
+                        description = getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName),
                         positiveButtonText = R.string.buttonYes,
                         negativeButtonText = R.string.buttonNo,
                         onPositiveButtonClicked = {
-                            context?.trackManageFolderEvent("deleteConfirm")
+                            trackManageFolderEvent(MatomoName.DeleteConfirm)
                             mainViewModel.deleteFolder(folderId)
                         }
                     )
