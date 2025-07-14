@@ -31,7 +31,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomSheetSeparatorBinding
@@ -42,6 +46,7 @@ import splitties.systemservices.layoutInflater
 fun MailBottomSheetScaffold(
     isVisible: () -> Boolean,
     onDismissRequest: () -> Unit,
+    title: String? = null,
     content: @Composable (ColumnScope.() -> Unit),
 ) {
     if (isVisible()) {
@@ -59,6 +64,14 @@ fun MailBottomSheetScaffold(
                 ) { /* No-op */ }
             },
             content = {
+                title?.let {
+                    Text(
+                        it,
+                        style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 16.sp),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                    )
+                }
                 content()
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.bottomSheetBottomPadding)))
             },
@@ -74,6 +87,7 @@ private fun Preview() {
             MailBottomSheetScaffold(
                 isVisible = { true },
                 onDismissRequest = {},
+                title = "This bottom sheet's title"
             ) {
                 Text("Hello world")
             }
