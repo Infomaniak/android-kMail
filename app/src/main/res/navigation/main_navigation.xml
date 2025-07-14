@@ -688,6 +688,16 @@
             app:argType="com.infomaniak.mail.data.models.calendar.Attendee[]" />
     </dialog>
 
+    <dialog
+        android:id="@+id/unencryptableRecipientsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBottomSheetDialog"
+        android:label="UnencryptableRecipientsBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_unencryptable_recipients">
+        <argument
+            android:name="unencryptableRecipients"
+            app:argType="com.infomaniak.mail.data.models.correspondent.Recipient[]" />
+    </dialog>
+
     <fragment
         android:id="@+id/permissionsOnboardingPagerFragment"
         android:name="com.infomaniak.mail.ui.main.onboarding.PermissionsOnboardingPagerFragment"

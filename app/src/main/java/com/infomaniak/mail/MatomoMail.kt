@@ -166,6 +166,7 @@ object MatomoMail : Matomo {
         EmptySpam("emptySpam"),
         EmptyTrash("emptyTrash"),
         Enable("enable"),
+        Encryption("encryption"),
         ExecuteSearch("executeSearch"),
         Expand("expand"),
         Favorite("favorite"),

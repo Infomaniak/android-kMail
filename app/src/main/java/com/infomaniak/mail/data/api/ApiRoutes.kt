@@ -102,6 +102,11 @@ object ApiRoutes {
         return "${securedProxy()}/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName/external_mail_flag"
     }
 
+    fun isInfomaniakMailboxes(emails: Set<String>): String {
+        val encodedEmails = emails.joinToString("&mailboxes[]=") { URLEncoder.encode(it, "UTF-8") }
+        return "${securedProxy()}/1/mail_hostings/mailboxes/exist?mailboxes[]=$encodedEmails"
+    }
+
     fun updateMailboxPassword(mailboxId: Int): String {
         return "${securedProxy()}/cache/invalidation/profile/workspace/mailbox/$mailboxId/update_password"
     }

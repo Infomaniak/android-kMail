@@ -194,7 +194,7 @@ object RealmDatabase {
         //region Configurations versions
         const val USER_INFO_SCHEMA_VERSION = 4L
         const val MAILBOX_INFO_SCHEMA_VERSION = 9L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 31L // Emoji reactions 2
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 32L // Emoji reactions
         //endregion
 
         //region Configurations names

@@ -143,18 +143,6 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="aiEngineSettingFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="2208" />
-                            <option name="y" value="1792" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="attachMailboxFragment">
                     <value>
                       <LayoutPositions>
@@ -670,11 +658,6 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_settings_to_aiEngineSetting">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
                             <entry key="action_settings_to_autoAdvanceSettings">
                               <value>
                                 <LayoutPositions />
@@ -910,6 +893,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="uBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="updateAvailableBottomSheetDialog">
                     <value>
                       <LayoutPositions>
@@ -956,18 +951,6 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="aiEngineChoiceFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="448" />
-                            <option name="y" value="12" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="aiPropositionFragment">
                     <value>
                       <LayoutPositions>
@@ -992,7 +975,40 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="downloadThreadsProgressDialog">
+                  <entry key="encryptionActionsBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="368" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_encryptionActionsBottomSheetDialog_to_encryptionPasswordFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="encryptionPasswordFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="256" />
+                            <option name="y" value="368" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="my_ksuite_navigation">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
@@ -1020,17 +1036,29 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_newMessageFragment_to_aiEngineChoiceFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
                             <entry key="action_newMessageFragment_to_aiPropositionFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_newMessageFragment_to_encryptionActionsBottomSheetDialog">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="scheduleSendBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="252" />
+                            <option name="y" value="12" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>

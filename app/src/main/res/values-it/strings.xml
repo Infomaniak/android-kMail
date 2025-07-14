@@ -62,7 +62,7 @@
     <string name="aiErrorMaxTokenReached">La tua richiesta è troppo lunga, ti prego di accorciarla.</string>
     <string name="aiErrorTooManyRequests">Sono state presentate troppe richieste in un breve lasso di tempo. Attendere prego.</string>
     <string name="aiErrorUnknown">Si è verificato un errore. Se l’errore persiste, si prega di contattare il nostro helpdesk.\nGrazie per la pazienza.</string>
-    <string name="aiGenerationTitlePrompt">Genera con</string>
+    <string name="aiGenerationTitlePrompt">Generato con</string>
     <string name="aiMenuEditRequest">Modifica la mia richiesta</string>
     <string name="aiMenuExpand">Espandi</string>
     <string name="aiMenuFriendlyWriting">Scrittura amichevole</string>
@@ -131,6 +131,7 @@
     <string name="buttonConfirm">Conferma</string>
     <string name="buttonConfirmRestoreEmails">Ripristino</string>
     <string name="buttonContinue">Continua</string>
+    <string name="buttonCopyPassword">Copia la password</string>
     <string name="buttonCreate">Crea</string>
     <string name="buttonCreateAccount">Crea un account</string>
     <string name="buttonCreateFolder">Aggiungi una cartella</string>
@@ -184,7 +185,7 @@
     <string name="commercialFolder">Promozioni</string>
     <string name="confirmLogoutDescription">Sei sicuro di volerti disconnettere da %s?</string>
     <string name="confirmLogoutTitle">Disconnettersi</string>
-    <string name="confirmationToBlockAnExpeditorText">Questa e-mail e tutti i futuri messaggi di %s saranno spostati nella cartella della posta indesiderata.</string>
+    <string name="confirmationToBlockAnExpeditorText">Tutti i futuri messaggi di %s saranno spostati nella cartella della posta indesiderata.</string>
     <string name="contactActionAddToContacts">Aggiungi ai contatti</string>
     <string name="contactActionCopyEmailAddress">Copia l’indirizzo e-mail</string>
     <string name="contactActionWriteEmail">Scrivi un’e-mail</string>
@@ -267,6 +268,33 @@
     <string name="emptyStateTrashDescription">Sposta i messaggi nel cestino. Verranno eliminati definitivamente dopo 30 giorni.</string>
     <string name="emptyStateTrashTitle">Il cestino è vuoto</string>
     <string name="enableFilterButton">Abilita il filtro</string>
+    <string name="enableMultiSelection">Abilita la selezione multipla</string>
+    <string name="encryptedButtonSeeConcernedRecipients">Vedere i destinatari interessati</string>
+    <string name="encryptedMessageAddPasswordButton">Proteggere con una password</string>
+    <string name="encryptedMessageAddPasswordInformation">La password è necessaria solo per gli utenti esterni a Infomaniak. Per questi ultimi, il messaggio scadrà 30 giorni dopo l‘invio.</string>
+    <string name="encryptedMessageDisableEncryptionButton">Disattiva la crittografia</string>
+    <string name="encryptedMessageGeneratePasswordContentDescription">Genera la password</string>
+    <string name="encryptedMessageHeader">Questo messaggio è criptato.</string>
+    <string name="encryptedMessageHeaderPasswordExpiryDate">Questo messaggio è stato crittografato e scadrà il %s solo per i destinatari che non possono usufruire della crittografia automatica.</string>
+    <plurals name="encryptedMessageIncompleteUser">
+        <item quantity="one">La crittografia non è supportata dall’utente %d.</item>
+        <item quantity="other">La crittografia non è supportata da %d utenti.</item>
+    </plurals>
+    <string name="encryptedMessagePasswordConcernedUserTitle">Utenti interessati</string>
+    <string name="encryptedMessagePasswordLabel">Condividete questa password tramite messaggio privato. Non sarà possibile copiarla una volta inviata.</string>
+    <string name="encryptedMessageSnackbarEncryptionDisabled">La crittografia è stata disattivata</string>
+    <string name="encryptedMessageSnackbarScheduledUnavailable">Email programmate non disponibili per i messaggi criptati</string>
+    <string name="encryptedMessageUpdatePasswordButton">Modifica della password</string>
+    <string name="encryptedPasswordProtectionTitle">Protezione con password</string>
+    <string name="encryptedProtectionAdDescription">Proteggete i vostri messaggi dall’accesso non autorizzato con la crittografia Infomaniak.</string>
+    <string name="encryptedProtectionAdDescription1">L’oggetto del messaggio rimane visibile, ma il contenuto è completamente protetto.</string>
+    <string name="encryptedProtectionAdDescription2">Per gli utenti esterni a Infomaniak sarà necessaria una password.</string>
+    <string name="encryptedProtectionAdTitle">Crittografia dei messaggi riservati</string>
+    <string name="encryptedRecipientRequiringPasswordTitle">Destinatari con password (%d)</string>
+    <string name="encryptedStatePanelEnable">Il tuo messaggio è protetto.</string>
+    <string name="encryptedStatePanelIncomplete">Per completare la trasmissione è necessaria una password.</string>
+    <string name="encryptedStatePanelStatePartialLabel">Parziale</string>
+    <string name="encryptedStatePanelTitle">Crittografia</string>
     <string name="enterPasswordDescription1">La password è stata modificata. Se non sei responsabile, contatta l’amministratore.</string>
     <string name="enterPasswordDescription2">Inserisci la nuova password per l’indirizzo e-mail %s</string>
     <string name="enterPasswordOrDescription">o</string>
@@ -551,6 +579,7 @@
     <string name="snackbarMessageDeletedPermanently">Messaggio cancellato</string>
     <string name="snackbarMessageMoved">Messaggio spostato a %s</string>
     <string name="snackbarMoveCancelled">Spostamento annullato</string>
+    <string name="snackbarPasswordCopied">Password copiata</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Numero copiato negli appunti</string>
     <string name="snackbarReportPhishingConfirmation">Segnalato con successo</string>
     <string name="snackbarRestorationLaunched">Avvio del restauro</string>
@@ -608,12 +637,8 @@
     <string name="thisAfternoon">Questo pomeriggio</string>
     <string name="thisEvening">Questa sera</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
-        <item quantity="one">Sei sicuro di voler cancellare questo messaggio in modo permanente?</item>
-        <item quantity="other">Sei sicuro di voler cancellare questi messaggi in modo permanente?</item>
-    </plurals>
-    <plurals name="threadListDeletionConfirmationAlertTitle">
-        <item quantity="one">Cancella %d messaggio</item>
-        <item quantity="other">Cancella %d messaggi</item>
+        <item quantity="one">Sei sicuro di voler cancellare questo conversazione in modo permanente?</item>
+        <item quantity="other">Sei sicuro di voler cancellare questi conversazioni in modo permanente?</item>
     </plurals>
     <string name="threadListEmptyDraftButton">Bozze vuote</string>
     <string name="threadListEmptyFolderAlertDescription">Sei sicuro di voler eliminare definitivamente tutti i messaggi in questa cartella?</string>

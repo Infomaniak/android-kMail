@@ -68,7 +68,7 @@
     <string name="aiErrorMaxTokenReached">Your request is too long, please shorten it.</string>
     <string name="aiErrorTooManyRequests">Too many requests in a short time. Please wait.</string>
     <string name="aiErrorUnknown">An error has occurred. If this error persists, please contact our helpdesk.\nThank you for your patience.</string>
-    <string name="aiGenerationTitlePrompt">Generate with</string>
+    <string name="aiGenerationTitlePrompt">Generated with</string>
     <string name="aiMenuEditRequest">Edit my request</string>
     <string name="aiMenuExpand">Expand</string>
     <string name="aiMenuFriendlyWriting">Friendly writing</string>
@@ -137,6 +137,7 @@
     <string name="buttonConfirm">Confirm</string>
     <string name="buttonConfirmRestoreEmails">Restore</string>
     <string name="buttonContinue">Continue</string>
+    <string name="buttonCopyPassword">Copy password</string>
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateAccount">Create an account</string>
     <string name="buttonCreateFolder">Add a folder</string>
@@ -190,7 +191,7 @@
     <string name="commercialFolder">Promotions</string>
     <string name="confirmLogoutDescription">Are you sure you want to log out from %s?</string>
     <string name="confirmLogoutTitle">Log out</string>
-    <string name="confirmationToBlockAnExpeditorText">This email and all future messages from %s will be moved to the Junk Mail folder.</string>
+    <string name="confirmationToBlockAnExpeditorText">All future messages from %s will be moved to the Junk Mail folder.</string>
     <string name="contactActionAddToContacts">Add to contacts</string>
     <string name="contactActionCopyEmailAddress">Copy email address</string>
     <string name="contactActionWriteEmail">Write an email</string>
@@ -273,6 +274,33 @@
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
     <string name="enableFilterButton">Enable filter</string>
+    <string name="enableMultiSelection">Enable multiple selection</string>
+    <string name="encryptedButtonSeeConcernedRecipients">See relevant recipients</string>
+    <string name="encryptedMessageAddPasswordButton">Protect with a password</string>
+    <string name="encryptedMessageAddPasswordInformation">A password is only required for non-Infomaniak users. For them, the message will expire 30 days after sending.</string>
+    <string name="encryptedMessageDisableEncryptionButton">Disable encryption</string>
+    <string name="encryptedMessageGeneratePasswordContentDescription">Generate password</string>
+    <string name="encryptedMessageHeader">This message is encrypted.</string>
+    <string name="encryptedMessageHeaderPasswordExpiryDate">This message has been encrypted and will expire on %s only for recipients unable to benefit from automatic encryption.</string>
+    <plurals name="encryptedMessageIncompleteUser">
+        <item quantity="one">Encryption is not supported by %d user.</item>
+        <item quantity="other">Encryption is not supported by %d users.</item>
+    </plurals>
+    <string name="encryptedMessagePasswordConcernedUserTitle">Users concerned</string>
+    <string name="encryptedMessagePasswordLabel">Share this password by private message. You won’t be able to copy it once you’ve sent it.</string>
+    <string name="encryptedMessageSnackbarEncryptionDisabled">Encryption has been disabled</string>
+    <string name="encryptedMessageSnackbarScheduledUnavailable">Scheduled emails not available for encrypted messages</string>
+    <string name="encryptedMessageUpdatePasswordButton">Change password</string>
+    <string name="encryptedPasswordProtectionTitle">Password protection</string>
+    <string name="encryptedProtectionAdDescription">Protect your message from unauthorized access with Infomaniak encryption.</string>
+    <string name="encryptedProtectionAdDescription1">The message subject remains visible, but the content is completely secure.</string>
+    <string name="encryptedProtectionAdDescription2">A password will be required for non-Infomaniak users.</string>
+    <string name="encryptedProtectionAdTitle">Encrypt your confidential messages</string>
+    <string name="encryptedRecipientRequiringPasswordTitle">Recipients with password (%d)</string>
+    <string name="encryptedStatePanelEnable">Your message is protected.</string>
+    <string name="encryptedStatePanelIncomplete">A password is required to finalize the sending.</string>
+    <string name="encryptedStatePanelStatePartialLabel">Partial</string>
+    <string name="encryptedStatePanelTitle">Encryption</string>
     <string name="enterPasswordDescription1">Your password has been changed. If you are not the cause, please contact your administrator.</string>
     <string name="enterPasswordDescription2">Please enter the new password for the email address %s</string>
     <string name="enterPasswordOrDescription">or</string>
@@ -557,6 +585,7 @@
     <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>
     <string name="snackbarMoveCancelled">Move cancelled</string>
+    <string name="snackbarPasswordCopied">Password copied</string>
     <string name="snackbarPhoneNumberCopiedToClipboard">Number copied to clipboard</string>
     <string name="snackbarReportPhishingConfirmation">Successfully reported</string>
     <string name="snackbarRestorationLaunched">Launching the restoration</string>
@@ -614,12 +643,8 @@
     <string name="thisAfternoon">This afternoon</string>
     <string name="thisEvening">This evening</string>
     <plurals name="threadListDeletionConfirmationAlertDescription">
-        <item quantity="one">Are you sure you want to delete this message permanently?</item>
-        <item quantity="other">Are you sure you want to delete these messages permanently?</item>
-    </plurals>
-    <plurals name="threadListDeletionConfirmationAlertTitle">
-        <item quantity="one">Delete %d message</item>
-        <item quantity="other">Delete %d messages</item>
+        <item quantity="one">Are you sure you want to delete this conversation permanently?</item>
+        <item quantity="other">Are you sure you want to delete these conversations permanently?</item>
     </plurals>
     <string name="threadListEmptyDraftButton">Empty drafts</string>
     <string name="threadListEmptyFolderAlertDescription">Are you sure you want to permanently delete all the messages in this folder?</string>

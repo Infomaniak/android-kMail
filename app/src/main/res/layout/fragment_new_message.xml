@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -686,6 +686,14 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
+
+                        <com.infomaniak.mail.ui.newMessage.encryption.EncryptionLockButtonView
+                            android:id="@+id/encryptionLockButtonView"
+                            android:layout_width="@dimen/newMessageToolbarItemWidth"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/encryptedStatePanelTitle"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/scheduleButton"

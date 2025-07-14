@@ -21,6 +21,8 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import com.infomaniak.core.extensions.customReadBoolean
+import com.infomaniak.core.extensions.customWriteBoolean
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
@@ -111,11 +113,5 @@ class Attendee() : EmbeddedRealmObject, Correspondent, Parcelable {
             customWriteBoolean(isOrganizer)
             writeString(_state)
         }
-
-        private fun Parcel.customWriteBoolean(value: Boolean) {
-            writeInt(if (value) 1 else 0)
-        }
-
-        private fun Parcel.customReadBoolean(): Boolean = readInt() != 0
     }
 }

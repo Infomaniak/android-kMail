@@ -51,7 +51,6 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
     override val initials by lazy { computeInitials() }
 
     fun initLocalValues(email: String? = null, name: String? = null): Recipient {
-
         email?.let { this.email = it }
         name?.let { this.name = it }
 

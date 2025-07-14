@@ -125,6 +125,16 @@
     <color name="blue99">#FCFCFF</color>
     <color name="blue100">@color/white</color>
 
+    <color name="sovereignBlue100">#E2EDFD</color>
+    <color name="sovereignBlue200">#CBDEFA</color>
+    <color name="sovereignBlue300">#ACC6F5</color>
+    <color name="sovereignBlue400">#8AA7EF</color>
+    <color name="sovereignBlue600">#5466D9</color>
+    <color name="sovereignBlue700">#4351BF</color>
+    <color name="sovereignBlue800">#39469A</color>
+    <color name="sovereignBlue900">#343F7B</color>
+    <color name="sovereignBlue950">#1F2547</color>
+
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/background_color_light</color>
@@ -145,6 +155,7 @@
     <color name="newMessageBackgroundColor">@color/backgroundColor</color>
     <color name="toolbarLoweredColor">@color/backgroundColor</color>
     <color name="toolbarElevatedColor">@color/elevatedBackground</color>
+    <color name="bottomSheetBackgroundColor">@color/backgroundColorSecondary</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
@@ -198,6 +209,19 @@
 
     <!-- Scheduled drafts -->
     <color name="scheduledColor">@color/coral_light</color>
+
+    <!-- Encryption -->
+    <color name="encryptionBackgroundColor">@color/sovereignBlue100</color>
+    <color name="encryptionIconColor">@color/sovereignBlue600</color>
+    <color name="encryptionTextColor">@color/sovereignBlue900</color>
+    <color name="encryptionButtonColor">@color/sovereignBlue600</color>
+    <color name="encryptionOnButtonColor">@color/white</color>
+    <color name="encryptionTextButtonColor">@color/sovereignBlue600</color>
+    <color name="encryptionSnackbarActionColor">@color/sovereignBlue300</color>
+
+    <color name="partialEncryptionTagColor">@color/favoriteYellow</color>
+    <color name="validEncryptionTagColor">@color/greenSuccess</color>
+    <color name="onEncryptionTagColor">@color/orca</color>
 
     <!-- Thread -->
     <color name="folderTagTextColor">@color/elephant</color>

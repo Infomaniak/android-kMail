@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -24,11 +25,18 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.ui.newMessage.RecipientFieldView.Companion.setChipStyle
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptableView
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionStatus
 
 class ContactChipAdapter(
-    val openContextMenu: (Recipient, BackspaceAwareChip) -> Unit,
-    val onBackspace: (Recipient) -> Unit,
-) : Adapter<ContactChipAdapter.ContactChipViewHolder>() {
+    val canChipsBeEnabled: Boolean = true,
+    val openContextMenu: ((Recipient, BackspaceAwareChip) -> Unit)? = null,
+    val onBackspace: ((Recipient) -> Unit)? = null,
+) : Adapter<ContactChipAdapter.ContactChipViewHolder>(), EncryptableView {
+
+    override var isEncryptionActivated = false
+    override var unencryptableRecipients: Set<String>? = null
+    override var encryptionPassword = ""
 
     private val recipients = mutableSetOf<Recipient>()
 
@@ -38,11 +46,19 @@ class ContactChipAdapter(
 
     override fun onBindViewHolder(holder: ContactChipViewHolder, position: Int): Unit = with(holder.binding) {
         val recipient = recipients.elementAt(position)
+        val encryptionStatus = when {
+            !isEncryptionActivated -> EncryptionStatus.Unencrypted
+            unencryptableRecipients == null -> EncryptionStatus.Loading
+            recipient.isEncryptable -> EncryptionStatus.Encrypted
+            else -> EncryptionStatus.PartiallyEncrypted
+        }
+
         root.apply {
+            isEnabled = canChipsBeEnabled
             text = recipient.getNameOrEmail()
-            setOnClickListener { openContextMenu(recipient, root) }
-            setOnBackspaceListener { onBackspace(recipient) }
-            setChipStyle(recipient.isDisplayedAsExternal)
+            setOnClickListener { openContextMenu?.invoke(recipient, root) }
+            setOnBackspaceListener { onBackspace?.invoke(recipient) }
+            setChipStyle(recipient.isDisplayedAsExternal, encryptionStatus)
         }
     }
 
@@ -62,6 +78,30 @@ class ContactChipAdapter(
         val index = recipients.indexOf(recipient)
         recipients.remove(recipient)
         notifyItemRemoved(index)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun toggleEncryption(isEncryptionActivated: Boolean, unencryptableRecipients: Set<String>?, encryptionPassword: String) {
+        this.isEncryptionActivated = isEncryptionActivated
+        this.unencryptableRecipients = unencryptableRecipients
+        this.encryptionPassword = encryptionPassword
+        notifyDataSetChanged() // We need to recompute whole collection to set new style
+    }
+
+    fun updateUnencryptableRecipients(unencryptableRecipients: Set<String>?) {
+        val alreadyUnencryptableRecipients = this.unencryptableRecipients ?: emptySet()
+        this.unencryptableRecipients = unencryptableRecipients
+        // No need to recompute unencryptable items if a password is already set or the encryption is not activated
+        if (!isEncryptionActivated || encryptionPassword.isNotBlank()) return
+
+        unencryptableRecipients?.let { newUnencryptableRecipients ->
+            recipients.forEachIndexed { index, recipient ->
+                // Only recompute items that weren't already in the same state to avoid making them blink
+                if (recipient.email in newUnencryptableRecipients && recipient.email !in alreadyUnencryptableRecipients) {
+                    notifyItemChanged(index)
+                }
+            }
+        }
     }
 
     class ContactChipViewHolder(val binding: ChipContactBinding) : ViewHolder(binding.root)

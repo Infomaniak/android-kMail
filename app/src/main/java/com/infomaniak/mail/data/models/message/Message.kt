@@ -140,6 +140,10 @@ class Message : RealmObject, Snoozable {
     @SerialName("snooze_uuid")
     override var snoozeUuid: String? = null
     var headers: Headers? = null
+    @SerialName("encrypted")
+    var isEncrypted: Boolean = false
+    @SerialName("crypt_password_validity")
+    var encryptionPasswordValidity: RealmInstant? = null
     @SerialName("emoji_reaction")
     var emojiReaction: String? = null
     @SerialName("emoji_reaction_not_allowed_reason")
@@ -217,6 +221,8 @@ class Message : RealmObject, Snoozable {
     val threads by backlinks(Thread::messages)
 
     val threadsDuplicatedIn by backlinks(Thread::duplicates)
+
+    val allRecipients inline get() = listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray())
 
     inline val folder: Folder
         get() = run {

@@ -44,12 +44,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.isNightModeEnabled
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.lib.richhtmleditor.StatusCommand.BOLD
@@ -85,6 +85,8 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageRecipientFieldsManager.FieldType
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel.UiFrom
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionMessageManager
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionViewModel
 import com.infomaniak.mail.utils.HtmlUtils.processCids
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
 import com.infomaniak.mail.utils.SentryDebug
@@ -135,6 +137,7 @@ class NewMessageFragment : Fragment() {
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val aiViewModel: AiViewModel by activityViewModels()
+    private val encryptionViewModel: EncryptionViewModel by activityViewModels()
 
     private val filePicker = FilePicker(fragment = this).apply {
         initCallback { uris -> newMessageViewModel.importAttachmentsLiveData.value = uris }
@@ -156,6 +159,9 @@ class NewMessageFragment : Fragment() {
 
     @Inject
     lateinit var aiManager: NewMessageAiManager
+
+    @Inject
+    lateinit var encryptionMessageManager: EncryptionMessageManager
 
     @Inject
     lateinit var externalsManager: NewMessageExternalsManager
@@ -234,6 +240,13 @@ class NewMessageFragment : Fragment() {
             observeAiOutput()
             observeAiPromptStatus()
             observeAiFeatureFlagUpdates()
+        }
+
+        with(encryptionMessageManager) {
+            observeEncryptionFeatureFlagUpdates()
+            observeEncryptionData()
+            observeEncryptionActivation()
+            observeUnencryptableRecipients()
         }
 
         with(recipientFieldsManager) {
@@ -317,7 +330,15 @@ class NewMessageFragment : Fragment() {
             binding = binding,
             fragment = this@NewMessageFragment,
             aiManager = aiManager,
+            encryptionManager = encryptionMessageManager,
             openFilePicker = filePicker::open,
+        )
+
+        encryptionMessageManager.init(
+            newMessageViewModel = newMessageViewModel,
+            binding = binding,
+            fragment = this@NewMessageFragment,
+            encryptionViewModel = encryptionViewModel,
         )
 
         recipientFieldsManager.initValues(
@@ -325,6 +346,7 @@ class NewMessageFragment : Fragment() {
             binding = binding,
             fragment = this@NewMessageFragment,
             externalsManager = externalsManager,
+            encryptionMessageManager = encryptionMessageManager,
         )
     }
 
@@ -633,7 +655,11 @@ class NewMessageFragment : Fragment() {
                 shouldInitToField = false
                 binding.toField.initRecipients(it.recipients, it.otherFieldsAreEmpty)
             }
-            updateIsSendingAllowed(type = FieldType.TO, recipients = it.recipients)
+            updateIsSendingAllowed(
+                type = FieldType.TO,
+                recipients = it.recipients,
+                isEncryptionValid = encryptionMessageManager.checkEncryptionCanBeSend(),
+            )
         }
 
         ccLiveData.observe(viewLifecycleOwner) {
@@ -641,7 +667,11 @@ class NewMessageFragment : Fragment() {
                 shouldInitCcField = false
                 binding.ccField.initRecipients(it.recipients)
             }
-            updateIsSendingAllowed(type = FieldType.CC, recipients = it.recipients)
+            updateIsSendingAllowed(
+                type = FieldType.CC,
+                recipients = it.recipients,
+                isEncryptionValid = encryptionMessageManager.checkEncryptionCanBeSend(),
+            )
             updateOtherRecipientsFieldsAreEmpty(cc = it.recipients, bcc = bccLiveData.valueOrEmpty())
         }
 
@@ -650,7 +680,11 @@ class NewMessageFragment : Fragment() {
                 shouldInitBccField = false
                 binding.bccField.initRecipients(it.recipients)
             }
-            updateIsSendingAllowed(type = FieldType.BCC, recipients = it.recipients)
+            updateIsSendingAllowed(
+                type = FieldType.BCC,
+                recipients = it.recipients,
+                isEncryptionValid = encryptionMessageManager.checkEncryptionCanBeSend(),
+            )
             updateOtherRecipientsFieldsAreEmpty(cc = ccLiveData.valueOrEmpty(), bcc = it.recipients)
         }
     }
@@ -680,7 +714,7 @@ class NewMessageFragment : Fragment() {
             if (attachments.isEmpty()) TransitionManager.beginDelayedTransition(binding.root)
             binding.attachmentsRecyclerView.isVisible = attachments.isNotEmpty()
 
-            updateIsSendingAllowed(attachments)
+            updateIsSendingAllowed(attachments, isEncryptionValid = encryptionMessageManager.checkEncryptionCanBeSend())
         }
     }
 
@@ -764,13 +798,21 @@ class NewMessageFragment : Fragment() {
             sendButton.isEnabled = it
         }
 
-        scheduleButton.setOnClickListener { if (checkMailboxStorage()) navigateToScheduleSendBottomSheet() }
+        scheduleButton.setOnClickListener {
+            if (checkMailboxStorage()) {
+                if (newMessageViewModel.isEncryptionActivated.value == true) {
+                    snackbarManager.postValue(getString(R.string.encryptedMessageSnackbarScheduledUnavailable))
+                } else {
+                    navigateToScheduleSendBottomSheet()
+                }
+            }
+        }
 
         sendButton.setOnClickListener { if (checkMailboxStorage()) tryToSendEmail() }
     }
 
     private fun navigateToScheduleSendBottomSheet() {
-        safeNavigate(
+        safelyNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,

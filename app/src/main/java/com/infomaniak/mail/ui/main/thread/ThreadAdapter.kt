@@ -41,7 +41,9 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
 import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
+import com.infomaniak.core.utils.FormatData
 import com.infomaniak.core.utils.format
+import com.infomaniak.core.utils.formatWithLocal
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -89,6 +91,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.format.FormatStyle
 import java.util.Date
 import com.google.android.material.R as RMaterial
 
@@ -222,7 +225,6 @@ class ThreadAdapter(
 
         bindHeader(message)
         bindAlerts(message)
-        bindSpam(message)
         bindCalendarEvent(message)
         bindAttachments(message)
         bindContent(message)
@@ -247,7 +249,7 @@ class ThreadAdapter(
                     shouldDisplayReplyOptions = calendarEventResponse.isReplyAuthorized(),
                     attachment = calendarAttachment,
                     hasAssociatedInfomaniakCalendarEvent = calendarEventResponse.hasAssociatedInfomaniakCalendarEvent(),
-                    shouldStartExpanded = threadAdapterState.isCalendarEventExpandedMap[message.uid] ?: false,
+                    shouldStartExpanded = threadAdapterState.isCalendarEventExpandedMap[message.uid] == true,
                 )
             }
 
@@ -371,22 +373,6 @@ class ThreadAdapter(
     private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.displayDate.toDate()
 
-        if (message.isScheduledDraft) {
-            scheduleAlert.setDescription(
-                context.getString(
-                    R.string.scheduledEmailHeader,
-                    message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
-                ),
-            )
-            scheduleSendIcon.isVisible = true
-            alertsGroup.isVisible = true
-            scheduleAlert.isVisible = true
-        } else {
-            scheduleSendIcon.isGone = true
-            alertsGroup.isGone = true
-            scheduleAlert.isGone = true
-        }
-
         if (message.isDraft) {
             userAvatar.loadUserAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
@@ -404,7 +390,7 @@ class ThreadAdapter(
             }
 
             userAvatar.loadAvatar(firstSender, message.bimi)
-            certifiedIcon.isVisible = message.bimi?.isCertified ?: false
+            certifiedIcon.isVisible = message.bimi?.isCertified == true
 
             shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
@@ -475,6 +461,78 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindAlerts(message: Message) = with(binding) {
+        if (message.isEncrypted) {
+            bindEncryption(message)
+        } else {
+            encryptionAlert.isGone = true
+        }
+
+        if (message.isScheduledDraft) {
+            bindScheduled(message)
+        } else {
+            scheduleSendIcon.isGone = true
+            scheduleAlert.isGone = true
+        }
+
+        distantImagesAlert.onAction1 {
+            bodyWebViewClient.unblockDistantResources()
+            fullMessageWebViewClient.unblockDistantResources()
+
+            manuallyAllowedMessagesUids.add(message.uid)
+
+            reloadVisibleWebView()
+
+            distantImagesAlert.isGone = true
+            hideAlertGroupIfNoneDisplayed()
+        }
+
+        bindSpam(message)
+
+        hideAlertGroupIfNoneDisplayed() // Must be called after binding all the different alerts
+    }
+
+    private fun ItemMessageBinding.bindEncryption(message: Message) {
+        encryptionAlert.apply {
+            isVisible = true
+
+            val isMe = message.from.all(Recipient::isMe)
+            val passwordValidity = message.encryptionPasswordValidity?.toDate()
+
+            val (description, actionRes) = if (isMe && passwordValidity != null) {
+                getDisplayablePasswordValidity(context, passwordValidity) to R.string.encryptedButtonSeeConcernedRecipients
+            } else {
+                context.getString(R.string.encryptedMessageHeader) to null
+            }
+
+            setDescription(description)
+            actionRes?.let {
+                // TODO: Put this back when the back will have put the encryption information in prod
+                //     setAction1Text(context.getString(it))
+                //     onAction1 {
+                //         threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(message.allRecipients)
+                //     }
+                setActionsVisibility(isVisible = false)
+            } ?: setActionsVisibility(isVisible = false)
+        }
+    }
+
+    private fun getDisplayablePasswordValidity(context: Context, passwordValidity: Date): String {
+        val displayableDate = passwordValidity.formatWithLocal(formatData = FormatData.DATE, formatStyle = FormatStyle.SHORT)
+        return context.getString(R.string.encryptedMessageHeaderPasswordExpiryDate, displayableDate)
+    }
+
+    private fun ItemMessageBinding.bindScheduled(message: Message) {
+        scheduleAlert.setDescription(
+            context.getString(
+                R.string.scheduledEmailHeader,
+                message.displayDate.toDate().format(FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME),
+            ),
+        )
+
+        scheduleSendIcon.isVisible = true
+        alertsGroup.isVisible = true
+        scheduleAlert.isVisible = true
+
         message.draftResource?.let { draftResource ->
             scheduleAlert.onAction1 {
                 trackScheduleSendEvent(MatomoName.ModifySnooze)
@@ -489,18 +547,6 @@ class ThreadAdapter(
             trackScheduleSendEvent(MatomoName.CancelSnooze)
             threadAdapterCallbacks?.onModifyScheduledClicked?.invoke(message)
         }
-
-        distantImagesAlert.onAction1 {
-            bodyWebViewClient.unblockDistantResources()
-            fullMessageWebViewClient.unblockDistantResources()
-
-            manuallyAllowedMessagesUids.add(message.uid)
-
-            reloadVisibleWebView()
-
-            distantImagesAlert.isGone = true
-            hideAlertGroupIfNoneDisplayed()
-        }
     }
 
     //region Spam
@@ -510,7 +556,7 @@ class ThreadAdapter(
 
     private data class SpamData(val spamAction: SpamAction, val description: String = "", val action: String = "")
 
-    private fun MessageViewHolder.bindSpam(message: Message) = with(binding) {
+    private fun ItemMessageBinding.bindSpam(message: Message) {
         val firstExpeditor = message.from.firstOrNull()
         val spamAction = getSpamBannerAction(message, firstExpeditor)
         val spamData = context.getSpamBannerData(spamAction = spamAction, emailToUnblock = firstExpeditor?.email)
@@ -523,8 +569,6 @@ class ThreadAdapter(
             spamAlert.setAction1Text(spamData.action)
             spamAlert.onAction1 { spamActionButton(spamData, message, firstExpeditor!!) }
         }
-
-        hideAlertGroupIfNoneDisplayed()
     }
 
     private fun getSpamBannerAction(message: Message, firstExpeditor: Recipient?): SpamAction {
@@ -765,7 +809,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
-        val isExpanded = threadAdapterState.isExpandedMap[message.uid] ?: false
+        val isExpanded = threadAdapterState.isExpandedMap[message.uid] == true
 
         if (shouldTrack) trackMessageEvent(MatomoName.OpenMessage, isExpanded)
 
@@ -793,8 +837,8 @@ class ThreadAdapter(
         recipientOverlayedButton.isVisible = isExpanded
     }
 
-    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String = with(message) {
-        return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
+    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String {
+        return message.allRecipients.joinToString { it.displayedName(context) }
     }
 
     fun isMessageUidManuallyAllowed(messageUid: String) = manuallyAllowedMessagesUids.contains(messageUid)
@@ -944,6 +988,7 @@ class ThreadAdapter(
         var promptLink: ((String, ContextMenuType) -> Unit)? = null,
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
+        var onEncryptionSeeConcernedRecipients: ((List<Recipient>) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {

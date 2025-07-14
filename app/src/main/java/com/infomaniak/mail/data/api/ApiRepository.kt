@@ -67,6 +67,7 @@ import com.infomaniak.mail.data.models.getMessages.MessageFlags
 import com.infomaniak.mail.data.models.getMessages.NewMessagesResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxExternalMailInfo
+import com.infomaniak.mail.data.models.mailbox.MailboxHostingStatus
 import com.infomaniak.mail.data.models.mailbox.MailboxLinkedResult
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
@@ -157,6 +158,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.requestMailboxPassword(mailboxHostingId, mailboxName), POST)
     }
 
+    suspend fun isInfomaniakMailboxes(emails: Set<String>): ApiResponse<List<MailboxHostingStatus>> {
+        return callApi(ApiRoutes.isInfomaniakMailboxes(emails), GET)
+    }
+
     suspend fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
     suspend fun createFolder(mailboxUuid: String, name: String): ApiResponse<Folder> {
@@ -169,7 +174,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     suspend fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
         return callApi(
-            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=emoji_reactions_per_message"),
+            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=auto_uncrypt,emoji_reactions_per_message"),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )

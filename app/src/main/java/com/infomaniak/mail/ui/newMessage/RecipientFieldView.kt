@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.PopupWindow
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -47,6 +47,8 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewContactChipContextMenuBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptableView
+import com.infomaniak.mail.ui.newMessage.encryption.EncryptionStatus
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.extensions.isEmail
@@ -54,17 +56,36 @@ import com.infomaniak.mail.utils.extensions.toggleChevron
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.min
+import com.infomaniak.lib.core.R as RCore
 
 @AndroidEntryPoint
 class RecipientFieldView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr), EncryptableView {
 
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
     private var contactAdapter: ContactAdapter
     private var contactChipAdapter: ContactChipAdapter
+
+    override var isEncryptionActivated: Boolean = false
+        set(value) {
+            field = value
+            applyEncryptionStyle()
+        }
+    override var unencryptableRecipients: Set<String>? = null
+        set(value) {
+            field = value
+            contactChipAdapter.updateUnencryptableRecipients(value)
+            setSingleChipStyle()
+            setPlusChipStyle()
+        }
+    override var encryptionPassword: String = ""
+        set(value) {
+            field = value
+            applyEncryptionStyle()
+        }
 
     private lateinit var popupRecipient: Recipient
     private var popupDeletesTheCollapsedChip = false
@@ -78,7 +99,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private val contactPopupWindow by lazy {
         PopupWindow(context).apply {
             contentView = contextMenuBinding.root
-            height = ViewGroup.LayoutParams.WRAP_CONTENT
+            height = LayoutParams.WRAP_CONTENT
 
             val displayMetrics = context.resources.displayMetrics
             val percentageOfScreen = (displayMetrics.widthPixels * MAX_WIDTH_PERCENTAGE).toInt()
@@ -285,11 +306,12 @@ class RecipientFieldView @JvmOverloads constructor(
             isGone = isTextInputAccessible
             val recipient = contactChipAdapter.getRecipients().firstOrNull()
             text = recipient?.getNameOrEmail() ?: ""
-            setChipStyle(recipient?.isDisplayedAsExternal == true)
+            setSingleChipStyle()
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
             text = "+${contactChipAdapter.itemCount - 1}"
+            setPlusChipStyle()
         }
 
         transparentButton.isGone = isTextInputAccessible
@@ -298,6 +320,32 @@ class RecipientFieldView @JvmOverloads constructor(
 
     fun updateContacts(allContacts: List<MergedContact>) {
         contactAdapter.updateContacts(allContacts)
+    }
+
+    private fun setSingleChipStyle() {
+        val firstRecipient = contactChipAdapter.getRecipients().firstOrNull()
+        val isExternal = firstRecipient?.isDisplayedAsExternal == true
+
+        val firstRecipientStatus = getSpecialChipsEncryptionStatus(firstRecipient?.isEncryptable == true)
+        binding.singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus = firstRecipientStatus)
+    }
+
+    private fun setPlusChipStyle() {
+        val recipientsExceptFirst = contactChipAdapter.getRecipients().drop(1)
+        val plusChipEncryptionStatus = getSpecialChipsEncryptionStatus(recipientsExceptFirst.all { it.isEncryptable })
+        binding.plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipEncryptionStatus)
+    }
+
+    private fun getSpecialChipsEncryptionStatus(isRecipientEncryptable: Boolean) = when {
+        !isEncryptionActivated -> EncryptionStatus.Unencrypted
+        isRecipientEncryptable -> EncryptionStatus.Encrypted
+        else -> EncryptionStatus.PartiallyEncrypted
+    }
+
+    private fun applyEncryptionStyle() = with(binding) {
+        setSingleChipStyle()
+        setPlusChipStyle()
+        contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients, encryptionPassword)
     }
 
     private fun openAutoCompletion() {
@@ -442,18 +490,58 @@ class RecipientFieldView @JvmOverloads constructor(
         private const val EXTERNAL_CHIP_STROKE_WIDTH = 1
         private const val NO_STROKE = 0.0f
 
-        fun Chip.setChipStyle(displayAsExternal: Boolean) {
-            if (displayAsExternal) {
-                chipBackgroundColor = context.getColorStateList(R.color.chip_contact_background_color_external)
-                setTextColor(context.getColorStateList(R.color.chip_contact_text_color_external))
-                chipStrokeColor = ColorStateList.valueOf(context.getColor(R.color.externalTagBackground))
-                chipStrokeWidth = EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
-            } else {
-                chipBackgroundColor = context.getColorStateList(R.color.chip_contact_background_color)
-                setTextColor(context.getColorStateList(R.color.chip_contact_text_color))
-                chipStrokeColor = null
-                chipStrokeWidth = NO_STROKE
+        fun Chip.setChipStyle(displayAsExternal: Boolean, encryptionStatus: EncryptionStatus) = when {
+            encryptionStatus == EncryptionStatus.Encrypted -> {
+                ChipStyle(
+                    backgroundColor = R.color.encryptionBackgroundColor,
+                    textColor = R.color.encryptionTextColor,
+                    icon = R.drawable.ic_lock_filled,
+                    iconTint = R.color.encryptionIconColor,
+                )
             }
+            encryptionStatus == EncryptionStatus.PartiallyEncrypted ||
+                    encryptionStatus == EncryptionStatus.Loading -> ChipStyle(
+                backgroundColor = R.color.encryptionBackgroundColor,
+                textColor = R.color.encryptionTextColor,
+                icon = R.drawable.ic_lock_open_filled_pastille,
+            )
+            displayAsExternal -> ChipStyle(
+                backgroundColor = R.color.chip_contact_background_color_external,
+                textColor = R.color.chip_contact_text_color_external,
+                strokeColor = R.color.externalTagBackground,
+            )
+            else -> ChipStyle(
+                backgroundColor = R.color.chip_contact_background_color,
+                textColor = R.color.chip_contact_text_color,
+            )
+        }.applyTo(this)
+    }
+
+    private data class ChipStyle(
+        val backgroundColor: Int,
+        val textColor: Int,
+        val strokeColor: Int? = null,
+        val icon: Int? = null,
+        val iconTint: Int? = null,
+    ) {
+
+        fun applyTo(chip: Chip) = chip.apply {
+            val (color, width) = strokeColor?.let {
+                ColorStateList.valueOf(context.getColor(it)) to EXTERNAL_CHIP_STROKE_WIDTH.toPx().toFloat()
+            } ?: (null to NO_STROKE)
+
+            chipStrokeWidth = width
+            chipStrokeColor = color
+
+            setTextColor(context.getColorStateList(textColor))
+            setChipBackgroundColorResource(backgroundColor)
+
+            chipIcon = icon?.let { ResourcesCompat.getDrawable(resources, it, null) }
+            chipIconTint = iconTint?.let(context::getColorStateList)
+            setChipIconSizeResource(R.dimen.iconImageSize)
+            setIconStartPaddingResource(RCore.dimen.marginStandardVerySmall)
+            val textStartPadding = if (icon == null) RCore.dimen.marginStandardSmall else RCore.dimen.marginStandardVerySmall
+            setTextStartPaddingResource(textStartPadding)
         }
     }
 }
