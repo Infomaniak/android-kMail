@@ -92,7 +92,12 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
     fun setupEditorFormatActions() = with(binding) {
         fun linkEditor(view: MaterialButton, action: EditorAction) {
             view.setOnClickListener {
-                trackEvent(MatomoCategory.EditorActions, action.matomoName)
+                val trackerName = when {
+                    action != EditorAction.ENCRYPTION -> action.matomoName
+                    newMessageViewModel.isEncryptionActivated.value == true -> MatomoName.OpenEncryptionActions
+                    else -> MatomoName.EncryptionActivation
+                }
+                trackEvent(MatomoCategory.EditorActions, trackerName)
                 newMessageViewModel.editorAction.value = action to null
             }
         }
@@ -160,6 +165,6 @@ class NewMessageEditorManager @Inject constructor(private val insertLinkDialog: 
         UNDERLINE(MatomoName.Underline),
         STRIKE_THROUGH(MatomoName.StrikeThrough),
         UNORDERED_LIST(MatomoName.UnorderedList),
-        ENCRYPTION(MatomoName.Encryption),
+        ENCRYPTION(MatomoName.EncryptionActivation),
     }
 }
