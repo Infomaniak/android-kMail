@@ -281,8 +281,7 @@
         <item quantity="other">La encriptación no es soportada por %d usuarios.</item>
     </plurals>
     <string name="encryptedMessagePasswordConcernedUserTitle">Usuarios afectados</string>
-    <string name="encryptedMessagePasswordLabel">Comparta esta contraseña de forma segura (kPaste, kChat, SMS…). No podrás copiarla una vez enviada.</string>
-    <string name="encryptedMessageSnackbarEncryptionActivated">Se ha activado el cifrado</string>
+    <string name="encryptedMessagePasswordLabel">Comparte esta contraseña por mensaje privado. No podrás copiarla una vez que la hayas enviado.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Se ha desactivado el cifrado</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Los correos electrónicos programados no están disponibles para los mensajes cifrados</string>
     <string name="encryptedMessageUpdatePasswordButton">Cambiar contraseña</string>

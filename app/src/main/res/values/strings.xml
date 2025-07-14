@@ -287,8 +287,7 @@
         <item quantity="other">Encryption is not supported by %d users.</item>
     </plurals>
     <string name="encryptedMessagePasswordConcernedUserTitle">Users concerned</string>
-    <string name="encryptedMessagePasswordLabel">Share this password securely (kPaste, kChat, SMS…). You won’t be able to copy it once you’ve sent it.</string>
-    <string name="encryptedMessageSnackbarEncryptionActivated">Encryption has been activated</string>
+    <string name="encryptedMessagePasswordLabel">Share this password by private message. You won’t be able to copy it once you’ve sent it.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Encryption has been disabled</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Scheduled emails not available for encrypted messages</string>
     <string name="encryptedMessageUpdatePasswordButton">Change password</string>

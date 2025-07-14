@@ -22,12 +22,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEncryptionLockButtonBinding
 
 class EncryptionLockButtonView @JvmOverloads constructor(
@@ -60,6 +57,10 @@ class EncryptionLockButtonView @JvmOverloads constructor(
             setToolbarButtonUi()
         }
 
+    init {
+        setToolbarButtonUi()
+    }
+
     override fun onDetachedFromWindow() {
         loadingDelayTimer.cancel()
         super.onDetachedFromWindow()
@@ -67,53 +68,23 @@ class EncryptionLockButtonView @JvmOverloads constructor(
 
     private fun setToolbarButtonUi() {
         loadingDelayTimer.cancel()
-
-        when (encryptionStatus) {
-            EncryptionStatus.Unencrypted -> setIconUi(
-                iconRes = R.drawable.ic_lock_open_filled,
-                iconTintRes = R.color.iconColor,
-                shouldDisplayPastille = false,
-            )
-            EncryptionStatus.PartiallyEncrypted -> setIconUi(
-                iconRes = R.drawable.ic_lock_filled,
-                iconTintRes = R.color.encryptionIconColor,
-                shouldDisplayPastille = true,
-            )
-            EncryptionStatus.Encrypted -> setIconUi(
-                iconRes = R.drawable.ic_lock_filled,
-                iconTintRes = R.color.encryptionIconColor,
-                shouldDisplayPastille = false,
-            )
-            EncryptionStatus.Loading -> setIconUi(
-                iconRes = R.drawable.ic_lock_filled,
-                iconTintRes = R.color.encryptionIconColor,
-                shouldDisplayPastille = false,
-                isLoading = true,
-            )
-        }
+        setIconUi(encryptionStatus)
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setIconUi(
-        @DrawableRes iconRes: Int,
-        @ColorRes iconTintRes: Int,
-        shouldDisplayPastille: Boolean,
-        isLoading: Boolean = false,
-    ) {
-        with(binding) {
-            encryptionButton.apply {
-                isEnabled = true
-                setIconResource(iconRes)
-                setIconTintResource(iconTintRes)
-            }
-            updateUnencryptableCountUi()
-            unencryptableGroup.isVisible = shouldDisplayPastille && !isLoading
+    private fun setIconUi(encryptionStatus: EncryptionStatus) = with(encryptionStatus) {
+        binding.encryptionButton.apply {
+            isEnabled = true
+            setIconResource(iconRes)
+            setIconTintResource(iconTintRes)
+        }
+        updateUnencryptableCountUi()
+        binding.unencryptableGroup.isVisible = shouldDisplayPastille && !isLoading
 
-            unencryptedRecipientLoader.isVisible = isLoading
-            if (isLoading) {
-                encryptionButton.isEnabled = false
-                loadingDelayTimer.start()
-            }
+        binding.unencryptedRecipientLoader.isVisible = isLoading
+        if (isLoading) {
+            binding.encryptionButton.isEnabled = false
+            loadingDelayTimer.start()
         }
     }
 

@@ -27,13 +27,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentEncryptionPasswordBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.newMessage.ContactChipAdapter
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
-import com.infomaniak.mail.utils.extensions.copyStringToClipboard
+import com.infomaniak.mail.utils.extensions.shareString
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -45,7 +44,7 @@ class EncryptionPasswordFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
     private val encryptionViewModel: EncryptionViewModel by activityViewModels()
 
-    private val contactChipAdapter: ContactChipAdapter by lazy { ContactChipAdapter() }
+    private val contactChipAdapter: ContactChipAdapter by lazy { ContactChipAdapter(canChipsBeEnabled = false) }
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -65,7 +64,7 @@ class EncryptionPasswordFragment : Fragment() {
     private fun setupUnencryptableRecipientsChips() {
         binding.userChipsRecyclerView.adapter = contactChipAdapter.apply {
             isEncryptionActivated = true
-            unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
+            unencryptableRecipients = encryptionViewModel.unencryptableRecipients.value?.toSet()
             unencryptableRecipients?.forEach { addChip(Recipient().initLocalValues(email = it)) }
         }
     }
@@ -75,7 +74,10 @@ class EncryptionPasswordFragment : Fragment() {
             passwordInput.setText(encryptionViewModel.generatePassword())
         }
         passwordInput.apply {
-            doOnTextChanged { password, _, _, _ -> newMessageViewModel.encryptionPassword.value = password.toString() }
+            doOnTextChanged { password, _, _, _ ->
+                newMessageViewModel.encryptionPassword.value = password.toString()
+                binding.sharePasswordButton.isEnabled = password?.isNotBlank() == true
+            }
             val initialPassword = newMessageViewModel.encryptionPassword.value.takeUnless { it.isNullOrBlank() }
             setText(initialPassword ?: encryptionViewModel.generatePassword())
         }
@@ -84,9 +86,9 @@ class EncryptionPasswordFragment : Fragment() {
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         readMoreButton.setOnClickListener { context?.openUrl(ENCRYPTION_FAQ_URL) }
-        copyPasswordButton.setOnClickListener {
-            val password = passwordInput.text
-            requireContext().copyStringToClipboard(password.toString(), R.string.snackbarPasswordCopied, snackbarManager)
+        sharePasswordButton.setOnClickListener {
+            val password = passwordInput.text?.toString()
+            if (password?.isNotBlank() == true) requireContext().shareString(password)
             findNavController().popBackStack()
         }
     }
