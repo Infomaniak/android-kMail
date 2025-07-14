@@ -25,6 +25,6 @@ interface EncryptableView {
     var unencryptableRecipients: Set<String>?
     var encryptionPassword: String
 
-    val Recipient.isUnencryptable: Boolean
-        get() = unencryptableRecipients?.contains(email) == true && encryptionPassword.isBlank()
+    val Recipient.isEncryptable: Boolean
+        get() = unencryptableRecipients?.contains(email) != true || encryptionPassword.isNotBlank()
 }
