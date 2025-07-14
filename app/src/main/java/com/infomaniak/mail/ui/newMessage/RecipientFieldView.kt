@@ -78,6 +78,7 @@ class RecipientFieldView @JvmOverloads constructor(
             field = value
             contactChipAdapter.updateUnencryptableRecipients(value)
             setSingleChipStyle()
+            setPlusChipStyle()
         }
     override var encryptionPassword: String = ""
         set(value) {
@@ -303,18 +304,13 @@ class RecipientFieldView @JvmOverloads constructor(
         singleChip.root.apply {
             isGone = isTextInputAccessible
             val recipient = contactChipAdapter.getRecipients().firstOrNull()
-            val firstRecipientStatus = when {
-                !isEncryptionActivated -> EncryptionStatus.Unencrypted
-                unencryptableRecipients == null -> EncryptionStatus.Loading
-                recipient?.isUnencryptable == true -> EncryptionStatus.PartiallyEncrypted
-                else -> EncryptionStatus.Encrypted
-            }
             text = recipient?.getNameOrEmail() ?: ""
-            setChipStyle(recipient?.isDisplayedAsExternal == true, firstRecipientStatus)
+            setSingleChipStyle()
         }
         plusChip.apply {
             isGone = !isCollapsed || contactChipAdapter.itemCount <= 1
             text = "+${contactChipAdapter.itemCount - 1}"
+            setPlusChipStyle()
         }
 
         transparentButton.isGone = isTextInputAccessible
@@ -326,23 +322,28 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun setSingleChipStyle() {
-
         val firstRecipient = contactChipAdapter.getRecipients().firstOrNull()
         val isExternal = firstRecipient?.isDisplayedAsExternal == true
 
-        val firstRecipientStatus = when {
-            !isEncryptionActivated -> EncryptionStatus.Unencrypted
-            firstRecipient?.isUnencryptable == true -> EncryptionStatus.PartiallyEncrypted
-            else -> EncryptionStatus.Encrypted
-        }
-
+        val firstRecipientStatus = getSpecialChipsEncryptionStatus(firstRecipient?.isEncryptable == true)
         binding.singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus = firstRecipientStatus)
+    }
+
+    private fun setPlusChipStyle() {
+        val recipientsExceptFirst = contactChipAdapter.getRecipients().drop(1)
+        val plusChipEncryptionStatus = getSpecialChipsEncryptionStatus(recipientsExceptFirst.all { it.isEncryptable })
+        binding.plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipEncryptionStatus)
+    }
+
+    private fun getSpecialChipsEncryptionStatus(isRecipientEncryptable: Boolean) = when {
+        !isEncryptionActivated -> EncryptionStatus.Unencrypted
+        isRecipientEncryptable -> EncryptionStatus.PartiallyEncrypted
+        else -> EncryptionStatus.Encrypted
     }
 
     private fun applyEncryptionStyle() = with(binding) {
         setSingleChipStyle()
-        val plusChipStatus = if (isEncryptionActivated) EncryptionStatus.Encrypted else EncryptionStatus.Unencrypted
-        plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipStatus)
+        setPlusChipStyle()
         contactChipAdapter.toggleEncryption(isEncryptionActivated, unencryptableRecipients, encryptionPassword)
     }
 
@@ -489,8 +490,7 @@ class RecipientFieldView @JvmOverloads constructor(
         private const val NO_STROKE = 0.0f
 
         fun Chip.setChipStyle(displayAsExternal: Boolean, encryptionStatus: EncryptionStatus) = when {
-            encryptionStatus == EncryptionStatus.Encrypted ||
-                    encryptionStatus == EncryptionStatus.Loading -> {
+            encryptionStatus == EncryptionStatus.Encrypted -> {
                 ChipStyle(
                     backgroundColor = R.color.encryptionBackgroundColor,
                     textColor = R.color.encryptionTextColor,
@@ -498,7 +498,8 @@ class RecipientFieldView @JvmOverloads constructor(
                     iconTint = R.color.encryptionIconColor,
                 )
             }
-            encryptionStatus == EncryptionStatus.PartiallyEncrypted -> ChipStyle(
+            encryptionStatus == EncryptionStatus.PartiallyEncrypted ||
+                    encryptionStatus == EncryptionStatus.Loading -> ChipStyle(
                 backgroundColor = R.color.encryptionBackgroundColor,
                 textColor = R.color.encryptionTextColor,
                 icon = R.drawable.ic_lock_open_filled_pastille,
