@@ -129,11 +129,8 @@ class AiPropositionFragment : Fragment() {
             toolbar.applyStatusBarInsets(insets)
             with(insets.safeArea()) {
                 with(binding) {
-                    insertPropositionButton.setMargins(right = right, bottom = bottom)
-                    refineButton.setMargins(left = left, bottom = bottom)
-                    retryButton.setMargins(left = left)
+                    aiPropositionBottomBarForeground.setMargins(left = left, bottom = bottom, right = right)
                     contentLayout.setMargins(left = left, right = right)
-                    generationLoaderText.setMargins(right = right)
                     errorBlock.setMargins(left = left, right = right)
                 }
             }
