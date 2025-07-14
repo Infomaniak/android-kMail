@@ -188,7 +188,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         this.configureSentry(
             isDebug = BuildConfig.DEBUG,
             isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled,
-            isErrorException = { exception: Throwable? ->
+            isFilteredException = { exception: Throwable? ->
                 when {
                     exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> true
                     exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> true
