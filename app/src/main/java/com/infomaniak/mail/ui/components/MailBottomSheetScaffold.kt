@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.components
 
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,7 +58,10 @@ fun MailBottomSheetScaffold(
                         .height(dimensionResource(R.dimen.bottomSheetDragHandleHeight)),
                 ) { /* No-op */ }
             },
-            content = content,
+            content = {
+                content()
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.bottomSheetBottomPadding)))
+            },
         )
     }
 }
