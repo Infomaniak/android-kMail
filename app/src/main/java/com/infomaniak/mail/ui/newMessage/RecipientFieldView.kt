@@ -322,30 +322,23 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun setSingleChipStyle() {
-
         val firstRecipient = contactChipAdapter.getRecipients().firstOrNull()
         val isExternal = firstRecipient?.isDisplayedAsExternal == true
 
-        val firstRecipientStatus = when {
-            !isEncryptionActivated -> EncryptionStatus.Unencrypted
-            firstRecipient?.isEncryptable == true -> EncryptionStatus.Encrypted
-            else -> EncryptionStatus.PartiallyEncrypted
-        }
-
+        val firstRecipientStatus = getSpecialChipsEncryptionStatus(firstRecipient?.isEncryptable == true)
         binding.singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus = firstRecipientStatus)
     }
 
     private fun setPlusChipStyle() {
-
         val recipientsExceptFirst = contactChipAdapter.getRecipients().drop(1)
-
-        val plusChipEncryptionStatus = when {
-            !isEncryptionActivated -> EncryptionStatus.Unencrypted
-            recipientsExceptFirst.all { it.isEncryptable } -> EncryptionStatus.Encrypted
-            else -> EncryptionStatus.PartiallyEncrypted
-        }
-
+        val plusChipEncryptionStatus = getSpecialChipsEncryptionStatus(recipientsExceptFirst.all { it.isEncryptable })
         binding.plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipEncryptionStatus)
+    }
+
+    private fun getSpecialChipsEncryptionStatus(isRecipientEncryptable: Boolean) = when {
+        !isEncryptionActivated -> EncryptionStatus.Unencrypted
+        isRecipientEncryptable -> EncryptionStatus.PartiallyEncrypted
+        else -> EncryptionStatus.Encrypted
     }
 
     private fun applyEncryptionStyle() = with(binding) {
