@@ -1,0 +1,2 @@
+- Add the possibility to delete a folder
+- Add message encryption

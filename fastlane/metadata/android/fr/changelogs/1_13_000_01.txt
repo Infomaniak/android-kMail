@@ -1,0 +1,2 @@
+- Ajout de la possibilité de supprimer un dossier
+- Ajout du chiffrement des messages
