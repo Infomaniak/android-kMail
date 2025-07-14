@@ -154,6 +154,7 @@ class NewMessageViewModel @Inject constructor(
     val attachmentsLiveData = MutableLiveData<List<Attachment>>()
     val uiSignatureLiveData = MutableLiveData<String?>()
     val uiQuoteLiveData = MutableLiveData<String?>()
+    inline val allRecipients get() = toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
     //endregion
 
     val editorBodyInitializer = SingleLiveEvent<BodyContentPayload>()
@@ -177,17 +178,27 @@ class NewMessageViewModel @Inject constructor(
     private var snapshot: DraftSnapshot? = null
 
     val otherRecipientsFieldsAreEmpty = MutableLiveData(true)
+    val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
     val isEditorWebViewFocusedLiveData = MutableLiveData<Boolean>()
 
     val initializeFieldsAsOpen = SingleLiveEvent<Boolean>()
-    val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
-    val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
-    val isSendingAllowed = SingleLiveEvent(false)
-    val externalRecipientCount = SingleLiveEvent<Pair<String?, Int>>()
-    // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
-    val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     // Needs to trigger every time the Fragment is recreated
     val initResult = MutableLiveData<InitResult>()
+
+    //region Attachments
+    val importAttachmentsLiveData = SingleLiveEvent<List<Uri>>()
+    val importAttachmentsResult = SingleLiveEvent<ImportationResult>()
+    //endRegion
+
+    //region Encryption
+    val isEncryptionActivated = SingleLiveEvent(false)
+    val encryptionPassword: SingleLiveEvent<String> = SingleLiveEvent("")
+    //endregion
+
+    val isSendingAllowed = SingleLiveEvent(false)
+
+    // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
+    val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
@@ -492,11 +503,15 @@ class NewMessageViewModel @Inject constructor(
             subject = subject,
             uiBody = uiBodyValue,
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
+            isEncrypted = isEncrypted,
+            encryptionPassword = encryptionKey,
         )
     }
 
     private fun Draft.initLiveData(signatures: List<Signature>) {
         val draftSignature = signatures.singleOrNull { it.id == identityId?.toInt() }
+
+        encryptionPassword.postValue(encryptionKey)
 
         fromLiveData.postValue(
             UiFrom(
@@ -520,6 +535,8 @@ class NewMessageViewModel @Inject constructor(
             otherRecipientsFieldsAreEmpty.postValue(false)
             initializeFieldsAsOpen.postValue(true)
         }
+
+        isEncryptionActivated.postValue(isEncrypted)
     }
 
     private suspend fun getLocalOrRemoteDraft(localUuid: String?): Draft? {
@@ -841,16 +858,17 @@ class NewMessageViewModel @Inject constructor(
         attachments: List<Attachment> = attachmentsLiveData.valueOrEmpty(),
         type: FieldType? = null,
         recipients: List<Recipient> = emptyList(),
+        isEncryptionValid: Boolean = true,
     ) {
 
-        val allRecipients = when (type) {
+        val allDraftRecipients = when (type) {
             FieldType.TO -> recipients + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
             FieldType.CC -> toLiveData.valueOrEmpty() + recipients + bccLiveData.valueOrEmpty()
             FieldType.BCC -> toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + recipients
-            null -> toLiveData.valueOrEmpty() + ccLiveData.valueOrEmpty() + bccLiveData.valueOrEmpty()
+            null -> allRecipients
         }
 
-        isSendingAllowed.value = if (allRecipients.isNotEmpty()) {
+        isSendingAllowed.value = if (allDraftRecipients.isNotEmpty() && isEncryptionValid) {
             var size = 0L
             var isSizeCorrect = true
             for (attachment in attachments) {
@@ -981,6 +999,8 @@ class NewMessageViewModel @Inject constructor(
     ) {
 
         action = draftAction
+        isEncrypted = isEncryptionActivated.value ?: false
+        encryptionKey = encryptionPassword.value
         identityId = fromLiveData.value?.signature?.id.toString()
 
         to = toLiveData.valueOrEmpty().toRealmList()
@@ -1061,6 +1081,8 @@ class NewMessageViewModel @Inject constructor(
                     draftSnapshot.bcc == bccLiveData.valueOrEmpty().toSet() &&
                     draftSnapshot.subject == subjectValue &&
                     draftSnapshot.uiBody == uiBodyValue &&
+                    draftSnapshot.isEncrypted == isEncryptionActivated.value &&
+                    draftSnapshot.encryptionPassword == encryptionPassword.value &&
                     draftSnapshot.attachmentsLocalUuids == attachmentsLiveData.valueOrEmpty()
                 .mapTo(mutableSetOf()) { it.localUuid }
         } ?: false
@@ -1153,6 +1175,8 @@ class NewMessageViewModel @Inject constructor(
         var subject: String?,
         var uiBody: String,
         val attachmentsLocalUuids: Set<String>,
+        var isEncrypted: Boolean,
+        var encryptionPassword: String?,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)

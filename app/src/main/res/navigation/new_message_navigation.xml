@@ -34,6 +34,9 @@
         <action
             android:id="@+id/action_newMessageFragment_to_aiDiscoveryBottomSheetDialog"
             app:destination="@id/aiDiscoveryBottomSheetDialog" />
+        <action
+            android:id="@+id/action_newMessageFragment_to_encryptionActionsBottomSheetDialog"
+            app:destination="@id/encryptionActionsBottomSheetDialog" />
     </fragment>
 
     <fragment
@@ -48,6 +51,12 @@
             android:name="isBodyBlank"
             app:argType="boolean" />
     </fragment>
+
+    <fragment
+        android:id="@+id/encryptionPasswordFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.encryption.EncryptionPasswordFragment"
+        android:label="EncryptionPasswordFragment"
+        tools:layout="@layout/fragment_encryption_password" />
 
     <dialog
         android:id="@+id/aiDiscoveryBottomSheetDialog"
@@ -90,5 +99,18 @@
             android:name="isCurrentMailboxFree"
             android:defaultValue="true"
             app:argType="boolean" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/encryptionActionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.newMessage.encryption.EncryptionActionsBottomSheet"
+        android:label="EncryptionActionsBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_encryption_actions">
+        <argument
+            android:name="password"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_encryptionActionsBottomSheetDialog_to_encryptionPasswordFragment"
+            app:destination="@id/encryptionPasswordFragment" />
     </dialog>
 </navigation>

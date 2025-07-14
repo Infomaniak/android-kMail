@@ -55,6 +55,7 @@ class LocalSettings private constructor(context: Context) : SharedValues {
     var firebaseToken by sharedValueNullable("firebaseTokenKey", null)
     var firebaseRegisteredUsers by sharedValue("firebaseRegisteredUsersKey", emptySet())
     var showAiDiscoveryBottomSheet by sharedValue("showAiDiscoveryBottomSheetKey", true)
+    var showEncryptionDiscoveryBottomSheet by sharedValue("showEncryptionDiscoveryBottomSheetKey", true)
     var showPermissionsOnboarding by sharedValue("showPermissionsOnboardingKey", true)
     var isSentryTrackingEnabled by sharedValue("isSentryTrackingEnabledKey", true)
     var isMatomoTrackingEnabled by sharedValue("isMatomoTrackingEnabledKey", true)

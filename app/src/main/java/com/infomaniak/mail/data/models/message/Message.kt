@@ -137,6 +137,10 @@ class Message : RealmObject, Snoozable {
     @SerialName("snooze_uuid")
     override var snoozeUuid: String? = null
     var headers: Headers? = null
+    @SerialName("encrypted")
+    var isEncrypted: Boolean = false
+    @SerialName("crypt_password_validity")
+    var encryptionPasswordValidity: RealmInstant? = null
 
     // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
     //  If we don't do it now, we'll probably forget to do it in the future.
@@ -200,6 +204,8 @@ class Message : RealmObject, Snoozable {
     val threads by backlinks(Thread::messages)
 
     val threadsDuplicatedIn by backlinks(Thread::duplicates)
+
+    val allRecipients inline get() = listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray())
 
     inline val folder: Folder
         get() = run {

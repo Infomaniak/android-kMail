@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2025 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/encryptionButton"
+        style="@style/IconButton"
+        app:iconSize="@dimen/iconButtonSize"
+        tools:icon="@drawable/ic_lock_filled"
+        tools:iconTint="@color/encryptionIconColor" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="@dimen/standardIconSize"
+        android:layout_height="@dimen/standardIconSize"
+        android:layout_gravity="center_vertical|right"
+        tools:ignore="RtlHardcoded">
+
+        <ImageView
+            android:id="@+id/pastille"
+            android:layout_width="@dimen/unencryptablePastilleSize"
+            android:layout_height="@dimen/unencryptablePastilleSize"
+            android:layout_gravity="top|left"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_pastille"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/orangeWarning"
+            tools:ignore="RtlHardcoded" />
+
+        <TextView
+            android:id="@+id/unencryptedRecipientText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center"
+            android:textColor="@color/onColorfulBackground"
+            android:textSize="8sp"
+            app:layout_constraintBottom_toBottomOf="@id/pastille"
+            app:layout_constraintEnd_toEndOf="@id/pastille"
+            app:layout_constraintStart_toStartOf="@id/pastille"
+            app:layout_constraintTop_toTopOf="@id/pastille"
+            tools:ignore="RtlHardcoded,SmallSp"
+            tools:text="9+" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/unencryptableGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="pastille,unencryptedRecipientText"
+            tools:visibility="visible" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/unencryptedRecipientLoader"
+            android:layout_width="@dimen/unencryptablePastilleSize"
+            android:layout_height="@dimen/unencryptablePastilleSize"
+            android:layout_gravity="top|left"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorInset="0dp"
+            app:indicatorSize="@dimen/unencryptablePastilleSize"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:trackThickness="2dp"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
