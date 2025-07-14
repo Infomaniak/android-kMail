@@ -49,8 +49,8 @@ class ContactChipAdapter(
         val encryptionStatus = when {
             !isEncryptionActivated -> EncryptionStatus.Unencrypted
             unencryptableRecipients == null -> EncryptionStatus.Loading
-            recipient.isUnencryptable -> EncryptionStatus.PartiallyEncrypted
-            else -> EncryptionStatus.Encrypted
+            recipient.isEncryptable -> EncryptionStatus.Encrypted
+            else -> EncryptionStatus.PartiallyEncrypted
         }
 
         root.apply {

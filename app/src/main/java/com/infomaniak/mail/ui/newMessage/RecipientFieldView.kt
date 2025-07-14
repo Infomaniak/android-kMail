@@ -329,8 +329,8 @@ class RecipientFieldView @JvmOverloads constructor(
 
         val firstRecipientStatus = when {
             !isEncryptionActivated -> EncryptionStatus.Unencrypted
-            firstRecipient?.isUnencryptable == true -> EncryptionStatus.PartiallyEncrypted
-            else -> EncryptionStatus.Encrypted
+            firstRecipient?.isEncryptable == true -> EncryptionStatus.Encrypted
+            else -> EncryptionStatus.PartiallyEncrypted
         }
 
         binding.singleChip.root.setChipStyle(displayAsExternal = isExternal, encryptionStatus = firstRecipientStatus)
@@ -342,8 +342,8 @@ class RecipientFieldView @JvmOverloads constructor(
 
         val plusChipEncryptionStatus = when {
             !isEncryptionActivated -> EncryptionStatus.Unencrypted
-            recipientsExceptFirst.any { it.isUnencryptable } -> EncryptionStatus.PartiallyEncrypted
-            else -> EncryptionStatus.Encrypted
+            recipientsExceptFirst.all { it.isEncryptable } -> EncryptionStatus.Encrypted
+            else -> EncryptionStatus.PartiallyEncrypted
         }
 
         binding.plusChip.setChipStyle(displayAsExternal = false, encryptionStatus = plusChipEncryptionStatus)
@@ -498,8 +498,7 @@ class RecipientFieldView @JvmOverloads constructor(
         private const val NO_STROKE = 0.0f
 
         fun Chip.setChipStyle(displayAsExternal: Boolean, encryptionStatus: EncryptionStatus) = when {
-            encryptionStatus == EncryptionStatus.Encrypted ||
-                    encryptionStatus == EncryptionStatus.Loading -> {
+            encryptionStatus == EncryptionStatus.Encrypted -> {
                 ChipStyle(
                     backgroundColor = R.color.encryptionBackgroundColor,
                     textColor = R.color.encryptionTextColor,
@@ -507,7 +506,8 @@ class RecipientFieldView @JvmOverloads constructor(
                     iconTint = R.color.encryptionIconColor,
                 )
             }
-            encryptionStatus == EncryptionStatus.PartiallyEncrypted -> ChipStyle(
+            encryptionStatus == EncryptionStatus.PartiallyEncrypted ||
+                    encryptionStatus == EncryptionStatus.Loading -> ChipStyle(
                 backgroundColor = R.color.encryptionBackgroundColor,
                 textColor = R.color.encryptionTextColor,
                 icon = R.drawable.ic_lock_open_filled_pastille,
