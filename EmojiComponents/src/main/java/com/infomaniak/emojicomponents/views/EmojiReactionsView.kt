@@ -63,4 +63,9 @@ class EmojiReactionsView @JvmOverloads constructor(
             )
         }
     }
+
+    fun setEmojiReactions(emojiReactions: Map<String, ReactionState>) {
+        reactionsState.clear()
+        reactionsState.putAll(emojiReactions)
+    }
 }
