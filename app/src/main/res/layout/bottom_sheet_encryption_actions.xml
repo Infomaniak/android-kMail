@@ -31,7 +31,8 @@
         android:paddingHorizontal="@dimen/marginStandardMedium"
         android:paddingVertical="@dimen/marginStandardSmall"
         android:text="@string/encryptedStatePanelTitle"
-        app:drawableStartCompat="@drawable/ic_shield_lock" />
+        app:drawableStartCompat="@drawable/ic_shield_lock"
+        app:drawableTint="@color/encryptionIconColor" />
 
     <TextView
         android:id="@+id/encryptionStatusDescription"
