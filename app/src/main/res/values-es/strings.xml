@@ -245,7 +245,7 @@
     <string name="datePickerTitle">Elige una fecha y hora</string>
     <string name="dateTitle">Date:</string>
     <string name="deleteAccountWarning">La eliminación de su cuenta será definitiva. No podrá reactivar su cuenta.</string>
-    <string name="deleteFolderDialogDescription">¿Quieres borrar la carpeta %s y todo lo que contiene?\nEl contenido de la carpeta se borrará definitivamente sin pasar por la papelera de reciclaje.</string>
+    <string name="deleteFolderDialogDescription">El contenido de la carpeta %s se borrará definitivamente sin pasar por la papelera.</string>
     <string name="deleteFolderDialogTitle">Eliminar la carpeta</string>
     <string name="disabledFeatureFlagDescription">Pronto podrás desbloquear los límites de tu dirección de correo electrónico ik.me\n(límite de almacenamiento, programación personalizada, envío y más…)</string>
     <string name="disabledFeatureFlagTitle">¿Necesita más almacenamiento y funciones?</string>

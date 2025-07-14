@@ -245,7 +245,7 @@
     <string name="datePickerTitle">Wählen Sie ein Datum und eine Uhrzeit</string>
     <string name="dateTitle">Datum:</string>
     <string name="deleteAccountWarning">Die Löschung Ihres Kontos ist endgültig. Sie werden nicht in der Lage sein, Ihr Konto zu reaktivieren.</string>
-    <string name="deleteFolderDialogDescription">Möchten Sie den Ordner %s und alles, was er enthält, löschen?\nDer Inhalt des Ordners wird dauerhaft gelöscht, ohne dass er in den Papierkorb wandert.</string>
+    <string name="deleteFolderDialogDescription">Der Inhalt des Ordners %s wird dauerhaft gelöscht, ohne den Papierkorb zu durchlaufen.</string>
     <string name="deleteFolderDialogTitle">Löschen Sie den Ordner</string>
     <string name="disabledFeatureFlagDescription">In Kürze können Sie die Beschränkungen Ihrer ik.me-E-Mail-Adresse entsperren\n(Speicherlimit, benutzerdefinierter Zeitplan, Senden und mehr…)</string>
     <string name="disabledFeatureFlagTitle">Benötigen Sie mehr Speicherplatz und Funktionen?</string>
