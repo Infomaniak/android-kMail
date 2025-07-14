@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,6 +54,7 @@ import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -147,10 +149,9 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
             isMultiSelectOn = false
         }
 
-        binding.spam.setClosingOnClickListener(shouldCloseMultiSelection = true) {
-            trackMultiSelectActionEvent(MatomoName.Spam, threadsCount, isFromBottomSheet = true)
-            toggleThreadsSpamStatus(threadsUids)
-            isMultiSelectOn = false
+        binding.reportJunk.setOnClickListener {
+            // TODO:  Add Tracker matomo
+            setBackNavigationResult("DIALOG_SHEET_MULTI_JUNK", JunkThreads(threadsUids))
         }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {
@@ -178,10 +179,10 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
-        binding.spam.apply {
-            setIconResource(spamIcon)
-            setTitle(spamText)
-        }
+        // binding.spam.apply {
+        //     setIconResource(spamIcon)
+        //     setTitle(spamText)
+        // }
 
         val favoriteIcon = if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar
         val favoriteText = if (shouldFavorite) R.string.actionStar else R.string.actionUnstar
@@ -226,5 +227,12 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun getFirstVisibleActionItemView(): ActionItemView? {
         return (binding.actionsLayout.children.firstOrNull { it is ActionItemView && it.isVisible } as ActionItemView?)
+    }
+
+    @Parcelize
+    data class JunkThreads(val threadUids: List<String>) : Parcelable
+
+    companion object{
+        const val DIALOG_SHEET_MULTI_JUNK = "dialog_sheet_multi_junk"
     }
 }
