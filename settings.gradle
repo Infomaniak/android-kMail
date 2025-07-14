@@ -31,6 +31,7 @@ include ':app',
         ':Core:Matomo',
         ':Core:MyKSuite',
         ':Core:Network',
+        ':Core:Network:Models',
         ':Core:Sentry',
         ':Core:UserAvatar',
         ':HtmlCleaner'

@@ -98,6 +98,7 @@ dependencies {
     implementation project(':Core:Matomo')
     implementation project(':Core:MyKSuite')
     implementation project(':Core:Network')
+    implementation project(':Core:Sentry')
     implementation project(':Core:UserAvatar')
     implementation project(':HtmlCleaner')
 
@@ -126,7 +127,7 @@ dependencies {
     kapt libs.hilt.compiler
     kapt libs.hilt.compiler.androidx
 
-    implementation libs.sentry.android.fragment
+    implementation core.sentry.android.fragment
 
     implementation libs.coil.svg
 
