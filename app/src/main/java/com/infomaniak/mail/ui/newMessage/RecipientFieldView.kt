@@ -338,8 +338,8 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun getSpecialChipsEncryptionStatus(isRecipientEncryptable: Boolean) = when {
         !isEncryptionActivated -> EncryptionStatus.Unencrypted
-        isRecipientEncryptable -> EncryptionStatus.PartiallyEncrypted
-        else -> EncryptionStatus.Encrypted
+        isRecipientEncryptable -> EncryptionStatus.Encrypted
+        else -> EncryptionStatus.PartiallyEncrypted
     }
 
     private fun applyEncryptionStyle() = with(binding) {
