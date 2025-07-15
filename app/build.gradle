@@ -89,6 +89,7 @@ android {
 
 dependencies {
     implementation project(':Core')
+    implementation project(':Core:Compose:MaterialThemeFromXml')
     implementation project(':Core:FragmentNavigation')
     implementation project(':Core:Legacy')
     implementation project(':Core:Legacy:AppLock')
