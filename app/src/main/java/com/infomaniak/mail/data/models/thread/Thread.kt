@@ -30,9 +30,9 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.isUnsnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
@@ -210,6 +210,9 @@ class Thread : RealmObject, Snoozable {
     fun recomputeThread(realm: MutableRealm? = null) {
 
         messages.sortBy { it.internalDate }
+        // All of the following methods should not be inside of Thread to begin with. At least the input list of messages is
+        // extracted once so every other following logic is forced to base its processing on this unique list of messages. We
+        // avoid side effects and unnecessary coupling
         val allMessages = messages
 
         val lastCurrentFolderMessage = allMessages.lastOrNull { it.folderId == folderId }
