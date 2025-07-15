@@ -151,7 +151,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.reportJunk.setOnClickListener {
             // TODO:  Add Tracker matomo
-            setBackNavigationResult("DIALOG_SHEET_MULTI_JUNK", JunkThreads(threadsUids))
+            setBackNavigationResult(DIALOG_SHEET_MULTI_JUNK, JunkThreads(threadsUids))
         }
 
         binding.favorite.setClosingOnClickListener(shouldCloseMultiSelection = true) {

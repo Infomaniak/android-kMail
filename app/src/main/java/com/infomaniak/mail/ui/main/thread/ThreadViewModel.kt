@@ -58,7 +58,9 @@ import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
+import com.infomaniak.mail.utils.JunkMessageThreadData
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.MessageUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
@@ -200,6 +202,10 @@ class ThreadViewModel @Inject constructor(
                 }
             }.getOrElse { ThreadHeaderVisibility.NONE }
         }
+
+    suspend fun getMessageReplyTo(threadUids: List<String>): List<JunkMessageThreadData> {
+        return MessageUtils.getMessageUidToReply(threadController, messageController, featureFlagsFlow.first(), threadUids)
+    }
 
     init {
         viewModelScope.launch {
