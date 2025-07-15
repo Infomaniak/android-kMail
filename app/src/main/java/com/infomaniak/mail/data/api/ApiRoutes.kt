@@ -191,6 +191,9 @@ object ApiRoutes {
     fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${message(mailboxUuid, folderId, shortUid)}/report"
     }
+    fun reportPhishing(mailboxUuid: String): String {
+        return "${mailMailbox(mailboxUuid)}/message/report"
+    }
 
     fun downloadMessage(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${message(mailboxUuid, folderId, shortUid)}/download"
