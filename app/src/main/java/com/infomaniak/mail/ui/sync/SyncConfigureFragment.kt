@@ -65,6 +65,7 @@ class SyncConfigureFragment : Fragment() {
     private fun handleEdgeToEdge() = with(binding) {
         applyWindowInsetsListener { _, insets ->
             toolbar.applyStatusBarInsets(insets)
+            startDescription.applySideAndBottomSystemInsets(insets, withBottom = false)
         }
     }
 
