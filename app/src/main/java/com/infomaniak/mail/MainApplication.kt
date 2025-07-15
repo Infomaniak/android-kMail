@@ -71,11 +71,7 @@ import io.sentry.android.fragment.FragmentLifecycleIntegration
 import io.sentry.android.fragment.FragmentLifecycleState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import splitties.init.injectAsAppCtx
@@ -283,10 +279,7 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        val userTokenFlow = AppSettingsController.getCurrentUserIdFlow()
-            .mapLatest { id -> id?.let { AccountUtils.getUserById(it)?.apiToken } }
-            .shareIn(globalCoroutineScope, SharingStarted.Lazily, replay = 1)
+        val userTokenFlow by lazy { AppSettingsController.getCurrentUserIdFlow().mapToApiToken(globalCoroutineScope) }
 
         override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
             if (AccountUtils.currentUser == null) AccountUtils.requestCurrentUser()
