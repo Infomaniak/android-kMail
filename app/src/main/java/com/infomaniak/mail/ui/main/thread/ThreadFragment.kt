@@ -41,6 +41,7 @@ import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getBackNavigationResult
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -95,7 +96,10 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
+import com.infomaniak.mail.ui.main.thread.actions.JunkBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.Companion.DIALOG_SHEET_MULTI_JUNK
+import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.JunkThreads
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
@@ -190,8 +194,11 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var subjectFormatter: SubjectFormatter
 
-    private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
+
+    private var _binding: FragmentThreadBinding? = null
+
+    private val currentClassName: String by lazy { ThreadFragment::class.java.name }
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
@@ -253,14 +260,14 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessageOfUserToBlock() = with(confirmationToBlockUserDialog) {
-        mainViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) {
-            setPositiveButtonCallback { messageOfUserToBlock ->
-                messageOfUserToBlock?.let {
+        mainViewModel.messagesOfUserToBlock.observe(viewLifecycleOwner) {
+            setPositiveButtonCallback { messagesOfUserToBlock ->
+                messagesOfUserToBlock?.let {
                     trackBlockUserAction(MatomoName.ConfirmSelectedUser)
-                    mainViewModel.blockUser(messageOfUserToBlock)
+                    mainViewModel.blockUser(messagesOfUserToBlock)
                 }
             }
-            show(it)
+            show(it as List<Message>)
         }
     }
 
@@ -741,6 +748,18 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
+        }
+
+        getBackNavigationResult(DIALOG_SHEET_MULTI_JUNK) { junkThreads: JunkThreads ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                val arrayOfThreadAndMessageUids = threadViewModel.getMessageReplyTo(junkThreads.threadUids).toTypedArray()
+                safeNavigate(
+                    resId = R.id.junkBottomSheetDialog,
+                    args = JunkBottomSheetDialogArgs(arrayOfThreadAndMessageUids).toBundle(),
+                    currentClassName = currentClassName,
+                )
+            }
+            
         }
     }
 

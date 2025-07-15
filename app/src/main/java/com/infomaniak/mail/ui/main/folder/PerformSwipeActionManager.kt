@@ -144,7 +144,7 @@ object PerformSwipeActionManager {
             mainViewModel.currentFilter.value != ThreadFilter.UNSEEN
         }
         SwipeAction.SPAM -> {
-            mainViewModel.toggleThreadSpamStatus(thread.uid)
+            mainViewModel.toggleThreadSpamStatus(listOf(thread.uid))
             false
         }
         SwipeAction.SNOOZE -> {

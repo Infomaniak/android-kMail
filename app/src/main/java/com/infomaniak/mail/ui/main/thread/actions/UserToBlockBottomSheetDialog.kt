@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
     private var binding: BottomSheetUserToBlockBinding by safeBinding()
     private val navigationArgs: UserToBlockBottomSheetDialogArgs by navArgs()
 
-    private var messageOfUserToBlock: Message? = null
+    private var messagesOfUserToBlock: List<Message?> = emptyList()
 
     override val mainViewModel: MainViewModel by activityViewModels()
 
@@ -44,10 +44,10 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
-        mainViewModel.getMessagesFromUniqueExpeditors(threadUid).observe(viewLifecycleOwner) { messages ->
-            messages?.let {
+        mainViewModel.getMessagesFromUniqueExpeditors(threadUids.asList()).observe(viewLifecycleOwner) { messages ->
+            messages.isNotEmpty().let {
                 binding.recipients.adapter = UserToBlockAdapter(messages) { message ->
-                    messageOfUserToBlock = message
+                    messagesOfUserToBlock += message
                     dismiss()
                 }
             }
@@ -56,6 +56,6 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        messageOfUserToBlock?.let { mainViewModel.messageOfUserToBlock.value = it }
+        messagesOfUserToBlock?.let { mainViewModel.messagesOfUserToBlock.value = it }
     }
 }
