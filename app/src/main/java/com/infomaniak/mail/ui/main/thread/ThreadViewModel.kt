@@ -115,6 +115,8 @@ class ThreadViewModel @Inject constructor(
         AccountUtils.currentMailboxId,
     ).mapNotNull { it.obj }
 
+    private val currentMailboxLive = currentMailboxFlow.asLiveData()
+
     private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
     val threadState = ThreadState()
@@ -159,7 +161,7 @@ class ThreadViewModel @Inject constructor(
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
 
     val isThreadSnoozeHeaderVisible: LiveData<ThreadHeaderVisibility> = Utils
-        .waitInitMediator(currentMailboxFlow.asLiveData(), threadLive)
+        .waitInitMediator(currentMailboxLive, threadLive)
         .map { (mailbox, thread) ->
             runCatchingRealm {
                 when {
@@ -355,7 +357,7 @@ class ThreadViewModel @Inject constructor(
                 value = SubjectDataResult(value?.thread, mergedContacts, value?.mailbox)
             }
 
-            addSource(currentMailboxFlow.asLiveData()) { mailbox ->
+            addSource(currentMailboxLive) { mailbox ->
                 value = SubjectDataResult(value?.thread, value?.mergedContacts, mailbox)
             }
         }
