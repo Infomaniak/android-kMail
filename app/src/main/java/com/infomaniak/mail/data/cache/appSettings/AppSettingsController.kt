@@ -32,8 +32,8 @@ object AppSettingsController {
         return realm?.let(block) ?: RealmDatabase.appSettings().writeBlocking(block)
     }
 
-    fun getCurrentUserIdFlow(customRealm: MutableRealm? = null): Flow<Int?> {
-        val realm = customRealm ?: RealmDatabase.appSettings()
+    fun getCurrentUserIdFlow(): Flow<Int?> {
+        val realm = RealmDatabase.appSettings()
         return realm.query<AppSettings>().first().asFlow().map { it.obj?.currentUserId }
     }
     //endregion
