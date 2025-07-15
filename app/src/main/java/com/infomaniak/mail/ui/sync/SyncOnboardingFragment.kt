@@ -25,13 +25,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSyncOnboardingBinding
-import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,19 +55,25 @@ class SyncOnboardingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.onboarding_secondary_background)
 
-        binding.applyWindowInsetsListener { root, insets ->
-            binding.dummyToolbarEdgeToEdge.apply {
+        handleEdgeToEdge()
+
+        binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
+        setupClickListener()
+    }
+
+    private fun handleEdgeToEdge() = with(binding) {
+        applyWindowInsetsListener { _, insets ->
+            dummyToolbarEdgeToEdge.apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     insets.statusBar().top,
                 )
                 context?.getColor(R.color.onboarding_secondary_background)?.let(::setBackgroundColor)
             }
-            root.applySideAndBottomSystemInsets(insets)
+            with(insets.safeArea()) {
+                toolbar.setMargins(left = left)
+            }
         }
-
-        binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
-        setupClickListener()
     }
 
     private fun setupClickListener() {
