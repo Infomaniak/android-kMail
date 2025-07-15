@@ -163,11 +163,8 @@
         android:label="JunkBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_junk">
         <argument
-            android:name="threadUid"
-            app:argType="string" />
-        <argument
-            android:name="messageUid"
-            app:argType="string" />
+            android:name="arrayOfThreadAndMessageUids"
+            app:argType="com.infomaniak.mail.utils.JunkMessageThreadData[]" />
     </dialog>
 
     <dialog
@@ -176,8 +173,8 @@
         android:label="UserToBlockBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_user_to_block">
         <argument
-            android:name="threadUid"
-            app:argType="string" />
+            android:name="threadUids"
+            app:argType="string[]" />
     </dialog>
 
     <dialog
