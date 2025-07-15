@@ -50,7 +50,9 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.JunkMessageThreadData
 import com.infomaniak.mail.utils.MessageBodyUtils
+import com.infomaniak.mail.utils.MessageUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.SharedUtils.Companion.isSnoozeAvailable
@@ -165,6 +167,10 @@ class ThreadViewModel @Inject constructor(
                 }
             }.getOrElse { ThreadHeaderVisibility.NONE }
         }
+
+    fun getMessageReplyTo(threadUids: List<String>): List<JunkMessageThreadData> {
+        return MessageUtils.getMessageUidToReply(threadController, messageController, threadUids)
+    }
 
     init {
         viewModelScope.launch {
