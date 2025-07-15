@@ -18,8 +18,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/modifySettingsFolder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:icon="@drawable/ic_editor_text_options"
-        android:title="@string/actionRename" />
+        android:title="@string/actionRename"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <item
+        android:id="@+id/deleteSettingsFolder"
+        android:icon="@drawable/ic_editor_text_options"
+        android:title="@string/actionDelete"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </menu>

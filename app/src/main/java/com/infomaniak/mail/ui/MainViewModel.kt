@@ -163,6 +163,7 @@ class MainViewModel @Inject constructor(
     val flushFolderTrigger = SingleLiveEvent<Unit>()
     val newFolderResultTrigger = MutableLiveData<Unit>()
     val renameFolderResultTrigger = MutableLiveData<Unit>()
+    val deleteFolderResultTrigger = MutableLiveData<Unit>()
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
@@ -1309,19 +1310,29 @@ class MainViewModel @Inject constructor(
         return apiResponseIsSuccess(apiResponse, mailbox)
     }
 
-    private suspend fun modifyNameFolderSync(folderId: String, name: String): String? {
-        val mailbox = currentMailbox.value ?: return null
-        val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
-
-        renameFolderResultTrigger.postValue(Unit)
-
-        return apiResponseIsSuccess(apiResponse, mailbox)
-    }
-
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
-    fun modifyNameFolder(name: String, folderId: String) =
-        viewModelScope.launch(ioCoroutineContext) { modifyNameFolderSync(folderId, name) }
+    fun modifyNameFolder(name: String, folderId: String) = viewModelScope.launch(ioCoroutineContext) {
+            val mailbox = currentMailbox.value ?: return@launch
+            val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
+
+            renameFolderResultTrigger.postValue(Unit)
+
+            apiResponseIsSuccess(apiResponse, mailbox)
+        }
+
+    fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) {
+        val mailbox = currentMailbox.value ?: return@launch
+        val apiResponse = ApiRepository.deleteFolder(mailbox.uuid, folderId)
+
+        deleteFolderResultTrigger.postValue(Unit)
+
+        if (apiResponse.isSuccess()) {
+            updateFolders(mailbox)
+        } else {
+            snackbarManager.postValue(title = appContext.getString(apiResponse.translateError()))
+        }
+    }
 
     private suspend fun apiResponseIsSuccess(apiResponse: ApiResponse<Folder>, mailbox: Mailbox): String? {
         return if (apiResponse.isSuccess()) {

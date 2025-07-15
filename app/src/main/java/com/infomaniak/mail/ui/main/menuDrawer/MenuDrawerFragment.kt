@@ -41,6 +41,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
+import com.infomaniak.mail.MatomoMail.trackManageFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
@@ -52,6 +53,7 @@ import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.alertDialogs.ConfirmDeleteFolderDialog
 import com.infomaniak.mail.ui.alertDialogs.CreateFolderDialog
 import com.infomaniak.mail.ui.alertDialogs.ModifyNameFolderDialog
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs
@@ -64,6 +66,7 @@ import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType.INFOMANIAK
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
+import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import dagger.hilt.android.AndroidEntryPoint
@@ -86,6 +89,9 @@ class MenuDrawerFragment : Fragment() {
 
     @Inject
     lateinit var modifyNameFolderDialog: ModifyNameFolderDialog
+
+    @Inject
+    lateinit var confirmDeleteFolderDialog: ConfirmDeleteFolderDialog
 
     @Inject
     lateinit var menuDrawerAdapter: MenuDrawerAdapter
@@ -114,8 +120,7 @@ class MenuDrawerFragment : Fragment() {
         observeMenuDrawerData()
         observeCurrentFolder()
         observeCurrentMailbox()
-        observeNewFolderCreation()
-        observeRenameFolder()
+        observeManageFolder()
     }
 
     private fun setupListeners() {
@@ -221,7 +226,22 @@ class MenuDrawerFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.modifySettingsFolder -> {
-                    modifyNameFolderDialog.show(folderName, folderId)
+                    trackManageFolderEvent(MatomoName.Rename)
+                    modifyNameFolderDialog.setFolderIdAndShow(folderName, folderId)
+                    true
+                }
+                R.id.deleteSettingsFolder -> {
+                    trackManageFolderEvent(MatomoName.Delete)
+                    confirmDeleteFolderDialog.show(
+                        title = requireContext().getString(R.string.deleteFolderDialogTitle),
+                        description = getStringWithBoldArg(R.string.deleteFolderDialogDescription, folderName),
+                        positiveButtonText = R.string.buttonYes,
+                        negativeButtonText = R.string.buttonNo,
+                        onPositiveButtonClicked = {
+                            trackManageFolderEvent(MatomoName.DeleteConfirm)
+                            mainViewModel.deleteFolder(folderId)
+                        }
+                    )
                     true
                 }
                 else -> false
@@ -349,12 +369,10 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun observeNewFolderCreation() {
+    private fun observeManageFolder() {
         mainViewModel.newFolderResultTrigger.observe(viewLifecycleOwner) { createFolderDialog.resetLoadingAndDismiss() }
-    }
-
-    private fun observeRenameFolder() {
         mainViewModel.renameFolderResultTrigger.observe(viewLifecycleOwner) { modifyNameFolderDialog.resetLoadingAndDismiss() }
+        mainViewModel.deleteFolderResultTrigger.observe(viewLifecycleOwner) { confirmDeleteFolderDialog.resetLoadingAndDismiss() }
     }
 
     override fun onDestroyView() {

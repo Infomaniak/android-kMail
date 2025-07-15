@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.alertDialogs
 import android.content.Context
 import androidx.annotation.StringRes
 import com.infomaniak.mail.MatomoMail.MatomoName
-import com.infomaniak.mail.MatomoMail.trackRenameFolderEvent
+import com.infomaniak.mail.MatomoMail.trackManageFolderEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.di.IoDispatcher
@@ -37,7 +37,7 @@ class ModifyNameFolderDialog @Inject constructor(
 
     private var folderId: String? = null
 
-    fun show(renameFolderLastName: String, folderId: String, @StringRes confirmButtonText: Int = R.string.buttonValid) {
+    fun setFolderIdAndShow(renameFolderLastName: String, folderId: String, @StringRes confirmButtonText: Int = R.string.buttonValid) {
         show(
             title = R.string.renameFolder,
             hint = R.string.newFolderDialogHint,
@@ -49,7 +49,7 @@ class ModifyNameFolderDialog @Inject constructor(
 
     fun setCallbacks(onPositiveButtonClicked: (String, String) -> Unit) = setCallbacks(
         onPositiveButtonClicked = { folderName ->
-            trackRenameFolderEvent(MatomoName.Rename)
+            trackManageFolderEvent(MatomoName.RenameConfirm)
             folderId?.let { onPositiveButtonClicked(folderName, it) }
         },
         onErrorCheck = { folderName ->
