@@ -24,8 +24,8 @@ android {
         applicationId 'com.infomaniak.mail'
         minSdk appMinSdk
         targetSdk appCompileSdk
-        versionCode 1_13_000_01
-        versionName '1.13.0'
+        versionCode 1_13_001_01
+        versionName '1.13.1'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         setProperty "archivesBaseName", "infomaniak-mail-$versionName ($versionCode)"
@@ -89,6 +89,7 @@ android {
 
 dependencies {
     implementation project(':Core')
+    implementation project(':Core:Compose:MaterialThemeFromXml')
     implementation project(':Core:FragmentNavigation')
     implementation project(':Core:Legacy')
     implementation project(':Core:Legacy:AppLock')

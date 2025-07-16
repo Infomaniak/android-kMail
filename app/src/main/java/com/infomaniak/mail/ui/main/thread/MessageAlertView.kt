@@ -18,10 +18,13 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.util.AttributeSet
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.Utils
@@ -37,13 +40,16 @@ class MessageAlertView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding by lazy { ViewMessageAlertBinding.inflate(LayoutInflater.from(context), this, true) }
+    private var _binding: ViewMessageAlertBinding? = null
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val action1LoadingTimer = Utils.createRefreshTimer(onTimerFinish = { binding.action1.showProgress() })
     private val action2LoadingTimer = Utils.createRefreshTimer(onTimerFinish = { binding.action2.showProgress() })
 
     init {
         attrs?.getAttributes(context, R.styleable.MessageAlertView) {
+            inflateBindingWithCustomStyle(context)
+
             with(binding) {
                 description.text = getString(R.styleable.MessageAlertView_description)
                 icon.setImageDrawable(getDrawable(R.styleable.MessageAlertView_icon))
@@ -103,6 +109,20 @@ class MessageAlertView @JvmOverloads constructor(
 
     fun setActionsVisibility(isVisible: Boolean) {
         binding.actionsLayout.isVisible = isVisible
+    }
+
+    private fun TypedArray.inflateBindingWithCustomStyle(context: Context) {
+        val style = Styles.entries[getInteger(R.styleable.MessageAlertView_style, 0)].style
+        _binding = ViewMessageAlertBinding.inflate(
+            LayoutInflater.from(ContextThemeWrapper(context, style)),
+            this@MessageAlertView,
+            true
+        )
+    }
+
+    private enum class Styles(@StyleRes val style: Int) {
+        Basic(R.style.BasicMessageAlertView),
+        Encryption(R.style.EncryptionMessageAlertView),
     }
 }
 

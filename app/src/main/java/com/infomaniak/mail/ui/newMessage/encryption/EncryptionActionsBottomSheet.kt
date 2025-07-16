@@ -110,7 +110,7 @@ class EncryptionActionsBottomSheet : ActionsBottomSheetDialog() {
         )
 
         return buildSpannedString {
-            val matchedValues = Regex("(.+)([0-9]+.+)\\.").find(plural)?.groupValues ?: emptyList()
+            val matchedValues = Regex("([^0-9]+)(.+)\\.").find(plural)?.groupValues ?: emptyList()
             if (matchedValues.isNotEmpty()) {
                 val (_, start, boldEnd) = matchedValues
                 append(start)

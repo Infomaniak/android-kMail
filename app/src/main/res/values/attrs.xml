@@ -171,6 +171,10 @@
         <attr name="action2" format="string" />
         <attr name="description" />
         <attr name="icon" />
+        <attr name="style" format="enum">
+            <enum name="basic" value="0" />
+            <enum name="encryption" value="1" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="InformationBlockView">

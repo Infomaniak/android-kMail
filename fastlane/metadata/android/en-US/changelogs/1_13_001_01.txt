@@ -1,0 +1,1 @@
+- Fix MessageAlertView default styling when no style is provided

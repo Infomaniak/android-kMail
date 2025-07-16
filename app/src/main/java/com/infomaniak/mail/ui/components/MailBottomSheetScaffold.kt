@@ -59,6 +59,7 @@ fun MailBottomSheetScaffold(
             onDismissRequest = onDismissRequest,
             shape = RoundedCornerShape(topStart = bottomSheetCornerSize, topEnd = bottomSheetCornerSize),
             containerColor = colorResource(R.color.bottomSheetBackgroundColor),
+            contentColor = colorResource(R.color.onBottomSheetBackgroundColor),
             dragHandle = {
                 AndroidView(
                     factory = { ViewBottomSheetSeparatorBinding.inflate(it.layoutInflater).root },

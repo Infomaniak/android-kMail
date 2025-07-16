@@ -56,13 +56,17 @@ class SyncConfigureFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
-        binding.applyWindowInsetsListener { root, insets ->
-            binding.toolbar.applyStatusBarInsets(insets)
-            root.applySideAndBottomSystemInsets(insets)
-        }
+        handleEdgeToEdge()
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         setupListeners()
+    }
+
+    private fun handleEdgeToEdge() = with(binding) {
+        applyWindowInsetsListener { _, insets ->
+            toolbar.applyStatusBarInsets(insets)
+            startDescription.applySideAndBottomSystemInsets(insets, withBottom = false)
+        }
     }
 
     override fun onResume() {
