@@ -282,7 +282,9 @@ class RefreshController @Inject constructor(
                 FolderController.getFolder(folderId, realm = this)?.let {
                     mainRefresh(scope, folder = it)
                 }
-            }.cancellable()
+            }.cancellable().onFailure {
+                it.printStackTrace()
+            }
         }
     }
 
@@ -706,6 +708,7 @@ class RefreshController @Inject constructor(
 
     //region Handle errors
     private fun handleAllExceptions(throwable: Throwable) {
+        throwable.printStackTrace()
 
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
 
