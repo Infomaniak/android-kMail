@@ -43,11 +43,9 @@ import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
-import io.realm.kotlin.ext.realmDictionaryOf
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.serializers.RealmListKSerializer
-import io.realm.kotlin.types.RealmDictionary
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -185,7 +183,7 @@ class Message : RealmObject, Snoozable {
     @Transient
     var hasAttachable: Boolean = false
     @Transient
-    var emojiReactions: RealmDictionary<EmojiReactionState?> = realmDictionaryOf()
+    var emojiReactions: RealmList<EmojiReactionState> = realmListOf()
     //endregion
 
     //region UI data (Transient & Ignore)
@@ -339,7 +337,7 @@ class Message : RealmObject, Snoozable {
         isDeletedOnApi: Boolean,
         latestCalendarEventResponse: CalendarEventResponse?,
         swissTransferFiles: RealmList<SwissTransferFile>,
-        emojiReactions: RealmDictionary<EmojiReactionState?>,
+        emojiReactions: RealmList<EmojiReactionState>,
     ) {
         this.areHeavyDataFetched = areHeavyDataFetched
         this.isTrashed = isTrashed

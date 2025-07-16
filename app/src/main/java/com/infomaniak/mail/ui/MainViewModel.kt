@@ -30,7 +30,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.network.NetworkAvailability
-import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -1295,7 +1295,7 @@ class MainViewModel @Inject constructor(
      * If sending is allowed, the caller place can fake the emoji reaction locally thanks to [onAllowed].
      * If sending is not allowed, it will display the error directly to the user and avoid doing the api call.
      */
-    fun trySendEmojiReply(emoji: String, messageUid: String, reactions: Map<String, ReactionState>, onAllowed: () -> Unit) {
+    fun trySendEmojiReply(emoji: String, messageUid: String, reactions: Map<String, Reaction>, onAllowed: () -> Unit) {
         viewModelScope.launch {
             when (val status = reactions.getEmojiSendStatus(emoji)) {
                 EmojiSendStatus.Allowed -> {
@@ -1307,7 +1307,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun Map<String, ReactionState>.getEmojiSendStatus(emoji: String): EmojiSendStatus = when {
+    private fun Map<String, Reaction>.getEmojiSendStatus(emoji: String): EmojiSendStatus = when {
         this[emoji]?.hasReacted == true -> EmojiSendStatus.NotAllowed.AlreadyUsed
         hasAvailableReactionSlot().not() -> EmojiSendStatus.NotAllowed.MaxReactionReached
         hasNetwork.not() -> EmojiSendStatus.NotAllowed.NoInternet

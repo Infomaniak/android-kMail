@@ -69,7 +69,7 @@ import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.types.RealmDictionary
+import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -632,18 +632,19 @@ private fun <E : Any> List<E>.toUiMessages(
     }
 }
 
-private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {
+private fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {
     val fakeReactions = mutableMapOf<String, EmojiReactionStateUi>()
 
-    entries
-        .filterOutNullStates()
-        .associateTo(fakeReactions) { (emoji, state) ->
-            emoji to fakeEmojiReactionState(emoji, state, localReactions)
-        }
+    // Fake emojis that are already found on the message's reactions
+    associateTo(fakeReactions) { state ->
+        state.emoji to fakeEmojiReactionState(state, localReactions)
+    }
 
+    // Fake emojis that are only present as fake ones but are not present on the message's reactions
     localReactions.forEach { emoji ->
         if (emoji !in fakeReactions) {
             fakeReactions[emoji] = EmojiReactionStateUi(
+                emoji = emoji,
                 authors = listOf(EmojiReactionAuthor.FakeMe),
                 hasReacted = true,
             )
@@ -653,16 +654,12 @@ private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions
     return fakeReactions
 }
 
-private fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry<String, T>> {
-    @Suppress("UNCHECKED_CAST")
-    return filter { (_, state) -> state != null } as List<Map.Entry<String, T>>
-}
-
-private fun fakeEmojiReactionState(emoji: String, state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
-    val shouldFake = emoji in localReactions && !state.hasReacted
+private fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
+    val shouldFake = state.emoji in localReactions && !state.hasReacted
 
     val authors = state.authors.mapTo(mutableListOf<EmojiReactionAuthor>(), EmojiReactionAuthor::Real)
     val fakedReaction = EmojiReactionStateUi(
+        emoji = state.emoji,
         authors = if (shouldFake) authors + EmojiReactionAuthor.FakeMe else authors,
         hasReacted = state.hasReacted || shouldFake,
     )

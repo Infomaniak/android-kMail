@@ -17,19 +17,29 @@
  */
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.annotations.Ignore
 
-class EmojiReactionState : ReactionState, EmbeddedRealmObject {
+class EmojiReactionState constructor() : Reaction, EmbeddedRealmObject {
+    override var emoji: String = ""
     var authors: RealmList<Recipient> = realmListOf()
     override var hasReacted: Boolean = false
 
     @Ignore
     override val count: Int by authors::size
+
+    constructor(emoji: String) : this() {
+        this.emoji = emoji
+    }
+
+    fun addAuthor(newAuthor: Recipient) {
+        authors.add(newAuthor)
+        hasReacted = hasReacted || newAuthor.isMe()
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -38,6 +48,7 @@ class EmojiReactionState : ReactionState, EmbeddedRealmObject {
         other as EmojiReactionState
 
         if (hasReacted != other.hasReacted) return false
+        if (emoji != other.emoji) return false
         if (authors != other.authors) return false
 
         return true
@@ -45,6 +56,7 @@ class EmojiReactionState : ReactionState, EmbeddedRealmObject {
 
     override fun hashCode(): Int {
         var result = hasReacted.hashCode()
+        result = 31 * result + emoji.hashCode()
         result = 31 * result + authors.hashCode()
         return result
     }

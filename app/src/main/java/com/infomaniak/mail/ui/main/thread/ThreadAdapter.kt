@@ -44,7 +44,7 @@ import com.infomaniak.core.utils.FORMAT_DATE_DAY_FULL_MONTH_YEAR_WITH_TIME
 import com.infomaniak.core.utils.FormatData
 import com.infomaniak.core.utils.format
 import com.infomaniak.core.utils.formatWithLocal
-import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.views.EmojiReactionsView
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.isNightModeEnabled
@@ -203,7 +203,7 @@ class ThreadAdapter(
         val canBeReactedTo by lazy { message.canBeReactedTo() }
 
         isVisible = message.isReactionsFeatureAvailable && (canBeReactedTo || message.hasEmojis())
-        setEmojiReactions(message.emojiReactionsState)
+        setEmojiReactions(message.emojiReactionsState.map { it.value })
 
         if (message.isReactionsFeatureAvailable) setAddReactionEnabledState(isEnabled = canBeReactedTo)
     }
@@ -954,7 +954,7 @@ class ThreadAdapter(
         }
 
         companion object {
-            fun Map<String, ReactionState?>.containsTheSameEmojiValuesAs(other: Map<String, ReactionState?>): Boolean {
+            fun Map<String, Reaction?>.containsTheSameEmojiValuesAs(other: Map<String, Reaction?>): Boolean {
                 if (this.size != other.size) return false
 
                 for ((emoji, state) in this) {
