@@ -65,6 +65,7 @@ import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import splitties.coroutines.repeatWhileActive
@@ -272,6 +273,7 @@ class LoginFragment : Fragment() {
                     openLoginWebView()
                 } else {
                     handleCrossAppLogin()
+                    delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
                 }
             }
         }
