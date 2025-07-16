@@ -238,6 +238,11 @@ class MessageController @Inject constructor(
             realm.delete(message)
         }
 
+        fun deleteMessageByUid(uid: String, realm: MutableRealm) {
+            val message = getMessage(uid, realm) ?: return
+            realm.delete(message)
+        }
+
         fun deleteMessages(context: Context, mailbox: Mailbox, messages: List<Message>, realm: MutableRealm) {
             /**
              * This list is reversed because we'll delete items while looping over it.

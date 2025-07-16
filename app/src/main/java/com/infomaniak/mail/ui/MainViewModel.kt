@@ -828,11 +828,14 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.moveMessages(
-            mailboxUuid = mailbox.uuid,
-            messagesUids = messagesToMove.getUids(),
-            destinationId = destinationFolder.id,
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings),
+        val apiResponses = sharedUtils.moveMessages(
+            mailbox = mailbox,
+            messagesToMove = messagesToMove,
+            destinationFolder = destinationFolder,
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(
+                featureFlagsLive.value,
+                sharedUtils.localSettings
+            ),
         )
 
         if (apiResponses.atLeastOneSucceeded()) {
