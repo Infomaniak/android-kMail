@@ -50,7 +50,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
-import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthor
+import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.AccountUtils
@@ -645,7 +645,7 @@ private fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<S
         if (emoji !in fakeReactions) {
             fakeReactions[emoji] = EmojiReactionStateUi(
                 emoji = emoji,
-                authors = listOf(EmojiReactionAuthor.FakeMe),
+                authors = listOf(EmojiReactionAuthorUi.FakeMe),
                 hasReacted = true,
             )
         }
@@ -657,10 +657,12 @@ private fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<S
 private fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
     val shouldFake = state.emoji in localReactions && !state.hasReacted
 
-    val authors = state.authors.mapTo(mutableListOf<EmojiReactionAuthor>(), EmojiReactionAuthor::Real)
+    val authors = state.authors.mapNotNullTo(mutableListOf<EmojiReactionAuthorUi>()) { author ->
+        author.recipient?.let(EmojiReactionAuthorUi::Real)
+    }
     val fakedReaction = EmojiReactionStateUi(
         emoji = state.emoji,
-        authors = if (shouldFake) authors + EmojiReactionAuthor.FakeMe else authors,
+        authors = if (shouldFake) authors + EmojiReactionAuthorUi.FakeMe else authors,
         hasReacted = state.hasReacted || shouldFake,
     )
 

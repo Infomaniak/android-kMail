@@ -21,7 +21,7 @@ import com.infomaniak.emojicomponents.data.Reaction
 
 data class EmojiReactionStateUi(
     override val emoji: String,
-    val authors: List<EmojiReactionAuthor>,
+    val authors: List<EmojiReactionAuthorUi>,
     override val hasReacted: Boolean,
 ) : Reaction {
     override val count: Int by authors::size

@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.main.thread.models
 
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 
-sealed interface EmojiReactionAuthor {
-    data class Real(val correspondent: Correspondent) : EmojiReactionAuthor
-    data object FakeMe : EmojiReactionAuthor
+sealed interface EmojiReactionAuthorUi {
+    data class Real(val correspondent: Correspondent) : EmojiReactionAuthorUi
+    data object FakeMe : EmojiReactionAuthorUi
 }
