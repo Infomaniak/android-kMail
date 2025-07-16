@@ -33,7 +33,6 @@ import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.components.EmojiReactions
 import com.infomaniak.emojicomponents.components.EmojiReactionsDefaults
 import com.infomaniak.emojicomponents.data.ReactionState
-import com.infomaniak.emojicomponents.updateWithEmoji
 
 class EmojiReactionsView @JvmOverloads constructor(
     context: Context,
@@ -43,6 +42,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 
     private val reactionsState = mutableStateMapOf<String, ReactionState>()
     private var addReactionClickListener: (() -> Unit)? = null
+    private var onEmojiClickListener: ((emoji: String) -> Unit)? = null
 
     private var chipCornerRadius: Float? = null
     private var addReactionIconRes: Int? = null
@@ -71,7 +71,7 @@ class EmojiReactionsView @JvmOverloads constructor(
 
             EmojiReactions(
                 reactions = { reactionsState },
-                onEmojiClicked = { emoji -> reactionsState.updateWithEmoji(emoji) },
+                onEmojiClicked = { emoji -> onEmojiClickListener?.invoke(emoji) },
                 shape = chipCornerRadius?.let { RoundedCornerShape(it) } ?: InputChipDefaults.shape,
                 addReactionIcon = addReactionIcon,
                 onAddReactionClick = { addReactionClickListener?.invoke() }
@@ -87,6 +87,10 @@ class EmojiReactionsView @JvmOverloads constructor(
 
     fun setOnAddReactionClickListener(listener: () -> Unit) {
         addReactionClickListener = listener
+    }
+
+    fun setOnEmojiClickListener(listener: (emoji: String) -> Unit) {
+        onEmojiClickListener = listener
     }
 
     fun setEmojiReactions(emojiReactions: Map<String, ReactionState>) {

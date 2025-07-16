@@ -389,6 +389,7 @@ class ThreadFragment : Fragment() {
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
                 onAddReaction = { navigateToEmojiPicker(it.uid) },
+                onAddEmoji = { emoji, messageUid -> mainViewModel.sendEmojiReply(emoji, messageUid) },
             ),
         )
 

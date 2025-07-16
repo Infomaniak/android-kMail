@@ -88,6 +88,10 @@ class Draft : RealmObject {
     @SerialName("encryption_password")
     var encryptionKey: String? = null
 
+    @EncodeDefault(EncodeDefault.Mode.NEVER) // The api will always reject this field if it's null
+    @SerialName("emoji_reaction")
+    var emojiReaction: String? = null
+
     /**
      * We can't have both `delay` & `scheduleDate`. They are mutually exclusive.
      *
@@ -151,6 +155,7 @@ class Draft : RealmObject {
     enum class DraftAction(val apiCallValue: String, val matomoName: MatomoName) {
         SAVE("save", MatomoName.SaveDraft),
         SEND("send", MatomoName.SendMail),
+        SEND_REACTION("send_reaction", MatomoName.SendReaction),
         SCHEDULE("schedule", MatomoName.ScheduleDraft),
     }
 
