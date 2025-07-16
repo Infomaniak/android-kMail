@@ -167,6 +167,7 @@
     <color name="onColorfulBackground">@color/white</color>
     <color name="textDisabledPrimaryButton">@color/white</color>
     <color name="primaryTextColorDisabled">@color/shark</color>
+    <color name="onBottomSheetBackgroundColor">@color/primaryTextColor</color>
 
     <!-- Dividers -->
     <color name="dividerColor">@color/mouse</color>
