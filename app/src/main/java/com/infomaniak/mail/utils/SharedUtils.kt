@@ -30,7 +30,9 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshCa
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
@@ -107,6 +109,49 @@ class SharedUtils @Inject constructor(
         mailboxContentRealm().write {
             MessageController.updateSeenStatus(messagesUids, isSeen, realm = this)
             ThreadController.updateSeenStatus(threadsUids, isSeen, realm = this)
+        }
+    }
+
+    suspend fun moveMessages(
+        mailbox: Mailbox,
+        messagesToMove: List<Message>,
+        destinationFolder: Folder,
+        alsoMoveReactionMessages: Boolean,
+    ): List<ApiResponse<MoveResult>> {
+        val apiResponses = ApiRepository.moveMessages(
+            mailboxUuid = mailbox.uuid,
+            messagesUids = messagesToMove.getUids(),
+            destinationId = destinationFolder.id,
+            alsoMoveReactionMessages = alsoMoveReactionMessages,
+        )
+
+        // TODO: Will unsync permantly the mailbox if one message in the batch did succeed but some other messages that are
+        //  target by emoji reactions did not
+        if (alsoMoveReactionMessages && apiResponses.atLeastOneSucceeded()) deleteEmojiReactionMessagesLocally(messagesToMove)
+
+        return apiResponses
+    }
+
+    /**
+     * When deleting a message targeted by emoji reactions inside of a thread, the emoji reaction messages from another folder
+     * that were targeting this message will display for a brief moment until we refresh their folders. This is because those
+     * messages don't have a target message anymore and emoji reactions messages with no target in their thread need to be
+     * displayed.
+     *
+     * Deleting them from the database in the first place will prevent them from being shown and the messages will be deleted by
+     * the api at the same time anyway.
+     */
+    private suspend fun deleteEmojiReactionMessagesLocally(messagesToMove: List<Message>) {
+        for (messageToMove in messagesToMove) {
+            if (messageToMove.emojiReactions.isEmpty()) continue
+
+            mailboxContentRealm().write {
+                messageToMove.emojiReactions.forEach { reaction ->
+                    reaction.authors.forEach { author ->
+                        MessageController.deleteMessageByUid(author.sourceMessageUid, this)
+                    }
+                }
+            }
         }
     }
 

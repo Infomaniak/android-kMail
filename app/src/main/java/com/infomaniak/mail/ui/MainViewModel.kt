@@ -828,11 +828,14 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.moveMessages(
-            mailboxUuid = mailbox.uuid,
-            messagesUids = messagesToMove.getUids(),
-            destinationId = destinationFolder.id,
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings),
+        val apiResponses = sharedUtils.moveMessages(
+            mailbox = mailbox,
+            messagesToMove = messagesToMove,
+            destinationFolder = destinationFolder,
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(
+                featureFlagsLive.value,
+                sharedUtils.localSettings
+            ),
         )
 
         if (apiResponses.atLeastOneSucceeded()) {
@@ -1409,13 +1412,13 @@ class MainViewModel @Inject constructor(
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
     fun modifyNameFolder(name: String, folderId: String) = viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = currentMailbox.value ?: return@launch
-            val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
+        val mailbox = currentMailbox.value ?: return@launch
+        val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
 
-            renameFolderResultTrigger.postValue(Unit)
+        renameFolderResultTrigger.postValue(Unit)
 
-            apiResponseIsSuccess(apiResponse, mailbox)
-        }
+        apiResponseIsSuccess(apiResponse, mailbox)
+    }
 
     fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value ?: return@launch
