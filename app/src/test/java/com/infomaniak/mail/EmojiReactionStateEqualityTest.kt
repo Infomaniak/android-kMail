@@ -57,8 +57,8 @@ class EmojiReactionStateEqualityTest {
 
     @Test
     fun emojiReactionStates_withDifferentCount_areNotEqual() {
-        val checkEmoji1 = "✅" to emojiReactionStateOf(2, false)
-        val checkEmoji2 = "✅" to emojiReactionStateOf(3, false) // count changed
+        val checkEmoji1 = "✅" to emojiReactionStateOf("✅", 2, false)
+        val checkEmoji2 = "✅" to emojiReactionStateOf("✅", 3, false) // count changed
 
         val dictionary1: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmoji1)
         val dictionary2: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmoji2)
@@ -69,8 +69,8 @@ class EmojiReactionStateEqualityTest {
 
     @Test
     fun emojiReactionStates_withDifferentHasReacted_areNotEqual() {
-        val checkEmoji1 = "✅" to emojiReactionStateOf(2, false)
-        val checkEmoji2 = "✅" to emojiReactionStateOf(2, true) // hasReacted changed
+        val checkEmoji1 = "✅" to emojiReactionStateOf("✅", 2, false)
+        val checkEmoji2 = "✅" to emojiReactionStateOf("✅", 2, true) // hasReacted changed
 
         val dictionary1: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmoji1)
         val dictionary2: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmoji2)
@@ -80,11 +80,11 @@ class EmojiReactionStateEqualityTest {
     }
 
     companion object {
-        private val checkEmojiReactionState = "✅" to emojiReactionStateOf(2, false)
-        private val crossEmojiReactionState = "❌" to emojiReactionStateOf(1, true)
+        private val checkEmojiReactionState = "✅" to emojiReactionStateOf("✅", 2, false)
+        private val crossEmojiReactionState = "❌" to emojiReactionStateOf("❌", 1, true)
 
-        private fun emojiReactionStateOf(count: Int, hasReacted: Boolean): EmojiReactionState {
-            return EmojiReactionState().apply {
+        private fun emojiReactionStateOf(emoji: String, count: Int, hasReacted: Boolean): EmojiReactionState {
+            return EmojiReactionState(emoji).apply {
                 this.count = count
                 this.hasReacted = hasReacted
             }

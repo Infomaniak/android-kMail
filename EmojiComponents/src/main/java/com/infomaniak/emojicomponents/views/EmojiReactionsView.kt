@@ -28,7 +28,7 @@ import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
@@ -40,7 +40,7 @@ import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.components.AddReactionChipDefaults
 import com.infomaniak.emojicomponents.components.EmojiReactions
 import com.infomaniak.emojicomponents.components.EmojiReactionsDefaults
-import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.data.Reaction
 
 class EmojiReactionsView @JvmOverloads constructor(
     context: Context,
@@ -48,7 +48,7 @@ class EmojiReactionsView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : AbstractComposeView(context, attrs, defStyleAttr) {
 
-    private val reactionsState = mutableStateMapOf<String, ReactionState>()
+    private val reactionsState = mutableStateListOf<Reaction>()
     private var isAddReactionEnabled by mutableStateOf(true)
 
     private var addReactionClickListener: (() -> Unit)? = null
@@ -116,9 +116,9 @@ class EmojiReactionsView @JvmOverloads constructor(
         onEmojiClickListener = listener
     }
 
-    fun setEmojiReactions(emojiReactions: Map<String, ReactionState>) {
+    fun setEmojiReactions(emojiReactions: List<Reaction>) {
         reactionsState.clear()
-        reactionsState.putAll(emojiReactions)
+        reactionsState.addAll(emojiReactions)
     }
 
     fun setAddReactionEnabledState(isEnabled: Boolean) {

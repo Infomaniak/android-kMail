@@ -17,7 +17,8 @@
  */
 package com.infomaniak.emojicomponents.data
 
-interface ReactionState {
+interface Reaction {
+    val emoji: String
     val count: Int
     val hasReacted: Boolean
 }

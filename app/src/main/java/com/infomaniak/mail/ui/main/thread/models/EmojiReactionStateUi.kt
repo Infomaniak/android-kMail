@@ -17,8 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.thread.models
 
-import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.data.Reaction
 
-data class EmojiReactionStateUi(val authors: List<EmojiReactionAuthor>, override val hasReacted: Boolean) : ReactionState {
+data class EmojiReactionStateUi(
+    override val emoji: String,
+    val authors: List<EmojiReactionAuthor>,
+    override val hasReacted: Boolean,
+) : Reaction {
     override val count: Int by authors::size
 }
