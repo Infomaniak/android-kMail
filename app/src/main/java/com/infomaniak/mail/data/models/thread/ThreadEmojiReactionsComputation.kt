@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models.thread
 
+import com.infomaniak.mail.data.models.message.EmojiReactionAuthor
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
@@ -45,7 +46,12 @@ private fun MutableMap<String, MutableMap<String, EmojiReactionState>>.addReacti
             emojis[emoji] = EmojiReactionState(emoji)
         }
 
-        emojis[emoji]!!.addAuthor(newAuthor = message.from.firstOrNull() ?: continue)
+        emojis[emoji]!!.addAuthor(
+            newAuthor = EmojiReactionAuthor(
+                recipient = message.from.firstOrNull() ?: continue,
+                sourceMessageUid = message.uid,
+            )
+        )
     }
 }
 

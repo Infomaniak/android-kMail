@@ -17,46 +17,33 @@
  */
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.emojicomponents.data.Reaction
-import io.realm.kotlin.ext.realmListOf
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import io.realm.kotlin.types.EmbeddedRealmObject
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.annotations.Ignore
 
-class EmojiReactionState constructor() : Reaction, EmbeddedRealmObject {
-    override var emoji: String = ""
-    var authors: RealmList<EmojiReactionAuthor> = realmListOf()
-    override var hasReacted: Boolean = false
+class EmojiReactionAuthor constructor() : EmbeddedRealmObject {
+    var recipient: Recipient? = null
+    var sourceMessageUid: String = ""
 
-    @Ignore
-    override val count: Int by authors::size
-
-    constructor(emoji: String) : this() {
-        this.emoji = emoji
-    }
-
-    fun addAuthor(newAuthor: EmojiReactionAuthor) {
-        authors.add(newAuthor)
-        hasReacted = hasReacted || newAuthor.recipient?.isMe() == true
+    constructor(recipient: Recipient, sourceMessageUid: String) : this() {
+        this.recipient = recipient
+        this.sourceMessageUid = sourceMessageUid
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as EmojiReactionState
+        other as EmojiReactionAuthor
 
-        if (hasReacted != other.hasReacted) return false
-        if (emoji != other.emoji) return false
-        if (authors != other.authors) return false
+        if (recipient != other.recipient) return false
+        if (sourceMessageUid != other.sourceMessageUid) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = hasReacted.hashCode()
-        result = 31 * result + emoji.hashCode()
-        result = 31 * result + authors.hashCode()
+        var result = recipient?.hashCode() ?: 0
+        result = 31 * result + sourceMessageUid.hashCode()
         return result
     }
 }
