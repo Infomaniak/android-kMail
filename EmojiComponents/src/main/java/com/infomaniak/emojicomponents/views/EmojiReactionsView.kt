@@ -25,10 +25,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.res.vectorResource
 import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.components.EmojiReactions
+import com.infomaniak.emojicomponents.components.EmojiReactionsDefaults
 import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.emojicomponents.updateWithEmoji
 
@@ -39,14 +42,21 @@ class EmojiReactionsView @JvmOverloads constructor(
 ) : AbstractComposeView(context, attrs, defStyleAttr) {
 
     private val reactionsState = mutableStateMapOf<String, ReactionState>()
+    private var addReactionClickListener: (() -> Unit)? = null
 
     private var chipCornerRadius: Float? = null
+    private var addReactionIconRes: Int? = null
 
     init {
         context.obtainStyledAttributes(attrs, R.styleable.EmojiReactionsView, defStyleAttr, 0).apply {
             chipCornerRadius = getDimensionOrNull(R.styleable.EmojiReactionsView_chipCornerRadius)
+            addReactionIconRes = getResourceIdOrNull(R.styleable.EmojiReactionsView_addReactionIcon)
             recycle()
         }
+    }
+
+    private fun TypedArray.getResourceIdOrNull(@StyleableRes index: Int): Int? {
+        return if (hasValue(index)) getResourceId(index, -1) else null
     }
 
     private fun TypedArray.getDimensionOrNull(@StyleableRes index: Int): Float? {
@@ -56,12 +66,27 @@ class EmojiReactionsView @JvmOverloads constructor(
     @Composable
     override fun Content() {
         MaterialThemeFromXml {
+            val addReactionIcon = addReactionIconRes?.let { ImageVector.vectorResource(it) }
+                ?: EmojiReactionsDefaults.addReactionIcon
+
             EmojiReactions(
                 reactions = { reactionsState },
                 onEmojiClicked = { emoji -> reactionsState.updateWithEmoji(emoji) },
-                shape = chipCornerRadius?.let { RoundedCornerShape(it) } ?: InputChipDefaults.shape
+                shape = chipCornerRadius?.let { RoundedCornerShape(it) } ?: InputChipDefaults.shape,
+                addReactionIcon = addReactionIcon,
+                onAddReactionClick = { addReactionClickListener?.invoke() }
             )
         }
+    }
+
+    /**
+     * Calling this method is ambiguous. You should choose between detecting clicks on existing emojis or on the "add" button
+     */
+    @AmbiguousClickListener
+    override fun setOnClickListener(listener: OnClickListener?) = super.setOnClickListener(listener)
+
+    fun setOnAddReactionClickListener(listener: () -> Unit) {
+        addReactionClickListener = listener
     }
 
     fun setEmojiReactions(emojiReactions: Map<String, ReactionState>) {
@@ -69,3 +94,11 @@ class EmojiReactionsView @JvmOverloads constructor(
         reactionsState.putAll(emojiReactions)
     }
 }
+
+@RequiresOptIn(
+    level = RequiresOptIn.Level.ERROR,
+    message = "Use the other methods to set click listeners when a reaction is clicked and when the add reaction button is clicked"
+)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+private annotation class AmbiguousClickListener

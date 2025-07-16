@@ -26,11 +26,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.icons.FaceSmileRoundPlus
+import com.infomaniak.emojicomponents.icons.Icons
 import com.infomaniak.emojicomponents.updateWithEmoji
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -38,11 +42,17 @@ import com.infomaniak.emojicomponents.updateWithEmoji
 fun EmojiReactions(
     reactions: () -> Map<String, ReactionState>,
     onEmojiClicked: (String) -> Unit,
+    onAddReactionClick: () -> Unit,
     modifier: Modifier = Modifier,
+    addReactionIcon: ImageVector = EmojiReactionsDefaults.addReactionIcon,
     colors: ReactionChipColors = ReactionChipDefaults.reactionChipColors(),
     shape: Shape = InputChipDefaults.shape,
 ) {
-    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(Margin.Mini)) {
+    FlowRow(
+        modifier,
+        itemVerticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
+    ) {
         reactions().forEach { (emoji, state) ->
             ReactionChip(
                 emoji = emoji,
@@ -53,7 +63,15 @@ fun EmojiReactions(
                 shape = shape,
             )
         }
+        AddReactionChip(
+            addReactionIcon,
+            onClick = onAddReactionClick,
+        )
     }
+}
+
+object EmojiReactionsDefaults {
+    val addReactionIcon = Icons.FaceSmileRoundPlus
 }
 
 @Preview
@@ -75,6 +93,7 @@ private fun EmojiReactionsPreview() {
         EmojiReactions(
             reactions = { reactions },
             onEmojiClicked = { emoji -> reactions.updateWithEmoji(emoji) },
+            onAddReactionClick = {},
         )
     }
 }
