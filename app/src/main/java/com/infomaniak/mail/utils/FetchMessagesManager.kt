@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.lib.core.api.ApiController.NetworkException
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -48,6 +49,7 @@ class FetchMessagesManager @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationUtils: NotificationUtils,
     private val refreshController: RefreshController,
+    private val localSettings: LocalSettings,
 ) {
 
     private lateinit var coroutineScope: CoroutineScope
@@ -185,7 +187,7 @@ class FetchMessagesManager @Inject constructor(
         okHttpClient: OkHttpClient,
     ): Boolean {
 
-        ThreadController.fetchMessagesHeavyData(messages, realm, okHttpClient)
+        ThreadController.fetchMessagesHeavyData(getDisplayedMessages(mailbox.featureFlags, localSettings), realm, okHttpClient)
 
         val message = MessageController.getThreadLastMessageInFolder(uid, realm) ?: run {
             SentryDebug.sendFailedNotification("No Message in the Thread", userId, mailbox.mailboxId, sentryMessageUid, mailbox)

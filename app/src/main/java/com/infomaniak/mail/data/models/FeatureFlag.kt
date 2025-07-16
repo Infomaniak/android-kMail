@@ -24,4 +24,5 @@ enum class FeatureFlag(val apiName: String) {
     ENCRYPTION("mail-compose-encrypted"),
     SCHEDULE_DRAFTS("schedule-send-draft"),
     SNOOZE("mail-snooze"),
+    EMOJI_REACTION("mail-emoji-reaction"),
 }

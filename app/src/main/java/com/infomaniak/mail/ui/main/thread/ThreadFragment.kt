@@ -489,7 +489,8 @@ class ThreadFragment : Fragment() {
                 iconTint = ColorStateList.valueOf(color)
             }
 
-            val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == thread.messages.size
+            val messagesCount = thread.getDisplayedMessages(mainViewModel.featureFlagsLive.value, localSettings).size
+            val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == messagesCount
             quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
 
             thread.snoozeEndDate?.let { snoozeEndDate ->
