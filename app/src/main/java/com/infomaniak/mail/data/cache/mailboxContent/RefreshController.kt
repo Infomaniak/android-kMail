@@ -217,7 +217,7 @@ class RefreshController @Inject constructor(
                     FolderController.getFolder(role, realm = this)?.let {
                         refresh(scope, folder = it)
                     }
-                }.onFailure {
+                }.cancellable().onFailure {
                     throw ReturnThreadsException(impactedThreads, exception = it)
                 }
             }
@@ -283,7 +283,7 @@ class RefreshController @Inject constructor(
                     mainRefresh(scope, folder = it)
                 }
             }.cancellable().onFailure {
-                it.printStackTrace()
+                SentryLog.e(TAG, "Throwable during extraRefresh", it)
             }
         }
     }
@@ -708,7 +708,7 @@ class RefreshController @Inject constructor(
 
     //region Handle errors
     private fun handleAllExceptions(throwable: Throwable) {
-        throwable.printStackTrace()
+        SentryLog.w(TAG, "Throwable during thread algorithm", throwable)
 
         if (throwable is ApiErrorException) throwable.handleOtherApiErrors()
 
@@ -838,4 +838,8 @@ class RefreshController @Inject constructor(
         val onStart: (() -> Unit),
         val onStop: (() -> Unit),
     )
+
+    companion object {
+        private val TAG = RefreshController::class.java.simpleName
+    }
 }
