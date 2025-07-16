@@ -79,6 +79,7 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeUpdateResponse
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
@@ -293,6 +294,9 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
+    /**
+     * Do not call this method directly. Use [SharedUtils.moveMessages]
+     */
     suspend fun moveMessages(
         mailboxUuid: String,
         messagesUids: List<String>,
