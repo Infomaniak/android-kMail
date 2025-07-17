@@ -170,7 +170,6 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
             trackNotificationActionEvent(matomoName)
 
-            // TODO: Add the same logic as in the main view model move when deleting emoji reactions as well
             val responses = ApiRepository.moveMessages(
                 mailboxUuid = mailbox.uuid,
                 messagesUids = messages.getUids(),
