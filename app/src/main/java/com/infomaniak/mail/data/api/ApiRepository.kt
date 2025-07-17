@@ -293,9 +293,6 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
-    /**
-     * Do not call this method directly. Use [SharedUtils.moveMessages]
-     */
     suspend fun moveMessages(
         mailboxUuid: String,
         messagesUids: List<String>,
