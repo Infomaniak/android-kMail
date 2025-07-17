@@ -33,6 +33,8 @@ import androidx.lifecycle.Observer
 import coil.ImageLoader
 import coil.imageLoader
 import coil.load
+import com.infomaniak.core.avatar.AvatarType
+import com.infomaniak.core.avatar.AvatarUrlData
 import com.infomaniak.core.useravatar.extensions.getBackgroundColorResBasedOnId
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.CoilUtils.simpleImageLoader
@@ -299,51 +301,6 @@ class AvatarView @JvmOverloads constructor(
         context.getBackgroundColorResBasedOnId(correspondent.email.hashCode(), R.array.AvatarColors)
     )
 
-    sealed interface AvatarType {
-
-        sealed interface WithInitials : AvatarType {
-            val initials: String
-            val containerColor: Color
-            val contentColor: Color
-
-            data class Initials(
-                override val initials: String,
-                override val containerColor: Color,
-                override val contentColor: Color,
-            ) : WithInitials {
-                companion object
-            }
-
-            data class Url(
-                val url: String,
-                val imageLoader: ImageLoader,
-                override val initials: String,
-                override val containerColor: Color,
-                override val contentColor: Color,
-            ) : WithInitials {
-                companion object
-            }
-        }
-
-        data class DrawableResource(@DrawableRes val resource: Int) : AvatarType
-
-        companion object {
-            fun getUrlOrInitials(
-                avatarUrlData: AvatarUrlData?,
-                initials: String,
-                containerColor: Color,
-                contentColor: Color,
-            ): AvatarType {
-                return if (avatarUrlData == null) {
-                    WithInitials.Initials(initials, containerColor, contentColor)
-                } else {
-                    WithInitials.Url(avatarUrlData.url, avatarUrlData.imageLoader, initials, containerColor, contentColor)
-                }
-            }
-        }
-    }
-
-    data class AvatarUrlData(val url: String, val imageLoader: ImageLoader)
 
     private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?, isBimiEnabled: Boolean): AvatarDisplayType {
         return when {
