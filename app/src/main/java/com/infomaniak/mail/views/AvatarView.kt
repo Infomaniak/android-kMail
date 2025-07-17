@@ -24,12 +24,18 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import coil3.ImageLoader
 import coil3.imageLoader
 import coil3.load
 import com.infomaniak.core.coil.ImageLoaderProvider.simpleImageLoader
+import com.infomaniak.core.coil.getBackgroundColorGradientDrawable
+import com.infomaniak.core.coil.getBackgroundColorResBasedOnId
 import com.infomaniak.core.coil.loadAvatar
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
@@ -144,7 +150,8 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadUserAvatar(user: User) = with(binding.avatarImage) {
-        contentDescription = user.email
+        // TODO: Use loadAvatarByDisplayType when its AvatarDisplayType contains the merged contact avatar for the only occasions
+        //  that need it
         loadAvatar(
             backgroundColor = context.getBackgroundColorBasedOnId(user.id, R.array.AvatarColors),
             avatarUrl = user.avatar,
@@ -160,12 +167,9 @@ class AvatarView @JvmOverloads constructor(
         loadAvatarByDisplayType(avatarDisplayType, correspondent, bimi, contactsFromViewModel)
     }
 
-    private fun updateStateAndLoadUserAvatar(user: User, correspondent: Correspondent?, bimi: Bimi?) {
-        state.update(correspondent, bimi)
-        loadUserAvatar(user)
-    }
-
     fun loadRawMergedContactAvatar(mergedContact: MergedContact) {
+        // TODO: Replace with centralized display logic and maybe create a new AvatarDisplayType for when we use the mergedContact
+        //  directly
         if (mergedContact.shouldDisplayUserAvatar()) {
             loadUserAvatar(AccountUtils.currentUser!!)
         } else {
@@ -176,26 +180,19 @@ class AvatarView @JvmOverloads constructor(
     fun loadUnknownUserAvatar() {
         state.update(correspondent = null, bimi = null)
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
+        // TODO: Use loadAvatarByDisplayType when its AvatarDisplayType contains the merged contact avatar for the only occasions
+        //  that need it
+        // loadAvatarByDisplayType(
+        //     avatarDisplayType = AvatarDisplayType.UNKNOWN_CORRESPONDENT,
+        //     correspondent = null,
+        //     bimi = null,
+        //
+        // )
     }
 
     fun loadTeamsUserAvatar() {
         state.update(correspondent = null, bimi = null)
         binding.avatarImage.load(R.drawable.ic_circle_teams_user)
-    }
-
-    private fun loadBimiAvatar(correspondent: Correspondent, bimi: Bimi) = with(binding.avatarImage) {
-        state.update(correspondent, bimi)
-        contentDescription = correspondent.email
-        loadAvatar(
-            backgroundColor = context.getBackgroundColorBasedOnId(
-                correspondent.email.hashCode(),
-                R.array.AvatarColors,
-            ),
-            avatarUrl = ApiRoutes.bimi(bimi.svgContentUrl!!),
-            initials = correspondent.initials,
-            imageLoader = context.imageLoader,
-            initialsColor = context.getColor(R.color.onColorfulBackground),
-        )
     }
 
     private fun loadAvatarByDisplayType(
@@ -204,15 +201,151 @@ class AvatarView @JvmOverloads constructor(
         bimi: Bimi?,
         contacts: MergedContactDictionary,
     ) {
-        when (avatarDisplayType) {
-            AvatarDisplayType.UNKNOWN_CORRESPONDENT -> loadUnknownUserAvatar()
-            AvatarDisplayType.USER_AVATAR ->
-                AccountUtils.currentUser?.let { updateStateAndLoadUserAvatar(user = it, correspondent, bimi) }
-            AvatarDisplayType.CUSTOM_AVATAR,
-            AvatarDisplayType.INITIALS -> loadAvatarUsingDictionary(correspondent!!, contacts, bimi)
-            AvatarDisplayType.BIMI -> loadBimiAvatar(correspondent!!, bimi!!)
+        val avatarType: AvatarType = when (avatarDisplayType) {
+            AvatarDisplayType.UNKNOWN_CORRESPONDENT -> {
+                state.update(correspondent = null, bimi = null)
+                AvatarType.DrawableResource(R.drawable.ic_unknown_user_avatar)
+            }
+            AvatarDisplayType.USER_AVATAR -> {
+                val user = AccountUtils.currentUser ?: return
+
+                state.update(correspondent, bimi)
+                AvatarType.getUrlOrInitials(
+                    avatarUrlData = user.avatar?.let { AvatarUrlData(it, context.simpleImageLoader) },
+                    initials = user.getInitials(),
+                    containerColor = Color(context.getBackgroundColorResBasedOnId(user.id, R.array.AvatarColors)),
+                    contentColor = getContentColor(),
+                )
+            }
+            AvatarDisplayType.CUSTOM_AVATAR -> {
+                state.update(correspondent, bimi)
+                val avatarUrlData = searchInMergedContact(correspondent!!, contacts)?.avatar?.let {
+                    AvatarUrlData(it, context.imageLoader)
+                }
+                AvatarType.getUrlOrInitialsFromCorrespondent(avatarUrlData, correspondent)
+            }
+            AvatarDisplayType.INITIALS -> {
+                state.update(correspondent!!, bimi)
+                AvatarType.WithInitials.Initials.fromCorrespondent(correspondent)
+            }
+            AvatarDisplayType.BIMI -> {
+                state.update(correspondent!!, bimi!!)
+                val avatarUrlData = AvatarUrlData(ApiRoutes.bimi(bimi.svgContentUrl!!), context.imageLoader)
+                AvatarType.WithInitials.Url.fromCorrespondent(avatarUrlData, correspondent)
+            }
+        }
+
+        load(avatarType)
+    }
+
+    private fun AvatarType.WithInitials.Initials.Companion.fromCorrespondent(correspondent: Correspondent): AvatarType.WithInitials.Initials {
+        return AvatarType.WithInitials.Initials(
+            initials = correspondent.initials,
+            containerColor = getContainerColor(correspondent),
+            contentColor = getContentColor(),
+        )
+    }
+
+    private fun AvatarType.WithInitials.Url.Companion.fromCorrespondent(
+        avatarUrlData: AvatarUrlData,
+        correspondent: Correspondent
+    ): AvatarType.WithInitials.Url {
+        return AvatarType.WithInitials.Url(
+            url = avatarUrlData.url,
+            imageLoader = avatarUrlData.imageLoader,
+            initials = correspondent.initials,
+            containerColor = getContainerColor(correspondent),
+            contentColor = getContentColor(),
+        )
+    }
+
+    private fun AvatarType.Companion.getUrlOrInitialsFromCorrespondent(
+        avatarUrlData: AvatarUrlData?,
+        correspondent: Correspondent,
+    ): AvatarType {
+        return getUrlOrInitials(
+            avatarUrlData = avatarUrlData,
+            initials = correspondent.initials,
+            containerColor = getContainerColor(correspondent),
+            contentColor = getContentColor(),
+        )
+    }
+
+    private fun load(avatarType: AvatarType) {
+        when (avatarType) {
+            is AvatarType.WithInitials.Url -> {
+                binding.avatarImage.loadAvatar(
+                    backgroundColor = getBackgroundColorGradientDrawable(avatarType.containerColor.toArgb()),
+                    avatarUrl = avatarType.url,
+                    initials = avatarType.initials,
+                    imageLoader = avatarType.imageLoader,
+                    initialsColor = avatarType.contentColor.toArgb(),
+                )
+            }
+            is AvatarType.WithInitials.Initials -> {
+                binding.avatarImage.loadAvatar(
+                    backgroundColor = getBackgroundColorGradientDrawable(avatarType.containerColor.toArgb()),
+                    avatarUrl = null,
+                    initials = avatarType.initials,
+                    imageLoader = context.imageLoader,
+                    initialsColor = avatarType.contentColor.toArgb(),
+                )
+            }
+            is AvatarType.DrawableResource -> binding.avatarImage.load(avatarType.resource)
         }
     }
+
+    private fun getContentColor() = Color(context.getColor(R.color.onColorfulBackground))
+
+    private fun getContainerColor(correspondent: Correspondent) = Color(
+        context.getBackgroundColorResBasedOnId(correspondent.email.hashCode(), R.array.AvatarColors)
+    )
+
+    sealed interface AvatarType {
+
+        sealed interface WithInitials : AvatarType {
+            val initials: String
+            val containerColor: Color
+            val contentColor: Color
+
+            data class Initials(
+                override val initials: String,
+                override val containerColor: Color,
+                override val contentColor: Color,
+            ) : WithInitials {
+                companion object
+            }
+
+            data class Url(
+                val url: String,
+                val imageLoader: ImageLoader,
+                override val initials: String,
+                override val containerColor: Color,
+                override val contentColor: Color,
+            ) : WithInitials {
+                companion object
+            }
+        }
+
+        data class DrawableResource(@DrawableRes val resource: Int) : AvatarType
+
+        companion object {
+            fun getUrlOrInitials(
+                avatarUrlData: AvatarUrlData?,
+                initials: String,
+                containerColor: Color,
+                contentColor: Color,
+            ): AvatarType {
+                return if (avatarUrlData == null) {
+                    WithInitials.Initials(initials, containerColor, contentColor)
+                } else {
+                    WithInitials.Url(avatarUrlData.url, avatarUrlData.imageLoader, initials, containerColor, contentColor)
+                }
+            }
+        }
+    }
+
+    data class AvatarUrlData(val url: String, val imageLoader: ImageLoader)
 
     private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?, isBimiEnabled: Boolean): AvatarDisplayType {
         return when {
@@ -261,7 +394,7 @@ class AvatarView @JvmOverloads constructor(
         }
     }
 
-    enum class AvatarDisplayType {
+    private enum class AvatarDisplayType {
         UNKNOWN_CORRESPONDENT,
         CUSTOM_AVATAR,
         USER_AVATAR,
