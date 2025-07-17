@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.decode.SvgDecoder
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
 import com.facebook.stetho.Stetho
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.api.ApiController
@@ -79,7 +79,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltAndroidApp
-open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycleObserver, Configuration.Provider {
+open class MainApplication : Application(), SingletonImageLoader.Factory, DefaultLifecycleObserver, Configuration.Provider {
 
     init {
         injectAsAppCtx() // Ensures it is always initialized
@@ -296,14 +296,9 @@ open class MainApplication : Application(), ImageLoaderFactory, DefaultLifecycle
         override fun getCurrentUserId(): Int = AccountUtils.currentUserId
     }
 
-    override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
 
-    fun createSvgImageLoader(): ImageLoader {
-        return CoilUtils.newImageLoader(
-            applicationContext,
-            tokenInterceptorListener(),
-            customFactories = listOf(SvgDecoder.Factory())
-        )
+    override fun newImageLoader(context: PlatformContext): ImageLoader {
+        return CoilUtils.newImageLoader(context, tokenInterceptorListener())
     }
 
     companion object {
