@@ -51,8 +51,15 @@ class EncryptionViewModel @Inject constructor(
     private val emailsBeingChecked: MutableList<String> = mutableListOf()
 
     fun checkIfEmailsCanBeEncrypted(emails: List<String>) {
+        // The infomaniak domains don't need to be checked because it can always be automatically encrypted
+        val infomaniakFilteredEmails = emails.filterNot { it.contains("@(ik.me|etik.com|ikmail.com|infomaniak.com)".toRegex()) }
+        if (infomaniakFilteredEmails.isEmpty()) {
+            unencryptableRecipients.postValue(unencryptableRecipients.value ?: emptyList())
+            return
+        }
+
         emailsCheckingJob?.cancel(AutoBulkCallCancellationException())
-        emailsBeingChecked.addAll(emails)
+        emailsBeingChecked.addAll(infomaniakFilteredEmails)
 
         emailsCheckingJob = viewModelScope.launch(ioDispatcher) {
             isCheckingEmails.postValue(true)
