@@ -17,16 +17,47 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.infomaniak.core.login.crossapp.CrossAppLogin
+import com.infomaniak.core.login.crossapp.DerivedTokenGenerator
+import com.infomaniak.core.login.crossapp.DerivedTokenGeneratorImpl
+import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.utils.CrossLoginAccount
+import com.infomaniak.mail.utils.extensions.loginUrl
+import com.infomaniak.mail.utils.toCrossLoginAccounts
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Inject
 
+@OptIn(ExperimentalSerializationApi::class)
 @HiltViewModel
 class IntroViewModel @Inject constructor(
     localSettings: LocalSettings,
 ) : ViewModel() {
 
     val updatedAccentColor = MutableLiveData(localSettings.accentColor to localSettings.accentColor)
+
+    val crossLoginAccounts = MutableLiveData(emptyList<CrossLoginAccount>())
+
+    var derivedTokenGenerator: DerivedTokenGenerator? = null
+        private set
+
+    suspend fun getCrossLoginAccounts(context: Context): List<CrossLoginAccount> {
+        return CrossAppLogin.forContext(context).retrieveAccountsFromOtherApps().toCrossLoginAccounts()
+    }
+
+    fun initDerivedTokenGenerator(coroutineScope: CoroutineScope) {
+        derivedTokenGenerator = DerivedTokenGeneratorImpl(
+            coroutineScope = coroutineScope,
+            tokenRetrievalUrl = "${loginUrl}token",
+            hostAppPackageName = BuildConfig.APPLICATION_ID,
+            clientId = BuildConfig.CLIENT_ID,
+            userAgent = HttpUtils.getUserAgent,
+        )
+    }
 }
