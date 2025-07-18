@@ -29,11 +29,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import coil3.imageLoader
 import coil3.load
+import com.infomaniak.core.coil.CoilUtils.simpleImageLoader
+import com.infomaniak.core.coil.loadAvatar
 import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.utils.CoilUtils.simpleImageLoader
 import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
 import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Bimi

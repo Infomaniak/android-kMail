@@ -35,22 +35,23 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import com.facebook.stetho.Stetho
+import com.infomaniak.core.auth.AuthConfiguration
+import com.infomaniak.core.coil.CoilUtils
+import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpClientConfig
-import com.infomaniak.lib.core.utils.CoilUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.stores.AppUpdateScheduler
+import com.infomaniak.mail.TokenInterceptorListenerProvider.legacyTokenInterceptorListener
+import com.infomaniak.mail.TokenInterceptorListenerProvider.tokenInterceptorListener
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
-import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
@@ -71,7 +72,6 @@ import io.sentry.android.fragment.FragmentLifecycleIntegration
 import io.sentry.android.fragment.FragmentLifecycleState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import splitties.init.injectAsAppCtx
@@ -234,6 +234,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     private fun getLaunchIntent() = Intent(this, LaunchActivity::class.java).clearStack()
 
     private fun configureInfomaniakCore() {
+        // Legacy configuration
         InfomaniakCore.apply {
             init(
                 appId = BuildConfig.APPLICATION_ID,
@@ -244,11 +245,25 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
             apiErrorCodes = ErrorCode.apiErrorCodes
             accessType = null
         }
+
+        // New modules configuration
+        NetworkConfiguration.init(
+            appId = BuildConfig.APPLICATION_ID,
+            appVersionCode = BuildConfig.VERSION_CODE,
+            appVersionName = BuildConfig.VERSION_NAME,
+        )
+
+        AuthConfiguration.init(
+            appId = BuildConfig.APPLICATION_ID,
+            appVersionCode = BuildConfig.VERSION_CODE,
+            appVersionName = BuildConfig.VERSION_NAME,
+            clientId = BuildConfig.CLIENT_ID,
+        )
     }
 
     private fun configureHttpClient() {
         AccountUtils.onRefreshTokenError = refreshTokenError
-        val tokenInterceptorListener = tokenInterceptorListener()
+        val tokenInterceptorListener = legacyTokenInterceptorListener(refreshTokenError, globalCoroutineScope)
         HttpClientConfig.customInterceptors = listOf(
             UrlTraceInterceptor(),
             AccessTokenUsageInterceptor(
@@ -278,27 +293,8 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         globalCoroutineScope.launch(ioDispatcher) { logoutUser(user) }
     }
 
-    private fun tokenInterceptorListener() = object : TokenInterceptorListener {
-        val userTokenFlow by lazy { AppSettingsController.getCurrentUserIdFlow().mapToApiToken(globalCoroutineScope) }
-
-        override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
-            if (AccountUtils.currentUser == null) AccountUtils.requestCurrentUser()
-            AccountUtils.setUserToken(AccountUtils.currentUser!!, apiToken)
-        }
-
-        override suspend fun onRefreshTokenError() {
-            if (AccountUtils.currentUser == null) AccountUtils.requestCurrentUser()
-            refreshTokenError(AccountUtils.currentUser!!)
-        }
-
-        override suspend fun getUserApiToken(): ApiToken? = userTokenFlow.first()
-
-        override fun getCurrentUserId(): Int = AccountUtils.currentUserId
-    }
-
-
     override fun newImageLoader(context: PlatformContext): ImageLoader {
-        return CoilUtils.newImageLoader(context, tokenInterceptorListener())
+        return CoilUtils.newImageLoader(context, tokenInterceptorListener(refreshTokenError, globalCoroutineScope))
     }
 
     companion object {
