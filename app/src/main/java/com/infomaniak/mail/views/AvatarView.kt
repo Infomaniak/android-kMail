@@ -29,7 +29,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import coil3.imageLoader
 import coil3.load
-import com.infomaniak.core.coil.CoilUtils.simpleImageLoader
+import com.infomaniak.core.coil.CoilXmlUtils.simpleImageLoader
 import com.infomaniak.core.coil.loadAvatar
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.UtilsUi.getBackgroundColorBasedOnId
