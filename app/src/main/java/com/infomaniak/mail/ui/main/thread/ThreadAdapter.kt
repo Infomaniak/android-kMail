@@ -495,9 +495,10 @@ class ThreadAdapter(
             isVisible = true
 
             val isMe = message.from.all(Recipient::isMe)
-            val passwordValidity = message.encryptionPasswordValidity?.toDate()
 
-            val (description, actionRes) = if (isMe && passwordValidity != null) {
+            val recipientsNeedingPassword = message.allRecipients.filter { recipient -> recipient.hasExternalProvider }
+            val passwordValidity = message.encryptionPasswordValidity?.toDate()
+            val (description, actionRes) = if (isMe && recipientsNeedingPassword.isNotEmpty() && passwordValidity != null) {
                 getDisplayablePasswordValidity(context, passwordValidity) to R.string.encryptedButtonSeeConcernedRecipients
             } else {
                 context.getString(R.string.encryptedMessageHeader) to null
@@ -505,12 +506,8 @@ class ThreadAdapter(
 
             setDescription(description)
             actionRes?.let {
-                // TODO: Put this back when the back will have put the encryption information in prod
-                //     setAction1Text(context.getString(it))
-                //     onAction1 {
-                //         threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(message.allRecipients)
-                //     }
-                setActionsVisibility(isVisible = false)
+                setAction1Text(context.getString(it))
+                onAction1 { threadAdapterCallbacks?.onEncryptionSeeConcernedRecipients?.invoke(recipientsNeedingPassword) }
             } ?: setActionsVisibility(isVisible = false)
         }
     }
