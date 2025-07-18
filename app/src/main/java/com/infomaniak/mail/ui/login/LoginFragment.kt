@@ -34,8 +34,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.core.Xor
-import com.infomaniak.core.crossloginui.data.CrossLoginAccount
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.login.crossapp.DerivedTokenGenerator.Issue
 import com.infomaniak.core.utils.awaitOneClick
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -65,7 +65,9 @@ import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import splitties.coroutines.repeatWhileActive
@@ -289,38 +291,49 @@ class LoginFragment : Fragment() {
             ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.id) == true }
             ?: return
         val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
+        val tokens = mutableListOf<ApiToken>()
+        var currentlySelectedInAnAppToken: ApiToken? = null
 
-        var firstAccountToken: ApiToken? = null
-        val accountsAndTokens = mutableMapOf<CrossLoginAccount, ApiToken?>()
+        if (accounts.isEmpty()) return
 
         accounts.forEach { account ->
+
             val token = when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
                 is Xor.First -> {
                     SentryLog.i(TAG, "Succeeded to derive token for account: ${account.id}")
-                    if (firstAccountToken == null) firstAccountToken = result.value
                     result.value
                 }
                 is Xor.Second -> {
                     SentryLog.e(TAG, "Failed to derive token for account ${account.id}, with reason: ${result.value}")
+                    val errorId = when (result.value) {
+                        is Issue.AppIntegrityCheckFailed -> TODO()
+                        is Issue.ErrorResponse -> TODO()
+                        is Issue.NetworkIssue -> RCore.string.connectionError
+                        is Issue.OtherIssue -> RCore.string.anErrorHasOccurred
+                    }
+                    Dispatchers.Main { showError(getString(errorId)) }
                     null
                 }
             }
-            accountsAndTokens.put(account, token)
+
+            token?.let {
+                if (account.isCurrentlySelectedInAnApp && currentlySelectedInAnAppToken == null) {
+                    currentlySelectedInAnAppToken = it
+                } else {
+                    tokens.add(it)
+                }
+            }
         }
 
-        val currentlySelectedInAnAppToken = accountsAndTokens.firstNotNullOfOrNull { (account, token) ->
-            if (account.isCurrentlySelectedInAnApp) token else null
-        }
+        if (currentlySelectedInAnAppToken == null) currentlySelectedInAnAppToken = tokens.firstOrNull() ?: return
 
-        val remainingTokens = accountsAndTokens
-            .filterNot { (_, token) -> token == currentlySelectedInAnAppToken }
-            .values
+        val remainingTokens = tokens.filterNot { it == currentlySelectedInAnAppToken }
 
         remainingTokens.forEach { token ->
-            token?.let { authenticateToken(token = it, withRedirection = false) }
+            authenticateToken(token, withRedirection = false)
         }
 
-        (currentlySelectedInAnAppToken ?: firstAccountToken)?.let { authenticateToken(token = it, withRedirection = true) }
+        authenticateToken(currentlySelectedInAnAppToken, withRedirection = true)
     }
 
     private fun openLoginWebView() {
