@@ -31,6 +31,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
 import javax.inject.Inject
@@ -65,7 +67,11 @@ class EncryptionViewModel @Inject constructor(
             isCheckingEmails.postValue(true)
 
             runCatching {
-                val newUnencryptableRecipients = computeUnencryptableAddressesFromApi()
+                val chunkedEmailsBeingChecked = emailsBeingChecked.chunked(size = MAX_EMAILS_PER_EXISTS_CALL).map { emailsChunk ->
+                    async(ioDispatcher) { computeUnencryptableAddressesFromApi(emailsChunk) }
+                }
+
+                val newUnencryptableRecipients = chunkedEmailsBeingChecked.awaitAll().flatten()
                 val existingUnencryptableRecipients = unencryptableRecipients.value ?: emptyList()
                 clearDataAndPostResult(newUnencryptableRecipients + existingUnencryptableRecipients)
             }.onFailure { exception ->
@@ -84,11 +90,11 @@ class EncryptionViewModel @Inject constructor(
      *
      * @return a list of the new unencryptable recipients
      */
-    private suspend fun computeUnencryptableAddressesFromApi(): List<String> {
+    private suspend fun computeUnencryptableAddressesFromApi(emails: List<String>): List<String> {
         // By default, all the new addresses are considered unencryptable
-        val newUnencryptableRecipients = emailsBeingChecked
+        val newUnencryptableRecipients = emails.toMutableList()
 
-        val apiResponse = ApiRepository.isInfomaniakMailboxes(emailsBeingChecked.toSet())
+        val apiResponse = ApiRepository.isInfomaniakMailboxes(emails.toSet())
         if (apiResponse.isSuccess()) {
             apiResponse.data?.let { mailboxHostingStatuses ->
                 mailboxHostingStatuses.forEach { mailboxStatus ->
@@ -96,6 +102,7 @@ class EncryptionViewModel @Inject constructor(
                 }
             }
         } else {
+            // TODO better with the parallelism
             // In case of error during the encryptable check, we consider all recipients as unencryptable
             snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
         }
@@ -131,6 +138,7 @@ class EncryptionViewModel @Inject constructor(
     private class AutoBulkCallCancellationException : CancellationException()
 
     companion object {
+        private const val MAX_EMAILS_PER_EXISTS_CALL = 10
         private const val PASSWORD_MIN_LENGTH = 16
         private const val PASSWORD_CHARACTERS_SET =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?"
