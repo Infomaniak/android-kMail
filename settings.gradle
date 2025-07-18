@@ -21,9 +21,11 @@ dependencyResolutionManagement {
 rootProject.name = 'Infomaniak Mail'
 include ':app',
         ':Core:AppIntegrity',
+        ':Core:Compose:Basics',
         ':Core:Compose:Margin',
         ':Core:Compose:MaterialThemeFromXml',
         ':Core:CrossAppLogin',
+        ':Core:CrossAppLoginUI',
         ':Core:FragmentNavigation',
         ':Core:Legacy',
         ':Core:Legacy:AppLock',

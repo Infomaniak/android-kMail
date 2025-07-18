@@ -25,7 +25,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.os.bundleOf
-import androidx.core.view.isInvisible
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -34,6 +34,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.core.Xor
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.login.crossapp.DerivedTokenGenerator.Issue
+import com.infomaniak.core.utils.awaitOneClick
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils
@@ -52,7 +55,7 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.utils.CrossLoginAccount
+import com.infomaniak.mail.ui.login.CrossLoginBottomSheetDialog.Companion.ON_ANOTHER_ACCOUNT_CLICKED_KEY
 import com.infomaniak.mail.utils.LoginUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.colorStateList
@@ -62,9 +65,15 @@ import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
+import splitties.coroutines.repeatWhileActive
+import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
+import com.infomaniak.core.crossloginui.R as RCrossLogin
 import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -143,9 +152,21 @@ class LoginFragment : Fragment() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
                     val showConnectButton = position == introPagerAdapter.itemCount - 1
-                    nextButton.isInvisible = showConnectButton
-                    connectButton.isInvisible = !showConnectButton
-                    signInButton.isInvisible = !showConnectButton
+                    nextButton.isGone = showConnectButton
+                    connectButton.isVisible = showConnectButton
+
+                    if (showConnectButton) {
+                        if (introViewModel.crossLoginAccounts.value!!.isEmpty()) {
+                            crossLoginSelection.isGone = true
+                            signInButton.isVisible = true
+                        } else {
+                            signInButton.isGone = true
+                            crossLoginSelection.isVisible = true
+                        }
+                    } else {
+                        crossLoginSelection.isGone = true
+                        signInButton.isGone = true
+                    }
                 }
             })
 
@@ -159,18 +180,6 @@ class LoginFragment : Fragment() {
 
         nextButton.setOnClickListener { introViewpager.currentItem += 1 }
 
-        connectButton.apply {
-            initProgress(viewLifecycleOwner, getCurrentOnPrimary())
-            setOnClickListener {
-                updateTextColor(getCurrentOnPrimary())
-                isEnabled = false
-                signInButton.isEnabled = false
-                connectButtonProgressTimer.start()
-                trackAccountEvent(MatomoName.OpenLoginWebview)
-                loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
-            }
-        }
-
         signInButton.setOnClickListener {
             safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
         }
@@ -181,6 +190,10 @@ class LoginFragment : Fragment() {
 
         handleOnBackPressed()
 
+        observeAccentColor()
+        observeCrossLoginAccounts()
+        observeCrossLoginSelectedIds()
+        setCrossLoginClickListener()
         initCrossLogin()
     }
 
@@ -195,20 +208,75 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private fun observeAccentColor() {
+        introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, _) ->
+            binding.crossLoginSelection.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
+            binding.crossLoginSelection.setOnPrimaryColor(newAccentColor.getOnPrimary(requireContext()))
+        }
+    }
+
+    private fun observeCrossLoginAccounts() {
+        introViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
+            SentryLog.i(TAG, "Got ${accounts.count()} accounts from other apps")
+            binding.crossLoginSelection.setAccounts(accounts)
+        }
+    }
+
+    private fun observeCrossLoginSelectedIds() {
+        introViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
+            if (ids.isEmpty()) return@observe
+
+            val count = ids.count()
+            SentryLog.i(TAG, "User selected $count accounts")
+            binding.crossLoginSelection.setSelectedIds(ids)
+            binding.connectButton.text = requireContext().resources.getQuantityString(
+                RCrossLogin.plurals.buttonContinueWithAccounts, count, count,
+            )
+        }
+    }
+
+    private fun setCrossLoginClickListener() {
+
+        // Open Login webView when coming back from CrossLogin bottomSheet
+        parentFragmentManager.setFragmentResultListener(
+            /* requestKey = */ ON_ANOTHER_ACCOUNT_CLICKED_KEY,
+            /* lifecycleOwner = */viewLifecycleOwner,
+        ) { _, bundle ->
+            bundle.getString(ON_ANOTHER_ACCOUNT_CLICKED_KEY)?.let { openLoginWebView() }
+        }
+
+        // Open CrossLogin bottomSheet
+        binding.crossLoginSelection.setOnClickListener {
+            safelyNavigate(LoginFragmentDirections.actionLoginFragmentToCrossLoginBottomSheetDialog())
+        }
+    }
+
+    @OptIn(ExperimentalSplittiesApi::class)
     private fun initCrossLogin() = viewLifecycleOwner.lifecycleScope.launch {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
 
             introViewModel.initDerivedTokenGenerator(coroutineScope = this)
 
-            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
-            if (accounts.isNotEmpty()) {
-                introViewModel.crossLoginAccounts.postValue(accounts)
+            binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
 
-                // TODO: Uncomment this when the UI is ready
-                // repeatWhileActive {
-                //     binding.connectButton.awaitOneClick()
-                //     handleCrossAppLogin()
-                // }
+            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
+
+            if (accounts.isNotEmpty()) {
+                introViewModel.crossLoginAccounts.value = accounts
+                introViewModel.crossLoginSelectedIds.value = accounts.map { it.id }.toSet()
+            }
+
+            repeatWhileActive {
+                binding.connectButton.awaitOneClick()
+                connectButtonProgressTimer.start()
+                if (accounts.isEmpty()) {
+                    binding.connectButton.updateTextColor(getCurrentOnPrimary())
+                    binding.signInButton.isEnabled = false
+                    openLoginWebView()
+                } else {
+                    handleCrossAppLogin()
+                    delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
+                }
             }
         }
     }
@@ -219,40 +287,58 @@ class LoginFragment : Fragment() {
             authenticateUser(token, loginActivity.infomaniakLogin, withRedirection)
         }
 
-        val accounts = introViewModel.crossLoginAccounts.value?.filter { it.isSelected } ?: return
+        val accounts = introViewModel.crossLoginAccounts.value
+            ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.id) == true }
+            ?: return
         val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
+        val tokens = mutableListOf<ApiToken>()
+        var currentlySelectedInAnAppToken: ApiToken? = null
 
-        var firstAccountToken: ApiToken? = null
-        val accountsAndTokens = mutableMapOf<CrossLoginAccount, ApiToken?>()
+        if (accounts.isEmpty()) return
 
         accounts.forEach { account ->
+
             val token = when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
                 is Xor.First -> {
-                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.email}")
-                    if (firstAccountToken == null) firstAccountToken = result.value
+                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.id}")
                     result.value
                 }
                 is Xor.Second -> {
-                    SentryLog.e(TAG, "Failed to derive token for account ${account.email}, with reason: ${result.value}")
+                    SentryLog.e(TAG, "Failed to derive token for account ${account.id}, with reason: ${result.value}")
+                    val errorId = when (result.value) {
+                        is Issue.AppIntegrityCheckFailed -> TODO()
+                        is Issue.ErrorResponse -> TODO()
+                        is Issue.NetworkIssue -> RCore.string.connectionError
+                        is Issue.OtherIssue -> RCore.string.anErrorHasOccurred
+                    }
+                    Dispatchers.Main { showError(getString(errorId)) }
                     null
                 }
             }
-            accountsAndTokens.put(account, token)
+
+            token?.let {
+                if (account.isCurrentlySelectedInAnApp && currentlySelectedInAnAppToken == null) {
+                    currentlySelectedInAnAppToken = it
+                } else {
+                    tokens.add(it)
+                }
+            }
         }
 
-        val currentlySelectedInAnAppToken = accountsAndTokens.firstNotNullOfOrNull { (account, token) ->
-            if (account.isCurrentlySelectedInAnApp) token else null
-        }
+        if (currentlySelectedInAnAppToken == null) currentlySelectedInAnAppToken = tokens.firstOrNull() ?: return
 
-        val remainingTokens = accountsAndTokens
-            .filterNot { (_, token) -> token == currentlySelectedInAnAppToken }
-            .values
+        val remainingTokens = tokens.filterNot { it == currentlySelectedInAnAppToken }
 
         remainingTokens.forEach { token ->
-            token?.let { authenticateToken(token = it, withRedirection = false) }
+            authenticateToken(token, withRedirection = false)
         }
 
-        (currentlySelectedInAnAppToken ?: firstAccountToken)?.let { authenticateToken(token = it, withRedirection = true) }
+        authenticateToken(currentlySelectedInAnAppToken, withRedirection = true)
+    }
+
+    private fun openLoginWebView() {
+        trackAccountEvent(MatomoName.OpenLoginWebview)
+        loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
     }
 
     private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
