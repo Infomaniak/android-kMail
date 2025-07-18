@@ -55,10 +55,16 @@ import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ReplyForwardFooterManager
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.cache.userInfo.AddressBookController
+import com.infomaniak.mail.data.cache.userInfo.ContactGroupController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.FeatureFlag
+import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
+import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -129,6 +135,8 @@ class NewMessageViewModel @Inject constructor(
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
     private val mailboxController: MailboxController,
     private val mergedContactController: MergedContactController,
+    private val addressBookController: AddressBookController,
+    private val contactGroupController: ContactGroupController,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val replyForwardFooterManager: ReplyForwardFooterManager,
     private val sharedUtils: SharedUtils,
@@ -213,7 +221,9 @@ class NewMessageViewModel @Inject constructor(
     val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
     val mergedContacts = liveData(ioCoroutineContext) {
-        val list = mergedContactController.getSortedMergedContacts().copyFromRealm()
+        var list: List<ContactAutocompletable> = mergedContactController.getSortedMergedContacts().copyFromRealm()
+        list += addressBookController.getAllAddressBook().copyFromRealm()
+        list += contactGroupController.getGroup().copyFromRealm()
         emit(list to arrangeMergedContacts(list))
     }
 
@@ -334,6 +344,18 @@ class NewMessageViewModel @Inject constructor(
         )
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
+    }
+
+    fun getAddressBookWithName(contactGroup: ContactGroup): AddressBook? {
+        return addressBookController.getAddressBookWithGroup(contactGroup)
+    }
+
+    fun getMergedContactFromContactGroup(contactGroup: ContactGroup): List<MergedContact> {
+        return mergedContactController.getMergedContactFromContactGroup(contactGroup)
+    }
+
+    fun getMergedContactFromAddressBook(addressBook: AddressBook): List<MergedContact> {
+        return mergedContactController.getMergedContactFromAddressBook(addressBook)
     }
 
     private fun initSignature(draft: Draft, signature: Signature) {

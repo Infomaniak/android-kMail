@@ -59,6 +59,7 @@
     <string name="addUnknownRecipientAlreadyUsed">The email is already used</string>
     <string name="addUnknownRecipientInvalidEmail">The email is invalid</string>
     <string name="addUnknownRecipientTitle">Add a recipient</string>
+    <string name="addressBookTitle">Address Book: %s</string>
     <string name="aiButtonInsert">Insert</string>
     <string name="aiButtonRefine">Refine</string>
     <string name="aiButtonRetry">Retry</string>
@@ -368,6 +369,7 @@
     </plurals>
     <string name="fromTitle">From:</string>
     <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
+    <string name="groupContactsTitle">Group: %s</string>
     <string name="inboxFolder">Inbox</string>
     <string name="lastSelectedSchedule">Last selected schedule</string>
     <string name="laterThisMorning">Later this morning</string>
@@ -453,6 +455,8 @@
     <string name="onBoardingTitle2">Save time with swipe actions</string>
     <string name="onBoardingTitle3">Press a message for a few seconds to select multiple messages</string>
     <string name="onBoardingTitle4">Get started!</string>
+    <string name="organizationName">Organization: %s</string>
+    <string name="otherOrganisation">Other</string>
     <string name="pendingMessagesFolder">Pending messages</string>
     <string name="pickerNoSelection">No selection</string>
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>

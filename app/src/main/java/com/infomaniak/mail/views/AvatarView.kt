@@ -182,6 +182,11 @@ class AvatarView @JvmOverloads constructor(
         binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
+    fun loadTeamsUserAvatar() {
+        state.update(correspondent = null, bimi = null)
+        binding.avatarImage.load(R.drawable.ic_circle_teams_user)
+    }
+
     private fun loadBimiAvatar(correspondent: Correspondent, bimi: Bimi) = with(binding.avatarImage) {
         state.update(correspondent, bimi)
         contentDescription = correspondent.email
