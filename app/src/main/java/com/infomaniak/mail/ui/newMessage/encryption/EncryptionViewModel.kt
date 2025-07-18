@@ -67,6 +67,7 @@ class EncryptionViewModel @Inject constructor(
             isCheckingEmails.postValue(true)
 
             runCatching {
+                // The API only support 10 emails per call so we have to chunk the list
                 val chunkedEmailsBeingChecked = emailsBeingChecked.chunked(size = MAX_EMAILS_PER_EXISTS_CALL).map { emailsChunk ->
                     async(ioDispatcher) { computeUnencryptableAddressesFromApi(emailsChunk) }
                 }
@@ -102,9 +103,10 @@ class EncryptionViewModel @Inject constructor(
                 }
             }
         } else {
-            // TODO better with the parallelism
-            // In case of error during the encryptable check, we consider all recipients as unencryptable
+            // In case of error during the encryptable check, we consider all recipients as unencryptable and
+            // we can stop the other call because the user will need a password either way
             snackbarManager.postValue(appContext.getString(apiResponse.translateError()))
+            emailsCheckingJob?.cancel()
         }
 
         return newUnencryptableRecipients
