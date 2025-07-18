@@ -36,7 +36,7 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import com.facebook.stetho.Stetho
 import com.infomaniak.core.auth.AuthConfiguration
-import com.infomaniak.core.coil.CoilUtils
+import com.infomaniak.core.coil.CoilXmlUtils
 import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.api.ApiController
@@ -294,7 +294,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
-        return CoilUtils.newImageLoader(context, tokenInterceptorListener(refreshTokenError, globalCoroutineScope))
+        return CoilXmlUtils.newImageLoader(context, tokenInterceptorListener(refreshTokenError, globalCoroutineScope))
     }
 
     companion object {
