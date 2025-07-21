@@ -19,4 +19,5 @@ package com.infomaniak.mail.data.models.correspondent
 
 interface ContactAutocompletable {
     var contactId: String
+    var name: String
 }

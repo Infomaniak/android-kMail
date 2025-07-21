@@ -28,7 +28,6 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.UseSerializers
 
 @Parcelize
@@ -40,6 +39,7 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
 
     override var email: String = ""
     override var name: String = ""
+    override var contactId: String = id.toString()
 
     var avatar: String? = null
         private set
@@ -47,10 +47,8 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
     var comesFromApi: Boolean = false // In opposition to coming from the phone's address book
         private set
 
-    @SerialName("categories")
     var remoteContactGroupIds: RealmList<Int> = realmListOf()
 
-    @SerialName("addressbook_id")
     var addressbookIds: RealmList<Int?> = realmListOf()
 
     @delegate:Ignore
@@ -66,8 +64,6 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
      *   - The user has sent a message first to this contact.
      */
     var other: Boolean = false
-
-    override var contactId: String = id.toString()
 
     constructor(
         email: String,

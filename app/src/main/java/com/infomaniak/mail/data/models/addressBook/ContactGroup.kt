@@ -27,7 +27,7 @@ class ContactGroup : RealmObject, ContactAutocompletable {
 
     @PrimaryKey
     var id: Int = 0
-    var name: String = ""
+    override var name: String = ""
 
     override var contactId: String = id.toString()
 

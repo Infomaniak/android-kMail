@@ -34,7 +34,7 @@ class AddressBook : RealmObject, ContactAutocompletable {
     @PrimaryKey
     var uuid: String = ""
     var id: Int = 0
-    var name: String = ""
+    override var name: String = ""
     @SerialName("default")
     var isDefault: Boolean = false
     @SerialName("account_name")
