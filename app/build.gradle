@@ -89,6 +89,8 @@ android {
 
 dependencies {
     implementation project(':Core')
+    implementation project(':Core:Auth')
+    implementation project(':Core:Coil')
     implementation project(':Core:Compose:MaterialThemeFromXml')
     implementation project(':Core:FragmentNavigation')
     implementation project(':Core:Legacy')
@@ -129,7 +131,8 @@ dependencies {
 
     implementation libs.sentry.android.fragment
 
-    implementation libs.coil.svg
+    // Not used directly in the code, but coil3 injects it automatically simply when it's present as a dependency in the project
+    implementation core.coil.svg
 
     coreLibraryDesugaring libs.desugar.jdk
 
