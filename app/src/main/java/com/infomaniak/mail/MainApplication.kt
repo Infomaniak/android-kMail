@@ -135,7 +135,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
 
         if (BuildConfig.DEBUG) configureDebugMode()
 
-        configSentry()
+        configureSentry()
         enforceAppTheme()
         configureRoomDatabases()
         configureAppReloading()
@@ -183,8 +183,8 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
      * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
      * - [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
      */
-    private fun configSentry() {
-        configureSentry(
+    private fun configureSentry() {
+        this.configureSentry(
             isDebug = BuildConfig.DEBUG,
             isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled,
             isFilteredException = { exception: Throwable? ->
