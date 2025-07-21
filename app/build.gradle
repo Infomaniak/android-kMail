@@ -132,7 +132,7 @@ dependencies {
     implementation libs.sentry.android.fragment
 
     // Not used directly in the code, but coil3 injects it automatically simply when it's present as a dependency in the project
-    implementation libs.coil.svg
+    implementation core.coil.svg
 
     coreLibraryDesugaring libs.desugar.jdk
 
