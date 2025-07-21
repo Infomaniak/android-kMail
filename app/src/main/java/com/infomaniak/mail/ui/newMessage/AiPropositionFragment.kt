@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.ChangeBounds
@@ -125,13 +126,12 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun handleEdgeToEdge() = with(binding) {
-        applyWindowInsetsListener(shouldConsume = true) { _, insets ->
-            toolbar.applyStatusBarInsets(insets)
+        applyWindowInsetsListener { _, insets ->
+            appBarLayout.applyStatusBarInsets(insets)
             with(insets.safeArea()) {
                 with(binding) {
                     aiPropositionBottomBarForeground.setMargins(left = left, bottom = bottom, right = right)
-                    contentLayout.setMargins(left = left, right = right)
-                    errorBlock.setMargins(left = left, right = right)
+                    aiResponseContainer.setMargins(left = left, right = right)
                 }
             }
         }
@@ -174,7 +174,9 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun setToolbar() = with(binding) {
-        changeToolbarColorOnScroll(toolbar, nestedScrollView)
+        changeToolbarColorOnScroll(toolbar, nestedScrollView, otherUpdates = { color ->
+            appBarLayout.backgroundTintList = ColorStateList.valueOf(color)
+        })
         toolbar.apply {
             setNavigationOnClickListener { trackDismissalAndPopBack() }
             title = requireContext().postfixWithTag(

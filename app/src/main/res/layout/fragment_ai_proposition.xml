@@ -24,19 +24,27 @@
     android:orientation="vertical"
     android:theme="@style/AiCursorAndPrimaryColorTheme">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/backgroundColor"
         android:touchscreenBlocksFocus="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_close_big"
-        app:navigationIconTint="@color/iconColor"
-        app:titleCentered="true"
-        app:titleTextAppearance="@style/H2"
-        tools:title="@string/aiPromptTitle" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:touchscreenBlocksFocus="false"
+            app:navigationIcon="@drawable/ic_close_big"
+            app:navigationIconTint="@color/iconColor"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/H2"
+            tools:title="@string/aiPromptTitle" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -45,9 +53,10 @@
         app:layout_constraintBottom_toTopOf="@id/aiPropositionBottomBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
         <LinearLayout
+            android:id="@+id/aiResponseContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -104,7 +113,7 @@
         app:layout_constraintBottom_toTopOf="@id/aiPropositionBottomBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintVertical_bias="1"
         tools:visibility="gone" />
 
