@@ -19,9 +19,6 @@ package com.infomaniak.mail.ui.newMessage
 
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.mail.data.models.addressBook.AddressBook
-import com.infomaniak.mail.data.models.addressBook.ContactGroup
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -74,9 +71,9 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
                 gotFocusCallback = { fieldGotFocus(TO) },
                 onToggleEverythingCallback = ::openAdvancedFields,
-                getAddressBookWithGroupCallback = ::getAddressBookWithGroup,
-                getMergedContactFromContactGroupCallback = ::getMergedContactFromContactGroup,
-                getMergedContactFromAddressBookCallback = ::getMergedContactFromAddressBook,
+                getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
+                getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
+                getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
             ),
         )
 
@@ -88,9 +85,9 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 onContactRemovedCallback = { recipient -> onContactRemoved(recipient, CC) },
                 onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
                 gotFocusCallback = { fieldGotFocus(CC) },
-                getAddressBookWithGroupCallback = ::getAddressBookWithGroup,
-                getMergedContactFromContactGroupCallback = ::getMergedContactFromContactGroup,
-                getMergedContactFromAddressBookCallback = ::getMergedContactFromAddressBook,
+                getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
+                getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
+                getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
             )
         )
 
@@ -102,9 +99,9 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
                 onContactRemovedCallback = { recipient -> onContactRemoved(recipient, BCC) },
                 onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
                 gotFocusCallback = { fieldGotFocus(BCC) },
-                getAddressBookWithGroupCallback = ::getAddressBookWithGroup,
-                getMergedContactFromContactGroupCallback = ::getMergedContactFromContactGroup,
-                getMergedContactFromAddressBookCallback = ::getMergedContactFromAddressBook,
+                getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
+                getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
+                getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
             )
         )
     }
@@ -117,18 +114,6 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     private fun onContactRemoved(recipient: Recipient, fieldType: FieldType) {
         recipient.removeInViewModelAndUpdateBannerVisibility(fieldType)
         encryptionManager.removeUnencryptableRecipient(recipient)
-    }
-
-    private fun getAddressBookWithGroup(contactGroup: ContactGroup): AddressBook? {
-        return newMessageViewModel.getAddressBookWithName(contactGroup)
-    }
-
-    private fun getMergedContactFromContactGroup(contactGroup: ContactGroup): List<MergedContact> {
-        return newMessageViewModel.getMergedContactFromContactGroup(contactGroup)
-    }
-
-    private fun getMergedContactFromAddressBook(addressBook: AddressBook): List<MergedContact> {
-        return newMessageViewModel.getMergedContactFromAddressBook(addressBook)
     }
 
     private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(binding) {

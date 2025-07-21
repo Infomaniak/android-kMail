@@ -84,16 +84,18 @@ class AvatarNameEmailView @JvmOverloads constructor(
         setNameAndEmail(mergedContact)
     }
 
-    fun setAddressBook(addressBook: AddressBook) = with(binding) {
+    fun setAddressBook(addressBook: AddressBook) {
         setNameAndSubName(addressBook)
     }
 
-    fun setContactGroup(contactGroup: ContactGroup, addressBook: AddressBook?) = with(binding) {
+    fun setContactGroup(contactGroup: ContactGroup, addressBook: AddressBook?) {
+        val addressBookName = if (addressBook?.isDynamicOrganisationMemberDirectory == true) {
+            addressBook.organization
+        } else {
+            addressBook?.name
+        }
 
-        setNameAndSubName(
-            contactGroup,
-            if (addressBook?.isDynamicOrganisationMemberDirectory == true) addressBook.organization else addressBook?.name
-        )
+        setNameAndSubName(contactGroup, addressBookName)
     }
 
     fun setAttendee(attendee: Attendee) = with(binding) {
@@ -101,28 +103,31 @@ class AvatarNameEmailView @JvmOverloads constructor(
         setNameAndEmail(attendee)
     }
 
-    private fun ViewAvatarNameEmailBinding.setNameAndSubName(
+    private fun setNameAndSubName(
         addressBook: AddressBook,
-    ) {
-        userName.text = if (addressBook.isDynamicOrganisationMemberDirectory) {
-            context.getString(R.string.addressBookTitle, addressBook.organization)
+    ) = with(binding) {
+
+        val userNameArg = if (addressBook.isDynamicOrganisationMemberDirectory) {
+            addressBook.organization
         } else {
-            context.getString(R.string.addressBookTitle, addressBook.name)
+            addressBook.name
         }
+        userName.text = context.getString(R.string.addressBookTitle, userNameArg)
 
         userAvatar.loadTeamsUserAvatar()
 
-        userEmail.text = if (addressBook.organization != "") {
-            context.getString(R.string.organizationName, addressBook.organization)
+        val userEmailArg = if (addressBook.organization.isNotBlank()) {
+            addressBook.organization
         } else {
-            context.getString(R.string.organizationName, context.getString(R.string.otherOrganisation))
+            context.getString(R.string.otherOrganisation)
         }
+        userEmail.text = context.getString(R.string.addressBookTitle, userEmailArg)
     }
 
-    private fun ViewAvatarNameEmailBinding.setNameAndSubName(
+    private fun setNameAndSubName(
         contactGroup: ContactGroup,
         addressBookName: String? = ""
-    ) {
+    ) = with(binding) {
         userAvatar.loadTeamsUserAvatar()
         userName.text = context.getString(R.string.groupContactsTitle, contactGroup.name)
         userEmail.text = context.getString(R.string.addressBookTitle, addressBookName)
@@ -153,18 +158,26 @@ class AvatarNameEmailView @JvmOverloads constructor(
         binding.root.setOnClickListener(onClickListener)
     }
 
-    fun highlight(nameStartIndex: Int, emailStartIndex: Int, length: Int, prefixSizeOfName: Int = 0, prefixSizeOfEmail: Int = 0) =
-        with(binding) {
-            if (nameStartIndex >= 0) userName.highlight(
-                prefixSizeOfName + nameStartIndex,
-                prefixSizeOfName + nameStartIndex + length
-            )
-            
-            if (emailStartIndex >= 0 && userEmail.text.isNotBlank()) userEmail.highlight(
-                prefixSizeOfEmail + emailStartIndex,
-                prefixSizeOfEmail + emailStartIndex + length
+    fun highlight(
+        nameStartIndex: Int,
+        emailStartIndex: Int,
+        length: Int,
+        prefixSizeOfName: Int = 0,
+        prefixSizeOfEmail: Int = 0,
+    ) = with(binding) {
+        if (nameStartIndex >= 0) {
+            userName.highlight(
+                startIndex = prefixSizeOfName + nameStartIndex,
+                endIndex = prefixSizeOfName + nameStartIndex + length,
             )
         }
+        if (emailStartIndex >= 0 && userEmail.text.isNotBlank()) {
+            userEmail.highlight(
+                startIndex = prefixSizeOfEmail + emailStartIndex,
+                endIndex = prefixSizeOfEmail + emailStartIndex + length,
+            )
+        }
+    }
 
     private fun TextView.highlight(
         startIndex: Int,

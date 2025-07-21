@@ -160,7 +160,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
             contactAdapter = ContactAdapter(
                 usedEmails = mutableSetOf(),
-                onContactClicked = ::contactCliked,
+                onContactClicked = ::contactClicked,
                 onAddUnrecognizedContact = {
                     val input = textInput.text.toString()
                     addRecipient(email = input, name = input)
@@ -365,11 +365,11 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled?.invoke(isAutoCompletionOpened)
     }
 
-    private fun contactCliked(contact: ContactAutocompletable) {
+    private fun contactClicked(contact: ContactAutocompletable) {
         val listOfContact = when (contact) {
             is MergedContact -> listOf(contact)
-            is ContactGroup -> getMergedContactFromContactGroup?.invoke(contact)!!
-            is AddressBook -> getMergedContactFromAddressBook?.invoke(contact)!!
+            is ContactGroup -> getMergedContactFromContactGroup?.invoke(contact) ?: emptyList()
+            is AddressBook -> getMergedContactFromAddressBook?.invoke(contact) ?: emptyList()
             else -> emptyList()
         }
 
@@ -422,18 +422,6 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    data class CallBackRecipientField(
-        val onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
-        val onContactAddedCallback: ((Recipient) -> Unit),
-        val onContactRemovedCallback: ((Recipient) -> Unit),
-        val onCopyContactAddressCallback: ((Recipient) -> Unit),
-        val gotFocusCallback: (() -> Unit),
-        val onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
-        val getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?,
-        val getMergedContactFromContactGroupCallback: (ContactGroup) -> List<MergedContact>,
-        val getMergedContactFromAddressBookCallback: (AddressBook) -> List<MergedContact>
-    )
-
     fun initRecipientField(
         autoComplete: RecyclerView,
         callBackRecipientField: CallBackRecipientField
@@ -455,10 +443,8 @@ class RecipientFieldView @JvmOverloads constructor(
             getAddressBookWithGroup = getAddressBookWithGroupCallback
             getMergedContactFromContactGroup = getMergedContactFromContactGroupCallback
             getMergedContactFromAddressBook = getMergedContactFromAddressBookCallback
-
             gotFocus = gotFocusCallback
         }
-
     }
 
     fun clearField() = binding.textInput.setText("")
@@ -516,6 +502,18 @@ class RecipientFieldView @JvmOverloads constructor(
             updateCollapsedChipValues(isSelfCollapsed)
         }
     }
+
+    data class CallBackRecipientField(
+        val onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
+        val onContactAddedCallback: ((Recipient) -> Unit),
+        val onContactRemovedCallback: ((Recipient) -> Unit),
+        val onCopyContactAddressCallback: ((Recipient) -> Unit),
+        val gotFocusCallback: (() -> Unit),
+        val onToggleEverythingCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+        val getAddressBookWithGroupCallback: (ContactGroup) -> AddressBook?,
+        val getMergedContactFromContactGroupCallback: (ContactGroup) -> List<MergedContact>,
+        val getMergedContactFromAddressBookCallback: (AddressBook) -> List<MergedContact>
+    )
 
     companion object {
         private const val MAX_WIDTH_PERCENTAGE = 0.8f

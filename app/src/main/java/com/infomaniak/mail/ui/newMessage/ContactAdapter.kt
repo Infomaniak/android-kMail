@@ -18,8 +18,10 @@
 package com.infomaniak.mail.ui.newMessage
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -33,7 +35,7 @@ import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.AutocompletableAdressBook
+import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.AutocompletableAddressBook
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.AutocompletableContact
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.AutocompletableGroup
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactType.UnknownContact
@@ -64,81 +66,76 @@ class ContactAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return getItemViewTypeEnum(position).id
+        return getContactTypeByItemPosition(position).id
     }
 
-    private fun getItemViewTypeEnum(position: Int): ContactType {
+    private fun getContactTypeByItemPosition(position: Int): ContactType {
         if (position >= matchedContacts.count()) return UnknownContact
 
         return when (matchedContacts[position].contact) {
             is MergedContact -> AutocompletableContact
-            is AddressBook -> AutocompletableAdressBook
+            is AddressBook -> AutocompletableAddressBook
             else -> AutocompletableGroup
         }
 
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
-        when {
-            getItemViewType(position) == AutocompletableContact.id -> {
-                bindContact(position, matchedContacts[position].contact as MergedContact)
-            }
-            getItemViewType(position) == AutocompletableAdressBook.id -> {
-                bindAdressBook(position, matchedContacts[position].contact as AddressBook)
-            }
-            getItemViewType(position) == AutocompletableGroup.id -> {
-                bindGroup(position, matchedContacts[position].contact as ContactGroup)
-            }
-            else -> {
-                bindAddNewUser()
-            }
+        when (getItemViewType(position)) {
+            AutocompletableContact.id -> bindContact(position)
+            AutocompletableAddressBook.id -> bindAddressBook(position)
+            AutocompletableGroup.id -> bindGroup(position)
+            else -> bindAddNewUser()
         }
     }
 
-    private fun ItemContactBinding.bindContact(position: Int, contact: MergedContact) = with(matchedContacts[position]) {
+    private fun ItemContactBinding.bindContact(position: Int) = with(matchedContacts[position]) {
+        val mergedContact = contact as MergedContact
         contactDetails.apply {
-            setMergedContact(contact)
+            setMergedContact(mergedContact)
             highlight(nameMatchedStartIndex, emailMatchedStartIndex, searchQuery.standardize().count())
         }
-        val isAlreadyUsed = usedEmails.contains(contact.email.standardize())
 
-        if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(contact) } else root.setOnClickListener(null)
-        
+        val isAlreadyUsed = usedEmails.contains(mergedContact.email.standardize())
+        if (!isAlreadyUsed) root.setOnClickListener { onContactClicked(mergedContact) } else root.setOnClickListener(null)
+
         setVisuallyUsed(isAlreadyUsed)
     }
 
-    private fun ItemContactBinding.bindAdressBook(position: Int, contact: AddressBook) = with(matchedContacts[position]) {
+    private fun ItemContactBinding.bindAddressBook(position: Int) = with(matchedContacts[position]) {
         contactDetails.apply {
-            setAddressBook(contact)
+            setAddressBook(contact as AddressBook)
             highlight(
-                nameMatchedStartIndex,
-                emailMatchedStartIndex,
-                searchQuery.standardize().count(),
-                prefixSizeOfName = getLengthStringTitle(context.getString(R.string.addressBookTitle)) ?: 0,
-                prefixSizeOfEmail = getLengthStringTitle(context.getString(R.string.organizationName)) ?: 0
+                nameStartIndex = nameMatchedStartIndex,
+                emailStartIndex = emailMatchedStartIndex,
+                length = searchQuery.standardize().count(),
+                prefixSizeOfName = context.getPrefixSizeFromRes(R.string.addressBookTitle),
+                prefixSizeOfEmail = context.getPrefixSizeFromRes(R.string.organizationName),
             )
         }
         root.setOnClickListener { onContactClicked(contact) }
     }
 
-    private fun ItemContactBinding.bindGroup(position: Int, contact: ContactGroup) = with(matchedContacts[position]) {
+    private fun ItemContactBinding.bindGroup(position: Int) = with(matchedContacts[position]) {
+        val contactGroup = contact as ContactGroup
         contactDetails.apply {
-            setContactGroup(contact, getAddressBookWithGroup?.invoke(contact))
+            setContactGroup(contactGroup, getAddressBookWithGroup?.invoke(contactGroup))
             highlight(
-                nameMatchedStartIndex,
-                emailMatchedStartIndex,
-                searchQuery.standardize().count(),
-                prefixSizeOfName = getLengthStringTitle(context.getString(R.string.groupContactsTitle)) ?: 0,
-                prefixSizeOfEmail = getLengthStringTitle(context.getString(R.string.addressBookTitle)) ?: 0
+                nameStartIndex = nameMatchedStartIndex,
+                emailStartIndex = emailMatchedStartIndex,
+                length = searchQuery.standardize().count(),
+                prefixSizeOfName = context.getPrefixSizeFromRes(R.string.groupContactsTitle),
+                prefixSizeOfEmail = context.getPrefixSizeFromRes(R.string.addressBookTitle),
             )
         }
-        root.setOnClickListener { onContactClicked(contact) }
+        root.setOnClickListener { onContactClicked(contactGroup) }
     }
 
-    fun getLengthStringTitle(title: String): Int? {
-        val regex = """.*: """.toRegex()
-        return regex.find(title)?.groups[0]?.value?.length
+    private fun Context.getPrefixSizeFromRes(@StringRes titleRes: Int): Int {
+        return getLengthStringTitle(title = getString(titleRes)) ?: 0
     }
+
+    private fun getLengthStringTitle(title: String): Int? = Regex(".*: ").find(title)?.groups[0]?.value?.length
 
     private fun ItemContactBinding.setVisuallyUsed(isVisuallyUsed: Boolean) {
         greyedOutState.isVisible = isVisuallyUsed
@@ -160,7 +157,9 @@ class ContactAdapter(
     override fun getItemCount(): Int = matchedContacts.count() + if (displayAddUnknownContactButton) 1 else 0
 
     override fun getItemId(position: Int): Long {
-        val viewType = getItemViewTypeEnum(position)
+        // To check that each contactautocomplatable has a different id, even if the types are different,
+        // we concatenate their ids and types
+        val viewType = getContactTypeByItemPosition(position)
         val contactIdHash = if (viewType == UnknownContact) 0 else matchedContacts[position].contact.contactId.hashCode()
         return (viewType.id.toLong() shl Int.SIZE_BITS) + contactIdHash
     }
@@ -174,11 +173,11 @@ class ContactAdapter(
         notifyDataSetChanged()
     }
 
-    private fun setMatchedContact(
+    private fun getMatchedContact(
         contact: ContactAutocompletable,
         nameMatched: String,
         emailMatched: String,
-        searchTerm: String
+        searchTerm: String,
     ): MatchedContact? {
         val nameMatchedIndex = nameMatched.standardize().indexOf(searchTerm)
         val standardizedEmail = emailMatched.standardize()
@@ -188,7 +187,15 @@ class ContactAdapter(
         val displayNewContact = (matches && searchTerm == standardizedEmail && !usedEmails.contains(searchTerm))
         if (displayNewContact) displayAddUnknownContactButton = false
 
-        return if (matches) MatchedContact(contact, nameMatchedIndex, emailMatchedIndex) else null
+        return if (matches) {
+            MatchedContact(
+                contact = contact,
+                nameMatchedStartIndex = nameMatchedIndex,
+                emailMatchedStartIndex = emailMatchedIndex,
+            )
+        } else {
+            null
+        }
     }
 
     private fun performFiltering(constraint: CharSequence): List<MatchedContact> {
@@ -197,32 +204,36 @@ class ContactAdapter(
         val finalUserList = mutableListOf<MatchedContact>()
         displayAddUnknownContactButton = true
         for (contact in allContacts) {
-            var matchedContact: MatchedContact? = null
-            when (contact) {
-                is MergedContact -> {
-                    matchedContact = setMatchedContact(contact, contact.name, contact.email, searchTerm)
-                }
-                is AddressBook -> {
-                    matchedContact = setMatchedContact(contact, contact.name, contact.organization, searchTerm)
-                }
-                is ContactGroup -> {
-                    val addressBook: AddressBook = getAddressBookWithGroup?.invoke(contact)!!
-
-                    val addressBookName =
-                        if (addressBook.isDynamicOrganisationMemberDirectory) {
-                            addressBook.organization.standardize()
-                        } else {
-                            addressBook.name.standardize()
-                        }
-                    matchedContact = setMatchedContact(contact, contact.name, addressBookName, searchTerm)
-                }
-            }
+            val matchedContact = getMatchedContact(
+                contact = contact,
+                nameMatched = contact.name,
+                emailMatched = getEmailMatched(contact),
+                searchTerm = searchTerm,
+            )
             if (matchedContact != null) finalUserList.add(matchedContact)
             if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
         }
+
         return finalUserList.sortedWith(
             compareByDescending { it.contact.contactId }
         ).toMutableList()
+    }
+
+    private fun getEmailMatched(contact: ContactAutocompletable): String {
+        return when (contact) {
+            is MergedContact -> contact.email
+            is AddressBook -> contact.organization
+            is ContactGroup -> {
+                getAddressBookWithGroup?.invoke(contact)?.let { addressBook ->
+                    if (addressBook.isDynamicOrganisationMemberDirectory) {
+                        addressBook.organization.standardize()
+                    } else {
+                        addressBook.name.standardize()
+                    }
+                }
+            }
+            else -> null
+        } ?: ""
     }
 
     fun searchContacts(text: CharSequence) {
@@ -250,7 +261,7 @@ class ContactAdapter(
     private enum class ContactType(val id: Int) {
         AutocompletableContact(0),
         AutocompletableGroup(1),
-        AutocompletableAdressBook(2),
+        AutocompletableAddressBook(2),
         UnknownContact(3),
     }
 
