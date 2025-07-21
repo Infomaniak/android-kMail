@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,10 +44,6 @@ class AddressBookController @Inject constructor(@UserInfoRealm private val userI
         val myContactGroup = userInfoRealm.query<ContactGroup>("id == $0", contactGroup.id).first().find()!!
         return userInfoRealm.query<AddressBook>("ANY ${AddressBook::contactGroups.name} == $0", myContactGroup).first()
     }
-
-    private fun getGroupFromAdressBookQuery(addressBook: AddressBook): RealmSingleQuery<AddressBook> {
-        return userInfoRealm.query<AddressBook>("${AddressBook::id.name} == $0", addressBook.id).first()
-    }
     //endregion
 
     //region Get data
@@ -56,9 +52,6 @@ class AddressBookController @Inject constructor(@UserInfoRealm private val userI
     fun getAllAddressBook() = getAllAddressBookQuery().find()
 
     fun getAddressBookWithGroup(contactGroup: ContactGroup) = getAddressBookWithGroupQuery(contactGroup).find()
-
-    fun getGroupFromAdressBook(addressBook: AddressBook) =
-        getGroupFromAdressBookQuery(addressBook).find()?.contactGroups?.map { it }!!
     //endregion
 
     //region Edit data

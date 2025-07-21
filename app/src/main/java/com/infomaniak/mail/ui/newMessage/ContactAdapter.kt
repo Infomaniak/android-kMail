@@ -221,7 +221,7 @@ class ContactAdapter(
             if (finalUserList.count() >= MAX_AUTOCOMPLETE_RESULTS) break
         }
         return finalUserList.sortedWith(
-            compareByDescending<MatchedContact> { it.contact.contactId }
+            compareByDescending { it.contact.contactId }
         ).toMutableList()
     }
 

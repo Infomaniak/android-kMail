@@ -68,7 +68,6 @@ class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parc
     var other: Boolean = false
 
     override var contactId: String = id.toString()
-    override var autocompletableName: String = name
 
     constructor(
         email: String,

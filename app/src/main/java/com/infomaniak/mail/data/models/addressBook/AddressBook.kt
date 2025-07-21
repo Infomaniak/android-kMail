@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,11 +45,8 @@ class AddressBook : RealmObject, ContactAutocompletable {
     var isDynamicOrganisationMemberDirectory: Boolean = false
 
     override var contactId: String = id.toString()
-    override var autocompletableName: String = name
 
     override fun toString(): String = "{$name}"
-
-    override fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable) = false
 
     companion object
 }

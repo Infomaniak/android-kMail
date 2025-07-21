@@ -24,15 +24,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class ContactGroup : RealmObject, ContactAutocompletable {
+
     @PrimaryKey
     var id: Int = 0
     var name: String = ""
 
     override var contactId: String = id.toString()
-    override var autocompletableName: String = name
 
     override fun toString(): String = "{$name}"
 
-    override fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable) = false
     companion object
 }

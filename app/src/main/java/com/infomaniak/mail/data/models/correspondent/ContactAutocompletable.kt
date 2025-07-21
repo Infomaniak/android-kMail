@@ -19,9 +19,4 @@ package com.infomaniak.mail.data.models.correspondent
 
 interface ContactAutocompletable {
     var contactId: String
-    var autocompletableName: String
-
-    fun ContactAutocompletable.isSameContactAutocompletable(contactAutoCompletable: ContactAutocompletable): Boolean{
-        return contactId == contactAutoCompletable.contactId
-    }
 }

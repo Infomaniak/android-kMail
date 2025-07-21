@@ -211,10 +211,10 @@ object RealmDatabase {
         val appSettingsSet = setOf(
             AppSettings::class,
         )
-        val userInfoSet = setOf(
-            AddressBook::class as KClass<out RealmObject>,
-            ContactGroup::class as KClass<out RealmObject>,
-            MergedContact::class as KClass<out RealmObject>,
+        val userInfoSet: Set<KClass<out RealmObject>> = setOf(
+            AddressBook::class,
+            ContactGroup::class,
+            MergedContact::class,
         )
         val mailboxInfoSet = setOf(
             Mailbox::class,

@@ -221,10 +221,11 @@ class NewMessageViewModel @Inject constructor(
     val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
     val mergedContacts = liveData(ioCoroutineContext) {
-        var list: List<ContactAutocompletable> = mergedContactController.getSortedMergedContacts().copyFromRealm()
-        list += addressBookController.getAllAddressBook().copyFromRealm()
-        list += contactGroupController.getGroup().copyFromRealm()
-        emit(list to arrangeMergedContacts(list))
+        val mergedContacts = mergedContactController.getSortedMergedContacts().copyFromRealm()
+        val addressBooks = addressBookController.getAllAddressBook().copyFromRealm()
+        val contactGroups = contactGroupController.getGroup().copyFromRealm()
+        val contactAutocompletables: List<ContactAutocompletable> = mergedContacts + addressBooks + contactGroups
+        emit(contactAutocompletables to arrangeMergedContacts(mergedContacts))
     }
 
     private val arrivedFromExistingDraft

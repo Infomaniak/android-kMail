@@ -55,8 +55,7 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable, ContactAu
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    override var contactId : String = name + email
-    override var autocompletableName : String = name
+    override var contactId = name + email
 
     fun initLocalValues(email: String? = null, name: String? = null, hasExternalProvider: Boolean? = null): Recipient {
         email?.let { this.email = it }
