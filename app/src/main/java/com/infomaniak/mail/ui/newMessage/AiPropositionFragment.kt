@@ -129,10 +129,8 @@ class AiPropositionFragment : Fragment() {
         applyWindowInsetsListener { _, insets ->
             appBarLayout.applyStatusBarInsets(insets)
             with(insets.safeArea()) {
-                with(binding) {
-                    aiPropositionBottomBarForeground.setMargins(left = left, bottom = bottom, right = right)
-                    aiResponseContainer.setMargins(left = left, right = right)
-                }
+                aiPropositionBottomBarForeground.setMargins(left = left, bottom = bottom, right = right)
+                aiResponseContainer.setMargins(left = left, right = right)
             }
         }
     }
