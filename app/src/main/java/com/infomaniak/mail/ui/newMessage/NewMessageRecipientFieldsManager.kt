@@ -64,30 +64,45 @@ class NewMessageRecipientFieldsManager @Inject constructor(private val snackbarM
     fun setupAutoCompletionFields() = with(binding) {
         toField.initRecipientField(
             autoComplete = autoCompleteTo,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
-            onContactAddedCallback = { recipient -> onContactAdded(recipient, TO) },
-            onContactRemovedCallback = { recipient -> onContactRemoved(recipient, TO) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
-            gotFocusCallback = { fieldGotFocus(TO) },
-            onToggleEverythingCallback = ::openAdvancedFields,
+            callBackRecipientField = RecipientFieldView.CallBackRecipientField(
+                onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
+                onContactAddedCallback = { recipient -> onContactAdded(recipient, TO) },
+                onContactRemovedCallback = { recipient -> onContactRemoved(recipient, TO) },
+                onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
+                gotFocusCallback = { fieldGotFocus(TO) },
+                onToggleEverythingCallback = ::openAdvancedFields,
+                getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
+                getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
+                getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
+            ),
         )
 
         ccField.initRecipientField(
             autoComplete = autoCompleteCc,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
-            onContactAddedCallback = { recipient -> onContactAdded(recipient, CC) },
-            onContactRemovedCallback = { recipient -> onContactRemoved(recipient, CC) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
-            gotFocusCallback = { fieldGotFocus(CC) },
+            callBackRecipientField = RecipientFieldView.CallBackRecipientField(
+                onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
+                onContactAddedCallback = { recipient -> onContactAdded(recipient, CC) },
+                onContactRemovedCallback = { recipient -> onContactRemoved(recipient, CC) },
+                onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
+                gotFocusCallback = { fieldGotFocus(CC) },
+                getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
+                getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
+                getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
+            )
         )
 
         bccField.initRecipientField(
             autoComplete = autoCompleteBcc,
-            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
-            onContactAddedCallback = { recipient -> onContactAdded(recipient, BCC) },
-            onContactRemovedCallback = { recipient -> onContactRemoved(recipient, BCC) },
-            onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
-            gotFocusCallback = { fieldGotFocus(BCC) },
+            callBackRecipientField = RecipientFieldView.CallBackRecipientField(
+                onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
+                onContactAddedCallback = { recipient -> onContactAdded(recipient, BCC) },
+                onContactRemovedCallback = { recipient -> onContactRemoved(recipient, BCC) },
+                onCopyContactAddressCallback = { fragment.copyRecipientEmailToClipboard(it, snackbarManager) },
+                gotFocusCallback = { fieldGotFocus(BCC) },
+                getAddressBookWithGroupCallback = newMessageViewModel::getAddressBookWithName,
+                getMergedContactFromContactGroupCallback = newMessageViewModel::getMergedContactFromContactGroup,
+                getMergedContactFromAddressBookCallback = newMessageViewModel::getMergedContactFromAddressBook,
+            )
         )
     }
 

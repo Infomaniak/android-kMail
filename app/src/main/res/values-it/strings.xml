@@ -53,6 +53,7 @@
     <string name="addUnknownRecipientAlreadyUsed">L’e-mail è già utilizzata</string>
     <string name="addUnknownRecipientInvalidEmail">L’e-mail non è valida</string>
     <string name="addUnknownRecipientTitle">Aggiungi un destinatario</string>
+    <string name="addressBookTitle">Rubrica: %s</string>
     <string name="aiButtonInsert">Inserisci</string>
     <string name="aiButtonRefine">Affinare</string>
     <string name="aiButtonRetry">Riprova</string>
@@ -362,6 +363,7 @@
     </plurals>
     <string name="fromTitle">Da:</string>
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
+    <string name="groupContactsTitle">Gruppo: %s</string>
     <string name="inboxFolder">Posta in arrivo</string>
     <string name="lastSelectedSchedule">Ultimo programma selezionato</string>
     <string name="laterThisMorning">Più tardi stamattina</string>
@@ -447,6 +449,8 @@
     <string name="onBoardingTitle2">Risparmia tempo con le azioni a scorrimento</string>
     <string name="onBoardingTitle3">Premi un messaggio per alcuni secondi per selezionare più messaggi</string>
     <string name="onBoardingTitle4">Inizia!</string>
+    <string name="organizationName">Organizzazione: %s</string>
+    <string name="otherOrganisation">Altro</string>
     <string name="pendingMessagesFolder">Messaggi in sospeso</string>
     <string name="pickerNoSelection">Nessuna selezione</string>
     <string name="popupDetachMailboxDescription">Sei sicuro di voler staccare l’indirizzo %s?</string>

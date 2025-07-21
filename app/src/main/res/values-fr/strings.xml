@@ -53,6 +53,7 @@
     <string name="addUnknownRecipientAlreadyUsed">L’adresse mail est déjà utilisée</string>
     <string name="addUnknownRecipientInvalidEmail">L’adresse mail n’est pas valide</string>
     <string name="addUnknownRecipientTitle">Ajouter un destinataire</string>
+    <string name="addressBookTitle">Carnet d’adresses : %s</string>
     <string name="aiButtonInsert">Insérer</string>
     <string name="aiButtonRefine">Affiner</string>
     <string name="aiButtonRetry">Réessayer</string>
@@ -367,6 +368,7 @@
     </plurals>
     <string name="fromTitle">De :</string>
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
+    <string name="groupContactsTitle">Groupe : %s</string>
     <string name="inboxFolder">Boîte de réception</string>
     <string name="lastSelectedSchedule">Dernier horaire choisi</string>
     <string name="laterThisMorning">Plus tard ce matin</string>
@@ -455,6 +457,8 @@
     <string name="onBoardingTitle2">Gagnez du temps avec les actions de balayage</string>
     <string name="onBoardingTitle3">Appuyez quelques secondes sur un message pour en sélectionner plusieurs</string>
     <string name="onBoardingTitle4">Lancez vous !</string>
+    <string name="organizationName">Organisation : %s</string>
+    <string name="otherOrganisation">Autre</string>
     <string name="pendingMessagesFolder">Messages en attente</string>
     <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
