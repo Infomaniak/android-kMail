@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipDescription
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.InputFilter
@@ -260,7 +261,7 @@ class NewMessageFragment : Fragment() {
 
     private fun handleEdgeToEdge() = with(binding) {
         applyWindowInsetsListener(shouldConsume = false) { _, insets ->
-            toolbar.applyStatusBarInsets(insets)
+            appBarLayout.applyStatusBarInsets(insets)
             compositionNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
             externalBannerContent.applySideAndBottomSystemInsets(insets, withBottom = false)
             editorActionsLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
@@ -395,7 +396,9 @@ class NewMessageFragment : Fragment() {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
-        changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
+        changeToolbarColorOnScroll(toolbar, compositionNestedScrollView, otherUpdates = { color ->
+            appBarLayout.backgroundTintList = ColorStateList.valueOf(color)
+        })
 
         signatureWebView.enableAlgorithmicDarkening(true)
         quoteWebView.enableAlgorithmicDarkening(true)
