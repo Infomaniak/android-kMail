@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.core.avatar.AvatarColors
 import com.infomaniak.core.avatar.AvatarType
 import com.infomaniak.core.avatar.AvatarUrlData
+import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.coil.ImageLoaderProvider.simpleImageLoader
-import com.infomaniak.core.coil.getBackgroundColorResBasedOnId
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
