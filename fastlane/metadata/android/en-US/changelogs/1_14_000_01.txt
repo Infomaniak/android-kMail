@@ -1,0 +1,2 @@
+- Add addresses books and contacts groups
+- Better edge to edge management
