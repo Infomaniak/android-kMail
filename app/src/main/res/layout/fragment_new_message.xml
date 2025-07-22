@@ -40,7 +40,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/newMessageBackgroundColor"
                 android:minHeight="?attr/actionBarSize"
                 android:touchscreenBlocksFocus="false"
                 app:navigationContentDescription="@string/buttonClose"

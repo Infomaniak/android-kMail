@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.ChangeBounds
@@ -38,8 +37,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.lib.core.utils.setMargins
+import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -172,9 +171,7 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun setToolbar() = with(binding) {
-        changeToolbarColorOnScroll(toolbar, nestedScrollView, otherUpdates = { color ->
-            appBarLayout.backgroundTintList = ColorStateList.valueOf(color)
-        })
+        changeToolbarColorOnScroll(appBarLayout, nestedScrollView)
         toolbar.apply {
             setNavigationOnClickListener { trackDismissalAndPopBack() }
             title = requireContext().postfixWithTag(
