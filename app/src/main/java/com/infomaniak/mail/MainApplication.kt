@@ -37,6 +37,7 @@ import coil3.SingletonImageLoader
 import com.facebook.stetho.Stetho
 import com.infomaniak.core.auth.AuthConfiguration
 import com.infomaniak.core.coil.ImageLoaderProvider
+import com.infomaniak.core.login.crossapp.internal.deviceinfo.DeviceInfoUpdateManager
 import com.infomaniak.core.network.NetworkConfiguration
 import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import com.infomaniak.lib.core.InfomaniakCore
@@ -52,6 +53,7 @@ import com.infomaniak.mail.TokenInterceptorListenerProvider.legacyTokenIntercept
 import com.infomaniak.mail.TokenInterceptorListenerProvider.tokenInterceptorListener
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.UrlTraceInterceptor
+import com.infomaniak.mail.data.services.DeviceInfoUpdateWorker
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
 import com.infomaniak.mail.ui.LaunchActivity
@@ -65,7 +67,9 @@ import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import splitties.init.injectAsAppCtx
@@ -123,6 +127,8 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
+    private val applicationScope = CoroutineScope(Dispatchers.Default + CoroutineName("MainApplication"))
+
     override fun onCreate() {
         super<Application>.onCreate()
 
@@ -139,6 +145,10 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         configureInfomaniakCore()
         notificationUtils.initNotificationChannel()
         configureHttpClient()
+
+        applicationScope.launch {
+            DeviceInfoUpdateManager.sharedInstance.scheduleWorkerOnDeviceInfoUpdate<DeviceInfoUpdateWorker>()
+        }
 
         localSettings.storageBannerDisplayAppLaunches++
     }
