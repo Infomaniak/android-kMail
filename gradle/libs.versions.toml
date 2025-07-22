@@ -1,6 +1,5 @@
 [versions]
 androidGradlePlugin = "8.8.2"
-coilSvg = "2.7.0"
 compose = "1.8.3"
 desugarJDK = "2.1.5"
 dotsindicator = "5.1.0"
@@ -8,7 +7,7 @@ dragDropSwipeRecyclerView = "1.0.0"
 firebaseMessagingKtx = "24.1.2"
 flexbox = "3.0.0"
 googleServices = "4.4.2"
-hiltAndroid = "2.56.2"
+hiltAndroid = "2.57"
 hiltAndroidx = "1.2.0"
 jsoup = "1.21.1"
 junit = "4.13.2"
@@ -18,7 +17,7 @@ ksp = "2.0.21-1.0.28" # Keep the same version as the one in Core
 leakcanaryAndroid = "2.12"
 lifecycleProcess = "2.9.1"
 lottie = "6.6.7"
-mockitoKotlin = "5.4.0"
+mockitoKotlin = "6.0.0"
 navigation = "2.8.9"
 playServices = "18.7.2"
 realmKotlin = "3.0.0"
@@ -29,7 +28,6 @@ workConcurrentFutures = "1.2.0"
 workVersion = "2.9.1" # Keep the same version as the one in Core
 
 [libraries]
-coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilSvg" }
 compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "compose" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 desugar-jdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJDK" }

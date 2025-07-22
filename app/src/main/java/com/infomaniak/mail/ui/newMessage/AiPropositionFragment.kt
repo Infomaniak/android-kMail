@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.ChangeBounds
@@ -38,6 +39,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -49,8 +51,11 @@ import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
+import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
+import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.postfixWithTag
+import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.AndroidEntryPoint
@@ -97,6 +102,7 @@ class AiPropositionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
+        handleEdgeToEdge()
         handleBackDispatcher()
         setUi()
 
@@ -117,6 +123,16 @@ class AiPropositionFragment : Fragment() {
 
     private fun handleBackDispatcher() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { trackDismissalAndPopBack() }
+    }
+
+    private fun handleEdgeToEdge() = with(binding) {
+        applyWindowInsetsListener { _, insets ->
+            appBarLayout.applyStatusBarInsets(insets)
+            with(insets.safeArea()) {
+                aiPropositionBottomBarForeground.setMargins(left = left, bottom = bottom, right = right)
+                aiResponseContainer.setMargins(left = left, right = right)
+            }
+        }
     }
 
     private fun setUi() = with(binding) {
@@ -156,7 +172,9 @@ class AiPropositionFragment : Fragment() {
     }
 
     private fun setToolbar() = with(binding) {
-        changeToolbarColorOnScroll(toolbar, nestedScrollView)
+        changeToolbarColorOnScroll(toolbar, nestedScrollView, otherUpdates = { color ->
+            appBarLayout.backgroundTintList = ColorStateList.valueOf(color)
+        })
         toolbar.apply {
             setNavigationOnClickListener { trackDismissalAndPopBack() }
             title = requireContext().postfixWithTag(

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import android.app.Application
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
-import coil.ImageLoader
 import com.infomaniak.lib.stores.AppUpdateScheduler
 import com.infomaniak.lib.stores.StoresSettingsRepository
 import com.infomaniak.mail.MainApplication
@@ -75,8 +74,4 @@ object ApplicationModule {
         appContext: Context,
         workManager: WorkManager,
     ): AppUpdateScheduler = AppUpdateScheduler(appContext, workManager)
-
-    @Provides
-    @Singleton
-    fun providesSvgImageLoader(mainApplication: MainApplication): ImageLoader = mainApplication.createSvgImageLoader()
 }

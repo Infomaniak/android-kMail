@@ -32,6 +32,8 @@ import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Bimi
+import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
@@ -82,9 +84,53 @@ class AvatarNameEmailView @JvmOverloads constructor(
         setNameAndEmail(mergedContact)
     }
 
+    fun setAddressBook(addressBook: AddressBook) {
+        setNameAndSubName(addressBook)
+    }
+
+    fun setContactGroup(contactGroup: ContactGroup, addressBook: AddressBook?) {
+        val addressBookName = if (addressBook?.isDynamicOrganisationMemberDirectory == true) {
+            addressBook.organization
+        } else {
+            addressBook?.name
+        }
+
+        setNameAndSubName(contactGroup, addressBookName)
+    }
+
     fun setAttendee(attendee: Attendee) = with(binding) {
         attendeeAvatar.setAttendee(attendee)
         setNameAndEmail(attendee)
+    }
+
+    private fun setNameAndSubName(
+        addressBook: AddressBook,
+    ) = with(binding) {
+
+        val userNameArg = if (addressBook.isDynamicOrganisationMemberDirectory) {
+            addressBook.organization
+        } else {
+            addressBook.name
+        }
+        userName.text = context.getString(R.string.addressBookTitle, userNameArg)
+
+        userAvatar.loadTeamsUserAvatar()
+
+        val userEmailArg = if (addressBook.organization.isNotBlank()) {
+            addressBook.organization
+        } else {
+            context.getString(R.string.otherOrganisation)
+        }
+        userEmail.text = context.getString(R.string.addressBookTitle, userEmailArg)
+    }
+
+    private fun setNameAndSubName(
+        contactGroup: ContactGroup,
+        addressBookName: String? = ""
+    ) = with(binding) {
+        userAvatar.loadTeamsUserAvatar()
+        userName.text = context.getString(R.string.groupContactsTitle, contactGroup.name)
+        userEmail.text = context.getString(R.string.addressBookTitle, addressBookName)
     }
 
     private fun ViewAvatarNameEmailBinding.setNameAndEmail(
@@ -112,9 +158,25 @@ class AvatarNameEmailView @JvmOverloads constructor(
         binding.root.setOnClickListener(onClickListener)
     }
 
-    fun highlight(nameStartIndex: Int, emailStartIndex: Int, length: Int) = with(binding) {
-        if (nameStartIndex >= 0) userName.highlight(nameStartIndex, nameStartIndex + length)
-        if (emailStartIndex >= 0 && userEmail.text.isNotBlank()) userEmail.highlight(emailStartIndex, emailStartIndex + length)
+    fun highlight(
+        nameStartIndex: Int,
+        emailStartIndex: Int,
+        length: Int,
+        prefixSizeOfName: Int = 0,
+        prefixSizeOfEmail: Int = 0,
+    ) = with(binding) {
+        if (nameStartIndex >= 0) {
+            userName.highlight(
+                startIndex = prefixSizeOfName + nameStartIndex,
+                endIndex = prefixSizeOfName + nameStartIndex + length,
+            )
+        }
+        if (emailStartIndex >= 0 && userEmail.text.isNotBlank()) {
+            userEmail.highlight(
+                startIndex = prefixSizeOfEmail + emailStartIndex,
+                endIndex = prefixSizeOfEmail + emailStartIndex + length,
+            )
+        }
     }
 
     private fun TextView.highlight(

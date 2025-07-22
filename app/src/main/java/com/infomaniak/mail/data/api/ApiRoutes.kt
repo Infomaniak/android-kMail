@@ -59,7 +59,7 @@ object ApiRoutes {
     }
 
     fun addressBooks(): String {
-        return "${pim()}/addressbook"
+        return "${pim()}/addressbook?with=categories,account_name"
     }
 
     fun contact(): String {

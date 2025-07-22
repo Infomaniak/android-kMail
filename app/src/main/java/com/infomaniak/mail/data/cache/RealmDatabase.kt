@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.SwissTransferFile
 import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.calendar.Attendee
 import com.infomaniak.mail.data.models.calendar.CalendarEvent
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
@@ -39,16 +40,17 @@ import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
 import com.infomaniak.mail.data.models.mailbox.SenderDetails
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Headers
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.SubBody
 import com.infomaniak.mail.data.models.signature.Signature
-import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +59,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.lang.ref.WeakReference
+import kotlin.reflect.KClass
 
 @Suppress("ObjectPropertyName")
 object RealmDatabase {
@@ -192,9 +195,9 @@ object RealmDatabase {
     private object RealmConfig {
 
         //region Configurations versions
-        const val USER_INFO_SCHEMA_VERSION = 4L
+        const val USER_INFO_SCHEMA_VERSION = 5L
         const val MAILBOX_INFO_SCHEMA_VERSION = 9L
-        const val MAILBOX_CONTENT_SCHEMA_VERSION = 32L // Emoji reactions
+        const val MAILBOX_CONTENT_SCHEMA_VERSION = 33L // Emoji reactions 2
         //endregion
 
         //region Configurations names
@@ -209,8 +212,9 @@ object RealmDatabase {
         val appSettingsSet = setOf(
             AppSettings::class,
         )
-        val userInfoSet = setOf(
+        val userInfoSet: Set<KClass<out RealmObject>> = setOf(
             AddressBook::class,
+            ContactGroup::class,
             MergedContact::class,
         )
         val mailboxInfoSet = setOf(

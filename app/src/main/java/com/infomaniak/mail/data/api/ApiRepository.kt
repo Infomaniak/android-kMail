@@ -177,8 +177,9 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     suspend fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
+        val encryptionWiths = "auto_uncrypt,recipient_provider_source"
         return callApi(
-            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=auto_uncrypt,emoji_reactions_per_message"),
+            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=$encryptionWiths,emoji_reactions_per_message"),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )

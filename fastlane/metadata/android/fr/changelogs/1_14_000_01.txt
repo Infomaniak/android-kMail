@@ -1,0 +1,2 @@
+- Ajout des carnets d'adresses et des groupes de contacts
+- Meilleure gestion de l'affichage en bord à bord

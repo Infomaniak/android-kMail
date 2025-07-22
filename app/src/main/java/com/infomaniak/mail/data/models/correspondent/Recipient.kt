@@ -19,21 +19,26 @@ package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.infomaniak.core.extensions.customReadBoolean
+import com.infomaniak.core.extensions.customWriteBoolean
 import com.infomaniak.mail.utils.ExternalUtils.ExternalData
 import com.infomaniak.mail.utils.extensions.isEmail
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Parcelize
 @Serializable
-open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
+open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable, ContactAutocompletable {
 
     override var email: String = ""
     override var name: String = ""
+    @SerialName("has_external_provider")
+    var hasExternalProvider: Boolean = true
 
     //region UI data (Transient & Ignore)
     // Only indicates how to display the Recipient chip when composing a new Message.
@@ -50,9 +55,12 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
 
-    fun initLocalValues(email: String? = null, name: String? = null): Recipient {
+    override var contactId = name + email
+
+    fun initLocalValues(email: String? = null, name: String? = null, hasExternalProvider: Boolean? = null): Recipient {
         email?.let { this.email = it }
         name?.let { this.name = it }
+        hasExternalProvider?.let { this.hasExternalProvider = it }
 
         return this
     }
@@ -85,13 +93,15 @@ open class Recipient : EmbeddedRealmObject, Correspondent, Parcelable {
         override fun create(parcel: Parcel): Recipient {
             val email = parcel.readString()!!
             val name = parcel.readString()!!
+            val hasExternalProvider = parcel.customReadBoolean()
 
-            return Recipient().initLocalValues(email, name)
+            return Recipient().initLocalValues(email, name, hasExternalProvider)
         }
 
         override fun Recipient.write(parcel: Parcel, flags: Int) {
             parcel.writeString(email)
             parcel.writeString(name)
+            parcel.customWriteBoolean(hasExternalProvider)
         }
     }
 }

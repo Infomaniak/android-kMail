@@ -15,30 +15,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(RealmListKSerializer::class)
+
 package com.infomaniak.mail.data.models.correspondent
 
 import android.os.Parcelable
 import com.infomaniak.mail.data.api.ApiRoutes
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.serializers.RealmListKSerializer
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.UseSerializers
 
 @Parcelize
 @Suppress("PROPERTY_WONT_BE_SERIALIZED", "PARCELABLE_PRIMARY_CONSTRUCTOR_IS_EMPTY")
-class MergedContact() : RealmObject, Correspondent, Parcelable {
+class MergedContact() : RealmObject, Correspondent, ContactAutocompletable, Parcelable {
     @PrimaryKey
     var id: Long? = null
         private set
 
     override var email: String = ""
     override var name: String = ""
+    override var contactId: String = id.toString()
 
     var avatar: String? = null
         private set
 
     var comesFromApi: Boolean = false // In opposition to coming from the phone's address book
         private set
+
+    var remoteContactGroupIds: RealmList<Int> = realmListOf()
+
+    var addressbookIds: RealmList<Int?> = realmListOf()
 
     @delegate:Ignore
     override val initials by lazy { computeInitials() }
@@ -69,6 +80,10 @@ class MergedContact() : RealmObject, Correspondent, Parcelable {
 
         this.comesFromApi = comesFromApi
 
+        this.remoteContactGroupIds = apiContact.remoteContactGroupIds
+
+        this.addressbookIds = realmListOf(apiContact.addressbookId)
+
         // We need an ID which is unique for each pair of email/name. Therefore we stick
         // together the two 32 bits hashcodes to make one unique 64 bits hashcode.
         this.id = (this.email.hashCode().toLong() shl Int.SIZE_BITS) + this.name.hashCode()
@@ -97,6 +112,8 @@ class MergedContact() : RealmObject, Correspondent, Parcelable {
             avatar = apiContact.avatar
             comesFromApi = true
         }
+        addressbookIds += realmListOf(apiContact.addressbookId)
+        remoteContactGroupIds += apiContact.remoteContactGroupIds
     }
 
     override fun toString(): String = "{$avatar, $email, $name}"
