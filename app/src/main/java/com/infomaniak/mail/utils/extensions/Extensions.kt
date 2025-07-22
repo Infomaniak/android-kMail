@@ -480,7 +480,6 @@ fun Fragment.changeToolbarColorOnScroll(
     nestedScrollView: NestedScrollView,
     @ColorRes loweredColor: Int = R.color.toolbarLoweredColor,
     @ColorRes elevatedColor: Int = R.color.toolbarElevatedColor,
-    shouldUpdateStatusBar: (() -> Boolean) = { true },
     otherUpdates: ((color: Int) -> Unit)? = null,
 ) {
     var valueAnimator: ValueAnimator? = null
@@ -504,7 +503,6 @@ fun Fragment.changeToolbarColorOnScroll(
         valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
             oldColor = color
             appBarLayout.backgroundTintList = ColorStateList.valueOf(newColor)
-            if (shouldUpdateStatusBar()) requireActivity().window.statusBarColor = color
             otherUpdates?.invoke(color)
         }
     }
