@@ -22,17 +22,28 @@ import androidx.compose.ui.graphics.Color
 import com.infomaniak.core.avatar.AvatarColors
 import com.infomaniak.core.avatar.AvatarType
 import com.infomaniak.core.avatar.AvatarUrlData
+import com.infomaniak.core.coil.ImageLoaderProvider.simpleImageLoader
 import com.infomaniak.core.coil.getBackgroundColorResBasedOnId
+import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 
 object AvatarTypeUtils {
+    fun AvatarType.Companion.fromUser(user: User, context: Context): AvatarType.WithInitials = getUrlOrInitials(
+        avatarUrlData = user.avatar?.let { AvatarUrlData(it, context.simpleImageLoader) },
+        initials = user.getInitials(),
+        colors = AvatarColors(
+            containerColor = Color(context.getBackgroundColorResBasedOnId(user.id, R.array.AvatarColors)),
+            contentColor = context.getContentColor(),
+        ),
+    )
+
     fun AvatarType.WithInitials.Initials.Companion.fromCorrespondent(
         correspondent: Correspondent,
         context: Context,
     ): AvatarType.WithInitials.Initials = AvatarType.WithInitials.Initials(
         initials = correspondent.initials,
-        colors = context.colors(correspondent),
+        colors = context.correspondentAvatarColors(correspondent),
     )
 
     fun AvatarType.WithInitials.Url.Companion.fromCorrespondent(
@@ -43,7 +54,7 @@ object AvatarTypeUtils {
         url = avatarUrlData.url,
         imageLoader = avatarUrlData.imageLoader,
         initials = correspondent.initials,
-        colors = context.colors(correspondent),
+        colors = context.correspondentAvatarColors(correspondent),
     )
 
     fun AvatarType.Companion.getUrlOrInitialsFromCorrespondent(
@@ -53,16 +64,16 @@ object AvatarTypeUtils {
     ): AvatarType.WithInitials = getUrlOrInitials(
         avatarUrlData = avatarUrlData,
         initials = correspondent.initials,
-        colors = context.colors(correspondent),
+        colors = context.correspondentAvatarColors(correspondent),
     )
 
-    fun Context.getContentColor() = Color(getColor(R.color.onColorfulBackground))
+    private fun Context.getContentColor() = Color(getColor(R.color.onColorfulBackground))
 
     private fun Context.getContainerColor(correspondent: Correspondent) = Color(
         getBackgroundColorResBasedOnId(correspondent.email.hashCode(), R.array.AvatarColors)
     )
 
-    private fun Context.colors(correspondent: Correspondent): AvatarColors {
+    fun Context.correspondentAvatarColors(correspondent: Correspondent): AvatarColors {
         return AvatarColors(getContainerColor(correspondent), getContentColor())
     }
 }
