@@ -198,8 +198,8 @@ class AvatarView @JvmOverloads constructor(
                 AvatarType.fromUser(user, context)
             }
             AvatarDisplayType.CUSTOM_AVATAR -> {
-                state.update(correspondent, bimi)
-                val avatarUrlData = searchInMergedContact(correspondent!!, contacts)?.avatar?.let {
+                state.update(correspondent!!, bimi)
+                val avatarUrlData = searchInMergedContact(correspondent, contacts)?.avatar?.let {
                     AvatarUrlData(it, context.imageLoader)
                 }
                 AvatarType.getUrlOrInitialsFromCorrespondent(avatarUrlData, correspondent, context)
@@ -234,7 +234,6 @@ class AvatarView @JvmOverloads constructor(
                     backgroundColor = getBackgroundColorGradientDrawable(avatarType.colors.containerColor.toArgb()),
                     avatarUrl = null,
                     initials = avatarType.initials,
-                    imageLoader = context.imageLoader,
                     initialsColor = avatarType.colors.contentColor.toArgb(),
                 )
             }
