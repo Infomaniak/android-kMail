@@ -396,9 +396,7 @@ class NewMessageFragment : Fragment() {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
-        changeToolbarColorOnScroll(toolbar, compositionNestedScrollView, otherUpdates = { color ->
-            appBarLayout.backgroundTintList = ColorStateList.valueOf(color)
-        })
+        changeToolbarColorOnScroll(appBarLayout, compositionNestedScrollView)
 
         signatureWebView.enableAlgorithmicDarkening(true)
         quoteWebView.enableAlgorithmicDarkening(true)
