@@ -151,22 +151,14 @@ class LoginFragment : Fragment() {
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    val showConnectButton = position == introPagerAdapter.itemCount - 1
-                    nextButton.isGone = showConnectButton
-                    connectButton.isVisible = showConnectButton
 
-                    if (showConnectButton) {
-                        if (introViewModel.crossLoginAccounts.value!!.isEmpty()) {
-                            crossLoginSelection.isGone = true
-                            signInButton.isVisible = true
-                        } else {
-                            signInButton.isGone = true
-                            crossLoginSelection.isVisible = true
-                        }
-                    } else {
-                        crossLoginSelection.isGone = true
-                        signInButton.isGone = true
-                    }
+                    val isLoginPage = position == introPagerAdapter.itemCount - 1
+                    val hasAccounts = introViewModel.crossLoginAccounts.value?.isNotEmpty() == true
+
+                    nextButton.isGone = isLoginPage
+                    connectButton.isVisible = isLoginPage
+                    signInButton.isVisible = isLoginPage && !hasAccounts
+                    crossLoginSelection.isVisible = isLoginPage && hasAccounts
                 }
             })
 
@@ -237,17 +229,17 @@ class LoginFragment : Fragment() {
 
     private fun setCrossLoginClickListener() {
 
+        // Open CrossLogin bottomSheet
+        binding.crossLoginSelection.setOnClickListener {
+            safelyNavigate(LoginFragmentDirections.actionLoginFragmentToCrossLoginBottomSheetDialog())
+        }
+
         // Open Login webView when coming back from CrossLogin bottomSheet
         parentFragmentManager.setFragmentResultListener(
             /* requestKey = */ ON_ANOTHER_ACCOUNT_CLICKED_KEY,
             /* lifecycleOwner = */viewLifecycleOwner,
         ) { _, bundle ->
             bundle.getString(ON_ANOTHER_ACCOUNT_CLICKED_KEY)?.let { openLoginWebView() }
-        }
-
-        // Open CrossLogin bottomSheet
-        binding.crossLoginSelection.setOnClickListener {
-            safelyNavigate(LoginFragmentDirections.actionLoginFragmentToCrossLoginBottomSheetDialog())
         }
     }
 
@@ -287,16 +279,16 @@ class LoginFragment : Fragment() {
             authenticateUser(token, loginActivity.infomaniakLogin, withRedirection)
         }
 
-        val accounts = introViewModel.crossLoginAccounts.value
+        val selectedAccounts = introViewModel.crossLoginAccounts.value
             ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.id) == true }
             ?: return
         val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
         val tokens = mutableListOf<ApiToken>()
         var currentlySelectedInAnAppToken: ApiToken? = null
 
-        if (accounts.isEmpty()) return
+        if (selectedAccounts.isEmpty()) return
 
-        accounts.forEach { account ->
+        selectedAccounts.forEach { account ->
 
             val token = when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
                 is Xor.First -> {
