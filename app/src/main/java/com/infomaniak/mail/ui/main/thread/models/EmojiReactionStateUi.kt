@@ -29,7 +29,14 @@ data class EmojiReactionStateUi(
 ) : Reaction {
     override val count: Int by authors::size
 
-    fun computeReactionDetail(emoji: String, context: Context, mergedContactDictionary: MergedContactDictionary): List<ReactionDetail> = authors.map {
-        ReactionDetail(name = it.getName(context), emoji = emoji, avatarType = it.getAvatarType(context, mergedContactDictionary))
+    fun computeReactionDetail(
+        emoji: String,
+        context: Context,
+        mergedContactDictionary: MergedContactDictionary,
+        isBimiEnabled: Boolean,
+    ): List<ReactionDetail> = authors.mapNotNull { author ->
+        author.getAvatarType(context, mergedContactDictionary, isBimiEnabled)?.let { avatarType ->
+            ReactionDetail(name = author.getName(context), emoji = emoji, avatarType = avatarType)
+        }
     }
 }
