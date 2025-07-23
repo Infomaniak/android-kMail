@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.login
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.infomaniak.core.autoCancelScope
 import com.infomaniak.core.login.crossapp.CrossAppLogin
 import com.infomaniak.core.login.crossapp.DerivedTokenGenerator
 import com.infomaniak.core.login.crossapp.DerivedTokenGeneratorImpl
@@ -30,7 +31,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.extensions.loginUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Inject
 
@@ -48,7 +48,7 @@ class IntroViewModel @Inject constructor(
     var derivedTokenGenerator: DerivedTokenGenerator? = null
         private set
 
-    suspend fun getCrossLoginAccounts(context: Context): List<ExternalAccount> = coroutineScope {
+    suspend fun getCrossLoginAccounts(context: Context): List<ExternalAccount> = autoCancelScope {
         CrossAppLogin.forContext(context, coroutineScope = this).retrieveAccountsFromOtherApps()
     }
 
