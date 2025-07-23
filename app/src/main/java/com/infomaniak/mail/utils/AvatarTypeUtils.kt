@@ -19,9 +19,9 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
-import com.infomaniak.core.avatar.AvatarColors
-import com.infomaniak.core.avatar.AvatarType
-import com.infomaniak.core.avatar.AvatarUrlData
+import com.infomaniak.core.avatar.models.AvatarColors
+import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.core.avatar.models.AvatarUrlData
 import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.coil.ImageLoaderProvider.simpleImageLoader
 import com.infomaniak.lib.core.models.user.User
