@@ -31,6 +31,7 @@ import com.infomaniak.mail.utils.extensions.loginUrl
 import com.infomaniak.mail.utils.toCrossLoginAccounts
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Inject
 
@@ -47,8 +48,8 @@ class IntroViewModel @Inject constructor(
     var derivedTokenGenerator: DerivedTokenGenerator? = null
         private set
 
-    suspend fun getCrossLoginAccounts(context: Context): List<CrossLoginAccount> {
-        return CrossAppLogin.forContext(context).retrieveAccountsFromOtherApps().toCrossLoginAccounts()
+    suspend fun getCrossLoginAccounts(context: Context): List<CrossLoginAccount> = coroutineScope {
+        CrossAppLogin.forContext(context, coroutineScope = this).retrieveAccountsFromOtherApps().toCrossLoginAccounts()
     }
 
     fun initDerivedTokenGenerator(coroutineScope: CoroutineScope) {
