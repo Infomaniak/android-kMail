@@ -157,7 +157,7 @@ class LoginFragment : Fragment() {
 
                     nextButton.isGone = isLoginPage
                     connectButton.isVisible = isLoginPage
-                    signInButton.isVisible = isLoginPage && !hasAccounts
+                    signUpButton.isVisible = isLoginPage && !hasAccounts
                     crossLoginSelection.isVisible = isLoginPage && hasAccounts
                 }
             })
@@ -172,7 +172,7 @@ class LoginFragment : Fragment() {
 
         nextButton.setOnClickListener { introViewpager.currentItem += 1 }
 
-        signInButton.setOnClickListener {
+        signUpButton.setOnClickListener {
             safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
         }
 
@@ -249,8 +249,6 @@ class LoginFragment : Fragment() {
 
             introViewModel.initDerivedTokenGenerator(coroutineScope = this)
 
-            binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
-
             val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
 
             if (accounts.isNotEmpty()) {
@@ -258,12 +256,14 @@ class LoginFragment : Fragment() {
                 introViewModel.crossLoginSelectedIds.value = accounts.map { it.id }.toSet()
             }
 
+            binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
+
             repeatWhileActive {
                 binding.connectButton.awaitOneClick()
                 connectButtonProgressTimer.start()
                 if (accounts.isEmpty()) {
                     binding.connectButton.updateTextColor(getCurrentOnPrimary())
-                    binding.signInButton.isEnabled = false
+                    binding.signUpButton.isEnabled = false
                     openLoginWebView()
                 } else {
                     handleCrossAppLogin()
@@ -351,8 +351,8 @@ class LoginFragment : Fragment() {
                 addForRemainingStates(color = requireContext().getColor(R.color.backgroundDisabledPrimaryButton))
             }
             nextButton.backgroundTintList = ColorStateList.valueOf(color)
-            signInButton.setTextColor(color)
-            signInButton.rippleColor = ColorStateList.valueOf(ripple)
+            signUpButton.setTextColor(color)
+            signUpButton.rippleColor = ColorStateList.valueOf(ripple)
         }
     }
 
@@ -383,7 +383,7 @@ class LoginFragment : Fragment() {
     private fun resetLoginButtons() = with(binding) {
         connectButtonProgressTimer.cancel()
         connectButton.hideProgressCatching(RCore.string.connect)
-        signInButton.isEnabled = true
+        signUpButton.isEnabled = true
     }
 
     private fun getViewPagerCurrentItem(): Int = binding.introViewpager.currentItem
