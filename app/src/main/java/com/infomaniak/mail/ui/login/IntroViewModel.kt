@@ -20,11 +20,10 @@ package com.infomaniak.mail.ui.login
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.infomaniak.core.crossloginui.data.CrossLoginAccount
-import com.infomaniak.core.crossloginui.data.toCrossLoginAccounts
 import com.infomaniak.core.login.crossapp.CrossAppLogin
 import com.infomaniak.core.login.crossapp.DerivedTokenGenerator
 import com.infomaniak.core.login.crossapp.DerivedTokenGeneratorImpl
+import com.infomaniak.core.login.crossapp.ExternalAccount
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.LocalSettings
@@ -43,14 +42,14 @@ class IntroViewModel @Inject constructor(
 
     val updatedAccentColor = MutableLiveData(localSettings.accentColor to localSettings.accentColor)
 
-    val crossLoginAccounts = MutableLiveData(emptyList<CrossLoginAccount>())
+    val crossLoginAccounts = MutableLiveData(emptyList<ExternalAccount>())
     val crossLoginSelectedIds = MutableLiveData(emptySet<Int>())
 
     var derivedTokenGenerator: DerivedTokenGenerator? = null
         private set
 
-    suspend fun getCrossLoginAccounts(context: Context): List<CrossLoginAccount> = coroutineScope {
-        CrossAppLogin.forContext(context, coroutineScope = this).retrieveAccountsFromOtherApps().toCrossLoginAccounts()
+    suspend fun getCrossLoginAccounts(context: Context): List<ExternalAccount> = coroutineScope {
+        CrossAppLogin.forContext(context, coroutineScope = this).retrieveAccountsFromOtherApps()
     }
 
     fun initDerivedTokenGenerator(coroutineScope: CoroutineScope) {
