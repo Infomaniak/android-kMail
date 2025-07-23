@@ -563,7 +563,8 @@ class ThreadViewModel @Inject constructor(
                 val reactionDetail = reactions[emoji]?.computeReactionDetail(
                     emoji = emoji,
                     context = appContext,
-                    mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap()
+                    mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap(),
+                    isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false,
                 )
                 if (reactionDetail != null) put(emoji, reactionDetail)
             }
@@ -571,6 +572,58 @@ class ThreadViewModel @Inject constructor(
 
         return reactionDetails
     }
+
+    private fun <E : Any> List<E>.toUiMessages(
+        fakeReactions: Map<String, Set<String>>,
+        isReactionsAvailable: Boolean,
+    ): List<Any> = map { item ->
+        if (item is Message) {
+            val localReactions = fakeReactions[item.messageId] ?: emptySet()
+            val reactions = item.emojiReactions.toFakedReactions(localReactions)
+            MessageUi(item, reactions, isReactionsAvailable)
+        } else {
+            item
+        }
+    }
+
+    private fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {
+        val fakeReactions = mutableMapOf<String, EmojiReactionStateUi>()
+
+        // Fake emojis that are already found on the message's reactions
+        associateTo(fakeReactions) { state ->
+            state.emoji to fakeEmojiReactionState(state, localReactions)
+        }
+
+        // Fake emojis that are only present as fake ones but are not present on the message's reactions
+        localReactions.forEach { emoji ->
+            if (emoji !in fakeReactions) {
+                fakeReactions[emoji] = EmojiReactionStateUi(
+                    emoji = emoji,
+                    authors = listOf(EmojiReactionAuthorUi.FakeMe),
+                    hasReacted = true,
+                )
+            }
+        }
+
+        return fakeReactions
+    }
+
+    private fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
+        val shouldFake = state.emoji in localReactions && !state.hasReacted
+
+        val authors = state.authors.mapNotNullTo(mutableListOf<EmojiReactionAuthorUi>()) { author ->
+            val bimi = messageController.getMessage(author.sourceMessageUid)?.bimi
+            author.recipient?.let { recipient -> EmojiReactionAuthorUi.Real(recipient, bimi) }
+        }
+        val fakedReaction = EmojiReactionStateUi(
+            emoji = state.emoji,
+            authors = if (shouldFake) authors + EmojiReactionAuthorUi.FakeMe else authors,
+            hasReacted = state.hasReacted || shouldFake,
+        )
+
+        return fakedReaction
+    }
+
 
     data class SubjectDataResult(
         val thread: Thread?,
@@ -642,54 +695,4 @@ class ThreadViewModel @Inject constructor(
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
     }
-}
-
-private fun <E : Any> List<E>.toUiMessages(
-    fakeReactions: Map<String, Set<String>>,
-    isReactionsAvailable: Boolean,
-): List<Any> = map { item ->
-    if (item is Message) {
-        val localReactions = fakeReactions[item.messageId] ?: emptySet()
-        val reactions = item.emojiReactions.toFakedReactions(localReactions)
-        MessageUi(item, reactions, isReactionsAvailable)
-    } else {
-        item
-    }
-}
-
-private fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {
-    val fakeReactions = mutableMapOf<String, EmojiReactionStateUi>()
-
-    // Fake emojis that are already found on the message's reactions
-    associateTo(fakeReactions) { state ->
-        state.emoji to fakeEmojiReactionState(state, localReactions)
-    }
-
-    // Fake emojis that are only present as fake ones but are not present on the message's reactions
-    localReactions.forEach { emoji ->
-        if (emoji !in fakeReactions) {
-            fakeReactions[emoji] = EmojiReactionStateUi(
-                emoji = emoji,
-                authors = listOf(EmojiReactionAuthorUi.FakeMe),
-                hasReacted = true,
-            )
-        }
-    }
-
-    return fakeReactions
-}
-
-private fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
-    val shouldFake = state.emoji in localReactions && !state.hasReacted
-
-    val authors = state.authors.mapNotNullTo(mutableListOf<EmojiReactionAuthorUi>()) { author ->
-        author.recipient?.let(EmojiReactionAuthorUi::Real)
-    }
-    val fakedReaction = EmojiReactionStateUi(
-        emoji = state.emoji,
-        authors = if (shouldFake) authors + EmojiReactionAuthorUi.FakeMe else authors,
-        hasReacted = state.hasReacted || shouldFake,
-    )
-
-    return fakedReaction
 }
