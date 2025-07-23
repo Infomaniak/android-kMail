@@ -29,8 +29,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import coil3.imageLoader
 import coil3.load
-import com.infomaniak.core.avatar.AvatarType
-import com.infomaniak.core.avatar.AvatarUrlData
+import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.core.avatar.models.AvatarUrlData
 import com.infomaniak.core.coil.getBackgroundColorGradientDrawable
 import com.infomaniak.core.coil.loadAvatar
 import com.infomaniak.lib.core.models.user.User

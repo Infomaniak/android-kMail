@@ -21,7 +21,7 @@ import android.app.Activity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.coil.getBackgroundColorResBasedOnId
+import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.fragmentnavigation.isAtInitialDestination
 import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
