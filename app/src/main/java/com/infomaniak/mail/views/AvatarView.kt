@@ -36,16 +36,14 @@ import com.infomaniak.core.coil.loadAvatar
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.AvatarTypeUtils.correspondentAvatarColors
-import com.infomaniak.mail.utils.AvatarTypeUtils.fromCorrespondent
 import com.infomaniak.mail.utils.AvatarTypeUtils.fromUser
-import com.infomaniak.mail.utils.AvatarTypeUtils.getUrlOrInitialsFromCorrespondent
+import com.infomaniak.mail.utils.AvatarTypeUtils.getAvatarType
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
@@ -78,10 +76,10 @@ class AvatarView @JvmOverloads constructor(
     private val avatarUpdateObserver = Observer<Pair<MergedContactDictionary, Boolean>> { (contacts, isBimiEnabled) ->
         runCatchingRealm {
             val (correspondent, bimi) = state
-            val displayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
+            if (correspondent == null) return@Observer
 
-            if (displayType == AvatarDisplayType.UNKNOWN_CORRESPONDENT) return@Observer
-            loadAvatarByDisplayType(displayType, correspondent, bimi, contacts)
+            val avatarType = getAvatarType(correspondent, bimi, isBimiEnabled, contacts, context) ?: return@Observer
+            loadAvatarType(avatarType)
         }
     }
 
@@ -155,9 +153,9 @@ class AvatarView @JvmOverloads constructor(
     }
 
     fun loadAvatar(correspondent: Correspondent?, bimi: Bimi? = null) {
-        val avatarDisplayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled)
-
-        loadAvatarByDisplayType(avatarDisplayType, correspondent, bimi, contactsFromViewModel)
+        state.update(correspondent, bimi)
+        val avatarType = getAvatarType(correspondent, bimi, isBimiEnabled, contactsFromViewModel, context) ?: return
+        loadAvatarType(avatarType)
     }
 
     fun loadRawMergedContactAvatar(mergedContact: MergedContact) {
@@ -178,44 +176,6 @@ class AvatarView @JvmOverloads constructor(
     fun loadTeamsUserAvatar() {
         state.update(correspondent = null, bimi = null)
         loadAvatarType(AvatarType.DrawableResource(R.drawable.ic_circle_teams_user))
-    }
-
-    private fun loadAvatarByDisplayType(
-        avatarDisplayType: AvatarDisplayType,
-        correspondent: Correspondent?,
-        bimi: Bimi?,
-        contacts: MergedContactDictionary,
-    ) {
-        val avatarType: AvatarType = when (avatarDisplayType) {
-            AvatarDisplayType.UNKNOWN_CORRESPONDENT -> {
-                state.update(correspondent = null, bimi = null)
-                AvatarType.DrawableResource(R.drawable.ic_unknown_user_avatar)
-            }
-            AvatarDisplayType.USER_AVATAR -> {
-                val user = AccountUtils.currentUser ?: return
-
-                state.update(correspondent, bimi)
-                AvatarType.fromUser(user, context)
-            }
-            AvatarDisplayType.CUSTOM_AVATAR -> {
-                state.update(correspondent!!, bimi)
-                val avatarUrlData = searchInMergedContact(correspondent, contacts)?.avatar?.let {
-                    AvatarUrlData(it, context.imageLoader)
-                }
-                AvatarType.getUrlOrInitialsFromCorrespondent(avatarUrlData, correspondent, context)
-            }
-            AvatarDisplayType.INITIALS -> {
-                state.update(correspondent!!, bimi)
-                AvatarType.WithInitials.Initials.fromCorrespondent(correspondent, context)
-            }
-            AvatarDisplayType.BIMI -> {
-                state.update(correspondent!!, bimi!!)
-                val avatarUrlData = AvatarUrlData(ApiRoutes.bimi(bimi.svgContentUrl!!), context.imageLoader)
-                AvatarType.WithInitials.Url.fromCorrespondent(avatarUrlData, correspondent, context)
-            }
-        }
-
-        loadAvatarType(avatarType)
     }
 
     private fun loadAvatarType(avatarType: AvatarType) {
@@ -241,26 +201,7 @@ class AvatarView @JvmOverloads constructor(
         }
     }
 
-    private fun getAvatarDisplayType(correspondent: Correspondent?, bimi: Bimi?, isBimiEnabled: Boolean): AvatarDisplayType {
-        return when {
-            correspondent == null -> AvatarDisplayType.UNKNOWN_CORRESPONDENT
-            correspondent.shouldDisplayUserAvatar() -> AvatarDisplayType.USER_AVATAR
-            correspondent.hasMergedContactAvatar(contactsFromViewModel) -> AvatarDisplayType.CUSTOM_AVATAR
-            bimi?.isDisplayable(isBimiEnabled) == true -> AvatarDisplayType.BIMI
-            else -> AvatarDisplayType.INITIALS
-        }
-    }
-
     fun setImageDrawable(drawable: Drawable?) = binding.avatarImage.setImageDrawable(drawable)
-
-    private fun searchInMergedContact(correspondent: Correspondent, contacts: MergedContactDictionary): MergedContact? {
-        val recipientsForEmail = contacts[correspondent.email]
-        return recipientsForEmail?.getOrElse(correspondent.name) { recipientsForEmail.entries.elementAt(0).value }
-    }
-
-    private fun Correspondent.hasMergedContactAvatar(contacts: MergedContactDictionary): Boolean {
-        return searchInMergedContact(correspondent = this, contacts)?.avatar != null
-    }
 
     private fun loadMergedContact(mergedContact: MergedContact) = loadAvatarType(
         AvatarType.getUrlOrInitials(
@@ -278,13 +219,5 @@ class AvatarView @JvmOverloads constructor(
             this.correspondent = correspondent
             this.bimi = bimi
         }
-    }
-
-    private enum class AvatarDisplayType {
-        UNKNOWN_CORRESPONDENT,
-        CUSTOM_AVATAR,
-        USER_AVATAR,
-        BIMI,
-        INITIALS,
     }
 }
