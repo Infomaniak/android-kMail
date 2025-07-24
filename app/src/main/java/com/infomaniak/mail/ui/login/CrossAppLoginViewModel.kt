@@ -31,6 +31,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.utils.extensions.loginUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -66,10 +67,10 @@ class CrossAppLoginViewModel : ViewModel() {
         }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
     }
 
-    suspend fun activateUpdates(hostActivity: ComponentActivity): Nothing {
+    suspend fun activateUpdates(hostActivity: ComponentActivity): Nothing = coroutineScope {
         val crossAppLogin = CrossAppLogin.forContext(
             context = hostActivity,
-            coroutineScope = hostActivity.lifecycleScope + Dispatchers.Default
+            coroutineScope = this + Dispatchers.Default
         )
         hostActivity.repeatOnLifecycle(Lifecycle.State.STARTED) {
             _availableAccounts.emit(crossAppLogin.retrieveAccountsFromOtherApps())
