@@ -37,6 +37,7 @@ import com.infomaniak.core.cancellable
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.getFileNameAndSize
 import com.infomaniak.lib.core.utils.guessMimeType
@@ -269,8 +270,7 @@ class NewMessageViewModel @Inject constructor(
                 getExistingDraft(draftLocalUuid) ?: return@runCatching
             }
         }.cancellable().onFailure {
-            it.printStackTrace()
-            Sentry.captureException(it)
+            SentryLog.e(TAG, "Caught exception during draft initialization", it)
         }
 
         draft?.let {
