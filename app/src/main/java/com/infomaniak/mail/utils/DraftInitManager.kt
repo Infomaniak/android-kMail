@@ -99,7 +99,7 @@ class DraftInitManager @Inject constructor(
         } ?: Signature.getDummySignature(appContext, email = currentMailboxEmail, isDefault = true)
     }
 
-    fun Draft.setSignature(signature: Signature) {
+    fun Draft.setSignatureIdentity(signature: Signature) {
         identityId = signature.id.toString()
     }
 

@@ -1302,7 +1302,7 @@ class MainViewModel @Inject constructor(
                 val currentMailbox = currentMailboxLive.asFlow().first()
                 with(draftInitManager) {
                     val signature = chooseSignature(currentMailbox.email, currentMailbox.signatures, draftMode, fullMessage)
-                    setSignature(signature)
+                    setSignatureIdentity(signature)
                 }
 
                 mimeType = Utils.TEXT_HTML
@@ -1361,13 +1361,13 @@ class MainViewModel @Inject constructor(
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
     fun modifyNameFolder(name: String, folderId: String) = viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = currentMailbox.value ?: return@launch
-            val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
+        val mailbox = currentMailbox.value ?: return@launch
+        val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
 
-            renameFolderResultTrigger.postValue(Unit)
+        renameFolderResultTrigger.postValue(Unit)
 
-            apiResponseIsSuccess(apiResponse, mailbox)
-        }
+        apiResponseIsSuccess(apiResponse, mailbox)
+    }
 
     fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value ?: return@launch

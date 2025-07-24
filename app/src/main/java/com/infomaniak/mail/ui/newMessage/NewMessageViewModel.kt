@@ -334,7 +334,7 @@ class NewMessageViewModel @Inject constructor(
 
         with(draftInitManager) {
             val signature = chooseSignature(currentMailbox.email, signatures, draftMode, previousMessage)
-            setSignature(signature)
+            setSignatureIdentity(signature)
             if (signature.content.isNotEmpty()) {
                 initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
             }
