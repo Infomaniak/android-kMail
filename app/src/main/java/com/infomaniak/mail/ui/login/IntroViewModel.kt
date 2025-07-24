@@ -21,8 +21,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.LocalSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Inject
 
+@OptIn(ExperimentalSerializationApi::class)
 @HiltViewModel
 class IntroViewModel @Inject constructor(
     localSettings: LocalSettings,

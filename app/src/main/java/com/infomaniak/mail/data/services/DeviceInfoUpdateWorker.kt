@@ -15,27 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail
+package com.infomaniak.mail.data.services
 
-import android.view.View
-import androidx.core.view.isVisible
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
+import android.content.Context
+import androidx.work.WorkerParameters
+import com.infomaniak.core.login.crossapp.internal.deviceinfo.AbstractDeviceInfoUpdateWorker
+import com.infomaniak.mail.utils.AccountUtils
+import okhttp3.OkHttpClient
 
-suspend fun View.awaitOneLongClick(
-    disableAfterClick: Boolean = true,
-    hideAfterClick: Boolean = false,
-) = try {
-    if (disableAfterClick) isEnabled = true
-    if (hideAfterClick) isVisible = true
-    suspendCancellableCoroutine<Unit> { continuation ->
-        setOnLongClickListener {
-            setOnLongClickListener(null)
-            continuation.resume(Unit); true
-        }
+class DeviceInfoUpdateWorker(
+    appContext: Context,
+    params: WorkerParameters
+) : AbstractDeviceInfoUpdateWorker(appContext, params) {
+
+    override suspend fun getConnectedHttpClient(userId: Int): OkHttpClient {
+        return AccountUtils.getHttpClient(userId = userId)
     }
-} finally {
-    setOnLongClickListener(null)
-    if (disableAfterClick) isEnabled = false
-    if (hideAfterClick) isVisible = false
 }
