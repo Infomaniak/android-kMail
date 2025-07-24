@@ -28,22 +28,4 @@ class EmojiReactionAuthor constructor() : EmbeddedRealmObject {
         this.recipient = recipient
         this.sourceMessageUid = sourceMessageUid
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as EmojiReactionAuthor
-
-        if (recipient != other.recipient) return false
-        if (sourceMessageUid != other.sourceMessageUid) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = recipient?.hashCode() ?: 0
-        result = 31 * result + sourceMessageUid.hashCode()
-        return result
-    }
 }

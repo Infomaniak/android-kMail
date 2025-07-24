@@ -39,24 +39,4 @@ class EmojiReactionState constructor() : Reaction, EmbeddedRealmObject {
         authors.add(newAuthor)
         hasReacted = hasReacted || newAuthor.recipient?.isMe() == true
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as EmojiReactionState
-
-        if (hasReacted != other.hasReacted) return false
-        if (emoji != other.emoji) return false
-        if (authors != other.authors) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = hasReacted.hashCode()
-        result = 31 * result + emoji.hashCode()
-        result = 31 * result + authors.hashCode()
-        return result
-    }
 }
