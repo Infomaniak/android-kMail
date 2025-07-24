@@ -174,11 +174,4 @@
         tools:title="@string/noConversationSelected"
         tools:visibility="gone" />
 
-    <androidx.emoji2.emojipicker.EmojiPickerView
-        android:layout_gravity="bottom"
-        android:id="@+id/emojiPicker"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="300dp" />
-
 </FrameLayout>

@@ -26,7 +26,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.canNavigate
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -52,14 +51,6 @@ fun getAnimatedNavOptions() = NavOptions
     .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
     .build()
 
-private fun getSheetAnimatedNavOptions() = NavOptions
-    .Builder()
-    .setEnterAnim(R.anim.fragment_swipe_enter)
-    .setExitAnim(R.anim.fragment_swipe_exit)
-    .setPopEnterAnim(R.anim.fragment_swipe_pop_enter)
-    .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
-    .build()
-
 fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: String? = null) {
     if (canNavigate(currentClassName)) findNavController().navigate(directions, getAnimatedNavOptions())
 }
@@ -74,10 +65,6 @@ fun NavController.animatedNavigation(directions: NavDirections, currentClassName
 
 fun NavController.animatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String) {
     if (canNavigate(currentClassName, currentClassName)) navigate(resId, args, getAnimatedNavOptions())
-}
-
-fun Fragment.animatedNavigationSheet(@IdRes resId: Int, substituteClassName: String) {
-    safelyNavigate(resId = resId, substituteClassName = substituteClassName, navOptions = getSheetAnimatedNavOptions())
 }
 
 fun Fragment.safeNavigateToNewMessageActivity(
