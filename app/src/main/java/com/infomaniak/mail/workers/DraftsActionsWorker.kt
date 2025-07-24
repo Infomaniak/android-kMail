@@ -539,7 +539,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.RUNNING))
         }
 
-        fun getCompletedWorkInfoLiveData(): LiveData<List<WorkInfo>> {
+        fun getSuccessWorkInfoLiveData(): LiveData<List<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.SUCCEEDED))
         }
 
@@ -547,7 +547,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.FAILED))
         }
 
-        fun getCompletedAndFailedInfoLiveData(): LiveData<List<WorkInfo>> {
+        fun getCompletedInfoLiveData(): LiveData<List<WorkInfo>> {
             return WorkerUtils.getWorkInfoLiveData(TAG, workManager, listOf(State.SUCCEEDED, State.FAILED))
         }
     }

@@ -655,7 +655,7 @@ class ThreadFragment : Fragment() {
             // Listening to the draft results ensures we will get all of the possible emoji results and not miss any unlike when
             // we listen to the worker's progress.
             val treatedWorkInfoUuids = mutableSetOf<UUID>()
-            draftsActionsWorkerScheduler.getCompletedAndFailedInfoLiveData().observe(viewLifecycleOwner) {
+            draftsActionsWorkerScheduler.getCompletedInfoLiveData().observe(viewLifecycleOwner) {
                 it.forEach { workInfo ->
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
 
