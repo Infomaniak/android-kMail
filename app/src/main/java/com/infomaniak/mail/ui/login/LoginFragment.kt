@@ -165,8 +165,7 @@ class LoginFragment : Fragment() {
                 connectButton.isVisible = isLoginPage
                 crossAppLoginViewModel.availableAccounts.collectLatest { accounts ->
                     val hasAccounts = accounts.isNotEmpty()
-                    signUpButton.isVisible = isLoginPage && !hasAccounts
-                    //TODO: Remove hasAccounts condition from above
+                    signUpButton.isVisible = isLoginPage
                     crossLoginSelection.isVisible = isLoginPage && hasAccounts
                 }
             }.launchInOnLifecycle(viewLifecycleOwner)
