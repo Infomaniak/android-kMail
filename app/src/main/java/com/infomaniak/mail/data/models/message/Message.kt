@@ -19,11 +19,8 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.core.utils.ApiEnum
 import com.infomaniak.core.utils.apiEnum
-import com.infomaniak.lib.core.utils.ErrorCodeTranslated
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -317,35 +314,6 @@ class Message : RealmObject, Snoozable {
         NONE,
         PENDING,
         ACKNOWLEDGED,
-    }
-
-    enum class EmojiReactionNotAllowedReason(
-        override val apiValue: String,
-        override val translateRes: Int,
-    ) : ApiEnum, ErrorCodeTranslated {
-        EmojiReactionFolderNotAllowedDraft("folder_not_allowed_draft", R.string.errorEmojiReactionFolderNotAllowedDraft),
-        EmojiReactionFolderNotAllowedScheduledDraft(
-            "folder_not_allowed_scheduled_draft",
-            R.string.errorEmojiReactionFolderNotAllowedScheduledDraft
-        ),
-        EmojiReactionFolderNotAllowedSpam("folder_not_allowed_spam", R.string.errorEmojiReactionFolderNotAllowedSpam),
-        EmojiReactionFolderNotAllowedTrash("folder_not_allowed_trash", R.string.errorEmojiReactionFolderNotAllowedTrash),
-        EmojiReactionMessageInReplyToNotAllowed(
-            "message_in_reply_to_not_allowed",
-            R.string.errorEmojiReactionMessageInReplyToNotAllowed
-        ),
-        EmojiReactionMessageInReplyToNotValid(
-            "message_in_reply_to_not_valid",
-            R.string.errorEmojiReactionMessageInReplyToNotValid
-        ),
-        EmojiReactionMessageInReplyToEncrypted(
-            "message_in_reply_to_not_valid",
-            R.string.errorEmojiReactionMessageInReplyEncrypted
-        ),
-        EmojiReactionMaxRecipient("max_recipient", R.string.errorEmojiReactionMaxRecipient),
-        EmojiReactionRecipientNotAllowed("recipient_not_allowed", R.string.errorEmojiReactionRecipientNotAllowed);
-
-        override val code: String = "emoji_reaction__$apiValue"
     }
 
     fun keepLocalValues(localMessage: Message) {
