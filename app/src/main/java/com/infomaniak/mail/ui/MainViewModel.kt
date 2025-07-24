@@ -1301,6 +1301,8 @@ class MainViewModel @Inject constructor(
 
                 val currentMailbox = currentMailboxLive.asFlow().first()
                 with(draftInitManager) {
+                    // We don't want to send the HTML code of the signature for an emoji reaction but we still need to send the
+                    // identityId stored in a Signature
                     val signature = chooseSignature(currentMailbox.email, currentMailbox.signatures, draftMode, fullMessage)
                     setSignatureIdentity(signature)
                 }
