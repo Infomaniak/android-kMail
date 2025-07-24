@@ -88,7 +88,12 @@ class DraftInitManager @Inject constructor(
         }
     }
 
-    fun chooseSignature(currentMailboxEmail: String, signatures: List<Signature>, draftMode: DraftMode, previousMessage: Message?): Signature {
+    fun chooseSignature(
+        currentMailboxEmail: String,
+        signatures: List<Signature>,
+        draftMode: DraftMode,
+        previousMessage: Message?,
+    ): Signature {
         val defaultSignature = signatures.getDefault(draftMode)
         val shouldPreselectSignature = draftMode == DraftMode.REPLY || draftMode == DraftMode.REPLY_ALL
         return if (shouldPreselectSignature) {
