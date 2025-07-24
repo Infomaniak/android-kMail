@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.core.observe
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetCrossLoginBinding
@@ -46,7 +47,7 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
         observeAccentColor()
         observeCrossLoginAccounts()
-        observeCrossLoginSelectedIds()
+        observeCrossLoginSkippedIds()
         setCrossLoginClicksListeners()
     }
 
@@ -58,14 +59,14 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun observeCrossLoginAccounts() {
-        crossAppLoginViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
+        crossAppLoginViewModel.availableAccounts.observe(viewLifecycleOwner) { accounts ->
             binding.crossLoginBottomSheet.setAccounts(accounts)
         }
     }
 
-    private fun observeCrossLoginSelectedIds() {
-        crossAppLoginViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
-            binding.crossLoginBottomSheet.setSelectedIds(ids)
+    private fun observeCrossLoginSkippedIds() {
+        crossAppLoginViewModel.skippedAccountIds.observe(viewLifecycleOwner) { ids ->
+            binding.crossLoginBottomSheet.setSkippedIds(ids)
         }
     }
 
@@ -79,8 +80,8 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
             findNavController().popBackStack()
         }
 
-        binding.crossLoginBottomSheet.setOnSaveClickedListener { selectedIds ->
-            crossAppLoginViewModel.crossLoginSelectedIds.value = selectedIds
+        binding.crossLoginBottomSheet.setOnSaveClickedListener { skippedIds ->
+            crossAppLoginViewModel.skippedAccountIds.value = skippedIds
             findNavController().popBackStack()
         }
     }
