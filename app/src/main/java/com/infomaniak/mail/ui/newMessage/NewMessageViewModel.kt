@@ -308,19 +308,11 @@ class NewMessageViewModel @Inject constructor(
                     ?.let { uid -> MessageController.getMessage(uid, realm) }
                     ?.let { message ->
                         val (fullMessage, hasFailedFetching) = DraftController.fetchHeavyDataIfNeeded(message, realm)
-                        if (hasFailedFetching) return null
-
-                        with(draftInitManager) {
-                            setPreviousMessage(draftMode = draftMode, previousMessage = fullMessage)
-                        }
-
-                        val quote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
-                        if (quote != null) initialQuote = quote
-
-                        val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
-                        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
-
                         previousMessage = fullMessage
+
+                        if (hasFailedFetching) return@let
+
+                        setReplyForwardDraftValues(draft = this, fullMessage)
                     }
             }
         }
@@ -334,6 +326,18 @@ class NewMessageViewModel @Inject constructor(
         }
 
         populateWithExternalMailDataIfNeeded(draft = this, intent)
+    }
+
+    private suspend fun setReplyForwardDraftValues(draft: Draft, fullMessage: Message) {
+        with(draftInitManager) {
+            draft.setPreviousMessage(draftMode = draftMode, previousMessage = fullMessage)
+        }
+
+        val quote = draftInitManager.createQuote(draftMode, fullMessage, draft.attachments)
+        if (quote != null) initialQuote = quote
+
+        val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
+        if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
     }
 
     fun getAddressBookWithName(contactGroup: ContactGroup): AddressBook? {
