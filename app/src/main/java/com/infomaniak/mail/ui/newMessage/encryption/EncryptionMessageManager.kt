@@ -189,7 +189,7 @@ class EncryptionMessageManager @Inject constructor(
     private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
         if (showEncryptionDiscoveryBottomSheet) {
             showEncryptionDiscoveryBottomSheet = false
-            // TODO show discovery screen ?
+            fragment.safelyNavigate(R.id.encryptionDiscoveryBottomSheetDialog)
         }
     }
 

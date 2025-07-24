@@ -113,4 +113,10 @@
             android:id="@+id/action_encryptionActionsBottomSheetDialog_to_encryptionPasswordFragment"
             app:destination="@id/encryptionPasswordFragment" />
     </dialog>
+
+    <dialog
+        android:id="@+id/encryptionDiscoveryBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.newMessage.encryption.EncryptionDiscoveryBottomSheetDialog"
+        android:label="EncryptionDiscoveryBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_encryption_actions" />
 </navigation>
