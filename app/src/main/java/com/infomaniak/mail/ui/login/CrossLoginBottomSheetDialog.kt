@@ -34,6 +34,8 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
     private var binding: BottomSheetCrossLoginBinding by safeBinding()
     private val introViewModel: IntroViewModel by activityViewModels()
 
+    private val crossAppLoginViewModel: CrossAppLoginViewModel by activityViewModels()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetCrossLoginBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -56,13 +58,13 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun observeCrossLoginAccounts() {
-        introViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
+        crossAppLoginViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
             binding.crossLoginBottomSheet.setAccounts(accounts)
         }
     }
 
     private fun observeCrossLoginSelectedIds() {
-        introViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
+        crossAppLoginViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
             binding.crossLoginBottomSheet.setSelectedIds(ids)
         }
     }
@@ -78,7 +80,7 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         binding.crossLoginBottomSheet.setOnSaveClickedListener { selectedIds ->
-            introViewModel.crossLoginSelectedIds.value = selectedIds
+            crossAppLoginViewModel.crossLoginSelectedIds.value = selectedIds
             findNavController().popBackStack()
         }
     }

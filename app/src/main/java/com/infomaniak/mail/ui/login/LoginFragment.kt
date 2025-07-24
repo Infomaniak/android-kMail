@@ -84,6 +84,8 @@ class LoginFragment : Fragment() {
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(requireActivity().intent.extras ?: bundleOf()) }
     private val introViewModel: IntroViewModel by activityViewModels()
 
+    private val crossAppLoginViewModel: CrossAppLoginViewModel by activityViewModels()
+
     private val loginActivity by lazy { requireActivity() as LoginActivity }
 
     private val connectButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
@@ -153,7 +155,7 @@ class LoginFragment : Fragment() {
                     super.onPageSelected(position)
 
                     val isLoginPage = position == introPagerAdapter.itemCount - 1
-                    val hasAccounts = introViewModel.crossLoginAccounts.value?.isNotEmpty() == true
+                    val hasAccounts = crossAppLoginViewModel.crossLoginAccounts.value?.isNotEmpty() == true
 
                     nextButton.isGone = isLoginPage
                     connectButton.isVisible = isLoginPage
@@ -208,14 +210,14 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeCrossLoginAccounts() {
-        introViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
+        crossAppLoginViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
             SentryLog.i(TAG, "Got ${accounts.count()} accounts from other apps")
             binding.crossLoginSelection.setAccounts(accounts)
         }
     }
 
     private fun observeCrossLoginSelectedIds() {
-        introViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
+        crossAppLoginViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
             if (ids.isEmpty()) return@observe
 
             val count = ids.count()
@@ -247,11 +249,11 @@ class LoginFragment : Fragment() {
     private fun initCrossLogin() = viewLifecycleOwner.lifecycleScope.launch {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
+            val accounts = crossAppLoginViewModel.getCrossLoginAccounts(context = requireContext())
 
             if (accounts.isNotEmpty()) {
-                introViewModel.crossLoginAccounts.value = accounts
-                introViewModel.crossLoginSelectedIds.value = accounts.map { it.id }.toSet()
+                crossAppLoginViewModel.crossLoginAccounts.value = accounts
+                crossAppLoginViewModel.crossLoginSelectedIds.value = accounts.map { it.id }.toSet()
             }
 
             binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
@@ -277,10 +279,10 @@ class LoginFragment : Fragment() {
             authenticateUser(token, loginActivity.infomaniakLogin, withRedirection)
         }
 
-        val selectedAccounts = introViewModel.crossLoginAccounts.value
-            ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.id) == true }
+        val selectedAccounts = crossAppLoginViewModel.crossLoginAccounts.value
+            ?.filter { crossAppLoginViewModel.crossLoginSelectedIds.value?.contains(it.id) == true }
             ?: return
-        val tokenGenerator = introViewModel.derivedTokenGenerator
+        val tokenGenerator = crossAppLoginViewModel.derivedTokenGenerator
         val tokens = mutableListOf<ApiToken>()
         var currentlySelectedInAnAppToken: ApiToken? = null
 
