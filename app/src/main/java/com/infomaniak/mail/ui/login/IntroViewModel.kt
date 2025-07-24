@@ -20,16 +20,15 @@ package com.infomaniak.mail.ui.login
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.AccentColor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Inject
 
+@OptIn(ExperimentalSerializationApi::class)
 @HiltViewModel
 class IntroViewModel @Inject constructor(
     localSettings: LocalSettings,
 ) : ViewModel() {
 
-    var updatedAccentColor: MutableLiveData<Pair<AccentColor, AccentColor>> = MutableLiveData(
-        localSettings.accentColor to localSettings.accentColor,
-    )
+    val updatedAccentColor = MutableLiveData(localSettings.accentColor to localSettings.accentColor)
 }
