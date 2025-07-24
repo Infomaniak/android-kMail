@@ -19,14 +19,19 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
+import coil3.imageLoader
+import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.avatar.models.AvatarUrlData
-import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.coil.ImageLoaderProvider.simpleImageLoader
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.data.models.correspondent.MergedContact
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 object AvatarTypeUtils {
     fun AvatarType.Companion.fromUser(user: User, context: Context): AvatarType.WithInitials = getUrlOrInitials(
@@ -38,7 +43,7 @@ object AvatarTypeUtils {
         ),
     )
 
-    fun AvatarType.WithInitials.Initials.Companion.fromCorrespondent(
+    private fun AvatarType.WithInitials.Initials.Companion.fromCorrespondent(
         correspondent: Correspondent,
         context: Context,
     ): AvatarType.WithInitials.Initials = AvatarType.WithInitials.Initials(
@@ -46,7 +51,7 @@ object AvatarTypeUtils {
         colors = context.correspondentAvatarColors(correspondent),
     )
 
-    fun AvatarType.WithInitials.Url.Companion.fromCorrespondent(
+    private fun AvatarType.WithInitials.Url.Companion.fromCorrespondent(
         avatarUrlData: AvatarUrlData,
         correspondent: Correspondent,
         context: Context,
@@ -57,7 +62,7 @@ object AvatarTypeUtils {
         colors = context.correspondentAvatarColors(correspondent),
     )
 
-    fun AvatarType.Companion.getUrlOrInitialsFromCorrespondent(
+    private fun AvatarType.Companion.getUrlOrInitialsFromCorrespondent(
         avatarUrlData: AvatarUrlData?,
         correspondent: Correspondent,
         context: Context,
@@ -75,5 +80,60 @@ object AvatarTypeUtils {
 
     fun Context.correspondentAvatarColors(correspondent: Correspondent): AvatarColors {
         return AvatarColors(getContainerColor(correspondent), getContentColor())
+    }
+
+    fun getAvatarType(
+        correspondent: Correspondent?,
+        bimi: Bimi?,
+        isBimiEnabled: Boolean,
+        contacts: MergedContactDictionary,
+        context: Context,
+    ): AvatarType? {
+        val avatarDisplayType = getAvatarDisplayType(correspondent, bimi, isBimiEnabled, contacts)
+        return when (avatarDisplayType) {
+            AvatarDisplayType.UNKNOWN_CORRESPONDENT -> AvatarType.DrawableResource(R.drawable.ic_unknown_user_avatar)
+            AvatarDisplayType.USER_AVATAR -> AccountUtils.currentUser?.let { user -> AvatarType.fromUser(user, context) }
+            AvatarDisplayType.CUSTOM_AVATAR -> {
+                val avatarUrlData = searchInMergedContact(correspondent!!, contacts)?.avatar?.let {
+                    AvatarUrlData(it, context.imageLoader)
+                }
+                AvatarType.getUrlOrInitialsFromCorrespondent(avatarUrlData, correspondent, context)
+            }
+            AvatarDisplayType.INITIALS -> AvatarType.WithInitials.Initials.fromCorrespondent(correspondent!!, context)
+            AvatarDisplayType.BIMI -> {
+                val avatarUrlData = AvatarUrlData(ApiRoutes.bimi(bimi!!.svgContentUrl!!), context.imageLoader)
+                AvatarType.WithInitials.Url.fromCorrespondent(avatarUrlData, correspondent!!, context)
+            }
+        }
+    }
+
+    private fun getAvatarDisplayType(
+        correspondent: Correspondent?,
+        bimi: Bimi?,
+        isBimiEnabled: Boolean,
+        contacts: MergedContactDictionary,
+    ): AvatarDisplayType = when {
+        correspondent == null -> AvatarDisplayType.UNKNOWN_CORRESPONDENT
+        correspondent.shouldDisplayUserAvatar() -> AvatarDisplayType.USER_AVATAR
+        correspondent.hasMergedContactAvatar(contacts) -> AvatarDisplayType.CUSTOM_AVATAR
+        bimi?.isDisplayable(isBimiEnabled) == true -> AvatarDisplayType.BIMI
+        else -> AvatarDisplayType.INITIALS
+    }
+
+    private fun Correspondent.hasMergedContactAvatar(contacts: MergedContactDictionary): Boolean {
+        return searchInMergedContact(correspondent = this, contacts)?.avatar != null
+    }
+
+    private fun searchInMergedContact(correspondent: Correspondent, contacts: MergedContactDictionary): MergedContact? {
+        val recipientsForEmail = contacts[correspondent.email]
+        return recipientsForEmail?.getOrElse(correspondent.name) { recipientsForEmail.entries.elementAt(0).value }
+    }
+
+    private enum class AvatarDisplayType {
+        UNKNOWN_CORRESPONDENT,
+        CUSTOM_AVATAR,
+        USER_AVATAR,
+        BIMI,
+        INITIALS,
     }
 }
