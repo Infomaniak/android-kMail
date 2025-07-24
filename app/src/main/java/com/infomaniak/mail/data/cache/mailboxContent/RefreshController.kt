@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.REFRESH_FOLDER
 import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMode.REFRESH_FOLDER_WITH_ROLE
 import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.RefreshStrategy
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
