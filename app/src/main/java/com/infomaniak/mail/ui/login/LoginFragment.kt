@@ -240,7 +240,7 @@ class LoginFragment : Fragment() {
     @OptIn(ExperimentalSplittiesApi::class, ExperimentalCoroutinesApi::class)
     private fun initCrossLogin() = viewLifecycleOwner.lifecycleScope.launch {
         launch { crossAppLoginViewModel.activateUpdates(requireActivity()) }
-        launch { crossAppLoginViewModel.skippedAccountIds.collect { binding.crossLoginSelection.setSkippedIds(it) } }
+        launch { crossAppLoginViewModel.skippedAccountIds.collect(binding.crossLoginSelection::setSkippedIds) }
 
         binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
         repeatWhileActive {
