@@ -1286,8 +1286,8 @@ class MainViewModel @Inject constructor(
     //region Emoji reaction
     fun sendEmojiReply(emoji: String, messageUid: String) {
         viewModelScope.launch {
-            val previousMessage = messageController.getMessage(messageUid) ?: return@launch
-            val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(previousMessage)
+            val targetMessage = messageController.getMessage(messageUid) ?: return@launch
+            val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(targetMessage)
             if (hasFailedFetching) return@launch
             val draftMode = Draft.DraftMode.REPLY_ALL
 
