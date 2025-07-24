@@ -648,7 +648,7 @@ class ThreadFragment : Fragment() {
                     val emojiSendResult = workInfo.progress
                         .getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
 
-                    undoFakeEmojiReply(emojiSendResult)
+                    undoFakeEmojiReplyIfNeeded(emojiSendResult)
                 }
             }
 
@@ -663,14 +663,14 @@ class ThreadFragment : Fragment() {
                         .getSerializable<DraftsActionsWorker.EmojiSendResults>(ALL_EMOJI_SENT_STATUS) ?: return@forEach
 
                     emojiSendResults.results.forEach { emojiSendResult ->
-                        undoFakeEmojiReply(emojiSendResult)
+                        undoFakeEmojiReplyIfNeeded(emojiSendResult)
                     }
                 }
             }
         }
     }
 
-    private fun undoFakeEmojiReply(emojiSendResult: DraftsActionsWorker.EmojiSendResult) {
+    private fun undoFakeEmojiReplyIfNeeded(emojiSendResult: DraftsActionsWorker.EmojiSendResult) {
         if (emojiSendResult.isSuccess.not()) {
             threadViewModel.undoFakeEmojiReply(emojiSendResult.emoji, emojiSendResult.previousMessageUid)
         }
