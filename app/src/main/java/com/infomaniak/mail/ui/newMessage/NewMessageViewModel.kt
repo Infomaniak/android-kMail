@@ -253,9 +253,7 @@ class NewMessageViewModel @Inject constructor(
         val realm = mailboxContentRealm()
         var signatures = emptyList<Signature>()
 
-        var draft: Draft? = null
-
-        runCatching {
+        val draft: Draft? = runCatching {
 
             signatures = currentMailbox.signatures
                 .also { signaturesCount = it.count() }
@@ -263,15 +261,10 @@ class NewMessageViewModel @Inject constructor(
                 .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox.email)) }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
-
-            draft = if (isNewMessage) {
-                getNewDraft(signatures, intent, realm) ?: return@runCatching
-            } else {
-                getExistingDraft(draftLocalUuid) ?: return@runCatching
-            }
+            if (isNewMessage) getNewDraft(signatures, intent, realm) else getExistingDraft(draftLocalUuid)
         }.cancellable().onFailure {
             SentryLog.e(TAG, "Caught exception during draft initialization", it)
-        }
+        }.getOrNull()
 
         draft?.let {
 
