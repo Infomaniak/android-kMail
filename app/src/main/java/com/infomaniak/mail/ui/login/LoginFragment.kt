@@ -29,13 +29,13 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.core.Xor
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.launchInOnLifecycle
 import com.infomaniak.core.login.crossapp.DerivedTokenGenerator.Issue
+import com.infomaniak.core.login.crossapp.ExternalAccount
+import com.infomaniak.core.observe
 import com.infomaniak.core.utils.awaitOneClick
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -62,11 +62,16 @@ import com.infomaniak.mail.utils.colorStateList
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
+import com.infomaniak.mail.utils.extensions.selectedPagePosition
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -83,6 +88,8 @@ class LoginFragment : Fragment() {
     private var binding: FragmentLoginBinding by safeBinding()
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(requireActivity().intent.extras ?: bundleOf()) }
     private val introViewModel: IntroViewModel by activityViewModels()
+
+    private val crossAppLoginViewModel: CrossAppLoginViewModel by activityViewModels()
 
     private val loginActivity by lazy { requireActivity() as LoginActivity }
 
@@ -103,7 +110,10 @@ class LoginFragment : Fragment() {
         loginUtils.handleWebViewLoginResult(fragment = this, result, loginActivity.infomaniakLogin, ::resetLoginButtons)
     }
 
+    private lateinit var connectButtonText: String
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        connectButtonText = getString(RCore.string.connect)
         return FragmentLoginBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
@@ -148,19 +158,17 @@ class LoginFragment : Fragment() {
 
         introViewpager.apply {
             adapter = introPagerAdapter
-            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
+            selectedPagePosition().mapLatest { position ->
+                val isLoginPage = position == introPagerAdapter.itemCount - 1
 
-                    val isLoginPage = position == introPagerAdapter.itemCount - 1
-                    val hasAccounts = introViewModel.crossLoginAccounts.value?.isNotEmpty() == true
-
-                    nextButton.isGone = isLoginPage
-                    connectButton.isVisible = isLoginPage
-                    signUpButton.isVisible = isLoginPage && !hasAccounts
+                nextButton.isGone = isLoginPage
+                connectButton.isVisible = isLoginPage
+                crossAppLoginViewModel.availableAccounts.collectLatest { accounts ->
+                    val hasAccounts = accounts.isNotEmpty()
+                    signUpButton.isVisible = isLoginPage
                     crossLoginSelection.isVisible = isLoginPage && hasAccounts
                 }
-            })
+            }.launchInOnLifecycle(viewLifecycleOwner)
 
             removeOverScrollForApiBelow31()
         }
@@ -184,7 +192,6 @@ class LoginFragment : Fragment() {
 
         observeAccentColor()
         observeCrossLoginAccounts()
-        observeCrossLoginSelectedIds()
         setCrossLoginClickListener()
         initCrossLogin()
     }
@@ -208,22 +215,9 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeCrossLoginAccounts() {
-        introViewModel.crossLoginAccounts.observe(viewLifecycleOwner) { accounts ->
+        crossAppLoginViewModel.availableAccounts.observe(viewLifecycleOwner) { accounts ->
             SentryLog.i(TAG, "Got ${accounts.count()} accounts from other apps")
             binding.crossLoginSelection.setAccounts(accounts)
-        }
-    }
-
-    private fun observeCrossLoginSelectedIds() {
-        introViewModel.crossLoginSelectedIds.observe(viewLifecycleOwner) { ids ->
-            if (ids.isEmpty()) return@observe
-
-            val count = ids.count()
-            SentryLog.i(TAG, "User selected $count accounts")
-            binding.crossLoginSelection.setSelectedIds(ids)
-            binding.connectButton.text = requireContext().resources.getQuantityString(
-                RCrossLogin.plurals.buttonContinueWithAccounts, count, count,
-            )
         }
     }
 
@@ -243,89 +237,94 @@ class LoginFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalSplittiesApi::class)
+    @OptIn(ExperimentalSplittiesApi::class, ExperimentalCoroutinesApi::class)
     private fun initCrossLogin() = viewLifecycleOwner.lifecycleScope.launch {
-        repeatOnLifecycle(Lifecycle.State.STARTED) {
+        launch { crossAppLoginViewModel.activateUpdates(requireActivity()) }
+        launch { crossAppLoginViewModel.skippedAccountIds.collect(binding.crossLoginSelection::setSkippedIds) }
 
-            introViewModel.initDerivedTokenGenerator(coroutineScope = this)
-
-            val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
-
-            if (accounts.isNotEmpty()) {
-                introViewModel.crossLoginAccounts.value = accounts
-                introViewModel.crossLoginSelectedIds.value = accounts.map { it.id }.toSet()
-            }
-
-            binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
-
-            repeatWhileActive {
-                binding.connectButton.awaitOneClick()
-                connectButtonProgressTimer.start()
-                if (accounts.isEmpty()) {
-                    binding.connectButton.updateTextColor(getCurrentOnPrimary())
-                    binding.signUpButton.isEnabled = false
-                    openLoginWebView()
-                } else {
-                    handleCrossAppLogin()
-                    delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
+        binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
+        repeatWhileActive {
+            val accountsToLogin = crossAppLoginViewModel.selectedAccounts.mapLatest { accounts ->
+                val selectedCount = accounts.count()
+                SentryLog.i(TAG, "User selected $selectedCount accounts")
+                connectButtonText = when {
+                    accounts.isEmpty() -> resources.getString(RCore.string.connect)
+                    else -> resources.getQuantityString(
+                        RCrossLogin.plurals.buttonContinueWithAccounts,
+                        selectedCount,
+                        selectedCount,
+                    )
                 }
+                binding.connectButton.text = connectButtonText
+                binding.connectButton.awaitOneClick()
+                accounts
+            }.first()
+            connectButtonProgressTimer.start()
+            if (accountsToLogin.isEmpty()) {
+                binding.connectButton.updateTextColor(getCurrentOnPrimary())
+                binding.signUpButton.isEnabled = false
+                openLoginWebView()
+            } else {
+                attemptLogin(selectedAccounts = accountsToLogin)
+                delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
             }
         }
     }
 
-    private suspend fun handleCrossAppLogin() {
+    private suspend fun attemptLogin(selectedAccounts: List<ExternalAccount>) {
 
         suspend fun authenticateToken(token: ApiToken, withRedirection: Boolean): Unit = with(loginUtils) {
             authenticateUser(token, loginActivity.infomaniakLogin, withRedirection)
         }
 
-        val selectedAccounts = introViewModel.crossLoginAccounts.value
-            ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.id) == true }
-            ?: return
-        val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
-        val tokens = mutableListOf<ApiToken>()
-        var currentlySelectedInAnAppToken: ApiToken? = null
+        val tokenGenerator = crossAppLoginViewModel.derivedTokenGenerator
 
         if (selectedAccounts.isEmpty()) return
 
-        selectedAccounts.forEach { account ->
-
-            val token = when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
+        val tokens = selectedAccounts.mapNotNull { account ->
+            when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
                 is Xor.First -> {
                     SentryLog.i(TAG, "Succeeded to derive token for account: ${account.id}")
                     result.value
                 }
                 is Xor.Second -> {
-                    SentryLog.e(TAG, "Failed to derive token for account ${account.id}, with reason: ${result.value}")
-                    val errorId = when (result.value) {
-                        is Issue.AppIntegrityCheckFailed -> TODO()
-                        is Issue.ErrorResponse -> TODO()
-                        is Issue.NetworkIssue -> RCore.string.connectionError
-                        is Issue.OtherIssue -> RCore.string.anErrorHasOccurred
-                    }
-                    Dispatchers.Main { showError(getString(errorId)) }
+                    handleTokenDerivationIssue(account, issue = result.value)
                     null
                 }
             }
+        }
 
-            token?.let {
-                if (account.isCurrentlySelectedInAnApp && currentlySelectedInAnAppToken == null) {
-                    currentlySelectedInAnAppToken = it
-                } else {
-                    tokens.add(it)
-                }
+        tokens.forEachIndexed { index, token ->
+            authenticateToken(token, withRedirection = index == tokens.lastIndex)
+        }
+    }
+
+    private suspend fun handleTokenDerivationIssue(account: ExternalAccount, issue: Issue) {
+        val shouldReport: Boolean
+        val errorId = when (issue) {
+            is Issue.AppIntegrityCheckFailed -> {
+                shouldReport = false
+                RCore.string.anErrorHasOccurred
+            }
+            is Issue.ErrorResponse -> {
+                shouldReport = issue.httpStatusCode !in 500..599
+                RCore.string.anErrorHasOccurred
+            }
+            is Issue.NetworkIssue -> {
+                shouldReport = false
+                RCore.string.connectionError
+            }
+            is Issue.OtherIssue -> {
+                shouldReport = true
+                RCore.string.anErrorHasOccurred
             }
         }
-
-        if (currentlySelectedInAnAppToken == null) currentlySelectedInAnAppToken = tokens.firstOrNull() ?: return
-
-        val remainingTokens = tokens.filterNot { it == currentlySelectedInAnAppToken }
-
-        remainingTokens.forEach { token ->
-            authenticateToken(token, withRedirection = false)
+        val errorMessage = "Failed to derive token for account ${account.id}, with reason: $issue"
+        when (shouldReport) {
+            true -> SentryLog.e(TAG, errorMessage)
+            false -> SentryLog.i(TAG, errorMessage)
         }
-
-        authenticateToken(currentlySelectedInAnAppToken, withRedirection = true)
+        Dispatchers.Main { showError(getString(errorId)) }
     }
 
     private fun openLoginWebView() {
@@ -382,7 +381,7 @@ class LoginFragment : Fragment() {
 
     private fun resetLoginButtons() = with(binding) {
         connectButtonProgressTimer.cancel()
-        connectButton.hideProgressCatching(RCore.string.connect)
+        connectButton.hideProgressCatching(connectButtonText)
         signUpButton.isEnabled = true
     }
 
