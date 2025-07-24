@@ -41,6 +41,8 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
     private var isVisible by mutableStateOf(false)
     private var startHidingAnimation by mutableStateOf(false)
 
+    protected open val title: String? = null
+
     @Composable
     abstract fun BottomSheetContent()
 
@@ -73,6 +75,7 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
             MailBottomSheetScaffold(
                 isVisible = { isVisible },
                 onDismissRequest = { isVisible = false },
+                title = title,
                 sheetState = sheetState,
                 content = { BottomSheetContent() }
             )
