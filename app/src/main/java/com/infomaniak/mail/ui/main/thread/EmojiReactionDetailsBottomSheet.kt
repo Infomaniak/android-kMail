@@ -20,12 +20,17 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.Context
 import android.util.AttributeSet
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Modifier
+import com.infomaniak.core.compose.margin.Margin
+import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.components.EmojiReactionDetails
 import com.infomaniak.emojicomponents.data.ReactionDetail
 import com.infomaniak.mail.ui.components.views.MailBottomSheetScaffoldComposeView
@@ -39,9 +44,12 @@ class EmojiReactionDetailsBottomSheet @JvmOverloads constructor(
     private val emojiReactionDetails = mutableStateListOf<Pair<String, SnapshotStateList<ReactionDetail>>>()
     private var initialEmoji by mutableStateOf<String?>(null)
 
+    override val title: String = context.getString(R.string.reactionsTitle)
+
     @Composable
     override fun BottomSheetContent() {
         Column {
+            Spacer(modifier = Modifier.height(Margin.Medium))
             EmojiReactionDetails(details = { emojiReactionDetails }, initialEmoji = initialEmoji)
         }
     }
