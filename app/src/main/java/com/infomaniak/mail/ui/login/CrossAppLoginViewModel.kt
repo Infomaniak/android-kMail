@@ -47,7 +47,7 @@ class CrossAppLoginViewModel : ViewModel() {
     val availableAccounts: StateFlow<List<ExternalAccount>>
     val selectedAccounts: StateFlow<List<ExternalAccount>>
 
-    val skippedAccountIds = MutableStateFlow(emptySet<Int>())
+    val skippedAccountIds = MutableStateFlow(emptySet<Long>())
 
     val derivedTokenGenerator: DerivedTokenGenerator = DerivedTokenGeneratorImpl(
         coroutineScope = viewModelScope,
