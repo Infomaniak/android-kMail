@@ -99,8 +99,6 @@ class EncryptionMessageManager @Inject constructor(
                 return@observe
             }
 
-            navigateToDiscoveryBottomSheetIfFirstTime()
-
             val recipients = newMessageViewModel.allRecipients
             val currentUnencryptableRecipients = encryptionViewModel.unencryptableRecipients.value
             val unknownEncryptionStatusRecipients = recipients.filter {
@@ -138,6 +136,9 @@ class EncryptionMessageManager @Inject constructor(
     }
 
     fun toggleEncryption() {
+
+        if (navigateToDiscoveryBottomSheetIfFirstTime()) return
+
         if (binding.encryptionLockButtonView.encryptionStatus == EncryptionStatus.Loading) return
 
         if (newMessageViewModel.isEncryptionActivated.value == true) {
@@ -186,11 +187,19 @@ class EncryptionMessageManager @Inject constructor(
         }
     }
 
-    private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
+    /**
+     * Navigate to the encryption discovery bottomsheet if it's the first time the user try to activate the feature.
+     *
+     * @return true if the bottomsheet is shown, false if we need to continue the default flow
+     */
+    private fun navigateToDiscoveryBottomSheetIfFirstTime(): Boolean = with(localSettings) {
         if (showEncryptionDiscoveryBottomSheet) {
             showEncryptionDiscoveryBottomSheet = false
             fragment.safelyNavigate(R.id.encryptionDiscoveryBottomSheetDialog)
+            return true
         }
+
+        return false
     }
 
     private fun applyEncryptionStyleOnRecipientFields(encryptionData: EncryptionData) = with(binding) {

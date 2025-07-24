@@ -17,21 +17,32 @@
  */
 package com.infomaniak.mail.ui.newMessage.encryption
 
-import androidx.navigation.fragment.findNavController
+import android.os.Bundle
+import android.view.View
+import android.view.WindowManager.LayoutParams
+import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.bottomSheetDialogs.DiscoveryBottomSheetDialog
+import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.lib.core.R as RCore
 
 class EncryptionDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
 
+    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
+
     override val titleRes = R.string.encryptedProtectionAdTitle
     override val descriptionRes = R.string.encryptedProtectionAdDescription
-    override val illustrationRes = R.drawable.illu_encrypted_mail
+    override val illustration = Illustration.Static(R.drawable.illu_encrypted_mail)
     override val positiveButtonRes = RCore.string.androidActivateButton
     override val trackMatomoWithCategory: (MatomoMail.MatomoName) -> Unit = MatomoMail::trackEncryptionEvent
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.setFlags(LayoutParams.FLAG_NOT_FOCUSABLE, LayoutParams.FLAG_NOT_FOCUSABLE)
+    }
+
     override fun onPositiveButtonClicked() {
-        findNavController().popBackStack()
+        newMessageViewModel.isEncryptionActivated.value = true
     }
 }
