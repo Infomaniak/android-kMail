@@ -247,8 +247,6 @@ class LoginFragment : Fragment() {
     private fun initCrossLogin() = viewLifecycleOwner.lifecycleScope.launch {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-            introViewModel.initDerivedTokenGenerator(coroutineScope = this)
-
             val accounts = introViewModel.getCrossLoginAccounts(context = requireContext())
 
             if (accounts.isNotEmpty()) {
@@ -282,7 +280,7 @@ class LoginFragment : Fragment() {
         val selectedAccounts = introViewModel.crossLoginAccounts.value
             ?.filter { introViewModel.crossLoginSelectedIds.value?.contains(it.id) == true }
             ?: return
-        val tokenGenerator = introViewModel.derivedTokenGenerator ?: return
+        val tokenGenerator = introViewModel.derivedTokenGenerator
         val tokens = mutableListOf<ApiToken>()
         var currentlySelectedInAnAppToken: ApiToken? = null
 
