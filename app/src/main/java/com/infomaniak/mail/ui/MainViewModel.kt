@@ -965,7 +965,9 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getLastMessageAndItsDuplicatesToExecuteAction)
+        null -> threads.flatMap { thread ->
+            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, featureFlagsLive.value)
+        }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
@@ -1031,7 +1033,9 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getLastMessageAndItsDuplicatesToExecuteAction)
+        null -> threads.flatMap { thread ->
+            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, featureFlagsLive.value)
+        }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
@@ -1154,7 +1158,7 @@ class MainViewModel @Inject constructor(
                 val threads = threadUids.mapNotNull(threadController::getThread)
 
                 val messageUids = threads.mapNotNull { thread ->
-                    thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
+                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings).lastOrNull { it.folderId == currentFolderId }?.uid
                 }
 
                 val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
@@ -1489,7 +1493,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun threadHasOnlyOneMessageLeft(threadUid: String): Boolean {
-        return messageController.getMessagesCountInThread(threadUid, mailboxContentRealm()) == 1
+        return messageController.getMessagesCountInThread(threadUid, featureFlagsLive.value, mailboxContentRealm()) == 1
     }
 
     fun shareThreadUrl(messageUid: String) {

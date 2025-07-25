@@ -25,7 +25,7 @@ import androidx.annotation.StringRes
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.FeatureAvailability
 
 enum class SwipeAction(
     @StringRes val nameRes: Int,
@@ -64,5 +64,5 @@ private val alwaysDisplay = SwipeDisplayBehavior { _, _, _ -> true }
 private val neverDisplay = SwipeDisplayBehavior { _, _, _ -> false }
 
 private val snoozeDisplay = SwipeDisplayBehavior { role, featureFlags, localSettings ->
-    (role == FolderRole.INBOX || role == FolderRole.SNOOZED) && SharedUtils.isSnoozeAvailable(featureFlags, localSettings)
+    (role == FolderRole.INBOX || role == FolderRole.SNOOZED) && FeatureAvailability.isSnoozeAvailable(featureFlags, localSettings)
 }

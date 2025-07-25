@@ -50,10 +50,10 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.SharedUtils.Companion.isSnoozeAvailable
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
@@ -77,6 +77,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -107,6 +108,17 @@ class ThreadViewModel @Inject constructor(
     private var fetchMessagesJob: Job? = null
     private var fetchCalendarEventJob: Job? = null
 
+    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+
+    private val currentMailboxFlow = mailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).mapNotNull { it.obj }
+
+    private val currentMailboxLive = currentMailboxFlow.asLiveData()
+
+    private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
+
     val threadState = ThreadState()
 
     @DoNotReadDirectly
@@ -136,26 +148,20 @@ class ThreadViewModel @Inject constructor(
          * As a workaround, [ThreadState.hasSuperCollapsedBlockBeenClicked] is used solely to retrigger the computation.
          * The [ThreadOpeningMode.getMessages] method will independently determine the appropriate value to use.
          */
-        combine(threadOpeningModeFlow, threadState.hasSuperCollapsedBlockBeenClicked) { mode, _ ->
-            mode
-        }.flatMapLatest { mode -> mode.getMessages() }.asLiveData(ioCoroutineContext)
+        combine(threadOpeningModeFlow, threadState.hasSuperCollapsedBlockBeenClicked, featureFlagsFlow) { mode, _, featureFlags ->
+            mode to featureFlags
+        }.flatMapLatest { (mode, featureFlags) -> mode.getMessages(featureFlags) }.asLiveData(ioCoroutineContext)
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     val failedMessagesUids = SingleLiveEvent<List<String>>()
     var deletedMessagesUids = mutableSetOf<String>()
 
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
-
-    private val currentMailboxLive = mailboxController.getMailboxAsync(
-        AccountUtils.currentUserId,
-        AccountUtils.currentMailboxId,
-    ).map { it.obj }.asLiveData(ioCoroutineContext)
-
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
 
-    val isThreadSnoozeHeaderVisible: LiveData<ThreadHeaderVisibility> = Utils.waitInitMediator(currentMailboxLive, threadLive)
+    val isThreadSnoozeHeaderVisible: LiveData<ThreadHeaderVisibility> = Utils
+        .waitInitMediator(currentMailboxLive, threadLive)
         .map { (mailbox, thread) ->
             runCatchingRealm {
                 when {
@@ -169,17 +175,20 @@ class ThreadViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             threadFlow.filterNotNull().collect { thread ->
+                val featureFlags = featureFlagsFlow.first()
+
                 // These 2 will always be empty or not all together at the same time.
                 if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
-                    thread.messages.forEachIndexed { index, message ->
-                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
+                    val displayedMessages = thread.getDisplayedMessages(featureFlags, localSettings)
+                    displayedMessages.forEachIndexed { index, message ->
+                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isThemeTheSameMap[message.uid] = true
                     }
                 }
 
                 if (threadState.isFirstOpening) {
                     threadState.isFirstOpening = false
-                    sendMatomoAndSentryAboutThreadMessagesCount(thread)
+                    sendMatomoAndSentryAboutThreadMessagesCount(thread, featureFlags)
                     if (thread.isSeen.not()) markThreadAsSeen(thread)
                 }
             }
@@ -323,9 +332,9 @@ class ThreadViewModel @Inject constructor(
         sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
 
-    private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
+    private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread, featureFlags: Mailbox.FeatureFlagSet) {
 
-        val nbMessages = thread.messages.count()
+        val nbMessages = thread.getDisplayedMessages(featureFlags, localSettings).count()
 
         trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
 
@@ -397,7 +406,7 @@ class ThreadViewModel @Inject constructor(
 
     fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
         val thread = threadLive.value ?: return@launch
-        val message = messageController.getLastMessageToExecuteAction(thread)
+        val message = messageController.getLastMessageToExecuteAction(thread, featureFlagsFlow.first())
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
@@ -522,13 +531,13 @@ class ThreadViewModel @Inject constructor(
 
     sealed interface ThreadOpeningMode {
         val threadUid: String?
-        fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>
+        fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>
     }
 
     inner class SingleMessage(val messageUid: String) : ThreadOpeningMode {
         override val threadUid: String? = null
 
-        override fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
+        override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
             return messageController.getMessageAsync(messageUid).mapNotNull {
                 it.obj?.let { message -> mapRealmMessagesResultWithoutSuperCollapsedBlock(message) }
             }
@@ -536,9 +545,11 @@ class ThreadViewModel @Inject constructor(
     }
 
     inner class AllMessages(override val threadUid: String) : ThreadOpeningMode {
-        override fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
-            return messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-                ?.map { mapRealmMessagesResult(it.list, threadUid) } ?: emptyFlow()
+        override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
+            return messageController
+                .getSortedAndNotDeletedMessagesAsync(threadUid, featureFlags)
+                ?.map { mapRealmMessagesResult(it.list, threadUid) }
+                ?: emptyFlow()
         }
     }
 
