@@ -31,6 +31,7 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebView.HitTestResult
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -737,6 +738,9 @@ class ThreadAdapter(
         val reactions = message.emojiReactions.filterNotNull()
         emojiReactions.apply {
             isGone = reactions.isEmpty()
+            setOnAddReactionClickListener {
+                Toast.makeText(context, "Add reaction", Toast.LENGTH_SHORT).show()
+            }
             setEmojiReactions(reactions)
         }
 
