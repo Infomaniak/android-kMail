@@ -17,7 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.thread.models
 
+import android.content.Context
 import com.infomaniak.emojicomponents.data.Reaction
+import com.infomaniak.emojicomponents.data.ReactionDetail
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 data class EmojiReactionStateUi(
     override val emoji: String,
@@ -25,4 +28,15 @@ data class EmojiReactionStateUi(
     override val hasReacted: Boolean,
 ) : Reaction {
     override val count: Int by authors::size
+
+    fun computeReactionDetail(
+        emoji: String,
+        context: Context,
+        mergedContactDictionary: MergedContactDictionary,
+        isBimiEnabled: Boolean,
+    ): List<ReactionDetail> = authors.mapNotNull { author ->
+        author.getAvatarType(context, mergedContactDictionary, isBimiEnabled)?.let { avatarType ->
+            ReactionDetail(name = author.getName(context), emoji = emoji, avatarType = avatarType)
+        }
+    }
 }

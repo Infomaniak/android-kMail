@@ -174,4 +174,9 @@
         tools:title="@string/noConversationSelected"
         tools:visibility="gone" />
 
+    <com.infomaniak.mail.ui.main.thread.EmojiReactionDetailsBottomSheet
+        android:id="@+id/emojiReactionDetailsBottomSheet"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
 </FrameLayout>
