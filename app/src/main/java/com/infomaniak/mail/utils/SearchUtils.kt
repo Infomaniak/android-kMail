@@ -35,7 +35,6 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.search.NamedFolder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.realmDictionaryOf
 import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
@@ -149,7 +148,7 @@ class SearchUtils @Inject constructor(
                     isDeletedOnApi = false,
                     latestCalendarEventResponse = null,
                     swissTransferFiles = realmListOf(),
-                    emojiReactions = realmDictionaryOf(),
+                    emojiReactions = realmListOf(),
                 )
             } else {
                 remoteMessage.keepLocalValues(localMessage)

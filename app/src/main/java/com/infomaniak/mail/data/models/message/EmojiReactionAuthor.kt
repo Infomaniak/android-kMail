@@ -15,9 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.emojicomponents.data
+package com.infomaniak.mail.data.models.message
 
-interface ReactionState {
-    val count: Int
-    val hasReacted: Boolean
+import com.infomaniak.mail.data.models.correspondent.Recipient
+import io.realm.kotlin.types.EmbeddedRealmObject
+
+class EmojiReactionAuthor constructor() : EmbeddedRealmObject {
+    var recipient: Recipient? = null
+    var sourceMessageUid: String = ""
+
+    constructor(recipient: Recipient, sourceMessageUid: String) : this() {
+        this.recipient = recipient
+        this.sourceMessageUid = sourceMessageUid
+    }
 }

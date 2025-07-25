@@ -17,10 +17,11 @@
  */
 package com.infomaniak.mail.data.models.thread
 
+import com.infomaniak.mail.data.models.message.EmojiReactionAuthor
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.message.Message.Companion.parseMessagesIds
-import io.realm.kotlin.types.RealmDictionary
+import io.realm.kotlin.types.RealmList
 
 fun computeReactionsPerMessageId(allMessages: List<Message>): ReactionData {
     val reactionsPerMessageId = mutableMapOf<String, MutableMap<String, EmojiReactionState>>()
@@ -38,17 +39,19 @@ private fun MutableMap<String, MutableMap<String, EmojiReactionState>>.addReacti
     val emoji = message.emojiReaction ?: return
 
     val replyToIds = message.inReplyTo?.parseMessagesIds() ?: emptyList()
-    replyToIds.forEach { replyToId ->
+    for (replyToId in replyToIds) {
         val emojis = getOrPut(replyToId) { emptyEmojiReaction(emoji) }
 
         if (emojis.containsKey(emoji).not()) {
-            emojis[emoji] = EmojiReactionState()
+            emojis[emoji] = EmojiReactionState(emoji)
         }
 
-        emojis[emoji]!!.apply {
-            count += 1
-            hasReacted = hasReacted || message.from.any { it.isMe() }
-        }
+        emojis[emoji]!!.addAuthor(
+            newAuthor = EmojiReactionAuthor(
+                recipient = message.from.firstOrNull() ?: continue,
+                sourceMessageUid = message.uid,
+            )
+        )
     }
 }
 
@@ -57,11 +60,11 @@ data class ReactionData(
     val messageIds: Set<String>,
 )
 
-private fun emptyEmojiReaction(emoji: String) = mutableMapOf(emoji to EmojiReactionState())
+private fun emptyEmojiReaction(emoji: String) = mutableMapOf(emoji to EmojiReactionState(emoji))
 
-fun RealmDictionary<EmojiReactionState?>.overrideWith(reactions: Map<String, EmojiReactionState>) {
+fun RealmList<EmojiReactionState>.overrideWith(reactions: Map<String, EmojiReactionState>) {
     clear()
-    reactions.forEach { (emoji, state) ->
-        this[emoji] = state
+    reactions.forEach { (_, state) ->
+        add(state)
     }
 }
