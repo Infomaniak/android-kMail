@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,6 +59,7 @@ import com.infomaniak.core.avatar.components.Avatar
 import com.infomaniak.core.avatar.models.AvatarColors
 import com.infomaniak.core.avatar.models.AvatarType
 import com.infomaniak.core.compose.margin.Margin
+import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.data.ReactionDetail
 import kotlinx.coroutines.launch
 
@@ -97,7 +99,7 @@ fun EmojiReactionDetails(
                     selected = pagerState.currentPage == 0,
                     onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
                 ) {
-                    Text("All") // TODO
+                    Text(stringResource(R.string.reactionsAll))
                 }
 
                 details().forEachIndexed { index, (emoji, details) ->
