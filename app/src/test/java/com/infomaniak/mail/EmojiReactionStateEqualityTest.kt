@@ -17,8 +17,9 @@
  */
 package com.infomaniak.mail
 
-import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.MessageDiffCallback.Companion.containsTheSameEmojiValuesAs
+import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
+import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
 import io.realm.kotlin.ext.realmDictionaryOf
 import io.realm.kotlin.types.RealmDictionary
 import org.junit.Assert.assertFalse
@@ -28,12 +29,12 @@ class EmojiReactionStateEqualityTest {
 
     @Test
     fun equivalentEmojiReactionStates_areEqual() {
-        val dictionary1: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(
+        val dictionary1: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(
             checkEmojiReactionState,
             crossEmojiReactionState,
         )
 
-        val dictionary2: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(
+        val dictionary2: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(
             crossEmojiReactionState,
             checkEmojiReactionState,
         )
@@ -44,9 +45,9 @@ class EmojiReactionStateEqualityTest {
 
     @Test
     fun emojiReactionStates_withMissingEmoji_areNotEqual() {
-        val dictionary1: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmojiReactionState)
+        val dictionary1: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmojiReactionState)
 
-        val dictionary2: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(
+        val dictionary2: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(
             checkEmojiReactionState,
             crossEmojiReactionState,
         )
@@ -60,8 +61,8 @@ class EmojiReactionStateEqualityTest {
         val checkEmoji1 = "✅" to emojiReactionStateOf("✅", 2, false)
         val checkEmoji2 = "✅" to emojiReactionStateOf("✅", 3, false) // count changed
 
-        val dictionary1: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmoji1)
-        val dictionary2: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmoji2)
+        val dictionary1: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmoji1)
+        val dictionary2: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmoji2)
 
         assertFalse(dictionary1.containsTheSameEmojiValuesAs(dictionary2))
         assertFalse(dictionary2.containsTheSameEmojiValuesAs(dictionary1))
@@ -72,8 +73,8 @@ class EmojiReactionStateEqualityTest {
         val checkEmoji1 = "✅" to emojiReactionStateOf("✅", 2, false)
         val checkEmoji2 = "✅" to emojiReactionStateOf("✅", 2, true) // hasReacted changed
 
-        val dictionary1: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmoji1)
-        val dictionary2: RealmDictionary<EmojiReactionState?> = realmDictionaryOf(checkEmoji2)
+        val dictionary1: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmoji1)
+        val dictionary2: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmoji2)
 
         assertFalse(dictionary1.containsTheSameEmojiValuesAs(dictionary2))
         assertFalse(dictionary2.containsTheSameEmojiValuesAs(dictionary1))
@@ -83,11 +84,11 @@ class EmojiReactionStateEqualityTest {
         private val checkEmojiReactionState = "✅" to emojiReactionStateOf("✅", 2, false)
         private val crossEmojiReactionState = "❌" to emojiReactionStateOf("❌", 1, true)
 
-        private fun emojiReactionStateOf(emoji: String, count: Int, hasReacted: Boolean): EmojiReactionState {
-            return EmojiReactionState(emoji).apply {
-                this.count = count
-                this.hasReacted = hasReacted
-            }
+        // This method need to return the same class (here: EmojiReactionStateUi) that is used where
+        // containsTheSameEmojiValuesAs() is called in the actual code of the app. This is needed so we can make sure that
+        // underlying equality checks used inside of containsTheSameEmojiValuesAs() are always correctly defined
+        private fun emojiReactionStateOf(emoji: String, count: Int, hasReacted: Boolean): EmojiReactionStateUi {
+            return EmojiReactionStateUi(emoji, List(count) { EmojiReactionAuthorUi.FakeMe }, hasReacted)
         }
     }
 }
