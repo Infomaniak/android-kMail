@@ -20,8 +20,6 @@ package com.infomaniak.mail
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.MessageDiffCallback.Companion.containsTheSameEmojiValuesAs
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
-import io.realm.kotlin.ext.realmDictionaryOf
-import io.realm.kotlin.types.RealmDictionary
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
@@ -29,31 +27,20 @@ class EmojiReactionStateEqualityTest {
 
     @Test
     fun equivalentEmojiReactionStates_areEqual() {
-        val dictionary1: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(
-            checkEmojiReactionState,
-            crossEmojiReactionState,
-        )
+        val map1: Map<String, EmojiReactionStateUi> = mapOf(checkEmojiReactionState, crossEmojiReactionState)
+        val map2: Map<String, EmojiReactionStateUi> = mapOf(crossEmojiReactionState, checkEmojiReactionState)
 
-        val dictionary2: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(
-            crossEmojiReactionState,
-            checkEmojiReactionState,
-        )
-
-        assert(dictionary1.containsTheSameEmojiValuesAs(dictionary2))
-        assert(dictionary2.containsTheSameEmojiValuesAs(dictionary1))
+        assert(map1.containsTheSameEmojiValuesAs(map2))
+        assert(map2.containsTheSameEmojiValuesAs(map1))
     }
 
     @Test
     fun emojiReactionStates_withMissingEmoji_areNotEqual() {
-        val dictionary1: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmojiReactionState)
+        val map1: Map<String, EmojiReactionStateUi> = mapOf(checkEmojiReactionState)
+        val map2: Map<String, EmojiReactionStateUi> = mapOf(checkEmojiReactionState, crossEmojiReactionState)
 
-        val dictionary2: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(
-            checkEmojiReactionState,
-            crossEmojiReactionState,
-        )
-
-        assertFalse(dictionary1.containsTheSameEmojiValuesAs(dictionary2))
-        assertFalse(dictionary2.containsTheSameEmojiValuesAs(dictionary1))
+        assertFalse(map1.containsTheSameEmojiValuesAs(map2))
+        assertFalse(map2.containsTheSameEmojiValuesAs(map1))
     }
 
     @Test
@@ -61,11 +48,11 @@ class EmojiReactionStateEqualityTest {
         val checkEmoji1 = "✅" to emojiReactionStateOf("✅", 2, false)
         val checkEmoji2 = "✅" to emojiReactionStateOf("✅", 3, false) // count changed
 
-        val dictionary1: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmoji1)
-        val dictionary2: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmoji2)
+        val map1: Map<String, EmojiReactionStateUi> = mapOf(checkEmoji1)
+        val map2: Map<String, EmojiReactionStateUi> = mapOf(checkEmoji2)
 
-        assertFalse(dictionary1.containsTheSameEmojiValuesAs(dictionary2))
-        assertFalse(dictionary2.containsTheSameEmojiValuesAs(dictionary1))
+        assertFalse(map1.containsTheSameEmojiValuesAs(map2))
+        assertFalse(map2.containsTheSameEmojiValuesAs(map1))
     }
 
     @Test
@@ -73,11 +60,11 @@ class EmojiReactionStateEqualityTest {
         val checkEmoji1 = "✅" to emojiReactionStateOf("✅", 2, false)
         val checkEmoji2 = "✅" to emojiReactionStateOf("✅", 2, true) // hasReacted changed
 
-        val dictionary1: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmoji1)
-        val dictionary2: RealmDictionary<EmojiReactionStateUi?> = realmDictionaryOf(checkEmoji2)
+        val map1: Map<String, EmojiReactionStateUi> = mapOf(checkEmoji1)
+        val map2: Map<String, EmojiReactionStateUi> = mapOf(checkEmoji2)
 
-        assertFalse(dictionary1.containsTheSameEmojiValuesAs(dictionary2))
-        assertFalse(dictionary2.containsTheSameEmojiValuesAs(dictionary1))
+        assertFalse(map1.containsTheSameEmojiValuesAs(map2))
+        assertFalse(map2.containsTheSameEmojiValuesAs(map1))
     }
 
     companion object {
