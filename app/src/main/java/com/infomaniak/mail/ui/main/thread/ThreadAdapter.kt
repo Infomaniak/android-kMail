@@ -31,7 +31,6 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebView.HitTestResult
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -737,10 +736,8 @@ class ThreadAdapter(
 
         val reactions = message.emojiReactions.filterNotNull()
         emojiReactions.apply {
-            isGone = reactions.isEmpty()
-            setOnAddReactionClickListener {
-                Toast.makeText(context, "Add reaction", Toast.LENGTH_SHORT).show()
-            }
+            isGone = false // reactions.isEmpty()
+            setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(message) }
             setEmojiReactions(reactions)
         }
 
@@ -990,6 +987,7 @@ class ThreadAdapter(
         var onRescheduleClicked: ((String, Long?) -> Unit)? = null,
         var onModifyScheduledClicked: ((Message) -> Unit)? = null,
         var onEncryptionSeeConcernedRecipients: ((List<Recipient>) -> Unit)? = null,
+        var onAddReaction: ((Message) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {
