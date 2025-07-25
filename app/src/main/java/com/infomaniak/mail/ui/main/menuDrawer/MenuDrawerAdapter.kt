@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             hasCollapsableDefaultFolder = addDefaultFolders(defaultFolders)
 
             add(ItemType.DIVIDER)
-            hasCollapsableCustomFolder = addCustomFolders(customFolders, areCustomFoldersExpanded)
+            hasCollapsableCustomFolder = addCustomFolders(customFolders.filter { it.role == null }, areCustomFoldersExpanded)
 
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)
