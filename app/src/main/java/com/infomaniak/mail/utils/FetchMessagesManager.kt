@@ -157,7 +157,7 @@ class FetchMessagesManager @Inject constructor(
         }
 
         notificationMessageUidToLog?.let { notificationMessageUidToLog ->
-            logNotFetchedMessageUid(threadsWithNewMessages, notificationMessageUidToLog, userId, mailbox)
+            logNotFetchedMessageUid(notificationMessageUidToLog, userId, mailbox, realm)
         }
 
         // Notify Threads with new Messages
@@ -182,18 +182,12 @@ class FetchMessagesManager @Inject constructor(
     }
 
     private fun logNotFetchedMessageUid(
-        threadsWithNewMessages: List<Thread>,
-        notificationMessageUidToLog: String?,
+        notificationMessageUidToLog: String,
         userId: Int,
-        mailbox: Mailbox
+        mailbox: Mailbox,
+        realm: Realm,
     ) {
-        val hasSentryMessageBeenFetched = threadsWithNewMessages.any { thread ->
-            thread.messages.any { message ->
-                message.uid == notificationMessageUidToLog
-            }
-        }
-
-        if (hasSentryMessageBeenFetched.not()) {
+        if (MessageController.doesMessageExist(notificationMessageUidToLog, realm)) {
             SentryDebug.sendMissingMessageUidInRealm(
                 userId,
                 mailbox.mailboxId,
