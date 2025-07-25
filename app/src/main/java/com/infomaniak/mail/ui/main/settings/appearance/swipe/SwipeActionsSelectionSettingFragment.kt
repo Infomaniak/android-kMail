@@ -44,7 +44,7 @@ import com.infomaniak.mail.data.models.SwipeAction.SNOOZE
 import com.infomaniak.mail.data.models.SwipeAction.SPAM
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.SharedUtils
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,7 +72,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         val actionResId = navigationArgs.titleResId
         root.setTitle(actionResId)
 
-        snooze.isVisible = SharedUtils.isSnoozeAvailable(mainViewModel.featureFlagsLive.value, localSettings)
+        snooze.isVisible = FeatureAvailability.isSnoozeAvailable(mainViewModel.featureFlagsLive.value, localSettings)
 
         radioGroup.apply {
             initBijectionTable(

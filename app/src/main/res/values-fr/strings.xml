@@ -312,6 +312,17 @@
     <string name="errorCorruptAttachment">Échec du traitement du brouillon, une pièce jointe est corrompue</string>
     <string name="errorDraftNotFound">Brouillon introuvable</string>
     <string name="errorEditScheduledMessage">Impossible de modifier un message planifié ou envoyé</string>
+    <string name="errorEmojiReactionAlreadyUsed">Vous avez déjà réagi avec cette réaction</string>
+    <string name="errorEmojiReactionFolderNotAllowedDraft">Vous ne pouvez pas réagir à un brouillon</string>
+    <string name="errorEmojiReactionFolderNotAllowedScheduledDraft">Vous ne pouvez pas réagir à un e-mail programmé</string>
+    <string name="errorEmojiReactionFolderNotAllowedSpam">Vous ne pouvez pas réagir à un e-mail marqué comme spam</string>
+    <string name="errorEmojiReactionFolderNotAllowedTrash">Vous ne pouvez pas réagir à un e-mail dans la corbeille</string>
+    <string name="errorEmojiReactionMaxReactionReached">Vous avez atteint le nombre maximum de réactions pour cet e-mail</string>
+    <string name="errorEmojiReactionMaxRecipient">Vous ne pouvez pas réagir à un e-mail avec plus de 20 destinataires</string>
+    <string name="errorEmojiReactionMessageInReplyEncrypted">Vous ne pouvez pas réagir à un e-mail chiffré</string>
+    <string name="errorEmojiReactionMessageInReplyToNotAllowed">Vous ne pouvez pas réagir à ce type d’e-mail</string>
+    <string name="errorEmojiReactionMessageInReplyToNotValid">Vous ne pouvez pas réagir à cet e-mail</string>
+    <string name="errorEmojiReactionRecipientNotAllowed">Seuls les destinataires et expéditeurs peuvent réagir à cet e-mail</string>
     <string name="errorFileNameTooLong">Nom de fichier trop long</string>
     <string name="errorFolderDoesNotExist">Le dossier n’existe pas</string>
     <string name="errorGetCredentials">Impossible d’obtenir les informations d’identification</string>

@@ -103,6 +103,7 @@ dependencies {
     implementation project(':Core:MyKSuite')
     implementation project(':Core:Network')
     implementation project(':Core:UserAvatar')
+    implementation project(':EmojiComponents')
     implementation project(':HtmlCleaner')
 
     implementation libs.rich.html.editor
@@ -115,6 +116,7 @@ dependencies {
     implementation libs.lottie
     implementation libs.dragdropswipe.recyclerview
     implementation libs.dotsindicator
+    implementation libs.emoji2.emojipicker
 
     implementation libs.flexbox
     implementation libs.lifecycle.process

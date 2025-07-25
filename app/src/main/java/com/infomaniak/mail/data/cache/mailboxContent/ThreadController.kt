@@ -293,6 +293,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
                                 isDeletedOnApi = false,
                                 latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
                                 swissTransferFiles = swissTransferFiles,
+                                emojiReactions = localMessage.emojiReactions,
                             )
 
                             if (remoteMessage.hasAttachable) hasAttachableInThread = true

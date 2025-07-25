@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.dataset
 
+import com.infomaniak.mail.data.cache.mailboxContent.refreshStrategies.ThreadRecomputations.recomputeThread
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.dataset.DummyFolders.FOLDER_DRAFT_ID

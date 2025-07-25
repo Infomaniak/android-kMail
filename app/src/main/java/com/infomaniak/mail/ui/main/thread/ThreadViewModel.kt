@@ -27,6 +27,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -45,15 +46,18 @@ import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
+import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.FeatureAvailability
+import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SharedUtils
-import com.infomaniak.mail.utils.SharedUtils.Companion.isSnoozeAvailable
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.coroutineContext
@@ -64,6 +68,7 @@ import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmDictionary
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -72,11 +77,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -107,6 +114,17 @@ class ThreadViewModel @Inject constructor(
     private var fetchMessagesJob: Job? = null
     private var fetchCalendarEventJob: Job? = null
 
+    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+
+    private val currentMailboxFlow = mailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).mapNotNull { it.obj }
+
+    private val currentMailboxLive = currentMailboxFlow.asLiveData()
+
+    private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
+
     val threadState = ThreadState()
 
     @DoNotReadDirectly
@@ -127,6 +145,10 @@ class ThreadViewModel @Inject constructor(
         .map { it.obj }
         .asLiveData(ioCoroutineContext)
 
+    // To each message id we associate a set of emojis that are added for fake so we can instantly apply clicked emojis without
+    // having to wait for the api call to return
+    private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
         /**
@@ -136,26 +158,31 @@ class ThreadViewModel @Inject constructor(
          * As a workaround, [ThreadState.hasSuperCollapsedBlockBeenClicked] is used solely to retrigger the computation.
          * The [ThreadOpeningMode.getMessages] method will independently determine the appropriate value to use.
          */
-        combine(threadOpeningModeFlow, threadState.hasSuperCollapsedBlockBeenClicked) { mode, _ ->
-            mode
-        }.flatMapLatest { mode -> mode.getMessages() }.asLiveData(ioCoroutineContext)
+        combine(
+            threadOpeningModeFlow,
+            threadState.hasSuperCollapsedBlockBeenClicked,
+            featureFlagsFlow,
+            fakeReactions,
+            transform = { mode, _, featureFlags, fakeReactions ->
+                Triple(mode, featureFlags, fakeReactions)
+            },
+        ).flatMapLatest { (mode, featureFlags, fakeReactions) ->
+            val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)
+            mode.getMessages(featureFlags).map { (items, messagesToFetch) ->
+                items.toUiMessages(fakeReactions, isReactionsAvailable) to messagesToFetch
+            }
+        }.asLiveData(ioCoroutineContext)
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     val failedMessagesUids = SingleLiveEvent<List<String>>()
     var deletedMessagesUids = mutableSetOf<String>()
 
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
-
-    private val currentMailboxLive = mailboxController.getMailboxAsync(
-        AccountUtils.currentUserId,
-        AccountUtils.currentMailboxId,
-    ).map { it.obj }.asLiveData(ioCoroutineContext)
-
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
 
-    val isThreadSnoozeHeaderVisible: LiveData<ThreadHeaderVisibility> = Utils.waitInitMediator(currentMailboxLive, threadLive)
+    val isThreadSnoozeHeaderVisible: LiveData<ThreadHeaderVisibility> = Utils
+        .waitInitMediator(currentMailboxLive, threadLive)
         .map { (mailbox, thread) ->
             runCatchingRealm {
                 when {
@@ -169,17 +196,20 @@ class ThreadViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             threadFlow.filterNotNull().collect { thread ->
+                val featureFlags = featureFlagsFlow.first()
+
                 // These 2 will always be empty or not all together at the same time.
                 if (threadState.isExpandedMap.isEmpty() || threadState.isThemeTheSameMap.isEmpty()) {
-                    thread.messages.forEachIndexed { index, message ->
-                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
+                    val displayedMessages = thread.getDisplayedMessages(featureFlags, localSettings)
+                    displayedMessages.forEachIndexed { index, message ->
+                        threadState.isExpandedMap[message.uid] = message.shouldBeExpanded(index, displayedMessages.lastIndex)
                         threadState.isThemeTheSameMap[message.uid] = true
                     }
                 }
 
                 if (threadState.isFirstOpening) {
                     threadState.isFirstOpening = false
-                    sendMatomoAndSentryAboutThreadMessagesCount(thread)
+                    sendMatomoAndSentryAboutThreadMessagesCount(thread, featureFlags)
                     if (thread.isSeen.not()) markThreadAsSeen(thread)
                 }
             }
@@ -323,9 +353,9 @@ class ThreadViewModel @Inject constructor(
         sharedUtils.markAsSeen(mailbox, listOf(thread))
     }
 
-    private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread) {
+    private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread, featureFlags: Mailbox.FeatureFlagSet) {
 
-        val nbMessages = thread.messages.count()
+        val nbMessages = thread.getDisplayedMessages(featureFlags, localSettings).count()
 
         trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
 
@@ -397,7 +427,7 @@ class ThreadViewModel @Inject constructor(
 
     fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
         val thread = threadLive.value ?: return@launch
-        val message = messageController.getLastMessageToExecuteAction(thread)
+        val message = messageController.getLastMessageToExecuteAction(thread, featureFlagsFlow.first())
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))
     }
 
@@ -419,8 +449,8 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun fetchCalendarEvent(item: Any, forceFetch: Boolean): Pair<Message, ApiResponse<CalendarEventResponse>>? {
 
-        if (item !is Message) return null
-        val message: Message = item
+        if (item !is MessageUi) return null
+        val message: Message = item.message
 
         if (!message.isFullyDownloaded()) return null // Only process Messages with Attachments already downloaded
 
@@ -486,6 +516,36 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
+    fun fakeEmojiReply(emoji: String, messageUid: String) {
+        viewModelScope.launch {
+            val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
+
+            // TODO: Optimize memory consumption
+            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
+                set(messageId, getOrDefault(messageId, emptySet()).plus(emoji))
+            }
+        }
+    }
+
+    fun undoFakeEmojiReply(emoji: String, messageUid: String) {
+        viewModelScope.launch {
+            val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
+
+            // If the value isn't present, there's nothing to remove, so we can exit
+            if (fakeReactions.value[messageId]?.contains(emoji) != true) return@launch
+
+            // TODO: Optimize memory consumption
+            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
+                set(messageId, getOrDefault(messageId, emptySet()).minus(emoji))
+            }
+        }
+    }
+
+    fun getLocalEmojiReactionsFor(messageUid: String) = (messagesLive.value
+        ?.first
+        ?.firstOrNull { it is MessageUi && it.message.uid == messageUid } as? MessageUi)
+        ?.emojiReactionsState
+
     data class SubjectDataResult(
         val thread: Thread?,
         val mergedContacts: MergedContactDictionary?,
@@ -522,13 +582,13 @@ class ThreadViewModel @Inject constructor(
 
     sealed interface ThreadOpeningMode {
         val threadUid: String?
-        fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>
+        fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>>
     }
 
     inner class SingleMessage(val messageUid: String) : ThreadOpeningMode {
         override val threadUid: String? = null
 
-        override fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
+        override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
             return messageController.getMessageAsync(messageUid).mapNotNull {
                 it.obj?.let { message -> mapRealmMessagesResultWithoutSuperCollapsedBlock(message) }
             }
@@ -536,9 +596,11 @@ class ThreadViewModel @Inject constructor(
     }
 
     inner class AllMessages(override val threadUid: String) : ThreadOpeningMode {
-        override fun getMessages(): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
-            return messageController.getSortedAndNotDeletedMessagesAsync(threadUid)
-                ?.map { mapRealmMessagesResult(it.list, threadUid) } ?: emptyFlow()
+        override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
+            return messageController
+                .getSortedAndNotDeletedMessagesAsync(threadUid, featureFlags)
+                ?.map { mapRealmMessagesResult(it.list, threadUid) }
+                ?: emptyFlow()
         }
     }
 
@@ -554,4 +616,51 @@ class ThreadViewModel @Inject constructor(
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
     }
+}
+
+private fun <E : Any> List<E>.toUiMessages(fakeReactions: Map<String, Set<String>>, isReactionsAvailable: Boolean): List<Any> = map { item ->
+    if (item is Message) {
+        val localReactions = fakeReactions[item.messageId] ?: emptySet()
+        val reactions = item.emojiReactions.toFakedReactions(localReactions)
+        MessageUi(item, reactions, isReactionsAvailable)
+    } else {
+        item
+    }
+}
+
+private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions: Set<String>): Map<String, ReactionState> {
+    val fakeReactions = mutableMapOf<String, ReactionState>()
+
+    entries
+        .filterOutNullStates()
+        .associateTo(fakeReactions) { (emoji, state) ->
+            emoji to fakeEmojiReactionState(emoji, state, localReactions)
+        }
+
+    localReactions.forEach { emoji ->
+        if (emoji !in fakeReactions) {
+            fakeReactions[emoji] = object : ReactionState {
+                override val count = 1
+                override val hasReacted = true
+            }
+        }
+    }
+
+    return fakeReactions
+}
+
+private fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry<String, T>> {
+    @Suppress("UNCHECKED_CAST")
+    return filter { (_, state) -> state != null } as List<Map.Entry<String, T>>
+}
+
+private fun fakeEmojiReactionState(emoji: String, state: EmojiReactionState, localReactions: Set<String>): ReactionState {
+    val shouldFake = emoji in localReactions && !state.hasReacted
+
+    val fakedReaction = object : ReactionState {
+        override val count = state.count + if (shouldFake) 1 else 0
+        override val hasReacted = state.hasReacted || shouldFake
+    }
+
+    return fakedReaction
 }

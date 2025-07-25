@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -29,6 +30,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.network.NetworkAvailability
+import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
@@ -40,6 +42,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -56,6 +59,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
@@ -70,6 +74,9 @@ import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
+import com.infomaniak.mail.utils.DraftInitManager
+import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
+import com.infomaniak.mail.utils.ErrorCode
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.NotificationUtils
@@ -95,6 +102,7 @@ import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
@@ -112,6 +120,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -133,6 +142,9 @@ class MainViewModel @Inject constructor(
     application: Application,
     avatarMergedContactData: AvatarMergedContactData,
     private val addressBookController: AddressBookController,
+    private val draftController: DraftController,
+    private val draftInitManager: DraftInitManager,
+    private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
@@ -965,7 +977,9 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getLastMessageAndItsDuplicatesToExecuteAction)
+        null -> threads.flatMap { thread ->
+            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, featureFlagsLive.value)
+        }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
@@ -1031,7 +1045,9 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getLastMessageAndItsDuplicatesToExecuteAction)
+        null -> threads.flatMap { thread ->
+            messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, featureFlagsLive.value)
+        }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
@@ -1154,7 +1170,8 @@ class MainViewModel @Inject constructor(
                 val threads = threadUids.mapNotNull(threadController::getThread)
 
                 val messageUids = threads.mapNotNull { thread ->
-                    thread.messages.lastOrNull { it.folderId == currentFolderId }?.uid
+                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings)
+                        .lastOrNull { it.folderId == currentFolderId }?.uid
                 }
 
                 val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
@@ -1270,6 +1287,81 @@ class MainViewModel @Inject constructor(
     }
     //endregion
 
+    //region Emoji reaction
+    /**
+     * Wrapper method to send an emoji reaction to the api. This method will check if the emoji reaction is allowed before
+     * initiating an api call. This is the entry point to add an emoji reaction anywhere in the app.
+     *
+     * If sending is allowed, the caller place can fake the emoji reaction locally thanks to [onAllowed].
+     * If sending is not allowed, it will display the error directly to the user and avoid doing the api call.
+     */
+    fun trySendEmojiReply(emoji: String, messageUid: String, reactions: Map<String, ReactionState>, onAllowed: () -> Unit) {
+        viewModelScope.launch {
+            when (val status = reactions.getEmojiSendStatus(emoji)) {
+                EmojiSendStatus.Allowed -> {
+                    onAllowed()
+                    sendEmojiReply(emoji, messageUid)
+                }
+                is EmojiSendStatus.NotAllowed -> snackbarManager.postValue(appContext.getString(status.errorMessageRes))
+            }
+        }
+    }
+
+    private fun Map<String, ReactionState>.getEmojiSendStatus(emoji: String): EmojiSendStatus = when {
+        this[emoji]?.hasReacted == true -> EmojiSendStatus.NotAllowed.AlreadyUsed
+        hasAvailableReactionSlot().not() -> EmojiSendStatus.NotAllowed.MaxReactionReached
+        hasNetwork.not() -> EmojiSendStatus.NotAllowed.NoInternet
+        else -> EmojiSendStatus.Allowed
+    }
+
+    /**
+     * The actual logic of sending an emoji reaction to the api. This method initializes a [Draft] instance, stores it into the
+     * database and schedules the [DraftsActionsWorker] so the draft is uploaded on the api.
+     */
+    private suspend fun sendEmojiReply(emoji: String, messageUid: String) {
+        val targetMessage = messageController.getMessage(messageUid) ?: return
+        val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(targetMessage)
+        if (hasFailedFetching) return
+        val draftMode = Draft.DraftMode.REPLY_ALL
+
+        val draft = Draft().apply {
+            with(draftInitManager) {
+                setPreviousMessage(draftMode, fullMessage)
+            }
+
+            val quote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
+            body = EMOJI_REACTION_PLACEHOLDER + quote
+
+            val currentMailbox = currentMailboxLive.asFlow().first()
+            with(draftInitManager) {
+                // We don't want to send the HTML code of the signature for an emoji reaction but we still need to send the
+                // identityId stored in a Signature
+                val signature = chooseSignature(currentMailbox.email, currentMailbox.signatures, draftMode, fullMessage)
+                setSignatureIdentity(signature)
+            }
+
+            mimeType = Utils.TEXT_HTML
+
+            action = Draft.DraftAction.SEND_REACTION
+            emojiReaction = emoji
+        }
+
+        draftController.upsertDraft(draft)
+
+        draftsActionsWorkerScheduler.scheduleWork(draft.localUuid)
+    }
+
+    private sealed interface EmojiSendStatus {
+        data object Allowed : EmojiSendStatus
+
+        sealed class NotAllowed(@StringRes val errorMessageRes: Int) : EmojiSendStatus {
+            data object AlreadyUsed : NotAllowed(ErrorCode.EmojiReactions.alreadyUsed.translateRes)
+            data object MaxReactionReached : NotAllowed(ErrorCode.EmojiReactions.maxReactionReached.translateRes)
+            data object NoInternet : NotAllowed(RCore.string.noConnection)
+        }
+    }
+    //endregion
+
     //region Undo action
     fun undoAction(undoData: UndoData) = viewModelScope.launch(ioCoroutineContext) {
 
@@ -1313,13 +1405,13 @@ class MainViewModel @Inject constructor(
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
     fun modifyNameFolder(name: String, folderId: String) = viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = currentMailbox.value ?: return@launch
-            val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
+        val mailbox = currentMailbox.value ?: return@launch
+        val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
 
-            renameFolderResultTrigger.postValue(Unit)
+        renameFolderResultTrigger.postValue(Unit)
 
-            apiResponseIsSuccess(apiResponse, mailbox)
-        }
+        apiResponseIsSuccess(apiResponse, mailbox)
+    }
 
     fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value ?: return@launch
@@ -1489,7 +1581,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun threadHasOnlyOneMessageLeft(threadUid: String): Boolean {
-        return messageController.getMessagesCountInThread(threadUid, mailboxContentRealm()) == 1
+        return messageController.getMessagesCountInThread(threadUid, featureFlagsLive.value, mailboxContentRealm()) == 1
     }
 
     fun shareThreadUrl(messageUid: String) {
@@ -1521,5 +1613,7 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
+
+        private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
 }
