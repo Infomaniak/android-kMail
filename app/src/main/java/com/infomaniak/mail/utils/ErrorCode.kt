@@ -170,9 +170,14 @@ object ErrorCode {
         EmojiReactionNotAllowedReason.EmojiReactionMessageInReplyToEncrypted,
         EmojiReactionNotAllowedReason.EmojiReactionMaxRecipient,
         EmojiReactionNotAllowedReason.EmojiReactionRecipientNotAllowed,
-        ApiErrorCode(EMOJI_REACTION_MAX_REACTION_REACHED, R.string.errorEmojiReactionMaxReactionReached),
-        ApiErrorCode(EMOJI_REACTION_ALREADY_USED, R.string.errorEmojiReactionAlreadyUsed),
+        EmojiReactions.maxReactionReached,
+        EmojiReactions.alreadyUsed,
     )
+
+    object EmojiReactions {
+        val maxReactionReached = ApiErrorCode(EMOJI_REACTION_MAX_REACTION_REACHED, R.string.errorEmojiReactionMaxReactionReached)
+        val alreadyUsed = ApiErrorCode(EMOJI_REACTION_ALREADY_USED, R.string.errorEmojiReactionAlreadyUsed)
+    }
 
     private val ignoredErrorCodesForDrafts = setOf(
         DRAFT_ALREADY_SCHEDULED_OR_SENT,
