@@ -214,8 +214,7 @@ class Message : RealmObject, Snoozable {
 
     val isReaction get() = emojiReaction != null
 
-    // TODO: Add check to know if the user has already reacted 5 times to an email
-    val isReactionAllowed get() = _emojiReactionNotAllowedReason != null
+    val isValidReactionTarget get() = _emojiReactionNotAllowedReason == null
 
     val threads by backlinks(Thread::messages)
 

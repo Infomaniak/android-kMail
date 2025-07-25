@@ -53,6 +53,7 @@ import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
 import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.SentryDebug
@@ -166,8 +167,9 @@ class ThreadViewModel @Inject constructor(
                 Triple(mode, featureFlags, fakeReactions)
             },
         ).flatMapLatest { (mode, featureFlags, fakeReactions) ->
+            val isReactionsAvailable = FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)
             mode.getMessages(featureFlags).map { (items, messagesToFetch) ->
-                items.toUiMessages(fakeReactions) to messagesToFetch
+                items.toUiMessages(fakeReactions, isReactionsAvailable) to messagesToFetch
             }
         }.asLiveData(ioCoroutineContext)
 
@@ -616,11 +618,11 @@ class ThreadViewModel @Inject constructor(
     }
 }
 
-private fun <E : Any> List<E>.toUiMessages(fakeReactions: Map<String, Set<String>>): List<Any> = map { item ->
+private fun <E : Any> List<E>.toUiMessages(fakeReactions: Map<String, Set<String>>, isReactionsAvailable: Boolean): List<Any> = map { item ->
     if (item is Message) {
         val localReactions = fakeReactions[item.messageId] ?: emptySet()
         val reactions = item.emojiReactions.toFakedReactions(localReactions)
-        MessageUi(item, reactions)
+        MessageUi(item, reactions, isReactionsAvailable)
     } else {
         item
     }

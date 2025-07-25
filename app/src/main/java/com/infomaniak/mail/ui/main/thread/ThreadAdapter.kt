@@ -174,7 +174,7 @@ class ThreadAdapter(
                 NotifyType.RE_RENDER -> reloadVisibleWebView()
                 NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.message.uid)
                 NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item.message)
-                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item.emojiReactionsState)
+                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item)
             }
         }
     }.getOrDefault(Unit)
@@ -195,13 +195,17 @@ class ThreadAdapter(
         calendarEvent.onlyUpdateAttendance(attendees)
     }
 
-    private fun ItemMessageBinding.handleEmojiReactionPayload(emojiReactionsState: Map<String, ReactionState>) {
-        emojiReactions.bindEmojiReactions(emojiReactionsState)
+    private fun ItemMessageBinding.handleEmojiReactionPayload(message: MessageUi) {
+        emojiReactions.bindEmojiReactions(message)
     }
 
-    private fun EmojiReactionsView.bindEmojiReactions(emojiReactions: Map<String, ReactionState>) {
-        isGone = false // reactions.isEmpty()
-        setEmojiReactions(emojiReactions)
+    private fun EmojiReactionsView.bindEmojiReactions(message: MessageUi) {
+        val canBeReactedTo by lazy { message.canBeReactedTo() }
+
+        isVisible = message.isReactionsFeatureAvailable && (canBeReactedTo || message.hasEmojis())
+        setEmojiReactions(message.emojiReactionsState)
+
+        if (message.isReactionsFeatureAvailable) setAddReactionEnabledState(isEnabled = canBeReactedTo)
     }
 
     override fun onBindViewHolder(holder: ThreadAdapterViewHolder, position: Int) {
@@ -813,7 +817,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.bindEmojiReactions(messageUi: MessageUi) = with(binding.emojiReactions) {
-        bindEmojiReactions(messageUi.emojiReactionsState)
+        bindEmojiReactions(messageUi)
         setOnAddReactionClickListener { threadAdapterCallbacks?.onAddReaction?.invoke(messageUi.message) }
         setOnEmojiClickListener { emoji ->
             threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, messageUi.message.uid)
