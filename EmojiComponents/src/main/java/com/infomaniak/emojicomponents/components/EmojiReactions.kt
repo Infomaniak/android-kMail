@@ -35,7 +35,6 @@ import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.emojicomponents.icons.FaceSmileRoundPlus
 import com.infomaniak.emojicomponents.icons.Icons
-import com.infomaniak.emojicomponents.updateWithEmoji
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -78,6 +77,16 @@ object EmojiReactionsDefaults {
 @Composable
 private fun EmojiReactionsPreview() {
     class State(override val count: Int, override val hasReacted: Boolean) : ReactionState
+
+    fun SnapshotStateMap<String, ReactionState>.updateWithEmoji(emoji: String) {
+        if (this[emoji]?.hasReacted == true) return
+
+        val oldCount = this[emoji]?.count ?: 0
+        this[emoji] = object : ReactionState {
+            override val count: Int = oldCount + 1
+            override val hasReacted: Boolean = true
+        }
+    }
 
     val reactions: SnapshotStateMap<String, ReactionState> = remember {
         mutableStateMapOf(

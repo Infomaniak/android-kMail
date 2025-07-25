@@ -27,6 +27,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -45,10 +46,12 @@ import com.infomaniak.mail.data.models.calendar.Attendee.AttendanceState
 import com.infomaniak.mail.data.models.calendar.CalendarEventResponse
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
+import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability.isSnoozeAvailable
 import com.infomaniak.mail.utils.MessageBodyUtils
@@ -64,6 +67,7 @@ import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.types.RealmDictionary
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -72,6 +76,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -139,6 +144,10 @@ class ThreadViewModel @Inject constructor(
         .map { it.obj }
         .asLiveData(ioCoroutineContext)
 
+    // To each message id we associate a set of emojis that are added for fake so we can instantly apply clicked emojis without
+    // having to wait for the api call to return
+    private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
         /**
@@ -148,9 +157,19 @@ class ThreadViewModel @Inject constructor(
          * As a workaround, [ThreadState.hasSuperCollapsedBlockBeenClicked] is used solely to retrigger the computation.
          * The [ThreadOpeningMode.getMessages] method will independently determine the appropriate value to use.
          */
-        combine(threadOpeningModeFlow, threadState.hasSuperCollapsedBlockBeenClicked, featureFlagsFlow) { mode, _, featureFlags ->
-            mode to featureFlags
-        }.flatMapLatest { (mode, featureFlags) -> mode.getMessages(featureFlags) }.asLiveData(ioCoroutineContext)
+        combine(
+            threadOpeningModeFlow,
+            threadState.hasSuperCollapsedBlockBeenClicked,
+            featureFlagsFlow,
+            fakeReactions,
+            transform = { mode, _, featureFlags, fakeReactions ->
+                Triple(mode, featureFlags, fakeReactions)
+            },
+        ).flatMapLatest { (mode, featureFlags, fakeReactions) ->
+            mode.getMessages(featureFlags).map { (items, messagesToFetch) ->
+                items.toUiMessages(fakeReactions) to messagesToFetch
+            }
+        }.asLiveData(ioCoroutineContext)
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
@@ -428,8 +447,8 @@ class ThreadViewModel @Inject constructor(
 
     private suspend fun fetchCalendarEvent(item: Any, forceFetch: Boolean): Pair<Message, ApiResponse<CalendarEventResponse>>? {
 
-        if (item !is Message) return null
-        val message: Message = item
+        if (item !is MessageUi) return null
+        val message: Message = item.message
 
         if (!message.isFullyDownloaded()) return null // Only process Messages with Attachments already downloaded
 
@@ -492,6 +511,31 @@ class ThreadViewModel @Inject constructor(
     fun updateCurrentThreadUid(mode: ThreadOpeningMode) {
         viewModelScope.launch {
             _threadOpeningModeFlow.emit(mode)
+        }
+    }
+
+    fun fakeEmojiReply(emoji: String, messageUid: String) {
+        viewModelScope.launch {
+            val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
+
+            // TODO: Optimize memory consumption
+            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
+                set(messageId, getOrDefault(messageId, emptySet()).plus(emoji))
+            }
+        }
+    }
+
+    fun undoFakeEmojiReply(emoji: String, messageUid: String) {
+        viewModelScope.launch {
+            val messageId = messageController.getMessage(messageUid)?.messageId ?: return@launch
+
+            // If the value isn't present, there's nothing to remove, so we can exit
+            if (fakeReactions.value[messageId]?.contains(emoji) != true) return@launch
+
+            // TODO: Optimize memory consumption
+            fakeReactions.value = fakeReactions.value.toMutableMap().apply {
+                set(messageId, getOrDefault(messageId, emptySet()).minus(emoji))
+            }
         }
     }
 
@@ -565,4 +609,51 @@ class ThreadViewModel @Inject constructor(
         private const val SUPER_COLLAPSED_BLOCK_MINIMUM_MESSAGES_LIMIT = 5
         private const val SUPER_COLLAPSED_BLOCK_FIRST_INDEX_LIMIT = 3
     }
+}
+
+private fun <E : Any> List<E>.toUiMessages(fakeReactions: Map<String, Set<String>>): List<Any> = map { item ->
+    if (item is Message) {
+        val localReactions = fakeReactions[item.messageId] ?: emptySet()
+        val reactions = item.emojiReactions.toFakedReactions(localReactions)
+        MessageUi(item, reactions)
+    } else {
+        item
+    }
+}
+
+private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions: Set<String>): Map<String, ReactionState> {
+    val fakeReactions = mutableMapOf<String, ReactionState>()
+
+    entries
+        .filterOutNullStates()
+        .associateTo(fakeReactions) { (emoji, state) ->
+            emoji to fakeEmojiReactionState(emoji, state, localReactions)
+        }
+
+    localReactions.forEach { emoji ->
+        if (emoji !in fakeReactions) {
+            fakeReactions[emoji] = object : ReactionState {
+                override val count = 1
+                override val hasReacted = true
+            }
+        }
+    }
+
+    return fakeReactions
+}
+
+private fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry<String, T>> {
+    @Suppress("UNCHECKED_CAST")
+    return filter { (_, state) -> state != null } as List<Map.Entry<String, T>>
+}
+
+private fun fakeEmojiReactionState(emoji: String, state: EmojiReactionState, localReactions: Set<String>): ReactionState {
+    val shouldFake = emoji in localReactions && !state.hasReacted
+
+    val fakedReaction = object : ReactionState {
+        override val count = state.count + if (shouldFake) 1 else 0
+        override val hasReacted = state.hasReacted || shouldFake
+    }
+
+    return fakedReaction
 }
