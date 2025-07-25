@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -173,18 +173,19 @@ class FolderController @Inject constructor(
             withoutChildren: Boolean = false,
             visibleFoldersOnly: Boolean = true,
         ): RealmQuery<Folder> {
-            val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
+            // Why block children ?
+            // val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
             val typeQuery = withoutTypes.joinToString(separator = "") {
                 when (it) {
-                    FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
-                    FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != nil"
+                    FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == null"
+                    FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != null"
                     FoldersType.SNOOZED -> " AND ${Folder.rolePropertyName} != '${FolderRole.SNOOZED.name}'"
                     FoldersType.SCHEDULED_DRAFTS -> " AND ${Folder.rolePropertyName} != '${FolderRole.SCHEDULED_DRAFTS.name}'"
                     FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
                 }
             }
             val visibilityQuery = if (visibleFoldersOnly) " AND ${Folder::isDisplayed.name} == true" else ""
-            return realm.query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}").sortFolders()
+            return realm.query<Folder>("${isNotSearch}${typeQuery}${visibilityQuery}").sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
