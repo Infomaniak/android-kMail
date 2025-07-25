@@ -40,6 +40,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ImpactedFolders
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -56,6 +57,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MoveResult
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
@@ -70,6 +72,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager.UndoData
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
+import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.NotificationUtils
@@ -95,6 +98,7 @@ import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
 import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.toRealmList
@@ -112,6 +116,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -133,6 +138,9 @@ class MainViewModel @Inject constructor(
     application: Application,
     avatarMergedContactData: AvatarMergedContactData,
     private val addressBookController: AddressBookController,
+    private val draftController: DraftController,
+    private val draftInitManager: DraftInitManager,
+    private val draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler,
     private val folderController: FolderController,
     private val folderRoleUtils: FolderRoleUtils,
     private val localSettings: LocalSettings,
@@ -1158,7 +1166,8 @@ class MainViewModel @Inject constructor(
                 val threads = threadUids.mapNotNull(threadController::getThread)
 
                 val messageUids = threads.mapNotNull { thread ->
-                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings).lastOrNull { it.folderId == currentFolderId }?.uid
+                    thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings)
+                        .lastOrNull { it.folderId == currentFolderId }?.uid
                 }
 
                 val responses = ioDispatcher { ApiRepository.snoozeMessages(currentMailbox.uuid, messageUids, date) }
@@ -1276,7 +1285,38 @@ class MainViewModel @Inject constructor(
 
     //region Emoji reaction
     fun sendEmojiReply(emoji: String, messageUid: String) {
-        // TODO
+        viewModelScope.launch {
+            val targetMessage = messageController.getMessage(messageUid) ?: return@launch
+            val (fullMessage, hasFailedFetching) = draftController.fetchHeavyDataIfNeeded(targetMessage)
+            if (hasFailedFetching) return@launch
+            val draftMode = Draft.DraftMode.REPLY_ALL
+
+            val draft = Draft().apply {
+                with(draftInitManager) {
+                    setPreviousMessage(draftMode, fullMessage)
+                }
+
+                val quote = draftInitManager.createQuote(draftMode, fullMessage, attachments)
+                body = EMOJI_REACTION_PLACEHOLDER + quote
+
+                val currentMailbox = currentMailboxLive.asFlow().first()
+                with(draftInitManager) {
+                    // We don't want to send the HTML code of the signature for an emoji reaction but we still need to send the
+                    // identityId stored in a Signature
+                    val signature = chooseSignature(currentMailbox.email, currentMailbox.signatures, draftMode, fullMessage)
+                    setSignatureIdentity(signature)
+                }
+
+                mimeType = Utils.TEXT_HTML
+
+                action = Draft.DraftAction.SEND_REACTION
+                emojiReaction = emoji
+            }
+
+            draftController.upsertDraft(draft)
+
+            draftsActionsWorkerScheduler.scheduleWork(draft.localUuid)
+        }
     }
     //endregion
 
@@ -1323,13 +1363,13 @@ class MainViewModel @Inject constructor(
     fun createNewFolder(name: String) = viewModelScope.launch(ioCoroutineContext) { createNewFolderSync(name) }
 
     fun modifyNameFolder(name: String, folderId: String) = viewModelScope.launch(ioCoroutineContext) {
-            val mailbox = currentMailbox.value ?: return@launch
-            val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
+        val mailbox = currentMailbox.value ?: return@launch
+        val apiResponse = ApiRepository.renameFolder(mailbox.uuid, folderId, name)
 
-            renameFolderResultTrigger.postValue(Unit)
+        renameFolderResultTrigger.postValue(Unit)
 
-            apiResponseIsSuccess(apiResponse, mailbox)
-        }
+        apiResponseIsSuccess(apiResponse, mailbox)
+    }
 
     fun deleteFolder(folderId: String) = viewModelScope.launch(ioCoroutineContext) {
         val mailbox = currentMailbox.value ?: return@launch
@@ -1531,5 +1571,7 @@ class MainViewModel @Inject constructor(
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
         private const val REFRESH_DELAY = 2_000L // We add this delay because `etop` isn't always big enough.
         private const val MAX_REFRESH_DELAY = 6_000L
+
+        private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
 }
