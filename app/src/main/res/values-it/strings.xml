@@ -310,6 +310,17 @@
     <string name="errorCorruptAttachment">Impossibile gestire la bozza, un allegato è danneggiato</string>
     <string name="errorDraftNotFound">Bozza non trovata</string>
     <string name="errorEditScheduledMessage">Impossibile modificare un messaggio pianificato o inviato</string>
+    <string name="errorEmojiReactionAlreadyUsed">Hai già reagito con questa reazione</string>
+    <string name="errorEmojiReactionFolderNotAllowedDraft">Non puoi reagire a una bozza</string>
+    <string name="errorEmojiReactionFolderNotAllowedScheduledDraft">Non puoi reagire a un email programmato</string>
+    <string name="errorEmojiReactionFolderNotAllowedSpam">Non puoi reagire a un’email contrassegnata come spam</string>
+    <string name="errorEmojiReactionFolderNotAllowedTrash">Non puoi reagire a un’email nel cestino</string>
+    <string name="errorEmojiReactionMaxReactionReached">Hai raggiunto il numero massimo di reazioni per questa email</string>
+    <string name="errorEmojiReactionMaxRecipient">Non puoi reagire a un’email con più di 20 destinatari</string>
+    <string name="errorEmojiReactionMessageInReplyEncrypted">Non puoi reagire a un’email criptata</string>
+    <string name="errorEmojiReactionMessageInReplyToNotAllowed">Non puoi reagire a questo tipo di email</string>
+    <string name="errorEmojiReactionMessageInReplyToNotValid">Non puoi reagire a questa email</string>
+    <string name="errorEmojiReactionRecipientNotAllowed">Solo i destinatari e i mittenti possono reagire a questa email</string>
     <string name="errorFileNameTooLong">Nome del file troppo lungo</string>
     <string name="errorFolderDoesNotExist">La cartella è inesistente</string>
     <string name="errorGetCredentials">Non è stato possibile ottenere le credenziali</string>

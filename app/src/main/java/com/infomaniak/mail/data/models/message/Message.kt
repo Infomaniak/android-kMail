@@ -19,7 +19,6 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.core.utils.ApiEnum
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -315,17 +314,6 @@ class Message : RealmObject, Snoozable {
         NONE,
         PENDING,
         ACKNOWLEDGED,
-    }
-
-    enum class EmojiReactionNotAllowedReason(override val apiValue: String) : ApiEnum {
-        EmojiReactionFolderNotAllowedDraft("folder_not_allowed_draft"),
-        EmojiReactionFolderNotAllowedScheduledDraft("folder_not_allowed_scheduled_draft"),
-        EmojiReactionFolderNotAllowedSpam("folder_not_allowed_spam"),
-        EmojiReactionFolderNotAllowedTrash("folder_not_allowed_trash"),
-        EmojiReactionMessageInReplyToNotAllowed("message_in_reply_to_not_allowed"),
-        EmojiReactionMessageInReplyToNotValid("message_in_reply_to_not_valid"),
-        EmojiReactionMaxRecipient("max_recipient"),
-        EmojiReactionRecipientNotAllowed("recipient_not_allowed"),
     }
 
     fun keepLocalValues(localMessage: Message) {
