@@ -49,6 +49,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.EmojiReactionState
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.di.DefaultDispatcher
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
 import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
@@ -92,6 +93,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -112,6 +114,7 @@ class ThreadViewModel @Inject constructor(
     private val threadController: ThreadController,
     private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
@@ -555,22 +558,24 @@ class ThreadViewModel @Inject constructor(
         ?.firstOrNull { it is MessageUi && it.message.uid == messageUid } as? MessageUi)
         ?.emojiReactionsState
 
-    fun getLocalEmojiReactionsDetailsFor(messageUid: String): Map<String, List<ReactionDetail>>? {
-        val reactions = getLocalEmojiReactionsFor(messageUid) ?: return null
+    suspend fun getLocalEmojiReactionsDetailsFor(messageUid: String): Map<String, List<ReactionDetail>>? {
+        return defaultDispatcher {
+            val reactions = getLocalEmojiReactionsFor(messageUid) ?: return@defaultDispatcher null
 
-        val reactionDetails: Map<String, List<ReactionDetail>> = buildMap {
-            reactions.keys.forEach { emoji ->
-                val reactionDetail = reactions[emoji]?.computeReactionDetail(
-                    emoji = emoji,
-                    context = appContext,
-                    mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap(),
-                    isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false,
-                )
-                if (reactionDetail != null) put(emoji, reactionDetail)
+            val reactionDetails: Map<String, List<ReactionDetail>> = buildMap {
+                reactions.keys.forEach { emoji ->
+                    val reactionDetail = reactions[emoji]?.computeReactionDetail(
+                        emoji = emoji,
+                        context = appContext,
+                        mergedContactDictionary = avatarMergedContactData.mergedContactLiveData.value ?: emptyMap(),
+                        isBimiEnabled = avatarMergedContactData.isBimiEnabledLiveData.value ?: false,
+                    )
+                    if (reactionDetail != null) put(emoji, reactionDetail)
+                }
             }
-        }
 
-        return reactionDetails
+            reactionDetails
+        }
     }
 
     private fun <E : Any> List<E>.toUiMessages(

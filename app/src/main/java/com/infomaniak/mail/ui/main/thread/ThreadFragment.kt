@@ -413,8 +413,10 @@ class ThreadFragment : Fragment() {
                     })
                 },
                 showEmojiDetails = { messageUid, emoji ->
-                    val emojiDetails = getLocalEmojiReactionsDetailsFor(messageUid) ?: return@ThreadAdapterCallbacks
-                    binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
+                    lifecycleScope.launch {
+                        val emojiDetails = getLocalEmojiReactionsDetailsFor(messageUid) ?: return@launch
+                        binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
+                    }
                 }
             ),
         )
