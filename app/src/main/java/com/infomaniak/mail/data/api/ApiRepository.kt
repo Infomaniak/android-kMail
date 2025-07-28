@@ -288,10 +288,12 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.attachmentToForward(mailboxUuid), POST, body)
     }
 
-    suspend fun deleteMessages(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
-        return batchOver(messagesUids) {
-            callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to it))
-        }
+    suspend fun deleteMessages(
+        mailboxUuid: String,
+        messagesUids: List<String>,
+        alsoMoveReactionMessages: Boolean,
+    ): List<ApiResponse<Unit>> = batchOver(messagesUids) {
+        callApi(ApiRoutes.deleteMessages(mailboxUuid).withMoveReactions(alsoMoveReactionMessages), POST, mapOf("uids" to it))
     }
 
     suspend fun moveMessages(
@@ -300,19 +302,17 @@ object ApiRepository : ApiRepositoryCore() {
         destinationId: String,
         alsoMoveReactionMessages: Boolean,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
-    ): List<ApiResponse<MoveResult>> {
-        fun createApiRoute(): String {
-            return ApiRoutes.moveMessages(mailboxUuid) + if (alsoMoveReactionMessages) "?move_reactions=1" else ""
-        }
+    ): List<ApiResponse<MoveResult>> = batchOver(messagesUids) {
+        callApi(
+            url = ApiRoutes.moveMessages(mailboxUuid).withMoveReactions(alsoMoveReactionMessages),
+            method = POST,
+            body = mapOf("uids" to it, "to" to destinationId),
+            okHttpClient = okHttpClient,
+        )
+    }
 
-        return batchOver(messagesUids) {
-            callApi(
-                url = createApiRoute(),
-                method = POST,
-                body = mapOf("uids" to it, "to" to destinationId),
-                okHttpClient = okHttpClient,
-            )
-        }
+    private fun String.withMoveReactions(alsoMoveReactions: Boolean): String {
+        return this + if (alsoMoveReactions) "?move_reactions=1" else ""
     }
 
     suspend fun deleteDraft(mailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {

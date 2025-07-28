@@ -669,7 +669,11 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.deleteMessages(mailbox.uuid, uids)
+        val apiResponses = ApiRepository.deleteMessages(
+            mailboxUuid = mailbox.uuid,
+            messagesUids = uids,
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings)
+        )
 
         activityDialogLoaderResetTrigger.postValue(Unit)
 
@@ -832,10 +836,7 @@ class MainViewModel @Inject constructor(
             mailbox = mailbox,
             messagesToMove = messagesToMove,
             destinationFolder = destinationFolder,
-            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(
-                featureFlagsLive.value,
-                sharedUtils.localSettings
-            ),
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings),
         )
 
         if (apiResponses.atLeastOneSucceeded()) {

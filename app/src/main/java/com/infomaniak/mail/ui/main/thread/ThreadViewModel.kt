@@ -414,7 +414,11 @@ class ThreadViewModel @Inject constructor(
         val thread = threadLive.value ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
 
-        val apiResponses = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids())
+        val apiResponses = ApiRepository.deleteMessages(
+            mailboxUuid = mailbox.uuid,
+            messagesUids = messages.getUids(),
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsFlow.first(), localSettings)
+        )
 
         if (apiResponses.atLeastOneSucceeded()) {
             refreshController.refreshThreads(

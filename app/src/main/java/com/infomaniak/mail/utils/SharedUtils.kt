@@ -57,10 +57,6 @@ class SharedUtils @Inject constructor(
     private val messageController: MessageController,
     private val mailboxController: MailboxController,
 ) {
-
-    @Inject
-    lateinit var localSettings: LocalSettings
-
     /**
      * Mark a Message or some Threads as read
      * @param mailbox The Mailbox where the Threads & Messages are located
