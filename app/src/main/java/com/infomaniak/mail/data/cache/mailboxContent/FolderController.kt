@@ -173,19 +173,21 @@ class FolderController @Inject constructor(
             withoutChildren: Boolean = false,
             visibleFoldersOnly: Boolean = true,
         ): RealmQuery<Folder> {
-            // Why block children ?
-            // val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
+            var rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
             val typeQuery = withoutTypes.joinToString(separator = "") {
                 when (it) {
-                    FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == null"
-                    FoldersType.CUSTOM -> " AND ${Folder.rolePropertyName} != null"
+                    FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
+                    FoldersType.CUSTOM -> {
+                        rootsQuery = ""
+                        " AND ${Folder.rolePropertyName} != nil"
+                    }
                     FoldersType.SNOOZED -> " AND ${Folder.rolePropertyName} != '${FolderRole.SNOOZED.name}'"
                     FoldersType.SCHEDULED_DRAFTS -> " AND ${Folder.rolePropertyName} != '${FolderRole.SCHEDULED_DRAFTS.name}'"
                     FoldersType.DRAFT -> " AND ${Folder.rolePropertyName} != '${FolderRole.DRAFT.name}'"
                 }
             }
             val visibilityQuery = if (visibleFoldersOnly) " AND ${Folder::isDisplayed.name} == true" else ""
-            return realm.query<Folder>("${isNotSearch}${typeQuery}${visibilityQuery}").sortFolders()
+            return realm.query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}").sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
