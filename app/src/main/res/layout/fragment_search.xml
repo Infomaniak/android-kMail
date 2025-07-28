@@ -104,6 +104,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/folderDropDown"
+                        style="@style/ChipNoCheckedIconBase"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:checkable="true"
