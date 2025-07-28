@@ -123,7 +123,7 @@ dependencies {
     implementation libs.lifecycle.process
     implementation libs.webkit
     implementation libs.work.concurrent.futures
-    implementation libs.work.runtime.ktx
+    implementation core.androidx.work.runtime
 
     implementation libs.hilt.android
     implementation libs.hilt.work

@@ -109,7 +109,7 @@ class MessageWebViewClient(
             if (widthInDp <= 0) {
                 val versionData = getWebViewVersionData(context)
 
-                Sentry.withScope { scope ->
+                Sentry.captureMessage("Zero width webview detected onPageFinished which prevents message width's normalization") { scope ->
                     scope.level = SentryLevel.WARNING
                     scope.setExtra("width", webView.width.toString())
                     scope.setExtra("measuredWidth", webView.measuredWidth.toString())
@@ -122,7 +122,6 @@ class MessageWebViewClient(
                     scope.setTag("visibility", webView.visibility.toString())
                     scope.setTag("messageUid", messageUid)
                     scope.setTag("shouldLoadDistantResources", shouldLoadDistantResources.toString())
-                    Sentry.captureMessage("Zero width webview detected onPageFinished which prevents message width's normalization")
                 }
             }
 

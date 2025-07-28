@@ -554,14 +554,14 @@ class RefreshController @Inject constructor(
     private fun reportMalformedSnoozeMessages(messages: List<Message>) {
         messages.forEach { message ->
             if (message.isSnoozeMalformed()) {
-                Sentry.withScope { scope ->
+                Sentry.captureMessage("Message contains malformed snoozed or unsnoozed information") { scope ->
                     val date = message.snoozeEndDate?.toDate()?.format(FORMAT_DATE_WITH_TIMEZONE)
 
                     scope.level = SentryLevel.WARNING
-                    scope.setTag("snoozeState", message.snoozeState?.apiValue)
+                    scope.setExtra("messageUid", message.uid)
                     scope.setExtra("snoozeUuid", message.snoozeUuid)
                     scope.setExtra("snoozeEndDate", date)
-                    Sentry.captureMessage("Message contains malformed snoozed or unsnoozed information")
+                    scope.setTag("snoozeState", message.snoozeState?.apiValue)
                 }
             }
         }

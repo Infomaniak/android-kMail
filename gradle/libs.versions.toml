@@ -26,7 +26,6 @@ richHtmlEditor = "0.2.0"
 sentryAndroidFragment = "8.11.1" # TODO: Upgrade once SwissTransfer updates Sentry Gradle plugin past 5.5.0
 webkit = "1.14.0"
 workConcurrentFutures = "1.2.0"
-workVersion = "2.9.1" # Keep the same version as the one in Core
 
 [libraries]
 compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "compose" }
@@ -52,7 +51,6 @@ rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", 
 sentry-android-fragment = { module = "io.sentry:sentry-android-fragment", version.ref = "sentryAndroidFragment" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 work-concurrent-futures = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "workConcurrentFutures" }
-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workVersion" }
 # Unit tests
 ext-junit = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
 junit = { module = "junit:junit", version.ref = "junit" }
