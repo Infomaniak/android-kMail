@@ -77,6 +77,7 @@ import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.DraftInitManager
 import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
 import com.infomaniak.mail.utils.ErrorCode
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
 import com.infomaniak.mail.utils.NotificationUtils
@@ -668,7 +669,11 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.deleteMessages(mailbox.uuid, uids)
+        val apiResponses = ApiRepository.deleteMessages(
+            mailboxUuid = mailbox.uuid,
+            messagesUids = uids,
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings)
+        )
 
         activityDialogLoaderResetTrigger.postValue(Unit)
 
@@ -827,7 +832,12 @@ class MainViewModel @Inject constructor(
 
         threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = true)
 
-        val apiResponses = ApiRepository.moveMessages(mailbox.uuid, messagesToMove.getUids(), destinationFolder.id)
+        val apiResponses = moveMessages(
+            mailbox = mailbox,
+            messagesToMove = messagesToMove,
+            destinationFolder = destinationFolder,
+            alsoMoveReactionMessages = FeatureAvailability.isReactionsAvailable(featureFlagsLive.value, localSettings),
+        )
 
         if (apiResponses.atLeastOneSucceeded()) {
             if (shouldAutoAdvance(message, threadsUids)) autoAdvanceThreadsUids.postValue(threadsUids)
@@ -843,6 +853,49 @@ class MainViewModel @Inject constructor(
         if (apiResponses.atLeastOneFailed()) threadController.updateIsLocallyMovedOutStatus(threadsUids, hasBeenMovedOut = false)
 
         if (shouldDisplaySnackbar) showMoveSnackbar(threads, message, messagesToMove, apiResponses, destinationFolder)
+    }
+
+    private suspend fun moveMessages(
+        mailbox: Mailbox,
+        messagesToMove: List<Message>,
+        destinationFolder: Folder,
+        alsoMoveReactionMessages: Boolean,
+    ): List<ApiResponse<MoveResult>> {
+        val apiResponses = ApiRepository.moveMessages(
+            mailboxUuid = mailbox.uuid,
+            messagesUids = messagesToMove.getUids(),
+            destinationId = destinationFolder.id,
+            alsoMoveReactionMessages = alsoMoveReactionMessages,
+        )
+
+        // TODO: Will unsync permantly the mailbox if one message in one of the batches did succeed but some other messages in the
+        //  same batch or in other batches that are target by emoji reactions did not
+        if (alsoMoveReactionMessages && apiResponses.atLeastOneSucceeded()) deleteEmojiReactionMessagesLocally(messagesToMove)
+
+        return apiResponses
+    }
+
+    /**
+     * When deleting a message targeted by emoji reactions inside of a thread, the emoji reaction messages from another folder
+     * that were targeting this message will display for a brief moment until we refresh their folders. This is because those
+     * messages don't have a target message anymore and emoji reactions messages with no target in their thread need to be
+     * displayed.
+     *
+     * Deleting them from the database in the first place will prevent them from being shown and the messages will be deleted by
+     * the api at the same time anyway.
+     */
+    private suspend fun deleteEmojiReactionMessagesLocally(messagesToMove: List<Message>) {
+        for (messageToMove in messagesToMove) {
+            if (messageToMove.emojiReactions.isEmpty()) continue
+
+            mailboxContentRealm().write {
+                messageToMove.emojiReactions.forEach { reaction ->
+                    reaction.authors.forEach { author ->
+                        MessageController.deleteMessageByUid(author.sourceMessageUid, this)
+                    }
+                }
+            }
+        }
     }
 
     private fun showMoveSnackbar(
