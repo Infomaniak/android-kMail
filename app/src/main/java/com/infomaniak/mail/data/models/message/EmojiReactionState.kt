@@ -37,6 +37,6 @@ class EmojiReactionState constructor() : Reaction, EmbeddedRealmObject {
 
     fun addAuthor(newAuthor: EmojiReactionAuthor) {
         authors.add(newAuthor)
-        hasReacted = hasReacted || newAuthor.recipient?.isMe() == true
+        if (hasReacted.not()) hasReacted = newAuthor.recipient?.isMe() == true
     }
 }
