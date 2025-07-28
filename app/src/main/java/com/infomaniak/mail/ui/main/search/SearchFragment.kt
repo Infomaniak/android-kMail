@@ -134,7 +134,7 @@ class SearchFragment : TwoPaneFragment() {
         applyWindowInsetsListener(shouldConsume = false) { _, insets ->
             toolbar.applySideAndBottomSystemInsets(insets, withBottom = false)
             swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
-            chipsList.applySideAndBottomSystemInsets(insets)
+            chipsList.applySideAndBottomSystemInsets(insets, withBottom = false)
             with(insets.safeArea()) {
                 toolbar.setMargins(top = top)
             }
