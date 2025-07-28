@@ -954,7 +954,7 @@ class ThreadAdapter(
         }
 
         companion object {
-            fun Map<String, Reaction?>.containsTheSameEmojiValuesAs(other: Map<String, Reaction?>): Boolean {
+            fun Map<String, Reaction>.containsTheSameEmojiValuesAs(other: Map<String, Reaction>): Boolean {
                 if (this.size != other.size) return false
 
                 for ((emoji, state) in this) {
