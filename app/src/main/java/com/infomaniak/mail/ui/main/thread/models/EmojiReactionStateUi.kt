@@ -1,0 +1,42 @@
+/*
+ * Infomaniak Mail - Android
+ * Copyright (C) 2025 Infomaniak Network SA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.infomaniak.mail.ui.main.thread.models
+
+import android.content.Context
+import com.infomaniak.emojicomponents.data.Reaction
+import com.infomaniak.emojicomponents.data.ReactionDetail
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
+
+data class EmojiReactionStateUi(
+    override val emoji: String,
+    val authors: List<EmojiReactionAuthorUi>,
+    override val hasReacted: Boolean,
+) : Reaction {
+    override val count: Int by authors::size
+
+    fun computeReactionDetail(
+        emoji: String,
+        context: Context,
+        mergedContactDictionary: MergedContactDictionary,
+        isBimiEnabled: Boolean,
+    ): List<ReactionDetail> = authors.mapNotNull { author ->
+        author.getAvatarType(context, mergedContactDictionary, isBimiEnabled)?.let { avatarType ->
+            ReactionDetail(name = author.getName(context), emoji = emoji, avatarType = avatarType)
+        }
+    }
+}

@@ -469,95 +469,97 @@
             app:layout_goneMarginTop="0dp"
             tools:visibility="visible" />
 
-        <LinearLayout
-            android:id="@+id/messageLoader"
+        <FrameLayout
+            android:id="@+id/webViewAndLoaderLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/threadHorizontalMargin"
-            android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                style="@style/Label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:maxWidth="900dp" />
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                style="@style/Label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:maxWidth="900dp" />
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                style="@style/Label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:maxWidth="900dp" />
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                style="@style/Label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:maxWidth="900dp" />
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                style="@style/Label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:maxWidth="200dp" />
-        </LinearLayout>
-
-        <FrameLayout
-            android:id="@+id/webViewsFrameLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:minHeight="70dp"
             app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/attachmentLayout">
 
-            <TextView
-                android:id="@+id/failedLoadingErrorMessage"
+            <LinearLayout
+                android:id="@+id/messageLoader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/threadHorizontalMargin"
-                android:drawablePadding="@dimen/marginStandardSmall"
-                android:fontFamily="@font/suisseintl_regular_italic"
-                android:text="@string/errorLoadingMessage"
-                android:textColor="@color/secondaryTextColor"
-                android:visibility="gone" />
+                android:layout_marginHorizontal="@dimen/threadHorizontalMargin"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-            <!-- `focusableInTouchMode` is set to false to prevent the WebView from automatically scrolling a small amount for no
-            reason when long pressing it -->
-            <WebView
-                android:id="@+id/bodyWebView"
+                <com.infomaniak.lib.core.views.LoaderTextView
+                    style="@style/Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                    android:maxWidth="900dp" />
+
+                <com.infomaniak.lib.core.views.LoaderTextView
+                    style="@style/Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                    android:maxWidth="900dp" />
+
+                <com.infomaniak.lib.core.views.LoaderTextView
+                    style="@style/Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                    android:maxWidth="900dp" />
+
+                <com.infomaniak.lib.core.views.LoaderTextView
+                    style="@style/Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                    android:maxWidth="900dp" />
+
+                <com.infomaniak.lib.core.views.LoaderTextView
+                    style="@style/Label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                    android:maxWidth="200dp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/webViewsFrameLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusableInTouchMode="false"
-                android:scrollbars="horizontal"
-                tools:visibility="gone" />
+                android:layout_height="match_parent"
+                android:minHeight="70dp">
 
-            <!-- `focusableInTouchMode` is set to false to prevent the WebView from automatically scrolling a small amount for no
-            reason when long pressing it -->
-            <WebView
-                android:id="@+id/fullMessageWebView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusableInTouchMode="false"
-                android:scrollbars="horizontal"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/failedLoadingErrorMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/threadHorizontalMargin"
+                    android:drawablePadding="@dimen/marginStandardSmall"
+                    android:fontFamily="@font/suisseintl_regular_italic"
+                    android:text="@string/errorLoadingMessage"
+                    android:textColor="@color/secondaryTextColor"
+                    android:visibility="gone" />
 
+                <!-- `focusableInTouchMode` is set to false to prevent the WebView from automatically scrolling a small amount for no
+                reason when long pressing it -->
+                <WebView
+                    android:id="@+id/bodyWebView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="false"
+                    android:scrollbars="horizontal"
+                    tools:visibility="gone" />
+
+                <!-- `focusableInTouchMode` is set to false to prevent the WebView from automatically scrolling a small amount for no
+                reason when long pressing it -->
+                <WebView
+                    android:id="@+id/fullMessageWebView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="false"
+                    android:scrollbars="horizontal"
+                    android:visibility="gone" />
+
+            </FrameLayout>
         </FrameLayout>
 
         <FrameLayout
@@ -565,10 +567,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/emojiReactions"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/webViewsFrameLayout"
+            app:layout_constraintTop_toBottomOf="@id/webViewAndLoaderLayout"
             tools:visibility="visible">
 
             <com.google.android.material.button.MaterialButton
@@ -586,6 +588,20 @@
                 android:text="@string/messageShowQuotedText" />
 
         </FrameLayout>
+
+        <com.infomaniak.emojicomponents.views.EmojiReactionsView
+            android:id="@+id/emojiReactions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:visibility="gone"
+            app:addReactionDisabledColor="@color/disabledIconColor"
+            app:chipCornerRadius="@dimen/chipCornerRadius"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/quoteButtonFrameLayout"
+            tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/alertsGroup"

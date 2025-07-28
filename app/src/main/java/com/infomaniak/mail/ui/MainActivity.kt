@@ -310,7 +310,7 @@ class MainActivity : BaseActivity() {
         WorkerUtils.flushWorkersBefore(context = this@MainActivity, lifecycleOwner = this@MainActivity) {
 
             val treatedWorkInfoUuids = mutableSetOf<UUID>()
-            getCompletedAndFailedInfoLiveData().observe(this@MainActivity) {
+            getCompletedInfoLiveData().observe(this@MainActivity) {
                 it.forEach { workInfo ->
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
 
@@ -348,7 +348,7 @@ class MainActivity : BaseActivity() {
                         showSavedDraftSnackbar(associatedMailboxUuid, remoteDraftUuid)
                     }
                 }
-                DraftAction.SEND -> {
+                DraftAction.SEND, DraftAction.SEND_REACTION -> {
                     showSentDraftSnackbar()
                 }
                 DraftAction.SCHEDULE -> {

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
     ): CharSequence {
         if (!externalMailFlagEnabled) return previousContent
 
-        val (externalRecipientEmail, externalRecipientQuantity) = thread.findExternalRecipients(
+        val (externalRecipientEmail, externalRecipientQuantity) = thread.messages.findExternalRecipients(
             externalData = ExternalData(emailDictionary, aliases, trustedDomains),
         )
         if (externalRecipientQuantity == 0) return previousContent
@@ -105,7 +105,9 @@ class SubjectFormatter @Inject constructor(private val appContext: Context) {
         ellipsizeConfiguration,
     )
 
-    private fun getFolderName(thread: Thread) = if (thread.messages.size > 1) "" else thread.folderName
+    private fun getFolderName(thread: Thread): String {
+        return if (thread.messages.size > 1) "" else thread.folderName
+    }
 
     private fun getEllipsizeConfiguration(tag: String): EllipsizeConfiguration? {
         val paddingsInPixels = (appContext.resources.getDimension(R.dimen.threadHorizontalMargin) * 2).toInt()

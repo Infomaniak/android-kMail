@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -218,6 +218,11 @@
     <style name="LoginToolbarTheme" parent="Theme.AppCompat">
         <item name="android:textColorPrimary">@color/title</item>
         <item name="android:textColorSecondary">@color/title</item>
+    </style>
+
+    <style name="EmojiPickerTheme">
+        <item name="colorControlNormal">@color/iconColor</item>
+        <item name="colorAccent">?attr/colorPrimary</item>
     </style>
 
 </resources>

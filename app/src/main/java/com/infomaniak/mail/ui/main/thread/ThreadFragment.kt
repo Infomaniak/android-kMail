@@ -36,6 +36,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import androidx.work.Data
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -79,6 +81,10 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogAr
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
@@ -94,11 +100,13 @@ import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.calendar.AttendeesBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.encryption.UnencryptableRecipientsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.UiUtils.dividerDrawable
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
+import com.infomaniak.mail.utils.WorkerUtils
 import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiveYear
 import com.infomaniak.mail.utils.extensions.AttachmentExt.openAttachment
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
@@ -116,11 +124,16 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.toDate
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
+import com.infomaniak.mail.workers.DraftsActionsWorker
+import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ALL_EMOJI_SENT_STATUS
+import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.EMOJI_SENT_STATUS
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -144,6 +157,9 @@ class ThreadFragment : Fragment() {
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
+
+    @Inject
+    lateinit var draftsActionsWorkerScheduler: DraftsActionsWorker.Scheduler
 
     @Inject
     lateinit var emailContextualMenuAlertDialog: EmailContextualMenuAlertDialog
@@ -206,6 +222,9 @@ class ThreadFragment : Fragment() {
         observeSubjectUpdateTriggers()
         observeCurrentFolderName()
         observeSnoozeHeaderVisibility()
+        observePickedEmoji()
+
+        observeDraftWorkerResults()
 
         observeThreadOpening()
         observeAutoAdvance()
@@ -382,6 +401,23 @@ class ThreadFragment : Fragment() {
                 onRescheduleClicked = ::rescheduleDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
+                onAddReaction = { navigateToEmojiPicker(it.uid) },
+                onAddEmoji = { emoji, messageUid ->
+                    val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@ThreadAdapterCallbacks
+
+                    // No need to display a snackbar to the user if he clicks on an already used reaction
+                    if (reactions[emoji]?.hasReacted == true) return@ThreadAdapterCallbacks
+
+                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
+                        threadViewModel.fakeEmojiReply(emoji, messageUid)
+                    })
+                },
+                showEmojiDetails = { messageUid, emoji ->
+                    lifecycleScope.launch {
+                        val emojiDetails = getLocalEmojiReactionsDetailsFor(messageUid) ?: return@launch
+                        binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
+                    }
+                }
             ),
         )
 
@@ -489,7 +525,8 @@ class ThreadFragment : Fragment() {
                 iconTint = ColorStateList.valueOf(color)
             }
 
-            val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == thread.messages.size
+            val messagesCount = thread.getDisplayedMessages(mainViewModel.featureFlagsLive.value, localSettings).size
+            val shouldDisplayScheduledDraftActions = thread.numberOfScheduledDrafts == messagesCount
             quickActionBar.init(if (shouldDisplayScheduledDraftActions) R.menu.scheduled_draft_menu else R.menu.message_menu)
 
             thread.snoozeEndDate?.let { snoozeEndDate ->
@@ -601,6 +638,55 @@ class ThreadFragment : Fragment() {
         threadViewModel.isThreadSnoozeHeaderVisible.observe(viewLifecycleOwner) {
             threadAlertsLayout.isGone = it == ThreadHeaderVisibility.NONE
             snoozeAlert.setActionsVisibility(it == ThreadHeaderVisibility.MESSAGE_AND_ACTIONS)
+        }
+    }
+
+    private fun observePickedEmoji() {
+        getBackNavigationResult<PickedEmojiPayload>(EmojiPickerBottomSheetDialog.PICKED_EMOJI) { (emoji, messageUid) ->
+            val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@getBackNavigationResult
+            mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
+                threadViewModel.fakeEmojiReply(emoji, messageUid)
+            })
+        }
+    }
+
+    private fun observeDraftWorkerResults() {
+        WorkerUtils.flushWorkersBefore(context = requireContext(), lifecycleOwner = viewLifecycleOwner) {
+
+            // Listening to progress of the worker only lets us react quickly if the user had to upload multiple drafts. This
+            // approach may skip intermediate progress updates if we stop listening and then restart, as it only captures the most
+            // recent state.
+            val runningWorkInfoLiveData = draftsActionsWorkerScheduler.getRunningWorkInfoLiveData()
+            runningWorkInfoLiveData.observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    val emojiSendResult = workInfo.progress
+                        .getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
+
+                    undoFakeEmojiReplyIfNeeded(emojiSendResult)
+                }
+            }
+
+            // Listening to the draft results ensures we will get all of the possible emoji results and not miss any unlike when
+            // we listen to the worker's progress.
+            val treatedWorkInfoUuids = mutableSetOf<UUID>()
+            draftsActionsWorkerScheduler.getCompletedInfoLiveData().observe(viewLifecycleOwner) {
+                it.forEach { workInfo ->
+                    if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
+
+                    val emojiSendResults = workInfo.outputData
+                        .getSerializable<DraftsActionsWorker.EmojiSendResults>(ALL_EMOJI_SENT_STATUS) ?: return@forEach
+
+                    emojiSendResults.results.forEach { emojiSendResult ->
+                        undoFakeEmojiReplyIfNeeded(emojiSendResult)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun undoFakeEmojiReplyIfNeeded(emojiSendResult: DraftsActionsWorker.EmojiSendResult) {
+        if (emojiSendResult.isSuccess.not()) {
+            threadViewModel.undoFakeEmojiReply(emojiSendResult.emoji, emojiSendResult.previousMessageUid)
         }
     }
 
@@ -805,7 +891,9 @@ class ThreadFragment : Fragment() {
 
         val scrollY = threadState.verticalScroll ?: run {
 
-            val indexToScroll = threadAdapter.items.indexOfFirst { it is Message && threadState.isExpandedMap[it.uid] == true }
+            val indexToScroll = threadAdapter.items.indexOfFirst {
+                it is MessageUi && threadState.isExpandedMap[it.message.uid] == true
+            }
 
             // If no Message is expanded (e.g. the last Message of the Thread is a Draft),
             // we want to automatically scroll to the very bottom.
@@ -821,7 +909,10 @@ class ThreadFragment : Fragment() {
                         scope.setExtra("indexToScroll", indexToScroll.toString())
                         scope.setExtra("messageCount", threadAdapter.items.count().toString())
                         scope.setExtra("isExpandedMap", threadState.isExpandedMap.toString())
-                        scope.setExtra("isLastMessageDraft", (threadAdapter.items.lastOrNull() as Message?)?.isDraft.toString())
+                        scope.setExtra(
+                            "isLastMessageDraft",
+                            (threadAdapter.items.lastOrNull() as MessageUi?)?.message?.isDraft.toString()
+                        )
                     }
                     getBottomY()
                 } else {
@@ -981,3 +1072,13 @@ class ThreadFragment : Fragment() {
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"
     }
 }
+
+private fun Fragment.navigateToEmojiPicker(messageUid: String) {
+    safelyNavigate(
+        resId = R.id.emojiPickerBottomSheetDialog,
+        args = EmojiPickerBottomSheetDialogArgs(messageUid).toBundle(),
+        substituteClassName = ThreadListFragment::class.java.name,
+    )
+}
+
+private inline fun <reified T> Data.getSerializable(key: String): T? = getString(key)?.let { Json.decodeFromString(it) }

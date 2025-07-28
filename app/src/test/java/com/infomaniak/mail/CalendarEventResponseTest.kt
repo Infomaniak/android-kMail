@@ -26,9 +26,12 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.NotifyType
+import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CalendarEventResponseTest {
@@ -43,7 +46,7 @@ class CalendarEventResponseTest {
             body = null
             splitBody = null
             latestCalendarEventResponse = response1
-        }
+        }.toMessageUi()
 
         // If nothing changed at all, no change should be detected
         assertTrue(messageDiffCallback.areContentsTheSame(message, message))
@@ -58,7 +61,7 @@ class CalendarEventResponseTest {
             body = filledBody
             splitBody = null
             latestCalendarEventResponse = response1
-        }
+        }.toMessageUi()
         assertFalse(messageDiffCallback.areContentsTheSame(message, otherThingsButAttendeesChanged))
         assertEquals(null, messageDiffCallback.getChangePayload(message, otherThingsButAttendeesChanged))
 
@@ -70,7 +73,7 @@ class CalendarEventResponseTest {
             body = null
             splitBody = null
             latestCalendarEventResponse = response2
-        }
+        }.toMessageUi()
         assertFalse(messageDiffCallback.areContentsTheSame(message, onlyAttendeesChanged))
         assertEquals(
             NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE,
@@ -83,7 +86,7 @@ class CalendarEventResponseTest {
             body = filledBody
             splitBody = null
             latestCalendarEventResponse = response2
-        }
+        }.toMessageUi()
         assertFalse(messageDiffCallback.areContentsTheSame(message, otherThingsAndAttendeesChanged))
         assertEquals(null, messageDiffCallback.getChangePayload(message, otherThingsAndAttendeesChanged))
     }
@@ -166,3 +169,5 @@ class CalendarEventResponseTest {
         val tomorrow = RealmInstant.from(1_706_792_315L, 0)
     }
 }
+
+private fun Message.toMessageUi(): MessageUi = MessageUi(this, emptyMap(), false)

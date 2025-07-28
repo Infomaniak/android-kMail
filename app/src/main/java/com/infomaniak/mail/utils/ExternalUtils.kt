@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 object ExternalUtils {
@@ -26,11 +26,11 @@ object ExternalUtils {
     /**
      * Only returns a quantity of at most 2, used to differentiate between the singular or plural form of the dialog messages
      */
-    fun Thread.findExternalRecipients(externalData: ExternalData): Pair<String?, Int> {
+    fun List<Message>.findExternalRecipients(externalData: ExternalData): Pair<String?, Int> {
         var externalRecipientEmail: String? = null
         var externalRecipientQuantity = 0
 
-        messages.forEach { message ->
+        forEach { message ->
             val (singleEmail, quantityForThisMessage) = findExternalRecipientInIterables(externalData, message.from)
 
             externalRecipientQuantity += quantityForThisMessage

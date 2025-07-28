@@ -715,6 +715,16 @@
     </fragment>
 
     <dialog
+        android:id="@+id/emojiPickerBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog"
+        android:label="EmojiPickerBottomSheetDialog"
+        tools:layout="@layout/fragment_emoji_picker">
+        <argument
+            android:name="messageUid"
+            app:argType="string" />
+    </dialog>
+
+    <dialog
         android:id="@+id/accountBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.bottomSheetDialogs.AccountBottomSheetDialog"
         android:label="AccountBottomSheetDialog"

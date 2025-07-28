@@ -79,6 +79,7 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeUpdateResponse
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
@@ -179,7 +180,7 @@ object ApiRepository : ApiRepositoryCore() {
     suspend fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
         val encryptionWiths = "auto_uncrypt,recipient_provider_source"
         return callApi(
-            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=$encryptionWiths"),
+            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html&with=$encryptionWiths,emoji_reactions_per_message"),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )
@@ -287,26 +288,31 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.attachmentToForward(mailboxUuid), POST, body)
     }
 
-    suspend fun deleteMessages(mailboxUuid: String, messagesUids: List<String>): List<ApiResponse<Unit>> {
-        return batchOver(messagesUids) {
-            callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to it))
-        }
+    suspend fun deleteMessages(
+        mailboxUuid: String,
+        messagesUids: List<String>,
+        alsoMoveReactionMessages: Boolean,
+    ): List<ApiResponse<Unit>> = batchOver(messagesUids) {
+        callApi(ApiRoutes.deleteMessages(mailboxUuid).withMoveReactions(alsoMoveReactionMessages), POST, mapOf("uids" to it))
     }
 
     suspend fun moveMessages(
         mailboxUuid: String,
         messagesUids: List<String>,
         destinationId: String,
+        alsoMoveReactionMessages: Boolean,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
-    ): List<ApiResponse<MoveResult>> {
-        return batchOver(messagesUids) {
-            callApi(
-                url = ApiRoutes.moveMessages(mailboxUuid),
-                method = POST,
-                body = mapOf("uids" to it, "to" to destinationId),
-                okHttpClient = okHttpClient,
-            )
-        }
+    ): List<ApiResponse<MoveResult>> = batchOver(messagesUids) {
+        callApi(
+            url = ApiRoutes.moveMessages(mailboxUuid).withMoveReactions(alsoMoveReactionMessages),
+            method = POST,
+            body = mapOf("uids" to it, "to" to destinationId),
+            okHttpClient = okHttpClient,
+        )
+    }
+
+    private fun String.withMoveReactions(alsoMoveReactions: Boolean): String {
+        return this + if (alsoMoveReactions) "?move_reactions=1" else ""
     }
 
     suspend fun deleteDraft(mailboxUuid: String, remoteDraftUuid: String): ApiResponse<Unit> {

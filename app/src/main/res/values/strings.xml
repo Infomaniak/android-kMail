@@ -316,6 +316,17 @@
     <string name="errorCorruptAttachment">Failed to handle draft, an attachment is corrupted</string>
     <string name="errorDraftNotFound">Draft cannot be found</string>
     <string name="errorEditScheduledMessage">Scheduled or sent messages cannot be edited</string>
+    <string name="errorEmojiReactionAlreadyUsed">You have already reacted with this reaction</string>
+    <string name="errorEmojiReactionFolderNotAllowedDraft">You cannot react to a draft</string>
+    <string name="errorEmojiReactionFolderNotAllowedScheduledDraft">You cannot react to a scheduled email</string>
+    <string name="errorEmojiReactionFolderNotAllowedSpam">You cannot react to an email marked as spam</string>
+    <string name="errorEmojiReactionFolderNotAllowedTrash">You cannot react to an email in the trash</string>
+    <string name="errorEmojiReactionMaxReactionReached">You have reached the maximum number of reactions for this email</string>
+    <string name="errorEmojiReactionMaxRecipient">You cannot react to an email with more than 20 recipients</string>
+    <string name="errorEmojiReactionMessageInReplyEncrypted">You cannot react to an encrypted email</string>
+    <string name="errorEmojiReactionMessageInReplyToNotAllowed">You cannot react to this type of email</string>
+    <string name="errorEmojiReactionMessageInReplyToNotValid">You cannot react to this email</string>
+    <string name="errorEmojiReactionRecipientNotAllowed">Only recipients and senders can react to this email</string>
     <string name="errorFileNameTooLong">File name too long</string>
     <string name="errorFolderDoesNotExist">The folder does not exist</string>
     <string name="errorGetCredentials">Couldn’t get credentials</string>

@@ -79,6 +79,9 @@
     <!-- Encryption -->
     <dimen name="unencryptablePastilleSize">14dp</dimen>
 
+    <!-- Chips -->
+    <dimen name="chipCornerRadius">@dimen/roundCornerRadius</dimen>
+
     <!-- Other -->
     <dimen name="roundCornerRadius">100dp</dimen>
     <dimen name="angleViewNotRotated">0.0</dimen>

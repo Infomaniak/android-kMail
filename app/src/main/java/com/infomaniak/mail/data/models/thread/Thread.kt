@@ -21,6 +21,7 @@ package com.infomaniak.mail.data.models.thread
 
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Bimi
@@ -31,20 +32,16 @@ import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.isUnsnoozed
+import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.folder.ThreadListDateDisplay
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.extensions.toRealmInstant
-import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.backlinks
-import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
-import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
@@ -114,6 +111,12 @@ class Thread : RealmObject, Snoozable {
     var numberOfScheduledDrafts: Int = 0
     @Transient
     var isLastInboxMessageSnoozed: Boolean = false
+
+    /**
+     * The list messages where messages that are emoji reactions have been filtered out
+     */
+    @Transient
+    var messagesWithContent = realmListOf<Message>()
     //endregion
 
     val isSeen get() = unseenMessagesCount == 0
@@ -163,6 +166,10 @@ class Thread : RealmObject, Snoozable {
 
     val isOnlyOneDraft get() = messages.count() == 1 && hasDrafts
 
+    fun getDisplayedMessages(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): RealmList<Message> {
+        return if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) messagesWithContent else messages
+    }
+
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
 
         val shouldAddMessage = when (FolderController.getFolder(folderId, realm)?.role) {
@@ -193,119 +200,6 @@ class Thread : RealmObject, Snoozable {
         }
     }
 
-    fun recomputeThread(realm: MutableRealm? = null) {
-
-        messages.sortBy { it.internalDate }
-
-        val lastCurrentFolderMessage = messages.lastOrNull { it.folderId == folderId }
-        val lastMessage = if (isFromSearch) {
-            // In the search, some threads (such as threads from the snooze folder) won't have any messages with the same folderId
-            // as the thread folderId. This is an expected behavior and we don't want to delete it in this case. We just need to
-            // fallback on the last message of the thread.
-            lastCurrentFolderMessage ?: messages.lastOrNull()
-        } else {
-            lastCurrentFolderMessage
-        }
-
-        if (lastMessage == null) {
-            // Delete Thread if empty. Do not rely on this deletion code being part of the method's logic, it's a temporary fix. If
-            // threads should be deleted, then they need to be deleted outside this method.
-            if (isManaged()) realm?.delete(this)
-            return
-        }
-
-        resetThread()
-
-        updateThread(lastMessage)
-
-        // Remove duplicates in Recipients lists
-        val unmanagedFrom = if (from.getRealm<Realm>() == null) from else from.copyFromRealm()
-        val unmanagedTo = if (to.getRealm<Realm>() == null) to else to.copyFromRealm()
-        from = unmanagedFrom.distinct().toRealmList()
-        to = unmanagedTo.distinct().toRealmList()
-    }
-
-    private fun resetThread() {
-        unseenMessagesCount = 0
-        from = realmListOf()
-        to = realmListOf()
-        hasDrafts = false
-        isFavorite = false
-        isAnswered = false
-        isForwarded = false
-        hasAttachable = false
-        numberOfScheduledDrafts = 0
-        snoozeState = null
-        snoozeEndDate = null
-        snoozeUuid = null
-        isLastInboxMessageSnoozed = false
-    }
-
-    private fun updateThread(lastMessage: Message) {
-
-        fun Thread.updateSnoozeStatesBasedOn(message: Message) {
-            message.snoozeState?.let {
-                snoozeState = it
-                snoozeEndDate = message.snoozeEndDate
-                snoozeUuid = message.snoozeUuid
-            }
-        }
-
-        messages.forEach { message ->
-            messagesIds += message.messageIds
-            if (!message.isSeen) unseenMessagesCount++
-            from += message.from
-            to += message.to
-            if (message.isDraft) hasDrafts = true
-            if (message.isFavorite) isFavorite = true
-            if (message.isAnswered) {
-                isAnswered = true
-                isForwarded = false
-            }
-            if (message.isForwarded) {
-                isForwarded = true
-                isAnswered = false
-            }
-            if (message.hasAttachable) hasAttachable = true
-            if (message.isScheduledDraft) numberOfScheduledDrafts++
-
-            updateSnoozeStatesBasedOn(message)
-        }
-
-        duplicates.forEach { message ->
-            if (!message.isSeen) unseenMessagesCount++
-            updateSnoozeStatesBasedOn(message)
-        }
-
-        displayDate = lastMessage.displayDate
-        internalDate = lastMessage.internalDate
-        subject = messages.first().subject
-
-        isLastInboxMessageSnoozed = messages.isLastInboxMessageSnoozed()
-    }
-
-    /**
-     * This method determines whether the last inbox message in the list is snoozed. If there are none, it returns false.
-     *
-     * Instead of querying Realm every time to retrieve the inbox folder ID, we rely on the fact that [Snoozable.isSnoozed] only
-     * returns `true` for messages whose [Message.folderId] matches the inbox folder ID.
-     *
-     * To illustrate the reasoning:
-     * | folderId == inbox | isSnoozed() | Comment                        | Result         |
-     * |-------------------|-------------|--------------------------------|----------------|
-     * | false             | false       | isSnoozed always returns false | false          |
-     * | false             | true        | This situation doesn't exist   | doesn't matter |
-     * |-------------------|-------------|--------------------------------|----------------|
-     * | true              | false       |                                | false          |
-     * | true              | true        |                                | true           |
-     *
-     * => Only returns true when the last message of inbox is snoozed
-     */
-    @Suppress("NullableBooleanElvis")
-    private fun List<Message>.isLastInboxMessageSnoozed(): Boolean {
-        return lastOrNull { it.folderId == folderId }?.isSnoozed() ?: false
-    }
-
     /**
      * Only used for when the api tells us we're trying to automatically unsnooze a thread that's not snoozed
      */
@@ -316,7 +210,6 @@ class Thread : RealmObject, Snoozable {
     }
 
     fun computeAvatarRecipient(): Pair<Recipient?, Bimi?> = runCatching {
-
         val message = messages.lastOrNull {
             it.folder.role != FolderRole.SENT &&
                     it.folder.role != FolderRole.DRAFT &&
