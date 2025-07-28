@@ -17,9 +17,41 @@
  */
 package com.infomaniak.mail.ui.main.thread.models
 
+import android.content.Context
+import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.AvatarTypeUtils
+import com.infomaniak.mail.utils.AvatarTypeUtils.fromUser
+import com.infomaniak.mail.utils.extensions.MergedContactDictionary
 
 sealed interface EmojiReactionAuthorUi {
-    data class Real(val correspondent: Correspondent) : EmojiReactionAuthorUi
-    data object FakeMe : EmojiReactionAuthorUi
+    fun getName(context: Context): String
+    fun getAvatarType(
+        context: Context,
+        mergedContactDictionary: MergedContactDictionary,
+        isBimiEnabled: Boolean,
+    ): AvatarType?
+
+    data class Real(val correspondent: Correspondent, val bimi: Bimi?) : EmojiReactionAuthorUi {
+        override fun getName(context: Context): String = correspondent.displayedName(context)
+
+        override fun getAvatarType(
+            context: Context,
+            mergedContactDictionary: MergedContactDictionary,
+            isBimiEnabled: Boolean,
+        ): AvatarType? = AvatarTypeUtils.getAvatarType(correspondent, bimi, isBimiEnabled, mergedContactDictionary, context)
+    }
+
+    data object FakeMe : EmojiReactionAuthorUi {
+        override fun getName(context: Context): String = context.getString(R.string.contactMe)
+
+        override fun getAvatarType(
+            context: Context,
+            mergedContactDictionary: MergedContactDictionary,
+            isBimiEnabled: Boolean,
+        ): AvatarType = AvatarType.fromUser(AccountUtils.currentUser!!, context)
+    }
 }

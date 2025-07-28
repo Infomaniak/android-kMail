@@ -17,4 +17,6 @@
   -->
 <resources>
     <string name="contentDescriptionAddReaction">Add reaction</string>
+    <string name="reactionsAll">All</string>
+    <string name="reactionsTitle">Reactions</string>
 </resources>

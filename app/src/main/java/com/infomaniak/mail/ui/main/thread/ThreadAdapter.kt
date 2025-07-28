@@ -822,6 +822,9 @@ class ThreadAdapter(
         setOnEmojiClickListener { emoji ->
             threadAdapterCallbacks?.onAddEmoji?.invoke(emoji, messageUi.message.uid)
         }
+        setOnLongPressListener { emoji ->
+            threadAdapterCallbacks?.showEmojiDetails?.invoke(messageUi.message.uid, emoji)
+        }
     }
 
     private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
@@ -1026,6 +1029,7 @@ class ThreadAdapter(
         var onEncryptionSeeConcernedRecipients: ((List<Recipient>) -> Unit)? = null,
         var onAddReaction: ((Message) -> Unit)? = null,
         var onAddEmoji: ((emoji: String, messageUid: String) -> Unit)? = null,
+        var showEmojiDetails: ((messageUid: String, emoji: String) -> Unit)? = null,
     )
 
     private enum class DisplayType(val layout: Int) {

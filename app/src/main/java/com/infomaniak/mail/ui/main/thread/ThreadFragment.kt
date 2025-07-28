@@ -412,6 +412,12 @@ class ThreadFragment : Fragment() {
                         threadViewModel.fakeEmojiReply(emoji, messageUid)
                     })
                 },
+                showEmojiDetails = { messageUid, emoji ->
+                    lifecycleScope.launch {
+                        val emojiDetails = getLocalEmojiReactionsDetailsFor(messageUid) ?: return@launch
+                        binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
+                    }
+                }
             ),
         )
 
