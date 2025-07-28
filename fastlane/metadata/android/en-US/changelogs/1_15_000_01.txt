@@ -1,0 +1,2 @@
+- Add the possibility to reply to an email with emojis
+- Better support of the edge to edge display on certain screens

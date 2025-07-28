@@ -1,0 +1,2 @@
+- Ajoute la possibilité de répondre à un mail avec des emojis
+- Amélioration du support de l'affichage bord à bord sur certains écrans
