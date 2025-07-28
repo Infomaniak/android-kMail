@@ -80,7 +80,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             hasCollapsableDefaultFolder = addDefaultFolders(defaultFolders)
 
             add(ItemType.DIVIDER)
-            hasCollapsableCustomFolder = addCustomFolders(customFolders.filter { it.role == null }, areCustomFoldersExpanded)
+            hasCollapsableCustomFolder = addCustomFolders(customFolders, areCustomFoldersExpanded)
 
             add(ItemType.DIVIDER)
             addAdvancedActions(areActionsExpanded, permissions)
