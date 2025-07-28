@@ -336,14 +336,18 @@ fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
 
     if (isEmpty()) return this
 
-    return formatFolderWithAllChildren(dismissHiddenChildren, toMutableList(), shouldFilterOutFolderWithRole = shouldFilterOutFolderWithRole)
+    return formatFolderWithAllChildren(
+        dismissHiddenChildren = dismissHiddenChildren,
+        inputList = toMutableList(),
+        shouldFilterOutFolderWithRole = shouldFilterOutFolderWithRole
+    )
 }
 
 private tailrec fun formatFolderWithAllChildren(
     dismissHiddenChildren: Boolean,
     inputList: MutableList<Folder>,
     outputList: MutableList<Folder> = mutableListOf(),
-    shouldFilterOutFolderWithRole: Boolean = false,
+    shouldFilterOutFolderWithRole: Boolean,
 ): List<Folder> {
 
     val folder = inputList.removeAt(0)
@@ -364,21 +368,32 @@ private tailrec fun formatFolderWithAllChildren(
         }
     }
 
-    val children = if (folder.isManaged()) {
-        if (shouldThisFolderBeAdded()) outputList.add(folder.copyFromRealm(depth = 1u))
+    fun actionForFolder(isManaged: Boolean): List<Folder> {
+        when {
+            shouldThisFolderBeAdded() && isManaged -> folder.copyFromRealm(depth = 1u)
+            shouldThisFolderBeAdded() && !isManaged -> folder
+            else -> null
+        }?.let { outputList.add(it) }
 
-        with(folder.children) {
-            (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
+        if (isManaged) {
+            with(folder.children) {
+                return (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
+            }
+        }else {
+            return (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
         }
-    } else {
-        if (shouldThisFolderBeAdded()) outputList.add(folder)
-
-        (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
     }
+
+    val children = actionForFolder(folder.isManaged())
 
     inputList.addAll(index = 0, children)
 
-    return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(dismissHiddenChildren, inputList, outputList, shouldFilterOutFolderWithRole)
+    return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(
+        dismissHiddenChildren,
+        inputList,
+        outputList,
+        shouldFilterOutFolderWithRole
+    )
 }
 
 /**
