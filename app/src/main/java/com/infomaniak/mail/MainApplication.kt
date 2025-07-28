@@ -38,11 +38,8 @@ import com.facebook.stetho.Stetho
 import com.infomaniak.core.auth.AuthConfiguration
 import com.infomaniak.core.coil.ImageLoaderProvider
 import com.infomaniak.core.network.NetworkConfiguration
+import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.core.sentryconfig.SentryConfig.configureSentry
-import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor
 import com.infomaniak.lib.core.networking.HttpClient
