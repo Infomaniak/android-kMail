@@ -17,12 +17,12 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.data.Reaction
 
 object EmojiReactionUtils {
     private const val MAX_REACTION_PER_USER = 5
 
-    fun Map<String, ReactionState>.hasAvailableReactionSlot(): Boolean {
+    fun Map<String, Reaction>.hasAvailableReactionSlot(): Boolean {
         var usedReactionSlots = 0
         forEach { (_, state) ->
             if (state.hasReacted && ++usedReactionSlots == MAX_REACTION_PER_USER) return false

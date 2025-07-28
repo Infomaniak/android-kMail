@@ -27,7 +27,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.emojicomponents.data.ReactionState
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -51,6 +50,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.SuperCollapsedBlock
+import com.infomaniak.mail.ui.main.thread.models.EmojiReactionAuthorUi
+import com.infomaniak.mail.ui.main.thread.models.EmojiReactionStateUi
 import com.infomaniak.mail.ui.main.thread.models.MessageUi
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
@@ -68,7 +69,7 @@ import com.infomaniak.mail.utils.extensions.indexOfFirstOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.types.RealmDictionary
+import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -618,7 +619,10 @@ class ThreadViewModel @Inject constructor(
     }
 }
 
-private fun <E : Any> List<E>.toUiMessages(fakeReactions: Map<String, Set<String>>, isReactionsAvailable: Boolean): List<Any> = map { item ->
+private fun <E : Any> List<E>.toUiMessages(
+    fakeReactions: Map<String, Set<String>>,
+    isReactionsAvailable: Boolean,
+): List<Any> = map { item ->
     if (item is Message) {
         val localReactions = fakeReactions[item.messageId] ?: emptySet()
         val reactions = item.emojiReactions.toFakedReactions(localReactions)
@@ -628,39 +632,39 @@ private fun <E : Any> List<E>.toUiMessages(fakeReactions: Map<String, Set<String
     }
 }
 
-private fun RealmDictionary<EmojiReactionState?>.toFakedReactions(localReactions: Set<String>): Map<String, ReactionState> {
-    val fakeReactions = mutableMapOf<String, ReactionState>()
+private fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {
+    val fakeReactions = mutableMapOf<String, EmojiReactionStateUi>()
 
-    entries
-        .filterOutNullStates()
-        .associateTo(fakeReactions) { (emoji, state) ->
-            emoji to fakeEmojiReactionState(emoji, state, localReactions)
-        }
+    // Fake emojis that are already found on the message's reactions
+    associateTo(fakeReactions) { state ->
+        state.emoji to fakeEmojiReactionState(state, localReactions)
+    }
 
+    // Fake emojis that are only present as fake ones but are not present on the message's reactions
     localReactions.forEach { emoji ->
         if (emoji !in fakeReactions) {
-            fakeReactions[emoji] = object : ReactionState {
-                override val count = 1
-                override val hasReacted = true
-            }
+            fakeReactions[emoji] = EmojiReactionStateUi(
+                emoji = emoji,
+                authors = listOf(EmojiReactionAuthorUi.FakeMe),
+                hasReacted = true,
+            )
         }
     }
 
     return fakeReactions
 }
 
-private fun <T> Set<Map.Entry<String, T?>>.filterOutNullStates(): List<Map.Entry<String, T>> {
-    @Suppress("UNCHECKED_CAST")
-    return filter { (_, state) -> state != null } as List<Map.Entry<String, T>>
-}
+private fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
+    val shouldFake = state.emoji in localReactions && !state.hasReacted
 
-private fun fakeEmojiReactionState(emoji: String, state: EmojiReactionState, localReactions: Set<String>): ReactionState {
-    val shouldFake = emoji in localReactions && !state.hasReacted
-
-    val fakedReaction = object : ReactionState {
-        override val count = state.count + if (shouldFake) 1 else 0
-        override val hasReacted = state.hasReacted || shouldFake
+    val authors = state.authors.mapNotNullTo(mutableListOf<EmojiReactionAuthorUi>()) { author ->
+        author.recipient?.let(EmojiReactionAuthorUi::Real)
     }
+    val fakedReaction = EmojiReactionStateUi(
+        emoji = state.emoji,
+        authors = if (shouldFake) authors + EmojiReactionAuthorUi.FakeMe else authors,
+        hasReacted = state.hasReacted || shouldFake,
+    )
 
     return fakedReaction
 }

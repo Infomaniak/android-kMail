@@ -15,16 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread.models
+package com.infomaniak.emojicomponents.data
 
-import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.EmojiReactionUtils.hasAvailableReactionSlot
-
-data class MessageUi(
-    val message: Message,
-    val emojiReactionsState: Map<String, EmojiReactionStateUi>,
-    val isReactionsFeatureAvailable: Boolean,
-) {
-    fun hasEmojis(): Boolean = emojiReactionsState.isNotEmpty()
-    fun canBeReactedTo(): Boolean = message.isValidReactionTarget && emojiReactionsState.hasAvailableReactionSlot()
+interface Reaction {
+    val emoji: String
+    val count: Int
+    val hasReacted: Boolean
 }

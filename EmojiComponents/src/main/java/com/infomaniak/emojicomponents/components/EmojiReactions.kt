@@ -18,28 +18,26 @@
 package com.infomaniak.emojicomponents.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.infomaniak.core.compose.margin.Margin
-import com.infomaniak.emojicomponents.data.ReactionState
+import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.emojicomponents.icons.FaceSmileRoundPlus
 import com.infomaniak.emojicomponents.icons.Icons
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EmojiReactions(
-    reactions: () -> Map<String, ReactionState>,
+    reactions: () -> List<Reaction>,
     onEmojiClicked: (String) -> Unit,
     onAddReactionClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -53,12 +51,12 @@ fun EmojiReactions(
         itemVerticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Margin.Mini),
     ) {
-        reactions().forEach { (emoji, state) ->
+        reactions().forEach { reaction ->
             ReactionChip(
-                emoji = emoji,
-                reactionCount = { state.count },
-                selected = { state.hasReacted },
-                onClick = { onEmojiClicked(emoji) },
+                emoji = reaction.emoji,
+                reactionCount = { reaction.count },
+                selected = { reaction.hasReacted },
+                onClick = { onEmojiClicked(reaction.emoji) },
                 colors = colors.reactionChip,
                 shape = shape,
             )
@@ -93,25 +91,31 @@ object EmojiReactionsDefaults {
 @Preview
 @Composable
 private fun EmojiReactionsPreview() {
-    class State(override val count: Int, override val hasReacted: Boolean) : ReactionState
+    class State(override val emoji: String, override val count: Int, override val hasReacted: Boolean) : Reaction
 
-    fun SnapshotStateMap<String, ReactionState>.updateWithEmoji(emoji: String) {
-        if (this[emoji]?.hasReacted == true) return
-
-        val oldCount = this[emoji]?.count ?: 0
-        this[emoji] = object : ReactionState {
-            override val count: Int = oldCount + 1
-            override val hasReacted: Boolean = true
+    fun SnapshotStateList<Reaction>.updateWithEmoji(emoji: String) {
+        val shouldUpdate = find { it.emoji == emoji }?.hasReacted != true
+        if (shouldUpdate) {
+            val index = indexOfFirst { it.emoji == emoji }
+            val oldReaction = get(index)
+            set(
+                index,
+                object : Reaction {
+                    override val emoji: String = oldReaction.emoji
+                    override val count: Int = oldReaction.count + 1
+                    override val hasReacted: Boolean = true
+                }
+            )
         }
     }
 
-    val reactions: SnapshotStateMap<String, ReactionState> = remember {
-        mutableStateMapOf(
-            "✅" to State(3, false),
-            "\uD83D\uDCCC" to State(1, false),
-            "\uD83D\uDE00" to State(5, true),
-            "\uD83D\uDE0D" to State(3, false),
-            "\uD83E\uDEE5" to State(2, true),
+    val reactions: SnapshotStateList<Reaction> = remember {
+        mutableStateListOf(
+            State("✅", 3, false),
+            State("\uD83D\uDCCC", 1, false),
+            State("\uD83D\uDE00", 5, true),
+            State("\uD83D\uDE0D", 3, false),
+            State("\uD83E\uDEE5", 2, true),
         )
     }
 
