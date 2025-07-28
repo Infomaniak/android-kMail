@@ -309,7 +309,8 @@ class ThreadFragment : Fragment() {
             mainAppBar,
             messagesListNestedScrollView,
             otherUpdates = { color ->
-                mainAppBar.backgroundTintList = ColorStateList.valueOf(color) // Duplicated line so both the mainAppBar and the appBar change color simultaneously
+                // Duplicated line so both the mainAppBar and the appBar change color simultaneously
+                mainAppBar.backgroundTintList = ColorStateList.valueOf(color)
                 appBar.backgroundTintList = ColorStateList.valueOf(color)
             },
         )
