@@ -58,8 +58,8 @@ class EmojiReactionDetailsBottomSheet @JvmOverloads constructor(
         emojiReactionDetails.clear()
         emojiDetails.forEach { (emoji, details) ->
             val emojiReactionData = mutableStateListOf<ReactionDetail>()
-            details.forEach { emojiReactionData.add(it) }
-            this.emojiReactionDetails.add(emoji to emojiReactionData)
+            emojiReactionData.addAll(details)
+            emojiReactionDetails.add(emoji to emojiReactionData)
         }
 
         initialEmoji = preselectedEmojiTab
