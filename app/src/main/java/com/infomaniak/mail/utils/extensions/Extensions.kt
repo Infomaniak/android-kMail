@@ -329,17 +329,21 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 //endregion
 
 //region Folders
-fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: Boolean = false): List<Folder> {
+fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
+    dismissHiddenChildren: Boolean = false,
+    shouldFilterOutFolderWithRole: Boolean = false,
+): List<Folder> {
 
     if (isEmpty()) return this
 
-    return formatFolderWithAllChildren(dismissHiddenChildren, toMutableList())
+    return formatFolderWithAllChildren(dismissHiddenChildren, toMutableList(), shouldFilterOutFolderWithRole = shouldFilterOutFolderWithRole)
 }
 
 private tailrec fun formatFolderWithAllChildren(
     dismissHiddenChildren: Boolean,
     inputList: MutableList<Folder>,
     outputList: MutableList<Folder> = mutableListOf(),
+    shouldFilterOutFolderWithRole: Boolean = false,
 ): List<Folder> {
 
     val folder = inputList.removeAt(0)
@@ -352,7 +356,13 @@ private tailrec fun formatFolderWithAllChildren(
     * We want to display the user's folders, and also the IK folders for which we handle the role.
     * IK folders where we don't handle the role are dismissed.
     */
-    fun shouldThisFolderBeAdded(): Boolean = folder.path.startsWith(IK_FOLDER).not() || folder.role != null
+    fun shouldThisFolderBeAdded(): Boolean {
+        return if (shouldFilterOutFolderWithRole) {
+            (folder.role != null && folder.children.isNotEmpty()) || folder.role == null
+        } else {
+            folder.path.startsWith(IK_FOLDER).not() || folder.role != null
+        }
+    }
 
     val children = if (folder.isManaged()) {
         if (shouldThisFolderBeAdded()) outputList.add(folder.copyFromRealm(depth = 1u))
@@ -368,7 +378,7 @@ private tailrec fun formatFolderWithAllChildren(
 
     inputList.addAll(index = 0, children)
 
-    return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(dismissHiddenChildren, inputList, outputList)
+    return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(dismissHiddenChildren, inputList, outputList, shouldFilterOutFolderWithRole)
 }
 
 /**
