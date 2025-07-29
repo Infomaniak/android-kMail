@@ -173,7 +173,7 @@ class FolderController @Inject constructor(
             withoutChildren: Boolean = false,
             visibleFoldersOnly: Boolean = true,
         ): RealmQuery<Folder> {
-            val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
+            val rootsQuery = if ((FoldersType.DEFAULT in withoutTypes) && withoutChildren) " AND $isRootFolder" else ""
             val typeQuery = withoutTypes.joinToString(separator = "") {
                 when (it) {
                     FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
@@ -184,7 +184,7 @@ class FolderController @Inject constructor(
                 }
             }
             val visibilityQuery = if (visibleFoldersOnly) " AND ${Folder::isDisplayed.name} == true" else ""
-            return realm.query<Folder>("${isNotSearch}${if (FoldersType.DEFAULT in withoutTypes) rootsQuery else ""}${typeQuery}${visibilityQuery}")
+            return realm.query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}")
                 .sortFolders()
         }
 
