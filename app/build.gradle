@@ -87,6 +87,14 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        // Needed until kotlin 2.1.0 where it will be enabled automatically see:
+        // https://developer.android.com/jetpack/androidx/releases/concurrent#1.3.0-alpha01
+        freeCompilerArgs.add("-Xjspecify-annotations=strict")
+    }
+}
+
 dependencies {
     implementation project(':Core')
     implementation project(':Core:Auth')
