@@ -132,12 +132,13 @@ class SearchFragment : TwoPaneFragment() {
 
     private fun handleEdgeToEdge(): Unit = with(binding) {
         applyWindowInsetsListener(shouldConsume = false) { _, insets ->
-            toolbar.applySideAndBottomSystemInsets(insets, withBottom = false)
-            swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
-            chipsList.applySideAndBottomSystemInsets(insets, withBottom = false)
-            with(insets.safeArea()) {
-                toolbar.setMargins(top = top)
+            toolbar.apply {
+                applySideAndBottomSystemInsets(insets, withBottom = false)
+                // Apply a margin instead of a padding so the icon and the search bar are aligned
+                setMargins(top = insets.safeArea().top)
             }
+            chipsList.applySideAndBottomSystemInsets(insets, withBottom = false)
+            swipeRefreshLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
         }
     }
 
