@@ -73,6 +73,7 @@ import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.removeAccents
@@ -433,6 +434,11 @@ fun Context.getInfomaniakLogin() = InfomaniakLogin(
     appUID = BuildConfig.APPLICATION_ID,
     clientID = BuildConfig.CLIENT_ID,
     accessType = null,
+    sentryCallback = { message ->
+        SentryLog.e(tag = "WebViewLogin", "An error occurred on the login/Account creation webview", scopeCallback = {
+            it.setTag("message", message)
+        })
+    }
 )
 
 fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackbarManager: SnackbarManager) {
