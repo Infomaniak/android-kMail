@@ -33,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/toolbarLoweredColor"
+            android:touchscreenBlocksFocus="false"
             app:layout_constraintBottom_toTopOf="@id/compositionNestedScrollView"
             app:layout_constraintTop_toTopOf="parent">
 
