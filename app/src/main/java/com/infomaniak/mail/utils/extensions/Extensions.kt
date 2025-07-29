@@ -379,21 +379,24 @@ private tailrec fun formatFolderWithAllChildren(
             with(folder.children) {
                 return (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
             }
-        }else {
-            return (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
         }
+        return (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
     }
 
     val children = actionForFolder(folder.isManaged())
 
     inputList.addAll(index = 0, children)
 
-    return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(
-        dismissHiddenChildren,
-        inputList,
-        outputList,
-        shouldFilterOutFolderWithRole
-    )
+    return if (inputList.isEmpty()) {
+        outputList
+    } else {
+        formatFolderWithAllChildren(
+            dismissHiddenChildren,
+            inputList,
+            outputList,
+            shouldFilterOutFolderWithRole
+        )
+    }
 }
 
 /**
