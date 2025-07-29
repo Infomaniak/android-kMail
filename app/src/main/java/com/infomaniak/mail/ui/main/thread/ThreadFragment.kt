@@ -405,9 +405,6 @@ class ThreadFragment : Fragment() {
                 onAddEmoji = { emoji, messageUid ->
                     val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@ThreadAdapterCallbacks
 
-                    // No need to display a snackbar to the user if he clicks on an already used reaction
-                    if (reactions[emoji]?.hasReacted == true) return@ThreadAdapterCallbacks
-
                     mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
                         threadViewModel.fakeEmojiReply(emoji, messageUid)
                     })
