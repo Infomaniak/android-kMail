@@ -434,9 +434,9 @@ fun Context.getInfomaniakLogin() = InfomaniakLogin(
     appUID = BuildConfig.APPLICATION_ID,
     clientID = BuildConfig.CLIENT_ID,
     accessType = null,
-    sentryCallback = { message ->
+    sentryCallback = { error ->
         SentryLog.e(tag = "WebViewLogin", "An error occurred on the login/Account creation webview", scopeCallback = {
-            it.setTag("message", message)
+            it.setTag("error", error)
         })
     }
 )
