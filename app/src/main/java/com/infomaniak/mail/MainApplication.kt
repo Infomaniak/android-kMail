@@ -38,8 +38,8 @@ import com.facebook.stetho.Stetho
 import com.infomaniak.core.auth.AuthConfiguration
 import com.infomaniak.core.coil.ImageLoaderProvider
 import com.infomaniak.core.network.NetworkConfiguration
+import com.infomaniak.core.sentry.SentryConfig.configureSentry
 import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor
 import com.infomaniak.lib.core.networking.HttpClient
@@ -64,12 +64,6 @@ import com.infomaniak.mail.utils.NotificationUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import com.infomaniak.mail.workers.SyncMailboxesWorker
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.SentryEvent
-import io.sentry.SentryOptions
-import io.sentry.android.core.SentryAndroid
-import io.sentry.android.core.SentryAndroidOptions
-import io.sentry.android.fragment.FragmentLifecycleIntegration
-import io.sentry.android.fragment.FragmentLifecycleState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -137,6 +131,7 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         if (BuildConfig.DEBUG) configureDebugMode()
+
         configureSentry()
         enforceAppTheme()
         configureRoomDatabases()
@@ -179,43 +174,24 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         MatomoMail.addTrackingCallbackForDebugLog()
     }
 
+
+    /**
+     * Reasons to discard Sentry events :
+     * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
+     * - [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
+     */
     private fun configureSentry() {
-        SentryAndroid.init(this) { options: SentryAndroidOptions ->
-            // Register the callback as an option
-            options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent, _: Any? ->
-                val exception = event.throwable
-                /**
-                 * Reasons to discard Sentry events :
-                 * - Application is in Debug mode
-                 * - User deactivated Sentry tracking in DataManagement settings
-                 * - The exception was an [ApiController.NetworkException], and we don't want to send them to Sentry
-                 * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
-                 *   [ErrorCode.NOT_AUTHORIZED] error code, and we don't want to send them to Sentry
-                 */
+        this.configureSentry(
+            isDebug = BuildConfig.DEBUG,
+            isSentryTrackingEnabled = localSettings.isSentryTrackingEnabled,
+            isFilteredException = { exception: Throwable? ->
                 when {
-                    BuildConfig.DEBUG -> null
-                    !localSettings.isSentryTrackingEnabled -> null
-                    exception is ApiController.NetworkException -> null
-                    exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> null
-                    exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> null
-                    else -> event
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.ACCESS_DENIED -> true
+                    exception is ApiErrorException && exception.errorCode == ErrorCode.NOT_AUTHORIZED -> true
+                    else -> false
                 }
-            }
-            options.addIntegration(
-                FragmentLifecycleIntegration(
-                    application = this,
-                    filterFragmentLifecycleBreadcrumbs = setOf(
-                        FragmentLifecycleState.CREATED,
-                        FragmentLifecycleState.STARTED,
-                        FragmentLifecycleState.RESUMED,
-                        FragmentLifecycleState.PAUSED,
-                        FragmentLifecycleState.STOPPED,
-                        FragmentLifecycleState.DESTROYED,
-                    ),
-                    enableAutoFragmentLifecycleTracing = true,
-                )
-            )
-        }
+            },
+        )
     }
 
     private fun enforceAppTheme() {
