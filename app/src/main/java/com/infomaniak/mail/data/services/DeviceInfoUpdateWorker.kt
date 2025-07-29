@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.draft
+package com.infomaniak.mail.data.services
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import android.content.Context
+import androidx.work.WorkerParameters
+import com.infomaniak.core.login.crossapp.internal.deviceinfo.AbstractDeviceInfoUpdateWorker
+import com.infomaniak.mail.utils.AccountUtils
+import okhttp3.OkHttpClient
 
-@Serializable
-data class ScheduleDraftResult(
-    @SerialName("schedule_action")
-    val unscheduleDraftUrl: String,
-)
+class DeviceInfoUpdateWorker(
+    appContext: Context,
+    params: WorkerParameters
+) : AbstractDeviceInfoUpdateWorker(appContext, params) {
+
+    override suspend fun getConnectedHttpClient(userId: Int): OkHttpClient {
+        return AccountUtils.getHttpClient(userId = userId)
+    }
+}

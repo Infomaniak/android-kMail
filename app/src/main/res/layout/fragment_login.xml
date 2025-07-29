@@ -47,7 +47,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.20"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/introViewpager">
 
         <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
             android:id="@+id/dotsIndicator"
@@ -75,6 +76,26 @@
             app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
             app:srcCompat="@drawable/ic_arrow_right" />
 
+        <com.infomaniak.core.crossloginui.views.CrossLoginSelectAccountsView
+            android:id="@+id/crossLoginSelection"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandard"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:visibility="gone"
+            app:crossLoginAvatarStrokeColor="@color/background"
+            app:crossLoginButtonStrokeColor="@color/commonColor2"
+            app:crossLoginButtonType="Mail"
+            app:crossLoginDescriptionColor="@color/secondaryTextColor"
+            app:crossLoginTitleColor="@color/primaryTextColor"
+            app:layout_constraintBottom_toTopOf="@id/connectButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
+            tools:crossLoginOnPrimaryColor="?attr/colorOnPrimary"
+            tools:crossLoginPrimaryColor="?attr/colorPrimary"
+            tools:visibility="visible" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/connectButton"
             style="@style/TextButtonPrimary"
@@ -82,20 +103,20 @@
             android:layout_marginHorizontal="@dimen/marginStandard"
             android:layout_marginTop="@dimen/marginStandardSmall"
             android:text="@string/connect"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@id/signInButton"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/signUpButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
+            app:layout_constraintTop_toBottomOf="@id/crossLoginSelection"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/signInButton"
+            android:id="@+id/signUpButton"
             style="@style/TextButtonSecondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/buttonCreateAccount"
-            android:visibility="invisible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
