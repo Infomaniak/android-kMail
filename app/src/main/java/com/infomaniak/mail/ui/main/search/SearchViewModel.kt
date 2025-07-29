@@ -26,6 +26,8 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -65,6 +67,7 @@ class SearchViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val searchUtils: SearchUtils,
     private val threadController: ThreadController,
+    private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -221,7 +224,13 @@ class SearchViewModel @Inject constructor(
         val folderId = folder?.id ?: dummyFolderId
         val resource = if (shouldGetNextPage) resourceNext else null
         val searchFilters = searchUtils.searchFilters(query, newFilters, resource)
-        val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resource)
+        val apiResponse = ApiRepository.searchThreads(
+            mailboxUuid = currentMailbox.uuid,
+            folderId = folderId,
+            filters = searchFilters,
+            hasDisplayModeThread = localSettings.threadMode == ThreadMode.CONVERSATION,
+            resource = resource
+        )
 
         currentCoroutineContext().ensureActive()
 

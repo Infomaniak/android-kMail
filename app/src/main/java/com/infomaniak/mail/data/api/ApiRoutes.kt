@@ -159,8 +159,8 @@ object ApiRoutes {
         return "${folder(mailboxUuid, folderId)}/rename"
     }
 
-    fun search(mailboxUuid: String, folderId: String, filters: String): String {
-        return "${folder(mailboxUuid, folderId)}/message?thread=on&offset=0&$filters"
+    fun search(mailboxUuid: String, folderId: String, hasDisplayModeThread: Boolean, filters: String): String {
+        return "${folder(mailboxUuid, folderId)}/message?thread=$hasDisplayModeThread&offset=0&$filters"
     }
     //endregion
 
