@@ -114,7 +114,6 @@ dependencies {
     implementation project(':Core:MyKSuite')
     implementation project(':Core:Network')
     implementation project(':Core:Sentry')
-    implementation project(':Core:UserAvatar')
     implementation project(':EmojiComponents')
     implementation project(':HtmlCleaner')
 
