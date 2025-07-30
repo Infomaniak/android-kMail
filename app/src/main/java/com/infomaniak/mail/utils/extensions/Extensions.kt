@@ -24,6 +24,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.net.Uri
@@ -60,7 +61,7 @@ import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
-import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
@@ -475,11 +476,10 @@ inline infix fun <reified E : Enum<E>, V> ((E) -> V).enumValueFrom(value: V): E?
 fun View.isAtTheTop(): Boolean = !canScrollVertically(-1)
 
 fun Fragment.changeToolbarColorOnScroll(
-    toolbar: MaterialToolbar,
+    appBarLayout: AppBarLayout,
     nestedScrollView: NestedScrollView,
     @ColorRes loweredColor: Int = R.color.toolbarLoweredColor,
     @ColorRes elevatedColor: Int = R.color.toolbarElevatedColor,
-    shouldUpdateStatusBar: (() -> Boolean) = { true },
     otherUpdates: ((color: Int) -> Unit)? = null,
 ) {
     var valueAnimator: ValueAnimator? = null
@@ -502,8 +502,7 @@ fun Fragment.changeToolbarColorOnScroll(
         valueAnimator?.cancel()
         valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
             oldColor = color
-            toolbar.setBackgroundColor(color)
-            if (shouldUpdateStatusBar()) requireActivity().window.statusBarColor = color
+            appBarLayout.backgroundTintList = ColorStateList.valueOf(newColor)
             otherUpdates?.invoke(color)
         }
     }

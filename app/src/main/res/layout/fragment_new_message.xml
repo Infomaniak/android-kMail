@@ -28,19 +28,26 @@
         android:layout_height="match_parent"
         android:background="@color/newMessageBackgroundColor">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/newMessageBackgroundColor"
-            android:minHeight="?attr/actionBarSize"
+            android:backgroundTint="@color/toolbarLoweredColor"
             android:touchscreenBlocksFocus="false"
             app:layout_constraintBottom_toTopOf="@id/compositionNestedScrollView"
-            app:layout_constraintTop_toTopOf="parent"
-            app:navigationContentDescription="@string/buttonClose"
-            app:navigationIcon="@drawable/ic_close_big"
-            app:title="@string/buttonNewMessage"
-            app:titleCentered="true" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                android:touchscreenBlocksFocus="false"
+                app:navigationContentDescription="@string/buttonClose"
+                app:navigationIcon="@drawable/ic_close_big"
+                app:title="@string/buttonNewMessage"
+                app:titleCentered="true" />
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/compositionNestedScrollView"
@@ -49,7 +56,7 @@
             android:layout_weight="1"
             android:fillViewport="true"
             app:layout_constraintBottom_toTopOf="@id/externalBanner"
-            app:layout_constraintTop_toBottomOf="@id/toolbar">
+            app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
             <LinearLayout
                 android:layout_width="match_parent"

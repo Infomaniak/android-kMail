@@ -260,7 +260,7 @@ class NewMessageFragment : Fragment() {
 
     private fun handleEdgeToEdge() = with(binding) {
         applyWindowInsetsListener(shouldConsume = false) { _, insets ->
-            toolbar.applyStatusBarInsets(insets)
+            appBarLayout.applyStatusBarInsets(insets)
             compositionNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
             externalBannerContent.applySideAndBottomSystemInsets(insets, withBottom = false)
             editorActionsLayout.applySideAndBottomSystemInsets(insets, withBottom = false)
@@ -395,7 +395,7 @@ class NewMessageFragment : Fragment() {
         addressListPopupWindow = ListPopupWindow(binding.root.context)
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
-        changeToolbarColorOnScroll(toolbar, compositionNestedScrollView)
+        changeToolbarColorOnScroll(appBarLayout, compositionNestedScrollView)
 
         signatureWebView.enableAlgorithmicDarkening(true)
         quoteWebView.enableAlgorithmicDarkening(true)
