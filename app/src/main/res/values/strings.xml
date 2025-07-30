@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@
     <string name="actionMove">Move</string>
     <string name="actionMoveToInbox">Move to inbox</string>
     <string name="actionNonSpam">Report as not spam</string>
-    <string name="actionOpenIn">Open in</string>
     <string name="actionPhishing">Report phishing</string>
     <string name="actionPrint">Print</string>
     <string name="actionRename">Rename</string>
@@ -101,7 +100,6 @@
     <string name="attachMailboxInputHint">Email address</string>
     <string name="attachMailboxPasswordInputHint">Password</string>
     <string name="attachMailboxTitle">Add email address</string>
-    <string name="attachmentActionCamera">Camera</string>
     <string name="attachmentActionFile">Attach a file</string>
     <string name="attachmentActionPhotoLibrary">Send a photo from the photo library</string>
     <string name="attachmentActionTitle">Add an attachment</string>
@@ -119,7 +117,6 @@
         <item quantity="other">Blocked passwords</item>
     </plurals>
     <string name="buttonAccept">Accept</string>
-    <string name="buttonAccountAssociatedEmailAddresses">Email addresses associated with this account</string>
     <string name="buttonAccountDelete">Delete account</string>
     <string name="buttonAccountLogOut">Log out</string>
     <string name="buttonAccountSwitch">Change account</string>
@@ -129,9 +126,7 @@
     <string name="buttonAttachMailbox">Add this email address</string>
     <string name="buttonAttachment">Add an attachment</string>
     <string name="buttonAttendees">Attendees</string>
-    <string name="buttonAvailableSoon">Available soon</string>
     <string name="buttonBold">Bold</string>
-    <string name="buttonBulletPoint">Bullet point</string>
     <string name="buttonCamera">Take a picture</string>
     <string name="buttonCancelReminder">Cancel reminder</string>
     <string name="buttonClose">Close</string>
@@ -148,7 +143,6 @@
     <string name="buttonDownloadAll">Download all</string>
     <string name="buttonFeedback">Feedback</string>
     <string name="buttonFolders">Folders</string>
-    <string name="buttonFreeTrial">Try for free</string>
     <string name="buttonHelp">Help</string>
     <string name="buttonHyperlink">Add a hyperlink</string>
     <string name="buttonImportEmails">Import emails</string>
@@ -160,7 +154,6 @@
     <string name="buttonMaybe">Maybe</string>
     <string name="buttonModify">Modify</string>
     <string name="buttonMore">More</string>
-    <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonNewMessage">New message</string>
     <string name="buttonNo">No</string>
     <string name="buttonOpenMyCalendar">Open in my calendar</string>
@@ -247,8 +240,6 @@
     <string name="contextMenuPhoneNumberDial">Dial</string>
     <string name="contextMenuPhoneNumberSms">Write an SMS</string>
     <string name="createFolderName">Name of the folder</string>
-    <string name="createFolderNoParent">None</string>
-    <string name="createFolderParent">Parent folder</string>
     <string name="datePickerTitle">Choose a date and time</string>
     <string name="dateTitle">Date:</string>
     <string name="deleteAccountWarning">The deletion of your account will be final. You will not be able to reactivate your account.</string>
@@ -277,19 +268,18 @@
     <string name="emptyStateTrashDescription">Move the messages to the trash. They will be permanently deleted after 30 days.</string>
     <string name="emptyStateTrashTitle">Trash is empty</string>
     <string name="enableFilterButton">Enable filter</string>
-    <string name="enableMultiSelection">Enable multiple selection</string>
     <string name="encryptedButtonSeeConcernedRecipients">See relevant recipients</string>
     <string name="encryptedMessageAddPasswordButton">Protect with a password</string>
-    <string name="encryptedMessageAddPasswordInformation">A password is only required for non-Infomaniak users. For them, the message will expire 30 days after sending.</string>
+    <string name="encryptedMessageAddPasswordInformation">A password is only required for non-Infomaniak recipients. For them, the message will expire 30 days after sending.</string>
     <string name="encryptedMessageDisableEncryptionButton">Disable encryption</string>
     <string name="encryptedMessageGeneratePasswordContentDescription">Generate password</string>
     <string name="encryptedMessageHeader">This message is encrypted.</string>
     <string name="encryptedMessageHeaderPasswordExpiryDate">This message has been encrypted and will expire on %s only for recipients unable to benefit from automatic encryption.</string>
     <plurals name="encryptedMessageIncompleteUser">
-        <item quantity="one">Encryption is not supported by %d user.</item>
-        <item quantity="other">Encryption is not supported by %d users.</item>
+        <item quantity="one">Encryption is not supported by %d recipient.</item>
+        <item quantity="other">Encryption is not supported by %d recipients.</item>
     </plurals>
-    <string name="encryptedMessagePasswordConcernedUserTitle">Users concerned</string>
+    <string name="encryptedMessagePasswordConcernedUserTitle">Recipients concerned</string>
     <string name="encryptedMessagePasswordLabel">Share this password by private message. You won’t be able to copy it once you’ve sent it.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Encryption has been disabled</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">Scheduled emails not available for encrypted messages</string>
@@ -297,7 +287,7 @@
     <string name="encryptedPasswordProtectionTitle">Password protection</string>
     <string name="encryptedProtectionAdDescription">Protect your message from unauthorized access with Infomaniak encryption.</string>
     <string name="encryptedProtectionAdDescription1">The message subject remains visible, but the content is completely secure.</string>
-    <string name="encryptedProtectionAdDescription2">A password will be required for non-Infomaniak users.</string>
+    <string name="encryptedProtectionAdDescription2">A password will be required for non-Infomaniak recipients.</string>
     <string name="encryptedProtectionAdTitle">Encrypt your confidential messages</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Recipients with password (%d)</string>
     <string name="encryptedStatePanelEnable">Your message is protected.</string>
@@ -409,12 +399,8 @@
     <string name="messageShowQuotedText">Display the conversation</string>
     <string name="mondayAfternoon">Monday afternoon</string>
     <string name="mondayMorning">Monday morning</string>
-    <string name="moreStorageText1">Your mailbox is full and you can‘t receive any more messages 🥲</string>
-    <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, …)</string>
-    <string name="moreStorageTitle">Is your box full? Get more storage!</string>
     <string name="moveInSpamButton">Move in Spam</string>
     <string name="moveSearchFieldPlaceholder">Search a folder</string>
-    <string name="moveTitle">Which folder do you want to move your email to?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
@@ -445,7 +431,6 @@
     <string name="noNetwork">No signal</string>
     <string name="noSubjectTitle">(no subject)</string>
     <string name="noUpdatedAt">Never updated</string>
-    <string name="noValidMailboxTitle">No valid mailbox found. Can only be fixed on the webmail for now.</string>
     <string name="notificationGeneralChannelName">General notifications</string>
     <string name="notificationNewEmail">You might have received new messages</string>
     <string name="notificationNewMessagesChannelName">New emails</string>
@@ -468,7 +453,6 @@
     <string name="onBoardingTitle4">Get started!</string>
     <string name="organizationName">Organization: %s</string>
     <string name="otherOrganisation">Other</string>
-    <string name="pendingMessagesFolder">Pending messages</string>
     <string name="pickerNoSelection">No selection</string>
     <string name="popupDetachMailboxDescription">Are you sure you want to detach the %s address?</string>
     <string name="popupDetachMailboxTitle">Detach mailbox</string>
@@ -553,10 +537,7 @@
     <string name="settingsSectionPrivacy">Privacy</string>
     <string name="settingsSectionSecurity">Security</string>
     <string name="settingsSecurityAdsFilter">Ads and social networks filter</string>
-    <string name="settingsSecurityApprovedOption">Approved</string>
-    <string name="settingsSecurityBlockedOption">Blocked</string>
     <string name="settingsSecurityBlockedRecipients">Blocked / authorised recipients</string>
-    <string name="settingsSecurityBlockedRecipientsDescription">You can specify senders to approve or block for our Anti-Spam protection to process them for you.</string>
     <string name="settingsSecuritySpamFilter">Spam filter</string>
     <string name="settingsSelectDisplayModeDescription">Select a display mode</string>
     <string name="settingsSendAcknowledgement">Request an acknowledgement of receipt for every email sent</string>
@@ -650,7 +631,6 @@
     <string name="startActivityCantHandleAction">No application has been found to handle this action</string>
     <string name="subjectTitle">Subject:</string>
     <string name="superCollapsedBlock">See all (%d)</string>
-    <string name="swissTransferAttachmentDescription">The sender has attached one or more large files, available via the SwissTransfer link.</string>
     <string name="syncCalendarsAndContactsDescription">View your contacts and calendar directly from your device.</string>
     <string name="syncCalendarsAndContactsTitle">Calendar and contact synchronization</string>
     <string name="syncFragmentTitle">Synchronize your calendars and contacts</string>
@@ -663,7 +643,6 @@
         <item quantity="one">Are you sure you want to delete this conversation permanently?</item>
         <item quantity="other">Are you sure you want to delete these conversations permanently?</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Empty drafts</string>
     <string name="threadListEmptyFolderAlertDescription">Are you sure you want to permanently delete all the messages in this folder?</string>
     <string name="threadListEmptySpamButton">Empty spam</string>
     <string name="threadListEmptyTrashButton">Empty the trash</string>
