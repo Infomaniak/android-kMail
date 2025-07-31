@@ -21,6 +21,10 @@
         <attr name="chipCornerRadius" format="dimension" />
         <attr name="addReactionIcon" format="reference" />
         <attr name="addReactionDisabledColor" format="color" />
+        <!-- Add other view composition strategies when they will be needed -->
+        <attr name="viewCompositionStrategy" format="enum">
+            <enum name="disposeOnDetachedFromWindowOrReleasedFromPool" value="0" />
+        </attr>
     </declare-styleable>
 
 </resources>

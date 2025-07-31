@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.vectorResource
 import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.emojicomponents.R
@@ -65,6 +66,8 @@ class EmojiReactionsView @JvmOverloads constructor(
             chipCornerRadius = getDimensionOrNull(R.styleable.EmojiReactionsView_chipCornerRadius)
             addReactionIconRes = getResourceIdOrNull(R.styleable.EmojiReactionsView_addReactionIcon)
             addReactionDisabledColor = getColorOrNull(R.styleable.EmojiReactionsView_addReactionDisabledColor)
+            val viewCompositionStrategyIndex = getInteger(R.styleable.EmojiReactionsView_viewCompositionStrategy, 0)
+            setViewCompositionStrategy(viewCompositionStrategyIndex.toViewCompositionStrategy())
             recycle()
         }
     }
@@ -140,6 +143,13 @@ class EmojiReactionsView @JvmOverloads constructor(
             )
         )
     )
+}
+
+private fun Int.toViewCompositionStrategy(): ViewCompositionStrategy {
+    return when(this) {
+        0 -> ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+        else -> error("Trying to set a ViewCompositionStrategy that has not been mapped to an instance")
+    }
 }
 
 @RequiresOptIn(
