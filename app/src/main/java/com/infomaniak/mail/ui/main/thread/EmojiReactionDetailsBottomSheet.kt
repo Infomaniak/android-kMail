@@ -50,7 +50,7 @@ class EmojiReactionDetailsBottomSheet @JvmOverloads constructor(
     override fun BottomSheetContent() {
         Column {
             Spacer(modifier = Modifier.height(Margin.Medium))
-            EmojiReactionDetails(details = { emojiReactionDetails }, initialEmoji = initialEmoji)
+            EmojiReactionDetails(details = emojiReactionDetails, initialEmoji = initialEmoji)
         }
     }
 

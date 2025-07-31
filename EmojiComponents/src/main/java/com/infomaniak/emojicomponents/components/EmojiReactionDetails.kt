@@ -66,18 +66,18 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmojiReactionDetails(
-    details: () -> SnapshotStateList<Pair<String, SnapshotStateList<ReactionDetail>>>,
+    details: SnapshotStateList<Pair<String, SnapshotStateList<ReactionDetail>>>,
     modifier: Modifier = Modifier,
     initialEmoji: String? = null,
 ) {
-    fun computeInitialPage(): Int = details()
+    fun computeInitialPage(): Int = details
         .indexOfFirst { it.first == initialEmoji }
         .takeIf { it != -1 }
         ?.plus(1)
         ?: 0
 
     Column(modifier) {
-        val pagerState = rememberPagerState(computeInitialPage()) { details().count() + 1 }
+        val pagerState = rememberPagerState(computeInitialPage()) { details.count() + 1 }
         val scope = rememberCoroutineScope()
 
         Box {
@@ -102,7 +102,7 @@ fun EmojiReactionDetails(
                     Text(stringResource(R.string.reactionsAll))
                 }
 
-                details().forEachIndexed { index, (emoji, details) ->
+                details.forEachIndexed { index, (emoji, details) ->
                     CustomTab(
                         selected = pagerState.currentPage == index + 1,
                         onClick = { scope.launch { pagerState.animateScrollToPage(index + 1) } },
@@ -124,13 +124,13 @@ fun EmojiReactionDetails(
                     .verticalScroll(rememberScrollState())
             ) {
                 if (it == 0) {
-                    details().forEach { (_, details) ->
+                    details.forEach { (_, details) ->
                         details.forEach { detail ->
                             Item(detail)
                         }
                     }
                 } else {
-                    details()[it - 1].let { (_, details) ->
+                    details[it - 1].let { (_, details) ->
                         details.forEach { detail ->
                             Item(detail)
                         }
@@ -191,7 +191,7 @@ private fun Preview() {
 
     MaterialTheme(if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
         Surface {
-            EmojiReactionDetails({ details })
+            EmojiReactionDetails(details)
         }
     }
 }
