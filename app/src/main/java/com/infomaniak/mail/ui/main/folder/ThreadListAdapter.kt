@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.folder
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
-import android.os.Build.VERSION.SDK_INT
 import android.text.Spannable
 import android.text.TextUtils.TruncateAt
 import android.view.HapticFeedbackConstants
@@ -38,22 +37,17 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.google.android.material.R as RMaterial
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.core.utils.FormatData
 import com.infomaniak.core.utils.format
-import com.infomaniak.core.utils.formatWithLocal
 import com.infomaniak.core.utils.isInTheFuture
+import com.infomaniak.core.utils.isThisMonth
+import com.infomaniak.core.utils.isThisWeek
 import com.infomaniak.core.utils.isThisYear
 import com.infomaniak.core.utils.isToday
-import com.infomaniak.core.utils.isThisWeek
-import com.infomaniak.core.utils.isThisMonth
-import com.infomaniak.mail.utils.extensions.isLastWeek
 import com.infomaniak.core.utils.isYesterday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.infomaniak.lib.core.R as RCore
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.setMarginsRelative
@@ -81,17 +75,20 @@ import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.formatSubject
 import com.infomaniak.mail.utils.extensions.getAttributeColor
 import com.infomaniak.mail.utils.extensions.isEmail
+import com.infomaniak.mail.utils.extensions.isLastWeek
 import com.infomaniak.mail.utils.extensions.postfixWithTag
 import com.infomaniak.mail.utils.extensions.toDate
 import dagger.hilt.android.qualifiers.ActivityContext
-import javax.inject.Inject
-import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.math.abs
+import com.google.android.material.R as RMaterial
+import com.infomaniak.lib.core.R as RCore
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here? Same for all adapters in the app?
 class ThreadListAdapter @Inject constructor(
@@ -254,7 +251,7 @@ class ThreadListAdapter @Inject constructor(
             mailSubject.text = context.formatSubject(subject)
             mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
 
-            val dateDisplay = computeThreadListDateDisplay(folderRole)
+            val dateDisplay = computeThreadListDateDisplay(callbacks?.getFeatureFlags?.invoke(), localSettings)
             mailDate.text = dateDisplay.formatThreadDate(context, this)
             mailDateIcon.apply {
                 isVisible = dateDisplay.iconRes != null
