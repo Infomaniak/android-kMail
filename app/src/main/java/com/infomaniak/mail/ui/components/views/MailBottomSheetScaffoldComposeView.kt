@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
 import com.infomaniak.mail.ui.components.MailBottomSheetScaffold
 import kotlinx.coroutines.launch
@@ -52,6 +53,10 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
 
     protected fun hideBottomSheet() {
         startHidingAnimation = true
+    }
+
+    init {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
