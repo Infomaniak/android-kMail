@@ -107,8 +107,10 @@ class Thread : RealmObject, Snoozable {
     // It's only used to filter locally the Threads' list.
     @Transient
     var isLocallyMovedOut: Boolean = false
+    // When deserializing threads from the api, this way of initializing the value will compute the correct
+    // numberOfScheduledDrafts right after deserialization
     @Transient
-    var numberOfScheduledDrafts: Int = 0
+    var numberOfScheduledDrafts: Int = messages.count { it.isScheduledDraft }
     @Transient
     var isLastInboxMessageSnoozed: Boolean = false
 
@@ -200,6 +202,10 @@ class Thread : RealmObject, Snoozable {
         }
     }
 
+    fun containsOnlyScheduledDrafts(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings): Boolean {
+        return getDisplayedMessages(featureFlags, localSettings).count() == numberOfScheduledDrafts
+    }
+
     /**
      * Only used for when the api tells us we're trying to automatically unsnooze a thread that's not snoozed
      */
@@ -253,8 +259,8 @@ class Thread : RealmObject, Snoozable {
         return message.preview
     }
 
-    fun computeThreadListDateDisplay(folderRole: FolderRole?) = when {
-        numberOfScheduledDrafts > 0 && folderRole == FolderRole.SCHEDULED_DRAFTS -> ThreadListDateDisplay.Scheduled
+    fun computeThreadListDateDisplay(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings) = when {
+        containsOnlyScheduledDrafts(featureFlags, localSettings) -> ThreadListDateDisplay.Scheduled
         isSnoozed() -> ThreadListDateDisplay.Snoozed
         isUnsnoozed() -> ThreadListDateDisplay.Unsnoozed
         else -> ThreadListDateDisplay.Default
