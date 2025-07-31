@@ -107,8 +107,10 @@ class Thread : RealmObject, Snoozable {
     // It's only used to filter locally the Threads' list.
     @Transient
     var isLocallyMovedOut: Boolean = false
+    // When deserializing threads from the api, this way of initializing the value will compute the correct
+    // numberOfScheduledDrafts right after deserialization
     @Transient
-    var numberOfScheduledDrafts: Int = 0
+    var numberOfScheduledDrafts: Int = messages.count { it.isScheduledDraft }
     @Transient
     var isLastInboxMessageSnoozed: Boolean = false
 
