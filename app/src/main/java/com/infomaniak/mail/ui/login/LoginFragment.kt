@@ -93,7 +93,9 @@ class LoginFragment : Fragment() {
 
     private val loginActivity by lazy { requireActivity() as LoginActivity }
 
-    private val connectButtonProgressTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::startProgress) }
+    private val connectButtonProgressTimer by lazy {
+        Utils.createRefreshTimer(milliseconds = 100, onTimerFinish = ::startProgress)
+    }
 
     @Inject
     @IoDispatcher
