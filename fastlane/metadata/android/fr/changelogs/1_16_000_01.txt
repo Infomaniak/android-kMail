@@ -1,0 +1,3 @@
+- Ajout du login commun entre les applications infomaniak
+- Correction d'un crash lors de la suppression par swipe du dernier brouillon du dossier
+- Correction du formulaire de création de compte qui se fermait après la deuxième étape

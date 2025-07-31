@@ -1,0 +1,3 @@
+- Add cross application login
+- Fix a crash when swipe deleting the last draft of the folder
+- Fix Account Creation formular quitting after second step
