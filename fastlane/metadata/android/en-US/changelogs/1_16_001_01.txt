@@ -1,0 +1,1 @@
+- Fix scheduled thread display in Search
