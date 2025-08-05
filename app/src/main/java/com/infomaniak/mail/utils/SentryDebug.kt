@@ -322,16 +322,6 @@ object SentryDebug {
             scope.setExtra("infomaniakPassword status", passwordStatus)
         }
     }
-
-    fun sendWebViewVersionName(versionData: WebViewVersionUtils.WebViewVersionData?) {
-        Sentry.captureMessage(
-            "WebView version name might be null on some devices. Checking that the version name is ok.",
-        ) { scope ->
-            scope.setTag("webViewPackageName", versionData?.webViewPackageName.toString())
-            scope.setTag("webViewVersionName", versionData?.versionName.toString())
-            scope.setTag("majorVersion", versionData?.majorVersion.toString())
-        }
-    }
     //endregion
 
     //region Utils
