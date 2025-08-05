@@ -51,7 +51,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -100,6 +102,13 @@ class SearchViewModel @Inject constructor(
 
     private var searchJob: Job? = null
     val searchResults = threadController.getSearchThreadsAsync().asLiveData(ioCoroutineContext)
+
+    private val currentMailboxFlow = mailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).mapNotNull { it.obj }
+
+    private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
     fun cancelSearch() {
         searchJob?.cancel()
@@ -274,7 +283,13 @@ class SearchViewModel @Inject constructor(
         newFilters: Set<ThreadFilter>,
         folderId: String,
     ) {
-        val searchMessages = messageController.searchMessages(query, newFilters, folderId)
+        val searchMessages = messageController.searchMessages(
+            searchQuery = query,
+            filters = newFilters,
+            folderId = folderId,
+            featureFlags = featureFlagsFlow.first(),
+            localSettings = localSettings
+        )
         val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
         threadController.saveSearchThreads(searchThreads)
     }
