@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.core.cancellable
-import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
+import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.format
@@ -92,7 +92,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.Response
 import java.io.File
 import java.util.Date
-import com.infomaniak.core.myksuite.ui.network.ApiRoutes as MyKSuiteApiRoutes
+import com.infomaniak.core.ksuite.myksuite.ui.network.ApiRoutes as MyKSuiteApiRoutes
 
 object ApiRepository : ApiRepositoryCore() {
 

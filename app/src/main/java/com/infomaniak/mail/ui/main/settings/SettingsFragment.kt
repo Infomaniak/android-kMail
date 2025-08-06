@@ -26,9 +26,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
-import com.infomaniak.core.myksuite.ui.utils.MatomoMyKSuite
-import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
+import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
+import com.infomaniak.core.ksuite.myksuite.ui.utils.MatomoMyKSuite
+import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuiteDashboardFragmentArgs
 import com.infomaniak.lib.applock.LockActivity
 import com.infomaniak.lib.applock.Utils.silentlyReverseSwitch
 import com.infomaniak.lib.core.utils.openAppNotificationSettings

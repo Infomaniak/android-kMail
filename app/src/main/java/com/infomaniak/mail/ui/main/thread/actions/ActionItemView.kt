@@ -29,7 +29,7 @@ import androidx.annotation.StyleableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.core.myksuite.ui.views.MyKSuitePlusChipView
+import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuitePlusChipView
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.setPaddingRelative
