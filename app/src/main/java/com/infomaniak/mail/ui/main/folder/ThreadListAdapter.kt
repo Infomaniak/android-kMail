@@ -101,24 +101,7 @@ class ThreadListAdapter @Inject constructor(
     private var formatListJob: Job? = null
     private lateinit var recyclerView: RecyclerView
 
-    private val diffItemCallbacks = object : DiffUtil.ItemCallback<ThreadListItem>() {
-        override fun areItemsTheSame(
-            oldItem: ThreadListItem,
-            newItem: ThreadListItem
-        ): Boolean = when (oldItem) {
-            is ThreadListItem.Content -> newItem is ThreadListItem.Content && oldItem.thread.uid == newItem.thread.uid
-            is ThreadListItem.DateSeparator -> newItem is ThreadListItem.DateSeparator && oldItem.title == newItem.title
-            is ThreadListItem.FlushFolderButton -> oldItem == newItem
-            ThreadListItem.LoadMore -> newItem == ThreadListItem.LoadMore
-        }
-
-        override fun areContentsTheSame(
-            oldItem: ThreadListItem,
-            newItem: ThreadListItem
-        ): Boolean = oldItem == newItem
-    }
-
-    override val asyncListDiffer: AsyncListDiffer<ThreadListItem> = AsyncListDiffer<ThreadListItem>(this, diffItemCallbacks)
+    override val asyncListDiffer: AsyncListDiffer<ThreadListItem> = AsyncListDiffer<ThreadListItem>(this, ThreadDiffCallback())
 
     override val realmAsyncListDiffer: AsyncListDiffer<Thread>? = null
 
