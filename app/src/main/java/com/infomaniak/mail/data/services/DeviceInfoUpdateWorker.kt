@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.services
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.infomaniak.core.login.crossapp.internal.deviceinfo.AbstractDeviceInfoUpdateWorker
+import com.infomaniak.core.crossapplogin.back.internal.deviceinfo.AbstractDeviceInfoUpdateWorker
 import com.infomaniak.mail.utils.AccountUtils
 import okhttp3.OkHttpClient
 

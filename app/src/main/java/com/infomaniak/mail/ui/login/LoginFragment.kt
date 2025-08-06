@@ -31,10 +31,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.Xor
+import com.infomaniak.core.crossapplogin.back.DerivedTokenGenerator.Issue
+import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.launchInOnLifecycle
-import com.infomaniak.core.login.crossapp.DerivedTokenGenerator.Issue
-import com.infomaniak.core.login.crossapp.ExternalAccount
 import com.infomaniak.core.observe
 import com.infomaniak.core.utils.awaitOneClick
 import com.infomaniak.lib.core.utils.SentryLog
@@ -78,7 +78,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import splitties.coroutines.repeatWhileActive
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
-import com.infomaniak.core.crossloginui.R as RCrossLogin
+import com.infomaniak.core.crossapplogin.front.R as RCrossLogin
 import com.infomaniak.lib.core.R as RCore
 
 @OptIn(ExperimentalSerializationApi::class)

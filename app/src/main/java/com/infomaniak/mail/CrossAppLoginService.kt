@@ -1,6 +1,6 @@
 package com.infomaniak.mail
 
-import com.infomaniak.core.login.crossapp.BaseCrossAppLoginService
+import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginService
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import io.realm.kotlin.ext.query
