@@ -24,7 +24,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.SearchUtils
-import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.WebViewVersionUtils.getWebViewVersionData
 import com.infomaniak.mail.utils.coroutineContext
 import com.infomaniak.mail.utils.extensions.appContext
@@ -83,10 +82,6 @@ class ThreadListViewModel @Inject constructor(
             }
         }
 
-        // TODO: (23/07) Remove this log in a few weeks/month if we don't have any Sentry anymore
-        if (hasOutdatedMajorVersion) {
-            SentryDebug.sendWebViewVersionName(versionData)
-        }
         isWebViewOutdated.value = canShowWebViewOutdated && hasOutdatedMajorVersion
     }
 
