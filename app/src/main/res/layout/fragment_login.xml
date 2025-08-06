@@ -76,7 +76,7 @@
             app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
             app:srcCompat="@drawable/ic_arrow_right" />
 
-        <com.infomaniak.core.crossloginui.views.CrossLoginSelectAccountsView
+        <com.infomaniak.core.crossapplogin.front.views.CrossLoginSelectAccountsView
             android:id="@+id/crossLoginSelection"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
