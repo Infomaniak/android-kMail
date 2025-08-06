@@ -101,7 +101,9 @@ class ThreadListAdapter @Inject constructor(
     private var formatListJob: Job? = null
     private lateinit var recyclerView: RecyclerView
 
-    override val asyncListDiffer: AsyncListDiffer<ThreadListItem> = AsyncListDiffer<ThreadListItem>(this, ThreadDiffCallback())
+    init {
+        setHasStableIds(true) // See fun getItemId(position: Int) below.
+    }
 
     override val realmAsyncListDiffer: AsyncListDiffer<Thread>? = null
 
@@ -155,6 +157,23 @@ class ThreadListAdapter @Inject constructor(
             ThreadListItem.LoadMore -> DisplayType.LOAD_MORE_BUTTON.layout
         }
     }.getOrDefault(super.getItemViewType(position))
+
+    // We know this is not perfect since hashCode() can produce collisions, which can cause
+    // sneaky issues (see https://stackoverflow.com/a/33084790/4433326),
+    // but replacing this with proper asycnListDiffer currently leads to more frequent bugs,
+    // including a systematic crash when viewing archived emails, most likely because of
+    // how this is handled by the RecyclerView drag'N'drop + swipe library we depend on.
+    // We are knowingly making the choice of the lowest impact crash, until a rewrite,
+    // or other kind of fixing endeavor takes place.
+    // NOTE: The commit that added this comment also removed the `ThreadDiffCallback` class,
+    // that might be useful in the future, if a fix is done (rather than a partial rewrite).
+    override fun getItemId(position: Int): Long = runCatchingRealm {
+        return when (val item = dataSet[position]) {
+            is ThreadListItem.Content -> item.thread.uid.hashCode().toLong()
+            is ThreadListItem.DateSeparator -> item.title.hashCode().toLong()
+            else -> super.getItemId(position)
+        }
+    }.getOrDefault(super.getItemId(position))
 
     fun getItemPosition(threadUid: String): Int? {
         return dataSet
