@@ -95,7 +95,7 @@ class ThreadListAdapter @Inject constructor(
     @ActivityContext context: Context,
     private val localSettings: LocalSettings,
     private val mailboxContentRealm: RealmDatabase.MailboxContent,
-) : DragDropSwipeAdapter<Any, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
+) : DragDropSwipeAdapter<ThreadListItem, ThreadListViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private var formatListJob: Job? = null
     private lateinit var recyclerView: RecyclerView
@@ -127,10 +127,6 @@ class ThreadListAdapter @Inject constructor(
 
     private val isMultiselectDisabledInThisFolder: Boolean get() = folderRole == FolderRole.SCHEDULED_DRAFTS
 
-    init {
-        setHasStableIds(true)
-    }
-
     operator fun invoke(
         folderRole: FolderRole?,
         callbacks: ThreadListAdapterCallbacks,
@@ -150,24 +146,16 @@ class ThreadListAdapter @Inject constructor(
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (dataSet[position]) {
-            is String -> DisplayType.DATE_SEPARATOR.layout
-            is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
-            is Unit -> DisplayType.LOAD_MORE_BUTTON.layout
-            else -> DisplayType.THREAD.layout
+            is ThreadListItem.Content -> DisplayType.THREAD.layout
+            is ThreadListItem.DateSeparator -> DisplayType.DATE_SEPARATOR.layout
+            is ThreadListItem.FlushFolderButton -> DisplayType.FLUSH_FOLDER_BUTTON.layout
+            ThreadListItem.LoadMore -> DisplayType.LOAD_MORE_BUTTON.layout
         }
     }.getOrDefault(super.getItemViewType(position))
 
-    override fun getItemId(position: Int): Long = runCatchingRealm {
-        return when (val item = dataSet[position]) {
-            is Thread -> item.uid.hashCode().toLong()
-            is String -> item.hashCode().toLong()
-            else -> super.getItemId(position)
-        }
-    }.getOrDefault(super.getItemId(position))
-
     fun getItemPosition(threadUid: String): Int? {
         return dataSet
-            .indexOfFirst { it is Thread && it.uid == threadUid }
+            .indexOfFirst { it is ThreadListItem.Content && it.thread.uid == threadUid }
             .takeIf { position -> position != -1 }
     }
 
@@ -193,21 +181,26 @@ class ThreadListAdapter @Inject constructor(
 
         if (payload == NotificationType.SELECTED_STATE && holder.itemViewType == DisplayType.THREAD.layout) {
             val binding = holder.binding as CardviewThreadItemBinding
-            val thread = dataSet[position] as Thread
+            val thread = (dataSet[position] as ThreadListItem.Content).thread
             binding.updateSelectedUi(thread)
         }
     }.getOrDefault(Unit)
 
-    override fun onBindViewHolder(item: Any, viewHolder: ThreadListViewHolder, position: Int) = with(viewHolder.binding) {
+    override fun onBindViewHolder(
+        item: ThreadListItem,
+        viewHolder: ThreadListViewHolder,
+        position: Int
+    ) = with(viewHolder.binding) {
         when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> {
-                (this as CardviewThreadItemBinding).displayThread(item as Thread, position)
+                (this as CardviewThreadItemBinding).displayThread((item as ThreadListItem.Content).thread, position)
             }
             DisplayType.DATE_SEPARATOR.layout -> {
-                (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
+                (this as ItemThreadDateSeparatorBinding).displayDateSeparator((item as ThreadListItem.DateSeparator).title)
             }
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> {
-                (this as ItemBannerWithActionViewBinding).displayFlushFolderButton(item as FolderRole)
+                (this as ItemBannerWithActionViewBinding)
+                    .displayFlushFolderButton((item as ThreadListItem.FlushFolderButton).folderRole)
             }
             DisplayType.LOAD_MORE_BUTTON.layout -> {
                 (this as ItemThreadLoadMoreButtonBinding).displayLoadMoreButton()
@@ -396,8 +389,10 @@ class ThreadListAdapter @Inject constructor(
         var currentThreadIndex = startingThreadIndex + direction
 
         while (currentThreadIndex >= 0 && currentThreadIndex <= dataSet.lastIndex) {
-            if (dataSet[currentThreadIndex] is Thread) return dataSet[currentThreadIndex] as Thread to currentThreadIndex
-            currentThreadIndex += direction
+            when (val item = dataSet[currentThreadIndex]) {
+                is ThreadListItem.Content -> return item.thread to currentThreadIndex
+                else -> currentThreadIndex += direction
+            }
         }
 
         return null
@@ -559,13 +554,13 @@ class ThreadListAdapter @Inject constructor(
 
     private fun ItemThreadLoadMoreButtonBinding.displayLoadMoreButton() {
         loadMoreButton.setOnClickListener {
-            if (dataSet.last() is Unit) dataSet = dataSet.toMutableList().apply { removeLastOrNull() }
+            if (dataSet.last() is ThreadListItem.LoadMore) dataSet = dataSet.toMutableList().apply { removeLastOrNull() }
             callbacks?.onLoadMoreClicked?.invoke()
         }
     }
 
-    override fun onSwipeStarted(item: Any, viewHolder: ThreadListViewHolder) {
-        (item as Thread).updateDynamicIcons()
+    override fun onSwipeStarted(item: ThreadListItem, viewHolder: ThreadListViewHolder) {
+        if (item is ThreadListItem.Content) item.thread.updateDynamicIcons()
     }
 
     private fun Thread.updateDynamicIcons() {
@@ -610,7 +605,7 @@ class ThreadListAdapter @Inject constructor(
     }
 
     override fun onIsSwiping(
-        item: Any?,
+        item: ThreadListItem?,
         viewHolder: ThreadListViewHolder,
         offsetX: Int,
         offsetY: Int,
@@ -654,7 +649,7 @@ class ThreadListAdapter @Inject constructor(
 
     override fun getViewHolder(itemView: View): ThreadListViewHolder = ThreadListViewHolder { itemView }
 
-    override fun getViewToTouchToStartDraggingItem(item: Any, viewHolder: ThreadListViewHolder, position: Int): View? {
+    override fun getViewToTouchToStartDraggingItem(item: ThreadListItem, viewHolder: ThreadListViewHolder, position: Int): View? {
         return when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (viewHolder.binding as CardviewThreadItemBinding).goneHandle
             DisplayType.FLUSH_FOLDER_BUTTON.layout -> (viewHolder.binding as ItemBannerWithActionViewBinding).root.getGoneHandle()
@@ -663,7 +658,7 @@ class ThreadListAdapter @Inject constructor(
         }
     }
 
-    override fun canBeSwiped(item: Any, viewHolder: ThreadListViewHolder, position: Int): Boolean {
+    override fun canBeSwiped(item: ThreadListItem, viewHolder: ThreadListViewHolder, position: Int): Boolean {
         return getItemViewType(position) == DisplayType.THREAD.layout && swipingIsAuthorized
     }
 
@@ -678,7 +673,7 @@ class ThreadListAdapter @Inject constructor(
 
             Dispatchers.Main {
                 // Put back "Load more" button if it was already there
-                dataSet = if (isLoadMoreDisplayed) formattedList + Unit else formattedList
+                dataSet = if (isLoadMoreDisplayed) formattedList + ThreadListItem.LoadMore else formattedList
             }
         }
     }
@@ -689,19 +684,19 @@ class ThreadListAdapter @Inject constructor(
         folderRole: FolderRole?,
         threadDensity: ThreadDensity,
         scope: CoroutineScope,
-    ) = mutableListOf<Any>().apply {
+    ) = mutableListOf<ThreadListItem>().apply {
 
         if ((folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) && threads.isNotEmpty()) {
-            add(folderRole)
+            add(ThreadListItem.FlushFolderButton(folderRole))
         }
 
         when {
             threadDensity == ThreadDensity.COMPACT -> {
                 cleanMultiSelectionItems(threads, scope)
-                addAll(threads)
+                addAll(threads.map { ThreadListItem.Content(it) })
             }
             folderRole?.groupMessagesBySection == false -> {
-                addAll(threads)
+                addAll(threads.map { ThreadListItem.Content(it) })
             }
             else -> {
                 var previousSectionTitle = ""
@@ -710,11 +705,11 @@ class ThreadListAdapter @Inject constructor(
 
                     val sectionTitle = thread.getSectionTitle(context)
                     if (sectionTitle != previousSectionTitle) {
-                        add(sectionTitle)
+                        add(ThreadListItem.DateSeparator(sectionTitle))
                         previousSectionTitle = sectionTitle
                     }
 
-                    add(thread)
+                    add(ThreadListItem.Content(thread))
                 }
             }
         }
@@ -758,8 +753,8 @@ class ThreadListAdapter @Inject constructor(
             val lastItem = lastOrNull() ?: return@apply
 
             val shouldUpdateDataSet = when {
-                shouldDisplayLoadMore && lastItem !is Unit -> add(Unit)
-                !shouldDisplayLoadMore && lastItem is Unit -> removeIf { it is Unit }
+                shouldDisplayLoadMore && lastItem !is ThreadListItem.LoadMore -> add(ThreadListItem.LoadMore)
+                !shouldDisplayLoadMore && lastItem is ThreadListItem.LoadMore -> removeIf { it is ThreadListItem.LoadMore }
                 else -> false
             }
 

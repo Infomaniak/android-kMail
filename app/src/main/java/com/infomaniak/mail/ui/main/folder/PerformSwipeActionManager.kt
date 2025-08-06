@@ -90,7 +90,9 @@ object PerformSwipeActionManager {
                 onCancel = {
                     // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
                     // otherwise it will notify the next item in the list and make it slightly blink
-                    if (threadListAdapter.dataSet.indexOf(thread) == position) threadListAdapter.notifyItemChanged(position)
+                    if (threadListAdapter.dataSet.indexOfFirstThread(thread) == position) {
+                        threadListAdapter.notifyItemChanged(position)
+                    }
                 },
             ) {
                 mainViewModel.archiveThread(thread.uid)
@@ -104,7 +106,9 @@ object PerformSwipeActionManager {
                 onCancel = {
                     // Notify only if the user cancelled the popup (e.g. the thread is not deleted),
                     // otherwise it will notify the next item in the list and make it slightly blink
-                    if (threadListAdapter.dataSet.indexOf(thread) == position) threadListAdapter.notifyItemChanged(position)
+                    if (threadListAdapter.dataSet.indexOfFirstThread(thread) == position) {
+                        threadListAdapter.notifyItemChanged(position)
+                    }
                 },
                 callback = {
                     if (isPermanentDeleteFolder) threadListAdapter.removeItem(position)
@@ -158,5 +162,9 @@ object PerformSwipeActionManager {
     private fun LocalSettings.setDefaultSwipeActions() {
         if (swipeRight == SwipeAction.TUTORIAL) swipeRight = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_RIGHT
         if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = SwipeActionsSettingsFragment.DEFAULT_SWIPE_ACTION_LEFT
+    }
+
+    private fun List<ThreadListItem>.indexOfFirstThread(thread: Thread): Int {
+        return indexOfFirst { (it as? ThreadListItem.Content)?.thread == thread }
     }
 }

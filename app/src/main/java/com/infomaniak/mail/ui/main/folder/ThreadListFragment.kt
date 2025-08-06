@@ -455,8 +455,8 @@ class ThreadListFragment : TwoPaneFragment() {
             }
         }
 
-        threadsList.swipeListener = object : OnItemSwipeListener<Thread> {
-            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Thread): Boolean {
+        threadsList.swipeListener = object : OnItemSwipeListener<ThreadListItem.Content> {
+            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: ThreadListItem.Content): Boolean {
 
                 val swipeAction = when (direction) {
                     SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
@@ -464,9 +464,9 @@ class ThreadListFragment : TwoPaneFragment() {
                     else -> error("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
-                val isPermanentDeleteFolder = isPermanentDeleteFolder(item.folder.role)
+                val isPermanentDeleteFolder = isPermanentDeleteFolder(item.thread.folder.role)
 
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item, position, isPermanentDeleteFolder)
+                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.thread, position, isPermanentDeleteFolder)
 
                 threadListAdapter.apply {
                     blockOtherSwipes()
