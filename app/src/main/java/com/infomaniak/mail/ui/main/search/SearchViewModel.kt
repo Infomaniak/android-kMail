@@ -26,6 +26,8 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -49,7 +51,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -65,6 +69,7 @@ class SearchViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val searchUtils: SearchUtils,
     private val threadController: ThreadController,
+    private val localSettings: LocalSettings,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
 
@@ -97,6 +102,13 @@ class SearchViewModel @Inject constructor(
 
     private var searchJob: Job? = null
     val searchResults = threadController.getSearchThreadsAsync().asLiveData(ioCoroutineContext)
+
+    private val currentMailboxFlow = mailboxController.getMailboxAsync(
+        AccountUtils.currentUserId,
+        AccountUtils.currentMailboxId,
+    ).mapNotNull { it.obj }
+
+    private val featureFlagsFlow = currentMailboxFlow.map { it.featureFlags }
 
     fun cancelSearch() {
         searchJob?.cancel()
@@ -221,7 +233,13 @@ class SearchViewModel @Inject constructor(
         val folderId = folder?.id ?: dummyFolderId
         val resource = if (shouldGetNextPage) resourceNext else null
         val searchFilters = searchUtils.searchFilters(query, newFilters, resource)
-        val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resource)
+        val apiResponse = ApiRepository.searchThreads(
+            mailboxUuid = currentMailbox.uuid,
+            folderId = folderId,
+            filters = searchFilters,
+            hasDisplayModeThread = localSettings.threadMode == ThreadMode.CONVERSATION,
+            resource = resource
+        )
 
         currentCoroutineContext().ensureActive()
 
@@ -265,7 +283,13 @@ class SearchViewModel @Inject constructor(
         newFilters: Set<ThreadFilter>,
         folderId: String,
     ) {
-        val searchMessages = messageController.searchMessages(query, newFilters, folderId)
+        val searchMessages = messageController.searchMessages(
+            searchQuery = query,
+            filters = newFilters,
+            folderId = folderId,
+            featureFlags = featureFlagsFlow.first(),
+            localSettings = localSettings
+        )
         val searchThreads = searchUtils.convertLocalMessagesToSearchThreads(searchMessages)
         threadController.saveSearchThreads(searchThreads)
     }
