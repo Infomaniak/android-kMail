@@ -20,14 +20,14 @@ package com.infomaniak.mail.ui.main.settings
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import com.infomaniak.core.myksuite.ui.views.MyKSuiteDashboardFragment
+import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuiteDashboardFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.observeNotNull
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.getDashboardData
 import dagger.hilt.android.AndroidEntryPoint
-import com.infomaniak.core.myksuite.R as RMyKSuite
+import com.infomaniak.core.ksuite.myksuite.R as RMyKSuite
 
 @AndroidEntryPoint
 class KSuiteDashboardFragment : MyKSuiteDashboardFragment() {

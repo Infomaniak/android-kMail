@@ -23,11 +23,11 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.fragmentnavigation.isAtInitialDestination
-import com.infomaniak.core.myksuite.ui.data.MyKSuiteData
-import com.infomaniak.core.myksuite.ui.screens.KSuiteApp
-import com.infomaniak.core.myksuite.ui.screens.MyKSuiteDashboardScreenData
-import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils
-import com.infomaniak.core.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
+import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
+import com.infomaniak.core.ksuite.myksuite.ui.screens.KSuiteApp
+import com.infomaniak.core.ksuite.myksuite.ui.screens.MyKSuiteDashboardScreenData
+import com.infomaniak.core.ksuite.myksuite.ui.utils.MyKSuiteUiUtils
+import com.infomaniak.core.ksuite.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.R
