@@ -17,6 +17,7 @@
   -->
 <com.google.android.material.bottomsheet.BottomSheetDragHandleView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/separator"
     android:layout_width="match_parent"
     android:layout_height="@dimen/bottomSheetDragHandleHeight"
     android:paddingTop="@dimen/marginStandardSmall"
