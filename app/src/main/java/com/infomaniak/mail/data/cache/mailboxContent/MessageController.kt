@@ -38,6 +38,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmScalarQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
@@ -190,6 +191,10 @@ class MessageController @Inject constructor(
         private fun getMessagesByFolderIdQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
             return realm.query<Message>("${Message::folderId.name} == '$folderId'")
         }
+
+        private fun doesMessageExistQuery(uid: String, realm: TypedRealm): RealmScalarQuery<Long> {
+            return realm.query<Message>("${Message::uid.name} == $0", uid).count()
+        }
         //endregion
 
         //region Get data
@@ -208,6 +213,10 @@ class MessageController @Inject constructor(
         fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
             return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
+        }
+
+        fun doesMessageExist(uid: String, realm: TypedRealm): Boolean {
+            return doesMessageExistQuery(uid, realm).find() > 0
         }
         //endregion
 
