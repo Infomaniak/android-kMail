@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2022-2024 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@
     <string name="actionMove">Déplacer</string>
     <string name="actionMoveToInbox">Déplacer vers la boîte de réception</string>
     <string name="actionNonSpam">Signaler comme légitime</string>
-    <string name="actionOpenIn">Ouvrir dans</string>
     <string name="actionPhishing">Signaler comme hameçonnage</string>
     <string name="actionPrint">Imprimer</string>
     <string name="actionRename">Renommer</string>
@@ -95,7 +94,6 @@
     <string name="attachMailboxInputHint">Adresse mail</string>
     <string name="attachMailboxPasswordInputHint">Mot de passe</string>
     <string name="attachMailboxTitle">Ajoutez une adresse mail</string>
-    <string name="attachmentActionCamera">Appareil photo</string>
     <string name="attachmentActionFile">Joindre un fichier</string>
     <string name="attachmentActionPhotoLibrary">Envoyer une photo depuis la photothèque</string>
     <string name="attachmentActionTitle">Ajouter une pièce jointe</string>
@@ -115,7 +113,6 @@
         <item quantity="many">Mots de passe bloqués</item>
     </plurals>
     <string name="buttonAccept">Accepter</string>
-    <string name="buttonAccountAssociatedEmailAddresses">Adresses mail associées au compte</string>
     <string name="buttonAccountDelete">Supprimer mon compte</string>
     <string name="buttonAccountLogOut">Se déconnecter</string>
     <string name="buttonAccountSwitch">Changer de compte</string>
@@ -125,9 +122,7 @@
     <string name="buttonAttachMailbox">Ajouter l’adresse mail</string>
     <string name="buttonAttachment">Ajouter une pièce jointe</string>
     <string name="buttonAttendees">Participants</string>
-    <string name="buttonAvailableSoon">Bientôt disponible</string>
     <string name="buttonBold">Gras</string>
-    <string name="buttonBulletPoint">Puce</string>
     <string name="buttonCamera">Prendre une photo</string>
     <string name="buttonCancelReminder">Annuler le rappel</string>
     <string name="buttonClose">Fermer</string>
@@ -144,7 +139,6 @@
     <string name="buttonDownloadAll">Tout télécharger</string>
     <string name="buttonFeedback">Feedback</string>
     <string name="buttonFolders">Dossiers</string>
-    <string name="buttonFreeTrial">Essayer gratuitement</string>
     <string name="buttonHelp">Aide</string>
     <string name="buttonHyperlink">Ajouter un lien hypertexte</string>
     <string name="buttonImportEmails">Importer des e-mails</string>
@@ -156,7 +150,6 @@
     <string name="buttonMaybe">Peut-être</string>
     <string name="buttonModify">Modifier</string>
     <string name="buttonMore">Plus</string>
-    <string name="buttonMoreStorage">Obtenir plus de stockage</string>
     <string name="buttonNewMessage">Nouveau message</string>
     <string name="buttonNo">Non</string>
     <string name="buttonOpenMyCalendar">Ouvrir dans mon calendrier</string>
@@ -243,8 +236,6 @@
     <string name="contextMenuPhoneNumberDial">Composer</string>
     <string name="contextMenuPhoneNumberSms">Rédiger un SMS</string>
     <string name="createFolderName">Nom du dossier</string>
-    <string name="createFolderNoParent">Aucun</string>
-    <string name="createFolderParent">Dossier parent</string>
     <string name="datePickerTitle">Choisir une date et une heure</string>
     <string name="dateTitle">Date :</string>
     <string name="deleteAccountWarning">La suppression de votre compte sera définitive. Vous ne pourrez pas réactiver votre compte.</string>
@@ -273,19 +264,18 @@
     <string name="emptyStateTrashDescription">Déplacez les messages dans la corbeille. Ils seront supprimés définitivement au bout de 30 jours.</string>
     <string name="emptyStateTrashTitle">La corbeille est vide</string>
     <string name="enableFilterButton">Activer le filtre</string>
-    <string name="enableMultiSelection">Activer la sélection multiple</string>
     <string name="encryptedButtonSeeConcernedRecipients">Voir les destinataires concernés</string>
     <string name="encryptedMessageAddPasswordButton">Protéger avec un mot de passe</string>
-    <string name="encryptedMessageAddPasswordInformation">Un mot de passe est nécessaire uniquement pour les utilisateurs hors Infomaniak. Pour eux, le message expirera 30 jours après envoi.</string>
+    <string name="encryptedMessageAddPasswordInformation">Un mot de passe est nécessaire uniquement pour les destinataires hors Infomaniak. Pour eux, le message expirera 30 jours après envoi.</string>
     <string name="encryptedMessageDisableEncryptionButton">Désactiver le chiffrement</string>
     <string name="encryptedMessageGeneratePasswordContentDescription">Générer un mot de passe</string>
     <string name="encryptedMessageHeader">Ce message est chiffré.</string>
     <string name="encryptedMessageHeaderPasswordExpiryDate">Ce message a été chiffré et expirera le %s uniquement pour les destinataires ne pouvant bénéficier du chiffrement automatique.</string>
     <plurals name="encryptedMessageIncompleteUser">
-        <item quantity="one">Le chiffrement n’est pas pris en charge par %d utilisateur.</item>
-        <item quantity="other">Le chiffrement n’est pas pris en charge par %d utilisateurs.</item>
+        <item quantity="one">Le chiffrement n’est pas pris en charge par %d destinataire.</item>
+        <item quantity="other">Le chiffrement n’est pas pris en charge par %d destinataires.</item>
     </plurals>
-    <string name="encryptedMessagePasswordConcernedUserTitle">Utilisateurs concernés</string>
+    <string name="encryptedMessagePasswordConcernedUserTitle">Destinataires concernés</string>
     <string name="encryptedMessagePasswordLabel">Partagez ce mot de passe par message privé. Vous ne pourrez plus le copier après l’envoi.</string>
     <string name="encryptedMessageSnackbarEncryptionDisabled">Le chiffrement a bien été désactivé</string>
     <string name="encryptedMessageSnackbarScheduledUnavailable">L’envoi programmé n’est pas disponible pour les messages chiffrés</string>
@@ -293,7 +283,7 @@
     <string name="encryptedPasswordProtectionTitle">Protection par mot de passe</string>
     <string name="encryptedProtectionAdDescription">Protégez votre message contre tout accès non autorisé grâce au chiffrement Infomaniak.</string>
     <string name="encryptedProtectionAdDescription1">L’objet du message reste visible mais le contenu est entièrement sécurisé.</string>
-    <string name="encryptedProtectionAdDescription2">Un mot de passe sera requis pour les utilisateurs hors Infomaniak.</string>
+    <string name="encryptedProtectionAdDescription2">Un mot de passe sera requis pour les destinataires hors Infomaniak.</string>
     <string name="encryptedProtectionAdTitle">Chiffrez vos messages confidentiels</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Destinataires avec mot de passe (%d)</string>
     <string name="encryptedStatePanelEnable">Votre message est protégé.</string>
@@ -409,12 +399,8 @@
     <string name="messageShowQuotedText">Afficher la conversation</string>
     <string name="mondayAfternoon">Lundi après-midi</string>
     <string name="mondayMorning">Lundi matin</string>
-    <string name="moreStorageText1">Votre boîte est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
-    <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
-    <string name="moreStorageTitle">Votre boîte est pleine ? Obtenez plus de stockage !</string>
     <string name="moveInSpamButton">Déplacer dans Spam</string>
     <string name="moveSearchFieldPlaceholder">Rechercher un dossier</string>
-    <string name="moveTitle">Dans quel dossier souhaitez-vous déplacer votre e-mail ?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d sélectionné</item>
         <item quantity="other">%d sélectionnés</item>
@@ -447,7 +433,6 @@
     <string name="noNetwork">Pas de signal</string>
     <string name="noSubjectTitle">(aucun sujet)</string>
     <string name="noUpdatedAt">Jamais mis à jour</string>
-    <string name="noValidMailboxTitle">Aucune boîte valide n’a été trouvée. Ne peut être corrigé que sur le webmail pour l’instant.</string>
     <string name="notificationGeneralChannelName">Notifications générales</string>
     <string name="notificationNewEmail">Vous pourriez avoir de nouveaux messages</string>
     <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>
@@ -470,7 +455,6 @@
     <string name="onBoardingTitle4">Lancez vous !</string>
     <string name="organizationName">Organisation : %s</string>
     <string name="otherOrganisation">Autre</string>
-    <string name="pendingMessagesFolder">Messages en attente</string>
     <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
     <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
@@ -555,10 +539,7 @@
     <string name="settingsSectionPrivacy">Confidentialité</string>
     <string name="settingsSectionSecurity">Sécurité</string>
     <string name="settingsSecurityAdsFilter">Filtre publicitaire et réseaux sociaux</string>
-    <string name="settingsSecurityApprovedOption">Autorisés</string>
-    <string name="settingsSecurityBlockedOption">Bloqués</string>
     <string name="settingsSecurityBlockedRecipients">Expéditeurs bloqués / autorisés</string>
-    <string name="settingsSecurityBlockedRecipientsDescription">Vous pouvez spécifier des expéditeurs à autoriser ou bloquer pour que notre protection Anti-Spam les traite pour vous.</string>
     <string name="settingsSecuritySpamFilter">Filtre anti-spam</string>
     <string name="settingsSelectDisplayModeDescription">Sélectionnez un mode d’affichage</string>
     <string name="settingsSendAcknowledgement">Demander un accusé de réception pour chaque message envoyé</string>
@@ -660,7 +641,6 @@
     <string name="startActivityCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
     <string name="subjectTitle">Objet :</string>
     <string name="superCollapsedBlock">Voir tout (%d)</string>
-    <string name="swissTransferAttachmentDescription">L’expéditeur a joint un ou plusieurs fichiers volumineux, disponibles via le lien SwissTransfer.</string>
     <string name="syncCalendarsAndContactsDescription">Consultez vos contacts et calendriers directement depuis votre appareil.</string>
     <string name="syncCalendarsAndContactsTitle">Synchronisation des calendriers et contacts</string>
     <string name="syncFragmentTitle">Synchroniser vos calendriers et contacts</string>
@@ -674,7 +654,6 @@
         <item quantity="other">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
         <item quantity="many">Êtes-vous sûr de vouloir supprimer ces conversations définitivement ?</item>
     </plurals>
-    <string name="threadListEmptyDraftButton">Vider les brouillons</string>
     <string name="threadListEmptyFolderAlertDescription">Êtes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
     <string name="threadListEmptySpamButton">Vider les spams</string>
     <string name="threadListEmptyTrashButton">Vider la corbeille</string>
