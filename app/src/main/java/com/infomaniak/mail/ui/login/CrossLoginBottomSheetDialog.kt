@@ -33,8 +33,8 @@ import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
     private var binding: BottomSheetCrossLoginBinding by safeBinding()
-    private val introViewModel: IntroViewModel by activityViewModels()
 
+    private val introViewModel: IntroViewModel by activityViewModels()
     private val crossAppLoginViewModel: CrossAppLoginViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

@@ -738,4 +738,20 @@
             android:name="dashboardData"
             app:argType="com.infomaniak.core.ksuite.myksuite.ui.screens.MyKSuiteDashboardScreenData" />
     </fragment>
+
+    <dialog
+        android:id="@+id/kSuiteProBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.KSuiteProBottomSheetDialog"
+        android:label="KSuiteProBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_k_suite_pro">
+        <argument
+            android:name="offer"
+            android:defaultValue="Standard"
+            app:argType="com.infomaniak.core.ksuite.ksuitepro.data.ProOffer" />
+        <argument
+            android:name="isAdmin"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </dialog>
+
 </navigation>
