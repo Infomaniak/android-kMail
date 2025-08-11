@@ -187,7 +187,7 @@ class FetchMessagesManager @Inject constructor(
         mailbox: Mailbox,
         realm: Realm,
     ) {
-        if (MessageController.doesMessageExist(notificationMessageUidToLog, realm)) {
+        if (MessageController.doesMessageExist(notificationMessageUidToLog, realm).not()) {
             SentryDebug.sendMissingMessageUidInRealm(
                 userId,
                 mailbox.mailboxId,
