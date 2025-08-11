@@ -45,7 +45,7 @@ class ActionItemView @JvmOverloads constructor(
 
     private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val myKSuiteChipPlusChipView by lazy { MyKSuitePlusChipView(context) }
+    private val myKSuitePlusChipView by lazy { MyKSuitePlusChipView(context) }
 
     var trailingContent = TrailingContent.None
         set(value) {

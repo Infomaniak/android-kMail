@@ -40,12 +40,13 @@ include(
     ":Core:Legacy:Confetti",
     ":Core:Legacy:Stores",
     ":Core:Matomo",
-    ":Core:Onboarding",
-    ":Core:kSuite:kSuitePro",
-    ":Core:kSuite:MyKSuite",
     ":Core:Network",
     ":Core:Network:Models",
+    ":Core:Onboarding",
     ":Core:Sentry",
+    ":Core:kSuite",
+    ":Core:kSuite:MyKSuite",
+    ":Core:kSuite:kSuitePro",
     ":EmojiComponents",
-    ":HtmlCleaner"
+    ":HtmlCleaner",
 )
