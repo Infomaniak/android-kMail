@@ -126,6 +126,10 @@ class FetchMessagesManager @Inject constructor(
 
         SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${threadsWithNewMessages.count()} Threads with new Messages")
 
+        notificationMessageUidToLog?.let { notificationMessageUidToLog ->
+            logNotFetchedMessageUid(notificationMessageUidToLog, userId, mailbox, realm)
+        }
+
         // Dismiss Notifications for Messages that have been read on another device
         notificationManagerCompat.activeNotifications.forEach { statusBarNotification ->
             statusBarNotification.notification.extras.getString(EXTRA_MESSAGE_UID)?.let { messageUid ->
@@ -154,10 +158,6 @@ class FetchMessagesManager @Inject constructor(
         if (threadsWithNewMessages.isEmpty()) {
             realm.close()
             return true
-        }
-
-        notificationMessageUidToLog?.let { notificationMessageUidToLog ->
-            logNotFetchedMessageUid(notificationMessageUidToLog, userId, mailbox, realm)
         }
 
         // Notify Threads with new Messages
