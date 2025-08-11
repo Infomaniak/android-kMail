@@ -1,0 +1,53 @@
+<!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2025 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M1.5,11.25C1.5,12.245 1.895,13.198 2.598,13.902C3.302,14.605 4.255,15 5.25,15C6.245,15 7.198,14.605 7.902,13.902C8.605,13.198 9,12.245 9,11.25C9,10.255 8.605,9.302 7.902,8.598C7.198,7.895 6.245,7.5 5.25,7.5C4.255,7.5 3.302,7.895 2.598,8.598C1.895,9.302 1.5,10.255 1.5,11.25Z"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.5"
+      android:strokeColor="#9f9f9f"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M15,6C15,6.995 15.395,7.948 16.098,8.652C16.802,9.355 17.755,9.75 18.75,9.75C19.745,9.75 20.698,9.355 21.402,8.652C22.105,7.948 22.5,6.995 22.5,6C22.5,5.005 22.105,4.052 21.402,3.348C20.698,2.645 19.745,2.25 18.75,2.25C17.755,2.25 16.802,2.645 16.098,3.348C15.395,4.052 15,5.005 15,6Z"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.5"
+      android:strokeColor="#9f9f9f"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M15,18C15,18.995 15.395,19.948 16.098,20.652C16.802,21.355 17.755,21.75 18.75,21.75C19.745,21.75 20.698,21.355 21.402,20.652C22.105,19.948 22.5,18.995 22.5,18C22.5,17.005 22.105,16.052 21.402,15.348C20.698,14.645 19.745,14.25 18.75,14.25C17.755,14.25 16.802,14.645 16.098,15.348C15.395,16.052 15,17.005 15,18Z"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.5"
+      android:strokeColor="#9f9f9f"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M8.746,9.89L15.254,7.359"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.5"
+      android:strokeColor="#9f9f9f"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M8.605,12.928L15.396,16.323"
+      android:strokeLineJoin="round"
+      android:strokeWidth="1.5"
+      android:strokeColor="#9f9f9f"
+      android:strokeLineCap="round"/>
+</vector>
