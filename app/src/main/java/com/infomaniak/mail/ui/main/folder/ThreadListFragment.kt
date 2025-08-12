@@ -722,10 +722,10 @@ class ThreadListFragment : TwoPaneFragment() {
 
     private fun removeMultiSelectItems(deletedIndices: IntArray) = with(mainViewModel) {
         if (isMultiSelectOn) {
-            val previousThreads = threadListAdapter.dataSet.filterIsInstance<Thread>()
+            val previousThreads = threadListAdapter.dataSet.filterIsInstance<ThreadListItem.Content>()
             var shouldPublish = false
             deletedIndices.forEach {
-                val isRemoved = mainViewModel.selectedThreads.remove(previousThreads[it])
+                val isRemoved = mainViewModel.selectedThreads.remove(previousThreads[it].thread)
                 if (isRemoved) shouldPublish = true
             }
             if (shouldPublish) publishSelectedItems()
