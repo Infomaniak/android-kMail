@@ -629,7 +629,6 @@ class ThreadViewModel @Inject constructor(
         return fakedReaction
     }
 
-
     data class SubjectDataResult(
         val thread: Thread?,
         val mergedContacts: MergedContactDictionary?,
