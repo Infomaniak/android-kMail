@@ -160,7 +160,8 @@ object ApiRoutes {
     }
 
     fun search(mailboxUuid: String, folderId: String, hasDisplayModeThread: Boolean, filters: String): String {
-        return "${folder(mailboxUuid, folderId)}/message?thread=$hasDisplayModeThread&offset=0&$filters"
+        val hasDisplayModeThreadToOnOff = if (hasDisplayModeThread) "on" else "off"
+        return "${folder(mailboxUuid, folderId)}/message?thread=${hasDisplayModeThreadToOnOff}&offset=0&$filters"
     }
     //endregion
 

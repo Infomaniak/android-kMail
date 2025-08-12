@@ -154,10 +154,10 @@ class MessageController @Inject constructor(
             val containsPreview = "${Message::preview.name} CONTAINS[c] $0"
             val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS[c] $0"
             val beginQuery = if (filtersQuery.isNotBlank()) "$filtersQuery AND " else ""
-            val featureFlag = if (!FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) {
-                " AND ${Message::emojiReaction.name} == nil"
-            } else {
+            val featureFlag = if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) {
                 ""
+            } else {
+                " AND ${Message::emojiReaction.name} == nil"
             }
 
             query<Message>(
