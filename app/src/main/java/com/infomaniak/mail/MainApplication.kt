@@ -184,7 +184,6 @@ open class MainApplication : Application(), SingletonImageLoader.Factory, Defaul
         MatomoMail.addTrackingCallbackForDebugLog()
     }
 
-
     /**
      * Reasons to discard Sentry events :
      * - The exception was an [ApiErrorException] with an [ErrorCode.ACCESS_DENIED] or
