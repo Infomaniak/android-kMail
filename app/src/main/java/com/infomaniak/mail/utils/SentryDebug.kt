@@ -213,7 +213,6 @@ object SentryDebug {
         mailboxId: Int? = null,
         messageUid: String? = null,
         mailbox: Mailbox? = null,
-        throwable: Throwable? = null,
     ) {
         sendNotificationSentry(
             "Message uid not found in Realm.",
@@ -221,7 +220,7 @@ object SentryDebug {
             mailboxId,
             mailbox,
             messageUid,
-            throwable,
+            null,
         )
     }
 
@@ -243,7 +242,7 @@ object SentryDebug {
         mailboxId: Int?,
         mailbox: Mailbox?,
         messageUid: String?,
-        throwable: Throwable?
+        throwable: Throwable?,
     ) {
         Sentry.captureMessage(message, SentryLevel.ERROR) { scope ->
             scope.setExtra("userId", "${userId?.toString()}")
