@@ -40,10 +40,7 @@ enum class EmojiReactionNotAllowedReason(
         "message_in_reply_to_not_valid",
         R.string.errorEmojiReactionMessageInReplyToNotValid
     ),
-    EmojiReactionMessageInReplyToEncrypted(
-        "message_in_reply_to_not_valid",
-        R.string.errorEmojiReactionMessageInReplyEncrypted
-    ),
+    EmojiReactionMessageInReplyToEncrypted("message_in_reply_to_encrypted", R.string.errorEmojiReactionMessageInReplyEncrypted),
     EmojiReactionMaxRecipient("max_recipient", R.string.errorEmojiReactionMaxRecipient),
     EmojiReactionRecipientNotAllowed("recipient_not_allowed", R.string.errorEmojiReactionRecipientNotAllowed);
 
