@@ -69,7 +69,7 @@ class FetchMessagesManager @Inject constructor(
         scope: CoroutineScope,
         userId: Int,
         mailbox: Mailbox,
-        sentryMessageUid: String? = null,
+        notificationMessageUidToLog: String? = null,
         mailboxContentRealm: Realm? = null,
     ): Boolean {
         coroutineScope = scope
@@ -112,7 +112,7 @@ class FetchMessagesManager @Inject constructor(
                         reason = "RefreshThreads failed",
                         userId = userId,
                         mailboxId = mailbox.mailboxId,
-                        messageUid = sentryMessageUid,
+                        messageUid = notificationMessageUidToLog,
                         mailbox = mailbox,
                         throwable = throwable,
                     )
@@ -125,6 +125,10 @@ class FetchMessagesManager @Inject constructor(
         }
 
         SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${threadsWithNewMessages.count()} Threads with new Messages")
+
+        notificationMessageUidToLog?.let { notificationMessageUidToLog ->
+            logNotFetchedMessageUid(notificationMessageUidToLog, userId, mailbox, realm)
+        }
 
         // Dismiss Notifications for Messages that have been read on another device
         notificationManagerCompat.activeNotifications.forEach { statusBarNotification ->
@@ -166,7 +170,7 @@ class FetchMessagesManager @Inject constructor(
                 realm = realm,
                 unReadThreadsCount = unReadThreadsCount,
                 isLastMessage = index == threadsWithNewMessages.lastIndex,
-                sentryMessageUid = sentryMessageUid,
+                sentryMessageUid = notificationMessageUidToLog,
                 okHttpClient = okHttpClient,
             ).let {
                 if (it) hasShownNotification = true
@@ -175,6 +179,22 @@ class FetchMessagesManager @Inject constructor(
 
         realm.close()
         return hasShownNotification
+    }
+
+    private fun logNotFetchedMessageUid(
+        notificationMessageUidToLog: String,
+        userId: Int,
+        mailbox: Mailbox,
+        realm: Realm,
+    ) {
+        if (MessageController.doesMessageExist(notificationMessageUidToLog, realm).not()) {
+            SentryDebug.sendMissingMessageUidInRealm(
+                userId,
+                mailbox.mailboxId,
+                notificationMessageUidToLog,
+                mailbox,
+            )
+        }
     }
 
     private suspend fun Thread.showThreadNotification(

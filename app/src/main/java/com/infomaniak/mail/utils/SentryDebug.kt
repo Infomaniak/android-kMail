@@ -208,6 +208,22 @@ object SentryDebug {
         }
     }
 
+    fun sendMissingMessageUidInRealm(
+        userId: Int? = null,
+        mailboxId: Int? = null,
+        messageUid: String? = null,
+        mailbox: Mailbox? = null,
+    ) {
+        sendNotificationSentry(
+            "Message uid not found in Realm.",
+            userId,
+            mailboxId,
+            mailbox,
+            messageUid,
+            null,
+        )
+    }
+
     fun sendFailedNotification(
         reason: String,
         userId: Int? = null,
@@ -216,10 +232,19 @@ object SentryDebug {
         mailbox: Mailbox? = null,
         throwable: Throwable? = null,
     ) {
+        val message = "Failed Notif : $reason"
+        sendNotificationSentry(message, userId, mailboxId, mailbox, messageUid, throwable)
+    }
 
-        val category = "Failed Notif : $reason"
-
-        Sentry.captureMessage(category, SentryLevel.ERROR) { scope ->
+    private fun sendNotificationSentry(
+        message: String,
+        userId: Int?,
+        mailboxId: Int?,
+        mailbox: Mailbox?,
+        messageUid: String?,
+        throwable: Throwable?,
+    ) {
+        Sentry.captureMessage(message, SentryLevel.ERROR) { scope ->
             scope.setExtra("userId", "${userId?.toString()}")
             scope.setExtra("currentUserId", "[${AccountUtils.currentUserId}]")
             scope.setExtra("mailboxId", "${mailboxId?.toString()}")

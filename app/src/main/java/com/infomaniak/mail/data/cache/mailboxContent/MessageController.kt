@@ -209,6 +209,10 @@ class MessageController @Inject constructor(
             val thread = ThreadController.getThread(threadUid, realm)
             return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
         }
+
+        fun doesMessageExist(uid: String, realm: TypedRealm): Boolean {
+            return getMessagesQuery(uid, realm).count().find() > 0
+        }
         //endregion
 
         //region Edit data
