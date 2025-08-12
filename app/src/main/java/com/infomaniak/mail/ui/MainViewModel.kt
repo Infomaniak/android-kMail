@@ -18,8 +18,8 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import androidx.annotation.StringRes
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -1123,12 +1123,8 @@ class MainViewModel @Inject constructor(
         toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = false)
     }
 
-    fun toggleThreadSpamStatus(threadUids: List<String>) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = threadUids)
-    }
-
-    fun toggleThreadsSpamStatus(threadsUids: List<String>) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = threadsUids)
+    fun toggleThreadSpamStatus(threadUids: List<String>, displaySnackbar: Boolean = true) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = threadUids, displaySnackbar = displaySnackbar)
     }
 
     private fun toggleThreadsOrMessageSpamStatus(
@@ -1170,10 +1166,10 @@ class MainViewModel @Inject constructor(
 
         with(apiCall) {
             val snackbarTitle = if (isSuccess()) {
-                for (i in 0..messages.size){
-                    if (folderRoleUtils.getActionFolderRole(messages[i]) != FolderRole.SPAM) toggleMessageSpamStatus(
-                        threadUids[i],
-                        messages[i]
+                if (folderRoleUtils.getActionFolderRole(messages[0]) != FolderRole.SPAM) {
+                    toggleThreadSpamStatus(
+                        threadUids = threadUids,
+                        displaySnackbar = false
                     )
                 }
 
