@@ -262,8 +262,12 @@
             android:defaultValue="0L"
             app:argType="long" />
         <argument
-            android:name="isCurrentMailboxFree"
-            android:defaultValue="true"
+            android:name="currentKSuite"
+            android:defaultValue="PersoFree"
+            app:argType="com.infomaniak.mail.data.models.mailbox.Mailbox$KSuite" />
+        <argument
+            android:name="isAdmin"
+            android:defaultValue="false"
             app:argType="boolean" />
     </dialog>
 
@@ -281,8 +285,12 @@
             android:defaultValue="0L"
             app:argType="long" />
         <argument
-            android:name="isCurrentMailboxFree"
-            android:defaultValue="true"
+            android:name="currentKSuite"
+            android:defaultValue="PersoFree"
+            app:argType="com.infomaniak.mail.data.models.mailbox.Mailbox$KSuite" />
+        <argument
+            android:name="isAdmin"
+            android:defaultValue="false"
             app:argType="boolean" />
     </dialog>
 
