@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.api
 
-import android.util.Log
 import com.infomaniak.core.cancellable
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.utils.FORMAT_FULL_DATE_WITH_HOUR
@@ -393,15 +392,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.reportPhishing(mailboxUuid, folderId, shortUid), POST, mapOf("type" to "phishing"))
     }
 
-    // TODO: comment on development time
-    // suspend fun blockUser(mailboxUuid: String, folderId: List<String>, shortUid: List<Int>): ApiResponse<Boolean> {
-    //     return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
-    // }
-
-    suspend fun blockUser(mailboxUuid: String, folderId: String?, shortUid: Int?): Boolean {
-        // Kylian: TODO faire le liens vers la nouvelle api
-        Log.e("TOTO", "blockUser: ApiRepository > blockUser with params ==> mailboxUuid ($mailboxUuid), folderId ($folderId), shortUid ($shortUid)")
-        return true
+    suspend fun blockUser(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
     suspend fun snoozeMessages(mailboxUuid: String, messageUids: List<String>, date: Date): List<ApiResponse<Unit>> {
