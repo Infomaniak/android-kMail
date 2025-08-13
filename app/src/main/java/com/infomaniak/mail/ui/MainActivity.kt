@@ -64,6 +64,7 @@ import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.mailbox.Mailbox.KSuite
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
@@ -90,6 +91,7 @@ import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiv
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.utils.extensions.safeArea
+import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -324,16 +326,32 @@ class MainActivity : BaseActivity() {
         if (errorRes > 0) {
             showSendingSnackbarTimer.cancel()
 
+            val currentKSuite = mainViewModel.currentMailbox.value?.kSuite
             val hasLimitBeenReached = errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_LIMIT_EXCEEDED) ||
                     errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_DAILY_LIMIT_REACHED)
+            val matomoDailyLimit = MatomoName.TrySendingWithDailyLimitReached
+            val matomoDailyLimitUpgrade = MatomoName.DailyLimitReachedUpgrade.value
 
-            if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
-                trackNewMessageEvent(MatomoName.TrySendingWithDailyLimitReached)
-                snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                    openMyKSuiteUpgradeBottomSheet(navController, MatomoName.DailyLimitReachedUpgrade.value)
+            when {
+                currentKSuite == KSuite.PersoFree && hasLimitBeenReached -> {
+                    trackNewMessageEvent(matomoDailyLimit)
+                    snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
+                        openMyKSuiteUpgradeBottomSheet(navController, matomoDailyLimitUpgrade)
+                    }
                 }
-            } else {
-                snackbarManager.setValue(getString(errorRes))
+                currentKSuite == KSuite.ProFree && hasLimitBeenReached -> {
+                    trackNewMessageEvent(matomoDailyLimit)
+                    snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
+                        openKSuiteProBottomSheet(
+                            navController = navController,
+                            isAdmin = mainViewModel.currentMailbox.value?.isAdmin ?: false,
+                            matomoTrackerName = matomoDailyLimitUpgrade,
+                        )
+                    }
+                }
+                else -> {
+                    snackbarManager.setValue(getString(errorRes))
+                }
             }
         }
     }

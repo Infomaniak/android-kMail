@@ -36,6 +36,7 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.mailbox.Mailbox.KSuite
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.MIN_SELECTABLE_DATE_MINUTES
 import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Afternoon
@@ -64,7 +65,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
 
     abstract val lastSelectedEpoch: Long?
     abstract val currentlyScheduledEpochMillis: Long?
-    abstract val isCurrentMailboxFree: Boolean
+    abstract val currentKSuite: KSuite
 
     @get:StringRes
     abstract val titleRes: Int
@@ -91,7 +92,11 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
         val shouldDisplayDivider = lastScheduleOption.isVisible
         (scheduleOptions.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
 
-        customScheduleOption.trailingContent = if (isCurrentMailboxFree) TrailingContent.MyKSuiteChip else TrailingContent.Chevron
+        customScheduleOption.trailingContent = when (currentKSuite) {
+            KSuite.PersoFree -> TrailingContent.MyKSuiteChip
+            KSuite.ProFree -> TrailingContent.KSuiteProChip
+            else -> TrailingContent.Chevron
+        }
     }
 
     private fun computeLastScheduleOption() = with(binding) {
