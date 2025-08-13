@@ -1169,7 +1169,7 @@ class MainViewModel @Inject constructor(
 
         with(ApiRepository.reportPhishing(mailboxUuid, messagesUids)) {
             val snackbarTitle = if (isSuccess()) {
-                if (folderRoleUtils.getActionFolderRole(messages[0]) != FolderRole.SPAM) {
+                if (folderRoleUtils.getActionFolderRole(messages.first()) != FolderRole.SPAM) {
                     toggleThreadSpamStatus(
                         threadUids = threadUids,
                         displaySnackbar = false
@@ -1217,7 +1217,7 @@ class MainViewModel @Inject constructor(
     fun blockUser(messages: List<Message?>) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
-        messages[0]?.let {
+        messages.first()?.let {
             with(ApiRepository.blockUser(mailboxUuid, it.folderId, it.shortUid)) {
 
                 val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translateError()
@@ -1576,15 +1576,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun getMessagesFromUniqueExpeditors(threadUids: List<String>) = liveData(ioCoroutineContext) {
-        var messageToRecipient = emptyList<Pair<Message, Recipient>>()
+        val messageToRecipient = mutableListOf<Pair<Message, Recipient>>()
         threadController.getThreads(threadUids).forEach { thread ->
-            thread?.messages
-                ?.distinctBy { it.from }
-                ?.flatMap { message ->
+            thread.messages
+                .distinctBy { it.from }
+                .flatMap { message ->
                     message.from.filterNot { it.isMe() }
                         .distinct()
-
-                        .map { from -> messageToRecipient += message to from }
+                        .map { from -> messageToRecipient.add(message to from) }
                 }
         }
         emit(messageToRecipient)

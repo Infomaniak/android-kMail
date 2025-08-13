@@ -93,13 +93,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setSnoozeUi(thread.isSnoozed())
         }
 
-        getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { result ->
-            result[0]?.let {
-                val thread: Thread? = threadController.getThread(uid = it.threadUid)
-                if (thread != null) {
-                    setupListeners(thread, it, it.messageUid)
-                }
-            } ?: findNavController().popBackStack()
+        getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) {
+            val thread: Thread? = threadController.getThread(uid = it.first().threadUid)
+            if (thread != null) {
+                setupListeners(thread, it.first(), it.first().messageUid)
+            }
         }
     }
 

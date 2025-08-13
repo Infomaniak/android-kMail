@@ -193,11 +193,8 @@ class ThreadFragment : Fragment() {
     @Inject
     lateinit var subjectFormatter: SubjectFormatter
 
-    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
-
     private var _binding: FragmentThreadBinding? = null
-
-    private val currentClassName: String by lazy { ThreadFragment::class.java.name }
+    private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
@@ -261,12 +258,10 @@ class ThreadFragment : Fragment() {
     private fun observeMessageOfUserToBlock() = with(confirmationToBlockUserDialog) {
         mainViewModel.messagesOfUserToBlock.observe(viewLifecycleOwner) {
             setPositiveButtonCallback { messagesOfUserToBlock ->
-                messagesOfUserToBlock?.let {
-                    trackBlockUserAction(MatomoName.ConfirmSelectedUser)
-                    mainViewModel.blockUser(messagesOfUserToBlock)
-                }
+                trackBlockUserAction(MatomoName.ConfirmSelectedUser)
+                mainViewModel.blockUser(messagesOfUserToBlock)
             }
-            show(it as List<Message>)
+            show(it.filterNotNull())
         }
     }
 

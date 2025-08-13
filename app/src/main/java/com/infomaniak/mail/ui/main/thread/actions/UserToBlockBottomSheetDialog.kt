@@ -34,7 +34,7 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
     private var binding: BottomSheetUserToBlockBinding by safeBinding()
     private val navigationArgs: UserToBlockBottomSheetDialogArgs by navArgs()
 
-    private var messagesOfUserToBlock: List<Message?> = emptyList()
+    private val messagesOfUserToBlock = mutableListOf<Message?>()
 
     override val mainViewModel: MainViewModel by activityViewModels()
 
@@ -45,9 +45,9 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
         mainViewModel.getMessagesFromUniqueExpeditors(threadUids.asList()).observe(viewLifecycleOwner) { messages ->
-            messages.isNotEmpty().let {
+            if (messages.isNotEmpty()) {
                 binding.recipients.adapter = UserToBlockAdapter(messages) { message ->
-                    messagesOfUserToBlock += message
+                    messagesOfUserToBlock.add(message)
                     dismiss()
                 }
             }
@@ -56,6 +56,6 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        messagesOfUserToBlock.let { mainViewModel.messagesOfUserToBlock.value = it }
+        if (messagesOfUserToBlock.isNotEmpty()) mainViewModel.messagesOfUserToBlock.value = this.messagesOfUserToBlock
     }
 }
