@@ -53,8 +53,6 @@ class Mailbox : RealmObject {
     var hostingId: Int = 0
     @SerialName("link_id")
     var linkId: Int = 0
-    @SerialName("is_limited")
-    var isLimited: Boolean = false
     @SerialName("is_primary")
     var isPrimary: Boolean = false
     @SerialName("is_valid")
@@ -66,10 +64,18 @@ class Mailbox : RealmObject {
     @SerialName("unseen_messages")
     var unreadCountRemote: Int = 0
     var aliases = realmListOf<String>()
-    @SerialName("is_free")
-    var isFree: Boolean = false
     @SerialName("is_spam_filter")
     var isSpamFiltered: Boolean = false
+    @SerialName("is_free")
+    var isMyKSuite: Boolean = false // Means it's a personal Mailbox (and not a professional one), so any [KSuite.Perso*] tier
+    @SerialName("is_limited")
+    var isMyKSuiteFree: Boolean = false // Means it's a free personal Mailbox, so specifically [KSuite.PersoFree]
+    @SerialName("is_part_of_ksuite")
+    var isKSuitePro: Boolean = false // Means it's a professional Mailbox (and not a personal one), so any [KSuite.Pro*] tier
+    @SerialName("is_ksuite_essential")
+    var isKSuiteProFree: Boolean = false // Means it's a free professional Mailbox, so specifically [KSuite.ProFree]
+    @SerialName("owner_or_admin")
+    var isAdmin: Boolean = false
     //endregion
 
     //region Local data (Transient)
@@ -108,6 +114,23 @@ class Mailbox : RealmObject {
     val featureFlags = FeatureFlagSet(::_featureFlags)
     //endregion
 
+    enum class KSuite {
+        PersoFree,
+        PersoPlus,
+        ProFree,
+        ProStandard,
+        ProBusiness, // Unused for now, all Pro paid tiers got the same functionalities in kMail, so [ProStandard] is enough
+        ProEnterprise, // Unused for now, all Pro paid tiers got the same functionalities in kMail, so [ProStandard] is enough
+    }
+
+    val kSuite: KSuite
+        get() = when {
+            isKSuitePro && !isKSuiteProFree -> KSuite.ProStandard
+            isKSuitePro && isKSuiteProFree -> KSuite.ProFree
+            isMyKSuite && !isMyKSuiteFree -> KSuite.PersoPlus
+            else -> KSuite.PersoFree
+        }
+
     inline val channelGroupId get() = "$mailboxId"
     inline val channelId get() = "${mailboxId}_channel_id"
     inline val notificationGroupId get() = uuid.hashCode()
@@ -121,8 +144,6 @@ class Mailbox : RealmObject {
             count = unreadCountLocal,
             shouldDisplayPastille = unreadCountLocal == 0 && unreadCountRemote > 0,
         )
-
-    val isFreeMailbox: Boolean get() = isFree && isLimited
 
     private fun createObjectId(userId: Int): String = "${userId}_${this.mailboxId}"
 

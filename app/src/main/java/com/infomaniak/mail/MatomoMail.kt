@@ -21,7 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
-import com.infomaniak.core.ksuite.myksuite.ui.utils.MatomoMyKSuite
+import com.infomaniak.core.ksuite.ksuitepro.utils.MatomoKSuitePro
 import com.infomaniak.core.matomo.Matomo
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
@@ -562,6 +562,14 @@ object MatomoMail : Matomo {
 
     fun trackMyKSuiteUpgradeBottomSheetEvent(name: String) {
         trackEvent(MatomoMyKSuite.CATEGORY_MY_KSUITE_UPGRADE_BOTTOMSHEET, name)
+    }
+
+    fun trackKSuiteProEvent(name: String) {
+        trackEvent(MatomoKSuitePro.CATEGORY_KSUITE_PRO, name)
+    }
+
+    fun trackKSuiteProBottomSheetEvent(name: String) {
+        trackEvent(MatomoKSuitePro.CATEGORY_KSUITE_PRO_BOTTOMSHEET, name)
     }
 
     fun trackEncryptionEvent(name: MatomoName) {
