@@ -159,8 +159,19 @@ object ApiRoutes {
         return "${folder(mailboxUuid, folderId)}/rename"
     }
 
-    fun search(mailboxUuid: String, folderId: String, filters: String): String {
-        return "${folder(mailboxUuid, folderId)}/message?thread=on&offset=0&$filters"
+    fun search(
+        mailboxUuid: String,
+        folderId: String,
+        hasDisplayModeThread: Boolean,
+        filters: String,
+        resource: String?,
+    ): String {
+        return if (resource.isNullOrBlank()) {
+            val hasDisplayModeThreadToOnOff = if (hasDisplayModeThread) "on" else "off"
+            "${folder(mailboxUuid, folderId)}/message?thread=${hasDisplayModeThreadToOnOff}&offset=0&$filters"
+        } else {
+            "${resource(resource)}&$filters"
+        }
     }
     //endregion
 

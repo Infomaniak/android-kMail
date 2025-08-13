@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
 import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.realm.kotlin.MutableRealm
@@ -130,6 +131,8 @@ class MessageController @Inject constructor(
         searchQuery: String?,
         filters: Set<ThreadFilter>,
         folderId: String?,
+        featureFlags: Mailbox.FeatureFlagSet?,
+        localSettings: LocalSettings
     ): List<Message> = with(mailboxContentRealm()) {
         val queriesList = mutableListOf<String>().apply {
             filters.forEach { filter ->
@@ -151,8 +154,16 @@ class MessageController @Inject constructor(
             val containsPreview = "${Message::preview.name} CONTAINS[c] $0"
             val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS[c] $0"
             val beginQuery = if (filtersQuery.isNotBlank()) "$filtersQuery AND " else ""
+            val featureFlag = if (FeatureAvailability.isReactionsAvailable(featureFlags, localSettings)) {
+                ""
+            } else {
+                " AND ${Message::emojiReaction.name} == nil"
+            }
 
-            query<Message>("$beginQuery ($containsSubject OR $containsPreview OR $containsBody)", searchQuery)
+            query<Message>(
+                query = "$beginQuery ($containsSubject OR $containsPreview OR $containsBody) ${featureFlag}",
+                searchQuery
+            )
         } else {
             query<Message>(filtersQuery)
         }.find().copyFromRealm()

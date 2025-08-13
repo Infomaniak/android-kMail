@@ -79,7 +79,6 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeUpdateResponse
 import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SharedUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
@@ -444,16 +443,10 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxUuid: String,
         folderId: String,
         filters: String,
-        resource: String?
+        hasDisplayModeThread: Boolean,
+        resource: String?,
     ): ApiResponse<ThreadResult> {
-
-        val url = if (resource.isNullOrBlank()) {
-            ApiRoutes.search(mailboxUuid, folderId, filters)
-        } else {
-            "${ApiRoutes.resource(resource)}&$filters"
-        }
-
-        return callApi(url, GET)
+        return callApi(ApiRoutes.search(mailboxUuid, folderId, hasDisplayModeThread, filters, resource), GET)
     }
 
     suspend fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> {
