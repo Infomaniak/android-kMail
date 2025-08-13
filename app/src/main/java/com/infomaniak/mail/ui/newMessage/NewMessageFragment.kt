@@ -71,6 +71,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.mailbox.Mailbox.KSuite
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainActivity
@@ -112,6 +113,7 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
+import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
@@ -816,7 +818,7 @@ class NewMessageFragment : Fragment() {
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
-                isCurrentMailboxFree = newMessageViewModel.currentMailbox.isFreeMailbox,
+                currentKSuite = newMessageViewModel.currentMailbox.kSuite,
             ).toBundle(),
         )
     }
@@ -857,11 +859,19 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun checkMailboxStorage(): Boolean {
-        val isMailboxFull = newMessageViewModel.currentMailbox.quotas?.isFull == true
+
+        val mailbox = newMessageViewModel.currentMailbox
+        val isMailboxFull = mailbox.quotas?.isFull == true
+
         if (isMailboxFull) {
             trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
-                openMyKSuiteUpgradeBottomSheet(MatomoMyKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME)
+                val matomoName = MatomoMyKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME
+                if (mailbox.kSuite == KSuite.ProFree) { // kSuite pro
+                    openKSuiteProBottomSheet(mailbox.isAdmin, matomoName)
+                } else { // kSuite perso
+                    openMyKSuiteUpgradeBottomSheet(matomoName)
+                }
             }
         }
 
