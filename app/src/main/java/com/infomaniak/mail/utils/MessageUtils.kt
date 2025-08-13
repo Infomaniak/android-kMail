@@ -33,7 +33,12 @@ object MessageUtils {
         val threadList = threadController.getThreads(threadsUids)
         val result = mutableListOf<JunkMessageThreadData>()
         threadList.forEach { thread ->
-            result += JunkMessageThreadData(thread.uid, messageController.getLastMessageToExecuteAction(thread, featureFlagsLive).uid)
+            result.add(
+                JunkMessageThreadData(
+                    threadUid = thread.uid,
+                    messageUid = messageController.getLastMessageToExecuteAction(thread, featureFlagsLive).uid
+                )
+            )
         }
         if (threadList.isEmpty()) {
             return emptyList()
