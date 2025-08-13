@@ -180,7 +180,7 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
-    val messagesOfUserToBlock = SingleLiveEvent<List<Message?>>()
+    val messagesOfUserToBlock = SingleLiveEvent<List<Message>>()
 
     val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
 
@@ -1214,10 +1214,10 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region BlockUser
-    fun blockUser(messages: List<Message?>) = viewModelScope.launch(ioCoroutineContext) {
+    fun blockUser(messages: List<Message>) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
-        messages.first()?.let {
+        messages.first().let {
             with(ApiRepository.blockUser(mailboxUuid, it.folderId, it.shortUid)) {
 
                 val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translateError()
@@ -1558,9 +1558,9 @@ class MainViewModel @Inject constructor(
 
     fun hasOtherExpeditors(threadUids: List<String>) = liveData(ioCoroutineContext) {
         val thereAreOtherExpeditor = threadController.getThreads(threadUids).any { thread ->
-            (thread?.messages
-                ?.flatMapTo(mutableSetOf()) { it.from }
-                ?.any { !it.isMe() }) == true
+            thread.messages
+                .flatMapTo(mutableSetOf()) { it.from }
+                .any { !it.isMe() }
         }
         emit(thereAreOtherExpeditor)
     }
@@ -1568,9 +1568,9 @@ class MainViewModel @Inject constructor(
     fun hasMoreThanOneExpeditor(threadUids: List<String>) = liveData(ioCoroutineContext) {
         var numberOfExpeditors = 0
         threadController.getThreads(threadUids).forEach { thread ->
-            numberOfExpeditors += (thread?.messages
-                ?.flatMap { it.from }
-                ?.count { !it.isMe() } ?: 0)
+            numberOfExpeditors += (thread.messages
+                .flatMap { it.from }
+                .count { !it.isMe() })
         }
         emit(numberOfExpeditors > 1)
     }

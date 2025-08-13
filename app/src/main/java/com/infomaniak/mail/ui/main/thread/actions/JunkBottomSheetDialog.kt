@@ -44,7 +44,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private var binding: BottomSheetJunkBinding by safeBinding()
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
 
-    private var messagesOfUserToBlock: List<Message?> = emptyList()
+    private var messagesOfUserToBlock: List<Message> = emptyList()
 
     override val mainViewModel: MainViewModel by activityViewModels()
 
