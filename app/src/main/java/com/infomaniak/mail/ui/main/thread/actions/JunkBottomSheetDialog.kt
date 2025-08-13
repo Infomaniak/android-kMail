@@ -64,6 +64,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         messagesUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.messageUid }
         threadsUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
 
+        // val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
         // TODO: When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
         val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)

@@ -187,7 +187,7 @@ object ApiRoutes {
     fun blockUser(mailboxUuid: String, folderId: String, shortUid: Int): String {
         return "${message(mailboxUuid, folderId, shortUid)}/blacklist"
     }
-    
+
     fun reportPhishing(mailboxUuid: String): String {
         return "${mailMailbox(mailboxUuid)}/message/report"
     }
