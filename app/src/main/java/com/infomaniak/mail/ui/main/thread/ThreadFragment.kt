@@ -41,7 +41,6 @@ import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
@@ -756,10 +755,9 @@ class ThreadFragment : Fragment() {
                 safeNavigate(
                     resId = R.id.junkBottomSheetDialog,
                     args = JunkBottomSheetDialogArgs(arrayOfThreadAndMessageUids).toBundle(),
-                    currentClassName = currentClassName,
                 )
             }
-            
+
         }
     }
 
