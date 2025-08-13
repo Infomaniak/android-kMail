@@ -29,7 +29,7 @@ import com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingAdapter.Sett
 
 class SignatureSettingAdapter(
     private val canManageSignature: Boolean,
-    private val isFreeMailbox: Boolean,
+    private val isMyKSuiteFreeMailbox: Boolean,
     private val onSignatureSelected: (Signature, Boolean) -> Unit,
 ) : Adapter<SettingsSignatureViewHolder>() {
 
@@ -47,7 +47,7 @@ class SignatureSettingAdapter(
         if (signature.isDefault) check() else uncheck()
         isEnabled = canManageSignature
 
-        val shouldBlockSignature = signature.isDummy && !signature.isDefault && isFreeMailbox
+        val shouldBlockSignature = signature.isDummy && !signature.isDefault && isMyKSuiteFreeMailbox
         setMyKSuiteChipVisibility(shouldBlockSignature)
 
         setOnClickListener { onSignatureSelected(signature, shouldBlockSignature) }
