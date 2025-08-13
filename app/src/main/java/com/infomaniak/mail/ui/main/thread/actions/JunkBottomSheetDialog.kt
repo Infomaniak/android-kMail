@@ -64,6 +64,14 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         messagesUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.messageUid }
         threadsUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
 
+        // TODO: When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
+        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
+        val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
+        binding.spam.apply {
+            setIconResource(spamIcon)
+            setTitle(spamText)
+        }
+
         mainViewModel.getMessages(messagesUids).observe(viewLifecycleOwner) { messages ->
             messagesOfUserToBlock = messages
             handleButtons(threadsUids, messages)
@@ -71,6 +79,10 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
         observeReportPhishingResult()
         observeExpeditorsResult(threadsUids)
+    }
+
+    private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
+        return if (isFromSpam) R.drawable.ic_non_spam to R.string.actionNonSpam else R.drawable.ic_spam to R.string.actionSpam
     }
 
     private fun observeReportPhishingResult() {
