@@ -388,10 +388,6 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.reportPhishing(mailboxUuid), POST, mapOf("type" to "phishing", "uids" to uids))
     }
 
-    suspend fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.reportPhishing(mailboxUuid, folderId, shortUid), POST, mapOf("type" to "phishing"))
-    }
-
     suspend fun blockUser(mailboxUuid: String, folderId: String, shortUid: Int): ApiResponse<Boolean> {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
