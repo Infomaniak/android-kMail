@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -1224,12 +1223,15 @@ class MainViewModel @Inject constructor(
     fun blockUser(messages: List<Message?>) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
 
+        messages[0]?.let {
+            with(ApiRepository.blockUser(mailboxUuid, it.folderId, it.shortUid)) {
 
-        val snackbarTitle = R.string.snackbarBlockUserConfirmation
-        snackbarManager.postValue(appContext.getString(snackbarTitle))
+                val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translateError()
+                snackbarManager.postValue(appContext.getString(snackbarTitle))
 
-        reportPhishingTrigger.postValue(Unit)
-        Log.e("TOTO-callApi", "blockUser: MainViewModel > blockUser with params ==> messages ($messages)")
+                reportPhishingTrigger.postValue(Unit)
+            }
+        }
     }
     //endregion
 
