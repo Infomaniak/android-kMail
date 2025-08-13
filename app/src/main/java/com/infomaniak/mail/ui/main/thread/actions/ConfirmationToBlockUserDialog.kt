@@ -39,8 +39,8 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         DialogConfirmationToBlockUserBinding.inflate(activity.layoutInflater)
     }
 
-    private var onPositiveButtonClick: ((List<Message?>) -> Unit)? = null
-    private var messagesOfUserToBlock: List<Message?> = emptyList()
+    private var onPositiveButtonClick: ((List<Message>) -> Unit)? = null
+    private var messagesOfUserToBlock: List<Message> = emptyList()
 
     override val alertDialog: AlertDialog = with(binding) {
         MaterialAlertDialogBuilder(context)
@@ -65,7 +65,7 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         alertDialog.show()
     }
 
-    fun setPositiveButtonCallback(onPositiveButtonClick: (List<Message?>) -> Unit) {
+    fun setPositiveButtonCallback(onPositiveButtonClick: (List<Message>) -> Unit) {
         this.onPositiveButtonClick = onPositiveButtonClick
     }
 }
