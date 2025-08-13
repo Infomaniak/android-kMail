@@ -446,14 +446,7 @@ object ApiRepository : ApiRepositoryCore() {
         hasDisplayModeThread: Boolean,
         resource: String?,
     ): ApiResponse<ThreadResult> {
-
-        val url = if (resource.isNullOrBlank()) {
-            ApiRoutes.search(mailboxUuid, folderId, hasDisplayModeThread, filters)
-        } else {
-            "${ApiRoutes.resource(resource)}&$filters"
-        }
-
-        return callApi(url, GET)
+        return callApi(ApiRoutes.search(mailboxUuid, folderId, hasDisplayModeThread, filters, resource), GET)
     }
 
     suspend fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> {
