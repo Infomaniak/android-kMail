@@ -21,9 +21,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
+import com.infomaniak.core.ksuite.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.core.matomo.Matomo
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.core.ksuite.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -273,6 +273,7 @@ object MatomoMail : Matomo {
         ReplyMaybe("replyMaybe"),
         ReplyNo("replyNo"),
         ReplyYes("replyYes"),
+        ReportJunk("reportJunk"),
         RequestPassword("requestPassword"),
         Restore("restore"),
         RestoreEmails("restoreEmails"),
