@@ -32,6 +32,7 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox.KSuite
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.databinding.FragmentSignatureSettingBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
@@ -72,8 +73,8 @@ class SignatureSettingFragment : Fragment() {
     private fun setupAdapter(mailbox: Mailbox) {
         binding.signatureList.adapter = SignatureSettingAdapter(
             canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
+            isMyKSuiteFreeMailbox = mailbox.kSuite == KSuite.PersoFree,
             onSignatureSelected = ::onSignatureClicked,
-            isFreeMailbox = mailbox.isFreeMailbox,
         )
     }
 
