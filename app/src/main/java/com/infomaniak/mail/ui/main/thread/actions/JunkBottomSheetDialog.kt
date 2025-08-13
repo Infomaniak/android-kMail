@@ -91,10 +91,11 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
                         currentClassName = JunkBottomSheetDialog::class.java.name,
                     )
                 } else {
-                    if(messagesOfUserToBlock.isNotEmpty()){
+                    if (messagesOfUserToBlock.isNotEmpty()) {
                         mainViewModel.messagesOfUserToBlock.value = messagesOfUserToBlock
                     }
                 }
+                mainViewModel.isMultiSelectOn = false
             }
         }
     }
