@@ -1165,15 +1165,9 @@ class MainViewModel @Inject constructor(
     //region Phishing
     fun reportPhishing(threadUids: List<String>, messages: List<Message>) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
+        val messagesUids: List<String> = messages.map { it.uid }
 
-        val apiCall = if (messages.size > 1) {
-            val messagesUids: List<String> = messages.map { it.uid }
-            ApiRepository.reportPhishing(mailboxUuid, messagesUids)
-        } else {
-            ApiRepository.reportPhishing(mailboxUuid, messages.first().folderId, messages.first().shortUid)
-        }
-
-        with(apiCall) {
+        with(ApiRepository.reportPhishing(mailboxUuid, messagesUids)) {
             val snackbarTitle = if (isSuccess()) {
                 if (folderRoleUtils.getActionFolderRole(messages[0]) != FolderRole.SPAM) {
                     toggleThreadSpamStatus(
