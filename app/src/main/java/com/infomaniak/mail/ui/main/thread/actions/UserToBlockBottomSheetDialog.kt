@@ -34,7 +34,7 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
     private var binding: BottomSheetUserToBlockBinding by safeBinding()
     private val navigationArgs: UserToBlockBottomSheetDialogArgs by navArgs()
 
-    private val messagesOfUserToBlock = mutableListOf<Message?>()
+    private val messagesOfUserToBlock = mutableListOf<Message>()
 
     override val mainViewModel: MainViewModel by activityViewModels()
 
