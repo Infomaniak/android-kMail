@@ -164,7 +164,7 @@ class MailboxController @Inject constructor(
         private val isValidInLdap = "${Mailbox.isValidInLdapPropertyName} == true"
         private val isLocked = "${Mailbox.isLockedPropertyName} == true"
         private val hasValidPassword = "${Mailbox::hasValidPassword.name} == true"
-        private val isMyKSuite = "${Mailbox::isFree.name} == true"
+        private val isMyKSuite = "${Mailbox::isMyKSuite.name} == true"
 
         private fun getMailboxesQuery(
             userId: Int? = null,

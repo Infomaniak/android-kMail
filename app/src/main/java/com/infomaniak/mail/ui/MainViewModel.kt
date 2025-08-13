@@ -62,6 +62,8 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
+import com.infomaniak.mail.data.models.mailbox.Mailbox.KSuite
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
@@ -263,7 +265,7 @@ class MainViewModel @Inject constructor(
     }.asLiveData(ioCoroutineContext)
 
     val swipeActionContext = Utils.waitInitMediator(featureFlagsLive, currentFolderLive) {
-        (it[0] as Mailbox.FeatureFlagSet) to (it[1] as Folder).role
+        (it[0] as FeatureFlagSet) to (it[1] as Folder).role
     }.distinctUntilChanged()
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
@@ -445,10 +447,11 @@ class MainViewModel @Inject constructor(
 
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
-        if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) {
+        if (mailbox.kSuite == KSuite.PersoFree) {
+            val apiResponse = ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)
+            if (apiResponse.isSuccess()) {
                 mailboxController.updateMailbox(mailbox.objectId) {
-                    it.quotas = data
+                    it.quotas = apiResponse.data
                 }
             }
         }

@@ -96,8 +96,12 @@
             android:defaultValue="0L"
             app:argType="long" />
         <argument
-            android:name="isCurrentMailboxFree"
-            android:defaultValue="true"
+            android:name="currentKSuite"
+            android:defaultValue="PersoFree"
+            app:argType="com.infomaniak.mail.data.models.mailbox.Mailbox$KSuite" />
+        <argument
+            android:name="isAdmin"
+            android:defaultValue="false"
             app:argType="boolean" />
     </dialog>
 
@@ -112,5 +116,20 @@
         <action
             android:id="@+id/action_encryptionActionsBottomSheetDialog_to_encryptionPasswordFragment"
             app:destination="@id/encryptionPasswordFragment" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/kSuiteProBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.bottomSheetDialogs.KSuiteProBottomSheetDialog"
+        android:label="KSuiteProBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_k_suite_pro">
+        <argument
+            android:name="offer"
+            android:defaultValue="Standard"
+            app:argType="com.infomaniak.core.ksuite.ksuitepro.data.ProOffer" />
+        <argument
+            android:name="isAdmin"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 </navigation>
