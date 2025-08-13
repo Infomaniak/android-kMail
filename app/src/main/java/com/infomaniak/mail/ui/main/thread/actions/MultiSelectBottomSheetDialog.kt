@@ -34,7 +34,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.BottomSheetMultiSelectBinding
@@ -150,7 +149,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         binding.reportJunk.setOnClickListener {
-            // TODO:  Add Tracker matomo
+            trackMultiSelectActionEvent(MatomoName.ReportJunk, threadsCount, isFromBottomSheet = true)
             setBackNavigationResult(DIALOG_SHEET_MULTI_JUNK, JunkThreads(threadsUids))
         }
 
@@ -174,16 +173,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         val (readIcon, readText) = getReadIconAndShortText(shouldRead)
         binding.mainActions.setAction(R.id.actionReadUnread, readIcon, readText)
 
-        // val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
-        // TODO: When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
-
-        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-        val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
-        // binding.spam.apply {
-        //     setIconResource(spamIcon)
-        //     setTitle(spamText)
-        // }
-
         val favoriteIcon = if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar
         val favoriteText = if (shouldFavorite) R.string.actionStar else R.string.actionUnstar
         binding.favorite.apply {
@@ -194,10 +183,6 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
         setSnoozeUi(threads)
 
         hideFirstActionItemDivider()
-    }
-
-    private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
-        return if (isFromSpam) R.drawable.ic_non_spam to R.string.actionNonSpam else R.drawable.ic_spam to R.string.actionSpam
     }
 
     private fun setSnoozeUi(threads: Set<Thread>) = with(binding) {
@@ -232,7 +217,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
     @Parcelize
     data class JunkThreads(val threadUids: List<String>) : Parcelable
 
-    companion object{
+    companion object {
         const val DIALOG_SHEET_MULTI_JUNK = "dialog_sheet_multi_junk"
     }
 }
