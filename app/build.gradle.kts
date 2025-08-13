@@ -37,7 +37,7 @@ android {
         buildConfigField("String", "CREATE_ACCOUNT_CANCEL_HOST", "\"welcome.preprod.dev.infomaniak.ch\"")
         buildConfigField("String", "IMPORT_EMAILS_URL", "\"https://import-email.preprod.dev.infomaniak.ch\"")
         // buildConfigField("String", "MAIL_API", "\"https://mail.infomaniak.com\"")
-        buildConfigField("String", "MAIL_API", "\"https://mail.preprod.dev.infomaniak.ch\"") // Pre-production
+        buildConfigField("String", "MAIL_API", "\"https://mail-mr-6962.preprod.dev.infomaniak.ch\"") // Pre-production
 
         buildConfigField("String", "SHOP_URL", "\"https://ik.me\"")
         buildConfigField("String", "CHATBOT_URL", "\"https://www.preprod.dev.infomaniak.ch/chatbot\"")
