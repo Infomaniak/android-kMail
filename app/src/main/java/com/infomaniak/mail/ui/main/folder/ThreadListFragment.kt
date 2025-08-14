@@ -41,6 +41,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -69,7 +70,6 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
 import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
-import com.infomaniak.mail.data.models.mailbox.Mailbox.KSuite
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
