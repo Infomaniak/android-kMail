@@ -264,7 +264,7 @@
         <argument
             android:name="currentKSuite"
             android:defaultValue="PersoFree"
-            app:argType="com.infomaniak.mail.data.models.mailbox.Mailbox$KSuite" />
+            app:argType="com.infomaniak.core.ksuite.data.KSuite" />
         <argument
             android:name="isAdmin"
             android:defaultValue="false"
@@ -287,7 +287,7 @@
         <argument
             android:name="currentKSuite"
             android:defaultValue="PersoFree"
-            app:argType="com.infomaniak.mail.data.models.mailbox.Mailbox$KSuite" />
+            app:argType="com.infomaniak.core.ksuite.data.KSuite" />
         <argument
             android:name="isAdmin"
             android:defaultValue="false"
