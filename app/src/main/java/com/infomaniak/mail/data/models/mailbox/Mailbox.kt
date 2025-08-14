@@ -20,6 +20,7 @@
 package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
@@ -114,16 +115,7 @@ class Mailbox : RealmObject {
     val featureFlags = FeatureFlagSet(::_featureFlags)
     //endregion
 
-    enum class KSuite {
-        PersoFree,
-        PersoPlus,
-        ProFree,
-        ProStandard,
-        ProBusiness, // Unused for now, all Pro paid tiers got the same functionalities in kMail, so [ProStandard] is enough
-        ProEnterprise, // Unused for now, all Pro paid tiers got the same functionalities in kMail, so [ProStandard] is enough
-    }
-
-    val kSuite: KSuite
+    inline val kSuite: KSuite
         get() = when {
             isKSuitePro && !isKSuiteProFree -> KSuite.ProStandard
             isKSuitePro && isKSuiteProFree -> KSuite.ProFree
