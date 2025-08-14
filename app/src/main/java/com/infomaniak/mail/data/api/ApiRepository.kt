@@ -82,6 +82,8 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.EML_CONTENT_TYPE
 import io.realm.kotlin.ext.copyFromRealm
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -511,7 +513,7 @@ object ApiRepository : ApiRepositoryCore() {
 
         val response = HttpClient.okHttpClient.newCall(request).await()
 
-        return ApiController.json.decodeFromString(response.body?.string() ?: "")
+        return ApiController.json.decodeFromString(Dispatchers.IO { response.body?.string() } ?: "")
 
     }.cancellable().getOrElse {
         return ApiResponse(result = ApiResponseStatus.ERROR, error = InternalTranslatedErrorCode.UnknownError.toApiError())
@@ -572,7 +574,7 @@ object ApiRepository : ApiRepositoryCore() {
         attachment: Attachment,
         mailbox: Mailbox,
         userApiToken: String,
-    ): ApiResponse<Attachment>? {
+    ): ApiResponse<Attachment>? = Dispatchers.Default {
         @OptIn(ManualAuthorizationRequired::class)
         val headers = HttpUtils.getHeaders(contentType = null).newBuilder()
             .set("Authorization", "Bearer $userApiToken")
@@ -587,7 +589,7 @@ object ApiRepository : ApiRepositoryCore() {
 
         val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).await()
 
-        return response.body?.string()?.let { ApiController.json.decodeFromString<ApiResponse<Attachment>>(it) }
+        Dispatchers.IO { response.body?.string() }?.let { ApiController.json.decodeFromString<ApiResponse<Attachment>>(it) }
     }
 
     /**
