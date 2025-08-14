@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.core.Xor
-import com.infomaniak.core.crossapplogin.back.DerivedTokenGenerator.Issue
-import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.launchInOnLifecycle
 import com.infomaniak.core.observe
@@ -47,7 +44,6 @@ import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.showProgressCatching
 import com.infomaniak.lib.core.utils.updateTextColor
-import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
@@ -66,13 +62,11 @@ import com.infomaniak.mail.utils.extensions.selectedPagePosition
 import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import splitties.coroutines.repeatWhileActive
@@ -247,66 +241,10 @@ class LoginFragment : Fragment() {
                 binding.signUpButton.isEnabled = false
                 openLoginWebView()
             } else {
-                attemptLogin(selectedAccounts = accountsToLogin)
+                crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
                 delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
             }
         }
-    }
-
-    private suspend fun attemptLogin(selectedAccounts: List<ExternalAccount>) {
-
-        suspend fun authenticateToken(token: ApiToken, withRedirection: Boolean): Unit = with(loginUtils) {
-            authenticateUser(token, loginActivity.infomaniakLogin, withRedirection)
-        }
-
-        val tokenGenerator = crossAppLoginViewModel.derivedTokenGenerator
-
-        if (selectedAccounts.isEmpty()) return
-
-        val tokens = selectedAccounts.mapNotNull { account ->
-            when (val result = tokenGenerator.attemptDerivingOneOfTheseTokens(account.tokens)) {
-                is Xor.First -> {
-                    SentryLog.i(TAG, "Succeeded to derive token for account: ${account.id}")
-                    result.value
-                }
-                is Xor.Second -> {
-                    handleTokenDerivationIssue(account, issue = result.value)
-                    null
-                }
-            }
-        }
-
-        tokens.forEachIndexed { index, token ->
-            authenticateToken(token, withRedirection = index == tokens.lastIndex)
-        }
-    }
-
-    private suspend fun handleTokenDerivationIssue(account: ExternalAccount, issue: Issue) {
-        val shouldReport: Boolean
-        val errorId = when (issue) {
-            is Issue.AppIntegrityCheckFailed -> {
-                shouldReport = false
-                RCore.string.anErrorHasOccurred
-            }
-            is Issue.ErrorResponse -> {
-                shouldReport = issue.httpStatusCode !in 500..599
-                RCore.string.anErrorHasOccurred
-            }
-            is Issue.NetworkIssue -> {
-                shouldReport = false
-                RCore.string.connectionError
-            }
-            is Issue.OtherIssue -> {
-                shouldReport = true
-                RCore.string.anErrorHasOccurred
-            }
-        }
-        val errorMessage = "Failed to derive token for account ${account.id}, with reason: $issue"
-        when (shouldReport) {
-            true -> SentryLog.e(TAG, errorMessage)
-            false -> SentryLog.i(TAG, errorMessage)
-        }
-        Dispatchers.Main { showError(getString(errorId)) }
     }
 
     private fun openLoginWebView() {
