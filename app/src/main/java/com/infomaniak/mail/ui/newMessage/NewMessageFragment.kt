@@ -881,7 +881,7 @@ class NewMessageFragment : Fragment() {
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
                 val matomoName = MatomoMyKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME
                 if (mailbox.kSuite == KSuite.ProFree) { // kSuite pro
-                    openKSuiteProBottomSheet(mailbox.isAdmin, matomoName)
+                    openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
                 } else { // kSuite perso
                     openMyKSuiteUpgradeBottomSheet(matomoName)
                 }
