@@ -39,6 +39,7 @@ val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     SentryDebug.addMigrationBreadcrumb(migrationContext)
     migrationContext.deleteRealmFromFirstMigration()
     migrationContext.keepDefaultValuesAfterSixthMigration()
+    migrationContext.renameKSuiteRelatedBooleans()
 }
 
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
@@ -86,6 +87,24 @@ private fun MigrationContext.keepDefaultValuesAfterSixthMigration() {
         }
     }
 }
+
+// Migrate from version #9
+private fun MigrationContext.renameKSuiteRelatedBooleans() {
+
+    if (oldRealm.schemaVersion() <= 9L) {
+        enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+            newObject?.apply {
+
+                // Rename property without losing its previous value
+                set(propertyName = "isMyKSuite", value = oldObject.getValue<Boolean>(fieldName = "isFree"))
+
+                // Rename property without losing its previous value
+                set(propertyName = "isMyKSuiteFree", value = oldObject.getValue<Boolean>(fieldName = "isLimited"))
+            }
+        }
+    }
+}
+//endregion
 
 // Migrate from version #19
 private fun MigrationContext.keepDefaultValuesAfterNineteenthMigration() {

@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
@@ -67,8 +68,8 @@ class SignatureSettingFragment : Fragment() {
     private fun setupAdapter(mailbox: Mailbox) {
         binding.signatureList.adapter = SignatureSettingAdapter(
             canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
+            isMyKSuiteFreeMailbox = mailbox.kSuite == KSuite.PersoFree,
             onSignatureSelected = ::onSignatureClicked,
-            isFreeMailbox = mailbox.isFreeMailbox,
         )
     }
 
