@@ -39,6 +39,7 @@ include(
         ":Core:Legacy:Confetti",
         ":Core:Legacy:Stores",
         ":Core:Matomo",
+        ":Core:kSuite",
         ":Core:kSuite:kSuitePro",
         ":Core:kSuite:MyKSuite",
         ":Core:Network",
