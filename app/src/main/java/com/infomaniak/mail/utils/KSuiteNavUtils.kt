@@ -24,7 +24,7 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.fragmentnavigation.isAtInitialDestination
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.core.ksuite.ksuitepro.data.ProOffer
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.ksuite.myksuite.ui.screens.KSuiteApp
 import com.infomaniak.core.ksuite.myksuite.ui.screens.MyKSuiteDashboardScreenData
@@ -65,19 +65,19 @@ fun Fragment.getDashboardData(myKSuiteData: MyKSuiteData, user: User): MyKSuiteD
     )
 }
 
-fun Fragment.openKSuiteProBottomSheet(isAdmin: Boolean, matomoTrackerName: String) {
+fun Fragment.openKSuiteProBottomSheet(kSuite: KSuite, isAdmin: Boolean, matomoTrackerName: String) {
     trackKSuiteProBottomSheetEvent(matomoTrackerName)
     safelyNavigate(
         resId = R.id.kSuiteProBottomSheetDialog,
-        args = KSuiteProBottomSheetDialogArgs(offer = ProOffer.Standard, isAdmin = isAdmin).toBundle(),
+        args = KSuiteProBottomSheetDialogArgs(kSuite, isAdmin).toBundle(),
     )
 }
 
-fun Activity.openKSuiteProBottomSheet(navController: NavController, isAdmin: Boolean, matomoTrackerName: String) {
+fun Activity.openKSuiteProBottomSheet(navController: NavController, kSuite: KSuite, isAdmin: Boolean, matomoTrackerName: String) {
     trackKSuiteProBottomSheetEvent(matomoTrackerName)
     safelyNavigate(
         navController = navController,
         resId = R.id.kSuiteProBottomSheetDialog,
-        args = KSuiteProBottomSheetDialogArgs(offer = ProOffer.Standard, isAdmin = isAdmin).toBundle(),
+        args = KSuiteProBottomSheetDialogArgs(kSuite, isAdmin).toBundle(),
     )
 }
