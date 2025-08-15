@@ -753,9 +753,9 @@
         android:label="KSuiteProBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_k_suite_pro">
         <argument
-            android:name="offer"
-            android:defaultValue="Standard"
-            app:argType="com.infomaniak.core.ksuite.ksuitepro.data.ProOffer" />
+            android:name="kSuite"
+            android:defaultValue="ProFree"
+            app:argType="com.infomaniak.core.ksuite.data.KSuite" />
         <argument
             android:name="isAdmin"
             android:defaultValue="false"
