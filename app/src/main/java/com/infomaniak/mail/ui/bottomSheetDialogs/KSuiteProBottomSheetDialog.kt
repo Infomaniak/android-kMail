@@ -43,7 +43,7 @@ class KSuiteProBottomSheetDialog : BottomSheetDialogFragment() {
         setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         with(binding.kSuiteProBottomSheet) {
-            setOffer(navArgs.offer)
+            setKSuite(navArgs.kSuite)
             setIsAdmin(navArgs.isAdmin)
             setOnClick { findNavController().popBackStack() }
         }

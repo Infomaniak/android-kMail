@@ -344,6 +344,7 @@ class MainActivity : BaseActivity() {
                     snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
                         openKSuiteProBottomSheet(
                             navController = navController,
+                            kSuite = currentKSuite,
                             isAdmin = mainViewModel.currentMailbox.value?.isAdmin ?: false,
                             matomoTrackerName = matomoDailyLimitUpgrade,
                         )
