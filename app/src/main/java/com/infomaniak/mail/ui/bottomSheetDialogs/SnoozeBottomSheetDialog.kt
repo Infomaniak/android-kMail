@@ -58,7 +58,7 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
         val matomoName = MatomoName.SnoozeCustomDate.value
         when (navigationArgs.currentKSuite) {
             KSuite.PersoFree -> openMyKSuiteUpgradeBottomSheet(matomoName)
-            KSuite.ProFree -> openKSuiteProBottomSheet(navigationArgs.isAdmin, matomoName)
+            KSuite.ProFree -> openKSuiteProBottomSheet(navigationArgs.currentKSuite, navigationArgs.isAdmin, matomoName)
             else -> {
                 trackSnoozeEvent(MatomoName.CustomSchedule)
                 setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)
