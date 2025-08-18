@@ -343,16 +343,7 @@ fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
     )
 }
 
-private tailrec fun formatFolderWithAllChildren(
-    dismissHiddenChildren: Boolean,
-    inputList: MutableList<Folder>,
-    outputList: MutableList<Folder> = mutableListOf(),
-    shouldFilterOutFolderWithRole: Boolean,
-): List<Folder> {
-
-    val folder = inputList.removeAt(0)
-
-    /*
+/*
     * There are two types of folders:
     * - user's folders (with or without a role)
     * - hidden IK folders (ScheduledDrafts, Snoozed, etc…)
@@ -360,30 +351,49 @@ private tailrec fun formatFolderWithAllChildren(
     * We want to display the user's folders, and also the IK folders for which we handle the role.
     * IK folders where we don't handle the role are dismissed.
     */
-    fun shouldThisFolderBeAdded(): Boolean {
-        return if (shouldFilterOutFolderWithRole) {
-            (folder.role != null && folder.children.isNotEmpty()) || folder.role == null
-        } else {
-            folder.path.startsWith(IK_FOLDER).not() || folder.role != null
+fun shouldThisFolderBeAdded(folder: Folder, shouldFilterOutFolderWithRole: Boolean): Boolean {
+    return if (shouldFilterOutFolderWithRole) {
+        (folder.role != null && folder.children.isNotEmpty()) || folder.role == null
+    } else {
+        folder.path.startsWith(IK_FOLDER).not() || folder.role != null
+    }
+}
+
+fun actionForFolder(
+    isManaged: Boolean,
+    folder: Folder,
+    shouldFilterOutFolderWithRole: Boolean,
+    dismissHiddenChildren: Boolean,
+    outputList: MutableList<Folder>
+): List<Folder> {
+    when {
+        shouldThisFolderBeAdded(folder, shouldFilterOutFolderWithRole) && isManaged -> folder.copyFromRealm(depth = 1u)
+        shouldThisFolderBeAdded(folder, shouldFilterOutFolderWithRole) && !isManaged -> folder
+        else -> null
+    }?.let { outputList.add(it) }
+
+    if (isManaged) {
+        with(folder.children) {
+            return (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
         }
     }
+    return (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
+}
 
-    fun actionForFolder(isManaged: Boolean): List<Folder> {
-        when {
-            shouldThisFolderBeAdded() && isManaged -> folder.copyFromRealm(depth = 1u)
-            shouldThisFolderBeAdded() && !isManaged -> folder
-            else -> null
-        }?.let { outputList.add(it) }
-
-        if (isManaged) {
-            with(folder.children) {
-                return (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
-            }
-        }
-        return (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
-    }
-
-    val children = actionForFolder(folder.isManaged())
+private tailrec fun formatFolderWithAllChildren(
+    dismissHiddenChildren: Boolean,
+    inputList: MutableList<Folder>,
+    outputList: MutableList<Folder> = mutableListOf(),
+    shouldFilterOutFolderWithRole: Boolean,
+): List<Folder> {
+    val folder = inputList.removeAt(0)
+    val children = actionForFolder(
+        isManaged = folder.isManaged(),
+        folder = folder,
+        shouldFilterOutFolderWithRole = shouldFilterOutFolderWithRole,
+        dismissHiddenChildren = dismissHiddenChildren,
+        outputList = outputList
+    )
 
     inputList.addAll(index = 0, children)
 
