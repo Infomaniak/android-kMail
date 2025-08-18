@@ -21,15 +21,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetKSuiteProBinding
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 
-class KSuiteProBottomSheetDialog : BottomSheetDialogFragment() {
+class KSuiteProBottomSheetDialog : DialogFragment() {
 
     private var binding: BottomSheetKSuiteProBinding by safeBinding()
     private val navArgs: KSuiteProBottomSheetDialogArgs by navArgs()
@@ -45,7 +45,8 @@ class KSuiteProBottomSheetDialog : BottomSheetDialogFragment() {
         with(binding.kSuiteProBottomSheet) {
             setKSuite(navArgs.kSuite)
             setIsAdmin(navArgs.isAdmin)
-            setOnClick { findNavController().popBackStack() }
+            setOnClose { findNavController().popBackStack() }
+            show()
         }
     }
 }

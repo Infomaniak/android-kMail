@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.infomaniak.core.compose.basics.bottomsheet.ThemedBottomSheetScaffold
@@ -43,6 +44,7 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
     private var startHidingAnimation by mutableStateOf(false)
 
     protected open val title: String? = null
+    protected open val dragHandleBackgroundColor: Color? = null
 
     @Composable
     abstract fun BottomSheetContent()
@@ -54,6 +56,12 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
     protected fun hideBottomSheet() {
         startHidingAnimation = true
     }
+
+    /**
+     * Only needed when used in a DialogFragment.
+     * Use it to close the DialogFragment completely.
+     */
+    protected open fun onDialogFragmentDismissRequest() = Unit
 
     init {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -73,13 +81,17 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
             }.invokeOnCompletion {
                 isVisible = false
                 startHidingAnimation = false
+                onDialogFragmentDismissRequest()
             }
         }
 
         MailTheme {
             if (isVisible) {
                 ThemedBottomSheetScaffold(
-                    onDismissRequest = { isVisible = false },
+                    onDismissRequest = {
+                        isVisible = false
+                        onDialogFragmentDismissRequest()
+                    },
                     title = title,
                     sheetState = sheetState,
                     content = { BottomSheetContent() },
