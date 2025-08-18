@@ -15,17 +15,15 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.infomaniak.mail.views.BottomSheetScaffoldingView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:separatorBackgroundColor="@color/kSuiteBackground"
     tools:context=".ui.bottomSheetDialogs.KSuiteProBottomSheetDialog">
 
-    <com.infomaniak.core.ksuite.ksuitepro.views.ProOfferView
+    <com.infomaniak.mail.ui.components.views.KSuiteProBottomSheetView
         android:id="@+id/kSuiteProBottomSheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</com.infomaniak.mail.views.BottomSheetScaffoldingView>
+</FrameLayout>
