@@ -69,6 +69,8 @@ fun EmojiReactionDetails(
     details: SnapshotStateList<Pair<String, SnapshotStateList<ReactionDetail>>>,
     modifier: Modifier = Modifier,
     initialEmoji: String? = null,
+    onAllTabClick: () -> Unit,
+    onEmojiTabClick: () -> Unit,
 ) {
     fun computeInitialPage(): Int = details
         .indexOfFirst { it.first == initialEmoji }
@@ -97,7 +99,10 @@ fun EmojiReactionDetails(
             ) {
                 CustomTab(
                     selected = pagerState.currentPage == 0,
-                    onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
+                    onClick = {
+                        onAllTabClick()
+                        scope.launch { pagerState.animateScrollToPage(0) }
+                    },
                 ) {
                     Text(stringResource(R.string.reactionsAll))
                 }
@@ -105,7 +110,10 @@ fun EmojiReactionDetails(
                 details.forEachIndexed { index, (emoji, details) ->
                     CustomTab(
                         selected = pagerState.currentPage == index + 1,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index + 1) } },
+                        onClick = {
+                            onEmojiTabClick()
+                            scope.launch { pagerState.animateScrollToPage(index + 1) }
+                        },
                     ) {
                         Text(emoji + " " + details.size)
                     }
@@ -191,7 +199,7 @@ private fun Preview() {
 
     MaterialTheme(if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
         Surface {
-            EmojiReactionDetails(details)
+            EmojiReactionDetails(details, onAllTabClick = {}, onEmojiTabClick = {})
         }
     }
 }

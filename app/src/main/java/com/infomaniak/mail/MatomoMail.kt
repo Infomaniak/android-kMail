@@ -21,9 +21,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
+import com.infomaniak.core.ksuite.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.core.matomo.Matomo
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.core.ksuite.myksuite.ui.utils.MatomoMyKSuite
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -48,6 +48,7 @@ object MatomoMail : Matomo {
         CreateFolder("createFolder"),
         EasterEgg("easterEgg"),
         EditorActions("editorActions"),
+        EmojiReactions("emojiReactions"),
         Encryption("encryption"),
         Externals("externals"),
         HomeScreenShortcuts("homeScreenShortcuts"),
@@ -98,11 +99,14 @@ object MatomoMail : Matomo {
         AddMailbox("addMailbox"),
         AddMailboxConfirm("addMailboxConfirm"),
         AddNewRecipient("addNewRecipient"),
+        AddReactionFromChip("addReactionFromChip"),
+        AddReactionFromEmojiPicker("addReactionFromEmojiPicker"),
         AddToContacts("addToContacts"),
         AdvancedActions("advancedActions"),
         AiWriter("aiWriter"),
         All("all"),
         AlreadySynchronized("alreadySynchronized"),
+        AlreadyUsedReaction("alreadyUsedReaction"),
         Always("always"),
         Archive("archive"),
         ArchiveClicked("archiveClicked"),
@@ -233,6 +237,7 @@ object MatomoMail : Matomo {
         OpenCreationWebview("openCreationWebview"),
         OpenDashboard("openDashboard"),
         OpenDetails("openDetails"),
+        OpenEmojiPicker("openEmojiPicker"),
         OpenEncryptionActions("openEncryptionActions"),
         OpenFromBottomsheet("openFromBottomsheet"),
         OpenFromDraft("openFromDraft"),
@@ -300,6 +305,7 @@ object MatomoMail : Matomo {
         ShareLink("shareLink"),
         SharePassword("sharePassword"),
         Shorten("shorten"),
+        ShowReactionsBottomSheet("showReactionsBottomSheet"),
         ShowSourceCode("showSourceCode"),
         SignalPhishing("signalPhishing "),
         Snooze("snooze"),
@@ -315,6 +321,8 @@ object MatomoMail : Matomo {
         SwitchColor("switchColor"),
         SwitchIdentity("switchIdentity"),
         SwitchMailbox("switchMailbox"),
+        SwitchReactionTab("switchReactionTab"),
+        SwitchReactionTabToAll("switchReactionTabToAll"),
         TenSecond("10s"),
         ThirtySecond("30s"),
         ThisAfternoon("thisAfternoon"),
@@ -567,6 +575,10 @@ object MatomoMail : Matomo {
             else -> MatomoName.EncryptionActivation
         }
         trackEvent(MatomoCategory.EditorActions, name)
+    }
+
+    fun trackEmojiReactionsEvent(name: MatomoName) {
+        trackEvent(MatomoCategory.EmojiReactions, name)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics because actions
