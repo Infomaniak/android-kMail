@@ -92,8 +92,8 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
                         isVisible = false
                         onDialogFragmentDismissRequest()
                     },
-                    title = title,
                     sheetState = sheetState,
+                    title = title,
                     content = { BottomSheetContent() },
                 )
             }
