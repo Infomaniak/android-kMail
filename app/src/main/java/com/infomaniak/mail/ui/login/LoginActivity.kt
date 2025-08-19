@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.login
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -107,7 +106,7 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
 
-        suspend fun authenticateUser(context: Context, apiToken: ApiToken, mailboxController: MailboxController): Any {
+        suspend fun authenticateUser(apiToken: ApiToken, mailboxController: MailboxController): Any {
             if (AccountUtils.getUserById(apiToken.userId) != null) return getErrorResponse(InternalTranslatedErrorCode.UserAlreadyPresent)
 
             val okhttpClient = HttpClient.okHttpClientNoTokenInterceptor.newBuilder().addInterceptor { chain ->

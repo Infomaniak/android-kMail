@@ -241,7 +241,20 @@ class LoginFragment : Fragment() {
                 binding.signUpButton.isEnabled = false
                 openLoginWebView()
             } else {
-                crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
+                val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
+
+                with(loginUtils) {
+                    loginResult.tokens.forEachIndexed { index, token ->
+                        authenticateUser(
+                            token = token,
+                            infomaniakLogin = loginActivity.infomaniakLogin,
+                            withRedirection = index == loginResult.tokens.lastIndex,
+                        )
+                    }
+                }
+
+                loginResult.errorMessageIds.forEach { errorId -> showError(getString(errorId)) }
+
                 delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
             }
         }

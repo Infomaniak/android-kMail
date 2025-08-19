@@ -88,7 +88,7 @@ class LoginUtils @Inject constructor(
     ) {
         val context = requireContext()
         runCatching {
-            when (val returnValue = LoginActivity.authenticateUser(context, token, mailboxController)) {
+            when (val returnValue = LoginActivity.authenticateUser(token, mailboxController)) {
                 is User -> {
                     if (withRedirection) context.loginSuccess(returnValue)
                     return
@@ -129,7 +129,7 @@ class LoginUtils @Inject constructor(
 
         val context = requireContext()
 
-        when (val returnValue = LoginActivity.authenticateUser(context, apiToken, mailboxController)) {
+        when (val returnValue = LoginActivity.authenticateUser(apiToken, mailboxController)) {
             is User -> return@launch context.loginSuccess(returnValue)
             is MailboxErrorCode -> context.mailboxError(returnValue)
             is ApiResponse<*> -> context.apiError(returnValue)
