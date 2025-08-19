@@ -253,7 +253,7 @@ class LoginFragment : Fragment() {
                     }
                 }
 
-                loginResult.errorMessageIds.forEach { errorId -> showError(getString(errorId)) }
+                loginResult.errorMessageIds.forEach { messageResId -> showError(getString(messageResId)) }
 
                 delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
             }
