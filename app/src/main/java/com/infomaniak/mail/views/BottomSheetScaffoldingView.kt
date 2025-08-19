@@ -61,15 +61,6 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
             }
         }
 
-    private var _separatorBackgroundColor = -1
-    var separatorBackgroundColor: Int?
-        get() = _separatorBackgroundColor
-        set(value) {
-            if (value == null || value == -1) return
-            binding.includeSeparator.separator.setBackgroundColor(value)
-            _separatorBackgroundColor = value
-        }
-
     init {
         binding = ViewBottomSheetScaffoldingBinding.inflate(LayoutInflater.from(context), this, true)
         isBindingInflated = true
@@ -79,7 +70,6 @@ class BottomSheetScaffoldingView @JvmOverloads constructor(
                 title = getString(R.styleable.BottomSheetScaffoldingView_title)
                 useDefaultLayout = getBoolean(R.styleable.BottomSheetScaffoldingView_useDefaultLayout, useDefaultLayout)
                 centerHorizontally = getBoolean(R.styleable.BottomSheetScaffoldingView_centerHorizontally, centerHorizontally)
-                separatorBackgroundColor = getInt(R.styleable.BottomSheetScaffoldingView_separatorBackgroundColor, -1)
             }
 
             childContainer = initChildContainer(context)
