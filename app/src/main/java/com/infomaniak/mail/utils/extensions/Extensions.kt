@@ -343,17 +343,16 @@ fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
     )
 }
 
-/*
-    * There are two types of folders:
-    * - user's folders (with or without a role)
-    * - hidden IK folders (ScheduledDrafts, Snoozed, etc…)
-    *
-    * We want to display the user's folders, and also the IK folders for which we handle the role.
-    * IK folders where we don't handle the role are dismissed.
-    */
+/* There are two types of folders:
+* - user's folders (with or without a role)
+* - hidden IK folders (ScheduledDrafts, Snoozed, etc…)
+*
+* We want to display the user's folders, and also the IK folders for which we handle the role.
+* IK folders where we don't handle the role are dismissed.
+*/
 fun shouldThisFolderBeAdded(folder: Folder, shouldFilterOutFolderWithRole: Boolean): Boolean {
     return if (shouldFilterOutFolderWithRole) {
-        (folder.role != null && folder.children.isNotEmpty()) || folder.role == null
+        folder.role == null || folder.children.isNotEmpty()
     } else {
         folder.path.startsWith(IK_FOLDER).not() || folder.role != null
     }
@@ -374,10 +373,13 @@ fun actionForFolder(
 
     if (isManaged) {
         with(folder.children) {
-            return (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
+            val folderChildrenQuery = if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()
+            return folderChildrenQuery.sortFolders().find()
         }
     }
-    return (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
+
+    val folderChildren = if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children
+    return folderChildren.sortFolders()
 }
 
 private tailrec fun formatFolderWithAllChildren(
