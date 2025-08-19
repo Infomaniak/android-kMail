@@ -102,6 +102,7 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
+import com.infomaniak.mail.ui.main.folder.ThreadListItem
 import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.RoundedBackgroundSpan
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.Companion.getTagsPaint
@@ -417,9 +418,17 @@ fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
 fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
-    addItemDecoration(HeaderItemDecoration(this, false) { position ->
-        return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is String
-    })
+
+    addItemDecoration(
+        HeaderItemDecoration(
+            parent = this,
+            shouldFadeOutHeader = false,
+            isHeader = { position ->
+                return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is ThreadListItem.DateSeparator
+            },
+        ),
+    )
+
     if (threadDensity == ThreadDensity.NORMAL) addItemDecoration(DateSeparatorItemDecoration())
 }
 
