@@ -116,12 +116,13 @@ class Mailbox : RealmObject {
     //endregion
 
     inline val kSuite: KSuite
-        get() = when {
-            isKSuitePro && !isKSuiteProFree -> KSuite.ProStandard
-            isKSuitePro && isKSuiteProFree -> KSuite.ProFree
-            isMyKSuite && !isMyKSuiteFree -> KSuite.PersoPlus
-            else -> KSuite.PersoFree
-        }
+        get() = KSuite.ProFree
+    // when {
+    //         isKSuitePro && !isKSuiteProFree -> KSuite.ProStandard
+    //         isKSuitePro && isKSuiteProFree -> KSuite.ProFree
+    //         isMyKSuite && !isMyKSuiteFree -> KSuite.PersoPlus
+    //         else -> KSuite.PersoFree
+    //     }
 
     inline val channelGroupId get() = "$mailboxId"
     inline val channelId get() = "${mailboxId}_channel_id"
