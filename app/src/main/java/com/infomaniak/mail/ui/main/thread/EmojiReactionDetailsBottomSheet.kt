@@ -55,8 +55,8 @@ class EmojiReactionDetailsBottomSheet @JvmOverloads constructor(
             EmojiReactionDetails(
                 details = emojiReactionDetails,
                 initialEmoji = initialEmoji,
-                onAllTabClick = { trackEmojiReactionsEvent(MatomoName.SwitchReactionTab) },
-                onEmojiTabClick = { trackEmojiReactionsEvent(MatomoName.SwitchReactionTabToAll) },
+                onAllTabClick = { trackEmojiReactionsEvent(MatomoName.SwitchReactionTabToAll) },
+                onEmojiTabClick = { trackEmojiReactionsEvent(MatomoName.SwitchReactionTab) },
             )
         }
     }
