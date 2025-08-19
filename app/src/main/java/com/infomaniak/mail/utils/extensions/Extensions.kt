@@ -129,6 +129,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
 import kotlin.math.roundToInt
+import com.infomaniak.core.auth.BuildConfig as AuthBuildConfig
 
 const val IK_FOLDER = ".ik"
 
@@ -476,17 +477,13 @@ fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
     return folder?.getLocalizedName(context = this) ?: getString(R.string.searchFilterFolder)
 }
 
-const val loginUrl = "https://login.infomaniak.com/"
-
 fun Context.getInfomaniakLogin() = InfomaniakLogin(
     context = this,
-    loginUrl = loginUrl,
+    loginUrl = AuthBuildConfig.LOGIN_ENDPOINT_URL,
     appUID = BuildConfig.APPLICATION_ID,
     clientID = BuildConfig.CLIENT_ID,
     accessType = null,
-    sentryCallback = { error ->
-        SentryLog.e(tag = "WebViewLogin", error)
-    }
+    sentryCallback = { error -> SentryLog.e(tag = "WebViewLogin", error) }
 )
 
 fun Fragment.copyRecipientEmailToClipboard(recipient: Recipient, snackbarManager: SnackbarManager) {
