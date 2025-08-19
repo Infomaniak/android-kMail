@@ -25,8 +25,8 @@ android {
         applicationId = "com.infomaniak.mail"
         minSdk = appMinSdk
         targetSdk = appCompileSdk
-        versionCode = 1_16_002_01
-        versionName = "1.16.2"
+        versionCode = 1_16_003_01
+        versionName = "1.16.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")

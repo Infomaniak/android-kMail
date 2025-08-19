@@ -1,0 +1,1 @@
+- Diverses corrections de bugs concernant les réactions par emoji
