@@ -115,14 +115,15 @@ class Mailbox : RealmObject {
     val featureFlags = FeatureFlagSet(::_featureFlags)
     //endregion
 
-    inline val kSuite: KSuite
-        get() = when {
-            // For KSuite Pro tiers, only Free & Standard are relevant in kMail, all Pro paid tiers got the same functionalities
-            isKSuitePro && !isKSuiteProFree -> KSuite.Pro.Standard
-            isKSuitePro && isKSuiteProFree -> KSuite.Pro.Free
-            isKSuitePerso && !isKSuitePersoFree -> KSuite.Perso.Plus
-            else -> KSuite.Perso.Free
-        }
+    inline val kSuite: KSuite get() = KSuite.Pro.Free
+    // TODO: Uncomment before merging
+    // get() = when {
+    //     // For KSuite Pro tiers, only Free & Standard are relevant in kMail, all Pro paid tiers got the same functionalities
+    //     isKSuitePro && !isKSuiteProFree -> KSuite.Pro.Standard
+    //     isKSuitePro && isKSuiteProFree -> KSuite.Pro.Free
+    //     isKSuitePerso && !isKSuitePersoFree -> KSuite.Perso.Plus
+    //     else -> KSuite.Perso.Free
+    // }
 
     inline val channelGroupId get() = "$mailboxId"
     inline val channelId get() = "${mailboxId}_channel_id"
