@@ -43,9 +43,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +74,8 @@ fun EmojiReactionDetails(
     details: SnapshotStateList<Pair<String, SnapshotStateList<ReactionDetail>>>,
     modifier: Modifier = Modifier,
     initialEmoji: String? = null,
+    onNavigateToAllTab: () -> Unit,
+    onNavigateToEmojiTab: () -> Unit,
 ) {
     fun computeInitialPage(): Int = details
         .indexOfFirst { it.first == initialEmoji }
@@ -79,6 +86,16 @@ fun EmojiReactionDetails(
     Column(modifier) {
         val pagerState = rememberPagerState(computeInitialPage()) { details.count() + 1 }
         val scope = rememberCoroutineScope()
+
+        var firstOpening by rememberSaveable { mutableStateOf(true) }
+        LaunchedEffect(pagerState.currentPage) {
+            if (firstOpening) {
+                firstOpening = false
+                return@LaunchedEffect
+            }
+
+            if (pagerState.currentPage == 0) onNavigateToAllTab() else onNavigateToEmojiTab()
+        }
 
         Box {
             // Workaround because when PrimaryScrollableTabRow has only a few tabs to display, the horizontal divider integrated
@@ -191,7 +208,7 @@ private fun Preview() {
 
     MaterialTheme(if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
         Surface {
-            EmojiReactionDetails(details)
+            EmojiReactionDetails(details, onNavigateToAllTab = {}, onNavigateToEmojiTab = {})
         }
     }
 }

@@ -45,6 +45,7 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBlockUserAction
+import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.MatomoMail.trackMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.MatomoMail.trackScheduleSendEvent
@@ -401,15 +402,25 @@ class ThreadFragment : Fragment() {
                 onRescheduleClicked = ::rescheduleDraft,
                 onModifyScheduledClicked = ::modifyScheduledDraft,
                 onEncryptionSeeConcernedRecipients = ::navigateToUnencryptableRecipients,
-                onAddReaction = { navigateToEmojiPicker(it.uid) },
+                onAddReaction = {
+                    trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
+                    navigateToEmojiPicker(it.uid)
+                },
                 onAddEmoji = { emoji, messageUid ->
                     val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@ThreadAdapterCallbacks
+
+                    if (reactions[emoji]?.hasReacted == true) {
+                        trackEmojiReactionsEvent(MatomoName.AlreadyUsedReaction)
+                    } else {
+                        trackEmojiReactionsEvent(MatomoName.AddReactionFromChip)
+                    }
 
                     mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
                         threadViewModel.fakeEmojiReply(emoji, messageUid)
                     })
                 },
                 showEmojiDetails = { messageUid, emoji ->
+                    trackEmojiReactionsEvent(MatomoName.ShowReactionsBottomSheet)
                     lifecycleScope.launch {
                         val emojiDetails = getLocalEmojiReactionsDetailsFor(messageUid) ?: return@launch
                         binding.emojiReactionDetailsBottomSheet.showBottomSheetFor(emojiDetails, preselectedEmojiTab = emoji)
@@ -642,6 +653,7 @@ class ThreadFragment : Fragment() {
 
     private fun observePickedEmoji() {
         getBackNavigationResult<PickedEmojiPayload>(EmojiPickerBottomSheetDialog.PICKED_EMOJI) { (emoji, messageUid) ->
+            trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
             val reactions = threadViewModel.getLocalEmojiReactionsFor(messageUid) ?: return@getBackNavigationResult
             mainViewModel.trySendEmojiReply(emoji, messageUid, reactions, onAllowed = {
                 threadViewModel.fakeEmojiReply(emoji, messageUid)

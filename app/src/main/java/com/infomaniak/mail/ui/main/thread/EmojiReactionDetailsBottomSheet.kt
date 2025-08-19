@@ -33,6 +33,8 @@ import com.infomaniak.core.compose.margin.Margin
 import com.infomaniak.emojicomponents.R
 import com.infomaniak.emojicomponents.components.EmojiReactionDetails
 import com.infomaniak.emojicomponents.data.ReactionDetail
+import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.ui.components.views.MailBottomSheetScaffoldComposeView
 
 class EmojiReactionDetailsBottomSheet @JvmOverloads constructor(
@@ -50,7 +52,12 @@ class EmojiReactionDetailsBottomSheet @JvmOverloads constructor(
     override fun BottomSheetContent() {
         Column {
             Spacer(modifier = Modifier.height(Margin.Medium))
-            EmojiReactionDetails(details = emojiReactionDetails, initialEmoji = initialEmoji)
+            EmojiReactionDetails(
+                details = emojiReactionDetails,
+                initialEmoji = initialEmoji,
+                onNavigateToAllTab = { trackEmojiReactionsEvent(MatomoName.SwitchReactionTabToAll) },
+                onNavigateToEmojiTab = { trackEmojiReactionsEvent(MatomoName.SwitchReactionTab) },
+            )
         }
     }
 
