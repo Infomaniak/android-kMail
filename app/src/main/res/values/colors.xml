@@ -307,6 +307,7 @@
     <color name="textInputStrokeColor">@color/mouse</color>
     <color name="toggleableTextFormatterBackgroundColor">@color/elephant</color>
     <color name="alertViewButtonColor">@color/blueMail</color>
+    <color name="dragHandleColor">#cedae1</color>
 
     <array name="AvatarColors">
         <item>@color/yellow_light</item>
