@@ -277,7 +277,10 @@ class DraftsActionsWorker @AssistedInject constructor(
                     it.action = DraftAction.SAVE
                 }
             }
-            executeDraftAction(Dispatchers.IO { draftController.getDraftBlocking(draft.localUuid)!! }, mailbox.uuid)
+            executeDraftAction(
+                draft = Dispatchers.IO { draftController.getDraftBlocking(draft.localUuid)!! },
+                mailboxUuid = mailbox.uuid
+            )
         }
     }.cancellable()
 
