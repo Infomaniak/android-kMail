@@ -60,7 +60,7 @@ class DraftController @Inject constructor(
     //region Edit data
     suspend fun upsertDraft(draft: Draft) {
         mailboxContentRealm().write {
-            upsertDraft(draft, realm = this)
+            upsertDraftBlocking(draft, realm = this)
         }
     }
 
@@ -116,11 +116,11 @@ class DraftController @Inject constructor(
         //endregion
 
         //region Edit data
-        fun upsertDraft(draft: Draft, realm: MutableRealm) {
+        fun upsertDraftBlocking(draft: Draft, realm: MutableRealm) {
             realm.copyToRealm(draft, UpdatePolicy.ALL)
         }
 
-        fun updateDraft(localUuid: String, realm: MutableRealm, onUpdate: (Draft) -> Unit) {
+        fun updateDraftBlocking(localUuid: String, realm: MutableRealm, onUpdate: (Draft) -> Unit) {
             getDraftBlocking(localUuid, realm)?.let(onUpdate)
         }
         //endregion

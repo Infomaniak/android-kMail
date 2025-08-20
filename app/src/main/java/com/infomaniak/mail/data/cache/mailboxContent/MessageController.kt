@@ -237,7 +237,7 @@ class MessageController @Inject constructor(
             onUpdate(getMessageBlocking(messageUid, realm))
         }
 
-        fun deleteMessage(context: Context, mailbox: Mailbox, message: Message, realm: MutableRealm) {
+        fun deleteMessageBlocking(context: Context, mailbox: Mailbox, message: Message, realm: MutableRealm) {
 
             DraftController.getDraftByMessageUidBlocking(message.uid, realm)?.let { draft ->
                 if (draft.action == null) {
@@ -269,7 +269,7 @@ class MessageController @Inject constructor(
              * Looping in reverse enables us to not skip any item.
              */
             messages.asReversed().forEach { message ->
-                deleteMessage(context, mailbox, message, realm)
+                deleteMessageBlocking(context, mailbox, message, realm)
             }
         }
 

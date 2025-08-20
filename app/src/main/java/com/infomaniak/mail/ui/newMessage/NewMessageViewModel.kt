@@ -279,7 +279,7 @@ class NewMessageViewModel @Inject constructor(
             dismissNotification()
             markAsRead(currentMailbox(), realm)
 
-            realm.write { DraftController.upsertDraft(it, realm = this) }
+            realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.saveSnapshot(initialBody.content)
             it.initLiveData(signatures)
             _isShimmering.emit(false)
@@ -737,7 +737,7 @@ class NewMessageViewModel @Inject constructor(
             LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
 
             mailboxContentRealm().write {
-                DraftController.updateDraft(draftLocalUuid!!, realm = this) {
+                DraftController.updateDraftBlocking(draftLocalUuid!!, realm = this) {
                     it.attachments.findSpecificAttachment(attachment)?.let(::delete)
                 }
             }

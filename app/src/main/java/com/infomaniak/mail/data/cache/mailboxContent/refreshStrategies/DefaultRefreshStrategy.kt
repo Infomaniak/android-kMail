@@ -55,7 +55,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         mailbox: Mailbox,
         realm: MutableRealm,
     ) {
-        MessageController.deleteMessage(context, mailbox, managedMessage, realm)
+        MessageController.deleteMessageBlocking(context, mailbox, managedMessage, realm)
     }
 
     override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
