@@ -92,7 +92,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeHasMoreThanOneExpeditor(threadsUids: List<String>) {
-        mainViewModel.countExpeditorsWhoAreNotMe(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
+        mainViewModel.expeditorsWhoAreNotMeCount(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
             binding.blockSender.setClosingOnClickListener {
                 trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
                 if (hasMoreThanOneExpeditor > 1) {
@@ -112,7 +112,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeExpeditorsResult(threadsUids: List<String>) {
-        mainViewModel.countExpeditorsWhoAreNotMe(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
+        mainViewModel.expeditorsWhoAreNotMeCount(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
             if (hasMoreThanOneExpeditor != 0) {
                 observeHasMoreThanOneExpeditor(threadsUids)
             } else {

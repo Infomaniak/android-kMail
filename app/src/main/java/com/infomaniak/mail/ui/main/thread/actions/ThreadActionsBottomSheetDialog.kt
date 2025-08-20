@@ -94,9 +94,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { junkMessageThreadData ->
-            val firstJunkMessageThreadData = junkMessageThreadData.first()
-            val thread: Thread? = threadController.getThread(uid = firstJunkMessageThreadData.threadUid)
-            if (thread != null) setupListeners(thread, firstJunkMessageThreadData, firstJunkMessageThreadData.messageUid)
+            val firstJunkMessageThreadData = junkMessageThreadData.firstOrNull()
+            firstJunkMessageThreadData?.let {
+                val thread: Thread? = threadController.getThread(uid = firstJunkMessageThreadData.threadUid)
+                if (thread != null) setupListeners(thread, firstJunkMessageThreadData, firstJunkMessageThreadData.messageUid)
+            } ?: findNavController().popBackStack()
         }
     }
 

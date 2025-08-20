@@ -1171,8 +1171,10 @@ class MainViewModel @Inject constructor(
             val snackbarTitle = if (isSuccess()) {
                 // Check the first message, because it is not possible to select messages from multiple folders,
                 // so you won't have both SPAM and non-SPAM messages.
-                if (folderRoleUtils.getActionFolderRole(messages.first()) != FolderRole.SPAM) {
-                    toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
+                messages.firstOrNull()?.let {
+                    if (folderRoleUtils.getActionFolderRole(it) != FolderRole.SPAM) {
+                        toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
+                    }
                 }
 
                 R.string.snackbarReportPhishingConfirmation
@@ -1222,7 +1224,6 @@ class MainViewModel @Inject constructor(
 
             reportPhishingTrigger.postValue(Unit)
         }
-
     }
     //endregion
 
@@ -1553,7 +1554,7 @@ class MainViewModel @Inject constructor(
         emit(messageController.getMessages(messagesUids))
     }
 
-    fun countExpeditorsWhoAreNotMe(threadUids: List<String>) = liveData(ioCoroutineContext) {
+    fun expeditorsWhoAreNotMeCount(threadUids: List<String>) = liveData(ioCoroutineContext) {
         val numberOfExpeditors = threadController.getThreads(threadUids)
             .flatMapTo(mutableSetOf()) { it.from }.count { !it.isMe() }
         emit(numberOfExpeditors)
