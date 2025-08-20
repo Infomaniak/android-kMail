@@ -21,6 +21,11 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization) apply false
     alias(libs.plugins.kapt) apply false
     alias(libs.plugins.realm.kotlin) apply false
+    alias(core.plugins.ktlint) version "13.0.0"
+}
+
+subprojects {
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 }
 
 tasks.register("clean", Delete::class) { delete(rootProject.layout.buildDirectory) }

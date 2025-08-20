@@ -1,0 +1,20 @@
+# Kotlin Ktlint
+root = true
+
+[*.{kt,kts}]
+
+ktlint_code_style = android_studio
+
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_no-empty-first-line-in-class-body = disabled
+ktlint_standard_no-line-break-before-assignment = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_string-template-indent = disabled
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+ktlint_standard_no-empty-first-line-in-method-block = disabled
+ktlint_standard_expression-body-wrapping = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_spacing-between-declarations-with-annotations = disabled
+
+max_line_length = 130
