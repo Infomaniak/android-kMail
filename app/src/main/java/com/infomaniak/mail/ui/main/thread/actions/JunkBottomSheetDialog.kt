@@ -64,8 +64,6 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         messagesUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.messageUid }
         threadsUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
 
-        // val isFromArchive = mainViewModel.currentFolder.value?.role == FolderRole.ARCHIVE
-        // TODO: When decided by UI/UX, change how the icon is displayed (when trying to archive from inside the Archive folder).
         val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
         binding.spam.apply {
@@ -94,10 +92,10 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeHasMoreThanOneExpeditor(threadsUids: List<String>) {
-        mainViewModel.hasMoreThanOneExpeditor(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
+        mainViewModel.countExpeditorsWhoAreNotMe(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
             binding.blockSender.setClosingOnClickListener {
                 trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
-                if (hasMoreThanOneExpeditor) {
+                if (hasMoreThanOneExpeditor > 1) {
                     safeNavigate(
                         resId = R.id.userToBlockBottomSheetDialog,
                         args = UserToBlockBottomSheetDialogArgs(threadsUids.toTypedArray()).toBundle(),
@@ -114,8 +112,8 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeExpeditorsResult(threadsUids: List<String>) {
-        mainViewModel.hasOtherExpeditors(threadsUids).observe(viewLifecycleOwner) { hasOtherExpeditors ->
-            if (hasOtherExpeditors) {
+        mainViewModel.countExpeditorsWhoAreNotMe(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
+            if (hasMoreThanOneExpeditor != 0) {
                 observeHasMoreThanOneExpeditor(threadsUids)
             } else {
                 binding.blockSender.isGone = true
@@ -125,6 +123,8 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun handleButtons(threadsUids: List<String>, messages: List<Message>) = with(binding) {
         spam.setClosingOnClickListener {
+            // Check the first message, because it is not possible to select messages from multiple folders,
+            // so you won't have both SPAM and non-SPAM messages.
             trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = messages.firstOrNull()?.folder?.role == FolderRole.SPAM)
             mainViewModel.toggleThreadSpamStatus(threadsUids)
         }

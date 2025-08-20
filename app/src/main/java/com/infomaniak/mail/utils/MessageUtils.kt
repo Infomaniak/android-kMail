@@ -40,10 +40,8 @@ object MessageUtils {
                 )
             )
         }
-        if (threadList.isEmpty()) {
-            return emptyList()
-        }
-        return (result)
+
+        return result
     }
 }
 @Parcelize

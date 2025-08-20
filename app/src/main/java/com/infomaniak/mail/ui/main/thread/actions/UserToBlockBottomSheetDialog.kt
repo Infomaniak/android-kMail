@@ -56,6 +56,6 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        if (messagesOfUserToBlock.isNotEmpty()) mainViewModel.messagesOfUserToBlock.value = this.messagesOfUserToBlock
+        if (messagesOfUserToBlock.isNotEmpty()) mainViewModel.messagesOfUserToBlock.value = messagesOfUserToBlock
     }
 }
