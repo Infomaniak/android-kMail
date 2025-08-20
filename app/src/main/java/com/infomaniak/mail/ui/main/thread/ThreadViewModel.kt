@@ -126,7 +126,7 @@ class ThreadViewModel @Inject constructor(
     private var fetchMessagesJob: Job? = null
     private var fetchCalendarEventJob: Job? = null
 
-    private val mailboxLazy = viewModelScope.suspendLazy {
+    private val mailbox = viewModelScope.suspendLazy {
         mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
     }
 
@@ -364,7 +364,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.markAsSeen(mailboxLazy(), listOf(thread))
+        sharedUtils.markAsSeen(mailbox(), listOf(thread))
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread, featureFlags: Mailbox.FeatureFlagSet) {
