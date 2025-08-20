@@ -31,17 +31,12 @@ object MessageUtils {
         threadsUids: List<String>
     ): List<JunkMessageThreadData> {
         val threadList = threadController.getThreads(threadsUids)
-        val result = mutableListOf<JunkMessageThreadData>()
-        threadList.forEach { thread ->
-            result.add(
-                JunkMessageThreadData(
-                    threadUid = thread.uid,
-                    messageUid = messageController.getLastMessageToExecuteAction(thread, featureFlagsLive).uid
-                )
+        return threadList.map {
+            JunkMessageThreadData(
+                threadUid = it.uid,
+                messageUid = messageController.getLastMessageToExecuteAction(it, featureFlagsLive).uid
             )
         }
-
-        return result
     }
 }
 @Parcelize
