@@ -20,13 +20,19 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
+import androidx.core.view.isVisible
+import com.dotlottie.dlplayer.Mode
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.lottiefiles.dotlottie.core.model.Config
+import com.lottiefiles.dotlottie.core.util.DotLottieSource
 
 abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
     abstract val titleRes: Int
     abstract val descriptionRes: Int?
-    abstract val illustrationRes: Int
+    abstract val illustration: Illustration
 
     abstract val positiveButtonRes: Int
 
@@ -37,7 +43,8 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
         title.setText(titleRes)
         descriptionRes?.let(description::setText)
-        infoIllustration.setBackgroundResource(illustrationRes)
+
+        setIllustration()
 
         actionButton.apply {
             setText(positiveButtonRes)
@@ -54,10 +61,37 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         }
     }
 
+    private fun setIllustration() = with(binding) {
+        when (val illustration = illustration) {
+            is Illustration.Static -> infoIllustration.apply {
+                isVisible = true
+                setBackgroundResource(illustration.resId)
+            }
+            is Illustration.Animated -> infoAnimation.apply {
+                isVisible = true
+
+                val config = Config.Builder()
+                    .autoplay(true)
+                    .source(DotLottieSource.Res(illustration.resId))
+                    .loop(true)
+                    .playMode(Mode.REVERSE)
+                    .useFrameInterpolation(true)
+                    .build()
+
+                infoAnimation.load(config)
+            }
+        }
+    }
+
     abstract fun onPositiveButtonClicked()
 
     override fun onCancel(dialog: DialogInterface) {
         trackMatomoWithCategory(MatomoName.DiscoverLater)
         super.onCancel(dialog)
+    }
+
+    sealed interface Illustration {
+        data class Static(@DrawableRes val resId: Int) : Illustration
+        data class Animated(@RawRes val resId: Int) : Illustration
     }
 }

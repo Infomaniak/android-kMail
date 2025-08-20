@@ -26,7 +26,7 @@ class SyncDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
 
     override val titleRes = R.string.syncCalendarsAndContactsTitle
     override val descriptionRes = R.string.syncCalendarsAndContactsDescription
-    override val illustrationRes = R.drawable.illustration_discover_sync
+    override val illustration = Illustration.Static(R.drawable.illustration_discover_sync)
     override val positiveButtonRes = R.string.buttonStart
     override val trackMatomoWithCategory: (name: MatomoName) -> Unit = { trackSyncAutoConfigEvent(it) }
 

@@ -23,14 +23,30 @@
     app:centerHorizontally="true"
     tools:context=".ui.bottomSheetDialogs.UpdateAvailableBottomSheetDialog">
 
-    <ImageView
-        android:id="@+id/info_illustration"
+    <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/marginStandardMedium"
-        android:importantForAccessibility="no"
-        android:maxHeight="270dp"
-        tools:src="@drawable/ic_update_logo" />
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/info_illustration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
+            android:importantForAccessibility="no"
+            android:maxHeight="270dp"
+            android:visibility="gone"
+            tools:src="@drawable/ic_update_logo"
+            tools:visibility="visible" />
+
+        <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
+            android:id="@+id/info_animation"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
+            android:importantForAccessibility="no"
+            android:maxHeight="270dp"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/title"
