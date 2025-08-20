@@ -39,5 +39,6 @@ object MessageUtils {
         }
     }
 }
+
 @Parcelize
 data class JunkMessageThreadData(val threadUid: String, val messageUid: String) : Parcelable
