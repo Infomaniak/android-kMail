@@ -21,18 +21,20 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ksuitepro.views.components.ProOfferContent
 import com.infomaniak.core.ksuite.ksuitepro.R as RCore
 
-class KSuiteProBottomSheetView @JvmOverloads constructor(
+class KSuiteProBottomSheet @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : MailBottomSheetScaffoldComposeView(context, attrs, defStyleAttr) {
 
-    override val dragHandleBackgroundColor: Color
-        get() = Color(resources.getColor(RCore.color.kSuiteBackground, null))
+    override val containerColor: Color get() = Color(resources.getColor(RCore.color.kSuiteProBackground))
+    override val bottomPadding: Dp get() = 0.dp
 
     private var kSuite = KSuite.ProStandard
     private var isAdmin = false
