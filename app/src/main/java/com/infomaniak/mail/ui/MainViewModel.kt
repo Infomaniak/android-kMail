@@ -1167,6 +1167,11 @@ class MainViewModel @Inject constructor(
         val mailboxUuid = currentMailbox.value?.uuid!!
         val messagesUids: List<String> = messages.map { it.uid }
 
+        if (messagesUids.isEmpty()) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
+
         with(ApiRepository.reportPhishing(mailboxUuid, messagesUids)) {
             val snackbarTitle = if (isSuccess()) {
                 // Check the first message, because it is not possible to select messages from multiple folders,
