@@ -258,9 +258,13 @@ class ThreadFragment : Fragment() {
         mainViewModel.messagesOfUserToBlock.observe(viewLifecycleOwner) {
             setPositiveButtonCallback { messagesOfUserToBlock ->
                 trackBlockUserAction(MatomoName.ConfirmSelectedUser)
-                mainViewModel.blockUser(messagesOfUserToBlock)
+                // .first() because we block one person at a time
+                mainViewModel.blockUser(
+                    messagesOfUserToBlock.first().folderId,
+                    messagesOfUserToBlock.first().shortUid
+                )
             }
-            show(it.filterNotNull())
+            show(it)
         }
     }
 
@@ -598,7 +602,6 @@ class ThreadFragment : Fragment() {
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
                             shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
-                            messageUidToReplyTo = lastMessageToReplyTo.uid,
                         ).toBundle(),
                     )
                 }

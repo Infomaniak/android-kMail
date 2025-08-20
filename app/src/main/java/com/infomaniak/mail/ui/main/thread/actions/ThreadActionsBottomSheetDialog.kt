@@ -93,11 +93,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setSnoozeUi(thread.isSnoozed())
         }
 
-        getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) {
-            val thread: Thread? = threadController.getThread(uid = it.first().threadUid)
-            if (thread != null) {
-                setupListeners(thread, it.first(), it.first().messageUid)
-            }
+        getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { junkMessageThreadData ->
+            val firstJunkMessageThreadData = junkMessageThreadData.first()
+            val thread: Thread? = threadController.getThread(uid = firstJunkMessageThreadData.threadUid)
+            if (thread != null) setupListeners(thread, firstJunkMessageThreadData, firstJunkMessageThreadData.messageUid)
         }
     }
 
@@ -122,14 +121,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         isVisible = true
     }
 
-    private fun setupListeners(thread: Thread, threadAndMessageUids: JunkMessageThreadData, messageUidToReply: String) =
-        with(navigationArgs) {
-            initOnClickListener(
-                listener = onActionClick(messageUidToReply, thread, threadAndMessageUids),
-            )
-        }
+    private fun setupListeners(thread: Thread, threadAndMessageUids: JunkMessageThreadData, messageUidToReply: String) {
+        initOnClickListener(
+            listener = onActionClick(messageUidToReply, thread, threadAndMessageUids),
+        )
+    }
 
-    private fun ThreadActionsBottomSheetDialogArgs.onActionClick(
+    private fun onActionClick(
         messageUidToReply: String,
         thread: Thread,
         threadAndMessageUids: JunkMessageThreadData
@@ -141,7 +139,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 draftMode = DraftMode.REPLY,
                 previousMessageUid = messageUidToReply,
                 currentClassName = currentClassName,
-                shouldLoadDistantResources = shouldLoadDistantResources,
+                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
             )
         }
 
@@ -151,7 +149,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 draftMode = DraftMode.REPLY_ALL,
                 previousMessageUid = messageUidToReply,
                 currentClassName = currentClassName,
-                shouldLoadDistantResources = shouldLoadDistantResources,
+                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
             )
         }
 
@@ -161,14 +159,14 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 draftMode = DraftMode.FORWARD,
                 previousMessageUid = messageUidToReply,
                 currentClassName = currentClassName,
-                shouldLoadDistantResources = shouldLoadDistantResources,
+                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
             )
         }
 
         override fun onDelete() {
             descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Delete)
-                mainViewModel.deleteThread(threadUid)
+                mainViewModel.deleteThread(navigationArgs.threadUid)
             }
         }
         //endregion
@@ -177,13 +175,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         override fun onArchive() {
             descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Archive, isFromArchive)
-                mainViewModel.archiveThread(threadUid)
+                mainViewModel.archiveThread(navigationArgs.threadUid)
             }
         }
 
         override fun onReadUnread() {
             trackBottomSheetThreadActionsEvent(MatomoName.MarkAsSeen, value = thread.isSeen)
-            mainViewModel.toggleThreadSeenStatus(threadUid)
+            mainViewModel.toggleThreadSeenStatus(navigationArgs.threadUid)
             twoPaneViewModel.closeThread()
         }
 
@@ -193,7 +191,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Move)
                 navController.animatedNavigation(
                     resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(arrayOf(threadUid)).toBundle(),
+                    args = MoveFragmentArgs(arrayOf(navigationArgs.threadUid)).toBundle(),
                     currentClassName = currentClassName,
                 )
             }
@@ -217,13 +215,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         override fun onFavorite() {
             trackBottomSheetThreadActionsEvent(MatomoName.Favorite, thread.isFavorite)
-            mainViewModel.toggleThreadFavoriteStatus(threadUid)
+            mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid)
         }
 
         override fun onReportJunk() {
             if (isFromSpam) {
                 trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
-                mainViewModel.toggleThreadSpamStatus(listOf(threadUid))
+                mainViewModel.toggleThreadSpamStatus(listOf(navigationArgs.threadUid))
             } else {
                 safeNavigate(
                     resId = R.id.junkBottomSheetDialog,

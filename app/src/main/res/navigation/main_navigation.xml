@@ -219,11 +219,6 @@
             android:name="threadUid"
             app:argType="string" />
         <argument
-            android:name="messageUidToReplyTo"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
             android:name="shouldLoadDistantResources"
             app:argType="boolean" />
         <argument
