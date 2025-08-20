@@ -259,11 +259,13 @@ class ThreadFragment : Fragment() {
         mainViewModel.messagesOfUserToBlock.observe(viewLifecycleOwner) {
             setPositiveButtonCallback { messagesOfUserToBlock ->
                 trackBlockUserAction(MatomoName.ConfirmSelectedUser)
-                // .first() because we block one person at a time
-                mainViewModel.blockUser(
-                    messagesOfUserToBlock.first().folderId,
-                    messagesOfUserToBlock.first().shortUid
-                )
+                // .firstOrNull() because we block one person at a time
+                messagesOfUserToBlock.firstOrNull()?.let { message ->
+                    mainViewModel.blockUser(
+                        message.folderId,
+                        message.shortUid
+                    )
+                }
             }
             show(it)
         }
