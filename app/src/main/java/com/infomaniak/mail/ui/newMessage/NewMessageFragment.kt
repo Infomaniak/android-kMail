@@ -439,7 +439,7 @@ class NewMessageFragment : Fragment() {
 
         initEditorUi()
 
-        viewLifecycleOwner.lifecycleScope.launch { setupSendButtons(newMessageViewModel.currentMailbox()) }
+        viewLifecycleOwner.lifecycleScope.launch { setupSendButtons() }
         externalsManager.setupExternalBanner()
 
         scrim.setOnClickListener {
@@ -799,12 +799,13 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.deleteAttachment(position)
     }
 
-    private fun setupSendButtons(mailbox: Mailbox) = with(binding) {
+    private suspend fun setupSendButtons() = with(binding) {
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
             scheduleButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
+        val mailbox: Mailbox = newMessageViewModel.currentMailbox()
         scheduleButton.setOnClickListener {
             if (checkMailboxStorage(mailbox)) {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
