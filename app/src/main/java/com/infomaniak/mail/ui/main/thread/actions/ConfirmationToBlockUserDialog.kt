@@ -58,10 +58,10 @@ class ConfirmationToBlockUserDialog @Inject constructor(
 
     fun show(messages: List<Message>) = with(binding) {
         messagesOfUserToBlock = messages
-        val recipient = messages.firstOrNull()?.from[0]
-        val title = recipient?.name?.ifBlank { recipient.email }
+        val recipient = messages.first().from[0]
+        val title = recipient.name.ifBlank { recipient.email }
         blockExpeditorTitle.text = activityContext.getString(R.string.blockExpeditorTitle, title)
-        blockExpeditorDescription.text = activityContext.getString(R.string.confirmationToBlockAnExpeditorText, recipient?.email)
+        blockExpeditorDescription.text = activityContext.getString(R.string.confirmationToBlockAnExpeditorText, recipient.email)
         alertDialog.show()
     }
 
