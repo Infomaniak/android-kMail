@@ -52,6 +52,8 @@
         <item name="colorAccent">?attr/colorPrimary</item>
         <item name="colorControlHighlight">@color/color_primary_translucent_ripple</item>
         <item name="colorError">@color/redDestructiveAction</item>
+        <item name="colorOnSurface">@color/onBottomSheetBackgroundColor</item> <!--Bottom sheet content color-->
+        <item name="colorSurfaceContainerLow">@color/bottomSheetBackgroundColor</item> <!--Bottom sheet container color-->
         <item name="colorOnSurfaceInverse">@color/snackbarTextColor</item>
         <item name="colorSurfaceInverse">@color/backgroundSnackbarColor</item>
         <item name="extendedFloatingActionButtonStyle">@style/ExtendedFloatingActionButtonStyle</item>

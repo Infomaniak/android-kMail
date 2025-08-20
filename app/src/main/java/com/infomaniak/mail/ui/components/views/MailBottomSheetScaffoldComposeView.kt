@@ -29,8 +29,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import com.infomaniak.core.compose.materialthemefromxml.MaterialThemeFromXml
-import com.infomaniak.mail.ui.components.MailBottomSheetScaffold
+import com.infomaniak.core.compose.basics.bottomsheet.ThemedBottomSheetScaffold
+import com.infomaniak.mail.ui.theme.MailTheme
 import kotlinx.coroutines.launch
 
 abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
@@ -76,14 +76,15 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
             }
         }
 
-        MaterialThemeFromXml {
-            MailBottomSheetScaffold(
-                isVisible = { isVisible },
-                onDismissRequest = { isVisible = false },
-                title = title,
-                sheetState = sheetState,
-                content = { BottomSheetContent() }
-            )
+        MailTheme {
+            if (isVisible) {
+                ThemedBottomSheetScaffold(
+                    onDismissRequest = { isVisible = false },
+                    title = title,
+                    sheetState = sheetState,
+                    content = { BottomSheetContent() },
+                )
+            }
         }
     }
 }

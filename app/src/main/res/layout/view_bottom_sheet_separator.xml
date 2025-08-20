@@ -15,10 +15,11 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
+<!--A padding top of 20dp is needed to center the handle correctly inside the drag handle to match the compose style-->
 <com.google.android.material.bottomsheet.BottomSheetDragHandleView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/bottomSheetDragHandleHeight"
-    android:paddingTop="@dimen/marginStandardSmall"
+    android:paddingTop="20dp"
     android:src="@drawable/bottom_sheet_drag_handle"
-    app:tint="#cedae1" />
+    app:tint="@color/dragHandleColor" />
