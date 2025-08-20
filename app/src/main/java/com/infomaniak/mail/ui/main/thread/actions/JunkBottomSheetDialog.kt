@@ -77,7 +77,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         observeReportPhishingResult()
-        observeExpeditorsResult(threadsUids)
+        observeHasMoreThanOneExpeditor(threadsUids)
     }
 
     private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
@@ -92,10 +92,15 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun observeHasMoreThanOneExpeditor(threadsUids: List<String>) {
-        mainViewModel.expeditorsWhoAreNotMeCount(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
+        mainViewModel.expeditorsWhoAreNotMeCount(threadsUids).observe(viewLifecycleOwner) { expeditorsCount ->
+            if (expeditorsCount == 0) {
+                binding.blockSender.isGone = true
+                return@observe
+            }
+
             binding.blockSender.setClosingOnClickListener {
                 trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
-                if (hasMoreThanOneExpeditor > 1) {
+                if (expeditorsCount > 1) {
                     safeNavigate(
                         resId = R.id.userToBlockBottomSheetDialog,
                         args = UserToBlockBottomSheetDialogArgs(threadsUids.toTypedArray()).toBundle(),
@@ -107,16 +112,6 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
                     }
                 }
                 mainViewModel.isMultiSelectOn = false
-            }
-        }
-    }
-
-    private fun observeExpeditorsResult(threadsUids: List<String>) {
-        mainViewModel.expeditorsWhoAreNotMeCount(threadsUids).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
-            if (hasMoreThanOneExpeditor != 0) {
-                observeHasMoreThanOneExpeditor(threadsUids)
-            } else {
-                binding.blockSender.isGone = true
             }
         }
     }
