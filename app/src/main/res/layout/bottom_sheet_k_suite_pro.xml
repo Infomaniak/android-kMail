@@ -21,7 +21,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.bottomSheetDialogs.KSuiteProBottomSheetDialog">
 
-    <com.infomaniak.mail.ui.components.views.KSuiteProBottomSheetView
+    <com.infomaniak.mail.ui.components.views.KSuiteProBottomSheet
         android:id="@+id/kSuiteProBottomSheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
