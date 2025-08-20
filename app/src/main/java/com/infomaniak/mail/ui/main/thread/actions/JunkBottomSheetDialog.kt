@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,9 +44,12 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private var binding: BottomSheetJunkBinding by safeBinding()
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
 
-    private var messageOfUserToBlock: Message? = null
+    private var messagesOfUserToBlock: List<Message> = emptyList()
 
     override val mainViewModel: MainViewModel by activityViewModels()
+
+    private var messagesUids: List<String> = emptyList()
+    private var threadsUids: List<String> = emptyList()
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -58,13 +61,27 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
-            this@JunkBottomSheetDialog.messageOfUserToBlock = message
-            handleButtons(threadUid, message)
+        messagesUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.messageUid }
+        threadsUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
+
+        val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
+        val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
+        binding.spam.apply {
+            setIconResource(spamIcon)
+            setTitle(spamText)
+        }
+
+        mainViewModel.getMessages(messagesUids).observe(viewLifecycleOwner) { messages ->
+            messagesOfUserToBlock = messages
+            handleButtons(threadsUids, messages)
         }
 
         observeReportPhishingResult()
-        observeExpeditorsResult(threadUid)
+        observeHasMoreThanOneExpeditor(threadsUids)
+    }
+
+    private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
+        return if (isFromSpam) R.drawable.ic_non_spam to R.string.actionNonSpam else R.drawable.ic_spam to R.string.actionSpam
     }
 
     private fun observeReportPhishingResult() {
@@ -74,39 +91,37 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun observeHasMoreThanOneExpeditor(threadUid: String) {
-        mainViewModel.hasMoreThanOneExpeditor(threadUid).observe(viewLifecycleOwner) { hasMoreThanOneExpeditor ->
+    private fun observeHasMoreThanOneExpeditor(threadsUids: List<String>) {
+        mainViewModel.expeditorsWhoAreNotMeCount(threadsUids).observe(viewLifecycleOwner) { expeditorsCount ->
+            if (expeditorsCount == 0) {
+                binding.blockSender.isGone = true
+                return@observe
+            }
+
             binding.blockSender.setClosingOnClickListener {
                 trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
-                if (hasMoreThanOneExpeditor) {
+                if (expeditorsCount > 1) {
                     safeNavigate(
                         resId = R.id.userToBlockBottomSheetDialog,
-                        args = UserToBlockBottomSheetDialogArgs(threadUid).toBundle(),
+                        args = UserToBlockBottomSheetDialogArgs(threadsUids.toTypedArray()).toBundle(),
                         currentClassName = JunkBottomSheetDialog::class.java.name,
                     )
                 } else {
-                    messageOfUserToBlock?.let {
-                        mainViewModel.messageOfUserToBlock.value = messageOfUserToBlock
+                    if (messagesOfUserToBlock.isNotEmpty()) {
+                        mainViewModel.messagesOfUserToBlock.value = messagesOfUserToBlock
                     }
                 }
+                mainViewModel.isMultiSelectOn = false
             }
         }
     }
 
-    private fun observeExpeditorsResult(threadUid: String) {
-        mainViewModel.hasOtherExpeditors(threadUid).observe(viewLifecycleOwner) { hasOtherExpeditors ->
-            if (hasOtherExpeditors) {
-                observeHasMoreThanOneExpeditor(threadUid)
-            } else {
-                binding.blockSender.isGone = true
-            }
-        }
-    }
-
-    private fun handleButtons(threadUid: String, message: Message) = with(binding) {
+    private fun handleButtons(threadsUids: List<String>, messages: List<Message>) = with(binding) {
         spam.setClosingOnClickListener {
-            trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = message.folder.role == FolderRole.SPAM)
-            mainViewModel.toggleThreadSpamStatus(threadUid)
+            // Check the first message, because it is not possible to select messages from multiple folders,
+            // so you won't have both SPAM and non-SPAM messages.
+            trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = messages.firstOrNull()?.folder?.role == FolderRole.SPAM)
+            mainViewModel.toggleThreadSpamStatus(threadsUids)
         }
 
         phishing.setOnClickListener {
@@ -114,7 +129,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             descriptionDialog.show(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
-                onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUid, message) },
+                onPositiveButtonClicked = { mainViewModel.reportPhishing(threadsUids, messages) },
             )
         }
     }

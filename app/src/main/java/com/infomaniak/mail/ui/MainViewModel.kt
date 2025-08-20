@@ -180,7 +180,7 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
-    val messageOfUserToBlock = SingleLiveEvent<Message>()
+    val messagesOfUserToBlock = SingleLiveEvent<List<Message>>()
 
     val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
 
@@ -1132,12 +1132,8 @@ class MainViewModel @Inject constructor(
         toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid), message = message, displaySnackbar = false)
     }
 
-    fun toggleThreadSpamStatus(threadUid: String) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = listOf(threadUid))
-    }
-
-    fun toggleThreadsSpamStatus(threadsUids: List<String>) {
-        toggleThreadsOrMessageSpamStatus(threadsUids = threadsUids)
+    fun toggleThreadSpamStatus(threadUids: List<String>, displaySnackbar: Boolean = true) {
+        toggleThreadsOrMessageSpamStatus(threadsUids = threadUids, displaySnackbar = displaySnackbar)
     }
 
     private fun toggleThreadsOrMessageSpamStatus(
@@ -1167,13 +1163,25 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region Phishing
-    fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(ioCoroutineContext) {
+    fun reportPhishing(threadUids: List<String>, messages: List<Message>) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
+        val messagesUids: List<String> = messages.map { it.uid }
 
-        with(ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)) {
+        if (messagesUids.isEmpty()) {
+            snackbarManager.postValue(appContext.getString(RCore.string.anErrorHasOccurred))
+            return@launch
+        }
 
+        with(ApiRepository.reportPhishing(mailboxUuid, messagesUids)) {
             val snackbarTitle = if (isSuccess()) {
-                if (folderRoleUtils.getActionFolderRole(message) != FolderRole.SPAM) toggleMessageSpamStatus(threadUid, message)
+                // Check the first message, because it is not possible to select messages from multiple folders,
+                // so you won't have both SPAM and non-SPAM messages.
+                messages.firstOrNull()?.let {
+                    if (folderRoleUtils.getActionFolderRole(it) != FolderRole.SPAM) {
+                        toggleThreadSpamStatus(threadUids = threadUids, displaySnackbar = false)
+                    }
+                }
+
                 R.string.snackbarReportPhishingConfirmation
             } else {
                 translateError()
@@ -1212,14 +1220,14 @@ class MainViewModel @Inject constructor(
     //endregion
 
     //region BlockUser
-    fun blockUser(message: Message) = viewModelScope.launch(ioCoroutineContext) {
+    fun blockUser(folderId: String, shortUid: Int) = viewModelScope.launch(ioCoroutineContext) {
         val mailboxUuid = currentMailbox.value?.uuid!!
-
-        with(ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)) {
+        with(ApiRepository.blockUser(mailboxUuid, folderId, shortUid)) {
 
             val snackbarTitle = if (isSuccess()) R.string.snackbarBlockUserConfirmation else translateError()
-
             snackbarManager.postValue(appContext.getString(snackbarTitle))
+
+            reportPhishingTrigger.postValue(Unit)
         }
     }
     //endregion
@@ -1547,22 +1555,24 @@ class MainViewModel @Inject constructor(
         emit(messageController.getMessage(messageUid)!!)
     }
 
-    fun hasOtherExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
-        val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } == true
-        emit(hasOtherExpeditors)
+    fun getMessages(messagesUids: List<String>): LiveData<List<Message>> = liveData(ioCoroutineContext) {
+        emit(messageController.getMessages(messagesUids))
     }
 
-    fun hasMoreThanOneExpeditor(threadUid: String) = liveData(ioCoroutineContext) {
-        val hasMoreThanOneExpeditor =
-            (threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.filter { it.isMe() }?.size ?: 0) > 1
-        emit(hasMoreThanOneExpeditor)
+    fun expeditorsWhoAreNotMeCount(threadUids: List<String>) = liveData(ioCoroutineContext) {
+        val numberOfExpeditors = threadController.getThreads(threadUids)
+            .flatMapTo(mutableSetOf()) { it.from }.count { !it.isMe() }
+        emit(numberOfExpeditors)
     }
 
-    fun getMessagesFromUniqueExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
-        val messageToRecipient = threadController.getThread(threadUid)?.messages?.distinctBy { it.from }?.flatMap { message ->
-            message.from.filterNot { it.isMe() }
-                .distinct()
-                .map { from -> message to from }
+    fun getMessagesFromUniqueExpeditors(threadUids: List<String>) = liveData(ioCoroutineContext) {
+        val messageToRecipient = mutableListOf<Pair<Message, Recipient>>()
+        threadController.getThreads(threadUids).forEach { thread ->
+            thread.messages.distinctBy { it.from }.flatMapTo(mutableSetOf()) { message ->
+                message.from.filterNot { it.isMe() }.mapTo(mutableSetOf()) { from ->
+                    messageToRecipient.add(message to from)
+                }
+            }
         }
         emit(messageToRecipient)
     }
