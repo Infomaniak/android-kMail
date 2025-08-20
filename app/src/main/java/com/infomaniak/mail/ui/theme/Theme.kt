@@ -37,7 +37,7 @@ fun MailTheme(content: @Composable () -> Unit) {
                 shape = RoundedCornerShape(topStart = cornerSize, topEnd = cornerSize),
                 dragHandleColor = colorResource(R.color.dragHandleColor),
                 titleTextStyle = Typography.bodyMedium,
-                titleColor = colorResource(R.color.primaryTextColor)
+                titleColor = colorResource(R.color.primaryTextColor),
             ),
             content = content,
         )
