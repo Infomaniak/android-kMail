@@ -44,17 +44,15 @@ class RestoreEmailsViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val mailboxLazy = viewModelScope.suspendLazy {
+    private val mailbox = viewModelScope.suspendLazy {
         mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
     }
 
     fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(ioCoroutineContext) {
-        val mailbox = mailboxLazy()
-        emit(ApiRepository.getBackups(mailbox.hostingId, mailbox.mailboxName))
+        emit(with(mailbox()) { ApiRepository.getBackups(hostingId, mailboxName) })
     }
 
     fun restoreEmails(date: String): LiveData<ApiResponse<Boolean>> = liveData(ioCoroutineContext) {
-        val mailbox = mailboxLazy()
-        emit(ApiRepository.restoreBackup(mailbox.hostingId, mailbox.mailboxName, date))
+        emit(with(mailbox()) { ApiRepository.restoreBackup(hostingId, mailboxName, date) })
     }
 }
