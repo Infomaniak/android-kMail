@@ -915,7 +915,7 @@ class NewMessageViewModel @Inject constructor(
          * - The link in the Draft is already added, when creating the Draft.
          * - The link in the Message is added here, when saving the Draft.
          */
-        messageUid?.let { MessageController.getMessage(uid = it, realm)?.draftLocalUuid = localUuid }
+        messageUid?.let { MessageController.getMessageBlocking(uid = it, realm)?.draftLocalUuid = localUuid }
 
         // If we opened a text/plain draft, we will now convert it as text/html as we send it because we only support editing
         // text/html drafts.

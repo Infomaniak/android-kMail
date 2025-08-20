@@ -299,11 +299,11 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
 
                             if (remoteMessage.hasAttachable) hasAttachableInThread = true
 
-                            MessageController.upsertMessage(remoteMessage, realm = this)
+                            MessageController.upsertMessageBlocking(remoteMessage, realm = this)
                         }
                     } else {
                         if (apiResponse.error?.code == ErrorCode.MESSAGE_NOT_FOUND) {
-                            MessageController.getMessage(localMessage.uid, realm = this)?.isDeletedOnApi = true
+                            MessageController.getMessageBlocking(localMessage.uid, realm = this)?.isDeletedOnApi = true
                             deletedMessagesUids.add(localMessage.uid)
                         } else {
                             failedMessagesUids.add(localMessage.uid)
@@ -367,7 +367,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
                 //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
                 if (emptyThreads.isNotEmpty()) {
                     emptyThreads.forEach {
-                        SentryDebug.sendEmptyThread(it, "No Message in a Thread when refreshing a Folder", realm = this)
+                        SentryDebug.sendEmptyThreadBlocking(it, "No Message in a Thread when refreshing a Folder", realm = this)
                     }
                     delete(emptyThreads)
                 }

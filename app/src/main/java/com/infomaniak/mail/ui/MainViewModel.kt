@@ -901,7 +901,7 @@ class MainViewModel @Inject constructor(
             mailboxContentRealm().write {
                 messageToMove.emojiReactions.forEach { reaction ->
                     reaction.authors.forEach { author ->
-                        MessageController.deleteMessageByUid(author.sourceMessageUid, this)
+                        MessageController.deleteMessageByUidBlocking(author.sourceMessageUid, this)
                     }
                 }
             }
@@ -1609,7 +1609,7 @@ class MainViewModel @Inject constructor(
         val realm = mailboxContentRealm()
 
         val foldersToUpdate = realm.write {
-            messagesUids.mapNotNullTo(mutableSetOf()) { MessageController.getMessage(it, realm = this)?.folderId }
+            messagesUids.mapNotNullTo(mutableSetOf()) { MessageController.getMessageBlocking(it, realm = this)?.folderId }
         }
 
         foldersToUpdate.forEach { folderId ->

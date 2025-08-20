@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
+import com.infomaniak.mail.utils.extensions.findSuspend
 import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -61,8 +62,7 @@ class MessageController @Inject constructor(
     }
     //endregion
 
-    //region Get data
-    fun getMessage(uid: String): Message? {
+    suspend fun getMessage(uid: String): Message? {
         return getMessage(uid, mailboxContentRealm())
     }
 
@@ -204,8 +204,12 @@ class MessageController @Inject constructor(
         //endregion
 
         //region Get data
-        fun getMessage(uid: String, realm: TypedRealm): Message? {
+        fun getMessageBlocking(uid: String, realm: TypedRealm): Message? {
             return getMessageQuery(uid, realm).find()
+        }
+
+        suspend fun getMessage(uid: String, realm: TypedRealm): Message? {
+            return getMessageQuery(uid, realm).findSuspend()
         }
 
         fun getMessagesByUids(messagesUids: List<String>, realm: MutableRealm): List<Message> {
@@ -227,10 +231,10 @@ class MessageController @Inject constructor(
         //endregion
 
         //region Edit data
-        fun upsertMessage(message: Message, realm: MutableRealm): Message = realm.copyToRealm(message, UpdatePolicy.ALL)
+        fun upsertMessageBlocking(message: Message, realm: MutableRealm): Message = realm.copyToRealm(message, UpdatePolicy.ALL)
 
-        fun updateMessage(messageUid: String, realm: MutableRealm, onUpdate: (Message?) -> Unit) {
-            onUpdate(getMessage(messageUid, realm))
+        fun updateMessageBlocking(messageUid: String, realm: MutableRealm, onUpdate: (Message?) -> Unit) {
+            onUpdate(getMessageBlocking(messageUid, realm))
         }
 
         fun deleteMessage(context: Context, mailbox: Mailbox, message: Message, realm: MutableRealm) {
@@ -253,8 +257,8 @@ class MessageController @Inject constructor(
             realm.delete(message)
         }
 
-        fun deleteMessageByUid(uid: String, realm: MutableRealm) {
-            val message = getMessage(uid, realm) ?: return
+        fun deleteMessageByUidBlocking(uid: String, realm: MutableRealm) {
+            val message = getMessageBlocking(uid, realm) ?: return
             realm.delete(message)
         }
 
