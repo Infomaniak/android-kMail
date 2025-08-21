@@ -106,7 +106,7 @@ kotlin {
 ktlint {
     version.set("1.7.1")
     android.set(true)
-    ignoreFailures.set(true)
+    ignoreFailures.set(false)
     reporters {
         reporter(ReporterType.PLAIN)
     }
