@@ -41,7 +41,7 @@ import splitties.experimental.ExperimentalSplittiesApi
 class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
 
-    override val dialogTitle: String? = "-"
+    override val dialogTitle: String? = null
 
     private val dialogTitleLazy = lifecycleScope.suspendLazy { downloadThreadsViewModel.getDialogName() }
 
