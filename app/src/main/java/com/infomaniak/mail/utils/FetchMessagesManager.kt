@@ -126,9 +126,7 @@ class FetchMessagesManager @Inject constructor(
 
         SentryLog.d(TAG, "LaunchWork: ${mailbox.email} has ${threadsWithNewMessages.count()} Threads with new Messages")
 
-        notificationMessageUidToLog?.let { notificationMessageUidToLog ->
-            logNotFetchedMessageUid(notificationMessageUidToLog, userId, mailbox, realm)
-        }
+        notificationMessageUidToLog?.let { logNotFetchedMessageUid(it, userId, mailbox, realm) }
 
         // Dismiss Notifications for Messages that have been read on another device
         notificationManagerCompat.activeNotifications.forEach { statusBarNotification ->
@@ -188,12 +186,7 @@ class FetchMessagesManager @Inject constructor(
         realm: Realm,
     ) {
         if (MessageController.doesMessageExist(notificationMessageUidToLog, realm).not()) {
-            SentryDebug.sendMissingMessageUidInRealm(
-                userId,
-                mailbox.mailboxId,
-                notificationMessageUidToLog,
-                mailbox,
-            )
+            SentryDebug.sendMissingMessageUidInRealm(userId, mailbox.mailboxId, notificationMessageUidToLog, mailbox)
         }
     }
 

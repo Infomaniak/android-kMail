@@ -18,7 +18,6 @@
 <!--A padding top of 20dp is needed to center the handle correctly inside the drag handle to match the compose style-->
 <com.google.android.material.bottomsheet.BottomSheetDragHandleView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/separator"
     android:layout_width="match_parent"
     android:layout_height="@dimen/bottomSheetDragHandleHeight"
     android:paddingTop="20dp"

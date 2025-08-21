@@ -22,9 +22,7 @@
     android:orientation="vertical"
     android:paddingBottom="@dimen/bottomSheetBottomPadding">
 
-    <include
-        android:id="@+id/include_separator"
-        layout="@layout/view_bottom_sheet_separator" />
+    <include layout="@layout/view_bottom_sheet_separator" />
 
     <TextView
         android:id="@+id/titleTextView"
