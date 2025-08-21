@@ -19,12 +19,12 @@
 
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -50,7 +50,9 @@ class DownloadMessagesProgressDialog : DownloadProgressDialog() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = super.onCreateDialog(savedInstanceState).also { dialog ->
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val dialog = requireDialog()
         viewLifecycleOwner.lifecycleScope.launch {
             dialog.setTitle(dialogTitleLazy())
         }
