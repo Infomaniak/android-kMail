@@ -79,6 +79,11 @@ class NewMessageActivity : BaseActivity() {
             return
         }
 
+        lifecycleScope.launch {
+            newMessageViewModel.awaitNoMailboxSignal()
+            finish()
+        }
+
         setupSnackbar()
         setupNavController()
         setupFeatureFlagIfMailTo()
@@ -89,6 +94,7 @@ class NewMessageActivity : BaseActivity() {
             startActivity(Intent(this, LaunchActivity::class.java))
             return false
         }
+
         return true
     }
 
