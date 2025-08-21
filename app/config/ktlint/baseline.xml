@@ -1,0 +1,1814 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="build.gradle.kts">
+        <error line="65" column="1" source="standard:indent" />
+        <error line="66" column="1" source="standard:indent" />
+        <error line="113" column="25" source="standard:string-template" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/CrossAppLoginService.kt">
+        <error line="13" column="30" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/MainApplication.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="80" column="30" source="standard:class-signature" />
+        <error line="80" column="45" source="standard:class-signature" />
+        <error line="80" column="75" source="standard:class-signature" />
+        <error line="80" column="101" source="standard:class-signature" />
+        <error line="265" column="19" source="standard:argument-list-wrapping" />
+        <error line="265" column="22" source="standard:argument-list-wrapping" />
+        <error line="281" column="72" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/TokenInterceptorListenerProvider.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/LocalSettings.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="120" column="9" source="standard:class-signature" />
+        <error line="121" column="9" source="standard:class-signature" />
+        <error line="122" column="9" source="standard:class-signature" />
+        <error line="122" column="32" source="standard:class-signature" />
+        <error line="174" column="21" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/api/ApiRepository.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="124" column="106" source="standard:function-expression-body" />
+        <error line="135" column="99" source="standard:function-expression-body" />
+        <error line="139" column="111" source="standard:function-expression-body" />
+        <error line="143" column="94" source="standard:function-expression-body" />
+        <error line="147" column="104" source="standard:function-expression-body" />
+        <error line="153" column="95" source="standard:function-expression-body" />
+        <error line="157" column="106" source="standard:function-expression-body" />
+        <error line="161" column="101" source="standard:function-expression-body" />
+        <error line="167" column="86" source="standard:function-expression-body" />
+        <error line="171" column="104" source="standard:function-expression-body" />
+        <error line="175" column="91" source="standard:function-expression-body" />
+        <error line="182" column="38" source="standard:argument-list-wrapping" />
+        <error line="182" column="131" source="standard:max-line-length" />
+        <error line="182" column="138" source="standard:argument-list-wrapping" />
+        <error line="188" column="92" source="standard:function-expression-body" />
+        <error line="192" column="108" source="standard:function-expression-body" />
+        <error line="197" column="123" source="standard:function-expression-body" />
+        <error line="201" column="118" source="standard:function-expression-body" />
+        <error line="218" column="119" source="standard:function-expression-body" />
+        <error line="222" column="110" source="standard:function-expression-body" />
+        <error line="228" column="112" source="standard:function-expression-body" />
+        <error line="234" column="120" source="standard:function-expression-body" />
+        <error line="238" column="120" source="standard:function-expression-body" />
+        <error line="242" column="128" source="standard:function-expression-body" />
+        <error line="313" column="78" source="standard:function-expression-body" />
+        <error line="317" column="94" source="standard:function-expression-body" />
+        <error line="321" column="80" source="standard:function-expression-body" />
+        <error line="325" column="95" source="standard:function-expression-body" />
+        <error line="332" column="106" source="standard:function-expression-body" />
+        <error line="338" column="111" source="standard:function-expression-body" />
+        <error line="348" column="39" source="standard:function-expression-body" />
+        <error line="361" column="41" source="standard:function-expression-body" />
+        <error line="374" column="45" source="standard:function-expression-body" />
+        <error line="382" column="73" source="standard:function-expression-body" />
+        <error line="386" column="108" source="standard:function-expression-body" />
+        <error line="390" column="103" source="standard:function-expression-body" />
+        <error line="394" column="117" source="standard:function-expression-body" />
+        <error line="404" column="116" source="standard:function-expression-body" />
+        <error line="419" column="53" source="standard:function-expression-body" />
+        <error line="429" column="95" source="standard:function-expression-body" />
+        <error line="436" column="127" source="standard:function-expression-body" />
+        <error line="448" column="34" source="standard:function-expression-body" />
+        <error line="452" column="90" source="standard:function-expression-body" />
+        <error line="471" column="30" source="standard:function-expression-body" />
+        <error line="495" column="88" source="standard:function-expression-body" />
+        <error line="515" column="1" source="standard:no-blank-line-before-rbrace" />
+        <error line="520" column="103" source="standard:function-expression-body" />
+        <error line="533" column="98" source="standard:function-expression-body" />
+        <error line="552" column="108" source="standard:function-expression-body" />
+        <error line="566" column="88" source="standard:function-expression-body" />
+        <error line="604" column="29" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/api/ApiRoutes.kt">
+        <error line="31" column="42" source="standard:function-expression-body" />
+        <error line="35" column="79" source="standard:function-expression-body" />
+        <error line="39" column="69" source="standard:function-expression-body" />
+        <error line="43" column="84" source="standard:function-expression-body" />
+        <error line="47" column="72" source="standard:function-expression-body" />
+        <error line="51" column="71" source="standard:function-expression-body" />
+        <error line="57" column="31" source="standard:function-expression-body" />
+        <error line="61" column="32" source="standard:function-expression-body" />
+        <error line="65" column="27" source="standard:function-expression-body" />
+        <error line="69" column="28" source="standard:function-expression-body" />
+        <error line="75" column="68" source="standard:function-expression-body" />
+        <error line="79" column="49" source="standard:function-expression-body" />
+        <error line="83" column="57" source="standard:function-expression-body" />
+        <error line="89" column="40" source="standard:function-expression-body" />
+        <error line="93" column="73" source="standard:function-expression-body" />
+        <error line="97" column="84" source="standard:function-expression-body" />
+        <error line="101" column="78" source="standard:function-expression-body" />
+        <error line="110" column="55" source="standard:function-expression-body" />
+        <error line="114" column="35" source="standard:function-expression-body" />
+        <error line="118" column="47" source="standard:function-expression-body" />
+        <error line="124" column="35" source="standard:function-expression-body" />
+        <error line="128" column="29" source="standard:function-expression-body" />
+        <error line="132" column="65" source="standard:function-expression-body" />
+        <error line="136" column="68" source="standard:function-expression-body" />
+        <error line="142" column="58" source="standard:function-expression-body" />
+        <error line="146" column="46" source="standard:function-expression-body" />
+        <error line="150" column="63" source="standard:function-expression-body" />
+        <error line="154" column="68" source="standard:function-expression-body" />
+        <error line="158" column="69" source="standard:function-expression-body" />
+        <error line="168" column="15" source="standard:function-expression-body" />
+        <error line="171" column="48" source="standard:string-template" />
+        <error line="179" column="87" source="standard:function-expression-body" />
+        <error line="183" column="91" source="standard:function-expression-body" />
+        <error line="187" column="81" source="standard:function-expression-body" />
+        <error line="191" column="86" source="standard:function-expression-body" />
+        <error line="195" column="87" source="standard:function-expression-body" />
+        <error line="201" column="76" source="standard:function-expression-body" />
+        <error line="205" column="93" source="standard:function-expression-body" />
+        <error line="211" column="56" source="standard:string-template" />
+        <error line="214" column="91" source="standard:function-expression-body" />
+        <error line="220" column="55" source="standard:function-expression-body" />
+        <error line="224" column="53" source="standard:function-expression-body" />
+        <error line="228" column="51" source="standard:function-expression-body" />
+        <error line="232" column="51" source="standard:function-expression-body" />
+        <error line="236" column="53" source="standard:function-expression-body" />
+        <error line="240" column="51" source="standard:function-expression-body" />
+        <error line="244" column="53" source="standard:function-expression-body" />
+        <error line="250" column="44" source="standard:function-expression-body" />
+        <error line="254" column="69" source="standard:function-expression-body" />
+        <error line="260" column="19" source="standard:string-template" />
+        <error line="263" column="55" source="standard:function-expression-body" />
+        <error line="267" column="58" source="standard:function-expression-body" />
+        <error line="273" column="30" source="standard:function-expression-body" />
+        <error line="277" column="53" source="standard:function-expression-body" />
+        <error line="281" column="95" source="standard:function-expression-body" />
+        <error line="285" column="74" source="standard:function-expression-body" />
+        <error line="291" column="63" source="standard:function-expression-body" />
+        <error line="295" column="74" source="standard:function-expression-body" />
+        <error line="301" column="45" source="standard:function-expression-body" />
+        <error line="305" column="71" source="standard:function-expression-body" />
+        <error line="310" column="67" source="standard:function-expression-body" />
+        <error line="314" column="51" source="standard:function-expression-body" />
+        <error line="318" column="24" source="standard:function-expression-body" />
+        <error line="322" column="44" source="standard:function-expression-body" />
+        <error line="326" column="36" source="standard:function-expression-body" />
+        <error line="330" column="79" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/api/CalendarRealmInstantSerializer.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/api/DateSerializer.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="37" column="54" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/api/RealmInstantSerializer.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="39" column="62" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/api/UnwrappingJsonListSerializer.kt">
+        <error line="28" column="74" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/api/UrlTraceInterceptor.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/RealmDatabase.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="101" column="106" source="standard:function-expression-body" />
+        <error line="207" column="46" source="standard:string-template" />
+        <error line="208" column="58" source="standard:string-template" />
+        <error line="209" column="68" source="standard:string-template" />
+        <error line="285" column="128" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/RealmMigrations.kt">
+        <error line="61" column="1" source="standard:spacing-between-declarations-with-comments" />
+        <error line="108" column="1" source="standard:no-blank-line-before-rbrace" />
+        <error line="285" column="126" source="standard:function-expression-body" />
+        <error line="301" column="95" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/AttachmentController.kt">
+        <error line="36" column="108" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/DelayApiCallManager.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/DraftController.kt">
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="34" column="67" source="standard:class-signature" />
+        <error line="38" column="70" source="standard:function-expression-body" />
+        <error line="42" column="43" source="standard:function-expression-body" />
+        <error line="46" column="62" source="standard:function-expression-body" />
+        <error line="50" column="45" source="standard:function-expression-body" />
+        <error line="54" column="58" source="standard:function-expression-body" />
+        <error line="74" column="82" source="standard:function-expression-body" />
+        <error line="86" column="80" source="standard:function-expression-body" />
+        <error line="90" column="107" source="standard:function-expression-body" />
+        <error line="94" column="85" source="standard:function-expression-body" />
+        <error line="100" column="68" source="standard:function-expression-body" />
+        <error line="104" column="64" source="standard:function-expression-body" />
+        <error line="108" column="69" source="standard:function-expression-body" />
+        <error line="112" column="81" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/FolderController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="48" column="73" source="standard:function-expression-body" />
+        <error line="56" column="72" source="standard:function-expression-body" />
+        <error line="64" column="62" source="standard:function-expression-body" />
+        <error line="68" column="48" source="standard:function-expression-body" />
+        <error line="76" column="40" source="standard:function-expression-body" />
+        <error line="80" column="46" source="standard:function-expression-body" />
+        <error line="88" column="50" source="standard:function-expression-body" />
+        <error line="187" column="70" source="standard:string-template" />
+        <error line="190" column="112" source="standard:function-expression-body" />
+        <error line="194" column="109" source="standard:function-expression-body" />
+        <error line="209" column="63" source="standard:function-expression-body" />
+        <error line="213" column="69" source="standard:function-expression-body" />
+        <error line="217" column="66" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/MessageController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="56" column="29" source="standard:function-expression-body" />
+        <error line="65" column="43" source="standard:function-expression-body" />
+        <error line="75" column="1" source="standard:indent" />
+        <error line="79" column="1" source="standard:indent" />
+        <error line="79" column="57" source="standard:string-template" />
+        <error line="80" column="1" source="standard:indent" />
+        <error line="80" column="61" source="standard:string-template" />
+        <error line="81" column="1" source="standard:indent" />
+        <error line="90" column="125" source="standard:function-expression-body" />
+        <error line="97" column="58" source="standard:function-expression-body" />
+        <error line="101" column="60" source="standard:function-expression-body" />
+        <error line="110" column="63" source="standard:function-expression-body" />
+        <error line="126" column="82" source="standard:function-expression-body" />
+        <error line="164" column="94" source="standard:string-template" />
+        <error line="175" column="38" source="standard:function-expression-body" />
+        <error line="179" column="79" source="standard:function-expression-body" />
+        <error line="183" column="112" source="standard:function-expression-body" />
+        <error line="193" column="98" source="standard:function-expression-body" />
+        <error line="197" column="96" source="standard:function-expression-body" />
+        <error line="201" column="106" source="standard:function-expression-body" />
+        <error line="207" column="66" source="standard:function-expression-body" />
+        <error line="211" column="95" source="standard:function-expression-body" />
+        <error line="215" column="87" source="standard:function-expression-body" />
+        <error line="224" column="71" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/RefreshController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="365" column="1" source="standard:indent" />
+        <error line="366" column="1" source="standard:indent" />
+        <error line="816" column="17" source="standard:property-naming" />
+        <error line="840" column="9" source="standard:class-signature" />
+        <error line="841" column="9" source="standard:class-signature" />
+        <error line="841" column="34" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/ReplyForwardFooterManager.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="98" column="89" source="standard:function-expression-body" />
+        <error line="167" column="78" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/SwissTransferFileController.kt">
+        <error line="36" column="122" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/ThreadController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="56" column="111" source="standard:function-expression-body" />
+        <error line="60" column="62" source="standard:function-expression-body" />
+        <error line="64" column="39" source="standard:function-expression-body" />
+        <error line="68" column="69" source="standard:function-expression-body" />
+        <error line="72" column="41" source="standard:function-expression-body" />
+        <error line="76" column="70" source="standard:function-expression-body" />
+        <error line="141" column="109" source="standard:function-expression-body" />
+        <error line="145" column="113" source="standard:function-expression-body" />
+        <error line="149" column="82" source="standard:function-expression-body" />
+        <error line="185" column="104" source="standard:function-expression-body" />
+        <error line="198" column="94" source="standard:function-expression-body" />
+        <error line="210" column="64" source="standard:function-expression-body" />
+        <error line="214" column="106" source="standard:function-expression-body" />
+        <error line="218" column="102" source="standard:function-expression-body" />
+        <error line="222" column="56" source="standard:function-expression-body" />
+        <error line="226" column="93" source="standard:function-expression-body" />
+        <error line="354" column="75" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/refreshStrategies/DefaultRefreshStrategy.kt">
+        <error line="39" column="88" source="standard:function-expression-body" />
+        <error line="47" column="106" source="standard:function-expression-body" />
+        <error line="75" column="56" source="standard:string-template" />
+        <error line="75" column="64" source="standard:string-template" />
+        <error line="196" column="77" source="standard:function-expression-body" />
+        <error line="200" column="82" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/refreshStrategies/InboxRefreshStrategy.kt">
+        <error line="27" column="88" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/refreshStrategies/SnoozeRefreshStrategy.kt">
+        <error line="35" column="88" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxContent/refreshStrategies/ThreadRecomputations.kt">
+        <error line="152" column="90" source="standard:function-expression-body" />
+        <error line="171" column="107" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxInfo/MailboxController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="55" column="30" source="standard:function-expression-body" />
+        <error line="61" column="115" source="standard:function-expression-body" />
+        <error line="65" column="48" source="standard:function-expression-body" />
+        <error line="69" column="59" source="standard:function-expression-body" />
+        <error line="73" column="71" source="standard:function-expression-body" />
+        <error line="77" column="53" source="standard:function-expression-body" />
+        <error line="81" column="77" source="standard:function-expression-body" />
+        <error line="85" column="88" source="standard:function-expression-body" />
+        <error line="89" column="79" source="standard:function-expression-body" />
+        <error line="93" column="70" source="standard:function-expression-body" />
+        <error line="97" column="52" source="standard:function-expression-body" />
+        <error line="192" column="97" source="standard:function-expression-body" />
+        <error line="196" column="100" source="standard:function-expression-body" />
+        <error line="200" column="101" source="standard:function-expression-body" />
+        <error line="209" column="107" source="standard:function-expression-body" />
+        <error line="213" column="98" source="standard:function-expression-body" />
+        <error line="217" column="100" source="standard:function-expression-body" />
+        <error line="227" column="34" source="standard:function-expression-body" />
+        <error line="231" column="71" source="standard:function-expression-body" />
+        <error line="235" column="82" source="standard:function-expression-body" />
+        <error line="239" column="94" source="standard:function-expression-body" />
+        <error line="243" column="76" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxInfo/PermissionsController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="54" source="standard:class-signature" />
+        <error line="32" column="81" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxInfo/QuotasController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="54" source="standard:class-signature" />
+        <error line="32" column="64" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/mailboxInfo/SignatureController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="29" column="5" source="standard:class-signature" />
+        <error line="29" column="54" source="standard:class-signature" />
+        <error line="33" column="81" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/userInfo/AddressBookController.kt">
+        <error line="35" column="77" source="standard:function-expression-body" />
+        <error line="39" column="67" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/userInfo/ContactGroupController.kt">
+        <error line="33" column="59" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/cache/userInfo/MergedContactController.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="39" column="69" source="standard:function-expression-body" />
+        <error line="45" column="105" source="standard:function-expression-body" />
+        <error line="51" column="103" source="standard:function-expression-body" />
+        <error line="59" column="64" source="standard:function-expression-body" />
+        <error line="63" column="86" source="standard:function-expression-body" />
+        <error line="67" column="84" source="standard:function-expression-body" />
+        <error line="71" column="70" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/Attachment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="36" column="20" source="standard:class-signature" />
+        <error line="36" column="41" source="standard:class-signature" />
+        <error line="64" column="17" source="standard:backing-property-naming" />
+        <error line="108" column="64" source="standard:function-expression-body" />
+        <error line="117" column="51" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/AttachmentsToForwardResult.kt">
+        <error line="24" column="5" source="standard:class-signature" />
+        <error line="24" column="39" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/Bimi.kt">
+        <error line="32" column="16" source="standard:class-signature" />
+        <error line="32" column="37" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/Folder.kt">
+        <error line="23" column="1" source="standard:import-ordering" />
+        <error line="58" column="16" source="standard:class-signature" />
+        <error line="58" column="29" source="standard:class-signature" />
+        <error line="67" column="9" source="standard:backing-property-naming" />
+        <error line="115" column="17" source="standard:backing-property-naming" />
+        <error line="169" column="52" source="standard:function-expression-body" />
+        <error line="174" column="24" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/InfomaniakPassword.kt">
+        <error line="24" column="5" source="standard:class-signature" />
+        <error line="25" column="5" source="standard:class-signature" />
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="26" column="34" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/Quotas.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/SwissTransferFile.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="29" column="27" source="standard:class-signature" />
+        <error line="29" column="48" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/addressBook/AddressBook.kt">
+        <error line="33" column="21" source="standard:class-signature" />
+        <error line="33" column="34" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/addressBook/ContactGroup.kt">
+        <error line="26" column="22" source="standard:class-signature" />
+        <error line="26" column="35" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/calendar/Attendee.kt">
+        <error line="38" column="20" source="standard:class-signature" />
+        <error line="38" column="41" source="standard:class-signature" />
+        <error line="38" column="56" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/calendar/CalendarEvent.kt">
+        <error line="22" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/calendar/CalendarEventResponse.kt">
+        <error line="58" column="38" source="standard:function-expression-body" />
+        <error line="60" column="1" source="standard:indent" />
+        <error line="60" column="17" source="standard:chain-wrapping" />
+        <error line="61" column="1" source="standard:indent" />
+        <error line="61" column="17" source="standard:chain-wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/correspondent/MergedContact.kt">
+        <error line="35" column="25" source="standard:class-signature" />
+        <error line="35" column="38" source="standard:class-signature" />
+        <error line="35" column="53" source="standard:class-signature" />
+        <error line="35" column="77" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/correspondent/Recipient.kt">
+        <error line="36" column="24" source="standard:class-signature" />
+        <error line="36" column="45" source="standard:class-signature" />
+        <error line="36" column="60" source="standard:class-signature" />
+        <error line="36" column="72" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/draft/Draft.kt">
+        <error line="22" column="1" source="standard:import-ordering" />
+        <error line="149" column="63" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/getMessages/GetMessagesByUidsResult.kt">
+        <error line="25" column="5" source="standard:class-signature" />
+        <error line="25" column="33" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/getMessages/SnoozeMessageFlags.kt">
+        <error line="22" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/mailbox/Mailbox.kt">
+        <error line="22" column="1" source="standard:import-ordering" />
+        <error line="61" column="17" source="standard:backing-property-naming" />
+        <error line="95" column="9" source="standard:backing-property-naming" />
+        <error line="152" column="54" source="standard:function-expression-body" />
+        <error line="163" column="57" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/message/EmojiReactionNotAllowedReason.kt">
+        <error line="25" column="5" source="standard:class-signature" />
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="26" column="36" source="standard:class-signature" />
+        <error line="27" column="14" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/message/EmojiReactionState.kt">
+        <error line="26" column="42" source="standard:class-signature" />
+        <error line="26" column="52" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/message/Message.kt">
+        <error line="22" column="1" source="standard:import-ordering" />
+        <error line="67" column="17" source="standard:class-signature" />
+        <error line="67" column="30" source="standard:class-signature" />
+        <error line="107" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="122" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="193" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="259" column="44" source="standard:function-literal" />
+        <error line="259" column="137" source="standard:function-literal" />
+        <error line="368" column="38" source="standard:function-expression-body" />
+        <error line="379" column="125" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/message/SubBody.kt">
+        <error line="22" column="1" source="standard:import-ordering" />
+        <error line="40" column="5" source="standard:spacing-between-declarations-with-comments" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/snooze/BatchSnoozeResponse.kt">
+        <error line="32" column="39" source="standard:binary-expression-wrapping" />
+        <error line="32" column="116" source="standard:argument-list-wrapping" />
+        <error line="32" column="131" source="standard:argument-list-wrapping" />
+        <error line="32" column="131" source="standard:max-line-length" />
+        <error line="40" column="109" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/models/thread/Thread.kt">
+        <error line="22" column="1" source="standard:import-ordering" />
+        <error line="61" column="16" source="standard:class-signature" />
+        <error line="61" column="29" source="standard:class-signature" />
+        <error line="67" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="106" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="110" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="130" column="9" source="standard:backing-property-naming" />
+        <error line="130" column="9" source="standard:backing-property-naming" />
+        <error line="177" column="119" source="standard:function-expression-body" />
+        <error line="211" column="115" source="standard:function-expression-body" />
+        <error line="227" column="1" source="standard:indent" />
+        <error line="228" column="1" source="standard:indent" />
+        <error line="237" column="1" source="standard:no-blank-line-before-rbrace" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/data/services/DeviceInfoUpdateWorker.kt">
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="29" source="standard:class-signature" />
+        <error line="31" column="76" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/di/ApplicationModule.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="49" column="91" source="standard:function-expression-body" />
+        <error line="59" column="113" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/receivers/NotificationActionsReceiver.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/receivers/NotificationJobsBus.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/receivers/RebootReceiver.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/BaseActivity.kt">
+        <error line="39" column="47" source="standard:multiline-if-else" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/LaunchActivity.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/MainActivity.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="256" column="38" source="standard:comment-wrapping" />
+        <error line="257" column="37" source="standard:comment-wrapping" />
+        <error line="258" column="39" source="standard:comment-wrapping" />
+        <error line="259" column="40" source="standard:comment-wrapping" />
+        <error line="328" column="1" source="standard:indent" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/MainViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="206" column="17" source="standard:backing-property-naming" />
+        <error line="458" column="32" source="standard:multiline-if-else" />
+        <error line="470" column="30" source="standard:multiline-if-else" />
+        <error line="1297" column="26" source="standard:function-expression-body" />
+        <error line="1354" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="1492" column="107" source="standard:function-expression-body" />
+        <error line="1646" column="73" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/AiDescriptionAlertDialog.kt">
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="59" source="standard:class-signature" />
+        <error line="29" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/ConfirmDeleteFolderDialog.kt">
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="27" column="59" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/ConfirmScheduledDraftModificationDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="59" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/ContextualMenuAlertDialog.kt">
+        <error line="30" column="5" source="standard:class-signature" />
+        <error line="30" column="59" source="standard:class-signature" />
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="64" column="9" source="standard:class-signature" />
+        <error line="65" column="9" source="standard:class-signature" />
+        <error line="65" column="78" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/CreateFolderDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/DescriptionAlertDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="35" column="5" source="standard:class-signature" />
+        <error line="35" column="59" source="standard:class-signature" />
+        <error line="36" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/EmailContextualMenuAlertDialog.kt">
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="59" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/InformationAlertDialog.kt">
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="59" source="standard:class-signature" />
+        <error line="29" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/InputAlertDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="64" column="49" source="standard:multiline-if-else" />
+        <error line="113" column="130" source="standard:max-line-length" />
+        <error line="113" column="139" source="standard:argument-list-wrapping" />
+        <error line="113" column="146" source="standard:argument-list-wrapping" />
+        <error line="118" column="34" source="standard:curly-spacing" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/LinkContextualMenuAlertDialog.kt">
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="31" column="59" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/ModifyNameFolderDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="40" column="130" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/PhoneContextualMenuAlertDialog.kt">
+        <error line="35" column="5" source="standard:class-signature" />
+        <error line="35" column="59" source="standard:class-signature" />
+        <error line="36" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/SelectDateAndTimeDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/SelectDateAndTimeForScheduledDraftDialog.kt">
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="34" column="59" source="standard:class-signature" />
+        <error line="35" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/SelectDateAndTimeForSnoozeDialog.kt">
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="34" column="59" source="standard:class-signature" />
+        <error line="35" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/alertDialogs/TitleAlertDialog.kt">
+        <error line="29" column="5" source="standard:class-signature" />
+        <error line="29" column="59" source="standard:class-signature" />
+        <error line="30" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/bottomSheetDialogs/AccountBottomSheetDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="87" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/bottomSheetDialogs/InformationBottomSheetDialog.kt">
+        <error line="32" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/bottomSheetDialogs/SelectScheduleOptionBottomSheet.kt">
+        <error line="76" column="115" source="standard:function-expression-body" />
+        <error line="100" column="60" source="standard:argument-list-wrapping" />
+        <error line="100" column="87" source="standard:argument-list-wrapping" />
+        <error line="100" column="99" source="standard:binary-expression-wrapping" />
+        <error line="100" column="130" source="standard:max-line-length" />
+        <error line="130" column="54" source="standard:function-expression-body" />
+        <error line="134" column="47" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/bottomSheetDialogs/UpdateAvailableBottomSheetDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/components/views/MailBottomSheetScaffoldComposeView.kt">
+        <error line="48" column="18" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/CrossAppLoginViewModel.kt">
+        <error line="25" column="29" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/CrossLoginBottomSheetDialog.kt">
+        <error line="40" column="115" source="standard:function-expression-body" />
+        <error line="77" column="36" source="standard:comment-wrapping" />
+        <error line="78" column="32" source="standard:comment-wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/IntroFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="69" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/IntroPagerAdapter.kt">
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="41" source="standard:class-signature" />
+        <error line="29" column="5" source="standard:class-signature" />
+        <error line="33" column="58" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/IntroViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="30" column="5" source="standard:class-signature" />
+        <error line="30" column="34" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/LoginActivity.kt">
+        <error line="110" column="42" source="standard:argument-list-wrapping" />
+        <error line="110" column="57" source="standard:argument-list-wrapping" />
+        <error line="110" column="61" source="standard:binary-expression-wrapping" />
+        <error line="110" column="92" source="standard:argument-list-wrapping" />
+        <error line="110" column="131" source="standard:max-line-length" />
+        <error line="110" column="138" source="standard:argument-list-wrapping" />
+        <error line="145" column="84" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/LoginFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="209" column="32" source="standard:comment-wrapping" />
+        <error line="210" column="35" source="standard:comment-wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/NewAccountFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="79" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/login/NoMailboxActivity.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/AvatarNameEmailView.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="46" column="5" source="standard:class-signature" />
+        <error line="47" column="5" source="standard:class-signature" />
+        <error line="48" column="5" source="standard:class-signature" />
+        <error line="48" column="27" source="standard:class-signature" />
+        <error line="49" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/EmptyStateView.kt">
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="34" column="27" source="standard:class-signature" />
+        <error line="35" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/InvalidPasswordFragment.kt">
+        <error line="60" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/InvalidPasswordViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/SnackbarManager.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="66" column="69" source="standard:function-expression-body" />
+        <error line="69" column="13" source="standard:curly-spacing" />
+        <error line="94" column="9" source="standard:class-signature" />
+        <error line="95" column="9" source="standard:class-signature" />
+        <error line="96" column="9" source="standard:class-signature" />
+        <error line="96" column="42" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/contact/ContactFragment.kt">
+        <error line="29" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/emojiPicker/EmojiPickerBottomSheetDialog.kt">
+        <error line="37" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/HeaderItemDecoration.kt">
+        <error line="67" column="111" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/PerformSwipeActionManager.kt">
+        <error line="167" column="78" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadItem.kt">
+        <error line="1" column="1" source="standard:filename" />
+        <error line="25" column="48" source="standard:colon-spacing" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadListAdapter.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="98" column="82" source="standard:class-signature" />
+        <error line="177" column="50" source="standard:function-expression-body" />
+        <error line="255" column="107" source="standard:function-expression-body" />
+        <error line="343" column="88" source="standard:function-expression-body" />
+        <error line="510" column="32" source="standard:string-template" />
+        <error line="653" column="78" source="standard:function-expression-body" />
+        <error line="673" column="130" source="standard:function-expression-body" />
+        <error line="682" column="110" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadListDateDisplay.kt">
+        <error line="98" column="56" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadListFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="147" column="115" source="standard:function-expression-body" />
+        <error line="203" column="37" source="standard:function-expression-body" />
+        <error line="404" column="51" source="standard:function-expression-body" />
+        <error line="671" column="1" source="standard:indent" />
+        <error line="671" column="25" source="standard:chain-wrapping" />
+        <error line="672" column="1" source="standard:indent" />
+        <error line="672" column="25" source="standard:chain-wrapping" />
+        <error line="673" column="1" source="standard:indent" />
+        <error line="673" column="25" source="standard:chain-wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadListMultiSelection.kt">
+        <error line="237" column="74" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadListViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="77" column="13" source="standard:multiline-if-else" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/folder/TwoPaneViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="117" column="9" source="standard:class-signature" />
+        <error line="118" column="9" source="standard:class-signature" />
+        <error line="118" column="26" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/MailboxesAdapter.kt">
+        <error line="111" column="50" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/MenuDrawerAdapter.kt">
+        <error line="300" column="37" source="standard:wrapping" />
+        <error line="301" column="1" source="standard:indent" />
+        <error line="301" column="25" source="standard:chain-wrapping" />
+        <error line="302" column="1" source="standard:indent" />
+        <error line="302" column="25" source="standard:chain-wrapping" />
+        <error line="303" column="1" source="standard:indent" />
+        <error line="303" column="25" source="standard:chain-wrapping" />
+        <error line="305" column="28" source="standard:wrapping" />
+        <error line="306" column="1" source="standard:indent" />
+        <error line="307" column="1" source="standard:indent" />
+        <error line="308" column="1" source="standard:indent" />
+        <error line="309" column="1" source="standard:indent" />
+        <error line="310" column="1" source="standard:indent" />
+        <error line="311" column="1" source="standard:indent" />
+        <error line="322" column="73" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/MenuDrawerDropdownView.kt">
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="27" source="standard:class-signature" />
+        <error line="34" column="48" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/MenuDrawerFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="106" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/MenuDrawerViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/RestoreEmailsBottomSheetDialog.kt">
+        <error line="58" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/RestoreEmailsViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/SimpleSettingView.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="37" column="5" source="standard:class-signature" />
+        <error line="38" column="5" source="standard:class-signature" />
+        <error line="39" column="5" source="standard:class-signature" />
+        <error line="39" column="27" source="standard:class-signature" />
+        <error line="40" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/ActionViewHolder.kt">
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="32" column="23" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="52" column="9" source="standard:class-signature" />
+        <error line="53" column="9" source="standard:class-signature" />
+        <error line="54" column="9" source="standard:class-signature" />
+        <error line="55" column="9" source="standard:class-signature" />
+        <error line="55" column="27" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/ActionsHeaderViewHolder.kt">
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="23" source="standard:class-signature" />
+        <error line="29" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/DividerItemViewHolder.kt">
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="27" column="23" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/EmptyFoldersViewHolder.kt">
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="27" column="23" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/FolderViewHolder.kt">
+        <error line="38" column="5" source="standard:class-signature" />
+        <error line="39" column="5" source="standard:class-signature" />
+        <error line="39" column="23" source="standard:class-signature" />
+        <error line="40" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/FoldersHeaderViewHolder.kt">
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="23" source="standard:class-signature" />
+        <error line="29" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/FooterViewHolder.kt">
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="32" column="23" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/InvalidMailboxViewHolder.kt">
+        <error line="29" column="5" source="standard:class-signature" />
+        <error line="30" column="5" source="standard:class-signature" />
+        <error line="30" column="23" source="standard:class-signature" />
+        <error line="31" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/MailboxViewHolder.kt">
+        <error line="30" column="5" source="standard:class-signature" />
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="31" column="23" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/menuDrawer/items/MailboxesHeaderViewHolder.kt">
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="32" column="23" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/move/MoveAdapter.kt">
+        <error line="134" column="1" source="standard:indent" />
+        <error line="135" column="1" source="standard:indent" />
+        <error line="136" column="1" source="standard:indent" />
+        <error line="137" column="1" source="standard:indent" />
+        <error line="138" column="1" source="standard:indent" />
+        <error line="139" column="1" source="standard:indent" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/move/MoveFragment.kt">
+        <error line="64" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/move/MoveViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/onboarding/PermissionsOnboardingFragment.kt">
+        <error line="48" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/onboarding/PermissionsOnboardingPagerFragment.kt">
+        <error line="54" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/search/RecentSearchAdapter.kt">
+        <error line="32" column="95" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/search/SearchFolderAdapter.kt">
+        <error line="37" column="5" source="standard:class-signature" />
+        <error line="37" column="28" source="standard:class-signature" />
+        <error line="62" column="93" source="standard:function-expression-body" />
+        <error line="73" column="13" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/search/SearchFragment.kt">
+        <error line="104" column="115" source="standard:function-expression-body" />
+        <error line="163" column="37" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/search/SearchViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="119" column="1" source="standard:indent" />
+        <error line="119" column="17" source="standard:chain-wrapping" />
+        <error line="120" column="1" source="standard:indent" />
+        <error line="120" column="17" source="standard:chain-wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/AutoAdvanceSettingsFragment.kt">
+        <error line="44" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/ItemSettingView.kt">
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="35" column="5" source="standard:class-signature" />
+        <error line="35" column="27" source="standard:class-signature" />
+        <error line="36" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/KSuiteDashboardFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/MykSuiteViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/SettingRadioButtonView.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="35" column="5" source="standard:class-signature" />
+        <error line="36" column="5" source="standard:class-signature" />
+        <error line="37" column="5" source="standard:class-signature" />
+        <error line="37" column="27" source="standard:class-signature" />
+        <error line="38" column="48" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/SettingRadioGroupView.kt">
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="27" source="standard:class-signature" />
+        <error line="34" column="49" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/SettingsFragment.kt">
+        <error line="77" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/SettingsMailboxesAdapter.kt">
+        <error line="30" column="5" source="standard:class-signature" />
+        <error line="30" column="54" source="standard:class-signature" />
+        <error line="35" column="98" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/appearance/AccentColorSettingFragment.kt">
+        <error line="51" column="115" source="standard:function-expression-body" />
+        <error line="84" column="21" source="standard:wrapping" />
+        <error line="87" column="13" source="standard:wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/appearance/ThemeSettingFragment.kt">
+        <error line="50" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/appearance/ThreadListDensitySettingFragment.kt">
+        <error line="46" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/appearance/swipe/SwipeActionsSelectionSettingFragment.kt">
+        <error line="63" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/appearance/swipe/SwipeActionsSettingsFragment.kt">
+        <error line="52" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/appearance/threadMode/ThreadModeSettingFragment.kt">
+        <error line="53" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/appearance/threadMode/ThreadModeSettingViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/general/ExternalContentSettingFragment.kt">
+        <error line="46" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/mailbox/AutoReplySettingFragment.kt">
+        <error line="29" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/mailbox/MailboxSettingsFragment.kt">
+        <error line="45" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/mailbox/SignatureSettingAdapter.kt">
+        <error line="38" column="100" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/mailbox/SignatureSettingFragment.kt">
+        <error line="47" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/mailbox/SignatureSettingViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/mailbox/SpamSettingFragment.kt">
+        <error line="29" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/privacy/AccountManagementSettingsFragment.kt">
+        <error line="50" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/privacy/AccountManagementSettingsViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="32" column="65" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/privacy/DataManagementMatomoSettingFragment.kt">
+        <error line="41" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/privacy/DataManagementSentrySettingFragment.kt">
+        <error line="40" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/privacy/DataManagementSettingsFragment.kt">
+        <error line="48" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/send/CancelDelaySettingFragment.kt">
+        <error line="41" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/send/ForwardMailsSettingFragment.kt">
+        <error line="42" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/settings/send/SendSettingsFragment.kt">
+        <error line="42" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/AttachmentAdapter.kt">
+        <error line="40" column="93" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/DetailedContactBottomSheetDialog.kt">
+        <error line="52" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/DetailedRecipientAdapter.kt">
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="80" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="40" column="100" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/MessageAlertView.kt">
+        <error line="38" column="5" source="standard:class-signature" />
+        <error line="39" column="5" source="standard:class-signature" />
+        <error line="40" column="5" source="standard:class-signature" />
+        <error line="40" column="27" source="standard:class-signature" />
+        <error line="41" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/MessageWebViewClient.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="78" column="1" source="standard:indent" />
+        <error line="78" column="17" source="standard:chain-wrapping" />
+        <error line="79" column="1" source="standard:indent" />
+        <error line="79" column="17" source="standard:chain-wrapping" />
+        <error line="112" column="39" source="standard:argument-list-wrapping" />
+        <error line="112" column="128" source="standard:argument-list-wrapping" />
+        <error line="112" column="130" source="standard:max-line-length" />
+        <error line="112" column="132" source="standard:function-literal" />
+        <error line="112" column="138" source="standard:function-literal" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/PrintMailFragment.kt">
+        <error line="52" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/PrintMailViewModel.kt">
+        <error line="50" column="9" source="standard:class-signature" />
+        <error line="51" column="9" source="standard:class-signature" />
+        <error line="51" column="42" source="standard:class-signature" />
+        <error line="52" column="9" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/RoundedBackgroundSpan.kt">
+        <error line="37" column="24" source="standard:class-signature" />
+        <error line="59" column="26" source="standard:comment-wrapping" />
+        <error line="60" column="25" source="standard:comment-wrapping" />
+        <error line="61" column="27" source="standard:comment-wrapping" />
+        <error line="62" column="28" source="standard:comment-wrapping" />
+        <error line="70" column="26" source="standard:comment-wrapping" />
+        <error line="71" column="27" source="standard:comment-wrapping" />
+        <error line="72" column="25" source="standard:comment-wrapping" />
+        <error line="73" column="23" source="standard:comment-wrapping" />
+        <error line="74" column="23" source="standard:comment-wrapping" />
+        <error line="75" column="27" source="standard:comment-wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/SubjectFormatter.kt">
+        <error line="108" column="55" source="standard:function-expression-body" />
+        <error line="148" column="9" source="standard:class-signature" />
+        <error line="149" column="9" source="standard:class-signature" />
+        <error line="149" column="56" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/ThreadAdapter.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="171" column="63" source="standard:multiline-if-else" />
+        <error line="568" column="21" source="standard:enum-wrapping" />
+        <error line="568" column="35" source="standard:enum-wrapping" />
+        <error line="568" column="44" source="standard:enum-wrapping" />
+        <error line="590" column="98" source="standard:function-expression-body" />
+        <error line="594" column="99" source="standard:function-expression-body" />
+        <error line="598" column="88" source="standard:function-expression-body" />
+        <error line="625" column="109" source="standard:function-expression-body" />
+        <error line="786" column="82" source="standard:function-expression-body" />
+        <error line="859" column="88" source="standard:function-expression-body" />
+        <error line="907" column="75" source="standard:function-expression-body" />
+        <error line="915" column="78" source="standard:function-expression-body" />
+        <error line="919" column="1" source="standard:indent" />
+        <error line="920" column="1" source="standard:indent" />
+        <error line="921" column="1" source="standard:indent" />
+        <error line="925" column="1" source="standard:indent" />
+        <error line="989" column="1" source="standard:indent" />
+        <error line="989" column="33" source="standard:chain-wrapping" />
+        <error line="1000" column="1" source="standard:indent" />
+        <error line="1001" column="1" source="standard:indent" />
+        <error line="1050" column="9" source="standard:class-signature" />
+        <error line="1050" column="62" source="standard:class-signature" />
+        <error line="1051" column="9" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/ThreadFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="204" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/ThreadViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="227" column="79" source="standard:function-expression-body" />
+        <error line="244" column="98" source="standard:function-expression-body" />
+        <error line="290" column="59" source="standard:function-expression-body" />
+        <error line="312" column="1" source="standard:indent" />
+        <error line="313" column="1" source="standard:indent" />
+        <error line="314" column="1" source="standard:indent" />
+        <error line="314" column="81" source="standard:no-multi-spaces" />
+        <error line="377" column="113" source="standard:function-expression-body" />
+        <error line="556" column="58" source="standard:wrapping" />
+        <error line="558" column="87" source="standard:wrapping" />
+        <error line="633" column="9" source="standard:class-signature" />
+        <error line="634" column="9" source="standard:class-signature" />
+        <error line="635" column="9" source="standard:class-signature" />
+        <error line="635" column="31" source="standard:class-signature" />
+        <error line="639" column="9" source="standard:class-signature" />
+        <error line="640" column="9" source="standard:class-signature" />
+        <error line="641" column="9" source="standard:class-signature" />
+        <error line="641" column="25" source="standard:class-signature" />
+        <error line="645" column="20" source="standard:enum-wrapping" />
+        <error line="645" column="31" source="standard:enum-wrapping" />
+        <error line="663" column="30" source="standard:enum-wrapping" />
+        <error line="663" column="44" source="standard:enum-wrapping" />
+        <error line="674" column="130" source="standard:function-expression-body" />
+        <error line="682" column="130" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/ActionItemView.kt">
+        <error line="41" column="5" source="standard:class-signature" />
+        <error line="42" column="5" source="standard:class-signature" />
+        <error line="43" column="5" source="standard:class-signature" />
+        <error line="43" column="27" source="standard:class-signature" />
+        <error line="44" column="5" source="standard:class-signature" />
+        <error line="141" column="15" source="standard:enum-wrapping" />
+        <error line="141" column="24" source="standard:enum-wrapping" />
+        <error line="141" column="37" source="standard:enum-wrapping" />
+        <error line="144" column="75" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/AttachmentActionsBottomSheetDialog.kt">
+        <error line="59" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/ConfirmationToBlockUserDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="35" column="5" source="standard:class-signature" />
+        <error line="35" column="59" source="standard:class-signature" />
+        <error line="36" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/DownloadAttachmentViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/DownloadMessagesProgressDialog.kt">
+        <error line="59" column="76" source="standard:function-expression-body" />
+        <error line="68" column="55" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/DownloadMessagesViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/JunkBottomSheetDialog.kt">
+        <error line="54" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/MailActionsBottomSheetDialog.kt">
+        <error line="72" column="115" source="standard:function-expression-body" />
+        <error line="136" column="75" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/MainActionsView.kt">
+        <error line="48" column="5" source="standard:class-signature" />
+        <error line="49" column="5" source="standard:class-signature" />
+        <error line="50" column="5" source="standard:class-signature" />
+        <error line="50" column="27" source="standard:class-signature" />
+        <error line="51" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/MultiSelectBottomSheetDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="75" column="115" source="standard:function-expression-body" />
+        <error line="198" column="73" source="standard:function-expression-body" />
+        <error line="227" column="66" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/ReplyBottomSheetDialog.kt">
+        <error line="43" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/ThreadActionsBottomSheetDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/ThreadActionsViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/UserToBlockAdapter.kt">
+        <error line="39" column="90" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/actions/UserToBlockBottomSheetDialog.kt">
+        <error line="41" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/calendar/AttendanceAvatarView.kt">
+        <error line="36" column="5" source="standard:class-signature" />
+        <error line="37" column="5" source="standard:class-signature" />
+        <error line="38" column="5" source="standard:class-signature" />
+        <error line="38" column="27" source="standard:class-signature" />
+        <error line="39" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/calendar/AttendeesAdapter.kt">
+        <error line="30" column="92" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/calendar/AttendeesBottomSheetDialog.kt">
+        <error line="39" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/calendar/CalendarEventBannerView.kt">
+        <error line="54" column="5" source="standard:class-signature" />
+        <error line="55" column="5" source="standard:class-signature" />
+        <error line="56" column="5" source="standard:class-signature" />
+        <error line="56" column="27" source="standard:class-signature" />
+        <error line="57" column="5" source="standard:class-signature" />
+        <error line="62" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="166" column="1" source="standard:indent" />
+        <error line="245" column="50" source="standard:function-expression-body" />
+        <error line="249" column="49" source="standard:function-expression-body" />
+        <error line="253" column="47" source="standard:function-expression-body" />
+        <error line="257" column="48" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/calendar/ManyAvatarsView.kt">
+        <error line="35" column="5" source="standard:class-signature" />
+        <error line="36" column="5" source="standard:class-signature" />
+        <error line="37" column="5" source="standard:class-signature" />
+        <error line="37" column="27" source="standard:class-signature" />
+        <error line="38" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/encryption/UnencryptableRecipientsAdapter.kt">
+        <error line="34" column="96" source="standard:function-expression-body" />
+        <error line="49" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/thread/encryption/UnencryptableRecipientsBottomSheetDialog.kt">
+        <error line="40" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/user/AttachMailboxFragment.kt">
+        <error line="56" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/user/AttachMailboxViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/user/SwitchUserAdapter.kt">
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="49" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="38" column="100" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/main/user/SwitchUserViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/AiPromptFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="72" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/AiPropositionFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="96" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/AiViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="132" column="108" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/BackspaceAwareChip.kt">
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="27" column="33" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/BackspaceAwareTextInput.kt">
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="27" column="33" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/ContactAdapter.kt">
+        <error line="64" column="90" source="standard:function-expression-body" />
+        <error line="68" column="54" source="standard:function-expression-body" />
+        <error line="80" column="1" source="standard:no-blank-line-before-rbrace" />
+        <error line="134" column="77" source="standard:function-expression-body" />
+        <error line="222" column="74" source="standard:function-expression-body" />
+        <error line="245" column="49" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/ContactChipAdapter.kt">
+        <error line="35" column="58" source="standard:class-signature" />
+        <error line="43" column="94" source="standard:function-expression-body" />
+        <error line="71" column="48" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/EditorContentManager.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="73" column="1" source="standard:indent" />
+        <error line="73" column="17" source="standard:chain-wrapping" />
+        <error line="74" column="1" source="standard:indent" />
+        <error line="74" column="17" source="standard:chain-wrapping" />
+        <error line="75" column="1" source="standard:indent" />
+        <error line="75" column="17" source="standard:chain-wrapping" />
+        <error line="76" column="1" source="standard:indent" />
+        <error line="76" column="17" source="standard:chain-wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/InsertLinkDialog.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="40" column="5" source="standard:class-signature" />
+        <error line="40" column="59" source="standard:class-signature" />
+        <error line="41" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/NewMessageAiManager.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/NewMessageEditorManager.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="46" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/NewMessageFragment.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="193" column="115" source="standard:function-expression-body" />
+        <error line="547" column="84" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/NewMessageViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="187" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="193" column="5" source="standard:comment-spacing" />
+        <error line="287" column="70" source="standard:function-expression-body" />
+        <error line="343" column="74" source="standard:function-expression-body" />
+        <error line="347" column="91" source="standard:function-expression-body" />
+        <error line="351" column="88" source="standard:function-expression-body" />
+        <error line="384" column="95" source="standard:function-expression-body" />
+        <error line="517" column="46" source="standard:function-expression-body" />
+        <error line="607" column="86" source="standard:function-expression-body" />
+        <error line="933" column="1" source="standard:indent" />
+        <error line="934" column="1" source="standard:indent" />
+        <error line="961" column="88" source="standard:function-expression-body" />
+        <error line="964" column="1" source="standard:indent" />
+        <error line="965" column="1" source="standard:indent" />
+        <error line="966" column="1" source="standard:indent" />
+        <error line="967" column="1" source="standard:indent" />
+        <error line="968" column="1" source="standard:indent" />
+        <error line="969" column="1" source="standard:indent" />
+        <error line="970" column="1" source="standard:indent" />
+        <error line="971" column="1" source="standard:indent" />
+        <error line="972" column="1" source="standard:indent" />
+        <error line="1031" column="9" source="standard:class-signature" />
+        <error line="1032" column="9" source="standard:class-signature" />
+        <error line="1032" column="41" source="standard:class-signature" />
+        <error line="1036" column="9" source="standard:class-signature" />
+        <error line="1037" column="9" source="standard:class-signature" />
+        <error line="1037" column="55" source="standard:class-signature" />
+        <error line="1041" column="9" source="standard:class-signature" />
+        <error line="1042" column="9" source="standard:class-signature" />
+        <error line="1042" column="49" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/RecipientFieldView.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="66" column="5" source="standard:class-signature" />
+        <error line="67" column="5" source="standard:class-signature" />
+        <error line="68" column="5" source="standard:class-signature" />
+        <error line="68" column="27" source="standard:class-signature" />
+        <error line="69" column="48" source="standard:class-signature" />
+        <error line="216" column="36" source="standard:multiline-if-else" />
+        <error line="534" column="1" source="standard:indent" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/SignatureAdapter.kt">
+        <error line="30" column="5" source="standard:class-signature" />
+        <error line="30" column="65" source="standard:class-signature" />
+        <error line="48" column="83" source="standard:function-expression-body" />
+        <error line="52" column="87" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/encryption/EncryptionActionsBottomSheet.kt">
+        <error line="59" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/encryption/EncryptionLockButtonView.kt">
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="27" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/encryption/EncryptionPasswordFragment.kt">
+        <error line="54" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/newMessage/encryption/EncryptionViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/noValidMailboxes/NoValidMailboxesFragment.kt">
+        <error line="39" column="34" source="standard:class-signature" />
+        <error line="39" column="46" source="standard:class-signature" />
+        <error line="54" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/noValidMailboxes/NoValidMailboxesViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/sync/SyncAutoConfigViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/sync/SyncConfigureFragment.kt">
+        <error line="51" column="115" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/sync/SyncOnboardingFragment.kt">
+        <error line="50" column="115" source="standard:function-expression-body" />
+        <error line="80" column="131" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/sync/discovery/SyncDiscoveryManager.kt">
+        <error line="29" column="5" source="standard:class-signature" />
+        <error line="29" column="44" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/sync/discovery/SyncDiscoveryRepository.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/sync/discovery/SyncDiscoveryViewModel.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/ui/theme/Theme.kt">
+        <error line="31" column="5" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/AccountUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="59" column="28" source="standard:wrapping" />
+        <error line="62" column="13" source="standard:wrapping" />
+        <error line="108" column="45" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/AvatarTypeUtils.kt">
+        <error line="81" column="87" source="standard:function-expression-body" />
+        <error line="123" column="98" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/ColorStateList.kt">
+        <error line="50" column="84" source="standard:function-expression-body" />
+        <error line="71" column="42" source="standard:function-expression-body" />
+        <error line="73" column="28" source="standard:comment-wrapping" />
+        <error line="74" column="28" source="standard:comment-wrapping" />
+        <error line="79" column="9" source="standard:class-signature" />
+        <error line="80" column="9" source="standard:class-signature" />
+        <error line="80" column="34" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/ConfettiUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="69" column="32" source="standard:string-template" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/CoroutineScopeUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="53" column="1" source="standard:indent" />
+        <error line="53" column="13" source="standard:chain-wrapping" />
+        <error line="54" column="1" source="standard:indent" />
+        <error line="54" column="13" source="standard:chain-wrapping" />
+        <error line="55" column="1" source="standard:indent" />
+        <error line="55" column="13" source="standard:chain-wrapping" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/DraftInitManager.kt">
+        <error line="83" column="109" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/ErrorCode.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="160" column="9" source="standard:comment-spacing" />
+        <error line="186" column="55" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/ExternalUtils.kt">
+        <error line="50" column="27" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/FetchMessagesManager.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="57" column="67" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/FolderRoleUtils.kt">
+        <error line="30" column="5" source="standard:class-signature" />
+        <error line="30" column="52" source="standard:class-signature" />
+        <error line="38" column="58" source="standard:function-expression-body" />
+        <error line="42" column="60" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/HtmlFormatter.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="187" column="9" source="standard:spacing-between-declarations-with-comments" />
+        <error line="200" column="51" source="standard:string-template" />
+        <error line="205" column="58" source="standard:function-expression-body" />
+        <error line="231" column="49" source="standard:function-expression-body" />
+        <error line="235" column="49" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/JsoupParserUtil.kt">
+        <error line="29" column="52" source="standard:function-expression-body" />
+        <error line="35" column="64" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/LocalStorageUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="57" column="13" source="standard:function-expression-body" />
+        <error line="106" column="13" source="standard:function-expression-body" />
+        <error line="107" column="45" source="standard:string-template" />
+        <error line="107" column="63" source="standard:string-template" />
+        <error line="115" column="13" source="standard:function-expression-body" />
+        <error line="227" column="85" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/LoginUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/LogoutUser.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/MessageBodyUtils.kt">
+        <error line="121" column="84" source="standard:function-expression-body" />
+        <error line="131" column="40" source="standard:string-template" />
+        <error line="139" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="148" column="9" source="standard:class-signature" />
+        <error line="149" column="9" source="standard:class-signature" />
+        <error line="149" column="35" source="standard:class-signature" />
+        <error line="151" column="51" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/MyKSuiteDataUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/NotificationUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="120" column="106" source="standard:function-expression-body" />
+        <error line="129" column="55" source="standard:function-expression-body" />
+        <error line="136" column="62" source="standard:function-expression-body" />
+        <error line="143" column="85" source="standard:function-expression-body" />
+        <error line="207" column="35" source="standard:function-expression-body" />
+        <error line="290" column="71" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/PrintHeaderUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/RealmChangesBinding.kt">
+        <error line="108" column="1" source="standard:no-blank-line-before-rbrace" />
+        <error line="144" column="1" source="standard:no-blank-line-before-rbrace" />
+        <error line="180" column="52" source="standard:argument-list-wrapping" />
+        <error line="180" column="131" source="standard:argument-list-wrapping" />
+        <error line="180" column="131" source="standard:max-line-length" />
+        <error line="205" column="39" source="standard:function-expression-body" />
+        <error line="212" column="39" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/SearchUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="62" column="35" source="standard:multiline-if-else" />
+        <error line="191" column="88" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/SentryDebug.kt">
+        <error line="171" column="26" source="standard:string-template" />
+        <error line="171" column="61" source="standard:string-template" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/SharedUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="195" column="30" source="standard:function-expression-body" />
+        <error line="212" column="30" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/SignatureUtils.kt">
+        <error line="34" column="131" source="standard:max-line-length" />
+        <error line="37" column="84" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/SimpleIconPopupMenu.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/UiUtils.kt">
+        <error line="63" column="1" source="standard:no-blank-line-before-rbrace" />
+        <error line="71" column="13" source="standard:class-signature" />
+        <error line="72" column="13" source="standard:class-signature" />
+        <error line="73" column="13" source="standard:class-signature" />
+        <error line="74" column="13" source="standard:class-signature" />
+        <error line="74" column="34" source="standard:class-signature" />
+        <error line="153" column="23" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/UnreadDisplay.kt">
+        <error line="21" column="5" source="standard:class-signature" />
+        <error line="22" column="5" source="standard:class-signature" />
+        <error line="22" column="48" source="standard:class-signature" />
+        <error line="25" column="1" source="standard:indent" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/Utils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="42" column="5" source="standard:spacing-between-declarations-with-comments" />
+        <error line="72" column="64" source="standard:function-expression-body" />
+        <error line="91" column="117" source="standard:function-expression-body" />
+        <error line="102" column="112" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/WebViewUtils.kt">
+        <error line="168" column="1" source="standard:indent" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/WebViewVersionUtils.kt">
+        <error line="50" column="9" source="standard:class-signature" />
+        <error line="51" column="9" source="standard:class-signature" />
+        <error line="52" column="9" source="standard:class-signature" />
+        <error line="52" column="40" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/date/MailDateFormatUtils.kt">
+        <error line="53" column="40" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/extensions/AttachmentExt.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="116" column="90" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/extensions/Extensions.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="185" column="1" source="standard:spacing-between-declarations-with-comments" />
+        <error line="187" column="1" source="standard:spacing-between-declarations-with-comments" />
+        <error line="204" column="61" source="standard:function-expression-body" />
+        <error line="208" column="53" source="standard:function-expression-body" />
+        <error line="300" column="68" source="standard:function-expression-body" />
+        <error line="325" column="74" source="standard:function-expression-body" />
+        <error line="354" column="94" source="standard:function-expression-body" />
+        <error line="476" column="67" source="standard:function-expression-body" />
+        <error line="518" column="82" source="standard:function-expression-body" />
+        <error line="633" column="43" source="standard:function-expression-body" />
+        <error line="706" column="107" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/utils/extensions/NavigationExt.kt">
+        <error line="112" column="112" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/AttachmentDetailsView.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="36" column="5" source="standard:class-signature" />
+        <error line="37" column="5" source="standard:class-signature" />
+        <error line="38" column="5" source="standard:class-signature" />
+        <error line="38" column="27" source="standard:class-signature" />
+        <error line="39" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/AvatarView.kt">
+        <error line="59" column="5" source="standard:class-signature" />
+        <error line="60" column="5" source="standard:class-signature" />
+        <error line="61" column="5" source="standard:class-signature" />
+        <error line="61" column="27" source="standard:class-signature" />
+        <error line="62" column="5" source="standard:class-signature" />
+        <error line="215" column="9" source="standard:class-signature" />
+        <error line="216" column="9" source="standard:class-signature" />
+        <error line="216" column="32" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/BottomSheetScaffoldingView.kt">
+        <error line="79" column="99" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/InformationBlockView.kt">
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="34" column="27" source="standard:class-signature" />
+        <error line="35" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/AvatarMergedContactData.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/BannerWithActionView.kt">
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="35" column="5" source="standard:class-signature" />
+        <error line="35" column="27" source="standard:class-signature" />
+        <error line="36" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/DecoratedItemView.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="37" column="5" source="standard:class-signature" />
+        <error line="38" column="5" source="standard:class-signature" />
+        <error line="39" column="5" source="standard:class-signature" />
+        <error line="39" column="27" source="standard:class-signature" />
+        <error line="40" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/IndentableFolder.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/InvalidMailboxItemView.kt">
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="27" source="standard:class-signature" />
+        <error line="29" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/MyKSuiteStorageBanner.kt">
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+        <error line="35" column="5" source="standard:class-signature" />
+        <error line="35" column="27" source="standard:class-signature" />
+        <error line="36" column="5" source="standard:class-signature" />
+        <error line="62" column="9" source="standard:class-signature" />
+        <error line="63" column="9" source="standard:class-signature" />
+        <error line="64" column="9" source="standard:class-signature" />
+        <error line="64" column="44" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/SelectableFolderItemView.kt">
+        <error line="24" column="5" source="standard:class-signature" />
+        <error line="25" column="5" source="standard:class-signature" />
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="26" column="27" source="standard:class-signature" />
+        <error line="27" column="55" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/SelectableItemView.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="27" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/SelectableMailboxItemView.kt">
+        <error line="24" column="5" source="standard:class-signature" />
+        <error line="25" column="5" source="standard:class-signature" />
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="26" column="27" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/SimpleMenuDrawerItemView.kt">
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="28" column="27" source="standard:class-signature" />
+        <error line="29" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/UnreadFolderItemView.kt">
+        <error line="28" column="5" source="standard:class-signature" />
+        <error line="29" column="5" source="standard:class-signature" />
+        <error line="30" column="5" source="standard:class-signature" />
+        <error line="30" column="27" source="standard:class-signature" />
+        <error line="31" column="51" source="standard:class-signature" />
+        <error line="31" column="69" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/UnreadItemView.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="31" column="5" source="standard:class-signature" />
+        <error line="32" column="5" source="standard:class-signature" />
+        <error line="33" column="5" source="standard:class-signature" />
+        <error line="33" column="27" source="standard:class-signature" />
+        <error line="34" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/views/itemViews/UnreadMailboxItemView.kt">
+        <error line="24" column="5" source="standard:class-signature" />
+        <error line="25" column="5" source="standard:class-signature" />
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="26" column="27" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/workers/BaseProcessMessageNotificationsWorker.kt">
+        <error line="25" column="5" source="standard:class-signature" />
+        <error line="26" column="5" source="standard:class-signature" />
+        <error line="26" column="30" source="standard:class-signature" />
+        <error line="27" column="5" source="standard:class-signature" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/workers/DraftsActionsWorker.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="199" column="1" source="standard:no-blank-line-before-rbrace" />
+        <error line="377" column="105" source="standard:string-template" />
+        <error line="512" column="9" source="standard:class-signature" />
+        <error line="513" column="9" source="standard:class-signature" />
+        <error line="513" column="46" source="standard:class-signature" />
+        <error line="538" column="68" source="standard:function-expression-body" />
+        <error line="542" column="68" source="standard:function-expression-body" />
+        <error line="546" column="67" source="standard:function-expression-body" />
+        <error line="550" column="66" source="standard:function-expression-body" />
+    </file>
+    <file name="src/main/java/com/infomaniak/mail/workers/SyncMailboxesWorker.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/standard/java/com/infomaniak/mail/StandardPlayServicesUtils.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="57" column="60" source="standard:function-expression-body" />
+    </file>
+    <file name="src/standard/java/com/infomaniak/mail/firebase/FirebaseApiRepository.kt">
+        <error line="28" column="23" source="standard:property-naming" />
+        <error line="30" column="128" source="standard:function-expression-body" />
+    </file>
+    <file name="src/standard/java/com/infomaniak/mail/firebase/ProcessMessageNotificationsWorker.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+        <error line="132" column="29" source="standard:argument-list-wrapping" />
+        <error line="132" column="32" source="standard:argument-list-wrapping" />
+        <error line="132" column="47" source="standard:argument-list-wrapping" />
+        <error line="169" column="1" source="standard:no-blank-line-before-rbrace" />
+    </file>
+    <file name="src/standard/java/com/infomaniak/mail/firebase/RegisterFirebaseBroadcastReceiver.kt">
+        <error line="32" column="43" source="standard:class-signature" />
+        <error line="32" column="69" source="standard:class-signature" />
+    </file>
+    <file name="src/standard/java/com/infomaniak/mail/firebase/RegisterUserDeviceWorker.kt">
+        <error line="20" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/standard/java/com/infomaniak/mail/firebase/RegistrationInfo.kt">
+        <error line="37" column="69" source="standard:function-expression-body" />
+    </file>
+    <file name="src/test/java/com/infomaniak/mail/CalendarEventResponseTest.kt">
+        <error line="140" column="96" source="standard:function-expression-body" />
+    </file>
+    <file name="src/test/java/com/infomaniak/mail/EmojiReactionStateEqualityTest.kt">
+        <error line="77" column="112" source="standard:function-expression-body" />
+    </file>
+    <file name="src/test/java/com/infomaniak/mail/dataset/DummyMailboxContent.kt">
+        <error line="31" column="27" source="standard:argument-list-wrapping" />
+        <error line="31" column="46" source="standard:argument-list-wrapping" />
+    </file>
+    <file name="src/test/java/com/infomaniak/mail/dataset/DummyThreads.kt">
+        <error line="42" column="56" source="standard:function-expression-body" />
+    </file>
+</baseline>

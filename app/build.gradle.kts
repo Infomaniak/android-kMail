@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.dagger.hilt)
@@ -99,6 +101,16 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xjspecify-annotations=strict")
     }
+}
+
+ktlint {
+    version.set("1.7.1")
+    android.set(true)
+    ignoreFailures.set(false)
+    reporters {
+        reporter(ReporterType.PLAIN)
+    }
+    baseline.set(file("${projectDir}/config/ktlint/baseline.xml"))
 }
 
 dependencies {
