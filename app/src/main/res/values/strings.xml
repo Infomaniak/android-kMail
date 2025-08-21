@@ -24,7 +24,7 @@
 
     <plurals name="threadListDeletionConfirmationAlertTitle">
         <item quantity="one">Delete %d conversation</item>
-        <item quantity="other">Delete %d conversation</item>
+        <item quantity="other">Delete %d conversations</item>
     </plurals>
     <string name="accentColorBlueTitle">Blue</string>
     <string name="accentColorPinkTitle">Pink</string>

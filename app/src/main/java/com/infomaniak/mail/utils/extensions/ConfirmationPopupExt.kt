@@ -50,7 +50,7 @@ private fun DescriptionAlertDialog.showDeletePermanentlyDialog(
     onCancel: (() -> Unit)? = null,
 ) = show(
     title = binding.context.resources.getQuantityString(
-        R.plurals.threadListDeletionConfirmationAlertDescription,
+        R.plurals.threadListDeletionConfirmationAlertTitle,
         deletedCount,
         deletedCount,
     ),
