@@ -16,6 +16,10 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <plurals name="threadListDeletionConfirmationAlertTitle">
+        <item quantity="one">%d Konversation löschen</item>
+        <item quantity="other">%d Konversationen löschen</item>
+    </plurals>
     <string name="accentColorBlueTitle">Blau</string>
     <string name="accentColorPinkTitle">Rosa</string>
     <string name="accentColorSystemTitle">Farbe des Systems</string>

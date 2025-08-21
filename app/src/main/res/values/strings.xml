@@ -22,6 +22,10 @@
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
     <string name="notification_channel_id_sync_messages_service" translatable="false">sync_messages_service_channel_id</string>
 
+    <plurals name="threadListDeletionConfirmationAlertTitle">
+        <item quantity="one">Delete %d conversation</item>
+        <item quantity="other">Delete %d conversations</item>
+    </plurals>
     <string name="accentColorBlueTitle">Blue</string>
     <string name="accentColorPinkTitle">Pink</string>
     <string name="accentColorSystemTitle">System color</string>
