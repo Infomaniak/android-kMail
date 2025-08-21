@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="build.gradle.kts">
+        <error line="49" column="25" source="standard:string-template" />
+    </file>
+    <file name="src/main/java/com/infomaniak/emojicomponents/components/AddReactionChip.kt">
+        <error line="40" column="14" source="standard:function-naming" />
+        <error line="75" column="13" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/emojicomponents/components/EmojiReactionDetails.kt">
+        <error line="73" column="5" source="standard:function-naming" />
+        <error line="159" column="1" source="standard:no-blank-line-before-rbrace" />
+        <error line="163" column="13" source="standard:function-naming" />
+        <error line="175" column="13" source="standard:function-naming" />
+        <error line="192" column="13" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/emojicomponents/components/EmojiReactions.kt">
+        <error line="39" column="5" source="standard:function-naming" />
+        <error line="76" column="5" source="standard:class-signature" />
+        <error line="77" column="5" source="standard:class-signature" />
+        <error line="77" column="40" source="standard:class-signature" />
+        <error line="95" column="13" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/emojicomponents/components/ReactionChip.kt">
+        <error line="39" column="14" source="standard:function-naming" />
+        <error line="83" column="5" source="standard:class-signature" />
+        <error line="84" column="5" source="standard:class-signature" />
+        <error line="84" column="28" source="standard:class-signature" />
+        <error line="105" column="13" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/emojicomponents/icons/FaceSmileRoundPlus.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="32" column="1" source="standard:indent" />
+        <error line="33" column="1" source="standard:indent" />
+        <error line="34" column="1" source="standard:indent" />
+        <error line="35" column="1" source="standard:indent" />
+        <error line="36" column="1" source="standard:indent" />
+        <error line="37" column="1" source="standard:indent" />
+        <error line="38" column="1" source="standard:indent" />
+        <error line="39" column="1" source="standard:indent" />
+        <error line="40" column="1" source="standard:indent" />
+        <error line="41" column="1" source="standard:indent" />
+        <error line="42" column="1" source="standard:indent" />
+        <error line="43" column="1" source="standard:indent" />
+        <error line="44" column="1" source="standard:indent" />
+        <error line="45" column="1" source="standard:indent" />
+        <error line="46" column="1" source="standard:indent" />
+        <error line="47" column="1" source="standard:indent" />
+        <error line="48" column="1" source="standard:indent" />
+        <error line="49" column="1" source="standard:indent" />
+        <error line="50" column="1" source="standard:indent" />
+        <error line="51" column="1" source="standard:indent" />
+        <error line="52" column="1" source="standard:indent" />
+        <error line="53" column="1" source="standard:indent" />
+        <error line="54" column="1" source="standard:indent" />
+        <error line="55" column="1" source="standard:indent" />
+        <error line="56" column="1" source="standard:indent" />
+        <error line="57" column="1" source="standard:indent" />
+        <error line="58" column="1" source="standard:indent" />
+        <error line="59" column="1" source="standard:indent" />
+        <error line="60" column="1" source="standard:indent" />
+        <error line="61" column="1" source="standard:indent" />
+        <error line="62" column="1" source="standard:indent" />
+        <error line="63" column="1" source="standard:indent" />
+        <error line="64" column="1" source="standard:indent" />
+        <error line="65" column="1" source="standard:indent" />
+        <error line="66" column="1" source="standard:indent" />
+        <error line="67" column="1" source="standard:indent" />
+        <error line="68" column="1" source="standard:indent" />
+        <error line="69" column="1" source="standard:indent" />
+        <error line="70" column="1" source="standard:indent" />
+        <error line="71" column="1" source="standard:indent" />
+        <error line="72" column="1" source="standard:indent" />
+        <error line="73" column="1" source="standard:indent" />
+        <error line="74" column="1" source="standard:indent" />
+        <error line="75" column="1" source="standard:indent" />
+        <error line="76" column="1" source="standard:indent" />
+        <error line="77" column="1" source="standard:indent" />
+        <error line="78" column="1" source="standard:indent" />
+        <error line="79" column="1" source="standard:indent" />
+        <error line="80" column="1" source="standard:indent" />
+        <error line="81" column="1" source="standard:indent" />
+        <error line="82" column="1" source="standard:indent" />
+        <error line="83" column="1" source="standard:indent" />
+        <error line="84" column="1" source="standard:indent" />
+        <error line="85" column="1" source="standard:indent" />
+        <error line="86" column="1" source="standard:indent" />
+        <error line="87" column="1" source="standard:indent" />
+        <error line="88" column="1" source="standard:indent" />
+        <error line="89" column="1" source="standard:indent" />
+        <error line="90" column="1" source="standard:indent" />
+        <error line="91" column="1" source="standard:indent" />
+        <error line="92" column="1" source="standard:indent" />
+        <error line="93" column="1" source="standard:indent" />
+        <error line="94" column="1" source="standard:indent" />
+        <error line="95" column="1" source="standard:indent" />
+        <error line="96" column="1" source="standard:indent" />
+        <error line="97" column="1" source="standard:indent" />
+        <error line="98" column="1" source="standard:indent" />
+        <error line="99" column="1" source="standard:indent" />
+        <error line="100" column="1" source="standard:indent" />
+        <error line="101" column="1" source="standard:indent" />
+        <error line="102" column="1" source="standard:indent" />
+        <error line="103" column="1" source="standard:indent" />
+        <error line="104" column="1" source="standard:indent" />
+        <error line="105" column="1" source="standard:indent" />
+        <error line="106" column="1" source="standard:indent" />
+        <error line="107" column="1" source="standard:indent" />
+        <error line="108" column="1" source="standard:indent" />
+        <error line="109" column="1" source="standard:indent" />
+        <error line="110" column="1" source="standard:indent" />
+        <error line="111" column="1" source="standard:indent" />
+        <error line="112" column="1" source="standard:indent" />
+        <error line="113" column="1" source="standard:indent" />
+        <error line="114" column="1" source="standard:indent" />
+        <error line="115" column="1" source="standard:indent" />
+        <error line="116" column="1" source="standard:indent" />
+        <error line="117" column="1" source="standard:indent" />
+        <error line="118" column="1" source="standard:indent" />
+        <error line="119" column="1" source="standard:indent" />
+        <error line="120" column="1" source="standard:indent" />
+        <error line="121" column="1" source="standard:indent" />
+        <error line="122" column="1" source="standard:indent" />
+        <error line="123" column="1" source="standard:indent" />
+        <error line="124" column="1" source="standard:indent" />
+        <error line="125" column="1" source="standard:indent" />
+        <error line="126" column="1" source="standard:indent" />
+        <error line="127" column="1" source="standard:indent" />
+        <error line="128" column="1" source="standard:indent" />
+        <error line="129" column="1" source="standard:indent" />
+        <error line="130" column="1" source="standard:indent" />
+        <error line="131" column="1" source="standard:indent" />
+        <error line="132" column="1" source="standard:indent" />
+        <error line="133" column="1" source="standard:indent" />
+        <error line="134" column="1" source="standard:indent" />
+        <error line="135" column="1" source="standard:indent" />
+        <error line="136" column="1" source="standard:indent" />
+        <error line="137" column="1" source="standard:indent" />
+        <error line="138" column="1" source="standard:indent" />
+        <error line="139" column="1" source="standard:indent" />
+        <error line="140" column="1" source="standard:indent" />
+        <error line="141" column="1" source="standard:indent" />
+        <error line="142" column="1" source="standard:indent" />
+        <error line="143" column="1" source="standard:indent" />
+        <error line="144" column="1" source="standard:indent" />
+        <error line="145" column="1" source="standard:indent" />
+        <error line="146" column="1" source="standard:indent" />
+        <error line="147" column="1" source="standard:indent" />
+        <error line="148" column="1" source="standard:indent" />
+        <error line="149" column="1" source="standard:indent" />
+        <error line="150" column="1" source="standard:indent" />
+        <error line="151" column="1" source="standard:indent" />
+        <error line="152" column="1" source="standard:indent" />
+        <error line="156" column="13" source="standard:backing-property-naming" />
+        <error line="160" column="13" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/com/infomaniak/emojicomponents/views/EmojiReactionsView.kt">
+        <error line="47" column="5" source="standard:class-signature" />
+        <error line="48" column="5" source="standard:class-signature" />
+        <error line="49" column="5" source="standard:class-signature" />
+        <error line="49" column="27" source="standard:class-signature" />
+        <error line="50" column="5" source="standard:class-signature" />
+        <error line="75" column="81" source="standard:function-expression-body" />
+        <error line="79" column="80" source="standard:function-expression-body" />
+        <error line="84" column="75" source="standard:function-expression-body" />
+        <error line="148" column="70" source="standard:function-expression-body" />
+        <error line="149" column="16" source="standard:keyword-spacing" />
+        <error line="157" column="131" source="standard:max-line-length" />
+    </file>
+</baseline>

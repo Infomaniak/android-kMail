@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     id("com.android.library")
     alias(core.plugins.kotlin.android)
@@ -35,6 +37,16 @@ android {
         create("standard") {}
         create("fdroid") {}
     }
+}
+
+ktlint {
+    version.set("1.7.1")
+    android.set(true)
+    ignoreFailures.set(true)
+    reporters {
+        reporter(ReporterType.PLAIN)
+    }
+    baseline.set(file("${projectDir}/config/ktlint/baseline.xml"))
 }
 
 dependencies {

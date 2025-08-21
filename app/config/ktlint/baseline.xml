@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <baseline version="1.0">
     <file name="build.gradle.kts">
-        <error line="63" column="1" source="standard:indent" />
-        <error line="64" column="1" source="standard:indent" />
+        <error line="65" column="1" source="standard:indent" />
+        <error line="66" column="1" source="standard:indent" />
+        <error line="113" column="25" source="standard:string-template" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/CrossAppLoginService.kt">
         <error line="13" column="30" source="standard:class-signature" />
@@ -176,6 +177,7 @@
         <error line="285" column="128" source="standard:function-expression-body" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/data/cache/RealmMigrations.kt">
+        <error line="61" column="1" source="standard:spacing-between-declarations-with-comments" />
         <error line="108" column="1" source="standard:no-blank-line-before-rbrace" />
         <error line="285" column="126" source="standard:function-expression-body" />
         <error line="301" column="95" source="standard:function-expression-body" />
@@ -251,11 +253,6 @@
         <error line="365" column="1" source="standard:indent" />
         <error line="366" column="1" source="standard:indent" />
         <error line="816" column="17" source="standard:property-naming" />
-        <error line="825" column="25" source="standard:comment-wrapping" />
-        <error line="826" column="35" source="standard:comment-wrapping" />
-        <error line="827" column="35" source="standard:comment-wrapping" />
-        <error line="831" column="22" source="standard:comment-wrapping" />
-        <error line="832" column="24" source="standard:comment-wrapping" />
         <error line="840" column="9" source="standard:class-signature" />
         <error line="841" column="9" source="standard:class-signature" />
         <error line="841" column="34" source="standard:class-signature" />
@@ -425,10 +422,8 @@
         <error line="58" column="38" source="standard:function-expression-body" />
         <error line="60" column="1" source="standard:indent" />
         <error line="60" column="17" source="standard:chain-wrapping" />
-        <error line="60" column="20" source="standard:condition-wrapping" />
         <error line="61" column="1" source="standard:indent" />
         <error line="61" column="17" source="standard:chain-wrapping" />
-        <error line="61" column="20" source="standard:condition-wrapping" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/data/models/correspondent/MergedContact.kt">
         <error line="35" column="25" source="standard:class-signature" />
@@ -485,10 +480,6 @@
     <file name="src/main/java/com/infomaniak/mail/data/models/message/SubBody.kt">
         <error line="22" column="1" source="standard:import-ordering" />
         <error line="40" column="5" source="standard:spacing-between-declarations-with-comments" />
-    </file>
-    <file name="src/main/java/com/infomaniak/mail/data/models/signature/Signature.kt">
-        <error line="46" column="28" source="standard:comment-wrapping" />
-        <error line="48" column="27" source="standard:comment-wrapping" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/data/models/snooze/BatchSnoozeResponse.kt">
         <error line="32" column="39" source="standard:binary-expression-wrapping" />
@@ -552,6 +543,7 @@
         <error line="458" column="32" source="standard:multiline-if-else" />
         <error line="470" column="30" source="standard:multiline-if-else" />
         <error line="1297" column="26" source="standard:function-expression-body" />
+        <error line="1354" column="5" source="standard:spacing-between-declarations-with-comments" />
         <error line="1492" column="107" source="standard:function-expression-body" />
         <error line="1646" column="73" source="standard:function-expression-body" />
     </file>
@@ -764,8 +756,6 @@
         <error line="682" column="110" source="standard:function-expression-body" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadListDateDisplay.kt">
-        <error line="21" column="1" source="standard:no-unused-imports" />
-        <error line="25" column="1" source="standard:no-unused-imports" />
         <error line="98" column="56" source="standard:function-expression-body" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadListFragment.kt">
@@ -775,13 +765,10 @@
         <error line="404" column="51" source="standard:function-expression-body" />
         <error line="671" column="1" source="standard:indent" />
         <error line="671" column="25" source="standard:chain-wrapping" />
-        <error line="671" column="28" source="standard:condition-wrapping" />
         <error line="672" column="1" source="standard:indent" />
         <error line="672" column="25" source="standard:chain-wrapping" />
-        <error line="672" column="28" source="standard:condition-wrapping" />
         <error line="673" column="1" source="standard:indent" />
         <error line="673" column="25" source="standard:chain-wrapping" />
-        <error line="673" column="28" source="standard:condition-wrapping" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/ui/main/folder/ThreadListMultiSelection.kt">
         <error line="237" column="74" source="standard:function-expression-body" />
@@ -803,13 +790,10 @@
         <error line="300" column="37" source="standard:wrapping" />
         <error line="301" column="1" source="standard:indent" />
         <error line="301" column="25" source="standard:chain-wrapping" />
-        <error line="301" column="28" source="standard:condition-wrapping" />
         <error line="302" column="1" source="standard:indent" />
         <error line="302" column="25" source="standard:chain-wrapping" />
-        <error line="302" column="28" source="standard:condition-wrapping" />
         <error line="303" column="1" source="standard:indent" />
         <error line="303" column="25" source="standard:chain-wrapping" />
-        <error line="303" column="28" source="standard:condition-wrapping" />
         <error line="305" column="28" source="standard:wrapping" />
         <error line="306" column="1" source="standard:indent" />
         <error line="307" column="1" source="standard:indent" />
@@ -913,7 +897,6 @@
         <error line="33" column="5" source="standard:class-signature" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/ui/main/move/MoveAdapter.kt">
-        <error line="133" column="36" source="standard:condition-wrapping" />
         <error line="134" column="1" source="standard:indent" />
         <error line="135" column="1" source="standard:indent" />
         <error line="136" column="1" source="standard:indent" />
@@ -950,10 +933,8 @@
         <error line="20" column="1" source="standard:import-ordering" />
         <error line="119" column="1" source="standard:indent" />
         <error line="119" column="17" source="standard:chain-wrapping" />
-        <error line="119" column="20" source="standard:condition-wrapping" />
         <error line="120" column="1" source="standard:indent" />
         <error line="120" column="17" source="standard:chain-wrapping" />
-        <error line="120" column="20" source="standard:condition-wrapping" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/ui/main/settings/AutoAdvanceSettingsFragment.kt">
         <error line="44" column="115" source="standard:function-expression-body" />
@@ -1088,10 +1069,8 @@
         <error line="20" column="1" source="standard:import-ordering" />
         <error line="78" column="1" source="standard:indent" />
         <error line="78" column="17" source="standard:chain-wrapping" />
-        <error line="78" column="20" source="standard:condition-wrapping" />
         <error line="79" column="1" source="standard:indent" />
         <error line="79" column="17" source="standard:chain-wrapping" />
-        <error line="79" column="20" source="standard:condition-wrapping" />
         <error line="112" column="39" source="standard:argument-list-wrapping" />
         <error line="112" column="128" source="standard:argument-list-wrapping" />
         <error line="112" column="130" source="standard:max-line-length" />
@@ -1146,7 +1125,6 @@
         <error line="925" column="1" source="standard:indent" />
         <error line="989" column="1" source="standard:indent" />
         <error line="989" column="33" source="standard:chain-wrapping" />
-        <error line="989" column="36" source="standard:condition-wrapping" />
         <error line="1000" column="1" source="standard:indent" />
         <error line="1001" column="1" source="standard:indent" />
         <error line="1050" column="9" source="standard:class-signature" />
@@ -1162,11 +1140,8 @@
         <error line="227" column="79" source="standard:function-expression-body" />
         <error line="244" column="98" source="standard:function-expression-body" />
         <error line="290" column="59" source="standard:function-expression-body" />
-        <error line="311" column="66" source="standard:condition-wrapping" />
         <error line="312" column="1" source="standard:indent" />
-        <error line="312" column="61" source="standard:condition-wrapping" />
         <error line="313" column="1" source="standard:indent" />
-        <error line="313" column="82" source="standard:condition-wrapping" />
         <error line="314" column="1" source="standard:indent" />
         <error line="314" column="81" source="standard:no-multi-spaces" />
         <error line="377" column="113" source="standard:function-expression-body" />
@@ -1348,16 +1323,12 @@
         <error line="20" column="1" source="standard:import-ordering" />
         <error line="73" column="1" source="standard:indent" />
         <error line="73" column="17" source="standard:chain-wrapping" />
-        <error line="73" column="20" source="standard:condition-wrapping" />
         <error line="74" column="1" source="standard:indent" />
         <error line="74" column="17" source="standard:chain-wrapping" />
-        <error line="74" column="20" source="standard:condition-wrapping" />
         <error line="75" column="1" source="standard:indent" />
         <error line="75" column="17" source="standard:chain-wrapping" />
-        <error line="75" column="20" source="standard:condition-wrapping" />
         <error line="76" column="1" source="standard:indent" />
         <error line="76" column="17" source="standard:chain-wrapping" />
-        <error line="76" column="20" source="standard:condition-wrapping" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/ui/newMessage/InsertLinkDialog.kt">
         <error line="20" column="1" source="standard:import-ordering" />
@@ -1500,13 +1471,10 @@
         <error line="20" column="1" source="standard:import-ordering" />
         <error line="53" column="1" source="standard:indent" />
         <error line="53" column="13" source="standard:chain-wrapping" />
-        <error line="53" column="16" source="standard:condition-wrapping" />
         <error line="54" column="1" source="standard:indent" />
         <error line="54" column="13" source="standard:chain-wrapping" />
-        <error line="54" column="16" source="standard:condition-wrapping" />
         <error line="55" column="1" source="standard:indent" />
         <error line="55" column="13" source="standard:chain-wrapping" />
-        <error line="55" column="16" source="standard:condition-wrapping" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/utils/DraftInitManager.kt">
         <error line="83" column="109" source="standard:function-expression-body" />
@@ -1559,6 +1527,7 @@
     <file name="src/main/java/com/infomaniak/mail/utils/MessageBodyUtils.kt">
         <error line="121" column="84" source="standard:function-expression-body" />
         <error line="131" column="40" source="standard:string-template" />
+        <error line="139" column="5" source="standard:spacing-between-declarations-with-comments" />
         <error line="148" column="9" source="standard:class-signature" />
         <error line="149" column="9" source="standard:class-signature" />
         <error line="149" column="35" source="standard:class-signature" />
@@ -1569,7 +1538,6 @@
     </file>
     <file name="src/main/java/com/infomaniak/mail/utils/NotificationUtils.kt">
         <error line="20" column="1" source="standard:import-ordering" />
-        <error line="28" column="1" source="standard:no-unused-imports" />
         <error line="120" column="106" source="standard:function-expression-body" />
         <error line="129" column="55" source="standard:function-expression-body" />
         <error line="136" column="62" source="standard:function-expression-body" />
@@ -1611,7 +1579,6 @@
         <error line="20" column="1" source="standard:import-ordering" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/utils/UiUtils.kt">
-        <error line="24" column="1" source="standard:no-unused-imports" />
         <error line="63" column="1" source="standard:no-blank-line-before-rbrace" />
         <error line="71" column="13" source="standard:class-signature" />
         <error line="72" column="13" source="standard:class-signature" />
@@ -1643,9 +1610,6 @@
         <error line="52" column="40" source="standard:class-signature" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/utils/date/MailDateFormatUtils.kt">
-        <error line="21" column="1" source="standard:no-unused-imports" />
-        <error line="22" column="1" source="standard:no-unused-imports" />
-        <error line="24" column="1" source="standard:no-unused-imports" />
         <error line="53" column="40" source="standard:function-expression-body" />
     </file>
     <file name="src/main/java/com/infomaniak/mail/utils/extensions/AttachmentExt.kt">
