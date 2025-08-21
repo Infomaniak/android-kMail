@@ -80,6 +80,8 @@ class NewMessageActivity : BaseActivity() {
         }
 
         lifecycleScope.launch {
+            // This awaits indefinitely until the currentMailbox in the viewModel is null.
+            // If this is the case, we quit the activity
             newMessageViewModel.awaitNoMailboxSignal()
             finish()
         }

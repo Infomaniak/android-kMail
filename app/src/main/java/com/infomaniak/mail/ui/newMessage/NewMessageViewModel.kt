@@ -213,6 +213,7 @@ class NewMessageViewModel @Inject constructor(
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
 
+    //region Check mailbox existence
     private val exitSignal: CompletableJob = Job()
 
     val currentMailbox = viewModelScope.suspendLazy {
@@ -226,7 +227,12 @@ class NewMessageViewModel @Inject constructor(
         mailbox
     }
 
+    // ------------- !IMPORTANT! -------------
+    /** Always call this before the first access to currentMailbox, otherwise the NewMessageActivity will just await indefinitely
+     * in the cases where `mailboxController.getMailbox` returns null
+     */
     suspend fun awaitNoMailboxSignal() = exitSignal.join()
+    //endregion
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
