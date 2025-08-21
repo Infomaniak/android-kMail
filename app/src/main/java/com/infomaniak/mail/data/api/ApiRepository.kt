@@ -37,6 +37,7 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.networking.ManualAuthorizationRequired
 import com.infomaniak.lib.core.utils.await
+import com.infomaniak.lib.core.utils.bodyAsStringOrNull
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentDisposition
 import com.infomaniak.mail.data.models.AttachmentsToForwardResult
@@ -511,7 +512,7 @@ object ApiRepository : ApiRepositoryCore() {
 
         val response = HttpClient.okHttpClient.newCall(request).await()
 
-        return ApiController.json.decodeFromString(response.body?.string() ?: "")
+        return ApiController.json.decodeFromString(response.bodyAsStringOrNull() ?: "")
 
     }.cancellable().getOrElse {
         return ApiResponse(result = ApiResponseStatus.ERROR, error = InternalTranslatedErrorCode.UnknownError.toApiError())
@@ -587,7 +588,7 @@ object ApiRepository : ApiRepositoryCore() {
 
         val response = AccountUtils.getHttpClient(mailbox.userId).newCall(request).await()
 
-        return response.body?.string()?.let { ApiController.json.decodeFromString<ApiResponse<Attachment>>(it) }
+        return response.bodyAsStringOrNull()?.let { ApiController.json.decodeFromString<ApiResponse<Attachment>>(it) }
     }
 
     /**
