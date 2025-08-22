@@ -79,7 +79,7 @@
     <string name="aiPromptExample4">un invito a un evento aziendale</string>
     <string name="aiPromptExample5">un’e-mail di richiesta di incontro con un cliente importante</string>
     <string name="aiPromptGenerationLoader">Euria sta scrivendo…</string>
-    <string name="aiPromptPlaceholder">Indicare a Euria cosa si desidera scrivere. Ad esempio \"%s\".</string>
+    <string name="aiPromptPlaceholder">Communica a Euria cosa si desidera scrivere. Ad esempio \"%s\".</string>
     <string name="aiPromptTitle">Euria</string>
     <string name="aiPromptValidateButton">Genera</string>
     <string name="aiReplaceSubjectDescription">Il soggetto diventerà:\n\n%s</string>

@@ -83,7 +83,7 @@
     <string name="aiPromptTitle">Euria</string>
     <string name="aiPromptValidateButton">Genere</string>
     <string name="aiReplaceSubjectDescription">El tema será:\n\n%s</string>
-    <string name="aiReplaceSubjectTitle">¿Sustituir el objeto actual por la propuesta de Euria?</string>
+    <string name="aiReplaceSubjectTitle">¿Sustituir el asunto actual por la propuesta de Euria?</string>
     <string name="aiReplacementDialogDescription">Al pulsar \"Sustituir\", se perderá el contenido preexistente.</string>
     <string name="aiReplacementDialogPositiveButton">Sustituir</string>
     <string name="aiReplacementDialogTitle">¿Reemplazar el contenido existente?</string>

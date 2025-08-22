@@ -89,7 +89,7 @@
     <string name="aiPromptTitle">Euria</string>
     <string name="aiPromptValidateButton">Generate</string>
     <string name="aiReplaceSubjectDescription">The subject will become:\n\n%s</string>
-    <string name="aiReplaceSubjectTitle">Replace the current object with Euria’s proposal?</string>
+    <string name="aiReplaceSubjectTitle">Replace the current subject with Euria’s proposal?</string>
     <string name="aiReplacementDialogDescription">By clicking on \"Replace\", pre-existing content will be lost.</string>
     <string name="aiReplacementDialogPositiveButton">Replace</string>
     <string name="aiReplacementDialogTitle">Replace already existing content?</string>
