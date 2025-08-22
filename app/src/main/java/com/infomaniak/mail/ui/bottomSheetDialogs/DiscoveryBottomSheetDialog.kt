@@ -23,9 +23,8 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.core.view.isVisible
-import com.dotlottie.dlplayer.Mode
 import com.infomaniak.mail.MatomoMail.MatomoName
-import com.lottiefiles.dotlottie.core.model.Config
+import com.infomaniak.mail.utils.extensions.getEuriaAnimationConfig
 import com.lottiefiles.dotlottie.core.util.DotLottieSource
 
 abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
@@ -69,16 +68,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
             }
             is Illustration.Animated -> infoAnimation.apply {
                 isVisible = true
-
-                val config = Config.Builder()
-                    .autoplay(true)
-                    .source(DotLottieSource.Res(illustration.resId))
-                    .loop(true)
-                    .playMode(Mode.BOUNCE)
-                    .threads(6u)
-                    .build()
-
-                infoAnimation.load(config)
+                infoAnimation.load(DotLottieSource.Res(illustration.resId).getEuriaAnimationConfig())
             }
         }
     }
