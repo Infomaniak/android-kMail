@@ -83,7 +83,7 @@
     <string name="aiPromptTitle">Euria</string>
     <string name="aiPromptValidateButton">Erzeugen</string>
     <string name="aiReplaceSubjectDescription">Der Betreff wird zu:\n\n%s</string>
-    <string name="aiReplaceSubjectTitle">Das aktuelle Betreff durch Eurias Vorschlag ersetzen?</string>
+    <string name="aiReplaceSubjectTitle">Betreff durch den Vorschlag von Euria ersetzen?</string>
     <string name="aiReplacementDialogDescription">Wenn Sie auf \"Ersetzen\" klicken, geht der bereits vorhandene Inhalt verloren.</string>
     <string name="aiReplacementDialogPositiveButton">Ersetzen</string>
     <string name="aiReplacementDialogTitle">Bestehende Inhalte ersetzen?</string>
