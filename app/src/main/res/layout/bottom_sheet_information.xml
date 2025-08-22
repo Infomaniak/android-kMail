@@ -38,6 +38,7 @@
             tools:src="@drawable/ic_update_logo"
             tools:visibility="visible" />
 
+        <!-- We set the height at 0dp here as layout_height is required, but setting a real value must be done programmatically. -->
         <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
             android:id="@+id/info_animation"
             android:layout_width="wrap_content"
