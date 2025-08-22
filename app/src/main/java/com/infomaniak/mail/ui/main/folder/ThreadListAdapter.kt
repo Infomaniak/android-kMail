@@ -268,7 +268,11 @@ class ThreadListAdapter @Inject constructor(
         with(thread) {
             expeditor.text = formatRecipientNames(computeDisplayedRecipients())
             mailSubject.text = context.formatSubject(subject)
-            mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
+            mailBodyPreview.text = if (messages.last().isEncrypted) {
+                context.getString(R.string.encryptedMessageHeader)
+            } else {
+                computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
+            }
 
             val dateDisplay = computeThreadListDateDisplay(callbacks?.getFeatureFlags?.invoke(), localSettings)
             mailDate.text = dateDisplay.formatThreadDate(context, this)
