@@ -544,23 +544,25 @@ class NewMessageViewModel @Inject constructor(
     }
 
     private suspend fun fetchDraft(): Draft? {
-        return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
+        return draftResource?.let { resource ->
+            ApiRepository.getDraft(resource).data?.also { draft ->
 
-            /**
-             * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail), we need to
-             * set all of its Attachments to [AttachmentUploadStatus.UPLOADED], so we don't try to upload them again.
-             */
-            draft.attachments.forEach {
-                it.setUploadStatus(AttachmentUploadStatus.UPLOADED, draft, "fetchDraft at NewMessage opening")
+                /**
+                 * If we are opening for the 1st time an existing Draft created somewhere else (ex: webmail), we need to
+                 * set all of its Attachments to [AttachmentUploadStatus.UPLOADED], so we don't try to upload them again.
+                 */
+                draft.attachments.forEach {
+                    it.setUploadStatus(AttachmentUploadStatus.UPLOADED, draft, "fetchDraft at NewMessage opening")
+                }
+
+                /**
+                 * If we are opening for the 1st time an existing Draft created somewhere else
+                 * (ex: webmail), we need to create the link between the Draft and its Message.
+                 * - The link in the Draft is added here, when creating the Draft.
+                 * - The link in the Message is added later, when saving the Draft.
+                 */
+                messageUid?.let(draft::initLocalValues) ?: throw IllegalArgumentException("messageUid is null.")
             }
-
-            /**
-             * If we are opening for the 1st time an existing Draft created somewhere else
-             * (ex: webmail), we need to create the link between the Draft and its Message.
-             * - The link in the Draft is added here, when creating the Draft.
-             * - The link in the Message is added later, when saving the Draft.
-             */
-            draft.initLocalValues(messageUid!!)
         }
     }
 
