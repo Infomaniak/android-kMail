@@ -618,16 +618,13 @@
                                     android:layout_height="match_parent"
                                     android:background="?android:attr/selectableItemBackgroundBorderless">
 
-                                    <com.airbnb.lottie.LottieAnimationView
+                                    <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
+                                        android:id="@+id/editorAiAnimation"
                                         android:layout_width="@dimen/standardIconSize"
                                         android:layout_height="@dimen/standardIconSize"
-                                        android:layout_marginHorizontal="16dp"
+                                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
                                         android:importantForAccessibility="no"
-                                        android:layout_gravity="center"
-                                        app:lottie_autoPlay="true"
-                                        app:lottie_loop="true"
-                                        app:lottie_rawRes="@raw/euria"
-                                        app:lottie_repeatMode="reverse" />
+                                        android:layout_gravity="center" />
                                 </FrameLayout>
                             </LinearLayout>
 
