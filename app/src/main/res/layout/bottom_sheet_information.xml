@@ -41,7 +41,7 @@
         <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
             android:id="@+id/info_animation"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="0dp"
             android:layout_marginBottom="@dimen/marginStandardMedium"
             android:importantForAccessibility="no"
             android:maxHeight="270dp"

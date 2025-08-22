@@ -20,9 +20,14 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.Dimension
+import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import com.dotlottie.dlplayer.Mode
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.utils.extensions.getEuriaAnimationConfig
 import com.lottiefiles.dotlottie.core.util.DotLottieSource
@@ -68,6 +73,9 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
             }
             is Illustration.Animated -> infoAnimation.apply {
                 isVisible = true
+
+                updateLayoutParams { height = illustration.heightDp.toPx() }
+
                 infoAnimation.load(DotLottieSource.Res(illustration.resId).getEuriaAnimationConfig())
             }
         }
@@ -82,6 +90,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
     sealed interface Illustration {
         data class Static(@DrawableRes val resId: Int) : Illustration
-        data class Animated(@RawRes val resId: Int) : Illustration
+        // heightDp must be set in order for Lottie to show the animation.
+        data class Animated(@RawRes val resId: Int, @Dimension(DP) val heightDp: Int) : Illustration
     }
 }

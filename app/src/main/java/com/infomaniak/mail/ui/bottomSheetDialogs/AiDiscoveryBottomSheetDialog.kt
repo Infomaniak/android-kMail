@@ -33,7 +33,10 @@ class AiDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
 
     override val titleRes = R.string.aiDiscoveryTitle
     override val descriptionRes = R.string.aiDiscoveryDescription
-    override val illustration = Illustration.Animated(R.raw.illustration_discover_euria)
+    override val illustration = Illustration.Animated(
+        R.raw.illustration_discover_euria,
+        heightDp = 50,
+    )
     override val positiveButtonRes = R.string.buttonTry
     override val trackMatomoWithCategory: (name: MatomoName) -> Unit = { trackAiWriterEvent(it) }
 

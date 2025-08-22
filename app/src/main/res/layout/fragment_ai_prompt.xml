@@ -97,23 +97,16 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/generateButton"
+                style="@style/TextButtonPrimaryMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="@string/aiPromptValidateButton"
+                android:layout_gravity="end"
+                tools:enabled="true" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/generateButton"
-                    style="@style/TextButtonPrimaryMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:enabled="false"
-                    android:text="@string/aiPromptValidateButton"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:enabled="true" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
