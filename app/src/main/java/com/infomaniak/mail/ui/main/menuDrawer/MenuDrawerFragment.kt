@@ -364,6 +364,7 @@ class MenuDrawerFragment : Fragment() {
             lifecycleScope.launch {
                 repeatOnLifecycle(State.STARTED) {
                     mainViewModel.dismissCurrentMailboxNotifications()
+                    val i = 0
                 }
             }
         }
