@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
+import com.dotlottie.dlplayer.Mode
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setMarginsRelative
@@ -40,6 +41,8 @@ import com.infomaniak.mail.databinding.FragmentAiPromptBinding
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.ime
 import com.infomaniak.mail.utils.extensions.systemBars
+import com.lottiefiles.dotlottie.core.model.Config
+import com.lottiefiles.dotlottie.core.util.DotLottieSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -88,6 +91,16 @@ class AiPromptFragment : Fragment() {
 
     private fun setUi() = with(binding) {
         setCorrectSheetMargins()
+
+        val animationConfig = Config.Builder()
+            .autoplay(true)
+            .source(DotLottieSource.Res(R.raw.euria))
+            .loop(true)
+            .playMode(Mode.BOUNCE)
+            .threads(6u)
+            .build()
+
+        euriaIcon.load(animationConfig)
 
         prompt.showKeyboard()
         initPromptTextAndPlaceholder()

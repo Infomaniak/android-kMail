@@ -74,8 +74,8 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
                     .autoplay(true)
                     .source(DotLottieSource.Res(illustration.resId))
                     .loop(true)
-                    .playMode(Mode.REVERSE)
-                    .useFrameInterpolation(true)
+                    .playMode(Mode.BOUNCE)
+                    .threads(6u)
                     .build()
 
                 infoAnimation.load(config)
