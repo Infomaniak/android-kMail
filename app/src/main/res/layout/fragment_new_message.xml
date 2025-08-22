@@ -612,17 +612,18 @@
                                     android:visibility="gone"
                                     app:icon="@drawable/ic_editor_clock" />
 
-                                <com.google.android.material.button.MaterialButton
+                                <FrameLayout
                                     android:id="@+id/editorAi"
-                                    style="@style/EditorIconButton"
                                     android:layout_width="@dimen/newMessageToolbarItemWidth"
                                     android:layout_height="match_parent"
-                                    android:contentDescription="@string/buttonSchedule"
-                                    android:theme="@style/AiCursorAndPrimaryColorTheme"
-                                    android:visibility="gone"
-                                    app:icon="@drawable/ic_ai_magic_wand"
-                                    app:iconTint="@color/aiColor"
-                                    tools:visibility="visible" />
+                                    android:background="?android:attr/selectableItemBackgroundBorderless">
+
+                                    <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
+                                        android:id="@+id/editorAiAnimation"
+                                        android:layout_width="@dimen/standardIconSize"
+                                        android:layout_height="@dimen/standardIconSize"
+                                        android:layout_gravity="center" />
+                                </FrameLayout>
                             </LinearLayout>
 
                             <LinearLayout

@@ -93,8 +93,8 @@
     <color name="contacts_light">#9D66E1</color>
     <color name="contacts_dark">#C8AAEE</color>
 
-    <color name="ai_light">#8D4AFF</color>
-    <color name="ai_dark">#BF99FF</color>
+    <color name="ai_light">#007EFF</color>
+    <color name="ai_dark">#65B1FF</color>
 
     <!-- Primary color palette -->
     <color name="pink0">@color/black</color>
@@ -198,8 +198,6 @@
     <!-- AI -->
     <color name="aiColor">@color/ai_light</color>
     <color name="onAiColor">@color/onColorfulBackground</color>
-    <color name="aiBetaTagTextColor">@color/onAiColor</color>
-    <color name="aiBetaTagBackground">@color/aiColor</color>
 
     <!-- Calendar events -->
     <color name="calendarHeaderBackground">@color/polar_bear</color>

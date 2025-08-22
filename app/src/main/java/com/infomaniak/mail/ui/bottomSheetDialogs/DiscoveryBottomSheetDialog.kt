@@ -20,13 +20,22 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.Dimension
+import androidx.annotation.Dimension.Companion.DP
+import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.utils.extensions.getEuriaAnimationConfig
+import com.lottiefiles.dotlottie.core.util.DotLottieSource
 
 abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
     abstract val titleRes: Int
     abstract val descriptionRes: Int?
-    abstract val illustrationRes: Int
+    abstract val illustration: Illustration
 
     abstract val positiveButtonRes: Int
 
@@ -37,7 +46,8 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
         title.setText(titleRes)
         descriptionRes?.let(description::setText)
-        infoIllustration.setBackgroundResource(illustrationRes)
+
+        setIllustration()
 
         actionButton.apply {
             setText(positiveButtonRes)
@@ -54,10 +64,32 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
         }
     }
 
+    private fun setIllustration() = with(binding) {
+        when (val illustration = illustration) {
+            is Illustration.Static -> infoIllustration.apply {
+                isVisible = true
+                setBackgroundResource(illustration.resId)
+            }
+            is Illustration.Animated -> infoAnimation.apply {
+                isVisible = true
+
+                updateLayoutParams { height = illustration.heightDp.toPx() }
+
+                infoAnimation.load(DotLottieSource.Res(illustration.resId).getEuriaAnimationConfig())
+            }
+        }
+    }
+
     abstract fun onPositiveButtonClicked()
 
     override fun onCancel(dialog: DialogInterface) {
         trackMatomoWithCategory(MatomoName.DiscoverLater)
         super.onCancel(dialog)
+    }
+
+    sealed interface Illustration {
+        data class Static(@DrawableRes val resId: Int) : Illustration
+        // heightDp must be set in order for Lottie to show the animation.
+        data class Animated(@RawRes val resId: Int, @Dimension(DP) val heightDp: Int) : Illustration
     }
 }

@@ -43,7 +43,7 @@
             app:navigationIconTint="@color/iconColor"
             app:titleCentered="true"
             app:titleTextAppearance="@style/H2"
-            tools:title="@string/aiPromptTitle" />
+            app:title="@string/aiPromptTitle" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView

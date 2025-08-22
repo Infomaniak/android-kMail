@@ -37,11 +37,11 @@ import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentAiPromptBinding
-import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.getEuriaAnimationConfig
 import com.infomaniak.mail.utils.extensions.ime
-import com.infomaniak.mail.utils.extensions.postfixWithTag
 import com.infomaniak.mail.utils.extensions.systemBars
+import com.lottiefiles.dotlottie.core.util.DotLottieSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,11 +91,7 @@ class AiPromptFragment : Fragment() {
     private fun setUi() = with(binding) {
         setCorrectSheetMargins()
 
-        aiPromptTitle.text = requireContext().postfixWithTag(
-            original = getString(R.string.aiPromptTitle),
-            tagRes = R.string.aiPromptTag,
-            tagColor = TagColor(R.color.aiBetaTagBackground, R.color.aiBetaTagTextColor),
-        )
+        euriaIcon.load(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
 
         prompt.showKeyboard()
         initPromptTextAndPlaceholder()

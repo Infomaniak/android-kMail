@@ -60,8 +60,8 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
         }
     }
@@ -132,6 +132,7 @@ dependencies {
     "standardImplementation"(libs.play.services.base)
     "standardImplementation"(libs.firebase.messaging.ktx)
 
+    implementation(libs.dotlottie)
     implementation(libs.lottie)
     implementation(libs.dragdropswipe.recyclerview)
     implementation(libs.dotsindicator)

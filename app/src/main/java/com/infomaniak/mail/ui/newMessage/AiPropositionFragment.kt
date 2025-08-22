@@ -49,14 +49,12 @@ import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.DialogAiReplaceContentBinding
 import com.infomaniak.mail.databinding.FragmentAiPropositionBinding
 import com.infomaniak.mail.ui.alertDialogs.AiDescriptionAlertDialog
-import com.infomaniak.mail.ui.main.thread.SubjectFormatter.TagColor
 import com.infomaniak.mail.ui.newMessage.AiViewModel.PropositionStatus
 import com.infomaniak.mail.ui.newMessage.AiViewModel.Shortcut
 import com.infomaniak.mail.utils.SimpleIconPopupMenu
 import com.infomaniak.mail.utils.extensions.applyStatusBarInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
-import com.infomaniak.mail.utils.extensions.postfixWithTag
 import com.infomaniak.mail.utils.extensions.safeArea
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
@@ -177,14 +175,7 @@ class AiPropositionFragment : Fragment() {
 
     private fun setToolbar() = with(binding) {
         changeToolbarColorOnScroll(appBarLayout, nestedScrollView)
-        toolbar.apply {
-            setNavigationOnClickListener { trackDismissalAndPopBack() }
-            title = requireContext().postfixWithTag(
-                original = getString(R.string.aiPromptTitle),
-                tagRes = R.string.aiPromptTag,
-                tagColor = TagColor(R.color.aiBetaTagBackground, R.color.aiBetaTagTextColor),
-            )
-        }
+        toolbar.setNavigationOnClickListener { trackDismissalAndPopBack() }
     }
 
     private fun trackDismissalAndPopBack() {
