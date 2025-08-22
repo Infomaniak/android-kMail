@@ -211,8 +211,10 @@ class NewMessageAiManager @Inject constructor(
     }
 
     private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
+        if (showAiDiscoveryBottomSheet) {
             showAiDiscoveryBottomSheet = false
             fragment.safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
+        }
     }
 
     fun navigateToPropositionFragment() {
