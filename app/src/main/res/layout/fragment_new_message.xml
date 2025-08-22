@@ -622,7 +622,6 @@
                                         android:id="@+id/editorAiAnimation"
                                         android:layout_width="@dimen/standardIconSize"
                                         android:layout_height="@dimen/standardIconSize"
-                                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
                                         android:layout_gravity="center" />
                                 </FrameLayout>
                             </LinearLayout>
