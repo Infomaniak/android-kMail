@@ -26,7 +26,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import com.dotlottie.dlplayer.Mode
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.utils.extensions.getEuriaAnimationConfig
