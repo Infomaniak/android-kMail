@@ -36,6 +36,7 @@ class RegistrationInfo private constructor(
 
         fun getDeviceName(contentResolver: ContentResolver): String {
             return Settings.Global.getString(contentResolver, "device_name").let { deviceName ->
+                // Some Xiaomi devices return null for this "device_name" so we need to check this case and not just "blank"
                 if (deviceName.isNullOrBlank()) DEVICE_MODEL else deviceName
             }
         }
