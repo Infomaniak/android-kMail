@@ -4,11 +4,10 @@ on:
   pull_request:
 
 concurrency:
-  group: ${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-
   instrumentation-tests:
     if: github.event.pull_request.draft == false
     runs-on: [ self-hosted, Android ]
@@ -18,11 +17,6 @@ jobs:
         target: [ google_apis ]
 
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.1
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout the code
         uses: actions/checkout@v4.1.1
         with:
