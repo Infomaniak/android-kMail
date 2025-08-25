@@ -121,7 +121,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
         } else {
             context.getString(R.string.otherOrganisation)
         }
-        userEmail.text = context.getString(R.string.addressBookTitle, userEmailArg)
+        userEmail.text = context.getString(R.string.organizationName, userEmailArg)
     }
 
     private fun setNameAndSubName(
