@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023-2024 Infomaniak Network SA
+  ~ Copyright (C) 2023-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,113 +15,8 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.compose.ui.platform.ComposeView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.login.LoginFragment">
-
-    <View
-        android:id="@+id/dummyToolbarEdgeToEdge"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:background="?attr/colorPrimaryContainer"
-        tools:layout_height="@dimen/marginLarge" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/introViewpager"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/footer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dummyToolbarEdgeToEdge" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/footer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:animateLayoutChanges="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.20"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/introViewpager">
-
-        <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
-            android:id="@+id/dotsIndicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:dotsColor="@color/border"
-            app:dotsCornerRadius="@dimen/marginStandardVerySmall"
-            app:dotsSize="8dp"
-            app:dotsSpacing="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:progressMode="true"
-            app:selectedDotColor="?android:attr/colorPrimary" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/nextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/contentDescriptionButtonNext"
-            app:fabCustomSize="64dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
-            app:srcCompat="@drawable/ic_arrow_right" />
-
-        <com.infomaniak.core.crossapplogin.front.views.CrossLoginSelectAccountsView
-            android:id="@+id/crossLoginSelection"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandard"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:visibility="gone"
-            app:crossLoginAvatarStrokeColor="@color/background"
-            app:crossLoginButtonStrokeColor="@color/commonColor2"
-            app:crossLoginButtonType="Mail"
-            app:crossLoginDescriptionColor="@color/secondaryTextColor"
-            app:crossLoginTitleColor="@color/primaryTextColor"
-            app:layout_constraintBottom_toTopOf="@id/connectButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
-            tools:crossLoginOnPrimaryColor="?attr/colorOnPrimary"
-            tools:crossLoginPrimaryColor="?attr/colorPrimary"
-            tools:visibility="visible" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/connectButton"
-            style="@style/TextButtonPrimary"
-            android:layout_width="0dp"
-            android:layout_marginHorizontal="@dimen/marginStandard"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:text="@string/connect"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/signUpButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/crossLoginSelection"
-            tools:visibility="visible" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/signUpButton"
-            style="@style/TextButtonSecondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonCreateAccount"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/connectButton"
-            tools:visibility="visible" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    tools:context=".ui.login.LoginFragment" />

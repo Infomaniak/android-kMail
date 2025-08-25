@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.di.IoDispatcher
-import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.extensions.enumValueFrom
 import com.infomaniak.mail.utils.extensions.repeatFrame
@@ -165,7 +164,7 @@ class IntroFragment : Fragment() {
     private fun setUi(newAccentColor: AccentColor, oldAccentColor: AccentColor, position: Int) {
         updateEachPageUi(newAccentColor, oldAccentColor)
 
-        binding.iconLayout.changeIllustrationColors(position, newAccentColor)
+        // binding.iconLayout.changeIllustrationColors(position, newAccentColor)
 
         if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(newAccentColor, oldAccentColor)
     }
