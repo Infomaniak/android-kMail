@@ -48,7 +48,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.ksuite.myksuite.ui.utils.MatomoMyKSuite
+import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -879,7 +879,7 @@ class NewMessageFragment : Fragment() {
         if (isMailboxFull) {
             trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
-                val matomoName = MatomoMyKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME
+                val matomoName = MatomoKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME
                 if (mailbox.kSuite == KSuite.ProFree) { // kSuite pro
                     openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
                 } else { // kSuite perso
