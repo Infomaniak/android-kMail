@@ -196,6 +196,7 @@
         <attr name="title" />
         <attr name="useDefaultLayout" format="boolean" />
         <attr name="centerHorizontally" format="boolean" />
+        <attr name="separatorBackgroundColor" format="integer" />
     </declare-styleable>
 
     <declare-styleable name="PrimaryPalette">

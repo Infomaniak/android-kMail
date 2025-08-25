@@ -387,6 +387,11 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="kSuiteProBottomSheetDialog">
+                    <value>
+                      <LayoutPositions />
+                    </value>
+                  </entry>
                   <entry key="launchActivity">
                     <value>
                       <LayoutPositions>
