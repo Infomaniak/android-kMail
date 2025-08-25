@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v5.0.0
         with:
           token: ${{ github.token }}
           submodules: recursive
