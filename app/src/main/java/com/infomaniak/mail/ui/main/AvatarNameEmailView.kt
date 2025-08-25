@@ -118,13 +118,10 @@ class AvatarNameEmailView @JvmOverloads constructor(
         userEmail.text = context.getString(R.string.organizationName, userEmailArg)
     }
 
-    private fun setContactGroupInfo(
-        contactGroup: ContactGroup,
-        addressBookName: String? = ""
-    ) = with(binding) {
+    private fun setContactGroupInfo(contactGroup: ContactGroup, addressBookName: String?) = with(binding) {
         userAvatar.loadTeamsUserAvatar()
         userName.text = context.getString(R.string.groupContactsTitle, contactGroup.name)
-        userEmail.text = context.getString(R.string.addressBookTitle, addressBookName)
+        addressBookName?.let { userEmail.text = context.getString(R.string.addressBookTitle, it) }
     }
 
     private fun ViewAvatarNameEmailBinding.setNameAndEmail(
