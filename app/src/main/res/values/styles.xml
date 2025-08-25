@@ -147,6 +147,8 @@
     </style>
 
     <style name="TextButtonPrimary" parent="Widget.Material3.Button">
+        <item name="android:insetBottom">@dimen/textButtonPrimaryVerticalInset</item>
+        <item name="android:insetTop">@dimen/textButtonPrimaryVerticalInset</item>
         <item name="android:layout_height">@dimen/textButtonPrimaryHeight</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:letterSpacing">0</item>
