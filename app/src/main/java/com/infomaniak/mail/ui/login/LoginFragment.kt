@@ -17,67 +17,47 @@
  */
 package com.infomaniak.mail.ui.login
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.VisibleForTesting
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.colorResource
 import androidx.core.os.bundleOf
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.core.auth.models.UserLoginResult
-import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel
+import com.infomaniak.core.crossapplogin.back.BaseCrossAppLoginViewModel.Companion.filterSelectedAccounts
+import com.infomaniak.core.crossapplogin.back.ExternalAccount
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.core.launchInOnLifecycle
 import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.core.legacy.utils.Utils
-import com.infomaniak.core.legacy.utils.context
-import com.infomaniak.core.legacy.utils.hideProgressCatching
-import com.infomaniak.core.legacy.utils.initProgress
 import com.infomaniak.core.legacy.utils.safeBinding
-import com.infomaniak.core.legacy.utils.safeNavigate
-import com.infomaniak.core.legacy.utils.showProgressCatching
-import com.infomaniak.core.legacy.utils.updateTextColor
 import com.infomaniak.core.observe
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.core.utils.awaitOneClick
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.databinding.FragmentLoginBinding
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.di.MainDispatcher
-import com.infomaniak.mail.ui.login.CrossLoginBottomSheetDialog.Companion.ON_ANOTHER_ACCOUNT_CLICKED_KEY
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.ui.login.components.OnboardingScreen
+import com.infomaniak.mail.ui.theme.MailTheme
 import com.infomaniak.mail.utils.LoginUtils
-import com.infomaniak.mail.utils.UiUtils.animateColorChange
-import com.infomaniak.mail.utils.colorStateList
-import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
-import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
-import com.infomaniak.mail.utils.extensions.removeOverScrollForApiBelow31
-import com.infomaniak.mail.utils.extensions.selectedPagePosition
-import com.infomaniak.mail.utils.extensions.statusBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
-import splitties.coroutines.repeatWhileActive
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
-import com.infomaniak.core.auth.utils.LoginUtils as CoreLoginUtils
-import com.infomaniak.core.crossapplogin.front.R as RCrossLogin
 import com.infomaniak.core.legacy.R as RCore
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -115,6 +95,9 @@ class LoginFragment : Fragment() {
 
     private lateinit var connectButtonText: String
 
+    private var isLoginButtonLoading by mutableStateOf(false)
+    private var isSignUpButtonLoading by mutableStateOf(false)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         connectButtonText = getString(RCore.string.connect)
         return FragmentLoginBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -123,55 +106,77 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        applyWindowInsetsListener(shouldConsume = false) { root, insets ->
-            root.applySideAndBottomSystemInsets(insets)
-            dummyToolbarEdgeToEdge.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                insets.statusBar().top,
-            )
+        binding.root.setContent {
+            val scope = rememberCoroutineScope()
+
+            val accounts by crossAppLoginViewModel.accountsCheckingState.collectAsStateWithLifecycle()
+            val skippedIds by crossAppLoginViewModel.skippedAccountIds.collectAsStateWithLifecycle()
+
+            MailTheme {
+                // The color can't be overridden at the theme level because it's used elsewhere inside the app like the threadlist
+                Surface(color = colorResource(R.color.backgroundColor)) {
+                    OnboardingScreen(
+                        accounts = { accounts },
+                        skippedIds = { skippedIds },
+                        isLoginButtonLoading = { isLoginButtonLoading },
+                        isSignUpButtonLoading = { isSignUpButtonLoading },
+                        onLogin = { openLoginWebView() },
+                        onContinueWithSelectedAccounts = { scope.launch { connectSelectedAccounts(it, skippedIds) } },
+                        onCreateAccount = { openAccountCreation() },
+                        onUseAnotherAccountClicked = { openLoginWebView() },
+                        onSaveSkippedAccounts = { crossAppLoginViewModel.skippedAccountIds.value = it },
+                    )
+                }
+            }
         }
+
+        // applyWindowInsetsListener(shouldConsume = false) { root, insets ->
+        //     root.applySideAndBottomSystemInsets(insets)
+        //     dummyToolbarEdgeToEdge.layoutParams = ViewGroup.LayoutParams(
+        //         ViewGroup.LayoutParams.MATCH_PARENT,
+        //         insets.statusBar().top,
+        //     )
+        // }
 
         loginUtils.initShowError(::showError)
 
-        val introPagerAdapter = IntroPagerAdapter(
-            manager = childFragmentManager,
-            lifecycle = viewLifecycleOwner.lifecycle,
-            isFirstAccount = navigationArgs.isFirstAccount,
-        )
-
-        introViewpager.apply {
-            adapter = introPagerAdapter
-            selectedPagePosition().mapLatest { position ->
-                val isLoginPage = position == introPagerAdapter.itemCount - 1
-
-                nextButton.isGone = isLoginPage
-                connectButton.isVisible = isLoginPage
-                crossAppLoginViewModel.availableAccounts.collectLatest { accounts ->
-                    val hasAccounts = accounts.isNotEmpty()
-                    signUpButton.isVisible = isLoginPage
-                    crossLoginSelection.isVisible = isLoginPage && hasAccounts
-                }
-            }.launchInOnLifecycle(viewLifecycleOwner)
-
-            removeOverScrollForApiBelow31()
-        }
-
-        dotsIndicator.apply {
-            attachTo(introViewpager)
-            isVisible = navigationArgs.isFirstAccount
-        }
-
-        nextButton.setOnClickListener { introViewpager.currentItem += 1 }
-
-        signUpButton.setOnClickListener {
-            safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
-        }
+        // val introPagerAdapter = IntroPagerAdapter(
+        //     manager = childFragmentManager,
+        //     lifecycle = viewLifecycleOwner.lifecycle,
+        //     isFirstAccount = navigationArgs.isFirstAccount,
+        // )
+        //
+        // introViewpager.apply {
+        //     adapter = introPagerAdapter
+        //     selectedPagePosition().mapLatest { position ->
+        //         val isLoginPage = position == introPagerAdapter.itemCount - 1
+        //
+        //         nextButton.isGone = isLoginPage
+        //         connectButton.isVisible = isLoginPage
+        //         crossAppLoginViewModel.availableAccounts.collectLatest { accounts ->
+        //             val hasAccounts = accounts.isNotEmpty()
+        //             signUpButton.isVisible = isLoginPage
+        //             crossLoginSelection.isVisible = isLoginPage && hasAccounts
+        //         }
+        //     }.launchInOnLifecycle(viewLifecycleOwner)
+        //
+        //     removeOverScrollForApiBelow31()
+        // }
+        //
+        // dotsIndicator.apply {
+        //     attachTo(introViewpager)
+        //     isVisible = navigationArgs.isFirstAccount
+        // }
+        //
+        // nextButton.setOnClickListener { introViewpager.currentItem += 1 }
+        //
+        // signUpButton.setOnClickListener {
+        //     safeNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
+        // }
 
         introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, oldAccentColor) ->
-            updateUi(newAccentColor, oldAccentColor)
+            // updateUi(newAccentColor, oldAccentColor)
         }
-
-        handleOnBackPressed()
 
         observeAccentColor()
         observeCrossLoginAccounts()
@@ -179,100 +184,116 @@ class LoginFragment : Fragment() {
         initCrossLogin()
     }
 
+    private suspend fun connectSelectedAccounts(accounts: List<ExternalAccount>, skippedIds: Set<Long>) {
+        val selectedAccounts = accounts.filterSelectedAccounts(skippedIds)
+        val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts)
+
+        with(loginResult) {
+            tokens.forEachIndexed { index, token ->
+                // TODO: Check why it's not like drive
+                // authenticateUser(token, loginActivity.infomaniakLogin, withRedirection = index == tokens.lastIndex)
+            }
+
+            errorMessageIds.forEach { errorId -> showError(getString(errorId)) }
+        }
+    }
+
     override fun onDestroyView() {
         connectButtonProgressTimer.cancel()
         super.onDestroyView()
     }
 
-    private fun handleOnBackPressed() = with(requireActivity()) {
-        onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            if (getViewPagerCurrentItem() == 0) finish() else goBackAPage()
-        }
-    }
+    // private fun handleOnBackPressed() = with(requireActivity()) {
+    //     onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+    //         if (getViewPagerCurrentItem() == 0) finish() else goBackAPage()
+    //     }
+    // }
 
     private fun observeAccentColor() {
         introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, _) ->
-            binding.crossLoginSelection.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
-            binding.crossLoginSelection.setOnPrimaryColor(newAccentColor.getOnPrimary(requireContext()))
+            // TODO
+            // binding.crossLoginSelection.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
+            // binding.crossLoginSelection.setOnPrimaryColor(newAccentColor.getOnPrimary(requireContext()))
         }
     }
 
     private fun observeCrossLoginAccounts() {
         crossAppLoginViewModel.availableAccounts.observe(viewLifecycleOwner) { accounts ->
             SentryLog.i(TAG, "Got ${accounts.count()} accounts from other apps")
-            binding.crossLoginSelection.setAccounts(accounts)
+            // binding.crossLoginSelection.setAccounts(accounts)
         }
     }
 
     private fun setCrossLoginClickListener() {
 
-        // Open CrossLogin bottomSheet
-        binding.crossLoginSelection.setOnClickListener {
-            safelyNavigate(LoginFragmentDirections.actionLoginFragmentToCrossLoginBottomSheetDialog())
-        }
-
-        // Open Login webView when coming back from CrossLogin bottomSheet
-        parentFragmentManager.setFragmentResultListener(
-            /* requestKey = */ ON_ANOTHER_ACCOUNT_CLICKED_KEY,
-            /* lifecycleOwner = */viewLifecycleOwner,
-        ) { _, bundle ->
-            bundle.getString(ON_ANOTHER_ACCOUNT_CLICKED_KEY)?.let { openLoginWebView() }
-        }
+        // // Open CrossLogin bottomSheet
+        // binding.crossLoginSelection.setOnClickListener {
+        //     safelyNavigate(LoginFragmentDirections.actionLoginFragmentToCrossLoginBottomSheetDialog())
+        // }
+        //
+        // // Open Login webView when coming back from CrossLogin bottomSheet
+        // parentFragmentManager.setFragmentResultListener(
+        //     /* requestKey = */ ON_ANOTHER_ACCOUNT_CLICKED_KEY,
+        //     /* lifecycleOwner = */viewLifecycleOwner,
+        // ) { _, bundle ->
+        //     bundle.getString(ON_ANOTHER_ACCOUNT_CLICKED_KEY)?.let { openLoginWebView() }
+        // }
     }
 
     @OptIn(ExperimentalSplittiesApi::class, ExperimentalCoroutinesApi::class)
     private fun initCrossLogin() = viewLifecycleOwner.lifecycleScope.launch {
         launch { crossAppLoginViewModel.activateUpdates(requireActivity()) }
-        launch { crossAppLoginViewModel.skippedAccountIds.collect(binding.crossLoginSelection::setSkippedIds) }
-
-        binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
-        repeatWhileActive {
-            val accountsToLogin = crossAppLoginViewModel.selectedAccounts.mapLatest { accounts ->
-                val selectedCount = accounts.count()
-                SentryLog.i(TAG, "User selected $selectedCount accounts")
-                connectButtonText = when {
-                    accounts.isEmpty() -> resources.getString(RCore.string.connect)
-                    else -> resources.getQuantityString(
-                        RCrossLogin.plurals.buttonContinueWithAccounts,
-                        selectedCount,
-                        selectedCount,
-                    )
-                }
-                binding.connectButton.text = connectButtonText
-                binding.connectButton.awaitOneClick()
-                accounts
-            }.first()
-            connectButtonProgressTimer.start()
-            if (accountsToLogin.isEmpty()) {
-                binding.connectButton.updateTextColor(getCurrentOnPrimary())
-                binding.signUpButton.isEnabled = false
-                openLoginWebView()
-            } else {
-                val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
-                loginUsers(loginResult)
-                loginResult.errorMessageIds.forEach { messageResId -> showError(getString(messageResId)) }
-
-                delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
-            }
-        }
+        // launch { crossAppLoginViewModel.skippedAccountIds.collect(binding.crossLoginSelection::setSkippedIds) }
+        //
+        // binding.connectButton.initProgress(viewLifecycleOwner, getCurrentOnPrimary())
+        // repeatWhileActive {
+        //     val accountsToLogin = crossAppLoginViewModel.selectedAccounts.mapLatest { accounts ->
+        //         val selectedCount = accounts.count()
+        //         SentryLog.i(TAG, "User selected $selectedCount accounts")
+        //         connectButtonText = when {
+        //             accounts.isEmpty() -> resources.getString(RCore.string.connect)
+        //             else -> resources.getQuantityString(
+        //                 RCrossLogin.plurals.buttonContinueWithAccounts,
+        //                 selectedCount,
+        //                 selectedCount,
+        //             )
+        //         }
+        //         binding.connectButton.text = connectButtonText
+        //         binding.connectButton.awaitOneClick()
+        //         accounts
+        //     }.first()
+        //     connectButtonProgressTimer.start()
+        //     if (accountsToLogin.isEmpty()) {
+        //         binding.connectButton.updateTextColor(getCurrentOnPrimary())
+        //         binding.signUpButton.isEnabled = false
+        //         openLoginWebView()
+        //     } else {
+        //         val loginResult = crossAppLoginViewModel.attemptLogin(selectedAccounts = accountsToLogin)
+        //         loginUsers(loginResult)
+        //         loginResult.errorMessageIds.forEach { messageResId -> showError(getString(messageResId)) }
+        //
+        //         delay(1_000L) // Add some delay so the button won't blink back into its original color before leaving the Activity
+        //     }
     }
 
-    private suspend fun loginUsers(loginResult: BaseCrossAppLoginViewModel.LoginResult) = with(loginUtils) {
-        val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
-        val users = buildList {
-            results.forEach { result ->
-                when (result) {
-                    is UserLoginResult.Success -> add(result.user)
-                    is UserLoginResult.Failure -> showError(result.errorMessage)
-                }
-            }
-        }
-
-        fetchMailboxes(users).forEachIndexed { index, outcome ->
-            outcome.handleErrors(loginActivity.infomaniakLogin)
-            if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation()
-        }
-    }
+    // private suspend fun loginUsers(loginResult: BaseCrossAppLoginViewModel.LoginResult) {
+    //     with(loginUtils) {
+    //         val results = CoreLoginUtils.getLoginResultsAfterCrossApp(loginResult.tokens, requireContext(), AccountUtils)
+    //         val users = buildList {
+    //             results.forEach { result ->
+    //                 when (result) {
+    //                     is UserLoginResult.Success -> add(result.user)
+    //                     is UserLoginResult.Failure -> showError(result.errorMessage)
+    //                 }
+    //             }
+    //         }
+    // 
+    //         fetchMailboxes(users).forEachIndexed { index, outcome ->
+    //             outcome.handleErrors(loginActivity.infomaniakLogin)
+    //             if (index == fetchMailboxes(users).lastIndex) outcome.handleNavigation()
+    //         }
+    //     }
+    // }
 
     @VisibleForTesting
     fun openLoginWebView() {
@@ -280,67 +301,71 @@ class LoginFragment : Fragment() {
         loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
     }
 
-    private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-        animatePrimaryColorElements(newAccentColor, oldAccentColor)
-        animateOnPrimaryColorElements(newAccentColor, oldAccentColor)
-        animateSecondaryColorElements(newAccentColor, oldAccentColor)
+    private fun openAccountCreation() {
+        safelyNavigate(LoginFragmentDirections.actionLoginFragmentToNewAccountFragment())
     }
 
-    private fun animatePrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
-        val newPrimary = newAccentColor.getPrimary(context)
-        val oldPrimary = oldAccentColor.getPrimary(context)
-        val ripple = newAccentColor.getRipple(context)
-
-        animateColorChange(oldPrimary, newPrimary) { color ->
-            dotsIndicator.selectedDotColor = color
-            connectButton.backgroundTintList = colorStateList {
-                addForState(state = android.R.attr.state_enabled, color = color)
-                addForRemainingStates(color = requireContext().getColor(R.color.backgroundDisabledPrimaryButton))
-            }
-            nextButton.backgroundTintList = ColorStateList.valueOf(color)
-            signUpButton.setTextColor(color)
-            signUpButton.rippleColor = ColorStateList.valueOf(ripple)
-        }
-    }
-
-    private fun animateOnPrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
-        val newOnPrimary = newAccentColor.getOnPrimary(context)
-        val oldOnPrimary = oldAccentColor.getOnPrimary(context)
-
-        animateColorChange(oldOnPrimary, newOnPrimary) { color ->
-            connectButton.setTextColor(color)
-            nextButton.imageTintList = ColorStateList.valueOf(color)
-        }
-    }
-
-    private fun animateSecondaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
-        val newSecondaryBackground = newAccentColor.getOnboardingSecondaryBackground(requireContext())
-        val oldSecondaryBackground = oldAccentColor.getOnboardingSecondaryBackground(requireContext())
-
-        animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
-            binding.dummyToolbarEdgeToEdge.setBackgroundColor(color)
-        }
-    }
-
+    // private fun updateUi(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
+    //     animatePrimaryColorElements(newAccentColor, oldAccentColor)
+    //     animateOnPrimaryColorElements(newAccentColor, oldAccentColor)
+    //     animateSecondaryColorElements(newAccentColor, oldAccentColor)
+    // }
+    //
+    // private fun animatePrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
+    //     val newPrimary = newAccentColor.getPrimary(context)
+    //     val oldPrimary = oldAccentColor.getPrimary(context)
+    //     val ripple = newAccentColor.getRipple(context)
+    //
+    //     animateColorChange(oldPrimary, newPrimary) { color ->
+    //         dotsIndicator.selectedDotColor = color
+    //         connectButton.backgroundTintList = colorStateList {
+    //             addForState(state = android.R.attr.state_enabled, color = color)
+    //             addForRemainingStates(color = requireContext().getColor(R.color.backgroundDisabledPrimaryButton))
+    //         }
+    //         nextButton.backgroundTintList = ColorStateList.valueOf(color)
+    //         signUpButton.setTextColor(color)
+    //         signUpButton.rippleColor = ColorStateList.valueOf(ripple)
+    //     }
+    // }
+    //
+    // private fun animateOnPrimaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) = with(binding) {
+    //     val newOnPrimary = newAccentColor.getOnPrimary(context)
+    //     val oldOnPrimary = oldAccentColor.getOnPrimary(context)
+    //
+    //     animateColorChange(oldOnPrimary, newOnPrimary) { color ->
+    //         connectButton.setTextColor(color)
+    //         nextButton.imageTintList = ColorStateList.valueOf(color)
+    //     }
+    // }
+    //
+    // private fun animateSecondaryColorElements(newAccentColor: AccentColor, oldAccentColor: AccentColor) {
+    //     val newSecondaryBackground = newAccentColor.getOnboardingSecondaryBackground(requireContext())
+    //     val oldSecondaryBackground = oldAccentColor.getOnboardingSecondaryBackground(requireContext())
+    //
+    //     animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
+    //         binding.dummyToolbarEdgeToEdge.setBackgroundColor(color)
+    //     }
+    // }
+    //
     private fun showError(error: String) {
         showSnackbar(error)
-        resetLoginButtons()
+        // resetLoginButtons()
     }
 
     private fun resetLoginButtons() = with(binding) {
         connectButtonProgressTimer.cancel()
-        connectButton.hideProgressCatching(connectButtonText)
-        signUpButton.isEnabled = true
+        // connectButton.hideProgressCatching(connectButtonText)
+        // signUpButton.isEnabled = true
     }
-
-    private fun getViewPagerCurrentItem(): Int = binding.introViewpager.currentItem
-
-    private fun goBackAPage() {
-        binding.introViewpager.currentItem -= 1
-    }
-
+    //
+    // private fun getViewPagerCurrentItem(): Int = binding.introViewpager.currentItem
+    //
+    // private fun goBackAPage() {
+    //     binding.introViewpager.currentItem -= 1
+    // }
+    //
     private fun startProgress() {
-        binding.connectButton.showProgressCatching(getCurrentOnPrimary())
+        // binding.connectButton.showProgressCatching(getCurrentOnPrimary())
     }
 
     private fun getCurrentOnPrimary(): Int? = introViewModel.updatedAccentColor.value?.first?.getOnPrimary(requireContext())

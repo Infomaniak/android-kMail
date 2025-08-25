@@ -22,16 +22,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.login.CrossLoginBottomSheetDialog">
 
-    <com.infomaniak.core.crossapplogin.front.views.CrossLoginListAccountsView
-        android:id="@+id/crossLoginBottomSheet"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:crossLoginAvatarStrokeColor="@color/background"
-        app:crossLoginButtonStrokeColor="@color/commonColor2"
-        app:crossLoginButtonType="Mail"
-        app:crossLoginDescriptionColor="@color/secondaryTextColor"
-        app:crossLoginTitleColor="@color/primaryTextColor"
-        tools:crossLoginOnPrimaryColor="?attr/colorOnPrimary"
-        tools:crossLoginPrimaryColor="?attr/colorPrimary" />
+    <!--<com.infomaniak.core.crossapplogin.front.views.CrossLoginListAccountsView-->
+    <!--    android:id="@+id/crossLoginBottomSheet"-->
+    <!--    android:layout_width="match_parent"-->
+    <!--    android:layout_height="match_parent"-->
+    <!--    app:crossLoginAvatarStrokeColor="@color/background"-->
+    <!--    app:crossLoginButtonStrokeColor="@color/commonColor2"-->
+    <!--    app:crossLoginButtonType="Mail"-->
+    <!--    app:crossLoginDescriptionColor="@color/secondaryTextColor"-->
+    <!--    app:crossLoginTitleColor="@color/primaryTextColor"-->
+    <!--    tools:crossLoginOnPrimaryColor="?attr/colorOnPrimary"-->
+    <!--    tools:crossLoginPrimaryColor="?attr/colorPrimary" />-->
 
 </com.infomaniak.mail.views.BottomSheetScaffoldingView>

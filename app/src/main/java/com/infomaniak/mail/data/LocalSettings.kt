@@ -108,10 +108,11 @@ class LocalSettings private constructor(context: Context) : SharedValues {
         @StringRes val localisedNameRes: Int,
         @StyleRes val theme: Int,
         val introTabIndex: Int,
+        @StringRes val tabNameRes: Int = localisedNameRes,
     ) {
         PINK(R.string.accentColorPinkTitle, R.style.AppTheme_Pink, 0),
         BLUE(R.string.accentColorBlueTitle, R.style.AppTheme_Blue, 1),
-        SYSTEM(R.string.accentColorSystemTitle, R.style.AppTheme, 2);
+        SYSTEM(R.string.accentColorSystemTitle, R.style.AppTheme, 2, R.string.settingsOptionSystemTheme);
 
         fun getPrimary(context: Context): Int {
             val baseThemeContext = ContextThemeWrapper(context, theme)

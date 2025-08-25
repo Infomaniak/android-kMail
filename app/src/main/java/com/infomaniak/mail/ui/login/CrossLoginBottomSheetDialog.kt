@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.observe
@@ -50,37 +49,37 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun observeAccentColor() {
         introViewModel.updatedAccentColor.observe(viewLifecycleOwner) { (newAccentColor, _) ->
-            binding.crossLoginBottomSheet.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
-            binding.crossLoginBottomSheet.setOnPrimaryColor(newAccentColor.getOnPrimary(requireContext()))
+            // binding.crossLoginBottomSheet.setPrimaryColor(newAccentColor.getPrimary(requireContext()))
+            // binding.crossLoginBottomSheet.setOnPrimaryColor(newAccentColor.getOnPrimary(requireContext()))
         }
     }
 
     private fun observeCrossLoginAccounts() {
         crossAppLoginViewModel.availableAccounts.observe(viewLifecycleOwner) { accounts ->
-            binding.crossLoginBottomSheet.setAccounts(accounts)
+            // binding.crossLoginBottomSheet.setAccounts(accounts)
         }
     }
 
     private fun observeCrossLoginSkippedIds() {
         crossAppLoginViewModel.skippedAccountIds.observe(viewLifecycleOwner) { ids ->
-            binding.crossLoginBottomSheet.setSkippedIds(ids)
+            // binding.crossLoginBottomSheet.setSkippedIds(ids)
         }
     }
 
     private fun setCrossLoginClicksListeners() {
 
-        binding.crossLoginBottomSheet.setOnAnotherAccountClickedListener {
-            parentFragmentManager.setFragmentResult(
-                /* requestKey = */ ON_ANOTHER_ACCOUNT_CLICKED_KEY,
-                /* result = */ Bundle().apply { putString(ON_ANOTHER_ACCOUNT_CLICKED_KEY, "") },
-            )
-            findNavController().popBackStack()
-        }
+        // binding.crossLoginBottomSheet.setOnAnotherAccountClickedListener {
+        //     parentFragmentManager.setFragmentResult(
+        //         /* requestKey = */ ON_ANOTHER_ACCOUNT_CLICKED_KEY,
+        //         /* result = */ Bundle().apply { putString(ON_ANOTHER_ACCOUNT_CLICKED_KEY, "") },
+        //     )
+        //     findNavController().popBackStack()
+        // }
 
-        binding.crossLoginBottomSheet.setOnSaveClickedListener { skippedIds ->
-            crossAppLoginViewModel.skippedAccountIds.value = skippedIds
-            findNavController().popBackStack()
-        }
+        // binding.crossLoginBottomSheet.setOnSaveClickedListener { skippedIds ->
+        //     crossAppLoginViewModel.skippedAccountIds.value = skippedIds
+        //     findNavController().popBackStack()
+        // }
     }
 
     companion object {
