@@ -85,7 +85,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
     }
 
     fun setAddressBook(addressBook: AddressBook) {
-        setNameAndSubName(addressBook)
+        setAddressBookInfo(addressBook)
     }
 
     fun setContactGroup(contactGroup: ContactGroup, addressBook: AddressBook?) {
@@ -95,7 +95,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
             addressBook?.name
         }
 
-        setNameAndSubName(contactGroup, addressBookName)
+        setContactGroupInfo(contactGroup, addressBookName)
     }
 
     fun setAttendee(attendee: Attendee) = with(binding) {
@@ -103,9 +103,7 @@ class AvatarNameEmailView @JvmOverloads constructor(
         setNameAndEmail(attendee)
     }
 
-    private fun setNameAndSubName(
-        addressBook: AddressBook,
-    ) = with(binding) {
+    private fun setAddressBookInfo(addressBook: AddressBook) = with(binding) {
 
         val userNameArg = if (addressBook.isDynamicOrganisationMemberDirectory) {
             addressBook.organization
@@ -116,15 +114,11 @@ class AvatarNameEmailView @JvmOverloads constructor(
 
         userAvatar.loadTeamsUserAvatar()
 
-        val userEmailArg = if (addressBook.organization.isNotBlank()) {
-            addressBook.organization
-        } else {
-            context.getString(R.string.otherOrganisation)
-        }
+        val userEmailArg = addressBook.organization.ifBlank { context.getString(R.string.otherOrganisation) }
         userEmail.text = context.getString(R.string.organizationName, userEmailArg)
     }
 
-    private fun setNameAndSubName(
+    private fun setContactGroupInfo(
         contactGroup: ContactGroup,
         addressBookName: String? = ""
     ) = with(binding) {
