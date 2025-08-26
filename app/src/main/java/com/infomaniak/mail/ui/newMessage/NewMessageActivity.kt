@@ -44,7 +44,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
@@ -59,9 +58,6 @@ class NewMessageActivity : BaseActivity() {
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.newMessageHostFragment) as NavHostFragment).navController
     }
-
-    @Inject
-    lateinit var globalCoroutineScope: CoroutineScope
 
     @Inject
     lateinit var snackbarManager: SnackbarManager
@@ -155,7 +151,7 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun startWorker() {
-        globalCoroutineScope.launch { draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid()) }
+        lifecycleScope.launch { draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid()) }
     }
 
     data class DraftSaveConfiguration(
