@@ -7,6 +7,10 @@ on:
   pull_request:
     types: [ labeled ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
@@ -17,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5.0.0
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
@@ -25,7 +29,7 @@ jobs:
       # Link: https://httgp.com/signing-commits-in-github-actions/
       - name: Import bot's GPG key for signing commits
         id: import-gpg
-        uses: crazy-max/ghaction-import-gpg@v4
+        uses: crazy-max/ghaction-import-gpg@v6.3.0
         with:
           gpg_private_key: ${{ secrets.BOT_MOBILE_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.BOT_MOBILE_GPG_PASSPHRASE }}
@@ -50,6 +54,6 @@ jobs:
       # Link: https://github.com/marketplace/actions/actions-ecosystem-remove-labels
       - name: remove label
         if: always()
-        uses: actions-ecosystem/action-remove-labels@v1
+        uses: actions-ecosystem/action-remove-labels@v1.3.0
         with:
           labels: rebase
