@@ -1,0 +1,52 @@
+name: Validate translations
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-strings:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v5.0.0
+
+      - name: Clone Ink repository
+        uses: actions/checkout@v5.0.0
+        with:
+          repository: infomaniak/ink_utils
+          ref: main
+          submodules: true
+          path: ink_utils
+
+      - name: Set up Python
+        uses: actions/setup-python@v5.6.0
+        with:
+          python-version: '3.11'
+
+      - name: Create venv and install requirements
+        run: |
+          cd ink_utils
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create Ink config YAML
+        run: |
+          PR_PATH=$(pwd)
+          cat <<EOF > ink_utils/settings.yml
+          app:
+            global:
+              project_root: "${PR_PATH}/app"
+          EOF
+
+      - name: Run Ink translations validation
+        run: |
+          source ink_utils/venv/bin/activate
+          python ink_utils/main.py project app
+          python ink_utils/main.py loco --check --verbose
