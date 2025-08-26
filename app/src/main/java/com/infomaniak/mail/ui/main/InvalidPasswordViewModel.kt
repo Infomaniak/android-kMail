@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalSplittiesApi::class)
-
 package com.infomaniak.mail.ui.main
 
 import androidx.lifecycle.SavedStateHandle
@@ -34,8 +32,6 @@ import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import splitties.coroutines.suspendLazy
-import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,28 +44,28 @@ class InvalidPasswordViewModel @Inject constructor(
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private val mailboxObjectId inline get() = savedStateHandle.get<String>(InvalidPasswordFragmentArgs::mailboxObjectId.name)!!
-    private val mailbox = viewModelScope.suspendLazy { mailboxController.getMailbox(mailboxObjectId)!! }
+    private val mailbox = mailboxController.getMailbox(mailboxObjectId)!!
 
     val updatePasswordResult = SingleLiveEvent<Int>()
     val requestPasswordResult = SingleLiveEvent<ApiResponse<*>>()
     val detachMailboxResult = SingleLiveEvent<Int>()
 
     fun updatePassword(password: String) = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.updateMailboxPassword(mailbox().mailboxId, password)
+        val apiResponse = ApiRepository.updateMailboxPassword(mailbox.mailboxId, password)
         if (apiResponse.isSuccess()) {
             mailboxController.updateMailbox(mailboxObjectId) { it.hasValidPassword = true }
-            AccountUtils.switchToMailbox(mailbox().mailboxId)
+            AccountUtils.switchToMailbox(mailbox.mailboxId)
         } else {
             updatePasswordResult.postValue(apiResponse.translateError())
         }
     }
 
     fun requestPassword() = viewModelScope.launch(ioCoroutineContext) {
-        requestPasswordResult.postValue(ApiRepository.requestMailboxPassword(mailbox().hostingId, mailbox().mailboxName))
+        requestPasswordResult.postValue(ApiRepository.requestMailboxPassword(mailbox.hostingId, mailbox.mailboxName))
     }
 
     fun detachMailbox() = viewModelScope.launch(ioCoroutineContext) {
-        val apiResponse = ApiRepository.detachMailbox(mailbox().mailboxId)
+        val apiResponse = ApiRepository.detachMailbox(mailbox.mailboxId)
         if (apiResponse.isSuccess()) {
             AccountUtils.switchToMailbox(
                 mailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.mailboxId ?: AppSettings.DEFAULT_ID,

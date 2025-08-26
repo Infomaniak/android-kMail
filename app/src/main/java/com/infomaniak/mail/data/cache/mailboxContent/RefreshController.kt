@@ -546,7 +546,7 @@ class RefreshController @Inject constructor(
                 val upToDateFolder = getUpToDateFolder(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
 
-                return@write handleAddedMessagesBlocking(scope, upToDateFolder, messages, isConversationMode)
+                return@write handleAddedMessages(scope, upToDateFolder, messages, isConversationMode)
             }
         } ?: emptySet()
     }
@@ -638,7 +638,7 @@ class RefreshController @Inject constructor(
     //endregion
 
     //region Create Threads
-    private fun MutableRealm.handleAddedMessagesBlocking(
+    private fun MutableRealm.handleAddedMessages(
         scope: CoroutineScope,
         folder: Folder,
         remoteMessages: List<Message>,
@@ -656,7 +656,7 @@ class RefreshController @Inject constructor(
             addedMessagesUids.add(remoteMessage.shortUid)
             refreshStrategy.handleAddedMessage(scope, remoteMessage, isConversationMode, impactedThreadsManaged, realm = this)
 
-            MessageController.getMessageBlocking(remoteMessage.uid, realm = this)?.let { localMessage ->
+            MessageController.getMessage(remoteMessage.uid, realm = this)?.let { localMessage ->
                 impactedThreadsManaged.addAll(localMessage.threadsDuplicatedIn)
             }
         }

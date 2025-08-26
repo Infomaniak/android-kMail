@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalSplittiesApi::class)
-
 package com.infomaniak.mail.ui.main.settings.mailbox
 
 import android.os.Bundle
@@ -25,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeBinding
@@ -38,8 +35,6 @@ import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.realm.kotlin.ext.copyFromRealm
-import kotlinx.coroutines.launch
-import splitties.experimental.ExperimentalSplittiesApi
 
 @AndroidEntryPoint
 class SignatureSettingFragment : Fragment() {
@@ -57,7 +52,7 @@ class SignatureSettingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsColors()
 
-        viewLifecycleOwner.lifecycleScope.launch { setupAdapter(mailbox()) }
+        setupAdapter(mailbox)
 
         binding.manageSignatures.setOnClickListener {
             requireContext().openUrl(BuildConfig.MANAGE_SIGNATURES_URL)

@@ -33,7 +33,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.PlayServicesUtils
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -87,7 +86,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         // This is to avoid doing some processing when we never opened a specific Mailbox.
         val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
         FolderController.getFolder(FolderRole.INBOX, realm)?.cursor?.let {
-            if (mainApplication.isAppInBackground) runBlocking { // runBlocking is fine here, not on main thread, 20s timeout.
+            if (mainApplication.isAppInBackground) {
                 processMessageInBackground(userId, mailboxId, messageUid)
             } else {
                 processMessageInForeground(userId, mailboxId)
@@ -102,7 +101,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    private suspend fun processMessageInBackground(userId: Int, mailboxId: Int, messageUid: String) {
+    private fun processMessageInBackground(userId: Int, mailboxId: Int, messageUid: String) {
         SentryLog.i(TAG, "processMessageInBackground: called")
         mailboxController.getMailbox(userId, mailboxId)?.let { mailbox ->
             // Ignore if the Mailbox notification channel is blocked

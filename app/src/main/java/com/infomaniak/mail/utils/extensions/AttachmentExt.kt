@@ -154,7 +154,7 @@ object AttachmentExt {
 
     private suspend fun Attachment.updateLocalAttachment(draftLocalUuid: String, remoteAttachment: Attachment, realm: Realm) {
         realm.write {
-            DraftController.updateDraftBlocking(draftLocalUuid, realm = this) { draft ->
+            DraftController.updateDraft(draftLocalUuid, realm = this) { draft ->
 
                 val uuidToLocalUri = draft.attachments.map { it.uuid to it.uploadLocalUri }
                 SentryLog.d(ATTACHMENT_TAG, "When removing uploaded attachment, we found (uuids to localUris): $uuidToLocalUri")

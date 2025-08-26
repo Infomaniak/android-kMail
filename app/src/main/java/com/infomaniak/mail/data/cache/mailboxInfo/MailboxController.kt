@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
-import com.infomaniak.mail.utils.extensions.findSuspend
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -50,11 +49,11 @@ class MailboxController @Inject constructor(
 ) {
 
     //region Get data
-    fun getMailboxesBlocking(
+    fun getMailboxes(
         userId: Int? = null,
         exceptionMailboxIds: List<Int> = emptyList(),
     ): RealmResults<Mailbox> {
-        return getMailboxesBlocking(userId, mailboxInfoRealm, exceptionMailboxIds)
+        return getMailboxes(userId, mailboxInfoRealm, exceptionMailboxIds)
     }
 
     fun getMailboxesCount(userId: Int): Flow<Long> = getMailboxesCountQuery(userId, mailboxInfoRealm).asFlow()
@@ -63,19 +62,19 @@ class MailboxController @Inject constructor(
         return getMailboxesQuery(userId, mailboxInfoRealm, exceptionMailboxIds).toMailboxesFlow()
     }
 
-    suspend fun getMailbox(objectId: String): Mailbox? {
-        return getMailboxQuery(objectId, mailboxInfoRealm).findSuspend()
+    fun getMailbox(objectId: String): Mailbox? {
+        return getMailboxQuery(objectId, mailboxInfoRealm).find()
     }
 
-    suspend fun getMailbox(userId: Int, mailboxId: Int): Mailbox? {
+    fun getMailbox(userId: Int, mailboxId: Int): Mailbox? {
         return getMailbox(userId, mailboxId, mailboxInfoRealm)
     }
 
-    suspend fun getMailboxWithFallback(userId: Int, mailboxId: Int): Mailbox? {
+    fun getMailboxWithFallback(userId: Int, mailboxId: Int): Mailbox? {
         return getMailboxWithFallback(userId, mailboxId, mailboxInfoRealm)
     }
 
-    suspend fun getFirstValidMailbox(userId: Int): Mailbox? {
+    fun getFirstValidMailbox(userId: Int): Mailbox? {
         return getFirstValidMailbox(userId, mailboxInfoRealm)
     }
 
@@ -95,8 +94,8 @@ class MailboxController @Inject constructor(
         return getLockedMailboxesQuery(userId, mailboxInfoRealm).toMailboxesFlow()
     }
 
-    suspend fun getMyKSuiteMailboxCount(userId: Int): Long {
-        return getMyKSuiteMailboxesQuery(userId, mailboxInfoRealm).count().findSuspend()
+    fun getMyKSuiteMailboxCount(userId: Int): Long {
+        return getMyKSuiteMailboxesQuery(userId, mailboxInfoRealm).count().find()
     }
 
     private fun RealmQuery<Mailbox>.toMailboxesFlow() = asFlow().map { it.list }
@@ -109,7 +108,7 @@ class MailboxController @Inject constructor(
             val remoteMailboxesIds = remoteMailboxes.map { remoteMailbox ->
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-                val localMailbox = getMailboxBlocking(userId, remoteMailbox.mailboxId, realm = this)?.copyFromRealm()
+                val localMailbox = getMailbox(userId, remoteMailbox.mailboxId, realm = this)?.copyFromRealm()
 
                 SentryLog.d(RealmDatabase.TAG, "Mailboxes: Save new data")
                 remoteMailbox.initLocalValues(
@@ -134,7 +133,7 @@ class MailboxController @Inject constructor(
     }
 
     private fun MutableRealm.deleteOutdatedData(remoteMailboxesIds: List<Int>, userId: Int) {
-        val outdatedMailboxes = getMailboxesBlocking(userId, realm = this, remoteMailboxesIds)
+        val outdatedMailboxes = getMailboxes(userId, realm = this, remoteMailboxesIds)
         val isCurrentMailboxDeleted = outdatedMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
             RealmDatabase.closeMailboxContent()
@@ -145,12 +144,12 @@ class MailboxController @Inject constructor(
     }
 
     suspend fun updateMailbox(objectId: String, onUpdate: (Mailbox) -> Unit) {
-        mailboxInfoRealm.write { getMailboxBlocking(objectId, realm = this)?.let(onUpdate) }
+        mailboxInfoRealm.write { getMailbox(objectId, realm = this)?.let(onUpdate) }
     }
 
     suspend fun deleteUserMailboxes(userId: Int) {
         mailboxInfoRealm.write {
-            val mailboxes = getMailboxesBlocking(userId, realm = this)
+            val mailboxes = getMailboxes(userId, realm = this)
             appContext.deleteMailNotificationChannel(mailboxes)
             delete(mailboxes)
         }
@@ -221,7 +220,7 @@ class MailboxController @Inject constructor(
         //endregion
 
         //region Get data
-        fun getMailboxesBlocking(
+        fun getMailboxes(
             userId: Int? = null,
             realm: TypedRealm,
             exceptionMailboxIds: List<Int> = emptyList(),
@@ -229,24 +228,20 @@ class MailboxController @Inject constructor(
             return getMailboxesQuery(userId, realm, exceptionMailboxIds).find()
         }
 
-        fun getMailboxBlocking(objectId: String, realm: TypedRealm): Mailbox? {
+        fun getMailbox(objectId: String, realm: TypedRealm): Mailbox? {
             return getMailboxQuery(objectId, realm).find()
         }
 
-        suspend fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm): Mailbox? {
-            return getMailboxQuery(userId, mailboxId, realm).findSuspend()
-        }
-
-        private fun getMailboxBlocking(userId: Int, mailboxId: Int, realm: TypedRealm): Mailbox? {
+        fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm): Mailbox? {
             return getMailboxQuery(userId, mailboxId, realm).find()
         }
 
-        suspend fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm): Mailbox? {
-            return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm).findSuspend().first()
+        fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm): Mailbox? {
+            return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm).first().find()
         }
 
-        suspend fun getFirstValidMailbox(userId: Int, realm: TypedRealm): Mailbox? {
-            return getValidMailboxesQuery(userId, realm).findSuspend().first()
+        fun getFirstValidMailbox(userId: Int, realm: TypedRealm): Mailbox? {
+            return getValidMailboxesQuery(userId, realm).first().find()
         }
         //endregion
     }

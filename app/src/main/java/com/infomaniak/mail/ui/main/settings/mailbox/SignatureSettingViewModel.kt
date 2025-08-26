@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalSplittiesApi::class)
-
 package com.infomaniak.mail.ui.main.settings.mailbox
 
 import androidx.lifecycle.SavedStateHandle
@@ -36,8 +34,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import splitties.coroutines.suspendLazy
-import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
@@ -53,13 +49,13 @@ class SignatureSettingViewModel @Inject constructor(
     private val coroutineContext = viewModelScope.coroutineContext + ioDispatcher
 
     private val mailboxObjectId inline get() = savedStateHandle.get<String>(SignatureSettingFragmentArgs::mailboxObjectId.name)!!
-    val mailbox = viewModelScope.suspendLazy { mailboxController.getMailbox(mailboxObjectId)!! }
+    val mailbox = mailboxController.getMailbox(mailboxObjectId)!!
 
     val signaturesLive = signatureController.getSignaturesAsync(mailboxObjectId).asLiveData(coroutineContext)
     val showError = SingleLiveEvent<Int>() // StringRes
 
     fun setDefaultSignature(signature: Signature?) = viewModelScope.launch(ioDispatcher) {
-        with(ApiRepository.setDefaultSignature(mailbox().hostingId, mailbox().mailboxName, signature)) {
+        with(ApiRepository.setDefaultSignature(mailbox.hostingId, mailbox.mailboxName, signature)) {
             if (isSuccess()) {
                 updateSignatures()
             } else {
@@ -69,7 +65,7 @@ class SignatureSettingViewModel @Inject constructor(
     }
 
     fun updateSignatures() = viewModelScope.launch(ioDispatcher) {
-        updateSignatures(mailbox(), mailboxInfoRealm)?.also { translatedError ->
+        updateSignatures(mailbox, mailboxInfoRealm)?.also { translatedError ->
             val title = if (translatedError == 0) RCore.string.anErrorHasOccurred else translatedError
             showError.postValue(title)
         }

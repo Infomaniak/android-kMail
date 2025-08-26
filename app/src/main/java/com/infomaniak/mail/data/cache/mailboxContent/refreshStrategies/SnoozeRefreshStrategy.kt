@@ -81,13 +81,13 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
         impactedThreadsManaged: MutableSet<Thread>,
         realm: MutableRealm,
     ) {
-        val localMessage = MessageController.getMessageBlocking(remoteMessage.uid, realm)
+        val localMessage = MessageController.getMessage(remoteMessage.uid, realm)
 
         if (localMessage == null) {
             super.handleAddedMessage(scope, remoteMessage, isConversationMode, impactedThreadsManaged, realm)
         } else {
             remoteMessage.keepLocalValues(localMessage)
-            val updatedMessage = MessageController.upsertMessageBlocking(remoteMessage, realm)
+            val updatedMessage = MessageController.upsertMessage(remoteMessage, realm)
             impactedThreadsManaged += updatedMessage.threads
         }
     }

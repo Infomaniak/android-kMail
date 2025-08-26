@@ -39,7 +39,6 @@ import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.JsoupParserUtil.jsoupParseWithLog
-import com.infomaniak.mail.utils.SharedUtils.Companion.unsnoozeThreadsWithoutRefresh
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
 import com.infomaniak.mail.utils.extensions.getApiException
 import com.infomaniak.mail.utils.extensions.getFoldersIds
@@ -155,7 +154,7 @@ class SharedUtils @Inject constructor(
                 return@with if (isSuccess()) {
                     val signaturesResult = data!!
                     customRealm.write {
-                        MailboxController.getMailboxBlocking(mailbox.objectId, realm = this)?.let { mailbox ->
+                        MailboxController.getMailbox(mailbox.objectId, realm = this)?.let { mailbox ->
                             mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
                                 val defaultSignature = firstOrNull { it.id == signaturesResult.defaultSignatureId }
                                 val defaultReplySignature = firstOrNull { it.id == signaturesResult.defaultReplySignatureId }

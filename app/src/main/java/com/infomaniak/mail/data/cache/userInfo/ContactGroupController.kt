@@ -21,7 +21,6 @@ import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.di.UserInfoRealm
-import com.infomaniak.mail.utils.extensions.findSuspend
 import com.infomaniak.mail.utils.extensions.update
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
@@ -37,7 +36,7 @@ class ContactGroupController @Inject constructor(@UserInfoRealm private val user
     //endregion
 
     //region Get data
-    suspend fun getGroup() = getGroupQuery().findSuspend()
+    fun getGroup() = getGroupQuery().find()
     //endregion
 
     //region Edit data

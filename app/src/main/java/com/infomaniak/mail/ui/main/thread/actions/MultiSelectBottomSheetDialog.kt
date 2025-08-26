@@ -89,7 +89,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
 
         binding.mainActions.setClosingOnClickListener(shouldCloseMultiSelection = true) { id: Int ->
             when (id) {
-                R.id.actionMove -> viewLifecycleOwner.lifecycleScope.launch {
+                R.id.actionMove -> {
                     val navController = findNavController()
                     descriptionDialog.moveWithConfirmationPopup(
                         folderRole = folderRoleUtils.getActionFolderRole(threads),
@@ -108,7 +108,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                     trackMultiSelectActionEvent(MatomoName.MarkAsSeen, threadsCount, isFromBottomSheet = true)
                     toggleThreadsSeenStatus(threadsUids, shouldRead)
                 }
-                R.id.actionArchive -> viewLifecycleOwner.lifecycleScope.launch {
+                R.id.actionArchive -> {
                     descriptionDialog.archiveWithConfirmationPopup(
                         folderRole = folderRoleUtils.getActionFolderRole(threads),
                         count = threadsCount,
@@ -117,7 +117,7 @@ class MultiSelectBottomSheetDialog : ActionsBottomSheetDialog() {
                         archiveThreads(threadsUids)
                     }
                 }
-                R.id.actionDelete -> viewLifecycleOwner.lifecycleScope.launch {
+                R.id.actionDelete -> {
                     descriptionDialog.deleteWithConfirmationPopup(
                         folderRole = folderRoleUtils.getActionFolderRole(threads),
                         count = threadsCount,

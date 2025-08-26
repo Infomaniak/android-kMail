@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalSplittiesApi::class)
-
 package com.infomaniak.mail.ui.newMessage
 
 import androidx.core.view.isGone
@@ -30,7 +28,6 @@ import com.infomaniak.mail.utils.ExternalUtils.findExternalRecipientForNewMessag
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import dagger.hilt.android.scopes.FragmentScoped
-import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
 @FragmentScoped
@@ -55,14 +52,13 @@ class NewMessageExternalsManager @Inject constructor() : NewMessageManager() {
         _informationDialog = informationDialog
     }
 
-    suspend fun observeExternals(arrivedFromExistingDraft: Boolean) = with(newMessageViewModel) {
-        val mailbox = currentMailbox()
+    fun observeExternals(arrivedFromExistingDraft: Boolean) = with(newMessageViewModel) {
         Utils.waitInitMediator(initResult, mergedContacts).observe(viewLifecycleOwner) { (_, mergedContacts) ->
-            val shouldWarnForExternal = mailbox.externalMailFlagEnabled && !arrivedFromExistingDraft
+            val shouldWarnForExternal = currentMailbox.externalMailFlagEnabled && !arrivedFromExistingDraft
             val externalData = ExternalData(
                 emailDictionary = mergedContacts.second,
-                aliases = mailbox.aliases,
-                trustedDomains = mailbox.trustedDomains,
+                aliases = currentMailbox.aliases,
+                trustedDomains = currentMailbox.trustedDomains,
             )
 
             updateFields(shouldWarnForExternal, externalData)

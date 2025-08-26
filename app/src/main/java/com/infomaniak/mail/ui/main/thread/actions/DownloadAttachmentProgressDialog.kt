@@ -34,7 +34,7 @@ class DownloadAttachmentProgressDialog : DownloadProgressDialog() {
     private val navigationArgs: DownloadAttachmentProgressDialogArgs by navArgs()
     private val downloadAttachmentViewModel: DownloadAttachmentViewModel by viewModels()
 
-    override val dialogTitle: String by lazy { navigationArgs.attachmentName }
+    override val dialogTitle: String? by lazy { navigationArgs.attachmentName }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding.icon.isVisible = true
