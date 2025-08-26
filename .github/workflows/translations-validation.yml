@@ -43,10 +43,20 @@ jobs:
           app:
             global:
               project_root: "${PR_PATH}/app"
+          emoji:
+            global:
+              project_root: "${PR_PATH}/EmojiComponents"
           EOF
 
-      - name: Run Ink translations validation
+      - name: Run Ink validation for app
         run: |
           source ink_utils/venv/bin/activate
           python ink_utils/main.py project app
+          python ink_utils/main.py loco --check --verbose
+
+      # App specific steps
+      - name: Run Ink validation for emoji reaction module
+        run: |
+          source ink_utils/venv/bin/activate
+          python ink_utils/main.py project emoji
           python ink_utils/main.py loco --check --verbose
