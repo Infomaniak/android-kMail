@@ -25,7 +25,7 @@ android {
         applicationId = "com.infomaniak.mail"
         minSdk = appMinSdk
         targetSdk = appCompileSdk
-        versionCode = 1_16_004_02
+        versionCode = 1_16_004_03
         versionName = "1.16.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

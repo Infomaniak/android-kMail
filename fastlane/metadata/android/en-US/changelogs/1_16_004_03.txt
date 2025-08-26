@@ -1,0 +1,3 @@
+- Renamed the AI writing tool to Euria
+- Fixed a possible crash when copying and pasting an address to add a recipient if the device is in German
+- Attempted to improve notifications on Xiaomi devices

@@ -1,0 +1,3 @@
+- Renomme l'outil d'écriture IA en Euria
+- Correction d'un crash possible lors d'un copié-collé d'une adresse pour ajouter un destinataire si l'appareil est en allemand
+- Tentative d'amélioration des notifications des appareils Xiaomi
