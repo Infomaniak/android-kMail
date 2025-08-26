@@ -15,18 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalSplittiesApi::class)
-
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.extensions.goToPlayStore
 import com.infomaniak.lib.core.utils.setBackNavigationResult
@@ -34,26 +30,15 @@ import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.canSaveOnKDrive
-import kotlinx.coroutines.launch
-import splitties.coroutines.suspendLazy
-import splitties.experimental.ExperimentalSplittiesApi
 
 class DownloadMessagesProgressDialog : DownloadProgressDialog() {
     private val downloadThreadsViewModel: DownloadMessagesViewModel by viewModels()
 
-    override val dialogTitle: String = "-" // Placeholder value to ensure the dialog's title view gets created.
-
-    private val dialogTitleLazy = lifecycleScope.suspendLazy { downloadThreadsViewModel.getDialogName() }
+    override val dialogTitle: String? by lazy { downloadThreadsViewModel.getDialogName() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         observeDownload()
         super.onCreate(savedInstanceState)
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = super.onCreateDialog(savedInstanceState).also { dialog ->
-        lifecycleScope.launch {
-            dialog.setTitle(dialogTitleLazy())
-        }
     }
 
     override fun download() {

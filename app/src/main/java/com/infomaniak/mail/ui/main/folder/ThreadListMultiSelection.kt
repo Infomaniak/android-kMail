@@ -21,7 +21,6 @@ import android.transition.AutoTransition
 import android.transition.TransitionManager
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -34,15 +33,16 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.Utils.runCatchingRealm
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.deleteWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
-import kotlinx.coroutines.launch
 
 class ThreadListMultiSelection {
 
     lateinit var mainViewModel: MainViewModel
+    private lateinit var folderRoleUtils: FolderRoleUtils
     private lateinit var threadListFragment: ThreadListFragment
     lateinit var unlockSwipeActionsIfSet: () -> Unit
     lateinit var localSettings: LocalSettings
@@ -52,11 +52,13 @@ class ThreadListMultiSelection {
 
     fun initMultiSelection(
         mainViewModel: MainViewModel,
+        folderRoleUtils: FolderRoleUtils,
         threadListFragment: ThreadListFragment,
         unlockSwipeActionsIfSet: () -> Unit,
         localSettings: LocalSettings,
     ) {
         this.mainViewModel = mainViewModel
+        this.folderRoleUtils = folderRoleUtils
         this.threadListFragment = threadListFragment
         this.unlockSwipeActionsIfSet = unlockSwipeActionsIfSet
         this.localSettings = localSettings
@@ -77,9 +79,9 @@ class ThreadListMultiSelection {
                     toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionArchive -> threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
+                R.id.quickActionArchive -> {
                     threadListFragment.descriptionDialog.archiveWithConfirmationPopup(
-                        folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
+                        folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Archive, selectedThreadsCount)
@@ -92,9 +94,9 @@ class ThreadListMultiSelection {
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionDelete -> threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
+                R.id.quickActionDelete -> threadListFragment.apply {
                     threadListFragment.descriptionDialog.deleteWithConfirmationPopup(
-                        folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
+                        folderRole = folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
                     ) {
                         trackMultiSelectActionEvent(MatomoName.Delete, selectedThreadsCount)
@@ -204,12 +206,10 @@ class ThreadListMultiSelection {
             changeIcon(FAVORITE_INDEX, favoriteIcon)
 
             val isSelectionEmpty = selectedThreads.isEmpty()
-            threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
-                val isFromArchive = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
-                for (index in 0 until getButtonCount()) {
-                    val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
-                    if (shouldDisable) disable(index) else enable(index)
-                }
+            val isFromArchive = folderRoleUtils.getActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
+            for (index in 0 until getButtonCount()) {
+                val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
+                if (shouldDisable) disable(index) else enable(index)
             }
         }
     }

@@ -77,7 +77,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         threadLive.observe(viewLifecycleOwner) { thread ->
 
-            lifecycleScope.launch { folderRole = folderRoleUtils.getActionFolderRole(thread) }
+            folderRole = folderRoleUtils.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
             isFromSpam = folderRole == FolderRole.SPAM
 

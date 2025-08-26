@@ -67,8 +67,6 @@ import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.invoke
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -245,7 +243,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         )
 
         mailboxContentRealm.write {
-            val orphans = DraftController.getOrphanDraftsBlocking(realm = this)
+            val orphans = DraftController.getOrphanDrafts(realm = this)
             SentryDebug.sendOrphanDrafts(orphans)
             delete(orphans)
         }
@@ -273,14 +271,11 @@ class DraftsActionsWorker @AssistedInject constructor(
         if (errorCode == ErrorCode.SEND_LIMIT_EXCEEDED || errorCode == ErrorCode.SEND_DAILY_LIMIT_REACHED) {
             SentryLog.d(TAG, "Trying to save draft after a rate-limit error")
             mailboxContentRealm.write {
-                DraftController.updateDraftBlocking(draft.localUuid, realm = this) {
+                DraftController.updateDraft(draft.localUuid, realm = this) {
                     it.action = DraftAction.SAVE
                 }
             }
-            executeDraftAction(
-                draft = Dispatchers.IO { draftController.getDraftBlocking(draft.localUuid)!! },
-                mailboxUuid = mailbox.uuid
-            )
+            executeDraftAction(draftController.getDraft(draft.localUuid)!!, mailbox.uuid)
         }
     }.cancellable()
 
@@ -496,11 +491,11 @@ class DraftsActionsWorker @AssistedInject constructor(
         val signature = mailbox.getDefaultSignatureWithFallback()
 
         mailboxContentRealm.write {
-            DraftController.updateDraftBlocking(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
+            DraftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
         }
 
         return executeDraftAction(
-            draft = Dispatchers.IO { DraftController.getDraftBlocking(draft.localUuid, mailboxContentRealm)!! },
+            draft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!,
             mailboxUuid = mailboxUuid,
             isFirstTime = false,
         )
@@ -518,7 +513,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         private val workManager: WorkManager,
     ) {
 
-        suspend fun scheduleWork(draftLocalUuid: String? = null) {
+        fun scheduleWork(draftLocalUuid: String? = null) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (draftController.getDraftsWithActionsCount() == 0L) return

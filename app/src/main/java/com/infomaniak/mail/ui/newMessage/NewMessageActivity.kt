@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalSplittiesApi::class)
-
 package com.infomaniak.mail.ui.newMessage
 
 import android.annotation.SuppressLint
@@ -27,7 +25,6 @@ import android.webkit.WebView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.BuildConfig
@@ -44,8 +41,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -108,12 +103,12 @@ class NewMessageActivity : BaseActivity() {
         }
     }
 
-    private fun setupFeatureFlagIfMailTo() = lifecycleScope.launch {
+    private fun setupFeatureFlagIfMailTo() {
         when (intent.action) {
             Intent.ACTION_SEND,
             Intent.ACTION_SEND_MULTIPLE,
             Intent.ACTION_VIEW,
-            Intent.ACTION_SENDTO -> with(newMessageViewModel.currentMailbox()) {
+            Intent.ACTION_SENDTO -> with(newMessageViewModel.currentMailbox) {
                 aiViewModel.updateFeatureFlag(objectId, uuid)
             }
         }
@@ -143,7 +138,7 @@ class NewMessageActivity : BaseActivity() {
     }
 
     private fun startWorker() {
-        lifecycleScope.launch { draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid()) }
+        draftsActionsWorkerScheduler.scheduleWork(newMessageViewModel.draftLocalUuid())
     }
 
     data class DraftSaveConfiguration(

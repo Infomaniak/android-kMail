@@ -36,7 +36,6 @@ import com.infomaniak.mail.dataset.DummyThreads.threadSearchSnoozed
 import com.infomaniak.mail.dataset.DummyThreads.threadSnoozed
 import com.infomaniak.mail.utils.FolderRoleUtils
 import io.realm.kotlin.UpdatePolicy
-import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
@@ -56,49 +55,49 @@ class FolderRoleUtilsTest {
 
     @Test
     fun messageInbox_should_be_INBOX() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(messageInbox) }
+        val folderRole = folderRoleUtils.getActionFolderRole(messageInbox)
         assertTrue(folderRole == FolderRole.INBOX)
     }
 
     @Test
     fun threadInbox_should_be_INBOX() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadInbox) }
+        val folderRole = folderRoleUtils.getActionFolderRole(threadInbox)
         assertTrue(folderRole == FolderRole.INBOX)
     }
 
     @Test
     fun messageDraft_should_be_DRAFT() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(messageDraft) }
+        val folderRole = folderRoleUtils.getActionFolderRole(messageDraft)
         assertTrue(folderRole == FolderRole.DRAFT)
     }
 
     @Test
     fun threadDraft_should_be_DRAFT() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadDraft) }
+        val folderRole = folderRoleUtils.getActionFolderRole(threadDraft)
         assertTrue(folderRole == FolderRole.DRAFT)
     }
 
     @Test
     fun messageSnoozed_should_be_SNOOZED() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(messageSnoozed) }
+        val folderRole = folderRoleUtils.getActionFolderRole(messageSnoozed)
         assertTrue(folderRole == FolderRole.SNOOZED)
     }
 
     @Test
     fun threadSnoozed_should_be_SNOOZED() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadSnoozed) }
+        val folderRole = folderRoleUtils.getActionFolderRole(threadSnoozed)
         assertTrue(folderRole == FolderRole.SNOOZED)
     }
 
     @Test
     fun threadSearchInbox_should_be_INBOX() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadSearchInbox) }
+        val folderRole = folderRoleUtils.getActionFolderRole(threadSearchInbox)
         assertTrue(folderRole == FolderRole.INBOX)
     }
 
     @Test
     fun threadSearchSnoozed_should_be_SNOOZED() {
-        val folderRole = runBlocking { folderRoleUtils.getActionFolderRole(threadSearchSnoozed) }
+        val folderRole = folderRoleUtils.getActionFolderRole(threadSearchSnoozed)
         assertTrue(folderRole == FolderRole.SNOOZED)
     }
 
