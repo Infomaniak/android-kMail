@@ -724,7 +724,8 @@ class ThreadListFragment : TwoPaneFragment() {
             val previousThreads = threadListAdapter.dataSet.filterIsInstance<Thread>()
             var shouldPublish = false
             deletedIndices.forEach {
-                val isRemoved = mainViewModel.selectedThreads.remove(previousThreads[it])
+                val thread = previousThreads.getOrElse(it) { return@forEach }
+                val isRemoved = mainViewModel.selectedThreads.remove(thread)
                 if (isRemoved) shouldPublish = true
             }
             if (shouldPublish) publishSelectedItems()
