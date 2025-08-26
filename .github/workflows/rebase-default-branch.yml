@@ -54,6 +54,6 @@ jobs:
       # Link: https://github.com/marketplace/actions/actions-ecosystem-remove-labels
       - name: remove label
         if: always()
-        uses: actions-ecosystem/action-remove-labels@v1.3
+        uses: actions-ecosystem/action-remove-labels@v1.3.0
         with:
           labels: rebase
