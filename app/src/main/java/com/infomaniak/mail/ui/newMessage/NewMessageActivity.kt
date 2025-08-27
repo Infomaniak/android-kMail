@@ -42,7 +42,6 @@ import com.infomaniak.mail.utils.Utils.Shortcuts
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import com.infomaniak.core.R as RCore
 
 @AndroidEntryPoint
 class NewMessageActivity : BaseActivity() {
@@ -75,12 +74,6 @@ class NewMessageActivity : BaseActivity() {
             return
         }
 
-        if (newMessageViewModel.nullableCurrentMailbox == null) {
-            snackbarManager.setValue(title = getString(RCore.string.anErrorHasOccurred))
-            finish()
-            return
-        }
-
         setupSnackbar()
         setupNavController()
         setupFeatureFlagIfMailTo()
@@ -91,7 +84,6 @@ class NewMessageActivity : BaseActivity() {
             startActivity(Intent(this, LaunchActivity::class.java))
             return false
         }
-
         return true
     }
 
