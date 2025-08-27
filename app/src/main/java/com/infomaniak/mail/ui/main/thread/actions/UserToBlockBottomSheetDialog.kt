@@ -42,7 +42,7 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
 
         junkMessagesViewModel.potentialBlockedUsers.value?.let { potentialBlockedUsers ->
             if (potentialBlockedUsers.values.isNotEmpty()) {
-                val messagesToRecipients = potentialBlockedUsers.map { (key, value) -> value to key }
+                val messagesToRecipients = potentialBlockedUsers.map { (key, value) -> key to value }
                 binding.recipients.adapter = UserToBlockAdapter(messagesToRecipients) { message ->
                     junkMessagesViewModel.messageOfUserToBlock.value = message
                     dismiss()
