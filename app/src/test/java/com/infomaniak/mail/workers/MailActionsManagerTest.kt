@@ -93,6 +93,8 @@ class MailActionsManagerTest {
                 }
             }
         }
+        
+        assert(false)
     }
 
     @Test
