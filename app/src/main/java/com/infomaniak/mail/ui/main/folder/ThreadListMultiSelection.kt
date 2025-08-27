@@ -77,7 +77,7 @@ class ThreadListMultiSelection {
                     toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionArchive -> threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
+                R.id.quickActionArchive -> threadListFragment.lifecycleScope.launch {
                     threadListFragment.descriptionDialog.archiveWithConfirmationPopup(
                         folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
@@ -92,7 +92,7 @@ class ThreadListMultiSelection {
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionDelete -> threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
+                R.id.quickActionDelete -> threadListFragment.lifecycleScope.launch {
                     threadListFragment.descriptionDialog.deleteWithConfirmationPopup(
                         folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
@@ -204,7 +204,7 @@ class ThreadListMultiSelection {
             changeIcon(FAVORITE_INDEX, favoriteIcon)
 
             val isSelectionEmpty = selectedThreads.isEmpty()
-            threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
+            threadListFragment.lifecycleScope.launch {
                 val isFromArchive = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads) == FolderRole.ARCHIVE
                 for (index in 0 until getButtonCount()) {
                     val shouldDisable = isSelectionEmpty || (isFromArchive && index == ARCHIVE_INDEX)
