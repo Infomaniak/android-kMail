@@ -205,8 +205,7 @@ class NewMessageViewModel @Inject constructor(
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
 
-    val nullableCurrentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) }
-    val currentMailbox by lazy { nullableCurrentMailbox!! }
+    val currentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
