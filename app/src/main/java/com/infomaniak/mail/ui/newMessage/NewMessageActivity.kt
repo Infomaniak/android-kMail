@@ -79,6 +79,13 @@ class NewMessageActivity : BaseActivity() {
             return
         }
 
+        lifecycleScope.launch {
+            // This awaits indefinitely until the currentMailbox in the viewModel is null.
+            // If this is the case, we quit the activity
+            newMessageViewModel.awaitNoMailboxSignal()
+            finish()
+        }
+
         setupSnackbar()
         setupNavController()
         setupFeatureFlagIfMailTo()
@@ -89,6 +96,7 @@ class NewMessageActivity : BaseActivity() {
             startActivity(Intent(this, LaunchActivity::class.java))
             return false
         }
+
         return true
     }
 
