@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalSplittiesApi::class)
+
 package com.infomaniak.mail.ui.main.menuDrawer
 
 import androidx.lifecycle.LiveData
@@ -30,6 +32,8 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import splitties.coroutines.suspendLazy
+import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,13 +44,15 @@ class RestoreEmailsViewModel @Inject constructor(
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    private val mailbox = viewModelScope.suspendLazy {
+        mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
+    }
 
     fun getBackups(): LiveData<ApiResponse<BackupResult>> = liveData(ioCoroutineContext) {
-        emit(ApiRepository.getBackups(mailbox.hostingId, mailbox.mailboxName))
+        emit(with(mailbox()) { ApiRepository.getBackups(hostingId, mailboxName) })
     }
 
     fun restoreEmails(date: String): LiveData<ApiResponse<Boolean>> = liveData(ioCoroutineContext) {
-        emit(ApiRepository.restoreBackup(mailbox.hostingId, mailbox.mailboxName, date))
+        emit(with(mailbox()) { ApiRepository.restoreBackup(hostingId, mailboxName, date) })
     }
 }
