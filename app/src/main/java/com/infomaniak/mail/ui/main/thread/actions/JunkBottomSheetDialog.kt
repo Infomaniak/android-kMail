@@ -31,6 +31,7 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -44,12 +45,8 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     private var binding: BottomSheetJunkBinding by safeBinding()
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
 
-    private var messagesOfUserToBlock: List<Message> = emptyList()
-
     override val mainViewModel: MainViewModel by activityViewModels()
-
-    private var messagesUids: List<String> = emptyList()
-    private var threadsUids: List<String> = emptyList()
+    private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
@@ -61,8 +58,7 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        messagesUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.messageUid }
-        threadsUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
+        junkMessagesViewModel.threadsUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
 
         val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
@@ -71,13 +67,14 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             setTitle(spamText)
         }
 
-        mainViewModel.getMessages(messagesUids).observe(viewLifecycleOwner) { messages ->
-            messagesOfUserToBlock = messages
-            handleButtons(threadsUids, messages)
+        junkMessagesViewModel.junkMessages.observe(viewLifecycleOwner) { junkMessages ->
+            handleButtons(junkMessagesViewModel.threadsUids, junkMessages)
+        }
+        junkMessagesViewModel.potentialBlockedUsers.observe(viewLifecycleOwner) { potentialUsersToBlock ->
+            manageBlockUserUi(potentialUsersToBlock)
         }
 
         observeReportPhishingResult()
-        observeHasMoreThanOneExpeditor(threadsUids)
     }
 
     private fun getSpamIconAndText(isFromSpam: Boolean): Pair<Int, Int> {
@@ -91,28 +88,25 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    private fun observeHasMoreThanOneExpeditor(threadsUids: List<String>) {
-        mainViewModel.expeditorsWhoAreNotMeCount(threadsUids).observe(viewLifecycleOwner) { expeditorsCount ->
-            if (expeditorsCount == 0) {
-                binding.blockSender.isGone = true
-                return@observe
-            }
+    private fun manageBlockUserUi(potentialUsersToBlock: Map<Recipient, Message>) {
+        val expeditorsCount = potentialUsersToBlock.count()
+        if (expeditorsCount == 0) {
+            binding.blockSender.isGone = true
+            return
+        }
 
-            binding.blockSender.setClosingOnClickListener {
-                trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
-                if (expeditorsCount > 1) {
-                    safeNavigate(
-                        resId = R.id.userToBlockBottomSheetDialog,
-                        args = UserToBlockBottomSheetDialogArgs(threadsUids.toTypedArray()).toBundle(),
-                        currentClassName = JunkBottomSheetDialog::class.java.name,
-                    )
-                } else {
-                    if (messagesOfUserToBlock.isNotEmpty()) {
-                        mainViewModel.messagesOfUserToBlock.value = messagesOfUserToBlock
-                    }
-                }
-                mainViewModel.isMultiSelectOn = false
+        binding.blockSender.setClosingOnClickListener {
+            trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
+            if (expeditorsCount > 1) {
+                safeNavigate(
+                    resId = R.id.userToBlockBottomSheetDialog,
+                    args = UserToBlockBottomSheetDialogArgs(junkMessagesViewModel.threadsUids.toTypedArray()).toBundle(),
+                    currentClassName = JunkBottomSheetDialog::class.java.name,
+                )
+            } else {
+                junkMessagesViewModel.messageOfUserToBlock.value = potentialUsersToBlock.values.firstOrNull()
             }
+            mainViewModel.isMultiSelectOn = false
         }
     }
 
