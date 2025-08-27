@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 
 class UserToBlockAdapter(
-    private val messagesToRecipients: List<Pair<Message, Recipient>>,
+    private val messagesToRecipients: List<Pair<Recipient, Message>>,
     private val onClickListener: (Message) -> Unit,
 ) : Adapter<ContactViewHolder>() {
 
@@ -43,10 +43,11 @@ class UserToBlockAdapter(
     override fun getItemCount() = messagesToRecipients.count()
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
-        contactDetails.setCorrespondent(messagesToRecipients[position].second)
+        val (recipient, message) = messagesToRecipients[position]
+        contactDetails.setCorrespondent(recipient)
         root.setOnClickListener {
             trackBlockUserAction(MatomoName.SelectUser)
-            onClickListener(messagesToRecipients[position].first)
+            onClickListener(message)
         }
     }
 }
