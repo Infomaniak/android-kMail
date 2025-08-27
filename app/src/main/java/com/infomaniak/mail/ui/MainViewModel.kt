@@ -180,7 +180,6 @@ class MainViewModel @Inject constructor(
     val reportPhishingTrigger = SingleLiveEvent<Unit>()
     val reportDisplayProblemTrigger = SingleLiveEvent<Unit>()
     val canInstallUpdate = MutableLiveData(false)
-    val messagesOfUserToBlock = SingleLiveEvent<List<Message>>()
 
     val autoAdvanceThreadsUids = SingleLiveEvent<List<String>>()
 
@@ -1557,24 +1556,6 @@ class MainViewModel @Inject constructor(
 
     fun getMessages(messagesUids: List<String>): LiveData<List<Message>> = liveData(ioCoroutineContext) {
         emit(messageController.getMessages(messagesUids))
-    }
-
-    fun expeditorsWhoAreNotMeCount(threadUids: List<String>) = liveData(ioCoroutineContext) {
-        val numberOfExpeditors = threadController.getThreads(threadUids)
-            .flatMapTo(mutableSetOf()) { it.from }.count { !it.isMe() }
-        emit(numberOfExpeditors)
-    }
-
-    fun getMessagesFromUniqueExpeditors(threadUids: List<String>) = liveData(ioCoroutineContext) {
-        val messageToRecipient = mutableListOf<Pair<Message, Recipient>>()
-        threadController.getThreads(threadUids).forEach { thread ->
-            thread.messages.distinctBy { it.from }.flatMapTo(mutableSetOf()) { message ->
-                message.from.filterNot { it.isMe() }.mapTo(mutableSetOf()) { from ->
-                    messageToRecipient.add(message to from)
-                }
-            }
-        }
-        emit(messageToRecipient)
     }
 
     fun selectOrUnselectAll() {

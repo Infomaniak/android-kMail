@@ -96,6 +96,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
 import com.infomaniak.mail.ui.main.thread.actions.JunkBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.Companion.DIALOG_SHEET_MULTI_JUNK
 import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.JunkThreads
@@ -197,6 +198,7 @@ class ThreadFragment : Fragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
@@ -256,18 +258,12 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessageOfUserToBlock() = with(confirmationToBlockUserDialog) {
-        mainViewModel.messagesOfUserToBlock.observe(viewLifecycleOwner) {
-            setPositiveButtonCallback { messagesOfUserToBlock ->
+        junkMessagesViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) { messageOfUserToBlock ->
+            setPositiveButtonCallback { message ->
                 trackBlockUserAction(MatomoName.ConfirmSelectedUser)
-                // .firstOrNull() because we block one person at a time
-                messagesOfUserToBlock.firstOrNull()?.let { message ->
-                    mainViewModel.blockUser(
-                        message.folderId,
-                        message.shortUid
-                    )
-                }
+                // mainViewModel.blockUser(message.folderId, message.shortUid)
             }
-            show(it)
+            show(messageOfUserToBlock)
         }
     }
 

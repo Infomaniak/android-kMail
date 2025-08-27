@@ -17,45 +17,37 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetUserToBlockBinding
 import com.infomaniak.mail.ui.MainViewModel
 
 class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private var binding: BottomSheetUserToBlockBinding by safeBinding()
-    private val navigationArgs: UserToBlockBottomSheetDialogArgs by navArgs()
-
-    private val messagesOfUserToBlock: MutableList<Message> = mutableListOf()
 
     override val mainViewModel: MainViewModel by activityViewModels()
+    private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetUserToBlockBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainViewModel.getMessagesFromUniqueExpeditors(threadUids.asList()).observe(viewLifecycleOwner) { messages ->
-            if (messages.isNotEmpty()) {
-                binding.recipients.adapter = UserToBlockAdapter(messages) { message ->
-                    messagesOfUserToBlock.add(message)
+
+        junkMessagesViewModel.potentialBlockedUsers.value?.let { potentialBlockedUsers ->
+            if (potentialBlockedUsers.values.isNotEmpty()) {
+                val messagesToRecipients = potentialBlockedUsers.map { (key, value) -> value to key }
+                binding.recipients.adapter = UserToBlockAdapter(messagesToRecipients) { message ->
+                    junkMessagesViewModel.messageOfUserToBlock.value = message
                     dismiss()
                 }
             }
         }
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        if (messagesOfUserToBlock.isNotEmpty()) mainViewModel.messagesOfUserToBlock.value = messagesOfUserToBlock
     }
 }
