@@ -39,14 +39,14 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         DialogConfirmationToBlockUserBinding.inflate(activity.layoutInflater)
     }
 
-    private var onPositiveButtonClick: ((List<Message>) -> Unit)? = null
-    private var messagesOfUserToBlock: List<Message> = emptyList()
+    private var onPositiveButtonClick: ((Message) -> Unit)? = null
+    private var messageOfUserToBlock: Message? = null
 
     override val alertDialog: AlertDialog = with(binding) {
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm) { _, _ ->
-                onPositiveButtonClick?.invoke(messagesOfUserToBlock)
+                messageOfUserToBlock?.let { message -> onPositiveButtonClick?.invoke(message) }
             }
             .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
@@ -56,19 +56,17 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         onPositiveButtonClick = null
     }
 
-    fun show(messages: List<Message>) = with(binding) {
-        messagesOfUserToBlock = messages
-        val recipient = messages.firstOrNull()?.from[0]
-        recipient?.let {
-            val title = recipient.name.ifBlank { recipient.email }
-            blockExpeditorTitle.text = activityContext.getString(R.string.blockExpeditorTitle, title)
-            blockExpeditorDescription.text =
-                activityContext.getString(R.string.confirmationToBlockAnExpeditorText, recipient.email)
-            alertDialog.show()
-        } ?: alertDialog.dismiss()
+    fun show(message: Message) = with(binding) {
+        messageOfUserToBlock = message
+        val recipient = message.from[0]
+        val title = recipient.name.ifBlank { recipient.email }
+        blockExpeditorTitle.text = activityContext.getString(R.string.blockExpeditorTitle, title)
+        blockExpeditorDescription.text =
+            activityContext.getString(R.string.confirmationToBlockAnExpeditorText, recipient.email)
+        alertDialog.show()
     }
 
-    fun setPositiveButtonCallback(onPositiveButtonClick: (List<Message>) -> Unit) {
+    fun setPositiveButtonCallback(onPositiveButtonClick: (Message) -> Unit) {
         this.onPositiveButtonClick = onPositiveButtonClick
     }
 }
