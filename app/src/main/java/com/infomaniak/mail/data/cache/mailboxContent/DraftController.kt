@@ -102,6 +102,10 @@ class DraftController @Inject constructor(
             return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
         }
 
+        suspend fun getDraft(localUuid: String, realm: TypedRealm): Draft? {
+            return getDraftQuery(Draft::localUuid.name, localUuid, realm).findSuspend()
+        }
+
         suspend fun getDraftsWithActionsCount(realm: TypedRealm): Long {
             return getDraftsWithActionsQuery(realm).count().findSuspend()
         }

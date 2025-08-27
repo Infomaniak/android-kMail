@@ -38,9 +38,9 @@ suspend fun uploadAttachmentsWithMutex(
     mailbox: Mailbox,
     realm: Realm,
 ): Draft = attachmentsUploadMutex.withLock {
-    val draft = DraftController.getDraftBlocking(localUuid, realm)!!
+    val draft = DraftController.getDraft(localUuid, realm)!!
     draft.uploadAttachments(mailbox, realm)
-    val updatedDraft = DraftController.getDraftBlocking(localUuid, realm)!!
+    val updatedDraft = DraftController.getDraft(localUuid, realm)!!
     return@withLock updatedDraft
 }
 
