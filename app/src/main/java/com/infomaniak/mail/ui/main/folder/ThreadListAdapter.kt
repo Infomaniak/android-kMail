@@ -52,6 +52,7 @@ import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
@@ -85,6 +86,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
+import splitties.init.appCtx
 import javax.inject.Inject
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
@@ -236,11 +238,14 @@ class ThreadListAdapter @Inject constructor(
             // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
             //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
             callbacks?.deleteThreadInRealm?.invoke(thread.uid)
-            SentryDebug.sendEmptyThread(
-                thread = thread,
-                message = "No Message in the Thread when displaying it in ThreadList",
-                realm = mailboxContentRealm(),
-            )
+            val mainApp = appCtx as MainApplication
+            mainApp.globalCoroutineScope.launch(mainApp.ioDispatcher) {
+                SentryDebug.sendEmptyThreadBlocking(
+                    thread = thread,
+                    message = "No Message in the Thread when displaying it in ThreadList",
+                    realm = mailboxContentRealm(),
+                )
+            }
             return
         }
 

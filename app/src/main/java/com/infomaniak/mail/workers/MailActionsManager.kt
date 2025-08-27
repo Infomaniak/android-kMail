@@ -58,6 +58,8 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -195,7 +197,7 @@ class MailActionsManager(
         )
 
         mailboxContentRealm.write {
-            val orphans = DraftController.getOrphanDrafts(realm = this)
+            val orphans = DraftController.getOrphanDraftsBlocking(realm = this)
             SentryDebug.sendOrphanDrafts(orphans)
             delete(orphans)
         }
@@ -296,11 +298,14 @@ class MailActionsManager(
         if (errorCode == ErrorCode.SEND_LIMIT_EXCEEDED || errorCode == ErrorCode.SEND_DAILY_LIMIT_REACHED) {
             SentryLog.d(TAG, "Trying to save draft after a rate-limit error")
             mailboxContentRealm.write {
-                DraftController.updateDraft(draft.localUuid, realm = this) {
+                DraftController.updateDraftBlocking(draft.localUuid, realm = this) {
                     it.action = DraftAction.SAVE
                 }
             }
-            executeDraftAction(draftController.getDraft(draft.localUuid)!!, mailbox.uuid)
+            executeDraftAction(
+                draft = Dispatchers.IO { draftController.getDraftBlocking(draft.localUuid)!! },
+                mailboxUuid = mailbox.uuid,
+            )
         }
     }.cancellable()
 
@@ -447,11 +452,11 @@ class MailActionsManager(
         val signature = mailbox.getDefaultSignatureWithFallback()
 
         mailboxContentRealm.write {
-            DraftController.updateDraft(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
+            DraftController.updateDraftBlocking(draft.localUuid, realm = this) { it.identityId = signature.id.toString() }
         }
 
         return executeDraftAction(
-            draft = DraftController.getDraft(draft.localUuid, mailboxContentRealm)!!,
+            draft = Dispatchers.IO { DraftController.getDraftBlocking(draft.localUuid, mailboxContentRealm)!! },
             mailboxUuid = mailboxUuid,
             isFirstTime = false,
         )

@@ -171,7 +171,6 @@ class ThreadListFragment : TwoPaneFragment() {
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
-            folderRoleUtils = folderRoleUtils,
             threadListFragment = this,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
