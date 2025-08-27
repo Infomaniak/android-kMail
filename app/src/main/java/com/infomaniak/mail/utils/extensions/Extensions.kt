@@ -330,7 +330,7 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 //endregion
 
 //region Folders
-fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
+suspend fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
     dismissHiddenChildren: Boolean = false,
     shouldFilterOutFolderWithRole: Boolean = false,
 ): List<Folder> {
@@ -359,7 +359,7 @@ fun shouldThisFolderBeAdded(folder: Folder, shouldFilterOutFolderWithRole: Boole
     }
 }
 
-fun actionForFolder(
+suspend fun actionForFolder(
     isManaged: Boolean,
     folder: Folder,
     shouldFilterOutFolderWithRole: Boolean,
@@ -375,7 +375,7 @@ fun actionForFolder(
     if (isManaged) {
         with(folder.children) {
             val folderChildrenQuery = if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()
-            return folderChildrenQuery.sortFolders().find()
+            return folderChildrenQuery.sortFolders().findSuspend()
         }
     }
 
@@ -383,7 +383,7 @@ fun actionForFolder(
     return folderChildren.sortFolders()
 }
 
-private tailrec fun formatFolderWithAllChildren(
+private tailrec suspend fun formatFolderWithAllChildren(
     dismissHiddenChildren: Boolean,
     inputList: MutableList<Folder>,
     outputList: MutableList<Folder> = mutableListOf(),
@@ -707,7 +707,7 @@ fun Context.getFolderCreationError(folderName: CharSequence, folderController: F
     return when {
         folderName.length > 255 -> getString(R.string.errorNewFolderNameTooLong)
         folderName.contains(invalidCharactersRegex) -> getString(R.string.errorNewFolderInvalidCharacter)
-        folderController.getRootFolder(folderName.toString()) != null -> getString(R.string.errorNewFolderAlreadyExists)
+        folderController.getRootFolderBlocking(folderName.toString()) != null -> getString(R.string.errorNewFolderAlreadyExists)
         else -> null
     }
 }

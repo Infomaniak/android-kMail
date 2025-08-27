@@ -163,7 +163,7 @@ class NotificationUtils @Inject constructor(
         )
     }
 
-    fun showMessageNotification(
+    suspend fun showMessageNotification(
         scope: CoroutineScope = globalCoroutineScope,
         notificationManagerCompat: NotificationManagerCompat,
         payload: NotificationPayload,

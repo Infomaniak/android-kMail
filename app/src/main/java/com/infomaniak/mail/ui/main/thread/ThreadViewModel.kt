@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalSplittiesApi::class)
+
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
@@ -97,6 +99,8 @@ import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import splitties.coroutines.suspendLazy
+import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
 typealias ThreadAdapterItems = List<Any>
@@ -122,7 +126,9 @@ class ThreadViewModel @Inject constructor(
     private var fetchMessagesJob: Job? = null
     private var fetchCalendarEventJob: Job? = null
 
-    private val mailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    private val mailbox = viewModelScope.suspendLazy {
+        mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
+    }
 
     private val currentMailboxFlow = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -358,7 +364,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
-        sharedUtils.markAsSeen(mailbox, listOf(thread))
+        sharedUtils.markAsSeen(mailbox(), listOf(thread))
     }
 
     private fun sendMatomoAndSentryAboutThreadMessagesCount(thread: Thread, featureFlags: Mailbox.FeatureFlagSet) {
@@ -368,7 +374,9 @@ class ThreadViewModel @Inject constructor(
         trackUserInfo(MatomoName.NbMessagesInThread, nbMessages)
 
         when (nbMessages) {
-            0 -> SentryDebug.sendEmptyThread(thread, "No Message in the Thread when opening it", mailboxContentRealm())
+            0 -> viewModelScope.launch(ioDispatcher) {
+                SentryDebug.sendEmptyThreadBlocking(thread, "No Message in the Thread when opening it", mailboxContentRealm())
+            }
             1 -> trackUserInfo(MatomoName.OneMessagesInThread)
             else -> trackUserInfo(MatomoName.MultipleMessagesInThread, nbMessages)
         }
@@ -453,7 +461,7 @@ class ThreadViewModel @Inject constructor(
 
             mailboxContentRealm().write {
                 results.forEach { (message, apiResponse) ->
-                    updateCalendarEvent(message, apiResponse)
+                    updateCalendarEventBlocking(message, apiResponse)
                 }
             }
         }
@@ -478,7 +486,7 @@ class ThreadViewModel @Inject constructor(
         return message to apiResponse
     }
 
-    private fun MutableRealm.updateCalendarEvent(message: Message, apiResponse: ApiResponse<CalendarEventResponse>) {
+    private fun MutableRealm.updateCalendarEventBlocking(message: Message, apiResponse: ApiResponse<CalendarEventResponse>) {
 
         if (!apiResponse.isSuccess()) {
             Sentry.captureMessage("Failed loading calendar event") { scope ->
@@ -489,7 +497,7 @@ class ThreadViewModel @Inject constructor(
             return
         }
 
-        MessageController.updateMessage(message.uid, realm = this) { localMessage ->
+        MessageController.updateMessageBlocking(message.uid, realm = this) { localMessage ->
             val calendarEventResponse = apiResponse.data!!
             localMessage?.let {
                 it.latestCalendarEventResponse = calendarEventResponse
@@ -578,7 +586,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    private fun <E : Any> List<E>.toUiMessages(
+    private suspend fun <E : Any> List<E>.toUiMessages(
         fakeReactions: Map<String, Set<String>>,
         isReactionsAvailable: Boolean,
     ): List<Any> = map { item ->
@@ -591,7 +599,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    private fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {
+    private suspend fun RealmList<EmojiReactionState>.toFakedReactions(localReactions: Set<String>): Map<String, EmojiReactionStateUi> {
         val fakeReactions = mutableMapOf<String, EmojiReactionStateUi>()
 
         // Fake emojis that are already found on the message's reactions
@@ -613,7 +621,7 @@ class ThreadViewModel @Inject constructor(
         return fakeReactions
     }
 
-    private fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
+    private suspend fun fakeEmojiReactionState(state: EmojiReactionState, localReactions: Set<String>): EmojiReactionStateUi {
         val shouldFake = state.emoji in localReactions && !state.hasReacted
 
         val authors = state.authors.mapNotNullTo(mutableListOf<EmojiReactionAuthorUi>()) { author ->

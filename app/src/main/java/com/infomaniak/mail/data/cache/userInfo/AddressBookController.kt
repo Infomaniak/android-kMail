@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.di.UserInfoRealm
+import com.infomaniak.mail.utils.extensions.findSuspend
 import com.infomaniak.mail.utils.extensions.update
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
@@ -47,9 +48,9 @@ class AddressBookController @Inject constructor(@UserInfoRealm private val userI
     //endregion
 
     //region Get data
-    fun getDefaultAddressBook() = getDefaultAddressBookQuery().find()!!
+    suspend fun getDefaultAddressBook() = getDefaultAddressBookQuery().findSuspend()!!
 
-    fun getAllAddressBook() = getAllAddressBookQuery().find()
+    suspend fun getAllAddressBook() = getAllAddressBookQuery().findSuspend()
 
     fun getAddressBookWithGroup(contactGroup: ContactGroup) = getAddressBookWithGroupQuery(contactGroup).find()
     //endregion

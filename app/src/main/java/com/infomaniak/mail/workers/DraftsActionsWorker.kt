@@ -123,7 +123,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         private val workManager: WorkManager,
     ) {
 
-        fun scheduleWork(draftLocalUuid: String? = null) {
+        suspend fun scheduleWork(draftLocalUuid: String? = null) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (draftController.getDraftsWithActionsCount() == 0L) return

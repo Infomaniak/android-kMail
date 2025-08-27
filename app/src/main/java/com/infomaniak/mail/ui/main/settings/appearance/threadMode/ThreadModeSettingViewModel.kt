@@ -38,7 +38,7 @@ class ThreadModeSettingViewModel @Inject constructor(
 
         RealmDatabase.closeMailboxContent()
 
-        mailboxController.getMailboxes().forEach { mailbox ->
+        mailboxController.getMailboxesBlocking().forEach { mailbox ->
             RealmDatabase.deleteMailboxContent(mailbox.mailboxId, mailbox.userId)
         }
 

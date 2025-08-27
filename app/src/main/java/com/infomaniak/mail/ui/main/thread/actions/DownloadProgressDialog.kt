@@ -35,7 +35,7 @@ abstract class DownloadProgressDialog : DialogFragment() {
     protected val binding by lazy { DialogDownloadProgressBinding.inflate(layoutInflater) }
     protected val mainViewModel: MainViewModel by activityViewModels()
 
-    abstract val dialogTitle: String?
+    abstract val dialogTitle: String
 
     protected abstract fun download()
 
