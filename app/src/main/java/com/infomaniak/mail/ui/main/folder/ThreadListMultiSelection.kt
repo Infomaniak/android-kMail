@@ -77,7 +77,7 @@ class ThreadListMultiSelection {
                     toggleThreadsSeenStatus(selectedThreadsUids, shouldMultiselectRead)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionArchive -> threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
+                R.id.quickActionArchive -> threadListFragment.lifecycleScope.launch {
                     threadListFragment.descriptionDialog.archiveWithConfirmationPopup(
                         folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
@@ -92,7 +92,7 @@ class ThreadListMultiSelection {
                     toggleThreadsFavoriteStatus(selectedThreadsUids, shouldMultiselectFavorite)
                     isMultiSelectOn = false
                 }
-                R.id.quickActionDelete -> threadListFragment.viewLifecycleOwner.lifecycleScope.launch {
+                R.id.quickActionDelete -> threadListFragment.lifecycleScope.launch {
                     threadListFragment.descriptionDialog.deleteWithConfirmationPopup(
                         folderRole = threadListFragment.folderRoleUtils.getActionFolderRole(selectedThreads),
                         count = selectedThreadsCount,
