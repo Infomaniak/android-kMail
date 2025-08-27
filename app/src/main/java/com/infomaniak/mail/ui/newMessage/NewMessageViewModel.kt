@@ -106,10 +106,12 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
+import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -211,7 +213,26 @@ class NewMessageViewModel @Inject constructor(
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
 
-    val currentMailbox = viewModelScope.suspendLazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    //region Check mailbox existence
+    private val exitSignal: CompletableJob = Job()
+
+    val currentMailbox = viewModelScope.suspendLazy {
+        val mailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+
+        if (mailbox == null) {
+            exitSignal.complete()
+            awaitCancellation()
+        }
+
+        mailbox
+    }
+
+    // ------------- !IMPORTANT! -------------
+    /** Always call this before the first access to currentMailbox, otherwise the NewMessageActivity will just await indefinitely
+     * in the cases where `mailboxController.getMailbox` returns null
+     */
+    suspend fun awaitNoMailboxSignal() = exitSignal.join()
+    //endregion
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
