@@ -45,7 +45,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     override fun shouldHideEmptyFolder(): Boolean = false
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
-        return MessageController.getMessage(shortUid.toLongUid(folderId), realm)
+        return MessageController.getMessageBlocking(shortUid.toLongUid(folderId), realm)
     }
 
     override fun processDeletedMessage(
@@ -55,7 +55,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         mailbox: Mailbox,
         realm: MutableRealm,
     ) {
-        MessageController.deleteMessage(context, mailbox, managedMessage, realm)
+        MessageController.deleteMessageBlocking(context, mailbox, managedMessage, realm)
     }
 
     override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {

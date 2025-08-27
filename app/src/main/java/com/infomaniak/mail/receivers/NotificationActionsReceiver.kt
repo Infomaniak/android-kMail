@@ -130,10 +130,12 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
 
-        notificationUtils.showMessageNotification(
-            notificationManagerCompat = notificationManagerCompat,
-            payload = payload.apply { behavior = null },
-        )
+        globalCoroutineScope.launch {
+            notificationUtils.showMessageNotification(
+                notificationManagerCompat = notificationManagerCompat,
+                payload = payload.apply { behavior = null },
+            )
+        }
     }
 
     private fun executeAction(
@@ -144,15 +146,17 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         payload: NotificationPayload,
     ) = with(payload) {
 
-        notificationUtils.showMessageNotification(
-            notificationManagerCompat = notificationManagerCompat,
-            payload = payload.apply {
-                behavior = NotificationBehavior(
-                    type = NotificationType.UNDO,
-                    behaviorTitle = context.getString(undoNotificationTitle),
-                )
-            },
-        )
+        globalCoroutineScope.launch {
+            notificationUtils.showMessageNotification(
+                notificationManagerCompat = notificationManagerCompat,
+                payload = payload.apply {
+                    behavior = NotificationBehavior(
+                        type = NotificationType.UNDO,
+                        behaviorTitle = context.getString(undoNotificationTitle),
+                    )
+                },
+            )
+        }
 
         val job = globalCoroutineScope.launch(ioDispatcher) {
 
@@ -165,7 +169,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
             val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@launch
             val messages = sharedUtils.getMessagesToMove(threads, message)
-            val destinationFolder = folderController.getFolder(folderRole) ?: return@launch
+            val destinationFolder = folderController.getFolderBlocking(folderRole) ?: return@launch
             val okHttpClient = AccountUtils.getHttpClient(userId)
 
             trackNotificationActionEvent(matomoName)
