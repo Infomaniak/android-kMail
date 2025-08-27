@@ -128,6 +128,7 @@ import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.ALL_EMOJI_SENT_STATUS
 import com.infomaniak.mail.workers.DraftsActionsWorker.Companion.EMOJI_SENT_STATUS
+import com.infomaniak.mail.workers.MailActionsManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -671,7 +672,7 @@ class ThreadFragment : Fragment() {
             runningWorkInfoLiveData.observe(viewLifecycleOwner) {
                 it.forEach { workInfo ->
                     val emojiSendResult = workInfo.progress
-                        .getSerializable<DraftsActionsWorker.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
+                        .getSerializable<MailActionsManager.EmojiSendResult>(EMOJI_SENT_STATUS) ?: return@forEach
 
                     undoFakeEmojiReplyIfNeeded(emojiSendResult)
                 }
@@ -685,7 +686,7 @@ class ThreadFragment : Fragment() {
                     if (!treatedWorkInfoUuids.add(workInfo.id)) return@forEach
 
                     val emojiSendResults = workInfo.outputData
-                        .getSerializable<DraftsActionsWorker.EmojiSendResults>(ALL_EMOJI_SENT_STATUS) ?: return@forEach
+                        .getSerializable<MailActionsManager.EmojiSendResults>(ALL_EMOJI_SENT_STATUS) ?: return@forEach
 
                     emojiSendResults.results.forEach { emojiSendResult ->
                         undoFakeEmojiReplyIfNeeded(emojiSendResult)
@@ -695,7 +696,7 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun undoFakeEmojiReplyIfNeeded(emojiSendResult: DraftsActionsWorker.EmojiSendResult) {
+    private fun undoFakeEmojiReplyIfNeeded(emojiSendResult: MailActionsManager.EmojiSendResult) {
         if (emojiSendResult.isSuccess.not()) {
             threadViewModel.undoFakeEmojiReply(emojiSendResult.emoji, emojiSendResult.previousMessageUid)
         }

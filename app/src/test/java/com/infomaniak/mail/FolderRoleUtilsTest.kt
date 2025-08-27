@@ -35,21 +35,16 @@ import com.infomaniak.mail.dataset.DummyThreads.threadSearchInbox
 import com.infomaniak.mail.dataset.DummyThreads.threadSearchSnoozed
 import com.infomaniak.mail.dataset.DummyThreads.threadSnoozed
 import com.infomaniak.mail.utils.FolderRoleUtils
+import io.mockk.mockk
 import io.realm.kotlin.UpdatePolicy
 import org.junit.AfterClass
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito.mock
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class FolderRoleUtilsTest {
 
-    @Mock
-    private val mockContext = mock<Context>() // We can mock this one because we don't use it in our tests
+    private val mockContext = mockk<Context>() // We can mock this one because we don't use it in our tests
     private val folderController = FolderController(mockContext, mailboxContentRealm)
     private val folderRoleUtils = FolderRoleUtils(folderController)
 
