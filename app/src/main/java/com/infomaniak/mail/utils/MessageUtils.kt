@@ -20,7 +20,9 @@ package com.infomaniak.mail.utils
 import android.os.Parcelable
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import kotlinx.parcelize.Parcelize
 
 object MessageUtils {
@@ -37,6 +39,27 @@ object MessageUtils {
                 messageUid = messageController.getLastMessageToExecuteAction(it, featureFlagsLive).uid
             )
         }
+    }
+
+    fun getJunkMessagesAndMessagesToBlockUsers(
+        threadController: ThreadController,
+        messageController: MessageController,
+        featureFlagsLive: Mailbox.FeatureFlagSet?,
+        threadsUids: List<String>,
+    ): Pair<List<Message>, Map<Recipient, Message>> {
+        val threadList = threadController.getThreads(threadsUids)
+        val messagesFromUsersToBlock: MutableMap<Recipient, Message> = mutableMapOf()
+        val lastMessagesOfThreads = threadList.map { thread ->
+            thread.messages.forEach { message ->
+                message.from.firstOrNull()?.let { user ->
+                    if (!user.isMe() && user !in messagesFromUsersToBlock) messagesFromUsersToBlock.put(user, message)
+                }
+            }
+
+            messageController.getLastMessageToExecuteAction(thread, featureFlagsLive)
+        }
+
+        return lastMessagesOfThreads to messagesFromUsersToBlock
     }
 }
 
