@@ -747,13 +747,11 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(DIALOG_SHEET_MULTI_JUNK) { junkThreads: JunkThreads ->
             viewLifecycleOwner.lifecycleScope.launch {
-                val arrayOfThreadAndMessageUids = threadViewModel.getMessageReplyTo(junkThreads.threadUids).toTypedArray()
                 safeNavigate(
                     resId = R.id.junkBottomSheetDialog,
-                    args = JunkBottomSheetDialogArgs(arrayOfThreadAndMessageUids).toBundle(),
+                    args = JunkBottomSheetDialogArgs(junkThreads.threadUids.toTypedArray()).toBundle(),
                 )
             }
-
         }
     }
 

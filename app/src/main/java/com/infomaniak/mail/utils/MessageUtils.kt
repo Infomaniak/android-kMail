@@ -27,20 +27,6 @@ import com.infomaniak.mail.data.models.message.Message
 import kotlinx.parcelize.Parcelize
 
 object MessageUtils {
-    fun getMessageUidToReply(
-        threadController: ThreadController,
-        messageController: MessageController,
-        featureFlagsLive: Mailbox.FeatureFlagSet?,
-        threadsUids: List<String>
-    ): List<JunkMessageThreadData> {
-        val threadList = threadController.getThreads(threadsUids)
-        return threadList.map {
-            JunkMessageThreadData(
-                threadUid = it.uid,
-                messageUid = messageController.getLastMessageToExecuteAction(it, featureFlagsLive).uid
-            )
-        }
-    }
 
     fun getJunkMessagesAndMessagesToBlockUsers(
         threadController: ThreadController,
