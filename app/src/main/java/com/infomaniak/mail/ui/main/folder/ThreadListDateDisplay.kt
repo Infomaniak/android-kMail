@@ -18,11 +18,9 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.content.Context
-import android.os.Build.VERSION.SDK_INT
 import android.text.format.DateUtils
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.infomaniak.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
 import com.infomaniak.core.utils.FORMAT_DATE_SHORT_DAY_ONE_CHAR
 import com.infomaniak.core.utils.FORMAT_HOUR_MINUTES
 import com.infomaniak.core.utils.FormatData

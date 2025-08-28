@@ -461,9 +461,9 @@ class NewMessageViewModel @Inject constructor(
             bcc = bcc.toSet(),
             subject = subject,
             uiBody = uiBodyValue,
-            attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
             isEncrypted = isEncrypted,
             encryptionPassword = encryptionKey,
+            attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
         )
     }
 
@@ -1050,9 +1050,9 @@ class NewMessageViewModel @Inject constructor(
         val bcc: Set<Recipient>,
         var subject: String?,
         var uiBody: String,
-        val attachmentsLocalUuids: Set<String>,
         var isEncrypted: Boolean,
         var encryptionPassword: String?,
+        val attachmentsLocalUuids: Set<String>,
     )
 
     private data class SubjectAndBodyData(val subject: String, val body: String, val expirationId: Int)

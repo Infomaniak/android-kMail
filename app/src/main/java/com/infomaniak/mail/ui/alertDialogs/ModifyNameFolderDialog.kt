@@ -37,7 +37,11 @@ class ModifyNameFolderDialog @Inject constructor(
 
     private var folderId: String? = null
 
-    fun setFolderIdAndShow(renameFolderLastName: String, folderId: String, @StringRes confirmButtonText: Int = R.string.buttonValid) {
+    fun setFolderIdAndShow(
+        renameFolderLastName: String,
+        folderId: String,
+        @StringRes confirmButtonText: Int = R.string.buttonValid,
+    ) {
         show(
             title = R.string.renameFolder,
             hint = R.string.newFolderDialogHint,

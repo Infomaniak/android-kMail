@@ -22,7 +22,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 
 sealed interface ThreadListItem {
     data class Content(val thread: Thread) : ThreadListItem
-    data class DateSeparator(val title: String): ThreadListItem
+    data class DateSeparator(val title: String) : ThreadListItem
     data class FlushFolderButton(val folderRole: Folder.FolderRole) : ThreadListItem
     data object LoadMore : ThreadListItem
 }
