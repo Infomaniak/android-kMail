@@ -99,7 +99,6 @@ class MailActionsManagerTest {
     fun `test attachments`() = runTest {
         mailboxContentRealm?.let { realm ->
             realm.write {
-
                 launch {
                     val file = mockk<File>()
                     every { file.exists() } answers { true }
