@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -198,18 +199,7 @@ private sealed interface Page {
                 )
             },
             illustration = {
-                // TODO
-                // RepeatableLottieIllustration(
-                //     lottieRawRes = illustrationRes,
-                //     isCurrentPageVisible = { pagerState.currentPage == index },
-                //     firstFrame = repeatFrameStart,
-                //     lastFrame = repeatFrameEnd,
-                //     // Force height of the animation because animations are way too big otherwise. Also having the same height for
-                //     // all animations makes it so content is correctly centered vertically between view pager's screens.
-                //     modifier = Modifier.height(250.dp)
-                // )
-
-                Illustration(pagerState, index, accentColor)
+                CustomRepeatableLottieIllustration(pagerState, index, accentColor)
             },
             text = {
                 DefaultTitleAndDescription(
@@ -244,17 +234,7 @@ private sealed interface Page {
                 )
             },
             illustration = {
-                // RepeatableLottieIllustration(
-                //     lottieRawRes = illustrationRes,
-                //     isCurrentPageVisible = { pagerState.currentPage == index },
-                //     firstFrame = repeatFrameStart,
-                //     lastFrame = repeatFrameEnd,
-                //     // Force height of the animation because animations are way too big otherwise. Also having the same height for
-                //     // all animations makes it so content is correctly centered vertically between view pager's screens.
-                //     modifier = Modifier.height(250.dp)
-                // )
-
-                Illustration(pagerState, index, accentColor)
+                CustomRepeatableLottieIllustration(pagerState, index, accentColor)
             },
             text = {
                 Column(
@@ -316,7 +296,9 @@ private sealed interface Page {
 }
 
 @Composable
-private fun Page.Illustration(pagerState: PagerState, index: Int, theme: () -> AccentColor) {
+private fun Page.CustomRepeatableLottieIllustration(pagerState: PagerState, index: Int, theme: () -> AccentColor) {
+    var isReadyToStart by remember { mutableStateOf(true) }
+
     AndroidView(
         modifier = Modifier.height(250.dp),
         factory = {
@@ -326,9 +308,11 @@ private fun Page.Illustration(pagerState: PagerState, index: Int, theme: () -> A
             }
         },
         update = {
-            if (pagerState.currentPage == index) it.playAnimation()
-            // TODO: Fix animation recomposition that restarts the animation. Maybe the fix should be to do the animation in
-            //  compose instead
+            // Avoid restarting the animation when there's a recomposition by taking isReadyToStart into account
+            if (pagerState.currentPage == index && isReadyToStart) {
+                it.playAnimation()
+                isReadyToStart = false
+            }
             it.changeIllustrationColors(index, theme())
         }
     )
