@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.os.Parcelable
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -46,11 +47,12 @@ object MessageUtils {
         messageController: MessageController,
         featureFlagsLive: Mailbox.FeatureFlagSet?,
         threadsUids: List<String>,
+        localSettings: LocalSettings,
     ): Pair<List<Message>, Map<Recipient, Message>> {
         val threadList = threadController.getThreads(threadsUids)
         val messagesFromUsersToBlock: MutableMap<Recipient, Message> = mutableMapOf()
         val lastMessagesOfThreads = threadList.map { thread ->
-            thread.messages.forEach { message ->
+            thread.getDisplayedMessages(featureFlagsLive, localSettings).forEach { message ->
                 message.from.firstOrNull()?.let { user ->
                     if (!user.isMe() && user !in messagesFromUsersToBlock) messagesFromUsersToBlock.put(user, message)
                 }
