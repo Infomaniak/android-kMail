@@ -67,6 +67,7 @@ import com.infomaniak.core.onboarding.OnboardingScaffold
 import com.infomaniak.core.onboarding.components.OnboardingComponents
 import com.infomaniak.core.onboarding.components.OnboardingComponents.DefaultBackground
 import com.infomaniak.core.onboarding.components.OnboardingComponents.DefaultTitleAndDescription
+import com.infomaniak.core.onboarding.components.OnboardingComponents.RepeatableLottieIllustration
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.ui.login.IlluColors.changeIllustrationColors
@@ -187,17 +188,19 @@ private sealed interface Page {
             },
             illustration = {
                 // TODO
-                // RepeatableLottieIllustration(
-                //     lottieRawRes = illustrationRes,
-                //     isCurrentPageVisible = { pagerState.currentPage == index },
-                //     firstFrame = repeatFrameStart,
-                //     lastFrame = repeatFrameEnd,
-                //     // Force height of the animation because animations are way too big otherwise. Also having the same height for
-                //     // all animations makes it so content is correctly centered vertically between view pager's screens.
-                //     modifier = Modifier.height(250.dp)
-                // )
+                RepeatableLottieIllustration(
+                    lottieRawRes = illustrationRes,
+                    isCurrentPageVisible = { pagerState.currentPage == index },
+                    firstFrame = repeatFrameStart,
+                    lastFrame = repeatFrameEnd,
+                    // Force height of the animation because animations are way too big otherwise. Also having the same height for
+                    // all animations makes it so content is correctly centered vertically between view pager's screens.
+                    modifier = Modifier.height(250.dp)
+                )
 
-                Illustration(pagerState, index, accentColor)
+                // CustomRepeatableLottieIllustration(pagerState, index, accentColor)
+
+                // Illustration(pagerState, index, accentColor)
             },
             text = {
                 DefaultTitleAndDescription(
@@ -302,6 +305,14 @@ private sealed interface Page {
         val entries: Array<Page> get() = arrayOf(ThemeChoice, SwipeActions, MultiSelect, GetStarted)
     }
 }
+
+// @Composable
+// private fun Page.CustomRepeatableLottieIllustration(pagerState: PagerState, index: Int, theme: () -> AccentColor) {
+//     DotLottieAnimation(
+//         source = DotLottieSource.Res(illustrationRes),
+//         themeId =
+//     )
+// }
 
 @Composable
 private fun Page.Illustration(pagerState: PagerState, index: Int, theme: () -> AccentColor) {
