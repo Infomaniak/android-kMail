@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.MessageUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -42,7 +41,7 @@ class ThreadActionsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val messageController: MessageController,
     mailboxController: MailboxController,
-    private val threadController: ThreadController,
+    threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -61,7 +60,11 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
-    fun getThreadAndMessageUidToReplyTo() = liveData(ioCoroutineContext) {
-        emit(MessageUtils.getMessageUidToReply(threadController, messageController, featureFlagsLive.value, listOf(threadUid)))
+    fun getThreadAndMessageUidToExecuteAction(): LiveData<Pair<Thread, String>?> = liveData(ioCoroutineContext) {
+        emit(
+            threadLive.value?.let { thread ->
+                thread to messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid
+            }
+        )
     }
 }

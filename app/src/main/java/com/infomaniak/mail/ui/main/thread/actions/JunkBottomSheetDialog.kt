@@ -56,10 +56,10 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         return BottomSheetJunkBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        junkMessagesViewModel.threadsUids = navigationArgs.arrayOfThreadAndMessageUids.map { data -> data.threadUid }
+        junkMessagesViewModel.threadsUids = navigationArgs.threadUids.toList()
 
         val isFromSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
         val (spamIcon, spamText) = getSpamIconAndText(isFromSpam)
