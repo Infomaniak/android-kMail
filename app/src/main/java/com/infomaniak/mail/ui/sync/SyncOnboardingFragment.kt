@@ -77,9 +77,13 @@ class SyncOnboardingFragment : Fragment() {
     }
 
     private fun setupClickListener() {
-        val trackerName = if (syncAutoConfigViewModel.isSyncAppUpToDate()) MatomoName.ConfigureReady else MatomoName.ConfigureInstall
+        val matomoName = if (syncAutoConfigViewModel.isSyncAppUpToDate()) {
+            MatomoName.ConfigureReady
+        } else {
+            MatomoName.ConfigureInstall
+        }
         binding.continueButton.setOnClickListener {
-            trackSyncAutoConfigEvent(trackerName)
+            trackSyncAutoConfigEvent(matomoName)
             safeNavigate(SyncOnboardingFragmentDirections.actionSyncOnboardingFragmentToSyncConfigureFragment())
         }
     }

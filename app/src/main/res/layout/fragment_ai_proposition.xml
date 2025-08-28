@@ -41,9 +41,9 @@
             android:touchscreenBlocksFocus="false"
             app:navigationIcon="@drawable/ic_close_big"
             app:navigationIconTint="@color/iconColor"
+            app:title="@string/aiPromptTitle"
             app:titleCentered="true"
-            app:titleTextAppearance="@style/H2"
-            app:title="@string/aiPromptTitle" />
+            app:titleTextAppearance="@style/H2" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
