@@ -21,6 +21,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -41,6 +42,7 @@ import javax.inject.Inject
 class JunkMessagesViewModel @Inject constructor(
     application: Application,
     mailboxController: MailboxController,
+    private val localSettings: LocalSettings,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
@@ -68,6 +70,7 @@ class JunkMessagesViewModel @Inject constructor(
             messageController = messageController,
             featureFlagsLive = featureFlagsFlow.first(),
             threadsUids = threadUids,
+            localSettings = localSettings,
         )
         junkMessages.postValue(messages)
         potentialBlockedUsers.postValue(potentialMessagesToBlock)
