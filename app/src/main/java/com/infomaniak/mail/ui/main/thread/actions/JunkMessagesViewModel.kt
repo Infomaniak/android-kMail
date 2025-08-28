@@ -27,10 +27,8 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.di.DefaultDispatcher
-import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MessageUtils
-import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
@@ -45,11 +43,8 @@ class JunkMessagesViewModel @Inject constructor(
     mailboxController: MailboxController,
     private val messageController: MessageController,
     private val threadController: ThreadController,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
-
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     val messageOfUserToBlock = SingleLiveEvent<Message>()
     val potentialBlockedUsers = SingleLiveEvent<Map<Recipient, Message>>()

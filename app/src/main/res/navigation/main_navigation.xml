@@ -171,11 +171,7 @@
         android:id="@+id/userToBlockBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.UserToBlockBottomSheetDialog"
         android:label="UserToBlockBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_user_to_block">
-        <argument
-            android:name="threadUids"
-            app:argType="string[]" />
-    </dialog>
+        tools:layout="@layout/bottom_sheet_user_to_block" />
 
     <dialog
         android:id="@+id/detailedContactBottomSheetDialog"

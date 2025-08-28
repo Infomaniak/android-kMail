@@ -100,7 +100,6 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             if (expeditorsCount > 1) {
                 safeNavigate(
                     resId = R.id.userToBlockBottomSheetDialog,
-                    args = UserToBlockBottomSheetDialogArgs(junkMessagesViewModel.threadsUids.toTypedArray()).toBundle(),
                     currentClassName = JunkBottomSheetDialog::class.java.name,
                 )
             } else {
