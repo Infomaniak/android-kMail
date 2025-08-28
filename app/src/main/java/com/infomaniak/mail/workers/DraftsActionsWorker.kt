@@ -102,9 +102,7 @@ class DraftsActionsWorker @AssistedInject constructor(
             coroutineWorker = this@DraftsActionsWorker,
             notificationUtils = notificationUtils,
             notificationManagerCompat = notificationManagerCompat,
-            isAppInBackground = {
-                mainApplication.isAppInBackground
-            },
+            isAppInBackground = { mainApplication.isAppInBackground },
         )
 
         return@withContext mailActionsManager!!.handleDraftsActions()

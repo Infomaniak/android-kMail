@@ -25,14 +25,16 @@ import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.ApiResponseStatus
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.RealmDatabase.MailboxContent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.AttachmentUploadStatus
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.dataset.DummyMailboxContent
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.NotificationUtils
@@ -64,10 +66,8 @@ class MailActionsManagerTest {
     private val okHttpClient = mockk<OkHttpClient>()
     private val coroutineWorker = mockk<CoroutineWorker>()
 
+    private var mailboxContentRealm: MailboxContent? = null
     private var draftController: DraftController? = null
-    private var mailboxContent: RealmDatabase.MailboxContent? = null
-    private val mailboxContentRealm: Realm?
-        get() = mailboxContent?.invoke()
 
     @Before
     fun setup() {
@@ -83,47 +83,41 @@ class MailActionsManagerTest {
 
     @Test
     fun `test sending email`() = runTest {
-        mailboxContentRealm?.let { realm ->
-            realm.write {
-                launch {
-                    draftController?.upsertDraft(getDraft())
-                    assert(draftController?.getAllDrafts(realm)?.count() == 1) { "We should have one draft" }
-                    getMailActionManager(mailboxContentRealm).handleDraftsActions()
-                    assert(draftController?.getAllDrafts(realm)?.count() == 0) { "Drafts should be empty" }
-                }
-            }
+        val realm = mailboxContentRealm?.invoke() ?: return@runTest
+        launch {
+            draftController?.upsertDraft(getDraft())
+            assert(draftController?.getAllDrafts(realm)?.count() == 1) { "We should have one draft" }
+            getMailActionManager(realm).handleDraftsActions()
+            assert(draftController?.getAllDrafts(realm)?.count() == 0) { "Drafts should be empty" }
         }
     }
 
     @Test
     fun `test attachments`() = runTest {
-        mailboxContentRealm?.let { realm ->
-            realm.write {
-                launch {
-                    val file = mockk<File>()
-                    every { file.exists() } answers { true }
+        val realm = mailboxContentRealm?.invoke() ?: return@runTest
+        launch {
+            val file = mockk<File>()
+            every { file.exists() } answers { true }
 
-                    val mockedAttachment = spyk(getAttachment())
-                    every { mockedAttachment.getUploadLocalFile() } answers { file }
+            val mockedAttachment = spyk(getAttachment())
+            every { mockedAttachment.getUploadLocalFile() } answers { file }
 
-                    mockkObject(AccountUtils)
-                    coEvery { AccountUtils.getUserById(any())?.apiToken?.accessToken } answers { "token" }
+            mockkObject(AccountUtils)
+            coEvery { AccountUtils.getUserById(any())?.apiToken?.accessToken } answers { "token" }
 
-                    mockApiRepository()
+            mockApiRepository()
 
-                    draftController?.upsertDraft(getDraft(realmListOf(getAttachment())))
+            draftController?.upsertDraft(getDraft(realmListOf(mockedAttachment)))
 
-                    val storedAttachment = draftController?.getDraft(DRAFT_LOCAL_UUID)?.attachments?.first()
-                    assert(storedAttachment?.uuid?.isEmpty() == true)
-                    assert(storedAttachment?.attachmentUploadStatus == AttachmentUploadStatus.NOT_UPLOADED)
+            val storedAttachment = draftController?.getDraft(DRAFT_LOCAL_UUID)?.attachments?.first()
+            assert(storedAttachment?.uuid?.isEmpty() == true)
+            assert(storedAttachment?.attachmentUploadStatus == AttachmentUploadStatus.NOT_UPLOADED)
 
-                    mockedAttachment.startUpload(DRAFT_LOCAL_UUID, Mailbox(), realm)
+            mockedAttachment.startUpload(DRAFT_LOCAL_UUID, Mailbox(), realm)
 
-                    val updatedStoredAttachment = draftController?.getDraft(DRAFT_LOCAL_UUID)?.attachments?.first()
-                    assert(updatedStoredAttachment?.uuid == ATTACHMENT_REMOTE_UUID)
-                    assert(updatedStoredAttachment?.attachmentUploadStatus == AttachmentUploadStatus.UPLOADED)
-                }
-            }
+            val updatedStoredAttachment = draftController?.getDraft(DRAFT_LOCAL_UUID)?.attachments?.first()
+            assert(updatedStoredAttachment?.uuid == ATTACHMENT_REMOTE_UUID)
+            assert(updatedStoredAttachment?.attachmentUploadStatus == AttachmentUploadStatus.UPLOADED)
         }
     }
 
@@ -148,13 +142,13 @@ class MailActionsManagerTest {
         coEvery { ApiRepository.sendDraft(any(), any(), any()) } coAnswers {
             ApiResponse(
                 result = ApiResponseStatus.SUCCESS,
-                data = SendDraftResult(scheduledMessageEtop = "2025-08-27T10:45:48+0200")
+                data = SendDraftResult(scheduledMessageEtop = "2025-08-27T10:45:48+0200"),
             )
         }
         coEvery { ApiRepository.createAttachments(any(), any(), any(), any()) } coAnswers {
             ApiResponse(
                 result = ApiResponseStatus.SUCCESS,
-                data = getAttachment(remoteUUID = ATTACHMENT_REMOTE_UUID)
+                data = getAttachment(remoteUUID = ATTACHMENT_REMOTE_UUID),
             )
         }
     }
@@ -169,15 +163,13 @@ class MailActionsManagerTest {
     private fun initializeConstants() {
         InfomaniakCore.appVersionName = "0.0.0"
         InfomaniakCore.appId = "0"
-
-        AccountUtils.currentUserId = 0
-        AccountUtils.currentMailboxId = 0
-        AccountUtils.loadInMemory = true
     }
 
     private fun initializeMailRelatedStuff() {
-        mailboxContent = RealmDatabase.MailboxContent()
-        draftController = DraftController(mailboxContent!!)
+        mailboxContentRealm?.invoke()?.close()
+        mailboxContentRealm = DummyMailboxContent().also {
+            draftController = DraftController(it)
+        }
     }
 
     private fun getMailActionManager(mailboxContentRealm: Realm?): MailActionsManager {
@@ -200,14 +192,14 @@ class MailActionsManagerTest {
     private fun getDraft(attachments: RealmList<Attachment> = realmListOf()): Draft {
         return Draft().apply {
             localUuid = DRAFT_LOCAL_UUID
-            action = Draft.DraftAction.SEND
+            action = DraftAction.SEND
             body = "This is a test email."
             subject = "This is a test subject."
             to = realmListOf(
                 Recipient().apply {
                     email = "test@example.com"
                     name = "Test"
-                }
+                },
             )
             cc = realmListOf()
             bcc = realmListOf()

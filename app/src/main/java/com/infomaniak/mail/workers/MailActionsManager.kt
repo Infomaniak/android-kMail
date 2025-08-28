@@ -223,7 +223,7 @@ class MailActionsManager(
         trackedDraftAction: DraftAction?,
         trackedDraftErrorMessageResId: Int?,
         trackedScheduledDraftDate: String?,
-        trackedUnscheduleDraftUrl: String?,
+        trackedUnscheduledDraftUrl: String?,
         emojiSendResults: List<EmojiSendResult>,
     ): ListenableWorker.Result {
 
@@ -253,7 +253,7 @@ class MailActionsManager(
                     emojiPair,
                     isSuccessPair,
                     SCHEDULED_DRAFT_DATE_KEY to trackedScheduledDraftDate,
-                    UNSCHEDULE_DRAFT_URL_KEY to trackedUnscheduleDraftUrl,
+                    UNSCHEDULE_DRAFT_URL_KEY to trackedUnscheduledDraftUrl,
                 )
             } else {
                 emptyData
@@ -416,7 +416,7 @@ class MailActionsManager(
                 localDraft.localUuid,
                 userId,
                 mailboxId,
-                mustForceDelete = true
+                mustForceDelete = true,
             )
             realm.delete(localDraft)
         }
