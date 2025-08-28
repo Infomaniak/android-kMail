@@ -17,14 +17,13 @@
  */
 package com.infomaniak.mail.utils
 
-import android.os.Parcelable
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import kotlinx.parcelize.Parcelize
+import com.infomaniak.mail.data.models.thread.Thread
 
 object MessageUtils {
 
@@ -51,5 +50,4 @@ object MessageUtils {
     }
 }
 
-@Parcelize
-data class JunkMessageThreadData(val threadUid: String, val messageUid: String) : Parcelable
+data class ThreadMessageToExecuteAction(val thread: Thread, val messageUid: String)
