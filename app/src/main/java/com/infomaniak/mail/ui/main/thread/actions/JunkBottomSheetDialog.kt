@@ -25,8 +25,8 @@ import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
@@ -36,6 +36,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -98,9 +99,9 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
         binding.blockSender.setClosingOnClickListener {
             trackBottomSheetThreadActionsEvent(MatomoName.BlockUser)
             if (expeditorsCount > 1) {
-                safeNavigate(
+                safelyNavigate(
                     resId = R.id.userToBlockBottomSheetDialog,
-                    currentClassName = JunkBottomSheetDialog::class.java.name,
+                    substituteClassName = ThreadListFragment::class.java.name,
                 )
             } else {
                 junkMessagesViewModel.messageOfUserToBlock.value = potentialUsersToBlock.values.firstOrNull()
