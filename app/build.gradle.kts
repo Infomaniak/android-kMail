@@ -165,7 +165,9 @@ dependencies {
 
     // Test
     testImplementation(libs.junit)
-    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockk.agent)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.kotlinx.coroutine.test)
     androidTestImplementation(libs.ext.junit)
 
     // Debug
