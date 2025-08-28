@@ -462,7 +462,7 @@ class NewMessageViewModel @Inject constructor(
             subject = subject,
             uiBody = uiBodyValue,
             isEncrypted = isEncrypted,
-            encryptionPassword = encryptionKey,
+            encryptionPassword = encryptionKey ?: "",
             attachmentsLocalUuids = attachments.mapTo(mutableSetOf()) { it.localUuid },
         )
     }
@@ -1051,7 +1051,7 @@ class NewMessageViewModel @Inject constructor(
         var subject: String?,
         var uiBody: String,
         var isEncrypted: Boolean,
-        var encryptionPassword: String?,
+        var encryptionPassword: String,
         val attachmentsLocalUuids: Set<String>,
     )
 
