@@ -17,28 +17,38 @@
  */
 package com.infomaniak.mail.utils
 
-import android.os.Parcelable
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import kotlinx.parcelize.Parcelize
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 
 object MessageUtils {
-    fun getMessageUidToReply(
+
+    fun getJunkMessagesAndMessagesToBlockUsers(
         threadController: ThreadController,
         messageController: MessageController,
         featureFlagsLive: Mailbox.FeatureFlagSet?,
-        threadsUids: List<String>
-    ): List<JunkMessageThreadData> {
+        threadsUids: List<String>,
+        localSettings: LocalSettings,
+    ): JunkMessagesData {
         val threadList = threadController.getThreads(threadsUids)
-        return threadList.map {
-            JunkMessageThreadData(
-                threadUid = it.uid,
-                messageUid = messageController.getLastMessageToExecuteAction(it, featureFlagsLive).uid
-            )
+        val messagesFromUsersToBlock: MutableMap<Recipient, Message> = mutableMapOf()
+        val lastMessagesOfThreads = threadList.map { thread ->
+            thread.getDisplayedMessages(featureFlagsLive, localSettings).forEach { message ->
+                message.from.firstOrNull()?.let { user ->
+                    if (!user.isMe() && user !in messagesFromUsersToBlock) messagesFromUsersToBlock.put(user, message)
+                }
+            }
+
+            messageController.getLastMessageToExecuteAction(thread, featureFlagsLive)
         }
+
+        return JunkMessagesData(junkMessages = lastMessagesOfThreads, messagesFromUsersToBlock = messagesFromUsersToBlock)
     }
 }
 
-@Parcelize
-data class JunkMessageThreadData(val threadUid: String, val messageUid: String) : Parcelable
+data class ThreadMessageToExecuteAction(val thread: Thread, val messageUid: String)
+data class JunkMessagesData(val junkMessages: List<Message>, val messagesFromUsersToBlock: Map<Recipient, Message>)
