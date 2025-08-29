@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.isNightModeEnabled
@@ -42,6 +43,7 @@ import com.infomaniak.mail.utils.extensions.moveWithConfirmationPopup
 import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDialog
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,7 +68,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
-            folderRole = folderRoleUtils.getActionFolderRole(message)
+            lifecycleScope.launch { folderRole = folderRoleUtils.getActionFolderRole(message) }
 
             setMarkAsReadUi(message.isSeen)
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)

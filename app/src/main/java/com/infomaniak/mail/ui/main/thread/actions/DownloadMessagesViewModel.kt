@@ -60,9 +60,9 @@ class DownloadMessagesViewModel @Inject constructor(
 
     val downloadMessagesLiveData = MutableLiveData<List<Uri>?>()
 
-    private fun getAllMessages(): Set<Message> {
+    private suspend fun getAllMessages(): Set<Message> {
         val messages = mutableSetOf<Message>()
-        messageLocalUids?.mapNotNull(messageController::getMessage)?.let(messages::addAll)
+        messageLocalUids?.mapNotNull { messageController.getMessage(it) }?.let(messages::addAll)
         return messages
     }
 
@@ -88,7 +88,7 @@ class DownloadMessagesViewModel @Inject constructor(
         return FileProvider.getUriForFile(context, context.getString(R.string.EML_AUTHORITY), file)
     }
 
-    private fun getFirstMessageSubject(): String? = getAllMessages().firstOrNull()?.subject
+    private suspend fun getFirstMessageSubject(): String? = getAllMessages().firstOrNull()?.subject
 
     private fun numberOfMessagesToDownloads(): Int = messageLocalUids?.size ?: 0
 
@@ -127,7 +127,7 @@ class DownloadMessagesViewModel @Inject constructor(
         downloadMessagesLiveData.postValue(downloadedThreadUris)
     }
 
-    fun getDialogName(): String {
+    suspend fun getDialogName(): String {
         val numberOfMessagesToDownload = numberOfMessagesToDownloads()
 
         return if (numberOfMessagesToDownload == 1) {
