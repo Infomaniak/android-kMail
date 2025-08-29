@@ -53,12 +53,9 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
 
-    val threadLive: LiveData<Thread> = threadController.getThreadAsync(threadUid)
-        .mapNotNull { it.obj?.also { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
+    val threadMessageToExecuteAction: LiveData<ThreadMessageToExecuteAction> = threadController.getThreadAsync(threadUid)
+        .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
         .asLiveData(ioCoroutineContext)
-
-    private val _threadMessageToExecuteAction: MutableSharedFlow<ThreadMessageToExecuteAction> = MutableSharedFlow(replay = 1)
-    val threadMessageToExecuteAction = _threadMessageToExecuteAction.asSharedFlow()
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -67,8 +64,8 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
-    private suspend fun getThreadAndMessageUidToExecuteAction(thread: Thread) {
+    private suspend fun getThreadAndMessageUidToExecuteAction(thread: Thread): ThreadMessageToExecuteAction {
         val messageUid = Dispatchers.IO { messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid }
-        _threadMessageToExecuteAction.emit(ThreadMessageToExecuteAction(thread, messageUid))
+        return ThreadMessageToExecuteAction(thread, messageUid)
     }
 }
