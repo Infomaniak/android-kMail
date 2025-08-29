@@ -261,7 +261,7 @@ class ThreadFragment : Fragment() {
         junkMessagesViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) { messageOfUserToBlock ->
             setPositiveButtonCallback { message ->
                 trackBlockUserAction(MatomoName.ConfirmSelectedUser)
-                // mainViewModel.blockUser(message.folderId, message.shortUid)
+                mainViewModel.blockUser(message.folderId, message.shortUid)
             }
             show(messageOfUserToBlock)
         }
