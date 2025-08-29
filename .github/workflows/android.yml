@@ -33,6 +33,28 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      # Run tests
-      - name: Run Unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
+      # Run UI tests
+      - name: Run UI tests
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          export PATH="$PATH":"$HOME/.maestro/bin"
+          export PATH="$PATH":":/Users/runner/Library/Android/sdk/platform-tools"
+          export PATH="$PATH":":/Users/runner/Library/Android/sdk/emulator"
+
+          APK_SEARCH_DIR="app/build/outputs/apk/standard/debug"
+          APP_APK_PATH=$(find "$APK_SEARCH_DIR" -maxdepth 1 -type f -name "*.apk" | head -n 1)
+
+          echo "APK_SEARCH_DIR => $APK_SEARCH_DIR"
+          echo "APP_APK_PATH => APP_APK_PATH"
+
+          if [ ! -f "$APP_APK_PATH" ]; then
+            echo "APK not found at $APP_APK_PATH"
+            exit 1
+          fi
+          
+          echo "List of emulator"
+          emulator -list-avds
+                    
+          adb install $APP_APK_PATH
+          
+          maestro test --output report.xml "$APP_APK_PATH" -e=ACCOUNT_EMAIL=${{ secrets.UI_TEST_ACCOUNT_EMAIL }} -e=ACCOUNT_PASSWORD=${{ secrets.UI_TEST_ACCOUNT_PASSWORD }} ./maestro/flow/login.yaml

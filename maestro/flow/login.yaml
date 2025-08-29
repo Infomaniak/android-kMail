@@ -1,0 +1,15 @@
+appId: com.infomaniak.mail
+---
+- launchApp:
+    clearState: true
+- tapOn: Next
+- tapOn: Next
+- tapOn: Next
+- tapOn: Login
+- tapOn: Login email address
+- inputText: '${ACCOUNT_EMAIL}'
+- tapOn: Password *
+- inputText: '${ACCOUNT_PASSWORD}'
+- tapOn:
+    text: Sign in
+    index: 1
