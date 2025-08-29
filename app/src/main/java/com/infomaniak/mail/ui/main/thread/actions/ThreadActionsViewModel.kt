@@ -21,7 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -34,7 +33,11 @@ import com.infomaniak.mail.utils.ThreadMessageToExecuteAction
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.invoke
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,8 +54,11 @@ class ThreadActionsViewModel @Inject constructor(
     private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
 
     val threadLive: LiveData<Thread> = threadController.getThreadAsync(threadUid)
-        .mapNotNull { it.obj }
+        .mapNotNull { it.obj?.also { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
         .asLiveData(ioCoroutineContext)
+
+    private val _threadMessageToExecuteAction: MutableSharedFlow<ThreadMessageToExecuteAction> = MutableSharedFlow(replay = 1)
+    val threadMessageToExecuteAction = _threadMessageToExecuteAction.asSharedFlow()
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -61,12 +67,8 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
-    fun getThreadAndMessageUidToExecuteAction(): LiveData<ThreadMessageToExecuteAction?> = liveData(ioCoroutineContext) {
-        emit(
-            threadLive.value?.let { thread ->
-                val messageUid = messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid
-                ThreadMessageToExecuteAction(thread, messageUid)
-            }
-        )
+    private suspend fun getThreadAndMessageUidToExecuteAction(thread: Thread) {
+        val messageUid = Dispatchers.IO { messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid }
+        _threadMessageToExecuteAction.emit(ThreadMessageToExecuteAction(thread, messageUid))
     }
 }

@@ -48,6 +48,7 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadMessagesProgressDi
 import com.infomaniak.mail.utils.extensions.notYetImplemented
 import com.infomaniak.mail.utils.extensions.safeNavigateToNewMessageActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,10 +77,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     @Inject
     lateinit var threadController: ThreadController
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadLive.observe(viewLifecycleOwner) { thread ->
+        threadActionsViewModel.threadLive.observe(viewLifecycleOwner) { thread ->
 
             folderRole = folderRoleUtils.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
@@ -92,10 +93,12 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setSnoozeUi(thread.isSnoozed())
         }
 
-        getThreadAndMessageUidToExecuteAction().observe(viewLifecycleOwner) { threadMessageToExecuteAction ->
-            threadMessageToExecuteAction?.let {
-                initOnClickListener(listener = onActionClick(it))
-            } ?: findNavController().popBackStack()
+        viewLifecycleOwner.lifecycleScope.launch {
+            threadActionsViewModel.threadMessageToExecuteAction.collectLatest { threadMessageToExecuteAction ->
+                threadMessageToExecuteAction?.let {
+                    initOnClickListener(listener = onActionClick(it))
+                } ?: findNavController().popBackStack()
+            }
         }
     }
 
