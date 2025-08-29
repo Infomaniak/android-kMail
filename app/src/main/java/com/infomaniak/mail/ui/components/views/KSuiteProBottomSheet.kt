@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.core.ksuite.ksuitepro.utils.KSuiteProUiUtils.color
 import com.infomaniak.core.ksuite.ksuitepro.views.components.ProOfferContent
 import com.infomaniak.core.ksuite.ksuitepro.R as RCore
 
@@ -34,7 +33,7 @@ class KSuiteProBottomSheet @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : MailBottomSheetScaffoldComposeView(context, attrs, defStyleAttr) {
 
-    override val containerColor: Color get() = resources.color(RCore.color.kSuiteProBackground)
+    override val containerColor: Color get() = Color(resources.getColor(RCore.color.kSuiteProBackground, context.theme))
     override val bottomPadding: Dp get() = 0.dp
 
     private var kSuite = KSuite.ProStandard
