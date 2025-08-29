@@ -33,7 +33,7 @@ object MessageUtils {
         featureFlagsLive: Mailbox.FeatureFlagSet?,
         threadsUids: List<String>,
         localSettings: LocalSettings,
-    ): Pair<List<Message>, Map<Recipient, Message>> {
+    ): JunkMessagesData {
         val threadList = threadController.getThreads(threadsUids)
         val messagesFromUsersToBlock: MutableMap<Recipient, Message> = mutableMapOf()
         val lastMessagesOfThreads = threadList.map { thread ->
@@ -46,8 +46,9 @@ object MessageUtils {
             messageController.getLastMessageToExecuteAction(thread, featureFlagsLive)
         }
 
-        return lastMessagesOfThreads to messagesFromUsersToBlock
+        return JunkMessagesData(junkMessages = lastMessagesOfThreads, messagesFromUsersToBlock = messagesFromUsersToBlock)
     }
 }
 
 data class ThreadMessageToExecuteAction(val thread: Thread, val messageUid: String)
+data class JunkMessagesData(val junkMessages: List<Message>, val messagesFromUsersToBlock: Map<Recipient, Message>)
