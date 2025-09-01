@@ -457,7 +457,7 @@ class MainViewModel @Inject constructor(
 
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
-        if (mailbox.kSuite == KSuite.PersoFree) {
+        if (mailbox.kSuite == KSuite.Perso.Free) {
             val apiResponse = ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)
             if (apiResponse.isSuccess()) {
                 mailboxController.updateMailbox(mailbox.objectId) {

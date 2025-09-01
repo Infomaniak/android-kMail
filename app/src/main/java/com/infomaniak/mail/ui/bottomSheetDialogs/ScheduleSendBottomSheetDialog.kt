@@ -57,8 +57,8 @@ class ScheduleSendBottomSheetDialog @Inject constructor() : SelectScheduleOption
     override fun onCustomScheduleOptionClicked() {
         val matomoName = MatomoName.ScheduledCustomDate.value
         when (navigationArgs.currentKSuite) {
-            KSuite.PersoFree -> openMyKSuiteUpgradeBottomSheet(matomoName)
-            KSuite.ProFree -> openKSuiteProBottomSheet(navigationArgs.currentKSuite, navigationArgs.isAdmin, matomoName)
+            KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
+            KSuite.Pro.Free -> openKSuiteProBottomSheet(navigationArgs.currentKSuite, navigationArgs.isAdmin, matomoName)
             else -> {
                 trackScheduleSendEvent(MatomoName.CustomSchedule)
                 setBackNavigationResult(OPEN_SCHEDULE_DRAFT_DATE_AND_TIME_PICKER, true)

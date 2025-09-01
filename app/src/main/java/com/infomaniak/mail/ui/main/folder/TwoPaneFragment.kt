@@ -30,7 +30,6 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -250,13 +249,15 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?, snoozeEndDate: RealmInstant?) {
+        val mailbox = mainViewModel.currentMailbox.value ?: return
         twoPaneViewModel.snoozeScheduleType = snoozeScheduleType
         twoPaneViewModel.safelyNavigate(
             resId = R.id.snoozeBottomSheetDialog,
             args = SnoozeBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
                 currentlyScheduledEpochMillis = snoozeEndDate?.epochSeconds?.times(1_000) ?: 0L,
-                currentKSuite = mainViewModel.currentMailbox.value?.kSuite ?: KSuite.PersoFree,
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
             ).toBundle(),
         )
     }

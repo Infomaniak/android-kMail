@@ -92,7 +92,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         reportJunk.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportJunk() }
         print.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onPrint() }
         share.setClosingOnClickListener(shouldCloseMultiSelection) {
-            if (mainViewModel.currentMailbox.value?.kSuite == KSuite.PersoFree) {
+            if (mainViewModel.currentMailbox.value?.kSuite == KSuite.Perso.Free) {
                 openMyKSuiteUpgradeBottomSheet(MatomoName.ShareEmail.value, ThreadListFragment::class.java.name)
             } else {
                 onClickListener.onShare()
@@ -112,7 +112,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun setShareTrailingContent() {
-        binding.share.trailingContent = if (mainViewModel.currentMailbox.value?.kSuite == KSuite.PersoFree) {
+        binding.share.trailingContent = if (mainViewModel.currentMailbox.value?.kSuite == KSuite.Perso.Free) {
             TrailingContent.MyKSuiteChip
         } else {
             TrailingContent.None

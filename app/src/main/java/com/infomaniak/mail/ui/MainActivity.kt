@@ -333,13 +333,13 @@ class MainActivity : BaseActivity() {
             val matomoDailyLimitUpgrade = MatomoName.DailyLimitReachedUpgrade.value
 
             when {
-                currentKSuite == KSuite.PersoFree && hasLimitBeenReached -> {
+                currentKSuite == KSuite.Perso.Free && hasLimitBeenReached -> {
                     trackNewMessageEvent(matomoDailyLimit)
                     snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
                         openMyKSuiteUpgradeBottomSheet(navController, matomoDailyLimitUpgrade)
                     }
                 }
-                currentKSuite == KSuite.ProFree && hasLimitBeenReached -> {
+                currentKSuite == KSuite.Pro.Free && hasLimitBeenReached -> {
                     trackNewMessageEvent(matomoDailyLimit)
                     snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
                         openKSuiteProBottomSheet(

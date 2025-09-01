@@ -535,8 +535,8 @@ class ThreadListFragment : TwoPaneFragment() {
                         val kSuite = mainViewModel.currentMailbox.value?.kSuite
                         val matomoName = MatomoName.CloseStorageWarningBanner.value
                         when (kSuite) {
-                            KSuite.PersoFree -> trackMyKSuiteEvent(matomoName)
-                            KSuite.ProFree -> trackKSuiteProEvent(matomoName)
+                            KSuite.Perso.Free -> trackMyKSuiteEvent(matomoName)
+                            KSuite.Pro.Free -> trackKSuiteProEvent(matomoName)
                             else -> Unit
                         }
                         binding.kSuiteStorageBanner.isGone = true

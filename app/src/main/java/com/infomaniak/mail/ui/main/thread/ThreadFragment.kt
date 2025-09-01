@@ -37,7 +37,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.work.Data
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -960,12 +959,14 @@ class ThreadFragment : Fragment() {
     }
 
     private fun navigateToScheduleSendBottomSheet() {
+        val mailbox = mainViewModel.currentMailbox.value ?: return
         safeNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
-                currentKSuite = mainViewModel.currentMailbox.value?.kSuite ?: KSuite.PersoFree,
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
             ).toBundle(),
         )
     }

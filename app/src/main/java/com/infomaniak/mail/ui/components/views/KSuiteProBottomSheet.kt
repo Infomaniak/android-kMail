@@ -36,7 +36,7 @@ class KSuiteProBottomSheet @JvmOverloads constructor(
     override val containerColor: Color get() = Color(resources.getColor(RCore.color.kSuiteProBackground, context.theme))
     override val bottomPadding: Dp get() = 0.dp
 
-    private var kSuite = KSuite.ProStandard
+    private var kSuite: KSuite = KSuite.Pro.Free
     private var isAdmin = false
     private var onClose: (() -> Unit)? = null
 
