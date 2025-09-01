@@ -828,11 +828,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun navigateToScheduleSendBottomSheet(): Job = viewLifecycleOwner.lifecycleScope.launch {
+        val mailbox = newMessageViewModel.currentMailbox()
         safelyNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
-                currentKSuite = newMessageViewModel.currentMailbox().kSuite,
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
             ).toBundle(),
         )
     }
@@ -880,9 +882,9 @@ class NewMessageFragment : Fragment() {
             trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
                 val matomoName = MatomoKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME
-                if (mailbox.kSuite == KSuite.ProFree) { // kSuite pro
+                if (mailbox.kSuite == KSuite.Pro.Free) { // KSuite pro
                     openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
-                } else { // kSuite perso
+                } else { // KSuite perso
                     openMyKSuiteUpgradeBottomSheet(matomoName)
                 }
             }

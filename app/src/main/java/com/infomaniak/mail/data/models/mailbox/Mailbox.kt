@@ -68,13 +68,13 @@ class Mailbox : RealmObject {
     @SerialName("is_spam_filter")
     var isSpamFiltered: Boolean = false
     @SerialName("is_free")
-    var isMyKSuite: Boolean = false // Means it's a personal Mailbox (and not a professional one), so any [KSuite.Perso*] tier
+    var isMyKSuite: Boolean = false // Means it's a personal Mailbox (and not a professional one), so any [KSuite.Perso.*] tier
     @SerialName("is_limited")
-    var isMyKSuiteFree: Boolean = false // Means it's a free personal Mailbox, so specifically [KSuite.PersoFree]
+    var isMyKSuiteFree: Boolean = false // Means it's a free personal Mailbox, so specifically [KSuite.Perso.Free]
     @SerialName("is_part_of_ksuite")
-    var isKSuitePro: Boolean = false // Means it's a professional Mailbox (and not a personal one), so any [KSuite.Pro*] tier
+    var isKSuitePro: Boolean = false // Means it's a professional Mailbox (and not a personal one), so any [KSuite.Pro.*] tier
     @SerialName("is_ksuite_essential")
-    var isKSuiteProFree: Boolean = false // Means it's a free professional Mailbox, so specifically [KSuite.ProFree]
+    var isKSuiteProFree: Boolean = false // Means it's a free professional Mailbox, so specifically [KSuite.Pro.Free]
     @SerialName("owner_or_admin")
     var isAdmin: Boolean = false
     //endregion
@@ -117,10 +117,10 @@ class Mailbox : RealmObject {
 
     inline val kSuite: KSuite
         get() = when {
-            isKSuitePro && !isKSuiteProFree -> KSuite.ProStandard
-            isKSuitePro && isKSuiteProFree -> KSuite.ProFree
-            isMyKSuite && !isMyKSuiteFree -> KSuite.PersoPlus
-            else -> KSuite.PersoFree
+            isKSuitePro && !isKSuiteProFree -> KSuite.Pro.Standard
+            isKSuitePro && isKSuiteProFree -> KSuite.Pro.Free
+            isMyKSuite && !isMyKSuiteFree -> KSuite.Perso.Plus
+            else -> KSuite.Perso.Free
         }
 
     inline val channelGroupId get() = "$mailboxId"

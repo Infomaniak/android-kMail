@@ -263,11 +263,9 @@
             app:argType="long" />
         <argument
             android:name="currentKSuite"
-            android:defaultValue="PersoFree"
             app:argType="com.infomaniak.core.ksuite.data.KSuite" />
         <argument
             android:name="isAdmin"
-            android:defaultValue="false"
             app:argType="boolean" />
     </dialog>
 
@@ -286,11 +284,9 @@
             app:argType="long" />
         <argument
             android:name="currentKSuite"
-            android:defaultValue="PersoFree"
             app:argType="com.infomaniak.core.ksuite.data.KSuite" />
         <argument
             android:name="isAdmin"
-            android:defaultValue="false"
             app:argType="boolean" />
     </dialog>
 
@@ -754,11 +750,9 @@
         tools:layout="@layout/bottom_sheet_k_suite_pro">
         <argument
             android:name="kSuite"
-            android:defaultValue="ProFree"
             app:argType="com.infomaniak.core.ksuite.data.KSuite" />
         <argument
             android:name="isAdmin"
-            android:defaultValue="false"
             app:argType="boolean" />
     </dialog>
 
