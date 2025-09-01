@@ -1,1 +1,0 @@
-- Corrige l'envoi d'e-mails dans un cas spécifique

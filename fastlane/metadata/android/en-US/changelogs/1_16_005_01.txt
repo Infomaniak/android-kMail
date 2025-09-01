@@ -1,0 +1,1 @@
+- Fix empty Draft auto-saving when they shouldn't

@@ -1,1 +1,0 @@
-- Fixes email sending in specific case
