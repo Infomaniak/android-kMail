@@ -23,6 +23,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:layout_marginHorizontal="@dimen/marginStandard"
         android:layout_marginVertical="@dimen/marginStandardSmall"
         android:text="@string/encryptedProtectionAdDescription1" />
@@ -30,11 +31,13 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:layout_marginHorizontal="@dimen/marginStandard"
         android:layout_marginTop="@dimen/marginStandardSmall"
         android:text="@string/encryptedProtectionAdDescription2" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/readMoreButton"
         style="@style/TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

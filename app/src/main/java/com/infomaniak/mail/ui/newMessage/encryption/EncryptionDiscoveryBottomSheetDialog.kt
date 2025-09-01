@@ -23,6 +23,7 @@ import android.view.WindowManager.LayoutParams
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.ItemEncryptionAdCustomDescriptionBinding
 import com.infomaniak.mail.ui.bottomSheetDialogs.DiscoveryBottomSheetDialog
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.lib.core.R as RCore
@@ -40,6 +41,10 @@ class EncryptionDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setFlags(LayoutParams.FLAG_NOT_FOCUSABLE, LayoutParams.FLAG_NOT_FOCUSABLE)
+        ItemEncryptionAdCustomDescriptionBinding.inflate(layoutInflater, binding.root, false).apply {
+            binding.root.addView(root, 3)
+            readMoreButton.setOnClickListener { EncryptionUtils.onReadMoreClicked() }
+        }
     }
 
     override fun onPositiveButtonClicked() {
