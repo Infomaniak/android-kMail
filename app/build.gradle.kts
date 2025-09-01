@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.realm.kotlin)
@@ -147,8 +147,8 @@ dependencies {
 
     implementation(libs.hilt.android)
     implementation(libs.hilt.work)
-    kapt(libs.hilt.compiler)
-    kapt(libs.hilt.compiler.androidx)
+    ksp(libs.hilt.compiler)
+    ksp(libs.hilt.compiler.androidx)
 
     implementation(core.sentry.android.fragment)
 
