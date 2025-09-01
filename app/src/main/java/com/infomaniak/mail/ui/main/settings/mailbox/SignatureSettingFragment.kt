@@ -73,7 +73,7 @@ class SignatureSettingFragment : Fragment() {
     private fun setupAdapter(mailbox: Mailbox) {
         binding.signatureList.adapter = SignatureSettingAdapter(
             canManageSignature = mailbox.permissions?.canManageSignatures ?: false,
-            isMyKSuiteFreeMailbox = mailbox.kSuite == KSuite.PersoFree,
+            isMyKSuiteFreeMailbox = mailbox.kSuite == KSuite.Perso.Free,
             onSignatureSelected = ::onSignatureClicked,
         )
     }
