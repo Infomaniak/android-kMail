@@ -18,36 +18,50 @@
 package com.infomaniak.mail.ui.newMessage.encryption
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager.LayoutParams
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail
-import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.ItemEncryptionAdCustomDescriptionBinding
-import com.infomaniak.mail.ui.bottomSheetDialogs.DiscoveryBottomSheetDialog
+import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.databinding.BottomSheetEncryptionDiscoveryBinding
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.lib.core.R as RCore
 
-class EncryptionDiscoveryBottomSheetDialog : DiscoveryBottomSheetDialog() {
+class EncryptionDiscoveryBottomSheetDialog : BottomSheetDialogFragment() {
+
+    private var binding: BottomSheetEncryptionDiscoveryBinding by safeBinding()
 
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
-    override val titleRes = R.string.encryptedProtectionAdTitle
-    override val descriptionRes = R.string.encryptedProtectionAdDescription
-    override val illustration = Illustration.Static(R.drawable.illu_encrypted_mail)
-    override val positiveButtonRes = RCore.string.androidActivateButton
-    override val trackMatomoWithCategory: (MatomoMail.MatomoName) -> Unit = MatomoMail::trackEncryptionEvent
+    private val positiveButtonRes = RCore.string.androidActivateButton
+    private val trackMatomoWithCategory: (MatomoName) -> Unit = MatomoMail::trackEncryptionEvent
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        dialog?.window?.setFlags(LayoutParams.FLAG_NOT_FOCUSABLE, LayoutParams.FLAG_NOT_FOCUSABLE)
-        ItemEncryptionAdCustomDescriptionBinding.inflate(layoutInflater, binding.root, false).apply {
-            binding.root.addView(root, 3)
-            readMoreButton.setOnClickListener { EncryptionUtils.onReadMoreClicked() }
-        }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return BottomSheetEncryptionDiscoveryBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onPositiveButtonClicked() {
-        newMessageViewModel.isEncryptionActivated.value = true
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.setFlags(LayoutParams.FLAG_NOT_FOCUSABLE, LayoutParams.FLAG_NOT_FOCUSABLE)
+        binding.readMoreButton.setOnClickListener { EncryptionUtils.onReadMoreClicked() }
+
+        actionButton.apply {
+            setText(positiveButtonRes)
+            setOnClickListener {
+                trackMatomoWithCategory(MatomoName.DiscoverNow)
+                newMessageViewModel.isEncryptionActivated.value = true
+                dismiss()
+            }
+        }
+
+        secondaryActionButton.setOnClickListener {
+            trackMatomoWithCategory(MatomoName.DiscoverLater)
+            newMessageViewModel.isEncryptionActivated.value = false
+            dismiss()
+        }
     }
 }
