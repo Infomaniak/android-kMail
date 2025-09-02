@@ -93,7 +93,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
         (scheduleOptions.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
 
         customScheduleOption.trailingContent = when (currentKSuite) {
-            KSuite.Perso.Free -> TrailingContent.MyKSuiteChip
+            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
             KSuite.Pro.Free -> TrailingContent.KSuiteProChip
             else -> TrailingContent.Chevron
         }
