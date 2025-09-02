@@ -33,7 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 
 val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
-        return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = true, realm = realm)
+        return ThreadController.getInboxThreadsWithSnoozeFilterBlocking(withSnooze = true, realm = realm)
     }
 
     override fun twinFolderRoles(): List<FolderRole> = listOf(FolderRole.INBOX)
@@ -41,7 +41,7 @@ val snoozeRefreshStrategy = object : DefaultRefreshStrategy {
     override fun shouldHideEmptyFolder(): Boolean = true
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
-        val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return null
+        val inboxId = FolderController.getFolderBlocking(FolderRole.INBOX, realm)?.id ?: return null
         return super.getMessageFromShortUid(shortUid, inboxId, realm)
     }
 

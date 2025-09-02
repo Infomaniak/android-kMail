@@ -164,7 +164,7 @@ class Folder : RealmObject, Cloneable {
         this.sortedName = this.name.lowercase().removeAccents()
     }
 
-    fun messages(realm: TypedRealm): List<Message> = MessageController.getMessagesByFolderId(id, realm)
+    fun messagesBlocking(realm: TypedRealm): List<Message> = MessageController.getMessagesByFolderIdBlocking(id, realm)
 
     fun getLocalizedName(context: Context): String {
         return role?.folderNameRes?.let(context::getString) ?: name

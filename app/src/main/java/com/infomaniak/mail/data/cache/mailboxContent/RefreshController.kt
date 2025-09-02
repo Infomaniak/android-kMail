@@ -257,9 +257,9 @@ class RefreshController @Inject constructor(
 
     private suspend fun Realm.resetFolder(folderId: String) {
         write {
-            val folder = getUpToDateFolder(folderId)
+            val folder = getUpToDateFolderBlocking(folderId)
 
-            MessageController.deleteMessages(appContext, mailbox, folder.messages(realm = this), realm = this)
+            MessageController.deleteMessages(appContext, mailbox, folder.messagesBlocking(realm = this), realm = this)
             if (folder.threads.isNotEmpty()) delete(folder.threads)
 
             folder.lastUpdatedAt = null
@@ -280,7 +280,7 @@ class RefreshController @Inject constructor(
             scope.ensureActive()
 
             runCatching {
-                FolderController.getFolder(folderId, realm = this)?.let {
+                FolderController.getFolderBlocking(folderId, realm = this)?.let {
                     mainRefresh(scope, folder = it)
                 }
             }.cancellable().onFailure {
@@ -310,7 +310,7 @@ class RefreshController @Inject constructor(
             cannotBeUnsnoozedThreadUids.forEach { manuallyUnsnoozeOutOfSyncThread(it) }
 
             if (cannotBeUnsnoozedThreadUids.isNotEmpty()) {
-                FolderController.getFolder(FolderRole.SNOOZED, realm = this)?.id?.let { snoozeFolderId ->
+                FolderController.getFolderBlocking(FolderRole.SNOOZED, realm = this)?.id?.let { snoozeFolderId ->
                     recomputeTwinFoldersThreadsDependantProperties(snoozeFolderId)
                 }
             }
@@ -320,7 +320,7 @@ class RefreshController @Inject constructor(
     }
 
     private fun MutableRealm.manuallyUnsnoozeOutOfSyncThread(threadUid: String) {
-        ThreadController.getThread(threadUid, realm = this)?.manuallyUnsnooze()
+        ThreadController.getThreadBlocking(threadUid, realm = this)?.manuallyUnsnooze()
     }
 
     private suspend fun Realm.fetchOnePageOfOldMessages(scope: CoroutineScope, folderId: String) {
@@ -379,7 +379,7 @@ class RefreshController @Inject constructor(
 
             inboxUnreadCount = updateFoldersUnreadCount(impactedFolders, realm = this)
 
-            getUpToDateFolder(folder.id).let {
+            getUpToDateFolderBlocking(folder.id).let {
                 it.newMessagesUidsToFetch.addAll(activities.addedShortUids)
                 it.unreadCountRemote = activities.unreadCountRemote
                 it.lastUpdatedAt = Date().toRealmInstant()
@@ -495,10 +495,10 @@ class RefreshController @Inject constructor(
 
         var inboxUnreadCount: Int? = null
 
-        folders.getFolderIds(realm).forEach {
-            val folder = realm.getUpToDateFolder(it)
+        folders.getFolderIdsBlocking(realm).forEach {
+            val folder = realm.getUpToDateFolderBlocking(it)
 
-            val unreadCount = ThreadController.getUnreadThreadsCount(folder)
+            val unreadCount = ThreadController.getUnreadThreadsCountBlocking(folder)
             folder.unreadCountLocal = unreadCount
 
             if (folder.role == FolderRole.INBOX) inboxUnreadCount = unreadCount
@@ -515,9 +515,12 @@ class RefreshController @Inject constructor(
         }
     }
 
-    private fun TypedRealm.getUpToDateFolder(id: String) = FolderController.getFolder(id, realm = this)!!
+    private suspend fun Realm.getUpToDateFolder(id: String) = FolderController.getFolder(id, realm = this)!!
+    private fun MutableRealm.getUpToDateFolderBlocking(id: String) = FolderController.getFolderBlocking(id, realm = this)!!
 
-    private fun TypedRealm.getUpToDateFolder(folderRole: FolderRole) = FolderController.getFolder(folderRole, realm = this)
+    private fun TypedRealm.getUpToDateFolderBlocking(folderRole: FolderRole): Folder? {
+        return FolderController.getFolderBlocking(folderRole, realm = this)
+    }
     //endregion
 
     //region Added Messages
@@ -543,7 +546,7 @@ class RefreshController @Inject constructor(
 
             return@let write {
 
-                val upToDateFolder = getUpToDateFolder(folder.id)
+                val upToDateFolder = getUpToDateFolderBlocking(folder.id)
                 val isConversationMode = localSettings.threadMode == ThreadMode.CONVERSATION
 
                 return@write handleAddedMessagesBlocking(scope, upToDateFolder, messages, isConversationMode)
@@ -729,8 +732,8 @@ class RefreshController @Inject constructor(
 
     private suspend fun Realm.sendOrphanMessages(folder: Folder, previousCursor: String? = null) {
         write {
-            val upToDateFolder = getUpToDateFolder(folder.id)
-            SentryDebug.sendOrphanMessages(previousCursor, folder = upToDateFolder, realm = this).also { orphans ->
+            val upToDateFolder = getUpToDateFolderBlocking(folder.id)
+            SentryDebug.sendOrphanMessagesBlocking(previousCursor, folder = upToDateFolder, realm = this).also { orphans ->
                 MessageController.deleteMessages(appContext, mailbox, orphans, realm = this)
             }
         }
@@ -788,14 +791,14 @@ class RefreshController @Inject constructor(
     ) {
         val currentFolderRefreshStrategy: RefreshStrategy
 
-        getUpToDateFolder(folderId).let { currentFolder ->
+        getUpToDateFolderBlocking(folderId).let { currentFolder ->
             recomputeThreadsDependantProperties(currentFolder, folderId)
             extraFolderUpdates?.invoke(currentFolder)
             currentFolderRefreshStrategy = currentFolder.refreshStrategy
         }
 
         currentFolderRefreshStrategy.twinFolderRoles().forEach { otherFolderRole ->
-            getUpToDateFolder(otherFolderRole)?.let { otherFolder ->
+            getUpToDateFolderBlocking(otherFolderRole)?.let { otherFolder ->
                 recomputeThreadsDependantProperties(otherFolder, folderId)
             }
         }

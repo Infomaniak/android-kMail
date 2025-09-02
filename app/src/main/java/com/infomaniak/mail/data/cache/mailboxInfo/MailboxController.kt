@@ -50,11 +50,11 @@ class MailboxController @Inject constructor(
 ) {
 
     //region Get data
-    fun getMailboxesBlocking(
+    suspend fun getMailboxes(
         userId: Int? = null,
         exceptionMailboxIds: List<Int> = emptyList(),
     ): RealmResults<Mailbox> {
-        return getMailboxesBlocking(userId, mailboxInfoRealm, exceptionMailboxIds)
+        return getMailboxes(userId, mailboxInfoRealm, exceptionMailboxIds)
     }
 
     fun getMailboxesCount(userId: Int): Flow<Long> = getMailboxesCountQuery(userId, mailboxInfoRealm).asFlow()
@@ -221,6 +221,14 @@ class MailboxController @Inject constructor(
         //endregion
 
         //region Get data
+        suspend fun getMailboxes(
+            userId: Int? = null,
+            realm: TypedRealm,
+            exceptionMailboxIds: List<Int> = emptyList(),
+        ): RealmResults<Mailbox> {
+            return getMailboxesQuery(userId, realm, exceptionMailboxIds).findSuspend()
+        }
+
         fun getMailboxesBlocking(
             userId: Int? = null,
             realm: TypedRealm,

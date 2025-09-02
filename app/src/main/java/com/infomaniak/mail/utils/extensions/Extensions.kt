@@ -359,7 +359,7 @@ fun shouldThisFolderBeAdded(folder: Folder, shouldFilterOutFolderWithRole: Boole
     }
 }
 
-suspend fun actionForFolder(
+private suspend fun actionForFolder(
     isManaged: Boolean,
     folder: Folder,
     shouldFilterOutFolderWithRole: Boolean,

@@ -366,7 +366,7 @@ class MainViewModel @Inject constructor(
         selectMailbox(mailbox)
 
         if (currentFolderId == null) {
-            folderController.getFolderBlocking(DEFAULT_SELECTED_FOLDER)?.let { folder ->
+            folderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
                 selectFolder(folder.id)
             }
         }
@@ -425,7 +425,7 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
 
             // Refresh Threads
-            (currentFolderId?.let { folderController.getFolder(it) } ?: folderController.getFolderBlocking(DEFAULT_SELECTED_FOLDER))
+            (currentFolderId?.let { folderController.getFolder(it) } ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))
                 ?.let { folder ->
                     selectFolder(folder.id)
                     viewModelScope.launch(ioCoroutineContext) {
@@ -658,7 +658,7 @@ class MainViewModel @Inject constructor(
             )
         } else {
             moveThreadsOrMessageTo(
-                destinationFolder = folderController.getFolderBlocking(FolderRole.TRASH)!!,
+                destinationFolder = folderController.getFolder(FolderRole.TRASH)!!,
                 threadsUids = threadsUids,
                 threads = threads,
                 message = message,
@@ -734,8 +734,8 @@ class MainViewModel @Inject constructor(
         snackbarManager.postValue(snackbarTitle, undoData)
     }
 
-    private fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getUnscheduledMessages)
+    private suspend fun getMessagesToDelete(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap { messageController.getUnscheduledMessages(it) }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
@@ -744,7 +744,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.deleteDraft(targetMailboxUuid, remoteDraftUuid)
 
         if (apiResponse.isSuccess() && mailbox.uuid == targetMailboxUuid) {
-            val draftFolderId = folderController.getFolderBlocking(FolderRole.DRAFT)!!.id
+            val draftFolderId = folderController.getFolder(FolderRole.DRAFT)!!.id
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(draftFolderId)))
         }
 
@@ -780,7 +780,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
 
         if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolderBlocking(FolderRole.SCHEDULED_DRAFTS)!!.id
+            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
             onSuccess()
         } else {
@@ -793,7 +793,7 @@ class MainViewModel @Inject constructor(
         val apiResponse = ApiRepository.unscheduleDraft(unscheduleDraftUrl)
 
         if (apiResponse.isSuccess()) {
-            val scheduledDraftsFolderId = folderController.getFolderBlocking(FolderRole.SCHEDULED_DRAFTS)!!.id
+            val scheduledDraftsFolderId = folderController.getFolder(FolderRole.SCHEDULED_DRAFTS)!!.id
             refreshFoldersAsync(mailbox, ImpactedFolders(mutableSetOf(scheduledDraftsFolderId)))
         }
 
@@ -802,7 +802,7 @@ class MainViewModel @Inject constructor(
 
     private fun showUnscheduledDraftSnackbar(apiResponse: ApiResponse<Unit>) {
 
-        fun openDraftFolder() = folderController.getFolderBlocking(FolderRole.DRAFT)?.id?.let(::openFolder)
+        fun openDraftFolder() = viewModelScope.launch { folderController.getFolder(FolderRole.DRAFT)?.id?.let(::openFolder) }
 
         if (apiResponse.isSuccess()) {
             snackbarManager.postValue(
@@ -966,7 +966,7 @@ class MainViewModel @Inject constructor(
         val isFromArchive = role == FolderRole.ARCHIVE
 
         val destinationFolderRole = if (isFromArchive) FolderRole.INBOX else FolderRole.ARCHIVE
-        val destinationFolder = folderController.getFolderBlocking(destinationFolderRole)!!
+        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
         val messagesToMove = sharedUtils.getMessagesToMove(threads, message)
 
@@ -1039,7 +1039,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
+    private suspend fun getMessagesToMarkAsUnseen(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap { thread ->
             messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, featureFlagsLive.value)
         }
@@ -1107,15 +1107,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
+    private suspend fun getMessagesToFavorite(threads: List<Thread>, message: Message?) = when (message) {
         null -> threads.flatMap { thread ->
             messageController.getLastMessageAndItsDuplicatesToExecuteAction(thread, featureFlagsLive.value)
         }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
-    private fun getMessagesToUnfavorite(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getFavoriteMessages)
+    private suspend fun getMessagesToUnfavorite(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap { messageController.getFavoriteMessages(it) }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
@@ -1153,15 +1153,15 @@ class MainViewModel @Inject constructor(
         } else {
             FolderRole.SPAM
         }
-        val destinationFolder = folderController.getFolderBlocking(destinationFolderRole)!!
+        val destinationFolder = folderController.getFolder(destinationFolderRole)!!
 
         val messages = getMessagesToSpamOrHam(threads, message)
 
         moveThreadsOrMessageTo(destinationFolder, threadsUids, threads, message, messages, displaySnackbar)
     }
 
-    private fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getUnscheduledMessages)
+    private suspend fun getMessagesToSpamOrHam(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap { messageController.getUnscheduledMessages(it) }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
     //endregion
@@ -1230,7 +1230,7 @@ class MainViewModel @Inject constructor(
 
         viewModelScope.launch {
             currentMailbox.value?.let { currentMailbox ->
-                val threads = threadUids.mapNotNull(threadController::getThread)
+                val threads = threadUids.mapNotNull { threadController.getThread(it) }
 
                 val messageUids = threads.mapNotNull { thread ->
                     thread.getDisplayedMessages(currentMailbox.featureFlags, localSettings)
@@ -1584,7 +1584,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun refreshDraftFolderWhenDraftArrives(scheduledMessageEtop: Long) = viewModelScope.launch(ioCoroutineContext) {
-        val folder = folderController.getFolderBlocking(FolderRole.DRAFT)
+        val folder = folderController.getFolder(FolderRole.DRAFT)
 
         if (folder?.cursor != null) {
 
@@ -1638,12 +1638,12 @@ class MainViewModel @Inject constructor(
         threadController.deleteThread(threadUid)
     }
 
-    private fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
+    private suspend fun shouldAutoAdvance(message: Message?, threadsUids: List<String>): Boolean {
         val isWorkingWithThread = message == null
         return isWorkingWithThread || threadHasOnlyOneMessageLeft(threadsUids.first())
     }
 
-    private fun threadHasOnlyOneMessageLeft(threadUid: String): Boolean {
+    private suspend fun threadHasOnlyOneMessageLeft(threadUid: String): Boolean {
         return messageController.getMessagesCountInThread(threadUid, featureFlagsLive.value, mailboxContentRealm()) == 1
     }
 

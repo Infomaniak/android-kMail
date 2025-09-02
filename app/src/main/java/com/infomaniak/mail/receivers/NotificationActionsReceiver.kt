@@ -169,7 +169,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
 
             val mailbox = mailboxController.getMailbox(userId, mailboxId) ?: return@launch
             val messages = sharedUtils.getMessagesToMove(threads, message)
-            val destinationFolder = folderController.getFolderBlocking(folderRole) ?: return@launch
+            val destinationFolder = folderController.getFolder(folderRole) ?: return@launch
             val okHttpClient = AccountUtils.getHttpClient(userId)
 
             trackNotificationActionEvent(matomoName)

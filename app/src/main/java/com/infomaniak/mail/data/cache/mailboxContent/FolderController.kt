@@ -78,8 +78,8 @@ class FolderController @Inject constructor(
         return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).findSuspend()
     }
 
-    fun getFolderBlocking(role: FolderRole): Folder? {
-        return getFolderQuery(Folder.rolePropertyName, role.name, mailboxContentRealm()).find()
+    suspend fun getFolder(role: FolderRole): Folder? {
+        return getFolderQuery(Folder.rolePropertyName, role.name, mailboxContentRealm()).findSuspend()
     }
 
     fun getRootFolderBlocking(name: String) = with(mailboxContentRealm()) {
@@ -111,13 +111,13 @@ class FolderController @Inject constructor(
          * Doing so for managed Realm objects will lively update the list we're iterating through, making us skip the next item.
          * Looping in reverse enables us to not skip any item.
          */
-        getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).asReversed().forEach { folder ->
+        getFoldersBlocking(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).asReversed().forEach { folder ->
             deleteLocalFolder(mailbox, folder)
         }
     }
 
     private fun MutableRealm.deleteLocalFolder(mailbox: Mailbox, folder: Folder) {
-        MessageController.deleteMessages(appContext, mailbox, folder.messages(realm = this), realm = this)
+        MessageController.deleteMessages(appContext, mailbox, folder.messagesBlocking(realm = this), realm = this)
         if (folder.threads.isNotEmpty()) delete(folder.threads)
         delete(folder)
     }
@@ -126,7 +126,7 @@ class FolderController @Inject constructor(
 
         remoteFolders.forEach { remoteFolder ->
 
-            val localFolder = getFolder(remoteFolder.id, realm = this)
+            val localFolder = getFolderBlocking(remoteFolder.id, realm = this)
 
             if (remoteFolder.role == FolderRole.SCHEDULED_DRAFTS && localFolder == null) remoteFolder.isDisplayed = false
 
@@ -198,7 +198,10 @@ class FolderController @Inject constructor(
         //endregion
 
         //region Get data
-        private fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm): RealmResults<Folder> {
+        private fun getFoldersBlocking(
+            exceptionsFoldersIds: List<String> = emptyList(),
+            realm: TypedRealm
+        ): RealmResults<Folder> {
             val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
                 getFoldersQuery(realm, visibleFoldersOnly = false)
             } else {
@@ -207,12 +210,20 @@ class FolderController @Inject constructor(
             return realmQuery.find()
         }
 
-        fun getFolder(id: String, realm: TypedRealm): Folder? {
+        suspend fun getFolder(id: String, realm: Realm): Folder? {
+            return getFolderQuery(Folder::id.name, id, realm).findSuspend()
+        }
+
+        fun getFolderBlocking(id: String, realm: TypedRealm): Folder? {
             return getFolderQuery(Folder::id.name, id, realm).find()
         }
 
-        fun getFolder(role: FolderRole, realm: TypedRealm): Folder? {
+        fun getFolderBlocking(role: FolderRole, realm: TypedRealm): Folder? {
             return getFolderQuery(Folder.rolePropertyName, role.name, realm).find()
+        }
+
+        suspend fun getFolder(role: FolderRole, realm: Realm): Folder? {
+            return getFolderQuery(Folder.rolePropertyName, role.name, realm).findSuspend()
         }
 
         fun getOrCreateSearchFolder(realm: MutableRealm): Folder {
@@ -224,7 +235,7 @@ class FolderController @Inject constructor(
 
         //region Edit data
         suspend fun updateFolder(id: String, realm: Realm, onUpdate: (MutableRealm, Folder) -> Unit) {
-            realm.write { getFolder(id, realm = this)?.let { onUpdate(this, it) } }
+            realm.write { getFolderBlocking(id, realm = this)?.let { onUpdate(this, it) } }
         }
 
         suspend fun updateFolderAndChildren(id: String, realm: Realm, onUpdate: (Folder) -> Unit) {
@@ -238,7 +249,7 @@ class FolderController @Inject constructor(
             }
 
             realm.write {
-                getFolder(id, realm = this)?.let { folder -> updateChildrenRecursively(mutableListOf(folder)) }
+                getFolderBlocking(id, realm = this)?.let { folder -> updateChildrenRecursively(mutableListOf(folder)) }
             }
         }
 

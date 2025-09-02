@@ -88,7 +88,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -147,7 +146,7 @@ class ThreadViewModel @Inject constructor(
     private val threadOpeningModeFlow = _threadOpeningModeFlow.distinctUntilChangedBy { it.threadUid }
 
     val threadFlow: Flow<Thread?> = threadOpeningModeFlow
-        .map { mode -> mode.threadUid?.let(threadController::getThread) }
+        .map { mode -> mode.threadUid?.let { threadController.getThread(it) } }
         // replay = 1 is needed because the UI relies on this flow to set click listeners. If there's a config change but no
         // replay value, the click listeners won't ever be set
         .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
@@ -690,8 +689,7 @@ class ThreadViewModel @Inject constructor(
         override fun getMessages(featureFlags: Mailbox.FeatureFlagSet): Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> {
             return messageController
                 .getSortedAndNotDeletedMessagesAsync(threadUid, featureFlags)
-                ?.map { mapRealmMessagesResult(it.list, threadUid) }
-                ?: emptyFlow()
+                .map { mapRealmMessagesResult(it.list, threadUid) }
         }
     }
 
