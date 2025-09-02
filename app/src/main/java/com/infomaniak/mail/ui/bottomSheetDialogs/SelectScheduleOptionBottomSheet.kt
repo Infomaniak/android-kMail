@@ -27,6 +27,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.utils.getNextMonday
 import com.infomaniak.core.utils.getTimeAtHour
 import com.infomaniak.core.utils.isAtLeastXMinutesInTheFuture
@@ -36,7 +37,6 @@ import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.mailbox.Mailbox.KSuite
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding
 import com.infomaniak.mail.ui.alertDialogs.SelectDateAndTimeDialog.Companion.MIN_SELECTABLE_DATE_MINUTES
 import com.infomaniak.mail.ui.bottomSheetDialogs.HourOfTheDay.Afternoon
