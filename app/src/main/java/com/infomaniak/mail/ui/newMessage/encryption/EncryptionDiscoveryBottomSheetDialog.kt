@@ -17,16 +17,22 @@
  */
 package com.infomaniak.mail.ui.newMessage.encryption
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager.LayoutParams
+import androidx.annotation.StringRes
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetEncryptionDiscoveryBinding
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
 import com.infomaniak.lib.core.R as RCore
@@ -47,6 +53,8 @@ class EncryptionDiscoveryBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setFlags(LayoutParams.FLAG_NOT_FOCUSABLE, LayoutParams.FLAG_NOT_FOCUSABLE)
+
+        setBoldDescriptions()
         binding.readMoreButton.setOnClickListener { EncryptionUtils.onReadMoreClicked() }
 
         actionButton.apply {
@@ -63,5 +71,35 @@ class EncryptionDiscoveryBottomSheetDialog : BottomSheetDialogFragment() {
             newMessageViewModel.isEncryptionActivated.value = false
             dismiss()
         }
+    }
+
+    private fun setBoldDescriptions() {
+        binding.description2.text = computeBoldDescription(
+            completeDescriptionRes = R.string.encryptedProtectionAdDescription1,
+            boldSubstringRes = R.string.encryptedProtectionAdDescription1Bold,
+        )
+        binding.description3.text = computeBoldDescription(
+            completeDescriptionRes = R.string.encryptedProtectionAdDescription2,
+            boldSubstringRes = R.string.encryptedProtectionAdDescription2Bold,
+        )
+    }
+
+    private fun computeBoldDescription(
+        @StringRes completeDescriptionRes: Int,
+        @StringRes boldSubstringRes: Int,
+    ): Spannable {
+        val completeDescription = getString(completeDescriptionRes)
+        val boldDescription = SpannableString(completeDescription)
+
+        getString(boldSubstringRes).toRegex().find(completeDescription)?.range?.let { range ->
+            boldDescription.setSpan(
+                StyleSpan(Typeface.BOLD),
+                range.start,
+                range.endInclusive,
+                Spannable.SPAN_INCLUSIVE_INCLUSIVE,
+            )
+        }
+
+        return boldDescription
     }
 }
