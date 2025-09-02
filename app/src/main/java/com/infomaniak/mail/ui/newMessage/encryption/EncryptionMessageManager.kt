@@ -137,8 +137,6 @@ class EncryptionMessageManager @Inject constructor(
 
     fun toggleEncryption() {
 
-        if (navigateToDiscoveryBottomSheetIfFirstTime()) return
-
         if (binding.encryptionLockButtonView.encryptionStatus == EncryptionStatus.Loading) return
 
         if (newMessageViewModel.isEncryptionActivated.value == true) {
@@ -148,6 +146,7 @@ class EncryptionMessageManager @Inject constructor(
                 )
             )
         } else {
+            if (navigateToDiscoveryBottomSheetIfFirstTime()) return
             newMessageViewModel.isEncryptionActivated.value = true
         }
     }
