@@ -542,8 +542,8 @@ class NewMessageViewModel @Inject constructor(
         return getLatestLocalDraft(localUuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
     }
 
-    private suspend fun getLatestLocalDraft(localUuid: String?): Draft? = Dispatchers.IO {
-        localUuid?.let(draftController::getDraftBlocking)?.copyFromRealm()
+    private suspend fun getLatestLocalDraft(localUuid: String?): Draft? {
+        return localUuid?.let { draftController.getDraft(it) }?.let { Dispatchers.IO { it.copyFromRealm() } }
     }
 
     private suspend fun fetchDraft(): Draft? {

@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.Snoozable
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.data.models.SwissTransferContainer
 import com.infomaniak.mail.data.models.isSnoozed
@@ -70,7 +71,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
         return getThreadsByUids(threadsUids, mailboxContentRealm())
     }
 
-    fun getThread(uid: String): Thread? {
+    suspend fun getThread(uid: String): Thread? {
         return getThread(uid, mailboxContentRealm())
     }
 
@@ -97,7 +98,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
     suspend fun updateIsLocallyMovedOutStatus(threadUids: List<String>, hasBeenMovedOut: Boolean) {
         mailboxContentRealm().write {
             threadUids.forEach {
-                getThread(it, realm = this)?.isLocallyMovedOut = hasBeenMovedOut
+                getThreadBlocking(it, realm = this)?.isLocallyMovedOut = hasBeenMovedOut
             }
         }
     }
@@ -105,7 +106,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
     // TODO: Remove this function when the Threads parental issues are fixed
     suspend fun removeThreadsWithParentalIssues() {
         val realm = mailboxContentRealm()
-        val threads = realm.query<Thread>("${Thread::_folders.name}.@count > 1").find()
+        val threads = realm.query<Thread>("${Thread::_folders.name}.@count > 1").findSuspend()
 
         threads.forEach { thread ->
 
@@ -200,15 +201,19 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
             return realm.query<Thread>("${Thread::uid.name} == $0", uid).first()
         }
 
-        private fun getEmptyThreadsInFolderQuery(folderId: String, realm: TypedRealm): RealmQuery<Thread> {
+        private fun getEmptyThreadsInFolderQueryBlocking(folderId: String, realm: TypedRealm): RealmQuery<Thread> {
             val noMessages = "${Thread::messages.name}.@size == $0"
-            return FolderController.getFolder(folderId, realm)?.threads?.query(noMessages, 0)
+            return FolderController.getFolderBlocking(folderId, realm)?.threads?.query(noMessages, 0)
                 ?: realm.query<Thread>("$noMessages AND ${Thread::folderId.name} == $1", 0, folderId)
         }
         //endregion
 
         //region Get data
-        fun getThread(uid: String, realm: TypedRealm): Thread? {
+        suspend fun getThread(uid: String, realm: TypedRealm): Thread? {
+            return getThreadQuery(uid, realm).findSuspend()
+        }
+
+        fun getThreadBlocking(uid: String, realm: TypedRealm): Thread? {
             return getThreadQuery(uid, realm).find()
         }
 
@@ -216,27 +221,27 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
             return getThreadsByUidsQuery(threadsUids, realm).findSuspend()
         }
 
-        fun getThreadsByMessageIds(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
+        fun getThreadsByMessageIdsBlocking(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
             return getThreadsByMessageIdsQuery(messageIds, realm).find()
         }
 
-        fun getUnreadThreadsCount(folder: Folder): Int {
+        fun getUnreadThreadsCountBlocking(folder: Folder): Int {
             return getUnreadThreadsCountQuery(folder).find().toInt()
         }
 
-        fun getThreadsByFolderId(folderId: String, realm: TypedRealm): RealmResults<Thread> {
+        fun getThreadsByFolderIdBlocking(folderId: String, realm: TypedRealm): RealmResults<Thread> {
             return getThreadsByFolderIdQuery(folderId, realm).find()
         }
 
-        fun getInboxThreadsWithSnoozeFilter(withSnooze: Boolean, realm: TypedRealm): List<Thread> {
-            val inboxId = FolderController.getFolder(FolderRole.INBOX, realm)?.id ?: return emptyList()
+        fun getInboxThreadsWithSnoozeFilterBlocking(withSnooze: Boolean, realm: TypedRealm): List<Thread> {
+            val inboxId = FolderController.getFolderBlocking(FolderRole.INBOX, realm)?.id ?: return emptyList()
             return getThreadsWithSnoozeFilterQuery(inboxId, withSnooze, realm).find()
         }
 
-        fun getSnoozedThreadsWithNewMessage(inboxFolderId: String, realm: Realm): List<Thread> {
+        suspend fun getSnoozedThreadsWithNewMessage(inboxFolderId: String, realm: Realm): List<Thread> {
             val isInFolder = "${Thread::folderId.name} == $0"
             val hasNewMessage = "${Thread::isLastInboxMessageSnoozed.name} == false"
-            return realm.query<Thread>("$isInFolder AND $hasNewMessage AND $isSnoozedState", inboxFolderId).find()
+            return realm.query<Thread>("$isInFolder AND $hasNewMessage AND $isSnoozedState", inboxFolderId).findSuspend()
         }
         //endregion
 
@@ -244,7 +249,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
         fun upsertThread(thread: Thread, realm: MutableRealm): Thread = realm.copyToRealm(thread, UpdatePolicy.ALL)
 
         private fun updateThread(threadUid: String, realm: MutableRealm, onUpdate: (Thread?) -> Unit) {
-            onUpdate(getThread(threadUid, realm))
+            onUpdate(getThreadBlocking(threadUid, realm))
         }
 
         /**
@@ -289,7 +294,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
                                 areHeavyDataFetched = true,
                                 isTrashed = localMessage.isTrashed,
                                 messageIds = localMessage.messageIds,
-                                draftLocalUuid = remoteMessage.getDraftLocalUuid(realm),
+                                draftLocalUuid = remoteMessage.getDraftLocalUuidBlocking(realm),
                                 isFromSearch = localMessage.isFromSearch,
                                 isDeletedOnApi = false,
                                 latestCalendarEventResponse = localMessage.latestCalendarEventResponse,
@@ -352,7 +357,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
 
         // If we've already got this Message's Draft beforehand, we need to save
         // its `draftLocalUuid`, otherwise we'll lose the link between them.
-        private fun Message.getDraftLocalUuid(realm: TypedRealm): String? {
+        private fun Message.getDraftLocalUuidBlocking(realm: TypedRealm): String? {
             return if (isDraft) DraftController.getDraftByMessageUidBlocking(uid, realm)?.localUuid else null
         }
 
@@ -362,7 +367,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
 
         suspend fun deleteEmptyThreadsInFolder(folderId: String, realm: Realm) {
             realm.write {
-                val emptyThreads = getEmptyThreadsInFolderQuery(folderId, realm = this).find()
+                val emptyThreads = getEmptyThreadsInFolderQueryBlocking(folderId, realm = this).find()
                 // TODO: Find why we are sometimes displaying empty Threads, and fix it instead of just deleting them.
                 //  It's possibly because we are out of sync, and the situation will resolve by itself shortly?
                 if (emptyThreads.isNotEmpty()) {
@@ -381,7 +386,7 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
             val localMessages = if (messages.firstOrNull()?.isManaged() == true) {
                 messages
             } else {
-                MessageController.getMessagesByUids(messages.map(Message::uid), realm)
+                MessageController.getMessagesByUidsBlocking(messages.map(Message::uid), realm)
             }
 
             localMessages.flatMapTo(mutableSetOf(), Message::threads).forEach { thread ->
@@ -395,13 +400,13 @@ class ThreadController @Inject constructor(private val mailboxContentRealm: Real
 
         fun updateFavoriteStatus(threadUids: List<String>, isFavorite: Boolean, realm: MutableRealm) {
             threadUids.forEach {
-                getThread(it, realm)?.isFavorite = isFavorite
+                getThreadBlocking(it, realm)?.isFavorite = isFavorite
             }
         }
 
         fun updateSeenStatus(threadUids: List<String>, isSeen: Boolean, realm: MutableRealm) {
             threadUids.forEach {
-                getThread(it, realm)?.unseenMessagesCount = if (isSeen) 0 else 1
+                getThreadBlocking(it, realm)?.unseenMessagesCount = if (isSeen) 0 else 1
             }
         }
         //endregion

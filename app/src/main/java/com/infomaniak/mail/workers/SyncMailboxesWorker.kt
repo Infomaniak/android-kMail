@@ -65,7 +65,7 @@ class SyncMailboxesWorker @AssistedInject constructor(
         notificationUtils.updateUserAndMailboxes(mailboxController, TAG)
 
         AccountUtils.getAllUsersSync().forEach { user ->
-            mailboxController.getMailboxesBlocking(user.id).forEach { mailbox ->
+            mailboxController.getMailboxes(user.id).forEach { mailbox ->
                 fetchMessagesManager.execute(scope = this, user.id, mailbox)
             }
         }

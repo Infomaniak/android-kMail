@@ -48,12 +48,12 @@ class DraftController @Inject constructor(
         return getDraftsQuery(realm = realm).findSuspend()
     }
 
-    fun getDraftBlocking(localUuid: String): Draft? {
-        return getDraftBlocking(localUuid, mailboxContentRealm())
+    suspend fun getDraft(localUuid: String): Draft? {
+        return getDraft(localUuid, mailboxContentRealm())
     }
 
-    fun getDraftByMessageUid(messageUid: String): Draft? {
-        return getDraftByMessageUidBlocking(messageUid, mailboxContentRealm())
+    suspend fun getDraftByMessageUid(messageUid: String): Draft? {
+        return getDraftByMessageUid(messageUid, mailboxContentRealm())
     }
     //endregion
 
@@ -116,6 +116,10 @@ class DraftController @Inject constructor(
 
         fun getDraftByMessageUidBlocking(messageUid: String, realm: TypedRealm): Draft? {
             return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
+        }
+
+        suspend fun getDraftByMessageUid(messageUid: String, realm: TypedRealm): Draft? {
+            return getDraftQuery(Draft::messageUid.name, messageUid, realm).findSuspend()
         }
         //endregion
 
