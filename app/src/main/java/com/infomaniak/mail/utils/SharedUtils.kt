@@ -77,7 +77,7 @@ class SharedUtils @Inject constructor(
     ) {
 
         val messages = when (message) {
-            null -> threads.flatMap(messageController::getUnseenMessages)
+            null -> threads.flatMap { messageController.getUnseenMessages(it) }
             else -> messageController.getMessageAndDuplicates(threads.first(), message)
         }
 
@@ -107,8 +107,8 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getMovableMessages)
+    suspend fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap { messageController.getMovableMessages(it) }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 

@@ -86,7 +86,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
         // This is to avoid doing some processing when we never opened a specific Mailbox.
         val realm = RealmDatabase.newMailboxContentInstance(userId, mailboxId)
-        FolderController.getFolder(FolderRole.INBOX, realm)?.cursor?.let {
+        FolderController.getFolderBlocking(FolderRole.INBOX, realm)?.cursor?.let {
             if (mainApplication.isAppInBackground) runBlocking { // runBlocking is fine here, not on main thread, 20s timeout.
                 processMessageInBackground(userId, mailboxId, messageUid)
             } else {
