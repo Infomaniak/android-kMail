@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.extensions.copyListToRealm
+import com.infomaniak.mail.utils.extensions.findSuspend
 import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
 import com.infomaniak.mail.utils.extensions.sortFolders
 import io.realm.kotlin.MutableRealm
@@ -65,23 +66,23 @@ class FolderController @Inject constructor(
         return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
     }
 
-    fun getMoveFolders(): RealmResults<Folder> {
+    suspend fun getMoveFolders(): RealmResults<Folder> {
         return getFoldersQuery(
             realm = mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.SNOOZED, FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
             withoutChildren = true,
-        ).find()
+        ).findSuspend()
     }
 
-    fun getFolder(id: String): Folder? {
-        return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).find()
+    suspend fun getFolder(id: String): Folder? {
+        return getFolderQuery(Folder::id.name, id, mailboxContentRealm()).findSuspend()
     }
 
-    fun getFolder(role: FolderRole): Folder? {
+    fun getFolderBlocking(role: FolderRole): Folder? {
         return getFolderQuery(Folder.rolePropertyName, role.name, mailboxContentRealm()).find()
     }
 
-    fun getRootFolder(name: String) = with(mailboxContentRealm()) {
+    fun getRootFolderBlocking(name: String) = with(mailboxContentRealm()) {
         query<Folder>("$isRootFolder AND ${Folder::name.name} == $0", name).first().find()
     }
 

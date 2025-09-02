@@ -109,13 +109,13 @@ class MailActionsManagerTest {
 
             draftController?.upsertDraft(getDraft(realmListOf(mockedAttachment)))
 
-            val storedAttachment = draftController?.getDraft(DRAFT_LOCAL_UUID)?.attachments?.first()
+            val storedAttachment = draftController?.getDraftBlocking(DRAFT_LOCAL_UUID)?.attachments?.first()
             assert(storedAttachment?.uuid?.isEmpty() == true)
             assert(storedAttachment?.attachmentUploadStatus == AttachmentUploadStatus.NOT_UPLOADED)
 
             mockedAttachment.startUpload(DRAFT_LOCAL_UUID, Mailbox(), realm)
 
-            val updatedStoredAttachment = draftController?.getDraft(DRAFT_LOCAL_UUID)?.attachments?.first()
+            val updatedStoredAttachment = draftController?.getDraftBlocking(DRAFT_LOCAL_UUID)?.attachments?.first()
             assert(updatedStoredAttachment?.uuid == ATTACHMENT_REMOTE_UUID)
             assert(updatedStoredAttachment?.attachmentUploadStatus == AttachmentUploadStatus.UPLOADED)
         }

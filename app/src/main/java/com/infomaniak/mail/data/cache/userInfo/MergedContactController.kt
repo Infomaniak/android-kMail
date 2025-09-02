@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.addressBook.ContactGroup
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.di.UserInfoRealm
+import com.infomaniak.mail.utils.extensions.findSuspend
 import com.infomaniak.mail.utils.extensions.update
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
@@ -56,8 +57,8 @@ class MergedContactController @Inject constructor(@UserInfoRealm private val use
     //endregion
 
     //region Get data
-    fun getSortedMergedContacts(): RealmResults<MergedContact> {
-        return getMergedContactsQuery().find()
+    suspend fun getSortedMergedContacts(): RealmResults<MergedContact> {
+        return getMergedContactsQuery().findSuspend()
     }
 
     fun getMergedContactFromContactGroup(contact: ContactGroup): List<MergedContact> {

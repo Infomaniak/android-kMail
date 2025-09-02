@@ -23,8 +23,15 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.query.RealmElementQuery
+import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.query.RealmScalarQuery
+import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 suspend inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
     write { update<T>(items) }
@@ -43,4 +50,16 @@ fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems:
 inline fun <reified T> RealmList<T>.replaceContent(list: List<T>) {
     clear()
     addAll(list.toRealmList())
+}
+
+suspend fun <T : BaseRealmObject> RealmElementQuery<T>.findSuspend(): RealmResults<T> {
+    return asFlow().map { it.list }.first()
+}
+
+suspend fun <T> RealmScalarQuery<T>.findSuspend(): T {
+    return asFlow().first()
+}
+
+suspend fun <T : BaseRealmObject> RealmSingleQuery<T>.findSuspend(): T? {
+    return asFlow().map { it.obj }.first()
 }
