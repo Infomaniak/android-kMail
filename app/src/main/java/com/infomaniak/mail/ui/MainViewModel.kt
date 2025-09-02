@@ -427,13 +427,14 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
 
             // Refresh Threads
-            (currentFolderId?.let { folderController.getFolder(it) } ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))
-                ?.let { folder ->
-                    selectFolder(folder.id)
-                    viewModelScope.launch(ioCoroutineContext) {
-                        refreshThreads(mailbox, folder.id)
-                    }
+            (currentFolderId
+                ?.let { folderController.getFolder(it) }
+                ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))?.let { folder ->
+                selectFolder(folder.id)
+                viewModelScope.launch(ioCoroutineContext) {
+                    refreshThreads(mailbox, folder.id)
                 }
+            }
         }
     }
 
@@ -457,12 +458,11 @@ class MainViewModel @Inject constructor(
 
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
-        if (mailbox.kSuite == KSuite.Perso.Free) {
-            val apiResponse = ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)
-            if (apiResponse.isSuccess()) {
-                mailboxController.updateMailbox(mailbox.objectId) {
-                    it.quotas = apiResponse.data
-                }
+        if (mailbox.kSuite != KSuite.Perso.Free) return@launch
+
+        with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
+                it.quotas = data
             }
         }
     }

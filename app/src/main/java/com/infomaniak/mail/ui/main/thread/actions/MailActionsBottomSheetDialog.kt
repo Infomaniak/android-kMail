@@ -113,7 +113,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setShareTrailingContent() {
         binding.share.trailingContent = if (mainViewModel.currentMailbox.value?.kSuite == KSuite.Perso.Free) {
-            TrailingContent.MyKSuiteChip
+            TrailingContent.KSuitePersoChip
         } else {
             TrailingContent.None
         }
