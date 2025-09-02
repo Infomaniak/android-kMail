@@ -20,7 +20,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:title="@string/encryptedProtectionAdTitle"
     tools:context=".ui.bottomSheetDialogs.UpdateAvailableBottomSheetDialog">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -37,10 +36,21 @@
             android:importantForAccessibility="no"
             android:maxHeight="270dp"
             android:src="@drawable/illu_encrypted_mail"
-            app:layout_constraintBottom_toTopOf="@id/description"
+            app:layout_constraintBottom_toTopOf="@id/title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/H2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:gravity="center"
+            android:text="@string/encryptedProtectionAdTitle"
+            app:layout_constraintBottom_toTopOf="@id/description"
+            app:layout_constraintTop_toBottomOf="@id/info_illustration" />
 
         <TextView
             android:id="@+id/description"
@@ -49,7 +59,7 @@
             android:layout_marginVertical="@dimen/marginStandardMedium"
             android:text="@string/encryptedProtectionAdDescription"
             app:layout_constraintBottom_toTopOf="@id/description2"
-            app:layout_constraintTop_toBottomOf="@id/info_illustration" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
 
         <ImageView
             android:id="@+id/descriptionBullet1"
@@ -104,7 +114,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/alternativeMargin"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
             android:text="@string/readMore"
+            app:layout_constraintBottom_toTopOf="@id/actionButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/description3" />
 
