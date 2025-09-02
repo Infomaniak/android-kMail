@@ -46,7 +46,7 @@ class ActionItemView @JvmOverloads constructor(
 
     private val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val myKSuitePlusChipView by lazy { MyKSuitePlusChipView(context) }
+    private val kSuitePersoChipView by lazy { MyKSuitePlusChipView(context) }
     private val kSuiteProChipView by lazy { EvolveChipView(context) }
 
     var trailingContent = TrailingContent.None
@@ -114,7 +114,7 @@ class ActionItemView @JvmOverloads constructor(
 
     private fun setTrailingContentUi(trailingContent: TrailingContent) = with(binding) {
         trailingContentLayout.isVisible = true
-        trailingContentLayout.removeView(myKSuitePlusChipView)
+        trailingContentLayout.removeView(kSuitePersoChipView)
         trailingContentLayout.removeView(kSuiteProChipView)
 
         when (trailingContent) {
@@ -127,11 +127,11 @@ class ActionItemView @JvmOverloads constructor(
                 description.isVisible = true
                 actionIcon.isGone = true
             }
-            TrailingContent.MyKSuiteChip -> {
+            TrailingContent.KSuitePersoChip -> {
                 // ComposeView are not compatible with view without lifecycles (ex: PopupWindow in RecipientFieldView).
                 // This is causing a crash so to avoid that, we have to programmatically
                 // add the Compose view only where it's needed.
-                trailingContentLayout.addView(myKSuitePlusChipView)
+                trailingContentLayout.addView(kSuitePersoChipView)
 
                 actionIcon.isGone = true
                 description.isGone = true
@@ -150,7 +150,7 @@ class ActionItemView @JvmOverloads constructor(
 
     /** Keep the entries order, it's used by the attribute (or change also the attributes order in attrs.xml) */
     enum class TrailingContent {
-        None, Chevron, Description, MyKSuiteChip, KSuiteProChip,
+        None, Chevron, Description, KSuitePersoChip, KSuiteProChip,
     }
 
     private fun TypedArray.getDimenOrNull(@StyleableRes index: Int): Int? {
