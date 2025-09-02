@@ -96,10 +96,10 @@ private fun MigrationContext.renameKSuiteRelatedBooleans() {
             newObject?.apply {
 
                 // Rename property without losing its previous value
-                set(propertyName = "isMyKSuite", value = oldObject.getValue<Boolean>(fieldName = "isFree"))
+                set(propertyName = "isKSuitePerso", value = oldObject.getValue<Boolean>(fieldName = "isFree"))
 
                 // Rename property without losing its previous value
-                set(propertyName = "isMyKSuiteFree", value = oldObject.getValue<Boolean>(fieldName = "isLimited"))
+                set(propertyName = "isKSuitePersoFree", value = oldObject.getValue<Boolean>(fieldName = "isLimited"))
             }
         }
     }
