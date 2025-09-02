@@ -18,11 +18,11 @@
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.mailbox.Mailbox.KSuite
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
