@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetUserToBlockBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -48,6 +49,6 @@ class UserToBlockBottomSheetDialog : ActionsBottomSheetDialog() {
                     dismiss()
                 }
             }
-        }
+        } ?: findNavController().popBackStack()
     }
 }
