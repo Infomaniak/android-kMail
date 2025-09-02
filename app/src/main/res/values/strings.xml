@@ -289,7 +289,9 @@
     <string name="encryptedPasswordProtectionTitle">Password protection</string>
     <string name="encryptedProtectionAdDescription">Protect your message from unauthorized access with Infomaniak encryption.</string>
     <string name="encryptedProtectionAdDescription1">The message subject remains visible, but the content is completely secure.</string>
+    <string name="encryptedProtectionAdDescription1Bold">the content is completely secure.</string>
     <string name="encryptedProtectionAdDescription2">A password will be required for non-Infomaniak recipients.</string>
+    <string name="encryptedProtectionAdDescription2Bold">non-Infomaniak recipients.</string>
     <string name="encryptedProtectionAdTitle">Encrypt your confidential messages</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Recipients with password (%d)</string>
     <string name="encryptedStatePanelEnable">Your message is protected.</string>

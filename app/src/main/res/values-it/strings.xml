@@ -283,7 +283,9 @@
     <string name="encryptedPasswordProtectionTitle">Protezione con password</string>
     <string name="encryptedProtectionAdDescription">Proteggete i vostri messaggi dall’accesso non autorizzato con la crittografia Infomaniak.</string>
     <string name="encryptedProtectionAdDescription1">L’oggetto del messaggio rimane visibile, ma il contenuto è completamente protetto.</string>
+    <string name="encryptedProtectionAdDescription1Bold">il contenuto è completamente protetto.</string>
     <string name="encryptedProtectionAdDescription2">Per i destinatari esterni a Infomaniak sarà necessaria una password.</string>
+    <string name="encryptedProtectionAdDescription2Bold">i destinatari esterni a Infomaniak</string>
     <string name="encryptedProtectionAdTitle">Crittografia dei messaggi riservati</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Destinatari con password (%d)</string>
     <string name="encryptedStatePanelEnable">Il tuo messaggio è protetto.</string>
