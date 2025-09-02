@@ -192,9 +192,9 @@ class EncryptionMessageManager @Inject constructor(
      *
      * @return true if the bottomsheet is shown, false if we need to continue the default flow
      */
-    private fun navigateToDiscoveryBottomSheetIfFirstTime(): Boolean = with(localSettings) {
-        if (showEncryptionDiscoveryBottomSheet) {
-            showEncryptionDiscoveryBottomSheet = false
+    private fun navigateToDiscoveryBottomSheetIfFirstTime(): Boolean {
+        if (localSettings.showEncryptionDiscoveryBottomSheet) {
+            localSettings.showEncryptionDiscoveryBottomSheet = false
             fragment.safelyNavigate(R.id.encryptionDiscoveryBottomSheetDialog)
             return true
         }

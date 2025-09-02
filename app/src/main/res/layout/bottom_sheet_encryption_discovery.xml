@@ -58,11 +58,35 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/marginStandardMedium"
             android:text="@string/encryptedProtectionAdDescription"
-            app:layout_constraintBottom_toTopOf="@id/description2"
+            app:layout_constraintBottom_toTopOf="@id/description1"
             app:layout_constraintTop_toBottomOf="@id/title" />
 
         <ImageView
             android:id="@+id/descriptionBullet1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardSmall"
+            android:layout_marginTop="6dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_pastille"
+            app:layout_constraintEnd_toStartOf="@id/description1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/description1"
+            app:tint="@color/iconColor" />
+
+        <TextView
+            android:id="@+id/description1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:text="@string/encryptedProtectionAdDescription1"
+            app:layout_constraintBottom_toTopOf="@id/description2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/descriptionBullet1"
+            app:layout_constraintTop_toBottomOf="@id/description" />
+
+        <ImageView
+            android:id="@+id/descriptionBullet2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardSmall"
@@ -78,35 +102,11 @@
             android:id="@+id/description2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/marginStandardMedium"
-            android:text="@string/encryptedProtectionAdDescription1"
-            app:layout_constraintBottom_toTopOf="@id/description3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/descriptionBullet1"
-            app:layout_constraintTop_toBottomOf="@id/description" />
-
-        <ImageView
-            android:id="@+id/descriptionBullet2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:layout_marginTop="6dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_pastille"
-            app:layout_constraintEnd_toStartOf="@id/description3"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/description3"
-            app:tint="@color/iconColor" />
-
-        <TextView
-            android:id="@+id/description3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:text="@string/encryptedProtectionAdDescription2"
             app:layout_constraintBottom_toTopOf="@id/readMoreButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/descriptionBullet2"
-            app:layout_constraintTop_toBottomOf="@id/description2" />
+            app:layout_constraintTop_toBottomOf="@id/description1" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/readMoreButton"
@@ -118,7 +118,7 @@
             android:text="@string/readMore"
             app:layout_constraintBottom_toTopOf="@id/actionButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/description3" />
+            app:layout_constraintTop_toBottomOf="@id/description2" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/actionButton"
@@ -127,11 +127,11 @@
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardSmall"
+            android:text="@string/androidActivateButton"
             app:layout_constraintBottom_toTopOf="@id/secondaryActionButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/readMoreButton"
-            tools:text="@string/buttonUpdate" />
+            app:layout_constraintTop_toBottomOf="@id/readMoreButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/secondaryActionButton"

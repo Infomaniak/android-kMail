@@ -35,16 +35,12 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetEncryptionDiscoveryBinding
 import com.infomaniak.mail.ui.newMessage.NewMessageViewModel
-import com.infomaniak.lib.core.R as RCore
 
 class EncryptionDiscoveryBottomSheetDialog : BottomSheetDialogFragment() {
 
     private var binding: BottomSheetEncryptionDiscoveryBinding by safeBinding()
 
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
-
-    private val positiveButtonRes = RCore.string.androidActivateButton
-    private val trackMatomoWithCategory: (MatomoName) -> Unit = MatomoMail::trackEncryptionEvent
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetEncryptionDiscoveryBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -55,30 +51,15 @@ class EncryptionDiscoveryBottomSheetDialog : BottomSheetDialogFragment() {
         dialog?.window?.setFlags(LayoutParams.FLAG_NOT_FOCUSABLE, LayoutParams.FLAG_NOT_FOCUSABLE)
 
         setBoldDescriptions()
-        binding.readMoreButton.setOnClickListener { EncryptionUtils.onReadMoreClicked() }
-
-        actionButton.apply {
-            setText(positiveButtonRes)
-            setOnClickListener {
-                trackMatomoWithCategory(MatomoName.DiscoverNow)
-                newMessageViewModel.isEncryptionActivated.value = true
-                dismiss()
-            }
-        }
-
-        secondaryActionButton.setOnClickListener {
-            trackMatomoWithCategory(MatomoName.DiscoverLater)
-            newMessageViewModel.isEncryptionActivated.value = false
-            dismiss()
-        }
+        setupListeners()
     }
 
     private fun setBoldDescriptions() {
-        binding.description2.text = computeBoldDescription(
+        binding.description1.text = computeBoldDescription(
             completeDescriptionRes = R.string.encryptedProtectionAdDescription1,
             boldSubstringRes = R.string.encryptedProtectionAdDescription1Bold,
         )
-        binding.description3.text = computeBoldDescription(
+        binding.description2.text = computeBoldDescription(
             completeDescriptionRes = R.string.encryptedProtectionAdDescription2,
             boldSubstringRes = R.string.encryptedProtectionAdDescription2Bold,
         )
@@ -101,5 +82,20 @@ class EncryptionDiscoveryBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         return boldDescription
+    }
+
+    private fun setupListeners() = with(binding) {
+        readMoreButton.setOnClickListener { EncryptionUtils.onReadMoreClicked() }
+
+        actionButton.setOnClickListener {
+            MatomoMail.trackEncryptionEvent(MatomoName.DiscoverNow)
+            newMessageViewModel.isEncryptionActivated.value = true
+            dismiss()
+        }
+
+        secondaryActionButton.setOnClickListener {
+            MatomoMail.trackEncryptionEvent(MatomoName.DiscoverLater)
+            dismiss()
+        }
     }
 }
