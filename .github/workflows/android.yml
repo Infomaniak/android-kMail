@@ -31,11 +31,22 @@ jobs:
         run: ./gradlew clean
 
       - name: Build app
-        run: ./gradlew app:assembleStandardDebug
+        run: ./gradlew app:assembleStandardDebug -Pandroid.injected.build.abi=arm64-v8a
 
       # Run tests
       - name: Run Unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
+
+      - name: Find APK file
+        id: find_apk
+        run: |
+          APK_PATH=$(realpath "$(find app/build/intermediates/apk/standard/debug -type f -name "*.apk" | head -n 1)")
+          if [ -z "$APK_PATH" ] || [ ! -f "$APK_PATH" ]; then
+          echo "::error::APK file not found or invalid path: '$APK_PATH'"
+            exit 1
+          fi
+          echo "Found APK at: $APK_PATH"
+          echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
 
       # Run UI tests
       - name: Run UI tests
@@ -48,50 +59,16 @@ jobs:
           disable-animations: true
           emulator-options: -no-snapshot-save -noaudio -no-boot-anim -camera-back none -skin 540x1110
           disk-size: 6G
-          app-path: "${{ github.workspace }}/app/build/outputs/apk/standard/debug/infomaniak-mail-1.16.5 (11600501)-standard-debug.apk"
+          app: ${{ steps.find_apk.outputs.apk_path }}
           script: |
-              echo "Current working directory:"
-              pwd
-              
               echo "Installing Maestro"
-              
               curl -fsSL "https://get.maestro.mobile.dev" | bash
-              export PATH="$PATH":"$HOME/.maestro/bin"
               
-              echo "github workspace = ${{ github.workspace }}"
-              
-              APK_SEARCH_DIR="${{ github.workspace }}/app/build/outputs/apk/standard/debug"
-              echo "APK_SEARCH_DIR = $APK_SEARCH_DIR"
-              APP_APK_PATH=$(find "$APK_SEARCH_DIR" -maxdepth 1 -type f -name "*.apk" | head -n 1)
-              echo "APP_APK_PATH = $APP_APK_PATH"
-              
-              echo "Files in folder"
-              
-              echo "Files in /Users/runner/actions-runner/_work/android-kMail/android-kMail/"
-               ls -la "/Users/runner/actions-runner/_work/android-kMail/android-kMail/"
-              
-               echo "Files in /Users/runner/actions-runner/_work/android-kMail/android-kMail/app/"
-               ls -la "/Users/runner/actions-runner/_work/android-kMail/android-kMail/app/"
-              
-               echo "Files in /Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/"
-               ls -la "/Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/"
-              
-               echo "Files in /Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/outputs/"
-               ls -la "/Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/outputs/"
-              
-               echo "Files in /Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/outputs/apk"
-               ls -la "/Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/outputs/apk/"
-              
-               echo "Files in /Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/outputs/apk/standard"
-               ls -la "/Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/outputs/apk/standard/"
-              
-              echo "Files in /Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/outputs/apk/standard/debug"
-              ls -la "/Users/runner/actions-runner/_work/android-kMail/android-kMail/app/build/outputs/apk/standard/debug"
-              
-              if [ ! -f "$APP_APK_PATH" ]; then
-                echo "APK not found at $APP_APK_PATH"
-                exit 1
-              fi
+              echo "APK PATH"
+              echo "${{ steps.find_apk.outputs.apk_path }}"
+            
+              echo "Installing APK"            
+              adb install -t "${{ steps.find_apk.outputs.apk_path }}"
               
               echo "Starting UI tests"
-              maestro test --output report.xml "$APP_APK_PATH" -e=ACCOUNT_EMAIL=${{ secrets.UI_TEST_ACCOUNT_EMAIL }} -e=ACCOUNT_PASSWORD=${{ secrets.UI_TEST_ACCOUNT_PASSWORD }} ./maestro/flow/login.yaml ./maestro/flow/writeEmail.yaml ./maestro/flow/logout.yaml
+              $HOME/.maestro/bin/maestro test --output report.xml "${{ steps.find_apk.outputs.apk_path }}" -e=ACCOUNT_EMAIL=${{ secrets.UI_TEST_ACCOUNT_EMAIL }} -e=ACCOUNT_PASSWORD=${{ secrets.UI_TEST_ACCOUNT_PASSWORD }} ./maestro/flow/login.yaml ./maestro/flow/writeEmail.yaml ./maestro/flow/logout.yaml
