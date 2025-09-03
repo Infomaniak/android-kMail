@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.utils.year
 import com.infomaniak.lib.core.utils.context
@@ -47,6 +46,7 @@ import com.infomaniak.mail.utils.extensions.launchLoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry.captureMessage
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -59,6 +59,9 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var logoutUser: LogoutUser
+
+    @Inject
+    lateinit var appScope: CoroutineScope
 
     @Inject
     @IoDispatcher
@@ -112,7 +115,7 @@ class AccountBottomSheetDialog : BottomSheetDialogFragment() {
         showEasterEggHalloween()
     }
 
-    private fun logoutCurrentUser() = lifecycleScope.launch(ioDispatcher) {
+    private fun logoutCurrentUser() = appScope.launch(ioDispatcher) {
         trackAccountEvent(MatomoName.LogOutConfirm)
         logoutUser(user = AccountUtils.currentUser!!)
     }

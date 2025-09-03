@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.login
 
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig.SHOP_URL
@@ -38,6 +37,7 @@ import com.infomaniak.mail.utils.extensions.changePathColor
 import com.infomaniak.mail.utils.extensions.repeatFrame
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,6 +45,9 @@ import javax.inject.Inject
 class NoMailboxActivity : BaseActivity() {
 
     private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
+
+    @Inject
+    lateinit var appScope: CoroutineScope
 
     @Inject
     lateinit var logoutUser: LogoutUser
@@ -63,7 +66,7 @@ class NoMailboxActivity : BaseActivity() {
 
         AccountUtils.currentUser?.let { currentUser ->
             if (savedInstanceState?.getInt(NO_MAILBOX_USER_ID_KEY) == currentUser.id) {
-                lifecycleScope.launch(ioDispatcher) { logoutUser(currentUser, shouldReload = false) }
+                appScope.launch(ioDispatcher) { logoutUser(currentUser, shouldReload = false) }
             }
         }
 
