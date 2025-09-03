@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -33,7 +32,10 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,9 +53,9 @@ class ThreadActionsViewModel @Inject constructor(
     private val messageUidToReplyTo
         inline get() = savedStateHandle.get<String?>(ThreadActionsBottomSheetDialogArgs::messageUidToReplyTo.name)
 
-    val threadLive: LiveData<Thread> = threadController.getThreadAsync(threadUid)
+    val threadLive: SharedFlow<Thread> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj }
-        .asLiveData(ioCoroutineContext)
+        .shareIn(scope = viewModelScope, started = SharingStarted.Eagerly, replay = 1)
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
