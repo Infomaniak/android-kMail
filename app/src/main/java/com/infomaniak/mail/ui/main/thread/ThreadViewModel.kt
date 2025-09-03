@@ -189,7 +189,7 @@ class ThreadViewModel @Inject constructor(
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
     val failedMessagesUids = SingleLiveEvent<List<String>>()
-    var deletedMessagesUids = mutableSetOf<String>()
+    val deletedMessagesUids = mutableSetOf<String>()
 
     // Save the current scheduled date of the draft we're rescheduling to be able to pass it to the schedule bottom sheet
     var reschedulingCurrentlyScheduledEpochMillis: Long? = null
