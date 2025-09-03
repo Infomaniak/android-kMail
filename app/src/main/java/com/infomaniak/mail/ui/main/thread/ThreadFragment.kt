@@ -746,12 +746,10 @@ class ThreadFragment : Fragment() {
         }
 
         getBackNavigationResult(DIALOG_SHEET_MULTI_JUNK) { junkThreads: JunkThreads ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                safeNavigate(
-                    resId = R.id.junkBottomSheetDialog,
-                    args = JunkBottomSheetDialogArgs(junkThreads.threadUids.toTypedArray()).toBundle(),
-                )
-            }
+            safeNavigate(
+                resId = R.id.junkBottomSheetDialog,
+                args = JunkBottomSheetDialogArgs(junkThreads.threadUids.toTypedArray()).toBundle(),
+            )
         }
     }
 

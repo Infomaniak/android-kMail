@@ -51,7 +51,7 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
 
-    val threadMessageToExecuteAction: LiveData<ThreadMessageToExecuteAction> = threadController.getThreadAsync(threadUid)
+    val threadMessageToExecuteAction: LiveData<ThreadMessageToExecuteAction?> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
         .asLiveData(ioCoroutineContext)
 

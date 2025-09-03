@@ -28,7 +28,7 @@ import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
 
 class UserToBlockAdapter(
-    private val messagesToRecipients: List<Pair<Recipient, Message>>,
+    private val recipientsToMessages: List<Pair<Recipient, Message>>,
     private val onClickListener: (Message) -> Unit,
 ) : Adapter<ContactViewHolder>() {
 
@@ -40,10 +40,10 @@ class UserToBlockAdapter(
         return ContactViewHolder(ItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun getItemCount() = messagesToRecipients.count()
+    override fun getItemCount() = recipientsToMessages.count()
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) = with(holder.binding) {
-        val (recipient, message) = messagesToRecipients[position]
+        val (recipient, message) = recipientsToMessages[position]
         contactDetails.setCorrespondent(recipient)
         root.setOnClickListener {
             trackBlockUserAction(MatomoName.SelectUser)

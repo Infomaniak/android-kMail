@@ -104,7 +104,9 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
                     substituteClassName = ThreadListFragment::class.java.name,
                 )
             } else {
-                junkMessagesViewModel.messageOfUserToBlock.value = potentialUsersToBlock.values.firstOrNull()
+                potentialUsersToBlock.values.firstOrNull()?.let { message ->
+                    junkMessagesViewModel.messageOfUserToBlock.value = message
+                }
             }
             mainViewModel.isMultiSelectOn = false
         }

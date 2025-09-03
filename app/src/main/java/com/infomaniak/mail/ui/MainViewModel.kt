@@ -1554,10 +1554,6 @@ class MainViewModel @Inject constructor(
         emit(messageController.getMessage(messageUid)!!)
     }
 
-    fun getMessages(messagesUids: List<String>): LiveData<List<Message>> = liveData(ioCoroutineContext) {
-        emit(messageController.getMessages(messagesUids))
-    }
-
     fun selectOrUnselectAll() {
         if (isEverythingSelected) {
             trackMultiSelectionEvent(MatomoName.None)
