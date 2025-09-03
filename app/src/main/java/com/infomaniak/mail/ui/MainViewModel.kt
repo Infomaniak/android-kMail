@@ -29,7 +29,6 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.lib.core.models.ApiResponse
@@ -458,7 +457,7 @@ class MainViewModel @Inject constructor(
 
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
-        if (mailbox.kSuite != KSuite.Perso.Free) return@launch
+        if (mailbox.kSuite.isFreeTier().not()) return@launch
 
         with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
