@@ -11,5 +11,5 @@ appId: com.infomaniak.mail
 - tapOn: Password *
 - inputText: '${ACCOUNT_PASSWORD}'
 - tapOn:
-    text: Sign in
+    text: Sign inn
     index: 1
