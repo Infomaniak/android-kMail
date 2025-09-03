@@ -146,7 +146,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         payload: NotificationPayload,
     ) = with(payload) {
 
-        globalCoroutineScope.launch {
+        val notificationShowingJob = globalCoroutineScope.launch {
             notificationUtils.showMessageNotification(
                 notificationManagerCompat = notificationManagerCompat,
                 payload = payload.apply {
@@ -159,6 +159,7 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         }
 
         val job = globalCoroutineScope.launch(ioDispatcher) {
+            notificationShowingJob.join()
 
             delay(UNDO_TIMEOUT)
             ensureActive()
