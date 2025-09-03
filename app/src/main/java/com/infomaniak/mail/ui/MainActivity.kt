@@ -329,29 +329,30 @@ class MainActivity : BaseActivity() {
             val currentKSuite = mainViewModel.currentMailbox.value?.kSuite
             val hasLimitBeenReached = errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_LIMIT_EXCEEDED) ||
                     errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_DAILY_LIMIT_REACHED)
-            val matomoDailyLimit = MatomoName.TrySendingWithDailyLimitReached
-            val matomoDailyLimitUpgrade = MatomoName.DailyLimitReachedUpgrade.value
 
             if (currentKSuite?.isFreeTier() == true && hasLimitBeenReached) {
-                trackNewMessageEvent(matomoDailyLimit)
-                snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                    onUpgradeClicked(currentKSuite, matomoDailyLimitUpgrade)
-                }
+                trackNewMessageEvent(MatomoName.TrySendingWithDailyLimitReached)
+                snackbarManager.setValue(
+                    title = getString(errorRes),
+                    buttonTitle = R.string.buttonUpgrade,
+                    customBehavior = { onUpgradeClicked(currentKSuite) },
+                )
             } else {
                 snackbarManager.setValue(getString(errorRes))
             }
         }
     }
 
-    private fun onUpgradeClicked(currentKSuite: KSuite, matomoDailyLimitUpgrade: String) {
+    private fun onUpgradeClicked(currentKSuite: KSuite) {
+        val matomoName = MatomoName.DailyLimitReachedUpgrade.value
         when (currentKSuite) {
-            is KSuite.Perso -> openMyKSuiteUpgradeBottomSheet(navController, matomoDailyLimitUpgrade)
+            is KSuite.Perso -> openMyKSuiteUpgradeBottomSheet(navController, matomoName)
             is KSuite.Pro -> {
                 openKSuiteProBottomSheet(
                     navController = navController,
                     kSuite = currentKSuite,
                     isAdmin = mainViewModel.currentMailbox.value?.isAdmin ?: false,
-                    matomoTrackerName = matomoDailyLimitUpgrade,
+                    matomoTrackerName = matomoName,
                 )
             }
         }
