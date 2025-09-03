@@ -170,7 +170,7 @@
     <string name="buttonUnderline">Subraye</string>
     <string name="buttonUnorderedList">Lista desordenada</string>
     <string name="buttonUnselectAll">Ninguno</string>
-    <string name="buttonUpgrade">Actualizar</string>
+    <string name="buttonUpgrade">Mejorar</string>
     <string name="buttonValid">Validar</string>
     <string name="buttonYes">Sí</string>
     <string name="calendarAllDayLong">Todo el día</string>
@@ -283,7 +283,9 @@
     <string name="encryptedPasswordProtectionTitle">Protección mediante contraseña</string>
     <string name="encryptedProtectionAdDescription">Proteja su mensaje contra el acceso no autorizado con el cifrado Infomaniak.</string>
     <string name="encryptedProtectionAdDescription1">El asunto del mensaje permanece visible, pero el contenido es completamente seguro.</string>
+    <string name="encryptedProtectionAdDescription1Bold">el contenido es completamente seguro.</string>
     <string name="encryptedProtectionAdDescription2">Se exigirá una contraseña a los destinatarios ajenos a Infomaniak.</string>
+    <string name="encryptedProtectionAdDescription2Bold">los destinatarios ajenos a Infomaniak.</string>
     <string name="encryptedProtectionAdTitle">Cifre sus mensajes confidenciales</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Destinatarios con contraseña (%d)</string>
     <string name="encryptedStatePanelEnable">Su mensaje está protegido.</string>

@@ -286,7 +286,9 @@
     <string name="encryptedPasswordProtectionTitle">Protection par mot de passe</string>
     <string name="encryptedProtectionAdDescription">Protégez votre message contre tout accès non autorisé grâce au chiffrement Infomaniak.</string>
     <string name="encryptedProtectionAdDescription1">L’objet du message reste visible mais le contenu est entièrement sécurisé.</string>
+    <string name="encryptedProtectionAdDescription1Bold">le contenu est entièrement sécurisé.</string>
     <string name="encryptedProtectionAdDescription2">Un mot de passe sera requis pour les destinataires hors Infomaniak.</string>
+    <string name="encryptedProtectionAdDescription2Bold">les destinataires hors Infomaniak.</string>
     <string name="encryptedProtectionAdTitle">Chiffrez vos messages confidentiels</string>
     <string name="encryptedRecipientRequiringPasswordTitle">Destinataires avec mot de passe (%d)</string>
     <string name="encryptedStatePanelEnable">Votre message est protégé.</string>
@@ -455,7 +457,7 @@
     <string name="onBoardingTitle1">Choisissez votre thème</string>
     <string name="onBoardingTitle2">Gagnez du temps avec les actions de balayage</string>
     <string name="onBoardingTitle3">Appuyez quelques secondes sur un message pour en sélectionner plusieurs</string>
-    <string name="onBoardingTitle4">Lancez vous !</string>
+    <string name="onBoardingTitle4">Lancez-vous !</string>
     <string name="organizationName">Organisation : %s</string>
     <string name="otherOrganisation">Autre</string>
     <string name="pickerNoSelection">Aucune sélection</string>

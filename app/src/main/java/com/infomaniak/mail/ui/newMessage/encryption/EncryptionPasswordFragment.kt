@@ -88,19 +88,12 @@ class EncryptionPasswordFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        readMoreButton.setOnClickListener {
-            MatomoMail.trackEncryptionEvent(MatomoName.ReadFAQ)
-            context?.openUrl(ENCRYPTION_FAQ_URL)
-        }
+        readMoreButton.setOnClickListener { EncryptionUtils.onReadMoreClicked() }
         sharePasswordButton.setOnClickListener {
             MatomoMail.trackEncryptionEvent(MatomoName.SharePassword)
             val password = passwordInput.text?.toString()
             if (password?.isNotBlank() == true) requireContext().shareString(password)
             findNavController().popBackStack()
         }
-    }
-
-    companion object {
-        private const val ENCRYPTION_FAQ_URL = "https://faq.infomaniak.com/1582"
     }
 }
