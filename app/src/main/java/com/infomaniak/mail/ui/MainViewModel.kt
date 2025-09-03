@@ -29,6 +29,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.lib.core.models.ApiResponse
@@ -103,7 +104,7 @@ import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
-import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
+import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner.StorageLevel
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
@@ -243,11 +244,13 @@ class MainViewModel @Inject constructor(
     val storageBannerStatus = currentQuotasLive.map { quotas ->
         when {
             quotas == null -> null
-            quotas.isFull -> StorageLevel.Full
+            quotas.isFull -> {
+                if (currentMailbox.value?.kSuite is KSuite.Perso) StorageLevel.Full.Perso else StorageLevel.Full.Pro
+            }
             quotas.getProgress() > StorageLevel.WARNING_THRESHOLD -> {
                 if (!localSettings.hasClosedStorageBanner || localSettings.storageBannerDisplayAppLaunches % 10 == 0) {
                     localSettings.hasClosedStorageBanner = false
-                    StorageLevel.Warning
+                    if (currentMailbox.value?.kSuite is KSuite.Perso) StorageLevel.Warning.Perso else StorageLevel.Warning.Pro
                 } else {
                     StorageLevel.Normal
                 }

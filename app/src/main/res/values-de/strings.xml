@@ -370,6 +370,9 @@
     <string name="googlePlayServicesAreRequired">Google Play Services sind erforderlich</string>
     <string name="groupContactsTitle">Gruppe: %s</string>
     <string name="inboxFolder">Posteingang</string>
+    <string name="kSuiteProQuotasAlertDescription">Der Speicherplatz in Ihrer Mail ist bald voll. Ändern Sie Ihr Angebot auf unbegrenzten Speicherplatz und schalten Sie neue Funktionen frei.</string>
+    <string name="kSuiteProQuotasAlertFullDescription">Der Speicherplatz in Ihrer Mail ist voll. Ändern Sie Ihr Angebot auf unbegrenzten Speicherplatz und schalten Sie neue Funktionen frei.</string>
+    <string name="kSuiteProQuotasAlertFullTitle">Ihr Mail-Speicherplatz ist voll</string>
     <string name="lastSelectedSchedule">Zuletzt ausgewählter Zeitplan</string>
     <string name="laterThisMorning">Später heute Morgen</string>
     <string name="linkingWord">und</string>
