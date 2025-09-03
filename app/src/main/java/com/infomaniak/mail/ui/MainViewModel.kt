@@ -1543,9 +1543,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getMessage(messageUid: String) = liveData(ioCoroutineContext) {
-        emit(messageController.getMessage(messageUid)!!)
-    }
+    suspend fun getMessage(messageUid: String): Message = messageController.getMessage(messageUid)!!
 
     fun hasOtherExpeditors(threadUid: String) = liveData(ioCoroutineContext) {
         val hasOtherExpeditors = threadController.getThread(threadUid)?.messages?.flatMap { it.from }?.any { !it.isMe() } == true

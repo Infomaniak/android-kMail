@@ -54,8 +54,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     private val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
     override val shouldCloseMultiSelection: Boolean = false
 
-    private var folderRole: FolderRole? = null
-
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
@@ -65,10 +63,9 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
         binding.print.isVisible = true
-
-        mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
-
-            lifecycleScope.launch { folderRole = folderRoleUtils.getActionFolderRole(message) }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val message = mainViewModel.getMessage(messageUid)
+            val folderRole = folderRoleUtils.getActionFolderRole(message)
 
             setMarkAsReadUi(message.isSeen)
             setArchiveUi(isFromArchive = folderRole == FolderRole.ARCHIVE)
@@ -84,6 +81,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             initActionClickListener(messageUid, message, threadUid)
         }
+        Unit
     }
 
     private fun initActionClickListener(messageUid: String, message: Message, threadUid: String) {
