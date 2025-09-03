@@ -332,27 +332,27 @@ class MainActivity : BaseActivity() {
             val matomoDailyLimit = MatomoName.TrySendingWithDailyLimitReached
             val matomoDailyLimitUpgrade = MatomoName.DailyLimitReachedUpgrade.value
 
-            when {
-                currentKSuite == KSuite.Perso.Free && hasLimitBeenReached -> {
-                    trackNewMessageEvent(matomoDailyLimit)
-                    snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                        openMyKSuiteUpgradeBottomSheet(navController, matomoDailyLimitUpgrade)
-                    }
+            if (currentKSuite?.isFreeTier() == true && hasLimitBeenReached) {
+                trackNewMessageEvent(matomoDailyLimit)
+                snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
+                    onUpgradeClicked(currentKSuite, matomoDailyLimitUpgrade)
                 }
-                currentKSuite == KSuite.Pro.Free && hasLimitBeenReached -> {
-                    trackNewMessageEvent(matomoDailyLimit)
-                    snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                        openKSuiteProBottomSheet(
-                            navController = navController,
-                            kSuite = currentKSuite,
-                            isAdmin = mainViewModel.currentMailbox.value?.isAdmin ?: false,
-                            matomoTrackerName = matomoDailyLimitUpgrade,
-                        )
-                    }
-                }
-                else -> {
-                    snackbarManager.setValue(getString(errorRes))
-                }
+            } else {
+                snackbarManager.setValue(getString(errorRes))
+            }
+        }
+    }
+
+    private fun onUpgradeClicked(currentKSuite: KSuite, matomoDailyLimitUpgrade: String) {
+        when (currentKSuite) {
+            is KSuite.Perso -> openMyKSuiteUpgradeBottomSheet(navController, matomoDailyLimitUpgrade)
+            is KSuite.Pro -> {
+                openKSuiteProBottomSheet(
+                    navController = navController,
+                    kSuite = currentKSuite,
+                    isAdmin = mainViewModel.currentMailbox.value?.isAdmin ?: false,
+                    matomoTrackerName = matomoDailyLimitUpgrade,
+                )
             }
         }
     }
