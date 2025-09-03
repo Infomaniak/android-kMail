@@ -339,6 +339,9 @@ class NewMessageViewModel @Inject constructor(
 
         val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
+
+        val isEncryptionEnabled = currentMailbox.featureFlags.contains(FeatureFlag.ENCRYPTION)
+        if (isEncryptionEnabled) draft.isEncrypted = fullMessage.isEncrypted
     }
 
     fun getAddressBookWithName(contactGroup: ContactGroup): AddressBook? {
