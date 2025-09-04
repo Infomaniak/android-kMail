@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalSplittiesApi::class)
+
 package com.infomaniak.mail.ui.newMessage
 
 import android.app.Application
@@ -104,18 +106,24 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.sentry.Sentry
+import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
+import splitties.coroutines.suspendLazy
+import splitties.experimental.ExperimentalSplittiesApi
 import java.util.Date
 import javax.inject.Inject
 
@@ -205,8 +213,26 @@ class NewMessageViewModel @Inject constructor(
     private val _isShimmering = MutableStateFlow(true)
     val isShimmering: StateFlow<Boolean> = _isShimmering
 
-    val nullableCurrentMailbox by lazy { mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) }
-    val currentMailbox by lazy { nullableCurrentMailbox!! }
+    //region Check mailbox existence
+    private val exitSignal: CompletableJob = Job()
+
+    val currentMailbox = viewModelScope.suspendLazy {
+        val mailbox = mailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+
+        if (mailbox == null) {
+            exitSignal.complete()
+            awaitCancellation()
+        }
+
+        mailbox
+    }
+
+    // ------------- !IMPORTANT! -------------
+    /** Always call this before the first access to currentMailbox, otherwise the NewMessageActivity will just await indefinitely
+     * in the cases where `mailboxController.getMailbox` returns null
+     */
+    suspend fun awaitNoMailboxSignal() = exitSignal.join()
+    //endregion
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
         AccountUtils.currentUserId,
@@ -256,10 +282,10 @@ class NewMessageViewModel @Inject constructor(
 
         val draft: Draft? = runCatching {
 
-            signatures = currentMailbox.signatures
+            signatures = currentMailbox().signatures
                 .also { signaturesCount = it.count() }
                 .toMutableList()
-                .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox.email)) }
+                .apply { add(index = 0, element = Signature.getDummySignature(appContext, email = currentMailbox().email)) }
 
             isNewMessage = !arrivedFromExistingDraft && draftLocalUuid == null
             if (isNewMessage) getNewDraft(signatures, intent, realm) else getExistingDraft(draftLocalUuid)
@@ -272,9 +298,9 @@ class NewMessageViewModel @Inject constructor(
             it.flagRecipientsAsAutomaticallyEntered()
 
             dismissNotification()
-            markAsRead(currentMailbox, realm)
+            markAsRead(currentMailbox(), realm)
 
-            realm.write { DraftController.upsertDraft(it, realm = this) }
+            realm.write { DraftController.upsertDraftBlocking(it, realm = this) }
             it.saveSnapshot(initialBody.content)
             it.initLiveData(signatures)
             _isShimmering.emit(false)
@@ -289,7 +315,7 @@ class NewMessageViewModel @Inject constructor(
         return getLocalOrRemoteDraft(localUuid)?.also { draft ->
             saveNavArgsToSavedState(draft.localUuid)
             if (draft.identityId.isNullOrBlank()) {
-                draft.identityId = currentMailbox.getDefaultSignatureWithFallback().id.toString()
+                draft.identityId = currentMailbox().getDefaultSignatureWithFallback().id.toString()
             }
             splitSignatureAndQuoteFromBody(draft)
         }
@@ -319,7 +345,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         with(draftInitManager) {
-            val signature = chooseSignature(currentMailbox.email, signatures, draftMode, previousMessage)
+            val signature = chooseSignature(currentMailbox().email, signatures, draftMode, previousMessage)
             setSignatureIdentity(signature)
             if (signature.content.isNotEmpty()) {
                 initialSignature = signatureUtils.encapsulateSignatureContentWithInfomaniakClass(signature.content)
@@ -337,10 +363,10 @@ class NewMessageViewModel @Inject constructor(
         val quote = draftInitManager.createQuote(draftMode, fullMessage, draft.attachments)
         if (quote != null) initialQuote = quote
 
-        val isAiEnabled = currentMailbox.featureFlags.contains(FeatureFlag.AI)
+        val isAiEnabled = currentMailbox().featureFlags.contains(FeatureFlag.AI)
         if (isAiEnabled) parsePreviousMailToAnswerWithAi(fullMessage.body!!)
 
-        val isEncryptionEnabled = currentMailbox.featureFlags.contains(FeatureFlag.ENCRYPTION)
+        val isEncryptionEnabled = currentMailbox().featureFlags.contains(FeatureFlag.ENCRYPTION)
         if (isEncryptionEnabled) draft.isEncrypted = fullMessage.isEncrypted
     }
 
@@ -470,14 +496,14 @@ class NewMessageViewModel @Inject constructor(
         )
     }
 
-    private fun Draft.initLiveData(signatures: List<Signature>) {
+    private suspend fun Draft.initLiveData(signatures: List<Signature>) {
         val draftSignature = signatures.singleOrNull { it.id == identityId?.toInt() }
 
         encryptionPassword.postValue(encryptionKey)
 
         fromLiveData.postValue(
             UiFrom(
-                signature = draftSignature ?: currentMailbox.getDefaultSignatureWithFallback(),
+                signature = draftSignature ?: currentMailbox().getDefaultSignatureWithFallback(),
                 shouldUpdateBodySignature = false,
             ),
         )
@@ -516,7 +542,9 @@ class NewMessageViewModel @Inject constructor(
         return getLatestLocalDraft(localUuid)?.also(::trackOpenLocal) ?: fetchDraft()?.also(::trackOpenRemote)
     }
 
-    private fun getLatestLocalDraft(localUuid: String?) = localUuid?.let(draftController::getDraft)?.copyFromRealm()
+    private suspend fun getLatestLocalDraft(localUuid: String?): Draft? {
+        return localUuid?.let { draftController.getDraft(it) }?.let { Dispatchers.IO { it.copyFromRealm() } }
+    }
 
     private suspend fun fetchDraft(): Draft? {
         return ApiRepository.getDraft(draftResource!!).data?.also { draft ->
@@ -733,7 +761,7 @@ class NewMessageViewModel @Inject constructor(
             LocalStorageUtils.deleteAttachmentUploadDir(appContext, draftLocalUuid!!, attachment.localUuid)
 
             mailboxContentRealm().write {
-                DraftController.updateDraft(draftLocalUuid!!, realm = this) {
+                DraftController.updateDraftBlocking(draftLocalUuid!!, realm = this) {
                     it.attachments.findSpecificAttachment(attachment)?.let(::delete)
                 }
             }
@@ -790,7 +818,7 @@ class NewMessageViewModel @Inject constructor(
         val realm = mailboxContentRealm()
 
         realm.write {
-            DraftController.getDraft(localUuid, realm = this)?.also {
+            DraftController.getDraftBlocking(localUuid, realm = this)?.also {
                 it.updateDraftAttachmentsWithLiveData(
                     uiAttachments = uiAttachments,
                     step = "observeAttachments -> uploadAttachmentsToServer",
@@ -799,14 +827,14 @@ class NewMessageViewModel @Inject constructor(
         } ?: return@launch
 
         runCatching {
-            uploadAttachmentsWithMutex(localUuid, currentMailbox, realm)
-        }.onFailure(Sentry::captureException)
+            uploadAttachmentsWithMutex(localUuid, currentMailbox(), realm)
+        }.cancellable().onFailure(Sentry::captureException)
     }
 
     fun setScheduleDate(date: Date?) = viewModelScope.launch(ioDispatcher) {
         val localUuid = draftLocalUuid ?: return@launch
         mailboxContentRealm().write {
-            DraftController.getDraft(localUuid, realm = this)?.also { draft ->
+            DraftController.getDraftBlocking(localUuid, realm = this)?.also { draft ->
                 draft.scheduleDate = date?.format(FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR)
             }
         }
@@ -830,7 +858,6 @@ class NewMessageViewModel @Inject constructor(
             val subject: String
             val body: String
             while (true) {
-                // receive() is a blocking call as long as it has no data
                 val (receivedSubject, receivedBody, expirationId) = subjectAndBodyChannel.receive()
                 if (expirationId == channelExpirationIdTarget) {
                     subject = receivedSubject
@@ -854,7 +881,7 @@ class NewMessageViewModel @Inject constructor(
         }
 
         val hasFailed = mailboxContentRealm().write {
-            DraftController.getDraft(localUuid, realm = this)
+            DraftController.getDraftBlocking(localUuid, realm = this)
                 ?.updateDraftBeforeSavingRemotely(action, isFinishing, subject, uiBodyValue, realm = this@write)
                 ?: return@write true
             return@write false
@@ -870,7 +897,7 @@ class NewMessageViewModel @Inject constructor(
             to = toLiveData.valueOrEmpty(),
             cc = ccLiveData.valueOrEmpty(),
             bcc = bccLiveData.valueOrEmpty(),
-            externalMailFlagEnabled = currentMailbox.externalMailFlagEnabled,
+            externalMailFlagEnabled = currentMailbox().externalMailFlagEnabled,
         )
     }
 
@@ -911,7 +938,7 @@ class NewMessageViewModel @Inject constructor(
          * - The link in the Draft is already added, when creating the Draft.
          * - The link in the Message is added here, when saving the Draft.
          */
-        messageUid?.let { MessageController.getMessage(uid = it, realm)?.draftLocalUuid = localUuid }
+        messageUid?.let { MessageController.getMessageBlocking(uid = it, realm)?.draftLocalUuid = localUuid }
 
         // If we opened a text/plain draft, we will now convert it as text/html as we send it because we only support editing
         // text/html drafts.
@@ -979,7 +1006,7 @@ class NewMessageViewModel @Inject constructor(
 
     private suspend fun removeDraftFromRealm(localUuid: String) {
         mailboxContentRealm().write {
-            DraftController.getDraft(localUuid, realm = this)?.let(::delete)
+            DraftController.getDraftBlocking(localUuid, realm = this)?.let(::delete)
         }
     }
 

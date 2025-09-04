@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalSplittiesApi::class)
+
 package com.infomaniak.mail.ui.newMessage
 
 import android.os.Bundle
@@ -33,6 +35,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -59,6 +62,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
@@ -228,7 +233,9 @@ class AiPropositionFragment : Fragment() {
         } else {
             binding.loadingPlaceholder.text = getLastMessage()
             aiPropositionStatusLiveData.value = null
-            currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailbox.uuid)
+            lifecycleScope.launch {
+                currentRequestJob = performShortcut(shortcut, newMessageViewModel.currentMailbox().uuid)
+            }
         }
     }
 
@@ -251,8 +258,10 @@ class AiPropositionFragment : Fragment() {
         val formattedRecipientsString = newMessageViewModel.toLiveData.valueOrEmpty()
             .joinToString(separator = ", ") { it.name }
             .takeIf { it.isNotBlank() }
-        val currentMailboxUuid = newMessageViewModel.currentMailbox.uuid
-        currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
+        lifecycleScope.launch {
+            val currentMailboxUuid = newMessageViewModel.currentMailbox().uuid
+            currentRequestJob = aiViewModel.generateNewAiProposition(currentMailboxUuid, formattedRecipientsString)
+        }
     }
 
     private fun observeAiProposition() {

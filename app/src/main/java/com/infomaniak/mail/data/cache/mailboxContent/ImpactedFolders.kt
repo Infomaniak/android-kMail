@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 
 data class ImpactedFolders(
@@ -42,7 +43,18 @@ data class ImpactedFolders(
     /**
      * This method makes sure we have no duplicated folders by merging both lists into a single one
      */
-    fun getFolderIds(realm: TypedRealm): Set<String> {
+    fun getFolderIdsBlocking(realm: TypedRealm): Set<String> {
+        folderRoles.forEach { folderRole ->
+            FolderController.getFolderBlocking(folderRole, realm)?.id?.let(folderIds::add)
+        }
+
+        return folderIds
+    }
+
+    /**
+     * This method makes sure we have no duplicated folders by merging both lists into a single one
+     */
+    suspend fun getFolderIds(realm: Realm): Set<String> {
         folderRoles.forEach { folderRole ->
             FolderController.getFolder(folderRole, realm)?.id?.let(folderIds::add)
         }

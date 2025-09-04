@@ -74,7 +74,7 @@ class TwoPaneViewModel @Inject constructor(
         navigateToSelectedDraft(thread.messages.single())
     }
 
-    private fun navigateToSelectedDraft(message: Message) = runCatchingRealm {
+    private suspend fun navigateToSelectedDraft(message: Message) = runCatchingRealm {
         newMessageArgs.postValue(
             NewMessageActivityArgs(
                 arrivedFromExistingDraft = true,

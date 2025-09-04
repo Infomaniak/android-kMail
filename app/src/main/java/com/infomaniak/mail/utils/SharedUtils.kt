@@ -77,7 +77,7 @@ class SharedUtils @Inject constructor(
     ) {
 
         val messages = when (message) {
-            null -> threads.flatMap(messageController::getUnseenMessages)
+            null -> threads.flatMap { messageController.getUnseenMessages(it) }
             else -> messageController.getMessageAndDuplicates(threads.first(), message)
         }
 
@@ -107,8 +107,8 @@ class SharedUtils @Inject constructor(
         }
     }
 
-    fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
-        null -> threads.flatMap(messageController::getMovableMessages)
+    suspend fun getMessagesToMove(threads: List<Thread>, message: Message?) = when (message) {
+        null -> threads.flatMap { messageController.getMovableMessages(it) }
         else -> messageController.getMessageAndDuplicates(threads.first(), message)
     }
 
@@ -155,7 +155,7 @@ class SharedUtils @Inject constructor(
                 return@with if (isSuccess()) {
                     val signaturesResult = data!!
                     customRealm.write {
-                        MailboxController.getMailbox(mailbox.objectId, realm = this)?.let { mailbox ->
+                        MailboxController.getMailboxBlocking(mailbox.objectId, realm = this)?.let { mailbox ->
                             mailbox.signatures = signaturesResult.signatures.toMutableList().apply {
                                 val defaultSignature = firstOrNull { it.id == signaturesResult.defaultSignatureId }
                                 val defaultReplySignature = firstOrNull { it.id == signaturesResult.defaultReplySignatureId }

@@ -181,7 +181,7 @@ class FetchMessagesManager @Inject constructor(
         return hasShownNotification
     }
 
-    private fun logNotFetchedMessageUid(
+    private suspend fun logNotFetchedMessageUid(
         notificationMessageUidToLog: String,
         userId: Int,
         mailbox: Mailbox,

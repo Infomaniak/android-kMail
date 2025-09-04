@@ -30,16 +30,16 @@ class FolderRoleUtils @Inject constructor(
     private val folderController: FolderController,
 ) {
 
-    fun getActionFolderRole(threads: Collection<Thread>): FolderRole? {
+    suspend fun getActionFolderRole(threads: Collection<Thread>): FolderRole? {
         val thread = threads.firstOrNull() ?: return null
         return getActionFolderRole(thread)
     }
 
-    fun getActionFolderRole(thread: Thread): FolderRole? {
+    suspend fun getActionFolderRole(thread: Thread): FolderRole? {
         return getActionFolderRole(thread.folderId, thread)
     }
 
-    fun getActionFolderRole(message: Message): FolderRole? {
+    suspend fun getActionFolderRole(message: Message): FolderRole? {
         return getActionFolderRole(message.folderId, message)
     }
 
@@ -49,7 +49,7 @@ class FolderRoleUtils @Inject constructor(
      * @param threads The list of Threads to find the FolderRole. They should ALL be from the same Folder. For now, it's
      * always the case. But it could change in the future (for example, if the MultiSelect feature is added in the Search).
      */
-    fun getActionFolderRole(threads: Collection<Thread>, message: Message?): FolderRole? {
+    suspend fun getActionFolderRole(threads: Collection<Thread>, message: Message?): FolderRole? {
         val thread = threads.firstOrNull()
         return getActionFolderRole(
             folderId = message?.folderId ?: thread?.folderId ?: return null,
@@ -57,7 +57,7 @@ class FolderRoleUtils @Inject constructor(
         )
     }
 
-    private fun getActionFolderRole(folderId: String, snoozable: Snoozable): FolderRole? {
+    private suspend fun getActionFolderRole(folderId: String, snoozable: Snoozable): FolderRole? {
         val folderRole = folderController.getFolder(folderId)?.role
         return if (folderRole == FolderRole.INBOX && snoozable.isSnoozed()) FolderRole.SNOOZED else folderRole
     }
