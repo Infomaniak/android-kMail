@@ -30,6 +30,7 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
@@ -253,7 +254,7 @@ abstract class TwoPaneFragment : Fragment() {
             args = SnoozeBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
                 currentlyScheduledEpochMillis = snoozeEndDate?.epochSeconds?.times(1_000) ?: 0L,
-                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
+                currentKSuite = mainViewModel.currentMailbox.value?.kSuite ?: KSuite.PersoFree,
             ).toBundle(),
         )
     }
