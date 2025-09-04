@@ -858,7 +858,6 @@ class NewMessageViewModel @Inject constructor(
             val subject: String
             val body: String
             while (true) {
-                // receive() is a blocking call as long as it has no data
                 val (receivedSubject, receivedBody, expirationId) = subjectAndBodyChannel.receive()
                 if (expirationId == channelExpirationIdTarget) {
                     subject = receivedSubject
