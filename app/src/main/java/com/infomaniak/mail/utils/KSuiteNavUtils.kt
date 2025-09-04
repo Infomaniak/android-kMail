@@ -23,14 +23,18 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
 import com.infomaniak.core.fragmentnavigation.isAtInitialDestination
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.ksuite.myksuite.ui.screens.KSuiteApp
 import com.infomaniak.core.ksuite.myksuite.ui.screens.MyKSuiteDashboardScreenData
 import com.infomaniak.core.ksuite.myksuite.ui.utils.MyKSuiteUiUtils
 import com.infomaniak.core.ksuite.myksuite.ui.utils.MyKSuiteUiUtils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.mail.MatomoMail.trackKSuiteProBottomSheetEvent
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteUpgradeBottomSheetEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.ui.bottomSheetDialogs.KSuiteProBottomSheetDialogArgs
 
 fun Fragment.openMyKSuiteUpgradeBottomSheet(matomoTrackerName: String, substituteClassName: String? = null) {
     if (isAtInitialDestination(substituteClassName)) {
@@ -58,5 +62,22 @@ fun Fragment.getDashboardData(myKSuiteData: MyKSuiteData, user: User): MyKSuiteD
         userInitials = user.getInitials(),
         iconColor = requireContext().getColor(R.color.onColorfulBackground),
         userInitialsBackgroundColor = backgroundColor,
+    )
+}
+
+fun Fragment.openKSuiteProBottomSheet(kSuite: KSuite, isAdmin: Boolean, matomoTrackerName: String) {
+    trackKSuiteProBottomSheetEvent(matomoTrackerName)
+    safelyNavigate(
+        resId = R.id.kSuiteProBottomSheetDialog,
+        args = KSuiteProBottomSheetDialogArgs(kSuite, isAdmin).toBundle(),
+    )
+}
+
+fun Activity.openKSuiteProBottomSheet(navController: NavController, kSuite: KSuite, isAdmin: Boolean, matomoTrackerName: String) {
+    trackKSuiteProBottomSheetEvent(matomoTrackerName)
+    safelyNavigate(
+        navController = navController,
+        resId = R.id.kSuiteProBottomSheetDialog,
+        args = KSuiteProBottomSheetDialogArgs(kSuite, isAdmin).toBundle(),
     )
 }

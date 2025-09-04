@@ -40,6 +40,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
@@ -90,6 +91,7 @@ import com.infomaniak.mail.utils.date.MailDateFormatUtils.formatDayOfWeekAdaptiv
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
 import com.infomaniak.mail.utils.extensions.isUserAlreadySynchronized
 import com.infomaniak.mail.utils.extensions.safeArea
+import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -324,16 +326,34 @@ class MainActivity : BaseActivity() {
         if (errorRes > 0) {
             showSendingSnackbarTimer.cancel()
 
+            val currentKSuite = mainViewModel.currentMailbox.value?.kSuite
             val hasLimitBeenReached = errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_LIMIT_EXCEEDED) ||
                     errorRes == ErrorCode.getTranslateResForDrafts(ErrorCode.SEND_DAILY_LIMIT_REACHED)
 
-            if (mainViewModel.currentMailbox.value?.isFreeMailbox == true && hasLimitBeenReached) {
+            if (currentKSuite?.isFreeTier() == true && hasLimitBeenReached) {
                 trackNewMessageEvent(MatomoName.TrySendingWithDailyLimitReached)
-                snackbarManager.setValue(getString(errorRes), buttonTitle = R.string.buttonUpgrade) {
-                    openMyKSuiteUpgradeBottomSheet(navController, MatomoName.DailyLimitReachedUpgrade.value)
-                }
+                snackbarManager.setValue(
+                    title = getString(errorRes),
+                    buttonTitle = R.string.buttonUpgrade,
+                    customBehavior = { onUpgradeClicked(currentKSuite) },
+                )
             } else {
                 snackbarManager.setValue(getString(errorRes))
+            }
+        }
+    }
+
+    private fun onUpgradeClicked(currentKSuite: KSuite) {
+        val matomoName = MatomoName.DailyLimitReachedUpgrade.value
+        when (currentKSuite) {
+            is KSuite.Perso -> openMyKSuiteUpgradeBottomSheet(navController, matomoName)
+            is KSuite.Pro -> {
+                openKSuiteProBottomSheet(
+                    navController = navController,
+                    kSuite = currentKSuite,
+                    isAdmin = mainViewModel.currentMailbox.value?.isAdmin ?: false,
+                    matomoTrackerName = matomoName,
+                )
             }
         }
     }
