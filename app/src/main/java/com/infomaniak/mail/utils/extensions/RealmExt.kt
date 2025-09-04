@@ -30,8 +30,8 @@ import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.invoke
 
 suspend inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
     write { update<T>(items) }
@@ -53,13 +53,16 @@ inline fun <reified T> RealmList<T>.replaceContent(list: List<T>) {
 }
 
 suspend fun <T : BaseRealmObject> RealmElementQuery<T>.findSuspend(): RealmResults<T> {
-    return asFlow().map { it.list }.first()
+    return Dispatchers.IO { find() }
+    // We are NOT using Realm's `asFlow().map { it.list }.first()` because it is less performant.
 }
 
 suspend fun <T> RealmScalarQuery<T>.findSuspend(): T {
-    return asFlow().first()
+    return Dispatchers.IO { find() }
+    // We are NOT using Realm's `asFlow().map { it.list }.first()` because it is less performant.
 }
 
 suspend fun <T : BaseRealmObject> RealmSingleQuery<T>.findSuspend(): T? {
-    return asFlow().map { it.obj }.first()
+    return Dispatchers.IO { find() }
+    // We are NOT using Realm's `asFlow().map { it.list }.first()` because it is less performant.
 }
