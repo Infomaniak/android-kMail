@@ -36,3 +36,19 @@ jobs:
       # Run tests
       - name: Run Unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
+
+      - name: Run UI tests
+        uses: ReactiveCircus/android-emulator-runner@v2.34.0
+        env:
+          UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
+          UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
+        with:
+          api-level: 36
+          target: google_apis
+          arch: arm64-v8a
+          avd-name: kdrive-test
+          disable-animations: true
+          emulator-options: -no-snapshot-save -noaudio -no-boot-anim -camera-back none -skin 540x1110
+          disk-size: 6G
+          script: |
+            ./gradlew app:connectedCheck --stacktrace
