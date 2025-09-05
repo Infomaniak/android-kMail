@@ -49,6 +49,9 @@ android {
         buildConfigField("String", "GITHUB_REPO", "\"android-mail\"")
         buildConfigField("String", "GITHUB_REPO_URL", "\"https://github.com/Infomaniak/android-kMail\"")
 
+        buildConfigField("String", "UI_TEST_ACCOUNT_EMAIL", "\"${System.getenv("UI_TEST_ACCOUNT_EMAIL") ?: "defaultUser"}\"")
+        buildConfigField("String", "UI_TEST_ACCOUNT_PASSWORD", "\"${System.getenv("UI_TEST_ACCOUNT_PASSWORD") ?: "defaultPass"}\"")
+
         resValue("string", "ATTACHMENTS_AUTHORITY", "com.infomaniak.mail.attachments")
         resValue("string", "EML_AUTHORITY", "com.infomaniak.mail.eml")
         resValue("string", "FILES_AUTHORITY", "com.infomaniak.mail.attachments;com.infomaniak.mail.eml")
@@ -128,6 +131,7 @@ dependencies {
     implementation(libs.rich.html.editor)
 
     implementation(libs.realm.kotlin.base)
+    implementation(libs.junit.ktx)
 
     "standardImplementation"(libs.play.services.base)
     "standardImplementation"(libs.firebase.messaging.ktx)
@@ -165,10 +169,21 @@ dependencies {
 
     // Test
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutine.test)
     testImplementation(libs.mockk.agent)
     testImplementation(libs.mockk.android)
-    testImplementation(libs.kotlinx.coroutine.test)
+
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.espresso.web)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.junit.ktx)
     androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.runner)
+    androidTestImplementation(libs.stdlib)
+    androidTestImplementation(libs.test.core)
+    androidTestImplementation(libs.test.core.ktx)
+
+    debugImplementation(libs.fragment.testing)
 
     // Debug
     if (enableLeakCanary) {
