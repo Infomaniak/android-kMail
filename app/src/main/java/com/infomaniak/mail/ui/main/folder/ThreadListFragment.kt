@@ -220,7 +220,7 @@ class ThreadListFragment : TwoPaneFragment() {
 
             val marginStandardSize = resources.getDimensionPixelSize(RCore.dimen.marginStandard)
             with(insets.safeArea()) {
-                binding.newMessageFab.setMargins(bottom = marginStandardSize + bottom, right = marginStandardSize + right)
+                newMessageFab.setMargins(bottom = marginStandardSize + bottom, right = marginStandardSize + right)
             }
         }
     }
