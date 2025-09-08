@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.infomaniak.mail.databinding.DialogConfirmationToBlockUserBinding
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
+import splitties.init.appCtx
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
@@ -39,14 +40,14 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         DialogConfirmationToBlockUserBinding.inflate(activity.layoutInflater)
     }
 
-    private var onPositiveButtonClick: ((Message?) -> Unit)? = null
+    private var onPositiveButtonClick: ((Message) -> Unit)? = null
     private var messageOfUserToBlock: Message? = null
 
     override val alertDialog: AlertDialog = with(binding) {
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm) { _, _ ->
-                onPositiveButtonClick?.invoke(messageOfUserToBlock)
+                messageOfUserToBlock?.let { message -> onPositiveButtonClick?.invoke(message) }
             }
             .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
@@ -61,11 +62,11 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         val recipient = message.from[0]
         val title = recipient.name.ifBlank { recipient.email }
         blockExpeditorTitle.text = activityContext.getString(R.string.blockExpeditorTitle, title)
-        blockExpeditorDescription.text = activityContext.getString(R.string.confirmationToBlockAnExpeditorText, recipient.email)
+        blockExpeditorDescription.text = appCtx.getString(R.string.confirmationToBlockAnExpeditorText, recipient.email)
         alertDialog.show()
     }
 
-    fun setPositiveButtonCallback(onPositiveButtonClick: (Message?) -> Unit) {
+    fun setPositiveButtonCallback(onPositiveButtonClick: (Message) -> Unit) {
         this.onPositiveButtonClick = onPositiveButtonClick
     }
 }

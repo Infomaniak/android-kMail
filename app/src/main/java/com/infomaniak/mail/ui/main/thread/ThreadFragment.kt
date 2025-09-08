@@ -94,7 +94,11 @@ import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.ThreadHeaderVisibility
 import com.infomaniak.mail.ui.main.thread.actions.AttachmentActionsBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ConfirmationToBlockUserDialog
+import com.infomaniak.mail.ui.main.thread.actions.JunkBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.JunkMessagesViewModel
 import com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialogArgs
+import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.Companion.DIALOG_SHEET_MULTI_JUNK
+import com.infomaniak.mail.ui.main.thread.actions.MultiSelectBottomSheetDialog.JunkThreads
 import com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog.Companion.OPEN_SNOOZE_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialogArgs
@@ -193,6 +197,7 @@ class ThreadFragment : Fragment() {
     private val binding get() = _binding!! // This property is only valid between onCreateView and onDestroyView
 
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
     private val twoPaneViewModel: TwoPaneViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
@@ -251,14 +256,12 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessageOfUserToBlock() = with(confirmationToBlockUserDialog) {
-        mainViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) {
-            setPositiveButtonCallback { messageOfUserToBlock ->
-                messageOfUserToBlock?.let {
-                    trackBlockUserAction(MatomoName.ConfirmSelectedUser)
-                    mainViewModel.blockUser(messageOfUserToBlock)
-                }
+        junkMessagesViewModel.messageOfUserToBlock.observe(viewLifecycleOwner) { messageOfUserToBlock ->
+            setPositiveButtonCallback { message ->
+                trackBlockUserAction(MatomoName.ConfirmSelectedUser)
+                mainViewModel.blockUser(message.folderId, message.shortUid)
             }
-            show(it)
+            show(messageOfUserToBlock)
         }
     }
 
@@ -596,7 +599,6 @@ class ThreadFragment : Fragment() {
                         args = ThreadActionsBottomSheetDialogArgs(
                             threadUid = threadUid,
                             shouldLoadDistantResources = shouldLoadDistantResources(lastMessageToReplyTo.uid),
-                            messageUidToReplyTo = lastMessageToReplyTo.uid,
                         ).toBundle(),
                     )
                 }
@@ -739,6 +741,13 @@ class ThreadFragment : Fragment() {
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
+        }
+
+        getBackNavigationResult(DIALOG_SHEET_MULTI_JUNK) { junkThreads: JunkThreads ->
+            safeNavigate(
+                resId = R.id.junkBottomSheetDialog,
+                args = JunkBottomSheetDialogArgs(junkThreads.threadUids.toTypedArray()).toBundle(),
+            )
         }
     }
 
