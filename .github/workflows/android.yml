@@ -37,6 +37,7 @@ jobs:
       - name: Run Unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
 
+      # TODO Move this to ui-tests.yml
       - name: Run UI tests
         uses: ReactiveCircus/android-emulator-runner@v2.34.0
         env:
