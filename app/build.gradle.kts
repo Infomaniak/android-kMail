@@ -28,6 +28,7 @@ android {
         versionCode = 1_17_000_01
         versionName = "1.17.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
         setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")
 
