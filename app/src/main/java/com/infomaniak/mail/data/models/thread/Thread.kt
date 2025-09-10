@@ -180,7 +180,7 @@ class Thread : RealmObject, Snoozable {
 
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
 
-        val shouldAddMessage = when (FolderController.getFolder(folderId, realm)?.role) {
+        val shouldAddMessage = when (FolderController.getFolderBlocking(folderId, realm)?.role) {
             FolderRole.DRAFT -> newMessage.isDraft // In Draft folder: only add draft Messages.
             FolderRole.SCHEDULED_DRAFTS -> newMessage.isScheduledDraft // In ScheduledDrafts folder: only add scheduled Messages.
             FolderRole.TRASH -> newMessage.isTrashed // In Trash folder: only add deleted Messages.

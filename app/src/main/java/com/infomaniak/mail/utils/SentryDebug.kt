@@ -187,9 +187,9 @@ object SentryDebug {
     //  If this doesn't trigger after a certain amount of time, you can remove it.
     //
     //  Also added in ThreadListAdapter & ThreadController the 04/06/24.
-    fun sendEmptyThread(thread: Thread, message: String, realm: TypedRealm) = with(thread) {
+    fun sendEmptyThreadBlocking(thread: Thread, message: String, realm: TypedRealm) = with(thread) {
 
-        val messageFromThreadUid = MessageController.getMessage(uid, realm)
+        val messageFromThreadUid = MessageController.getMessageBlocking(uid, realm)
 
         Sentry.captureMessage(message, SentryLevel.ERROR) { scope ->
             scope.setExtra("01. currentUserId", "${AccountUtils.currentUserId}")
@@ -271,8 +271,8 @@ object SentryDebug {
         // )
     }
 
-    fun sendOrphanMessages(previousCursor: String?, folder: Folder, realm: TypedRealm): List<Message> {
-        val orphanMessages = folder.messages(realm).filter { it.isOrphan() }
+    fun sendOrphanMessagesBlocking(previousCursor: String?, folder: Folder, realm: TypedRealm): List<Message> {
+        val orphanMessages = folder.messagesBlocking(realm).filter { it.isOrphan() }
         if (orphanMessages.isNotEmpty()) {
             Sentry.captureMessage("We found some orphan Messages.", SentryLevel.ERROR) { scope ->
                 scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")

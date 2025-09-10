@@ -178,7 +178,7 @@ private fun Thread.sharedThreadProcessing(context: Context, cachedNamedFolders: 
 
 private fun Thread.setFolderName(cachedNamedFolders: MutableMap<String, NamedFolder>, realm: Realm, context: Context) {
     val cachedNamedFolder = cachedNamedFolders[folderId]
-        ?: FolderController.getFolder(folderId, realm)
+        ?: FolderController.getFolderBlocking(folderId, realm)
             ?.let { NamedFolder.fromFolder(it, context) }
             ?.also { cachedNamedFolders[folderId] = it }
 

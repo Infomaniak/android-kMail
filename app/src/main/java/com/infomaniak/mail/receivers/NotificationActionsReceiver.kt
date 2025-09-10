@@ -130,10 +130,12 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         // Cancel action
         notificationJobsBus.unregister(payload.notificationId)
 
-        notificationUtils.showMessageNotification(
-            notificationManagerCompat = notificationManagerCompat,
-            payload = payload.apply { behavior = null },
-        )
+        globalCoroutineScope.launch {
+            notificationUtils.showMessageNotification(
+                notificationManagerCompat = notificationManagerCompat,
+                payload = payload.apply { behavior = null },
+            )
+        }
     }
 
     private fun executeAction(
@@ -144,17 +146,20 @@ class NotificationActionsReceiver : BroadcastReceiver() {
         payload: NotificationPayload,
     ) = with(payload) {
 
-        notificationUtils.showMessageNotification(
-            notificationManagerCompat = notificationManagerCompat,
-            payload = payload.apply {
-                behavior = NotificationBehavior(
-                    type = NotificationType.UNDO,
-                    behaviorTitle = context.getString(undoNotificationTitle),
-                )
-            },
-        )
+        val notificationShowingJob = globalCoroutineScope.launch {
+            notificationUtils.showMessageNotification(
+                notificationManagerCompat = notificationManagerCompat,
+                payload = payload.apply {
+                    behavior = NotificationBehavior(
+                        type = NotificationType.UNDO,
+                        behaviorTitle = context.getString(undoNotificationTitle),
+                    )
+                },
+            )
+        }
 
         val job = globalCoroutineScope.launch(ioDispatcher) {
+            notificationShowingJob.join()
 
             delay(UNDO_TIMEOUT)
             ensureActive()
