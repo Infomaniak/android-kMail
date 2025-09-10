@@ -31,6 +31,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -42,14 +43,18 @@ import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
+import com.infomaniak.mail.utils.openKSuiteProBottomSheet
+import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import com.infomaniak.lib.core.R as RCore
 
+@OptIn(ExperimentalSplittiesApi::class)
 @FragmentScoped
 class NewMessageAiManager @Inject constructor(
     @ActivityContext private val activityContext: Context,
@@ -230,8 +235,14 @@ class NewMessageAiManager @Inject constructor(
         )
     }
 
-    fun openAiPrompt() {
-        aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
+    fun openAiPrompt() = fragment.lifecycleScope.launch {
+        val mailbox = newMessageViewModel.currentMailbox()
+        val matomoName = MatomoName.AiWriter.value
+        when (mailbox.kSuite) {
+            KSuite.Perso.Free -> fragment.openMyKSuiteUpgradeBottomSheet(matomoName)
+            KSuite.Pro.Free -> fragment.openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
+            else -> aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
+        }
     }
 
     fun closeAiPrompt(becauseOfGeneration: Boolean = false) {
