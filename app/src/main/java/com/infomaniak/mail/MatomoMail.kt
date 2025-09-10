@@ -579,7 +579,7 @@ object MatomoMail : Matomo {
     fun trackEditorActionEvent(action: EditorAction, isEncryptionActivated: Boolean) {
         val name = when {
             action != EditorAction.ENCRYPTION -> action.matomoName
-            isEncryptionActivated == true -> MatomoName.OpenEncryptionActions
+            isEncryptionActivated -> MatomoName.OpenEncryptionActions
             else -> MatomoName.EncryptionActivation
         }
         trackEvent(MatomoCategory.EditorActions, name)
