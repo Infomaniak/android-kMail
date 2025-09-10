@@ -25,9 +25,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetKSuiteProBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 
 class KSuiteProBottomSheetDialog : DialogFragment() {
 
@@ -40,7 +38,6 @@ class KSuiteProBottomSheetDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         with(binding.kSuiteProBottomSheet) {
             setKSuite(navArgs.kSuite)
