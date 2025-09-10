@@ -96,10 +96,9 @@ abstract class MailBottomSheetScaffoldComposeView @JvmOverloads constructor(
 
         MailTheme {
             if (isVisible) {
-                if (containerColor == null) {
-                    Scaffold(sheetState)
-                } else {
-                    ProvideBottomSheetTheme(LocalBottomSheetTheme.current.copy(containerColor = containerColor!!)) {
+                when (val color = containerColor) {
+                    null -> Scaffold(sheetState)
+                    else -> ProvideBottomSheetTheme(LocalBottomSheetTheme.current.copy(containerColor = color)) {
                         Scaffold(sheetState)
                     }
                 }

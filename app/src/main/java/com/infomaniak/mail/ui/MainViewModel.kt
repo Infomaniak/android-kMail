@@ -463,8 +463,10 @@ class MainViewModel @Inject constructor(
         if (mailbox.kSuite.isFreeTier().not()) return@launch
 
         with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
-                it.quotas = data
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.quotas = data
+                }
             }
         }
     }
@@ -472,8 +474,10 @@ class MainViewModel @Inject constructor(
     private fun updatePermissions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
-            if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
-                it.permissions = data
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.permissions = data
+                }
             }
         }
     }
