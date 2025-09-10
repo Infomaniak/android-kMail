@@ -27,7 +27,9 @@ android {
         targetSdk = appCompileSdk
         versionCode = 1_16_006_01
         versionName = "1.16.6"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
         setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")
 
