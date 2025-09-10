@@ -25,9 +25,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.lib.core.utils.setBackNavigationResult
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentEmojiPickerBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 
 class EmojiPickerBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -40,7 +38,6 @@ class EmojiPickerBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         binding.emojiPicker.setOnEmojiPickedListener {
             setBackNavigationResult(PICKED_EMOJI, PickedEmojiPayload(it.emoji, navigationArgs.messageUid))
