@@ -96,11 +96,8 @@ private fun MigrationContext.renameKSuiteRelatedBooleans() {
             newObject?.apply {
 
                 // Rename property without losing its previous value
-                runCatching {
-                    // The runCatching is only there for users updating the app from a very old version,
-                    // because `isFree` didn't exist back then.
-                    // No runCatching is needed for `isLimited` because it exists since v1.0.0.
-                    set(propertyName = "isKSuitePerso", value = oldObject.getValue<Boolean>(fieldName = "isFree"))
+                oldObject.getValueOrNull<Boolean>(fieldName = "isFree")?.let {
+                    set(propertyName = "isKSuitePerso", value = it)
                 }
 
                 // Rename property without losing its previous value
