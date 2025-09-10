@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.ai.AiPromptOpeningStatus
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.Utils.isRunningInTest
 import com.infomaniak.mail.utils.extensions.updateNavigationBarColor
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
@@ -216,7 +217,8 @@ class NewMessageAiManager @Inject constructor(
     }
 
     private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
-        if (showAiDiscoveryBottomSheet) {
+        // Not showing the AI BottomSheet when running tests because it has a Lottie which breaks the tests.
+        if (showAiDiscoveryBottomSheet && isRunningInTest().not()) {
             showAiDiscoveryBottomSheet = false
             fragment.safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
         }

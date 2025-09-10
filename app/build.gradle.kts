@@ -133,6 +133,7 @@ dependencies {
 
     implementation(libs.realm.kotlin.base)
     implementation(libs.junit.ktx)
+    implementation(libs.espresso.contrib)
 
     "standardImplementation"(libs.play.services.base)
     "standardImplementation"(libs.firebase.messaging.ktx)
@@ -183,6 +184,7 @@ dependencies {
     androidTestImplementation(core.androidx.test.core)
     androidTestImplementation(core.androidx.test.core.ktx)
     androidTestImplementation(core.androidx.runner)
+    androidTestImplementation(libs.uiautomator)
 
     debugImplementation(libs.fragment.testing)
 
