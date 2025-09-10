@@ -882,10 +882,10 @@ class NewMessageFragment : Fragment() {
             trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
                 val matomoName = MatomoKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME
-                if (mailbox.kSuite == KSuite.Pro.Free) { // KSuite Pro
-                    openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
-                } else { // KSuite Perso
-                    openMyKSuiteUpgradeBottomSheet(matomoName)
+                when (mailbox.kSuite) {
+                    KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
+                    KSuite.Pro.Free -> openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
+                    else -> Unit
                 }
             }
         }
