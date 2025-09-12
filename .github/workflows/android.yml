@@ -52,4 +52,4 @@ jobs:
           emulator-options: -no-snapshot-save -noaudio -no-boot-anim -camera-back none -skin 540x1110
           disk-size: 6G
           script: |
-            ./gradlew :app:connectedStandardDebugAndroidTest --stacktrace
+            ./gradlew ui-testStandardDebugAndroidTest --stacktrace --info

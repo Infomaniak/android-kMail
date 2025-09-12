@@ -29,9 +29,21 @@ android {
         versionName = "1.17.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
+        testInstrumentationRunnerArguments["useTestStorageService"] = "true"
 
         testOptions {
-            execution = "ANDROIDX_TEST_ORCHESTRATOR"
+            @Suppress("UnstableApiUsage")
+            managedDevices {
+                allDevices {
+                    create<com.android.build.api.dsl.ManagedVirtualDevice>("ui-test") {
+                        device = "Pixel 9 Pro XL"
+                        apiLevel = 36
+                        systemImageSource = "google"
+                    }
+                }
+
+                execution = "ANDROIDX_TEST_ORCHESTRATOR"
+            }
         }
 
         setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")
