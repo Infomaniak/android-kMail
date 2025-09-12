@@ -13,7 +13,7 @@ jobs:
     runs-on: [ self-hosted, Android ]
     strategy:
       matrix:
-        api-level: [ 34 ]
+        api-level: [ 36 ]
         target: [ google_apis ]
 
     steps:
@@ -37,19 +37,26 @@ jobs:
       - name: Run Unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
 
-      # TODO Move this to ui-tests.yml
-      - name: Run UI tests
-        uses: ReactiveCircus/android-emulator-runner@v2.34.0
+      - name: Run UI tests with Managed Devices
         env:
           UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
           UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
-        with:
-          api-level: 36
-          target: google_apis
-          arch: arm64-v8a
-          avd-name: ui-test
-          disable-animations: true
-          emulator-options: -no-snapshot-save -noaudio -no-boot-anim -camera-back none -skin 540x1110
-          disk-size: 6G
-          script: |
-            ./gradlew ui-testStandardDebugAndroidTest --stacktrace --info
+        run: |
+          ./gradlew ui-testStandardDebugAndroidTest --stacktrace --info
+
+      # TODO Move this to ui-tests.yml
+#      - name: Run UI tests
+#        uses: ReactiveCircus/android-emulator-runner@v2.34.0
+#        env:
+#          UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
+#          UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
+#        with:
+#          api-level: 36
+#          target: google_apis
+#          arch: arm64-v8a
+#          avd-name: ui-test
+#          disable-animations: true
+#          emulator-options: -no-snapshot-save -noaudio -no-boot-anim -camera-back none -skin 540x1110
+#          disk-size: 6G
+#          script: |
+#            ./gradlew ui-testStandardDebugAndroidTest --stacktrace --info
