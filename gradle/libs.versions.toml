@@ -22,6 +22,7 @@ leakcanaryAndroid = "2.14"
 lifecycleProcess = "2.9.2"
 mockk = "1.14.5"
 navigation = "2.9.3"
+orchestrator = "1.6.1"
 playServices = "18.7.2"
 realmKotlin = "3.2.8-2"
 richHtmlEditor = "0.2.0"
@@ -46,6 +47,7 @@ jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
+orchestrator = { module = "androidx.test:orchestrator", version.ref = "orchestrator" }
 play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
 realm-kotlin-base = { module = "com.infomaniak.realm.kotlin:library-base", version.ref = "realmKotlin" }
 rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", version.ref = "richHtmlEditor" }

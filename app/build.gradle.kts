@@ -30,6 +30,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
+        testOptions {
+            execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        }
+
         setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")
 
         buildConfigField("String", "CLIENT_ID", "\"E90BC22D-67A8-452C-BE93-28DA33588CA4\"")
@@ -177,15 +181,17 @@ dependencies {
     testImplementation(core.kotlinx.coroutines.test)
 
     androidTestImplementation(core.androidx.junit)
-    androidTestImplementation(libs.espresso.core)
-    androidTestImplementation(libs.espresso.web)
-    androidTestImplementation(core.junit)
-    androidTestImplementation(libs.junit.ktx)
-    androidTestImplementation(libs.stdlib)
+    androidTestImplementation(core.androidx.runner)
     androidTestImplementation(core.androidx.test.core)
     androidTestImplementation(core.androidx.test.core.ktx)
-    androidTestImplementation(core.androidx.runner)
+    androidTestImplementation(core.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.espresso.web)
+    androidTestImplementation(libs.junit.ktx)
+    androidTestImplementation(libs.stdlib)
     androidTestImplementation(libs.uiautomator)
+
+    androidTestUtil(libs.orchestrator)
 
     debugImplementation(libs.fragment.testing)
 
