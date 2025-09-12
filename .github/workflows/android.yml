@@ -42,7 +42,7 @@ jobs:
           UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
           UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
         run: |
-          ./gradlew ui-testStandardDebugAndroidTest --stacktrace --info
+          ./gradlew ui-testStandardDebugAndroidTest --enable-display
 
       # TODO Move this to ui-tests.yml
 #      - name: Run UI tests

@@ -85,6 +85,9 @@ class NewMessageActivityTest {
     fun sendEmail() {
         onView(withId(R.id.newMessageFab)).perform(click())
 
+        // Waiting for the view to settle
+        onView(isRoot()).perform(waitFor(3.seconds))
+
         // Just clicking on the toField does not work ...
         onView(
             allOf(
@@ -104,7 +107,7 @@ class NewMessageActivityTest {
         onView(withId(R.id.sendButton)).perform(click())
 
         // Waiting for the email to be received
-        onView(isRoot()).perform(waitFor(10.seconds))
+        onView(isRoot()).perform(waitFor(15.seconds))
 
         // Checking if the email with a specific ID to be received
         onView(withId(R.id.threadsList))
