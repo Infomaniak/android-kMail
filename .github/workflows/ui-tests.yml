@@ -10,7 +10,6 @@ concurrency:
 
 jobs:
   instrumentation-tests:
-    if: github.event.pull_request.draft == false
     runs-on: [ self-hosted, Android ]
     strategy:
       matrix:
@@ -29,9 +28,6 @@ jobs:
 
       - name: Clean gradle cache
         run: ./gradlew clean
-
-      - name: Build app
-        run: ./gradlew app:assembleStandardDebug -Pandroid.injected.build.abi=arm64-v8a
 
       - name: Run UI tests
         env:
