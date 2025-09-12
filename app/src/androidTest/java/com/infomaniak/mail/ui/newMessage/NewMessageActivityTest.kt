@@ -83,7 +83,7 @@ class NewMessageActivityTest {
 
     @Test
     fun sendEmail() {
-        //onView(withId(R.id.newMessageFab)).perform(click())
+        onView(withId(R.id.newMessageFab)).perform(click())
 
         // Waiting for the view to settle
         onView(isRoot()).perform(waitFor(3.seconds))
