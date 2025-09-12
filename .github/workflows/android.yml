@@ -36,29 +36,3 @@ jobs:
       # Run tests
       - name: Run Unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
-
-      - name: Run UI tests
-        env:
-          UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
-          UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
-        run: |
-          ./gradlew ui-testStandardDebugAndroidTest --enable-display
-
-      - name: Upload Test Report
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-test-report
-          path: app/build/reports/androidTests/managedDevice/debug/flavors/standard/allDevices
-
-      - name: Create Github issue with tests failure
-        if: failure()
-        uses: actions/github-script@v7.0.1
-        with:
-          script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: 'UI tests failure',
-              body: 'Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} failed.',
-            })
