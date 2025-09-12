@@ -1,6 +1,0 @@
-appId: com.infomaniak.mail
----
-- tapOn:
-    id: userAvatar
-- tapOn: 'Log out'
-- tapOn: 'Confirm'
