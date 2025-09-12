@@ -14,7 +14,7 @@ jobs:
     runs-on: [ self-hosted, Android ]
     strategy:
       matrix:
-        api-level: [ 34 ]
+        api-level: [ 36 ]
         target: [ google_apis ]
 
     steps:
@@ -33,50 +33,22 @@ jobs:
       - name: Build app
         run: ./gradlew app:assembleStandardDebug -Pandroid.injected.build.abi=arm64-v8a
 
-      - name: Find APK file
-        id: find_apk
-        run: |
-          APK_PATH=$(realpath "$(find app/build/intermediates/apk/standard/debug -type f -name "*.apk" | head -n 1)")
-          if [ -z "$APK_PATH" ] || [ ! -f "$APK_PATH" ]; then
-          echo "::error::APK file not found or invalid path: '$APK_PATH'"
-            exit 1
-          fi
-          echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
-
-      # Run UI tests
       - name: Run UI tests
-        id: maestro_tests
-        uses: ReactiveCircus/android-emulator-runner@v2.34.0
         env:
           UI_TEST_ACCOUNT_EMAIL: ${{ secrets.UI_TEST_ACCOUNT_EMAIL }}
           UI_TEST_ACCOUNT_PASSWORD: ${{ secrets.UI_TEST_ACCOUNT_PASSWORD }}
-        with:
-          api-level: 36
-          target: google_apis
-          arch: arm64-v8a
-          avd-name: kdrive-test
-          disable-animations: true
-          emulator-options: -no-snapshot-save -noaudio -no-boot-anim -camera-back none -skin 540x1110
-          disk-size: 6G
-          script: |
-            echo "Installing Maestro"
-            curl -fsSL "https://get.maestro.mobile.dev" | bash
-            
-            echo "Installing APK"            
-            adb install -t "${{ steps.find_apk.outputs.apk_path }}"
-            
-            echo "Starting UI tests"
-            if ! $HOME/.maestro/bin/maestro test --format html --output report.html "${{ steps.find_apk.outputs.apk_path }}" -e=ACCOUNT_EMAIL=${{ secrets.UI_TEST_ACCOUNT_EMAIL }} -e=ACCOUNT_PASSWORD=${{ secrets.UI_TEST_ACCOUNT_PASSWORD }} ./maestro/flow/login.yaml ./maestro/flow/writeEmail.yaml ./maestro/flow/logout.yaml; then echo "Maestro tests failed!"; exit 1; fi
+        run: |
+          ./gradlew ui-testStandardDebugAndroidTest --enable-display
 
       - name: Upload Test Report
-        if: failure() && steps.maestro_tests.outcome == 'failure'
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
-          path: report.html
+          name: ui-test-report
+          path: app/build/reports/androidTests/managedDevice/debug/flavors/standard/allDevices
 
       - name: Create Github issue with tests failure
-        if: failure() && steps.maestro_tests.outcome == 'failure'
+        if: failure()
         uses: actions/github-script@v7.0.1
         with:
           script: |
@@ -86,3 +58,4 @@ jobs:
               title: 'UI tests failure',
               body: 'Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} failed.',
             })
+
