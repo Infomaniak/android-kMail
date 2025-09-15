@@ -35,13 +35,11 @@ import androidx.test.uiautomator.UiDevice
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.login.LoginFragment
 import org.hamcrest.Matcher
-import java.io.IOException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 object Scenarios {
 
-    //TODO remove password and email
     fun login(email: String, password: String) {
         // Typing the email
         onWebView()
@@ -80,19 +78,6 @@ object Scenarios {
             override fun perform(uiController: UiController, view: View?) {
                 uiController.loopMainThreadForAtLeast(delay.inWholeMilliseconds)
             }
-        }
-    }
-
-
-    fun grantPermission(device: UiDevice, permission: String, packageName: String) {
-        try {
-            val command = "pm grant $packageName $permission"
-            device.executeShellCommand(command)
-            // Add a small delay to ensure permission is processed by the system
-            Thread.sleep(1000)
-        } catch (e: IOException) {
-        } catch (e: InterruptedException) {
-            Thread.currentThread().interrupt()
         }
     }
 
