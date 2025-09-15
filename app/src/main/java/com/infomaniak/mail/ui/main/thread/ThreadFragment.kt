@@ -1062,6 +1062,14 @@ class ThreadFragment : Fragment() {
         return direction?.let { getNextThread(startingThreadIndex, direction) }
     }
 
+    private fun Fragment.navigateToEmojiPicker(messageUid: String) {
+        safelyNavigate(
+            resId = R.id.emojiPickerBottomSheetDialog,
+            args = EmojiPickerBottomSheetDialogArgs(messageUid).toBundle(),
+            substituteClassName = twoPaneFragment.substituteClassName,
+        )
+    }
+
     enum class HeaderState {
         ELEVATED,
         LOWERED,
@@ -1081,14 +1089,6 @@ class ThreadFragment : Fragment() {
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"
     }
-}
-
-private fun Fragment.navigateToEmojiPicker(messageUid: String) {
-    safelyNavigate(
-        resId = R.id.emojiPickerBottomSheetDialog,
-        args = EmojiPickerBottomSheetDialogArgs(messageUid).toBundle(),
-        substituteClassName = ThreadListFragment::class.java.name,
-    )
 }
 
 private inline fun <reified T> Data.getSerializable(key: String): T? = getString(key)?.let { Json.decodeFromString(it) }
