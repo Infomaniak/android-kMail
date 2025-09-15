@@ -114,6 +114,8 @@ class ThreadListFragment : TwoPaneFragment() {
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
+    override val substituteClassName: String = javaClass.name
+
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
     private var lastUpdatedDate: Date? = null
