@@ -376,6 +376,9 @@
     <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="groupContactsTitle">Groupe : %s</string>
     <string name="inboxFolder">Boîte de réception</string>
+    <string name="kSuiteProQuotasAlertDescription">L’espace de stockage de votre Mail est bientôt plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
+    <string name="kSuiteProQuotasAlertFullDescription">L’espace de stockage de votre Mail est plein. Modifiez votre offre pour avoir un stockage illimité et débloquez de nouvelles fonctionnalités.</string>
+    <string name="kSuiteProQuotasAlertFullTitle">Votre espace de stockage Mail est plein</string>
     <string name="lastSelectedSchedule">Dernier horaire choisi</string>
     <string name="laterThisMorning">Plus tard ce matin</string>
     <string name="linkingWord">et</string>

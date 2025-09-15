@@ -15,15 +15,9 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:pathData="M15.457,16.586C11.427,16.01 8.069,12.748 7.493,8.622C7.205,6.415 7.685,4.4 8.644,2.673C9.124,1.809 8.261,0.946 7.397,1.33C3.463,3.345 0.873,7.566 1.256,12.268C1.64,17.737 6.246,22.343 11.715,22.726C16.512,23.11 20.734,20.519 22.653,16.586C23.133,15.722 22.173,14.858 21.31,15.338C19.679,16.394 17.568,16.873 15.457,16.586Z"
-        android:strokeWidth="1"
-        android:strokeColor="#BC0055"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
-</vector>
+<com.infomaniak.mail.ui.components.views.KSuiteProBottomSheet xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/kSuiteProBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.bottomSheetDialogs.KSuiteProBottomSheetDialog" />

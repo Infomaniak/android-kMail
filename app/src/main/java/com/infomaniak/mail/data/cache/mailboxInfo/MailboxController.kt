@@ -165,7 +165,7 @@ class MailboxController @Inject constructor(
         private val isValidInLdap = "${Mailbox.isValidInLdapPropertyName} == true"
         private val isLocked = "${Mailbox.isLockedPropertyName} == true"
         private val hasValidPassword = "${Mailbox::hasValidPassword.name} == true"
-        private val isMyKSuite = "${Mailbox::isFree.name} == true"
+        private val isKSuitePerso = "${Mailbox::isKSuitePerso.name} == true"
 
         private fun getMailboxesQuery(
             userId: Int? = null,
@@ -216,7 +216,7 @@ class MailboxController @Inject constructor(
         }
 
         private fun getMyKSuiteMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
-            return realm.query<Mailbox>("${checkHasUserId(userId)} AND $isMyKSuite")
+            return realm.query<Mailbox>("${checkHasUserId(userId)} AND $isKSuitePerso")
         }
         //endregion
 

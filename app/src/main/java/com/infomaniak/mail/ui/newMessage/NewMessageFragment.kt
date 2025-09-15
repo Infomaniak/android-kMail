@@ -47,7 +47,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.core.ksuite.myksuite.ui.utils.MatomoMyKSuite
+import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -116,6 +117,7 @@ import com.infomaniak.mail.utils.extensions.navigateToDownloadProgressDialog
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
+import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import com.lottiefiles.dotlottie.core.util.DotLottieSource
 import dagger.hilt.android.AndroidEntryPoint
@@ -804,12 +806,14 @@ class NewMessageFragment : Fragment() {
     }
 
     private suspend fun setupSendButtons() = with(binding) {
+
+        val mailbox = newMessageViewModel.currentMailbox()
+
         newMessageViewModel.isSendingAllowed.observe(viewLifecycleOwner) {
             scheduleButton.isEnabled = it
             sendButton.isEnabled = it
         }
 
-        val mailbox: Mailbox = newMessageViewModel.currentMailbox()
         scheduleButton.setOnClickListener {
             if (checkMailboxStorage(mailbox)) {
                 if (newMessageViewModel.isEncryptionActivated.value == true) {
@@ -829,7 +833,8 @@ class NewMessageFragment : Fragment() {
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
-                isCurrentMailboxFree = mailbox.isFreeMailbox,
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
             ).toBundle(),
         )
     }
@@ -870,11 +875,18 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun checkMailboxStorage(mailbox: Mailbox): Boolean {
+
         val isMailboxFull = mailbox.quotas?.isFull == true
+
         if (isMailboxFull) {
             trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
             showSnackbar(R.string.myKSuiteSpaceFullAlert, actionButtonTitle = R.string.buttonUpgrade) {
-                openMyKSuiteUpgradeBottomSheet(MatomoMyKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME)
+                val matomoName = MatomoKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME
+                when (mailbox.kSuite) {
+                    KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
+                    KSuite.Pro.Free -> openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
+                    else -> Unit
+                }
             }
         }
 

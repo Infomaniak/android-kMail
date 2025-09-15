@@ -26,15 +26,13 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.observe
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetCrossLoginBinding
-import com.infomaniak.mail.utils.extensions.setSystemBarsColors
 
 class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
     private var binding: BottomSheetCrossLoginBinding by safeBinding()
-    private val introViewModel: IntroViewModel by activityViewModels()
 
+    private val introViewModel: IntroViewModel by activityViewModels()
     private val crossAppLoginViewModel: CrossAppLoginViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -43,7 +41,6 @@ class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSystemBarsColors(statusBarColor = R.color.backgroundColor)
 
         observeAccentColor()
         observeCrossLoginAccounts()

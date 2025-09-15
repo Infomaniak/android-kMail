@@ -15,36 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.emojiPicker
+package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.setBackNavigationResult
-import com.infomaniak.mail.databinding.FragmentEmojiPickerBinding
+import com.infomaniak.mail.databinding.BottomSheetKSuiteProBinding
 
-class EmojiPickerBottomSheetDialog : BottomSheetDialogFragment() {
+class KSuiteProBottomSheetDialog : DialogFragment() {
 
-    private var binding: FragmentEmojiPickerBinding by safeBinding()
-    private val navigationArgs: EmojiPickerBottomSheetDialogArgs by navArgs()
+    private var binding: BottomSheetKSuiteProBinding by safeBinding()
+    private val navArgs: KSuiteProBottomSheetDialogArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentEmojiPickerBinding.inflate(inflater, container, false).also { binding = it }.root
+        return BottomSheetKSuiteProBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.emojiPicker.setOnEmojiPickedListener {
-            setBackNavigationResult(PICKED_EMOJI, PickedEmojiPayload(it.emoji, navigationArgs.messageUid))
+        with(binding.kSuiteProBottomSheet) {
+            setKSuite(navArgs.kSuite)
+            setIsAdmin(navArgs.isAdmin)
+            setOnClose { findNavController().popBackStack() }
+            show()
         }
-    }
-
-    companion object {
-        const val PICKED_EMOJI = "PICKED_EMOJI"
     }
 }

@@ -249,13 +249,15 @@ abstract class TwoPaneFragment : Fragment() {
     }
 
     fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?, snoozeEndDate: RealmInstant?) {
+        val mailbox = mainViewModel.currentMailbox.value ?: return
         twoPaneViewModel.snoozeScheduleType = snoozeScheduleType
         twoPaneViewModel.safelyNavigate(
             resId = R.id.snoozeBottomSheetDialog,
             args = SnoozeBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedSnoozeEpochMillis ?: 0L,
                 currentlyScheduledEpochMillis = snoozeEndDate?.epochSeconds?.times(1_000) ?: 0L,
-                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
             ).toBundle(),
         )
     }

@@ -41,6 +41,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -57,6 +58,7 @@ import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.trackKSuiteProEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.MatomoMail.trackMyKSuiteEvent
@@ -67,7 +69,7 @@ import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.SwipeAction
-import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -169,7 +171,7 @@ class ThreadListFragment : TwoPaneFragment() {
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
-        setupMyKSuiteStorageBanner()
+        setupKSuiteStorageBanner()
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
@@ -369,7 +371,7 @@ class ThreadListFragment : TwoPaneFragment() {
 
                 override var deleteThreadInRealm: (String) -> Unit = { threadUid -> mainViewModel.deleteThreadInRealm(threadUid) }
 
-                override val getFeatureFlags: () -> Mailbox.FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
+                override val getFeatureFlags: () -> FeatureFlagSet? = { mainViewModel.featureFlagsLive.value }
             },
             multiSelection = object : MultiSelectionListener<Thread> {
                 override var isEnabled by mainViewModel::isMultiSelectOn
@@ -392,7 +394,7 @@ class ThreadListFragment : TwoPaneFragment() {
         }
     }
 
-    private fun updateDisabledSwipeActionsUi(featureFlags: Mailbox.FeatureFlagSet?, folderRole: FolderRole?) {
+    private fun updateDisabledSwipeActionsUi(featureFlags: FeatureFlagSet?, folderRole: FolderRole?) {
         val isLeftEnabled = localSettings.swipeLeft.canDisplay(folderRole, featureFlags, localSettings)
         val isRightEnabled = localSettings.swipeRight.canDisplay(folderRole, featureFlags, localSettings)
 
@@ -524,14 +526,20 @@ class ThreadListFragment : TwoPaneFragment() {
         }
     }
 
-    private fun setupMyKSuiteStorageBanner() = with(localSettings) {
+    private fun setupKSuiteStorageBanner() = with(localSettings) {
         mainViewModel.storageBannerStatus.observeNotNull(viewLifecycleOwner) { storageBannerStatus ->
-            binding.myKSuiteStorageBanner.apply {
+            binding.kSuiteStorageBanner.apply {
                 storageLevel = storageBannerStatus
                 setupListener(
                     onCloseButtonClicked = {
-                        trackMyKSuiteEvent(MatomoName.CloseStorageWarningBanner.value)
-                        binding.myKSuiteStorageBanner.isGone = true
+                        val kSuite = mainViewModel.currentMailbox.value?.kSuite
+                        val matomoName = MatomoName.CloseStorageWarningBanner.value
+                        when (kSuite) {
+                            KSuite.Perso.Free -> trackMyKSuiteEvent(matomoName)
+                            KSuite.Pro.Free -> trackKSuiteProEvent(matomoName)
+                            else -> Unit
+                        }
+                        binding.kSuiteStorageBanner.isGone = true
                         resetStorageBannerAppLaunches()
                     }
                 )
