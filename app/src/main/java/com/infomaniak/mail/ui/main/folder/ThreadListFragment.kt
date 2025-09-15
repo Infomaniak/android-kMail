@@ -114,6 +114,8 @@ class ThreadListFragment : TwoPaneFragment() {
     private val navigationArgs: ThreadListFragmentArgs by navArgs()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
+    override val substituteClassName: String = javaClass.name
+
     private val threadListMultiSelection by lazy { ThreadListMultiSelection() }
 
     private var lastUpdatedDate: Date? = null
@@ -171,7 +173,6 @@ class ThreadListFragment : TwoPaneFragment() {
 
         threadListMultiSelection.initMultiSelection(
             mainViewModel = mainViewModel,
-            folderRoleUtils = folderRoleUtils,
             threadListFragment = this,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
             localSettings = localSettings,
@@ -220,7 +221,7 @@ class ThreadListFragment : TwoPaneFragment() {
 
             val marginStandardSize = resources.getDimensionPixelSize(RCore.dimen.marginStandard)
             with(insets.safeArea()) {
-                binding.newMessageFab.setMargins(bottom = marginStandardSize + bottom, right = marginStandardSize + right)
+                newMessageFab.setMargins(bottom = marginStandardSize + bottom, right = marginStandardSize + right)
             }
         }
     }

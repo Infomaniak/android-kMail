@@ -65,7 +65,7 @@ class MoveViewModel @Inject constructor(
     init {
         viewModelScope.launch(ioCoroutineContext) {
 
-            val sourceFolderId = messageUid?.let(messageController::getMessage)?.folderId
+            val sourceFolderId = messageUid?.let { messageController.getMessage(it) }?.folderId
                 ?: threadController.getThread(threadsUids.first())!!.folderId
 
             sourceFolderIdLiveData.postValue(sourceFolderId)

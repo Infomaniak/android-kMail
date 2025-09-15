@@ -24,6 +24,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.observe
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -79,14 +80,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.threadMessageToExecuteAction.observe(viewLifecycleOwner) { threadMessageToExecuteAction ->
-            if (threadMessageToExecuteAction == null) {
-                findNavController().popBackStack()
-                return@observe
-            }
-
-            val (thread, messageUidToExecuteAction) = threadMessageToExecuteAction
-
+        threadActionsViewModel.threadMessageToExecuteAction.observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction) ->
             folderRole = folderRoleUtils.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
             isFromSpam = folderRole == FolderRole.SPAM

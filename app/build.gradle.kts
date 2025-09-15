@@ -25,8 +25,8 @@ android {
         applicationId = "com.infomaniak.mail"
         minSdk = appMinSdk
         targetSdk = appCompileSdk
-        versionCode = 1_16_005_01
-        versionName = "1.16.5"
+        versionCode = 1_16_006_01
+        versionName = "1.16.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")
@@ -133,7 +133,7 @@ dependencies {
     "standardImplementation"(libs.firebase.messaging.ktx)
 
     implementation(libs.dotlottie)
-    implementation(libs.lottie)
+    implementation(core.lottie)
     implementation(libs.dragdropswipe.recyclerview)
     implementation(libs.dotsindicator)
     implementation(libs.emoji2.emojipicker)
@@ -141,7 +141,7 @@ dependencies {
     implementation(libs.flexbox)
     implementation(libs.lifecycle.process)
     implementation(libs.webkit)
-    implementation(libs.work.concurrent.futures)
+    implementation(core.androidx.concurrent.futures.ktx)
     implementation(core.androidx.work.runtime)
 
     implementation(libs.hilt.android)
@@ -164,11 +164,11 @@ dependencies {
     implementation(core.compose.ui.tooling.preview)
 
     // Test
-    testImplementation(libs.junit)
+    testImplementation(core.junit)
     testImplementation(libs.mockk.agent)
     testImplementation(libs.mockk.android)
-    testImplementation(libs.kotlinx.coroutine.test)
-    androidTestImplementation(libs.ext.junit)
+    testImplementation(core.kotlinx.coroutines.test)
+    androidTestImplementation(core.androidx.junit)
 
     // Debug
     if (enableLeakCanary) {

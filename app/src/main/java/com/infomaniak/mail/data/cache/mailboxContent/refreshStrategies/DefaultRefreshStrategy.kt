@@ -37,7 +37,7 @@ val defaultRefreshStrategy = object : DefaultRefreshStrategy {}
 
 interface DefaultRefreshStrategy : RefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
-        return ThreadController.getThreadsByFolderId(folderId, realm)
+        return ThreadController.getThreadsByFolderIdBlocking(folderId, realm)
     }
 
     override fun twinFolderRoles(): List<FolderRole> = emptyList()
@@ -45,7 +45,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     override fun shouldHideEmptyFolder(): Boolean = false
 
     override fun getMessageFromShortUid(shortUid: String, folderId: String, realm: TypedRealm): Message? {
-        return MessageController.getMessage(shortUid.toLongUid(folderId), realm)
+        return MessageController.getMessageBlocking(shortUid.toLongUid(folderId), realm)
     }
 
     override fun processDeletedMessage(
@@ -55,7 +55,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
         mailbox: Mailbox,
         realm: MutableRealm,
     ) {
-        MessageController.deleteMessage(context, mailbox, managedMessage, realm)
+        MessageController.deleteMessageBlocking(context, mailbox, managedMessage, realm)
     }
 
     override fun addFolderToImpactedFolders(folderId: String, impactedFolders: ImpactedFolders) {
@@ -98,7 +98,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
     ): Thread? {
 
         // Other pre-existing Threads that will also require this Message and will provide the prior Messages for this new Thread.
-        val existingThreads = ThreadController.getThreadsByMessageIds(remoteMessage.messageIds, realm = this)
+        val existingThreads = ThreadController.getThreadsByMessageIdsBlocking(remoteMessage.messageIds, realm = this)
         val existingMessages = getExistingMessages(existingThreads)
 
         val thread = createNewThreadIfRequired(scope, remoteMessage, existingThreads, existingMessages)
@@ -181,7 +181,7 @@ interface DefaultRefreshStrategy : RefreshStrategy {
 
         // Create a map with all duplicated Threads of the same Thread in a list.
         val map = mutableMapOf<String, MutableList<Thread>>()
-        ThreadController.getThreadsByMessageIds(messageIds, realm = this).forEach {
+        ThreadController.getThreadsByMessageIdsBlocking(messageIds, realm = this).forEach {
             map.getOrPut(it.folderId) { mutableListOf() }.add(it)
         }
 

@@ -69,6 +69,8 @@ abstract class TwoPaneFragment : Fragment() {
     @Inject
     lateinit var localSettings: LocalSettings
 
+    abstract val substituteClassName: String
+
     @ColorRes
     abstract fun getStatusBarColor(): Int
     abstract fun getLeftPane(): View?

@@ -27,7 +27,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.ViewCompat.dispatchApplyWindowInsets
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -244,12 +243,11 @@ class ThreadFragment : Fragment() {
     }
 
     private fun handleEdgeToEdge() = with(binding) {
-        // We don't consume insets because the QuickActionBarView needs it
-        applyWindowInsetsListener(shouldConsume = false) { _, insets ->
+        applyWindowInsetsListener(shouldConsume = true) { _, insets ->
             mainAppBar.applyStatusBarInsets(insets)
             appBar.applySideAndBottomSystemInsets(insets, withBottom = false)
             messagesListNestedScrollView.applySideAndBottomSystemInsets(insets, withBottom = false)
-            dispatchApplyWindowInsets(binding.quickActionBar, insets)
+            quickActionBar.applySideAndBottomSystemInsets(insets)
         }
     }
 
@@ -1073,6 +1071,14 @@ class ThreadFragment : Fragment() {
         return direction?.let { getNextThread(startingThreadIndex, direction) }
     }
 
+    private fun Fragment.navigateToEmojiPicker(messageUid: String) {
+        safelyNavigate(
+            resId = R.id.emojiPickerBottomSheetDialog,
+            args = EmojiPickerBottomSheetDialogArgs(messageUid).toBundle(),
+            substituteClassName = twoPaneFragment.substituteClassName,
+        )
+    }
+
     enum class HeaderState {
         ELEVATED,
         LOWERED,
@@ -1092,14 +1098,6 @@ class ThreadFragment : Fragment() {
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"
     }
-}
-
-private fun Fragment.navigateToEmojiPicker(messageUid: String) {
-    safelyNavigate(
-        resId = R.id.emojiPickerBottomSheetDialog,
-        args = EmojiPickerBottomSheetDialogArgs(messageUid).toBundle(),
-        substituteClassName = ThreadListFragment::class.java.name,
-    )
 }
 
 private inline fun <reified T> Data.getSerializable(key: String): T? = getString(key)?.let { Json.decodeFromString(it) }

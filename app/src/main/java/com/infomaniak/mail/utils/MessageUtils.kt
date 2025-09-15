@@ -27,7 +27,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 
 object MessageUtils {
 
-    fun getJunkMessagesAndMessagesToBlockUsers(
+    suspend fun getJunkMessagesAndMessagesToBlockUsers(
         threadController: ThreadController,
         messageController: MessageController,
         featureFlagsLive: Mailbox.FeatureFlagSet?,

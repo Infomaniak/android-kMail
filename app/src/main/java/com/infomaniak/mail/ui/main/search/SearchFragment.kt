@@ -77,6 +77,8 @@ class SearchFragment : TwoPaneFragment() {
 
     private val searchViewModel: SearchViewModel by viewModels()
 
+    override val substituteClassName: String = javaClass.name
+
     private val showLoadingTimer: CountDownTimer by lazy { Utils.createRefreshTimer(onTimerFinish = ::showRefreshLayout) }
 
     private val recentSearchAdapter by lazy {

@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FeatureAvailability
 import com.infomaniak.mail.utils.LocalStorageUtils.deleteDraftUploadDir
+import com.infomaniak.mail.utils.extensions.findSuspend
 import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -41,7 +42,14 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.invoke
 import javax.inject.Inject
 
 class MessageController @Inject constructor(
@@ -50,7 +58,7 @@ class MessageController @Inject constructor(
 ) {
 
     //region Queries
-    private fun getSortedAndNotDeletedMessagesQuery(
+    private suspend fun getSortedAndNotDeletedMessagesQuery(
         threadUid: String,
         featureFlags: Mailbox.FeatureFlagSet?,
     ): RealmQuery<Message>? {
@@ -61,17 +69,16 @@ class MessageController @Inject constructor(
     }
     //endregion
 
-    //region Get data
-    fun getMessage(uid: String): Message? {
+    suspend fun getMessage(uid: String): Message? {
         return getMessage(uid, mailboxContentRealm())
     }
 
-    fun getMessages(uids: List<String>): List<Message> {
+    suspend fun getMessages(uids: List<String>): List<Message> {
         return getMessagesByUids(uids, mailboxContentRealm())
     }
 
-    fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
-        fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().find()
+    suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
+        suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
 
         val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
 
@@ -91,47 +98,50 @@ class MessageController @Inject constructor(
             ?: messages.last()
     }
 
-    fun getLastMessageAndItsDuplicatesToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): List<Message> {
+    suspend fun getLastMessageAndItsDuplicatesToExecuteAction(
+        thread: Thread,
+        featureFlags: Mailbox.FeatureFlagSet?
+    ): List<Message> {
         return getMessageAndDuplicates(
             thread = thread,
             message = getLastMessageToExecuteAction(thread, featureFlags),
         )
     }
 
-    fun getUnseenMessages(thread: Thread): List<Message> {
+    suspend fun getUnseenMessages(thread: Thread): List<Message> {
         return getMessagesAndDuplicates(thread, "${Message::isSeen.name} == false")
     }
 
-    fun getFavoriteMessages(thread: Thread): List<Message> {
+    suspend fun getFavoriteMessages(thread: Thread): List<Message> {
         return getMessagesAndTheirDuplicates(thread, "${Message::isFavorite.name} == true")
     }
 
-    fun getMovableMessages(thread: Thread): List<Message> {
+    suspend fun getMovableMessages(thread: Thread): List<Message> {
         val byFolderId = "${Message::folderId.name} == '${thread.folderId}'"
         return getMessagesAndTheirDuplicates(thread, "$byFolderId AND $isNotScheduledMessage")
     }
 
-    fun getUnscheduledMessages(thread: Thread): List<Message> {
+    suspend fun getUnscheduledMessages(thread: Thread): List<Message> {
         return getMessagesAndTheirDuplicates(thread, isNotScheduledMessage)
     }
 
-    private fun getMessagesAndTheirDuplicates(thread: Thread, query: String): List<Message> {
-        val messages = thread.messages.query(query).find()
-        val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).find()
+    private suspend fun getMessagesAndTheirDuplicates(thread: Thread, query: String): List<Message> {
+        val messages = thread.messages.query(query).findSuspend()
+        val duplicates = thread.duplicates.query("${Message::messageId.name} IN $0", messages.map { it.messageId }).findSuspend()
         return messages + duplicates
     }
 
-    private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {
-        val messages = thread.messages.query(query).find()
-        val duplicates = thread.duplicates.query(query).find()
-        return messages + duplicates
+    private suspend fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> = coroutineScope {
+        val messagesAsync = async { thread.messages.query(query).findSuspend() }
+        val duplicatesAsync = async { thread.duplicates.query(query).findSuspend() }
+        messagesAsync.await() + duplicatesAsync.await()
     }
 
-    fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
-        return listOf(message) + thread.duplicates.query("${Message::messageId.name} == $0", message.messageId).find()
+    suspend fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
+        return listOf(message) + thread.duplicates.query("${Message::messageId.name} == $0", message.messageId).findSuspend()
     }
 
-    fun searchMessages(
+    suspend fun searchMessages(
         searchQuery: String?,
         filters: Set<ThreadFilter>,
         folderId: String?,
@@ -170,21 +180,22 @@ class MessageController @Inject constructor(
             )
         } else {
             query<Message>(filtersQuery)
-        }.find().copyFromRealm()
+        }.findSuspend().let { Dispatchers.IO { it.copyFromRealm() } }
     }
 
     fun getSortedAndNotDeletedMessagesAsync(
         threadUid: String,
         featureFlags: Mailbox.FeatureFlagSet?,
-    ): Flow<ResultsChange<Message>>? {
-        return getSortedAndNotDeletedMessagesQuery(threadUid, featureFlags)?.asFlow()
+    ): Flow<ResultsChange<Message>> = flow {
+        val query = getSortedAndNotDeletedMessagesQuery(threadUid, featureFlags)
+        emitAll(query?.asFlow() ?: emptyFlow())
     }
 
     fun getMessageAsync(messageUid: String): Flow<SingleQueryChange<Message>> {
         return getMessagesQuery(messageUid, mailboxContentRealm()).first().asFlow()
     }
 
-    fun getMessagesCountInThread(threadUid: String, featureFlags: Mailbox.FeatureFlagSet?, realm: Realm): Int? {
+    suspend fun getMessagesCountInThread(threadUid: String, featureFlags: Mailbox.FeatureFlagSet?, realm: Realm): Int? {
         return ThreadController.getThread(threadUid, realm)?.getDisplayedMessages(featureFlags, localSettings)?.count()
     }
     //endregion
@@ -208,38 +219,46 @@ class MessageController @Inject constructor(
         //endregion
 
         //region Get data
-        fun getMessage(uid: String, realm: TypedRealm): Message? {
+        fun getMessageBlocking(uid: String, realm: TypedRealm): Message? {
             return getMessageQuery(uid, realm).find()
         }
 
-        fun getMessagesByUids(messagesUids: List<String>, realm: TypedRealm): List<Message> {
+        suspend fun getMessage(uid: String, realm: TypedRealm): Message? {
+            return getMessageQuery(uid, realm).findSuspend()
+        }
+
+        suspend fun getMessagesByUids(messagesUids: List<String>, realm: Realm): List<Message> {
+            return realm.query<Message>("${Message::uid.name} IN $0", messagesUids).findSuspend()
+        }
+
+        fun getMessagesByUidsBlocking(messagesUids: List<String>, realm: MutableRealm): List<Message> {
             return realm.query<Message>("${Message::uid.name} IN $0", messagesUids).find()
         }
 
-        fun getMessagesByFolderId(folderId: String, realm: TypedRealm): List<Message> {
+        fun getMessagesByFolderIdBlocking(folderId: String, realm: TypedRealm): List<Message> {
             return getMessagesByFolderIdQuery(folderId, realm).find()
         }
 
-        fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
+        suspend fun getThreadLastMessageInFolder(threadUid: String, realm: TypedRealm): Message? {
             val thread = ThreadController.getThread(threadUid, realm)
-            return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.find()?.lastOrNull()
+            return thread?.messages?.query("${Message::folderId.name} == $0", thread.folderId)?.findSuspend()?.lastOrNull()
         }
 
-        fun doesMessageExist(uid: String, realm: TypedRealm): Boolean {
-            return getMessagesQuery(uid, realm).count().find() > 0
+        suspend fun doesMessageExist(uid: String, realm: TypedRealm): Boolean {
+            return getMessagesQuery(uid, realm).count().findSuspend() > 0
         }
         //endregion
 
         //region Edit data
-        fun upsertMessage(message: Message, realm: MutableRealm): Message = realm.copyToRealm(message, UpdatePolicy.ALL)
+        fun upsertMessageBlocking(message: Message, realm: MutableRealm): Message = realm.copyToRealm(message, UpdatePolicy.ALL)
 
-        fun updateMessage(messageUid: String, realm: MutableRealm, onUpdate: (Message?) -> Unit) {
-            onUpdate(getMessage(messageUid, realm))
+        fun updateMessageBlocking(messageUid: String, realm: MutableRealm, onUpdate: (Message?) -> Unit) {
+            onUpdate(getMessageBlocking(messageUid, realm))
         }
 
-        fun deleteMessage(context: Context, mailbox: Mailbox, message: Message, realm: MutableRealm) {
+        fun deleteMessageBlocking(context: Context, mailbox: Mailbox, message: Message, realm: MutableRealm) {
 
-            DraftController.getDraftByMessageUid(message.uid, realm)?.let { draft ->
+            DraftController.getDraftByMessageUidBlocking(message.uid, realm)?.let { draft ->
                 if (draft.action == null) {
                     deleteDraftUploadDir(
                         context = context,
@@ -257,8 +276,8 @@ class MessageController @Inject constructor(
             realm.delete(message)
         }
 
-        fun deleteMessageByUid(uid: String, realm: MutableRealm) {
-            val message = getMessage(uid, realm) ?: return
+        fun deleteMessageByUidBlocking(uid: String, realm: MutableRealm) {
+            val message = getMessageBlocking(uid, realm) ?: return
             realm.delete(message)
         }
 
@@ -269,7 +288,7 @@ class MessageController @Inject constructor(
              * Looping in reverse enables us to not skip any item.
              */
             messages.asReversed().forEach { message ->
-                deleteMessage(context, mailbox, message, realm)
+                deleteMessageBlocking(context, mailbox, message, realm)
             }
         }
 
@@ -278,13 +297,13 @@ class MessageController @Inject constructor(
         }
 
         fun updateFavoriteStatus(messageUids: List<String>, isFavorite: Boolean, realm: MutableRealm) {
-            getMessagesByUids(messageUids, realm).forEach {
+            getMessagesByUidsBlocking(messageUids, realm).forEach {
                 it.isFavorite = isFavorite
             }
         }
 
         fun updateSeenStatus(messageUids: List<String>, isSeen: Boolean, realm: MutableRealm) {
-            getMessagesByUids(messageUids, realm).forEach {
+            getMessagesByUidsBlocking(messageUids, realm).forEach {
                 it.isSeen = isSeen
             }
         }

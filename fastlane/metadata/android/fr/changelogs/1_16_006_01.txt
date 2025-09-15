@@ -1,0 +1,3 @@
+- Ajout d'un onglet de découverte du chiffrement
+- Chiffrement automatique des réponses à un message chiffré
+- Correction du mode bord à bord pour certains anciens appareils

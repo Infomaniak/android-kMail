@@ -25,7 +25,7 @@ import io.realm.kotlin.TypedRealm
 
 val inboxRefreshStrategy = object : DefaultRefreshStrategy {
     override fun queryFolderThreads(folderId: String, realm: TypedRealm): List<Thread> {
-        return ThreadController.getInboxThreadsWithSnoozeFilter(withSnooze = false, realm = realm)
+        return ThreadController.getInboxThreadsWithSnoozeFilterBlocking(withSnooze = false, realm = realm)
     }
 
     override fun twinFolderRoles(): List<FolderRole> = listOf(FolderRole.SNOOZED)
