@@ -21,7 +21,6 @@ package com.infomaniak.mail.data.models.message
 
 import android.content.Context
 import com.infomaniak.core.utils.apiEnum
-import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -40,9 +39,7 @@ import com.infomaniak.mail.data.models.getMessages.DefaultMessageFlags
 import com.infomaniak.mail.data.models.getMessages.SnoozeMessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.MessageBodyUtils
 import com.infomaniak.mail.utils.MessageBodyUtils.SplitBody
-import com.infomaniak.mail.utils.extensions.removeLineBreaksFromHtml
 import com.infomaniak.mail.utils.extensions.replaceContent
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.backlinks
