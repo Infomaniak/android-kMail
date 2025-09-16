@@ -362,7 +362,7 @@ class ThreadViewModel @Inject constructor(
         return@withContext message
     }
 
-    private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioCoroutineContext) {
+    private fun markThreadAsSeen(thread: Thread) = viewModelScope.launch(ioDispatcher) {
         sharedUtils.markAsSeen(mailbox(), listOf(thread))
     }
 
@@ -401,7 +401,7 @@ class ThreadViewModel @Inject constructor(
 
     fun fetchMessagesHeavyData(messages: List<Message>) {
         fetchMessagesJob?.cancel()
-        fetchMessagesJob = viewModelScope.launch(ioCoroutineContext) {
+        fetchMessagesJob = viewModelScope.launch(ioDispatcher) {
             val (deleted, failed) = ThreadController.fetchMessagesHeavyData(messages, mailboxContentRealm())
             if (deleted.isNotEmpty() || failed.isNotEmpty()) {
 
@@ -423,7 +423,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
+    fun deleteDraft(message: Message, mailbox: Mailbox) = viewModelScope.launch(ioDispatcher) {
         val realm = mailboxContentRealm()
         val thread = threadLive.value ?: return@launch
         val messages = messageController.getMessageAndDuplicates(thread, message)
@@ -444,7 +444,7 @@ class ThreadViewModel @Inject constructor(
         }
     }
 
-    fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioCoroutineContext) {
+    fun clickOnQuickActionBar(menuId: Int) = viewModelScope.launch(ioDispatcher) {
         val thread = threadLive.value ?: return@launch
         val message = messageController.getLastMessageToExecuteAction(thread, featureFlagsFlow.first())
         quickActionBarClicks.postValue(QuickActionBarResult(thread.uid, message, menuId))

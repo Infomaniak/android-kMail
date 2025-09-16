@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -45,8 +44,6 @@ class InvalidPasswordViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
-
     private val mailboxObjectId inline get() = savedStateHandle.get<String>(InvalidPasswordFragmentArgs::mailboxObjectId.name)!!
     private val mailbox = viewModelScope.suspendLazy { mailboxController.getMailbox(mailboxObjectId)!! }
 
@@ -54,7 +51,7 @@ class InvalidPasswordViewModel @Inject constructor(
     val requestPasswordResult = SingleLiveEvent<ApiResponse<*>>()
     val detachMailboxResult = SingleLiveEvent<Int>()
 
-    fun updatePassword(password: String) = viewModelScope.launch(ioCoroutineContext) {
+    fun updatePassword(password: String) = viewModelScope.launch(ioDispatcher) {
         val apiResponse = ApiRepository.updateMailboxPassword(mailbox().mailboxId, password)
         if (apiResponse.isSuccess()) {
             mailboxController.updateMailbox(mailboxObjectId) { it.hasValidPassword = true }
@@ -64,11 +61,11 @@ class InvalidPasswordViewModel @Inject constructor(
         }
     }
 
-    fun requestPassword() = viewModelScope.launch(ioCoroutineContext) {
+    fun requestPassword() = viewModelScope.launch(ioDispatcher) {
         requestPasswordResult.postValue(ApiRepository.requestMailboxPassword(mailbox().hostingId, mailbox().mailboxName))
     }
 
-    fun detachMailbox() = viewModelScope.launch(ioCoroutineContext) {
+    fun detachMailbox() = viewModelScope.launch(ioDispatcher) {
         val apiResponse = ApiRepository.detachMailbox(mailbox().mailboxId)
         if (apiResponse.isSuccess()) {
             AccountUtils.switchToMailbox(
