@@ -145,13 +145,6 @@ class Message : RealmObject, Snoozable {
     var emojiReaction: String? = null
     @SerialName("emoji_reaction_not_allowed_reason")
     private var _emojiReactionNotAllowedReason: String? = null
-
-    // TODO: Those are unused for now, but if we ever want to use them, we need to save them in `Message.keepHeavyData()`.
-    //  If we don't do it now, we'll probably forget to do it in the future.
-    //  When we use them, ce can remove all comments here and in `Message.keepHeavyData()`.
-    private var _acknowledge: String = Acknowledge.NONE.name.lowercase()
-    @SerialName("drive_url")
-    var driveUrl: String = ""
     //endregion
 
     //region Local data (Transient)
@@ -210,9 +203,9 @@ class Message : RealmObject, Snoozable {
     @Ignore
     var emojiReactionNotAllowedReason: EmojiReactionNotAllowedReason? by apiEnum(::_emojiReactionNotAllowedReason)
 
-    val isReaction get() = emojiReaction != null
-
     val isValidReactionTarget get() = _emojiReactionNotAllowedReason == null
+
+    val isReaction get() = emojiReaction != null
 
     val threads by backlinks(Thread::messages)
 
@@ -301,18 +294,6 @@ class Message : RealmObject, Snoozable {
         NOT_SIGNED,
     }
 
-    var acknowledge: Acknowledge?
-        get() = enumValueOfOrNull<Acknowledge>(_acknowledge)
-        set(value) {
-            value?.name?.lowercase()?.let { _acknowledge = it }
-        }
-
-    enum class Acknowledge {
-        NONE,
-        PENDING,
-        ACKNOWLEDGED,
-    }
-
     fun keepLocalValues(localMessage: Message) {
         initLocalValues(
             areHeavyDataFetched = localMessage.areHeavyDataFetched,
@@ -356,11 +337,6 @@ class Message : RealmObject, Snoozable {
     private fun keepHeavyData(message: Message) {
         attachments.replaceContent(message.attachments.copyFromRealm())
         body = message.body?.copyFromRealm()
-
-        // TODO: Those are unused for now, but if we ever want to use them, we need to save them here.
-        //  If we don't do it now, we'll probably forget to do it in the future.
-        _acknowledge = message._acknowledge
-        driveUrl = message.driveUrl
     }
 
     // If we are supposed to have Attachable (via `hasAttachments` or `swissTransferUuid`),
