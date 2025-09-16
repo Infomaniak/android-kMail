@@ -466,6 +466,7 @@
     <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
     <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
+    <string name="previewReaction">%1$s a réagi avec %2$s</string>
     <string name="readFAQ">Consulter les FAQ</string>
     <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>

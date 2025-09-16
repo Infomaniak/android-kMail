@@ -22,6 +22,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.lib.core.api.ApiController.NetworkException
 import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -32,6 +33,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
@@ -212,7 +214,7 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (message.isSeen) return true
 
-        val formattedPreview = message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
+        val formattedPreview = message.getFormattedPreview(appContext)
         val body = if (message.body?.value.isNullOrBlank()) {
             formattedPreview
         } else {
