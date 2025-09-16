@@ -457,6 +457,7 @@
     <string name="pickerNoSelection">Sin selección</string>
     <string name="popupDetachMailboxDescription">¿Estás seguro de que quieres separar la dirección %s?</string>
     <string name="popupDetachMailboxTitle">Separar dirección</string>
+    <string name="previewReaction">%1$s reaccionó con %2$s</string>
     <string name="readFAQ">Lea las preguntas frecuentes</string>
     <string name="readMore">Seguir leyendo</string>
     <string name="recentSearchesTitle">Búsquedas recientes</string>
