@@ -1,0 +1,2 @@
+- Ajout d'informations sur la KSuite Pro
+- Correction d'un problème empêchant l'ouverture du sélecteur d'émoticônes dans la Recherche

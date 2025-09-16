@@ -208,8 +208,8 @@
                             android:layout_height="match_parent"
                             android:orientation="vertical">
 
-                            <com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner
-                                android:id="@+id/myKSuiteStorageBanner"
+                            <com.infomaniak.mail.views.itemViews.KSuiteStorageBanner
+                                android:id="@+id/kSuiteStorageBanner"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" />
 

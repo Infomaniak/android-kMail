@@ -46,8 +46,8 @@ realm-kotlin-base = { module = "io.realm.kotlin:library-base", version.ref = "re
 rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", version.ref = "richHtmlEditor" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 # Unit tests
-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk"}
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -57,7 +57,7 @@ google-services = { id = "com.google.gms.google-services" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-realm-kotlin = { id = "io.realm.kotlin", version.ref = "realmKotlin" }
 kotlin-parcelize = { id = "kotlin-parcelize" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
+realm-kotlin = { id = "io.realm.kotlin", version.ref = "realmKotlin" }

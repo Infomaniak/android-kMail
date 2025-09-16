@@ -18,10 +18,12 @@
 package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -31,7 +33,7 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
 
     private val navigationArgs: SnoozeBottomSheetDialogArgs by navArgs()
 
-    override val isCurrentMailboxFree: Boolean by lazy { navigationArgs.isCurrentMailboxFree }
+    override val currentKSuite: KSuite by lazy { navigationArgs.currentKSuite }
 
     // Navigation args does not support nullable primitive types, so we use 0L
     // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
@@ -53,11 +55,14 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
     }
 
     override fun onCustomScheduleOptionClicked() {
-        if (navigationArgs.isCurrentMailboxFree) {
-            openMyKSuiteUpgradeBottomSheet(MatomoName.SnoozeCustomDate.value)
-        } else {
-            trackSnoozeEvent(MatomoName.CustomSchedule)
-            setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)
+        val matomoName = MatomoName.SnoozeCustomDate.value
+        when (navigationArgs.currentKSuite) {
+            KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
+            KSuite.Pro.Free -> openKSuiteProBottomSheet(navigationArgs.currentKSuite, navigationArgs.isAdmin, matomoName)
+            else -> {
+                trackSnoozeEvent(MatomoName.CustomSchedule)
+                setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)
+            }
         }
     }
 

@@ -1,0 +1,2 @@
+- Add KSuite Pro information
+- Fix emoji picker not opening in the Search

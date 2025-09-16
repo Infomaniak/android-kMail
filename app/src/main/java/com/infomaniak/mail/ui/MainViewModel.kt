@@ -29,6 +29,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.network.NetworkAvailability
 import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.lib.core.models.ApiResponse
@@ -62,6 +63,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.mailbox.Mailbox.FeatureFlagSet
 import com.infomaniak.mail.data.models.mailbox.SendersRestrictions
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.snooze.BatchSnoozeResult
@@ -102,7 +104,7 @@ import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
 import com.infomaniak.mail.utils.extensions.launchNoValidMailboxesActivity
 import com.infomaniak.mail.views.itemViews.AvatarMergedContactData
-import com.infomaniak.mail.views.itemViews.MyKSuiteStorageBanner.StorageLevel
+import com.infomaniak.mail.views.itemViews.KSuiteStorageBanner.StorageLevel
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.Realm
@@ -241,11 +243,13 @@ class MainViewModel @Inject constructor(
     val storageBannerStatus = currentQuotasLive.map { quotas ->
         when {
             quotas == null -> null
-            quotas.isFull -> StorageLevel.Full
+            quotas.isFull -> {
+                if (currentMailbox.value?.kSuite is KSuite.Perso) StorageLevel.Full.Perso else StorageLevel.Full.Pro
+            }
             quotas.getProgress() > StorageLevel.WARNING_THRESHOLD -> {
                 if (!localSettings.hasClosedStorageBanner || localSettings.storageBannerDisplayAppLaunches % 10 == 0) {
                     localSettings.hasClosedStorageBanner = false
-                    StorageLevel.Warning
+                    if (currentMailbox.value?.kSuite is KSuite.Perso) StorageLevel.Warning.Perso else StorageLevel.Warning.Pro
                 } else {
                     StorageLevel.Normal
                 }
@@ -272,7 +276,7 @@ class MainViewModel @Inject constructor(
     }.asLiveData(ioCoroutineContext)
 
     val swipeActionContext = Utils.waitInitMediator(featureFlagsLive, currentFolderLive) {
-        (it[0] as Mailbox.FeatureFlagSet) to (it[1] as Folder).role
+        (it[0] as FeatureFlagSet) to (it[1] as Folder).role
     }.distinctUntilChanged()
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
@@ -424,13 +428,14 @@ class MainViewModel @Inject constructor(
             updateFolders(mailbox)
 
             // Refresh Threads
-            (currentFolderId?.let { folderController.getFolder(it) } ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))
-                ?.let { folder ->
-                    selectFolder(folder.id)
-                    viewModelScope.launch(ioCoroutineContext) {
-                        refreshThreads(mailbox, folder.id)
-                    }
+            (currentFolderId
+                ?.let { folderController.getFolder(it) }
+                ?: folderController.getFolder(DEFAULT_SELECTED_FOLDER))?.let { folder ->
+                selectFolder(folder.id)
+                viewModelScope.launch(ioCoroutineContext) {
+                    refreshThreads(mailbox, folder.id)
                 }
+            }
         }
     }
 
@@ -454,11 +459,19 @@ class MainViewModel @Inject constructor(
 
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
-        if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) {
-                mailboxController.updateMailbox(mailbox.objectId) {
-                    it.quotas = data
+
+        if (mailbox.kSuite.isFreeTier()) {
+            with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
+                if (isSuccess()) {
+                    mailboxController.updateMailbox(mailbox.objectId) {
+                        it.quotas = data
+                    }
                 }
+            }
+        } else {
+            // Currently, all paid-tiers (Perso & Pro) got unlimited quotas. Unlimited = null.
+            mailboxController.updateMailbox(mailbox.objectId) {
+                it.quotas = null
             }
         }
     }
@@ -466,8 +479,10 @@ class MainViewModel @Inject constructor(
     private fun updatePermissions(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Permissions")
         with(ApiRepository.getPermissions(mailbox.linkId, mailbox.hostingId)) {
-            if (isSuccess()) mailboxController.updateMailbox(mailbox.objectId) {
-                it.permissions = data
+            if (isSuccess()) {
+                mailboxController.updateMailbox(mailbox.objectId) {
+                    it.permissions = data
+                }
             }
         }
     }

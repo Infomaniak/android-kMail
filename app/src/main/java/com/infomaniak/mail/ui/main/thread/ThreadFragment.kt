@@ -968,12 +968,14 @@ class ThreadFragment : Fragment() {
     }
 
     private fun navigateToScheduleSendBottomSheet() {
+        val mailbox = mainViewModel.currentMailbox.value ?: return
         safeNavigate(
             resId = R.id.scheduleSendBottomSheetDialog,
             args = ScheduleSendBottomSheetDialogArgs(
                 lastSelectedScheduleEpochMillis = localSettings.lastSelectedScheduleEpochMillis ?: 0L,
                 currentlyScheduledEpochMillis = threadViewModel.reschedulingCurrentlyScheduledEpochMillis ?: 0L,
-                isCurrentMailboxFree = mainViewModel.currentMailbox.value?.isFreeMailbox ?: true,
+                currentKSuite = mailbox.kSuite,
+                isAdmin = mailbox.isAdmin,
             ).toBundle(),
         )
     }

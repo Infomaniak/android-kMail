@@ -27,6 +27,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.utils.getNextMonday
 import com.infomaniak.core.utils.getTimeAtHour
 import com.infomaniak.core.utils.isAtLeastXMinutesInTheFuture
@@ -64,7 +65,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
 
     abstract val lastSelectedEpoch: Long?
     abstract val currentlyScheduledEpochMillis: Long?
-    abstract val isCurrentMailboxFree: Boolean
+    abstract val currentKSuite: KSuite
 
     @get:StringRes
     abstract val titleRes: Int
@@ -91,7 +92,11 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
         val shouldDisplayDivider = lastScheduleOption.isVisible
         (scheduleOptions.children.first() as ActionItemView).setDividerVisibility(shouldDisplayDivider)
 
-        customScheduleOption.trailingContent = if (isCurrentMailboxFree) TrailingContent.MyKSuiteChip else TrailingContent.Chevron
+        customScheduleOption.trailingContent = when (currentKSuite) {
+            KSuite.Perso.Free -> TrailingContent.KSuitePersoChip
+            KSuite.Pro.Free -> TrailingContent.KSuiteProChip
+            else -> TrailingContent.Chevron
+        }
     }
 
     private fun computeLastScheduleOption() = with(binding) {

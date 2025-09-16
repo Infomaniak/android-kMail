@@ -370,6 +370,9 @@
     <string name="googlePlayServicesAreRequired">I servizi Google Play sono necessari</string>
     <string name="groupContactsTitle">Gruppo: %s</string>
     <string name="inboxFolder">Posta in arrivo</string>
+    <string name="kSuiteProQuotasAlertDescription">Lo spazio di archiviazione della posta è quasi esaurito. Modificate la vostra offerta per ottenere uno spazio di archiviazione illimitato e sbloccare nuove funzionalità.</string>
+    <string name="kSuiteProQuotasAlertFullDescription">Lo spazio di archiviazione della posta è esaurito. Modificate la vostra offerta per ottenere uno spazio di archiviazione illimitato e sbloccare nuove funzionalità.</string>
+    <string name="kSuiteProQuotasAlertFullTitle">Lo spazio di archiviazione della posta è pieno</string>
     <string name="lastSelectedSchedule">Ultimo programma selezionato</string>
     <string name="laterThisMorning">Più tardi stamattina</string>
     <string name="linkingWord">e</string>

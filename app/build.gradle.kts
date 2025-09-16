@@ -25,8 +25,8 @@ android {
         applicationId = "com.infomaniak.mail"
         minSdk = appMinSdk
         targetSdk = appCompileSdk
-        versionCode = 1_16_006_01
-        versionName = "1.16.6"
+        versionCode = 1_17_000_01
+        versionName = "1.17.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")
@@ -112,14 +112,15 @@ dependencies {
     implementation(project(":Core:CrossAppLogin:Back"))
     implementation(project(":Core:CrossAppLogin:Front"))
     implementation(project(":Core:FragmentNavigation"))
+    implementation(project(":Core:KSuite"))
+    implementation(project(":Core:KSuite:KSuitePro"))
+    implementation(project(":Core:KSuite:MyKSuite"))
     implementation(project(":Core:Legacy"))
     implementation(project(":Core:Legacy:AppLock"))
     implementation(project(":Core:Legacy:BugTracker"))
     implementation(project(":Core:Legacy:Confetti"))
     implementation(project(":Core:Legacy:Stores"))
     implementation(project(":Core:Matomo"))
-    implementation(project(":Core:kSuite:kSuitePro"))
-    implementation(project(":Core:kSuite:MyKSuite"))
     implementation(project(":Core:Network"))
     implementation(project(":Core:Sentry"))
     implementation(project(":EmojiComponents"))

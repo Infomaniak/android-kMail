@@ -27,17 +27,17 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.ViewBannerMyKsuiteStorageBinding
+import com.infomaniak.mail.databinding.ViewBannerKsuiteStorageBinding
 
-class MyKSuiteStorageBanner @JvmOverloads constructor(
+class KSuiteStorageBanner @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    private val binding by lazy { ViewBannerMyKsuiteStorageBinding.inflate(LayoutInflater.from(context), this, true) }
+    private val binding by lazy { ViewBannerKsuiteStorageBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    var storageLevel = StorageLevel.Normal
+    var storageLevel: StorageLevelData = StorageLevel.Normal
         set(value) {
             binding.root.isGone = value == StorageLevel.Normal
             if (value != StorageLevel.Normal) setStorageLevelUi(value)
@@ -48,36 +48,57 @@ class MyKSuiteStorageBanner @JvmOverloads constructor(
         binding.closeButton.setOnClickListener { onCloseButtonClicked() }
     }
 
-    private fun setStorageLevelUi(newStorageLevel: StorageLevel) = with(binding) {
+    private fun setStorageLevelUi(newStorageLevel: StorageLevelData) = with(binding) {
         if (newStorageLevel == storageLevel) return@with
 
         title.text = context.getText(newStorageLevel.titleRes)
         description.text = context.getText(newStorageLevel.descriptionRes)
         alertIcon.setColorFilter(context.getColor(newStorageLevel.iconColorRes))
 
-        closeButton.isVisible = newStorageLevel == StorageLevel.Warning
+        closeButton.isVisible = newStorageLevel is StorageLevel.Warning
     }
 
-    enum class StorageLevel(
+    open class StorageLevelData(
         @ColorRes val iconColorRes: Int,
         @StringRes val titleRes: Int,
         @StringRes val descriptionRes: Int,
-    ) {
-        Normal(
+    )
+
+    sealed interface StorageLevel {
+
+        data object Normal : StorageLevelData(
             iconColorRes = ResourcesCompat.ID_NULL,
             titleRes = ResourcesCompat.ID_NULL,
             descriptionRes = ResourcesCompat.ID_NULL,
-        ),
-        Warning(
-            iconColorRes = R.color.orangeWarning,
-            titleRes = R.string.myKSuiteQuotasAlertTitle,
-            descriptionRes = R.string.myKSuiteQuotasAlertDescription,
-        ),
-        Full(
-            iconColorRes = R.color.redDestructiveAction,
-            titleRes = R.string.myKSuiteQuotasAlertFullTitle,
-            descriptionRes = R.string.myKSuiteQuotasAlertFullDescription,
-        );
+        )
+
+        sealed interface Warning : StorageLevel {
+            data object Perso : StorageLevelData(
+                iconColorRes = R.color.orangeWarning,
+                titleRes = R.string.myKSuiteQuotasAlertTitle,
+                descriptionRes = R.string.myKSuiteQuotasAlertDescription,
+            )
+
+            data object Pro : StorageLevelData(
+                iconColorRes = R.color.orangeWarning,
+                titleRes = R.string.myKSuiteQuotasAlertTitle,
+                descriptionRes = R.string.kSuiteProQuotasAlertDescription,
+            )
+        }
+
+        sealed interface Full : StorageLevel {
+            data object Perso : StorageLevelData(
+                iconColorRes = R.color.redDestructiveAction,
+                titleRes = R.string.myKSuiteQuotasAlertFullTitle,
+                descriptionRes = R.string.myKSuiteQuotasAlertFullDescription,
+            )
+
+            data object Pro : StorageLevelData(
+                iconColorRes = R.color.redDestructiveAction,
+                titleRes = R.string.kSuiteProQuotasAlertFullTitle,
+                descriptionRes = R.string.kSuiteProQuotasAlertFullDescription,
+            )
+        }
 
         companion object {
             const val WARNING_THRESHOLD = 85
