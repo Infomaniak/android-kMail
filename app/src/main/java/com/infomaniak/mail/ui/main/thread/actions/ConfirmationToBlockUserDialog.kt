@@ -27,7 +27,6 @@ import com.infomaniak.mail.databinding.DialogConfirmationToBlockUserBinding
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
-import splitties.init.appCtx
 import javax.inject.Inject
 import com.infomaniak.lib.core.R as RCore
 
@@ -62,7 +61,7 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         val recipient = message.from[0]
         val title = recipient.name.ifBlank { recipient.email }
         blockExpeditorTitle.text = activityContext.getString(R.string.blockExpeditorTitle, title)
-        blockExpeditorDescription.text = appCtx.getString(R.string.confirmationToBlockAnExpeditorText, recipient.email)
+        blockExpeditorDescription.text = activityContext.getString(R.string.confirmationToBlockAnExpeditorText, recipient.email)
         alertDialog.show()
     }
 
