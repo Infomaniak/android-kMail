@@ -118,10 +118,11 @@ class Mailbox : RealmObject {
     inline val kSuite: KSuite
         get() = when {
             // For KSuite Pro tiers, only Free & Standard are relevant in kMail, all Pro paid tiers got the same functionalities
-            isKSuitePro && !isKSuiteProFree -> KSuite.Pro.Standard
             isKSuitePro && isKSuiteProFree -> KSuite.Pro.Free
+            isKSuitePro && !isKSuiteProFree -> KSuite.Pro.Standard
+            isKSuitePerso && isKSuitePersoFree -> KSuite.Perso.Free
             isKSuitePerso && !isKSuitePersoFree -> KSuite.Perso.Plus
-            else -> KSuite.Perso.Free
+            else -> KSuite.Pro.Enterprise // If we can't compute the KSuite, we fallback in a all-features unlocked mode
         }
 
     inline val channelGroupId get() = "$mailboxId"
