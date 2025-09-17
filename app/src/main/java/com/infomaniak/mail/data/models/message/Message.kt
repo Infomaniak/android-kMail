@@ -416,13 +416,11 @@ class Message : RealmObject, Snoozable {
         snoozeEndDate = flags.snoozeEndDate.toRealmInstant()
     }
 
-    fun getFormattedPreview(context: Context): String {
-        val content = when {
-            isEncrypted -> context.getString(R.string.encryptedMessageHeader)
-            isReaction -> context.getString(R.string.previewReaction, from.first().name, emojiReaction)
-            else -> preview.ifBlank { null }?.trim()
-        }
-        return content?.let { "\n$it" } ?: ""
+    fun getFormattedPreview(context: Context): String = "\n" + when {
+        isEncrypted -> context.getString(R.string.encryptedMessageHeader)
+        isReaction -> context.getString(R.string.previewReaction, from.first().name, emojiReaction)
+        preview.isBlank() -> context.getString(R.string.noBodyDescription)
+        else -> preview.trim()
     }
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
