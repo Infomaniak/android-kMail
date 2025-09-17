@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
@@ -212,10 +213,9 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (message.isSeen) return true
 
-        val formattedPreview = message.getFormattedPreview(appContext)
-        val body = if (message.body?.value.isNullOrBlank()) {
-            formattedPreview
-        } else {
+        val previewType = message.getPreviewType()
+        val formattedPreview = message.getFormattedPreview(appContext, previewType)
+        val notificationBody = if (previewType == Message.PreviewType.Body) {
             message.body
                 ?.let {
                     val content = MessageBodyUtils.splitContentAndQuote(it).content
@@ -224,10 +224,12 @@ class FetchMessagesManager @Inject constructor(
                     return@let "\n${cleanedDocument.wholeText().trim()}"
                 }
                 ?: formattedPreview
+        } else {
+            formattedPreview
         }
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
-        val formattedBody = body.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
+        val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
         val description = "$subject$formattedBody".take(MAX_CHAR_LIMIT)
 
         // Show Message notification
