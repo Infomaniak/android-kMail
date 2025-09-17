@@ -24,13 +24,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.observe
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.isSnoozed
@@ -73,10 +74,13 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     @Inject
     lateinit var localSettings: LocalSettings
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(threadActionsViewModel) {
+    @Inject
+    lateinit var threadController: ThreadController
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadLive.observe(viewLifecycleOwner) { thread ->
+        threadActionsViewModel.threadMessageToExecuteAction.observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction) ->
             folderRole = folderRoleUtils.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
             isFromSpam = folderRole == FolderRole.SPAM
@@ -86,12 +90,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
             setJunkUi()
             setSnoozeUi(thread.isSnoozed())
-        }
 
-        getThreadAndMessageUidToReplyTo().observe(viewLifecycleOwner) { result ->
-            result?.let { (thread, messageUidToReply) ->
-                setupListeners(thread, messageUidToReply)
-            } ?: findNavController().popBackStack()
+            initOnClickListener(onActionClick(thread, messageUidToExecuteAction))
         }
     }
 
@@ -116,138 +116,133 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         isVisible = true
     }
 
-    private fun setupListeners(thread: Thread, messageUidToReply: String) = with(navigationArgs) {
-        initOnClickListener(
-            listener = object : OnActionClick {
-                //region Main actions
-                override fun onReply() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.Reply)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.REPLY,
-                        previousMessageUid = messageUidToReply,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = shouldLoadDistantResources,
-                    )
-                }
+    private fun onActionClick(thread: Thread, messageUidToExecuteAction: String) = object : OnActionClick {
+        //region Main actions
+        override fun onReply() {
+            trackBottomSheetThreadActionsEvent(MatomoName.Reply)
+            safeNavigateToNewMessageActivity(
+                draftMode = DraftMode.REPLY,
+                previousMessageUid = messageUidToExecuteAction,
+                currentClassName = currentClassName,
+                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
+            )
+        }
 
-                override fun onReplyAll() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.ReplyAll)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.REPLY_ALL,
-                        previousMessageUid = messageUidToReply,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = shouldLoadDistantResources,
-                    )
-                }
+        override fun onReplyAll() {
+            trackBottomSheetThreadActionsEvent(MatomoName.ReplyAll)
+            safeNavigateToNewMessageActivity(
+                draftMode = DraftMode.REPLY_ALL,
+                previousMessageUid = messageUidToExecuteAction,
+                currentClassName = currentClassName,
+                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
+            )
+        }
 
-                override fun onForward() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.Forward)
-                    safeNavigateToNewMessageActivity(
-                        draftMode = DraftMode.FORWARD,
-                        previousMessageUid = messageUidToReply,
-                        currentClassName = currentClassName,
-                        shouldLoadDistantResources = shouldLoadDistantResources,
-                    )
-                }
+        override fun onForward() {
+            trackBottomSheetThreadActionsEvent(MatomoName.Forward)
+            safeNavigateToNewMessageActivity(
+                draftMode = DraftMode.FORWARD,
+                previousMessageUid = messageUidToExecuteAction,
+                currentClassName = currentClassName,
+                shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
+            )
+        }
 
-                override fun onDelete() {
-                    descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
-                        trackBottomSheetThreadActionsEvent(MatomoName.Delete)
-                        mainViewModel.deleteThread(threadUid)
-                    }
-                }
-                //endregion
+        override fun onDelete() {
+            descriptionDialog.deleteWithConfirmationPopup(folderRole, count = 1) {
+                trackBottomSheetThreadActionsEvent(MatomoName.Delete)
+                mainViewModel.deleteThread(navigationArgs.threadUid)
+            }
+        }
+        //endregion
 
-                //region Actions
-                override fun onArchive() {
-                    descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
-                        trackBottomSheetThreadActionsEvent(MatomoName.Archive, isFromArchive)
-                        mainViewModel.archiveThread(threadUid)
-                    }
-                }
+        //region Actions
+        override fun onArchive() {
+            descriptionDialog.archiveWithConfirmationPopup(folderRole, count = 1) {
+                trackBottomSheetThreadActionsEvent(MatomoName.Archive, isFromArchive)
+                mainViewModel.archiveThread(navigationArgs.threadUid)
+            }
+        }
 
-                override fun onReadUnread() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.MarkAsSeen, value = thread.isSeen)
-                    mainViewModel.toggleThreadSeenStatus(threadUid)
-                    twoPaneViewModel.closeThread()
-                }
+        override fun onReadUnread() {
+            trackBottomSheetThreadActionsEvent(MatomoName.MarkAsSeen, value = thread.isSeen)
+            mainViewModel.toggleThreadSeenStatus(navigationArgs.threadUid)
+            twoPaneViewModel.closeThread()
+        }
 
-                override fun onMove() {
-                    val navController = findNavController()
-                    descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
-                        trackBottomSheetThreadActionsEvent(MatomoName.Move)
-                        navController.animatedNavigation(
-                            resId = R.id.moveFragment,
-                            args = MoveFragmentArgs(arrayOf(threadUid)).toBundle(),
-                            currentClassName = currentClassName,
-                        )
-                    }
-                }
+        override fun onMove() {
+            val navController = findNavController()
+            descriptionDialog.moveWithConfirmationPopup(folderRole, count = 1) {
+                trackBottomSheetThreadActionsEvent(MatomoName.Move)
+                navController.animatedNavigation(
+                    resId = R.id.moveFragment,
+                    args = MoveFragmentArgs(arrayOf(navigationArgs.threadUid)).toBundle(),
+                    currentClassName = currentClassName,
+                )
+            }
+        }
 
-                override fun onSnooze() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.Snooze)
-                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze(thread.uid))
-                }
+        override fun onSnooze() {
+            trackBottomSheetThreadActionsEvent(MatomoName.Snooze)
+            setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze(thread.uid))
+        }
 
-                override fun onModifySnooze() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.ModifySnooze)
-                    setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Modify(thread.uid))
-                }
+        override fun onModifySnooze() {
+            trackBottomSheetThreadActionsEvent(MatomoName.ModifySnooze)
+            setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Modify(thread.uid))
+        }
 
-                override fun onCancelSnooze() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.CancelSnooze)
-                    lifecycleScope.launch { mainViewModel.unsnoozeThreads(listOf(thread)) }
-                    twoPaneViewModel.closeThread()
-                }
+        override fun onCancelSnooze() {
+            trackBottomSheetThreadActionsEvent(MatomoName.CancelSnooze)
+            lifecycleScope.launch { mainViewModel.unsnoozeThreads(listOf(thread)) }
+            twoPaneViewModel.closeThread()
+        }
 
-                override fun onFavorite() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.Favorite, thread.isFavorite)
-                    mainViewModel.toggleThreadFavoriteStatus(threadUid)
-                }
+        override fun onFavorite() {
+            trackBottomSheetThreadActionsEvent(MatomoName.Favorite, thread.isFavorite)
+            mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid)
+        }
 
-                override fun onReportJunk() {
-                    if (isFromSpam) {
-                        trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
-                        mainViewModel.toggleThreadSpamStatus(threadUid)
-                    } else {
-                        safeNavigate(
-                            resId = R.id.junkBottomSheetDialog,
-                            args = JunkBottomSheetDialogArgs(threadUid, messageUidToReply).toBundle(),
-                            currentClassName = currentClassName,
-                        )
-                    }
-                }
+        override fun onReportJunk() {
+            if (isFromSpam) {
+                trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
+                mainViewModel.toggleThreadSpamStatus(listOf(navigationArgs.threadUid))
+            } else {
+                safelyNavigate(
+                    resId = R.id.junkBottomSheetDialog,
+                    args = JunkBottomSheetDialogArgs(arrayOf(thread.uid)).toBundle(),
+                )
+            }
+        }
 
-                override fun onPrint() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.Print)
-                    notYetImplemented()
-                }
+        override fun onPrint() {
+            trackBottomSheetThreadActionsEvent(MatomoName.Print)
+            notYetImplemented()
+        }
 
-                override fun onShare() {
-                    activity?.apply {
-                        trackBottomSheetThreadActionsEvent(MatomoName.ShareLink)
-                        mainViewModel.shareThreadUrl(messageUidToReply)
-                    }
-                }
+        override fun onShare() {
+            activity?.apply {
+                trackBottomSheetThreadActionsEvent(MatomoName.ShareLink)
+                mainViewModel.shareThreadUrl(messageUidToExecuteAction)
+            }
+        }
 
-                override fun onSaveToKDrive() {
-                    trackBottomSheetThreadActionsEvent(MatomoName.SaveToKDrive)
-                    navigateToDownloadMessagesProgressDialog(
-                        messageUids = thread.messages.map { it.uid },
-                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
-                    )
-                }
+        override fun onSaveToKDrive() {
+            trackBottomSheetThreadActionsEvent(MatomoName.SaveToKDrive)
+            navigateToDownloadMessagesProgressDialog(
+                messageUids = thread.messages.map { it.uid },
+                currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
+            )
+        }
 
-                override fun onReportDisplayProblem() {
-                    descriptionDialog.show(
-                        title = getString(R.string.reportDisplayProblemTitle),
-                        description = getString(R.string.reportDisplayProblemDescription),
-                        onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(messageUidToReply) },
-                    )
-                }
-                //endregion
-            },
-        )
+        override fun onReportDisplayProblem() {
+            descriptionDialog.show(
+                title = getString(R.string.reportDisplayProblemTitle),
+                description = getString(R.string.reportDisplayProblemDescription),
+                onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(messageUidToExecuteAction) },
+            )
+        }
+        //endregion
     }
 
     companion object {

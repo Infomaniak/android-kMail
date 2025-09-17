@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,14 +39,14 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         DialogConfirmationToBlockUserBinding.inflate(activity.layoutInflater)
     }
 
-    private var onPositiveButtonClick: ((Message?) -> Unit)? = null
+    private var onPositiveButtonClick: ((Message) -> Unit)? = null
     private var messageOfUserToBlock: Message? = null
 
     override val alertDialog: AlertDialog = with(binding) {
         MaterialAlertDialogBuilder(context)
             .setView(root)
             .setPositiveButton(R.string.buttonConfirm) { _, _ ->
-                onPositiveButtonClick?.invoke(messageOfUserToBlock)
+                messageOfUserToBlock?.let { message -> onPositiveButtonClick?.invoke(message) }
             }
             .setNegativeButton(RCore.string.buttonCancel, null)
             .create()
@@ -65,7 +65,7 @@ class ConfirmationToBlockUserDialog @Inject constructor(
         alertDialog.show()
     }
 
-    fun setPositiveButtonCallback(onPositiveButtonClick: (Message?) -> Unit) {
+    fun setPositiveButtonCallback(onPositiveButtonClick: (Message) -> Unit) {
         this.onPositiveButtonClick = onPositiveButtonClick
     }
 }

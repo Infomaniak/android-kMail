@@ -73,6 +73,10 @@ class MessageController @Inject constructor(
         return getMessage(uid, mailboxContentRealm())
     }
 
+    suspend fun getMessages(uids: List<String>): List<Message> {
+        return getMessagesByUids(uids, mailboxContentRealm())
+    }
+
     suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
         suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
 
@@ -94,7 +98,10 @@ class MessageController @Inject constructor(
             ?: messages.last()
     }
 
-    suspend fun getLastMessageAndItsDuplicatesToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): List<Message> {
+    suspend fun getLastMessageAndItsDuplicatesToExecuteAction(
+        thread: Thread,
+        featureFlags: Mailbox.FeatureFlagSet?
+    ): List<Message> {
         return getMessageAndDuplicates(
             thread = thread,
             message = getLastMessageToExecuteAction(thread, featureFlags),
@@ -218,6 +225,10 @@ class MessageController @Inject constructor(
 
         suspend fun getMessage(uid: String, realm: TypedRealm): Message? {
             return getMessageQuery(uid, realm).findSuspend()
+        }
+
+        suspend fun getMessagesByUids(messagesUids: List<String>, realm: Realm): List<Message> {
+            return realm.query<Message>("${Message::uid.name} IN $0", messagesUids).findSuspend()
         }
 
         fun getMessagesByUidsBlocking(messagesUids: List<String>, realm: MutableRealm): List<Message> {

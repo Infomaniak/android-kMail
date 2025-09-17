@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread.actions
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -29,13 +28,16 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ThreadMessageToExecuteAction
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.invoke
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,18 +45,16 @@ class ThreadActionsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val messageController: MessageController,
     mailboxController: MailboxController,
-    private val threadController: ThreadController,
+    threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val ioCoroutineContext = viewModelScope.coroutineContext(ioDispatcher)
 
     private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
-    private val messageUidToReplyTo
-        inline get() = savedStateHandle.get<String?>(ThreadActionsBottomSheetDialogArgs::messageUidToReplyTo.name)
 
-    val threadLive: SharedFlow<Thread> = threadController.getThreadAsync(threadUid)
-        .mapNotNull { it.obj }
+    val threadMessageToExecuteAction: SharedFlow<ThreadMessageToExecuteAction> = threadController.getThreadAsync(threadUid)
+        .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
         .shareIn(scope = viewModelScope, started = SharingStarted.Eagerly, replay = 1)
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
@@ -64,15 +64,8 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
-    fun getThreadAndMessageUidToReplyTo() = liveData(ioCoroutineContext) {
-        val thread = threadController.getThread(threadUid) ?: run {
-            emit(null)
-            return@liveData
-        }
-
-        val uidToReplyTo = messageUidToReplyTo
-            ?: messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid
-
-        emit(thread to uidToReplyTo)
+    private suspend fun getThreadAndMessageUidToExecuteAction(thread: Thread): ThreadMessageToExecuteAction {
+        val messageUid = Dispatchers.IO { messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid }
+        return ThreadMessageToExecuteAction(thread, messageUid)
     }
 }
