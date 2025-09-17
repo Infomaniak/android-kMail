@@ -47,6 +47,8 @@ include(
     ":Core:Network:Models",
     ":Core:Onboarding",
     ":Core:Sentry",
+    ":Core:TwoFactorAuth:Front",
+    ":Core:TwoFactorAuth:Back",
     ":EmojiComponents",
     ":HtmlCleaner",
 )
