@@ -49,6 +49,8 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
     override val mainViewModel: MainViewModel by activityViewModels()
     private val junkMessagesViewModel: JunkMessagesViewModel by activityViewModels()
 
+    val i = 0
+
     @Inject
     lateinit var descriptionDialog: DescriptionAlertDialog
 
