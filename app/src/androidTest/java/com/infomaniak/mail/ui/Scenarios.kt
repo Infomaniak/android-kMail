@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.os.Build
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -92,11 +91,9 @@ object Scenarios {
     fun grantPermissions(device: UiDevice, permissions: List<String>, packageName: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             permissions.forEach { permission ->
-                try {
+                runCatching {
                     device.executeShellCommand("pm grant $packageName $permission")
-                    Thread.sleep(500) // Give system time to process
-                } catch (e: Exception) { // CatKotlinch generic Exception
-                    Log.e("GrantPermissionRule", "Error granting permission: $permission", e)
+                    Thread.sleep(500)
                 }
             }
         }
