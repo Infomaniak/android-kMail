@@ -13,7 +13,7 @@ jobs:
     runs-on: [ self-hosted, Android ]
     strategy:
       matrix:
-        api-level: [ 36 ]
+        api-level: [ 35 ]
         target: [ google_apis ]
 
     steps:
