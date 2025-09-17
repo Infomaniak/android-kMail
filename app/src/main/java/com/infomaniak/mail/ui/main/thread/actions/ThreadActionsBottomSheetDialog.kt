@@ -126,6 +126,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 currentClassName = currentClassName,
                 shouldLoadDistantResources = navigationArgs.shouldLoadDistantResources,
             )
+            val I = 0
         }
 
         override fun onReplyAll() {
