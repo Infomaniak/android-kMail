@@ -9,17 +9,17 @@ emoji2 = "1.5.0"
 firebaseMessagingKtx = "24.1.2"
 flexbox = "3.0.0"
 googleServices = "4.4.3"
-hiltAndroid = "2.57"
+hiltAndroid = "2.57.1"
 hiltAndroidx = "1.2.0"
 jsoup = "1.21.1"
-kotlin = "2.0.21" # Keep the same version as the one in Core
-ksp = "2.0.21-1.0.28" # Keep the same version as the one in Core
+kotlin = "2.2.0" # Keep the same version as the one in Core
+ksp = "2.2.0-2.0.2" # Keep the same version as the one in Core
 leakcanaryAndroid = "2.14"
 lifecycleProcess = "2.9.2"
 mockk = "1.14.5"
 navigation = "2.9.3"
 playServices = "18.7.2"
-realmKotlin = "3.0.0"
+realmKotlin = "3.2.8-2"
 richHtmlEditor = "0.2.0"
 webkit = "1.14.0"
 
@@ -42,7 +42,7 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
 navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServices" }
-realm-kotlin-base = { module = "io.realm.kotlin:library-base", version.ref = "realmKotlin" }
+realm-kotlin-base = { module = "com.infomaniak.realm.kotlin:library-base", version.ref = "realmKotlin" }
 rich-html-editor = { module = "com.github.infomaniak:android-rich-html-editor", version.ref = "richHtmlEditor" }
 webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 # Unit tests
@@ -56,8 +56,7 @@ dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroi
 google-services = { id = "com.google.gms.google-services" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-parcelize = { id = "kotlin-parcelize" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
-realm-kotlin = { id = "io.realm.kotlin", version.ref = "realmKotlin" }
+realm-kotlin = { id = "com.infomaniak.realm.kotlin", version.ref = "realmKotlin" }
