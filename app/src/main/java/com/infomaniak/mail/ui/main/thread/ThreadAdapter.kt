@@ -423,9 +423,7 @@ class ThreadAdapter(
 
         setDetailedFieldsVisibility(message)
 
-        if (isReducible) {
-            handleHeaderClick(message)
-        }
+        if (isReducible) handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
