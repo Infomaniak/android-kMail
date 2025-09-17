@@ -97,6 +97,7 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.isRunningInTest
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -457,7 +458,8 @@ class NewMessageFragment : Fragment() {
         setEditorStyle()
         handleEditorPlaceholderVisibility()
 
-        editorAiAnimation.load(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
+        // Not showing the Lottie because it prevents the UI to settle which is breaking tests.
+        if (!isRunningInTest()) editorAiAnimation.load(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
 
         setToolbarEnabledStatus(false)
         disableButtonsWhenFocusIsLost()

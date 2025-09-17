@@ -28,6 +28,23 @@ android {
         versionCode = 1_17_000_01
         versionName = "1.17.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+        testInstrumentationRunnerArguments["useTestStorageService"] = "true"
+
+        testOptions {
+            @Suppress("UnstableApiUsage")
+            managedDevices {
+                allDevices {
+                    create<com.android.build.api.dsl.ManagedVirtualDevice>("ui-test") {
+                        device = "Pixel 9 Pro XL"
+                        apiLevel = 36
+                        systemImageSource = "google"
+                    }
+                }
+
+                execution = "ANDROIDX_TEST_ORCHESTRATOR"
+            }
+        }
 
         setProperty("archivesBaseName", "infomaniak-mail-$versionName ($versionCode)")
 
@@ -48,6 +65,9 @@ android {
         buildConfigField("String", "BUGTRACKER_MAIL_PROJECT_NAME", "\"mail\"")
         buildConfigField("String", "GITHUB_REPO", "\"android-mail\"")
         buildConfigField("String", "GITHUB_REPO_URL", "\"https://github.com/Infomaniak/android-kMail\"")
+
+        buildConfigField("String", "UI_TEST_ACCOUNT_EMAIL", "\"${System.getenv("UI_TEST_ACCOUNT_EMAIL") ?: "defaultUser"}\"")
+        buildConfigField("String", "UI_TEST_ACCOUNT_PASSWORD", "\"${System.getenv("UI_TEST_ACCOUNT_PASSWORD") ?: "defaultPass"}\"")
 
         resValue("string", "ATTACHMENTS_AUTHORITY", "com.infomaniak.mail.attachments")
         resValue("string", "EML_AUTHORITY", "com.infomaniak.mail.eml")
@@ -129,6 +149,8 @@ dependencies {
     implementation(libs.rich.html.editor)
 
     implementation(libs.realm.kotlin.base)
+    implementation(libs.junit.ktx)
+    implementation(libs.espresso.contrib)
 
     "standardImplementation"(libs.play.services.base)
     "standardImplementation"(libs.firebase.messaging.ktx)
@@ -169,7 +191,21 @@ dependencies {
     testImplementation(libs.mockk.agent)
     testImplementation(libs.mockk.android)
     testImplementation(core.kotlinx.coroutines.test)
+
     androidTestImplementation(core.androidx.junit)
+    androidTestImplementation(core.androidx.runner)
+    androidTestImplementation(core.androidx.test.core)
+    androidTestImplementation(core.androidx.test.core.ktx)
+    androidTestImplementation(core.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.espresso.web)
+    androidTestImplementation(libs.junit.ktx)
+    androidTestImplementation(libs.stdlib)
+    androidTestImplementation(libs.uiautomator)
+
+    androidTestUtil(libs.orchestrator)
+
+    debugImplementation(libs.fragment.testing)
 
     // Debug
     if (enableLeakCanary) {

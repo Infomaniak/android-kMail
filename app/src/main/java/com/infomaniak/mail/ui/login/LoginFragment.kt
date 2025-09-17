@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -260,7 +261,8 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun openLoginWebView() {
+    @VisibleForTesting
+    fun openLoginWebView() {
         trackAccountEvent(MatomoName.OpenLoginWebview)
         loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
     }

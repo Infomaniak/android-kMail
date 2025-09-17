@@ -118,6 +118,13 @@ object Utils {
         context.openUrl(BuildConfig.CHATBOT_URL)
     }
 
+    fun isRunningInTest(): Boolean = runCatching {
+        Class.forName("androidx.test.espresso.Espresso")
+        true
+    }.getOrElse {
+        false
+    }
+
     enum class MailboxErrorCode {
         NO_MAILBOX,
         NO_VALID_MAILBOX,
