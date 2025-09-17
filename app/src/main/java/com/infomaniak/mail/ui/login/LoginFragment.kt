@@ -261,7 +261,7 @@ class LoginFragment : Fragment() {
         }
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting
     fun openLoginWebView() {
         trackAccountEvent(MatomoName.OpenLoginWebview)
         loginActivity.infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)

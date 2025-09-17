@@ -458,7 +458,7 @@ class NewMessageFragment : Fragment() {
         setEditorStyle()
         handleEditorPlaceholderVisibility()
 
-        if (isRunningInTest().not()) editorAiAnimation.load(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
+        if (!isRunningInTest()) editorAiAnimation.load(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
 
         setToolbarEnabledStatus(false)
         disableButtonsWhenFocusIsLost()

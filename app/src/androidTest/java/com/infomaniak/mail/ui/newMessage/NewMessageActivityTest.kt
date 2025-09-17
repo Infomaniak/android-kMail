@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.newMessage
 import android.Manifest
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -102,8 +103,8 @@ class NewMessageActivityTest {
 
         val subject = "UI test mail #${UUID.randomUUID()}"
 
-        onView(withId(R.id.subjectTextField)).perform(click(), typeText(subject))
-        onView(withId(R.id.editorWebView)).perform(click(), typeText("This is an email from UI test"))
+        onView(withId(R.id.subjectTextField)).perform(click(), typeText(subject), closeSoftKeyboard())
+        onView(withId(R.id.editorWebView)).perform(click(), typeText("This is an email from UI test"), closeSoftKeyboard())
         onView(withId(R.id.sendButton)).perform(click())
 
         // Waiting for the email to be received

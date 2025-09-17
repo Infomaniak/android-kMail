@@ -218,7 +218,7 @@ class NewMessageAiManager @Inject constructor(
 
     private fun navigateToDiscoveryBottomSheetIfFirstTime() = with(localSettings) {
         // Not showing the AI BottomSheet when running tests because it has a Lottie which breaks the tests.
-        if (showAiDiscoveryBottomSheet && isRunningInTest().not()) {
+        if (showAiDiscoveryBottomSheet && !isRunningInTest()) {
             showAiDiscoveryBottomSheet = false
             fragment.safeNavigate(NewMessageFragmentDirections.actionNewMessageFragmentToAiDiscoveryBottomSheetDialog())
         }

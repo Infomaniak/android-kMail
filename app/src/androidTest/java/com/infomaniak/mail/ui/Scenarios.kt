@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui
 
-import android.os.Build
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -51,8 +50,6 @@ object Scenarios {
             .withElement(findElement(Locator.XPATH, "//input[@name='password']"))
             .perform(webKeys(password))
 
-        onView(isRoot()).perform(waitFor(3.seconds))
-
         // Clicking on the connect button
         onWebView()
             .withElement(findElement(Locator.XPATH, "//button[@data-testid='btn-connect']"))
@@ -67,16 +64,13 @@ object Scenarios {
         loginFragment.openLoginWebView()
     }
 
+    fun waitFor(delay: Duration): ViewAction = object : ViewAction {
+        override fun getConstraints(): Matcher<View?>? = isRoot()
 
-    fun waitFor(delay: Duration): ViewAction {
-        return object : ViewAction {
-            override fun getConstraints(): Matcher<View?>? = isRoot()
+        override fun getDescription() = "wait for " + delay + "milliseconds"
 
-            override fun getDescription() = "wait for " + delay + "milliseconds"
-
-            override fun perform(uiController: UiController, view: View?) {
-                uiController.loopMainThreadForAtLeast(delay.inWholeMilliseconds)
-            }
+        override fun perform(uiController: UiController, view: View?) {
+            uiController.loopMainThreadForAtLeast(delay.inWholeMilliseconds)
         }
     }
 
@@ -89,12 +83,10 @@ object Scenarios {
     }
 
     fun grantPermissions(device: UiDevice, permissions: List<String>, packageName: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            permissions.forEach { permission ->
-                runCatching {
-                    device.executeShellCommand("pm grant $packageName $permission")
-                    Thread.sleep(500)
-                }
+        permissions.forEach { permission ->
+            runCatching {
+                device.executeShellCommand("pm grant $packageName $permission")
+                Thread.sleep(500)
             }
         }
     }
