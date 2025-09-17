@@ -89,6 +89,9 @@ class NewMessageActivityTest {
         // Waiting for the view to settle
         onView(isRoot()).perform(waitFor(3.seconds))
 
+        // Dismissing the AI BottomSheet. Clicking on "Later" is not working for some reason
+        device.click(0, 0)
+
         // Just clicking on the toField does not work ...
         onView(
             allOf(

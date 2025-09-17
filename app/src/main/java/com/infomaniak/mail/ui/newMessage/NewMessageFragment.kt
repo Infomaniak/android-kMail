@@ -458,6 +458,7 @@ class NewMessageFragment : Fragment() {
         setEditorStyle()
         handleEditorPlaceholderVisibility()
 
+        // Not showing the Lottie because it prevents the UI to settle which is breaking tests.
         if (!isRunningInTest()) editorAiAnimation.load(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
 
         setToolbarEnabledStatus(false)
