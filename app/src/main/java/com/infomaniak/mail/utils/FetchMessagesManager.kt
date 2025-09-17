@@ -161,7 +161,8 @@ class FetchMessagesManager @Inject constructor(
         // Notify Threads with new Messages
         val unReadThreadsCount = threadsWithNewMessages.count()
         var hasShownNotification = false
-        threadsWithNewMessages.forEachIndexed { index, thread ->
+        threadsWithNewMessages.forEachIndexed { index, unmanagedThread ->
+            val thread = ThreadController.getThread(unmanagedThread.uid, realm) ?: return@forEachIndexed
             thread.showThreadNotification(
                 userId = userId,
                 mailbox = mailbox,
