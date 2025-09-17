@@ -219,7 +219,7 @@ class ThreadAdapter(
         }
 
         if (item is MessageUi) {
-            (holder as MessageViewHolder).bindMail(item, position)
+            (holder as MessageViewHolder).bindMail(item, position, isReducible = items.size > 1)
         } else {
             (holder as SuperCollapsedBlockViewHolder).bindSuperCollapsedBlock(item as SuperCollapsedBlock)
         }
@@ -235,11 +235,11 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int) {
+    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int, isReducible: Boolean = false) {
 
         initMapForNewMessage(messageUi.message, position)
 
-        bindHeader(messageUi.message)
+        bindHeader(messageUi.message, isReducible)
         bindAlerts(messageUi.message)
         bindCalendarEvent(messageUi.message)
         bindAttachments(messageUi.message)
@@ -387,7 +387,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
+    private fun MessageViewHolder.bindHeader(message: Message, isReducible: Boolean) = with(binding) {
         val messageDate = message.displayDate.toDate()
 
         if (message.isDraft) {
@@ -423,7 +423,9 @@ class ThreadAdapter(
 
         setDetailedFieldsVisibility(message)
 
-        handleHeaderClick(message)
+        if (isReducible) {
+            handleHeaderClick(message)
+        }
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
