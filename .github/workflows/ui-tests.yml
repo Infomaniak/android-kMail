@@ -11,10 +11,6 @@ concurrency:
 jobs:
   instrumentation-tests:
     runs-on: [ self-hosted, Android ]
-    strategy:
-      matrix:
-        api-level: [ 36 ]
-        target: [ google_apis ]
 
     steps:
       - name: Checkout the code
@@ -54,4 +50,3 @@ jobs:
               title: 'UI tests failure',
               body: 'Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} failed.',
             })
-
