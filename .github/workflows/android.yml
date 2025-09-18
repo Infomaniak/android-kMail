@@ -11,10 +11,6 @@ jobs:
   instrumentation-tests:
     if: github.event.pull_request.draft == false
     runs-on: [ self-hosted, Android ]
-    strategy:
-      matrix:
-        api-level: [ 36 ]
-        target: [ google_apis ]
 
     steps:
       - name: Checkout the code
