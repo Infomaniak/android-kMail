@@ -219,7 +219,7 @@ class ThreadAdapter(
         }
 
         if (item is MessageUi) {
-            (holder as MessageViewHolder).bindMail(item, position, isReducible = items.size > 1)
+            (holder as MessageViewHolder).bindMail(item, position, isReducible = items.count() > 1)
         } else {
             (holder as SuperCollapsedBlockViewHolder).bindSuperCollapsedBlock(item as SuperCollapsedBlock)
         }
@@ -235,7 +235,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int, isReducible: Boolean = false) {
+    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int, isReducible: Boolean) {
 
         initMapForNewMessage(messageUi.message, position)
 
