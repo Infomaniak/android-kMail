@@ -16,7 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="contentDescriptionAddReaction">Aggiungi una reazione</string>
+    <string name="buttonAddReaction">Aggiungi una reazione</string>
     <string name="reactionsAll">Tutte</string>
     <string name="reactionsTitle">Reazioni</string>
 </resources>
