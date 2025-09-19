@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,7 +116,10 @@ class ProcessMessageNotificationsWorker @AssistedInject constructor(
             hasShownNotification = fetchMessagesManager.execute(scope = this, userId, mailbox, messageUid, mailboxContentRealm)
             SentryLog.i(TAG, "Work finished")
             Result.success()
-        }.cancellable().getOrElse {
+        }.cancellable().onFailure {
+            // This can be a cause that leads to displaying a generic new mail notification
+            SentryLog.e(TAG, "Unknown error thrown during notification processing", it)
+        }.getOrElse {
             Result.failure()
         }.also {
             if (!hasShownNotification) displayGenericNewMailsNotification()
