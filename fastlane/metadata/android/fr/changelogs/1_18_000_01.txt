@@ -1,0 +1,2 @@
+- Ajout des actions sur les messages indésirables dans la sélection multiple
+- Récupération du corps des messages lors de la réception d'une notification

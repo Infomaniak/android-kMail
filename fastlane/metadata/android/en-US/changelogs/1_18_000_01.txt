@@ -1,0 +1,2 @@
+- Add junk actions in multiselection
+- Fetch messages body when receiving notification
