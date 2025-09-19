@@ -50,5 +50,5 @@ object MessageUtils {
     }
 }
 
-data class ThreadMessageToExecuteAction(val thread: Thread, val messageUid: String)
+data class ThreadMessageToExecuteAction(val thread: Thread, val messageUid: String, val messageCanBeReactUid: String?)
 data class JunkMessagesData(val junkMessages: List<Message>, val messagesFromUsersToBlock: Map<Recipient, Message>)
