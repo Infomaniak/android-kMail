@@ -19,8 +19,10 @@
 
 package com.infomaniak.mail.data.models.message
 
+import android.content.Context
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -414,6 +416,20 @@ class Message : RealmObject, Snoozable {
         snoozeEndDate = flags.snoozeEndDate.toRealmInstant()
     }
 
+    fun getFormattedPreview(context: Context, previewType: PreviewType): String = "\n" + when (previewType) {
+        PreviewType.Encryption -> context.getString(R.string.encryptedMessageHeader)
+        PreviewType.Reaction -> context.getString(R.string.previewReaction, from.first().name, emojiReaction)
+        PreviewType.Empty -> context.getString(R.string.noBodyDescription)
+        PreviewType.Body -> preview.trim()
+    }
+
+    fun getPreviewType(): PreviewType = when {
+        isEncrypted -> PreviewType.Encryption
+        isReaction -> PreviewType.Reaction
+        preview.isBlank() -> PreviewType.Empty
+        else -> PreviewType.Body
+    }
+
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
 
     fun toThread() = Thread().apply {
@@ -432,6 +448,13 @@ class Message : RealmObject, Snoozable {
     override fun equals(other: Any?) = other === this || (other is Message && other.uid == uid)
 
     override fun hashCode(): Int = uid.hashCode()
+
+    enum class PreviewType {
+        Encryption,
+        Reaction,
+        Empty,
+        Body
+    }
 
     companion object {
         // Encountered formats so far:
