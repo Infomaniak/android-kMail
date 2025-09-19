@@ -52,8 +52,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:icon="@drawable/ic_email_action_move"
-            app:title="@string/contentDescriptionAddReaction"
+            app:icon="@drawable/ic_face_smile"
+            app:title="@string/buttonAddReaction"
             app:visibleDivider="false"
             tools:visibility="visible"/>
 
