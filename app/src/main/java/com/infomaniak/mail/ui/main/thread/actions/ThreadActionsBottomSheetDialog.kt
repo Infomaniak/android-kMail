@@ -91,9 +91,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
             setJunkUi()
             setSnoozeUi(thread.isSnoozed())
-            messageCanBeReactUid?.let {
-                setReactionUi()
-            }
+            setReactionUi(messageCanBeReactUid != null)
 
             initOnClickListener(onActionClick(thread, messageUidToExecuteAction))
         }
@@ -118,10 +116,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         setTitle(text)
         setIconResource(icon)
         isVisible = true
-    }
-
-    private fun setReactionUi() = with(binding) {
-        addReaction.isVisible = true
     }
 
     private fun onActionClick(thread: Thread, messageUidToExecuteAction: String) = object : OnActionClick {

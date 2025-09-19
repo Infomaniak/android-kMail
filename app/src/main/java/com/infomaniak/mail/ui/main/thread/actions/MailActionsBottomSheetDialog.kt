@@ -159,6 +159,10 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
+    fun setReactionUi(canBeReact: Boolean) = with(binding.addReaction) {
+        isVisible = canBeReact
+    }
+
     interface OnActionClick {
         fun onReply()
         fun onReplyAll()
