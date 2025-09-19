@@ -48,6 +48,16 @@
             tools:visibility="visible" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
+            android:id="@+id/addReaction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:icon="@drawable/ic_email_action_move"
+            app:title="@string/contentDescriptionAddReaction"
+            app:visibleDivider="false"
+            tools:visibility="visible"/>
+
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/snooze"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

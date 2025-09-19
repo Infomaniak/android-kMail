@@ -748,6 +748,10 @@ class ThreadFragment : Fragment() {
             )
         }
 
+        getBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET) { messageUid: String ->
+            navigateToReactionBottomSheet(messageUid)
+        }
+
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
             executeSavedSnoozeScheduleType(selectedScheduleEpoch)
         }
@@ -988,6 +992,10 @@ class ThreadFragment : Fragment() {
         twoPaneFragment.navigateToSnoozeBottomSheet(snoozeScheduleType, threadViewModel.threadLive.value?.snoozeEndDate)
     }
 
+    private fun navigateToReactionBottomSheet(messageUid: String) {
+        twoPaneFragment.navigateToEmojiPicker(messageUid)
+    }
+
     private fun unsnoozeThread(thread: Thread): Unit = with(binding) {
         lifecycleScope.launch {
             snoozeAlert.showAction2Progress()
@@ -1098,6 +1106,8 @@ class ThreadFragment : Fragment() {
         private const val NEXT_CHRONOLOGICAL_THREAD = 1
 
         private const val MAXIMUM_SUBJECT_LENGTH = 30
+
+        const val OPEN_REACTION_BOTTOM_SHEET = "openReactionBottomSheet"
 
         private fun allAttachmentsFileName(subject: String) = "infomaniak-mail-attachments-$subject.zip"
         private fun allSwissTransferFilesName(subject: String) = "infomaniak-mail-swisstransfer-$subject.zip"

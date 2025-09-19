@@ -42,6 +42,7 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -77,8 +78,15 @@ class MessageController @Inject constructor(
         return getMessagesByUids(uids, mailboxContentRealm())
     }
 
-    suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
+    private suspend fun getLastMessageToExecuteActionWithExtraQuery(
+        messages: RealmList<Message>,
+        extraQuery: String? = null
+    ): Message? {
         suspend fun RealmQuery<Message>.last(): Message? = sort(Message::internalDate.name, Sort.DESCENDING).first().findSuspend()
+
+        fun RealmQuery<Message>.appendNullableExtraQuery(extra: String?): RealmQuery<Message> {
+            return if (extra.isNullOrEmpty()) this else this.query(extra)
+        }
 
         val isNotScheduledDraft = "${Message::isScheduledDraft.name} == false"
 
@@ -91,11 +99,22 @@ class MessageController @Inject constructor(
                 " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
                 ").@count < 1"
 
-        val messages = thread.getDisplayedMessages(featureFlags, localSettings)
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").last()
-            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").last()
-            ?: messages.query(isNotScheduledDraft).last()
-            ?: messages.last()
+        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").appendNullableExtraQuery(extraQuery).last()
+            ?: messages.query("$isNotDraft AND $isNotScheduledDraft").appendNullableExtraQuery(extraQuery).last()
+            ?: messages.query(isNotScheduledDraft).appendNullableExtraQuery(extraQuery).last()
+            ?: extraQuery?.let { messages.query(extraQuery).last() }
+    }
+
+    suspend fun getLastMessageToExecuteAction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message {
+        val messages = thread.getDisplayedMessages(featureFlags, this@MessageController.localSettings)
+        return getLastMessageToExecuteActionWithExtraQuery(messages = messages) ?: messages.last()
+    }
+
+    suspend fun getLastMessageCanBeReact(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message? {
+        val isValidReactionTarget = "${Message::_emojiReactionNotAllowedReason.name} == null"
+
+        val messages = thread.getDisplayedMessages(featureFlags, this@MessageController.localSettings)
+        return getLastMessageToExecuteActionWithExtraQuery(messages, extraQuery = isValidReactionTarget)
     }
 
     suspend fun getLastMessageAndItsDuplicatesToExecuteAction(

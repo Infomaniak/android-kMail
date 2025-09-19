@@ -25,9 +25,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.extensions.isNightModeEnabled
 import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
+import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -35,6 +37,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
 import com.infomaniak.mail.ui.main.thread.PrintMailFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.extensions.animatedNavigation
 import com.infomaniak.mail.utils.extensions.archiveWithConfirmationPopup
@@ -194,6 +197,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     description = getString(R.string.reportDisplayProblemDescription),
                     onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(message.uid) },
                 )
+            }
+
+            override fun onAddReaction() {
+                trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
+                setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUid)
             }
             //endregion
         })

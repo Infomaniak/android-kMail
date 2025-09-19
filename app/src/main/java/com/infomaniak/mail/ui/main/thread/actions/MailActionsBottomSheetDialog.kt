@@ -58,6 +58,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         override fun onArchive() = Unit
         override fun onReadUnread() = Unit
         override fun onMove() = Unit
+        override fun onAddReaction() = Unit
         override fun onSnooze() = Unit
         override fun onModifySnooze() = Unit
         override fun onCancelSnooze() = Unit
@@ -100,6 +101,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
+        addReaction.setOnClickListener { onClickListener.onAddReaction() }
 
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
             when (id) {
@@ -166,6 +168,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         fun onArchive()
         fun onReadUnread()
         fun onMove()
+        fun onAddReaction()
         fun onSnooze()
         fun onModifySnooze()
         fun onCancelSnooze()

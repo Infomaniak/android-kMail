@@ -33,8 +33,10 @@ import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.invoke
@@ -53,8 +55,20 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
 
-    val threadMessageToExecuteAction: SharedFlow<ThreadMessageToExecuteAction> = threadController.getThreadAsync(threadUid)
+    private val threadMessageToExecuteAction: Flow<ThreadMessageToExecuteAction> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
+
+    private val threadMessageCanBeReact: Flow<ThreadMessageToExecuteAction> = threadController.getThreadAsync(threadUid)
+        .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidCanBeReact(thread) } }
+
+    val threadMessageWithActionAndReact: SharedFlow<ThreadMessageToExecuteAction> =
+        combine(threadMessageToExecuteAction, threadMessageCanBeReact) { messageToExecuteActions, messageCanBeReact ->
+            ThreadMessageToExecuteAction(
+                messageToExecuteActions.thread,
+                messageToExecuteActions.messageUid,
+                messageCanBeReact.messageUid
+            )
+        }
         .shareIn(scope = viewModelScope, started = SharingStarted.Eagerly, replay = 1)
 
     private val currentMailboxLive = mailboxController.getMailboxAsync(
@@ -66,6 +80,11 @@ class ThreadActionsViewModel @Inject constructor(
 
     private suspend fun getThreadAndMessageUidToExecuteAction(thread: Thread): ThreadMessageToExecuteAction {
         val messageUid = Dispatchers.IO { messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid }
-        return ThreadMessageToExecuteAction(thread, messageUid)
+        return ThreadMessageToExecuteAction(thread, messageUid, null)
+    }
+
+    private suspend fun getThreadAndMessageUidCanBeReact(thread: Thread): ThreadMessageToExecuteAction? {
+        val messageUid = Dispatchers.IO { messageController.getLastMessageCanBeReact(thread, featureFlagsLive.value)?.uid }
+        return messageUid?.let { ThreadMessageToExecuteAction(thread, it, it) }
     }
 }

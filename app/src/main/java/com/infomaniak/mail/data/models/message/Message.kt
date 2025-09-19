@@ -146,7 +146,8 @@ class Message : RealmObject, Snoozable {
     @SerialName("emoji_reaction")
     var emojiReaction: String? = null
     @SerialName("emoji_reaction_not_allowed_reason")
-    private var _emojiReactionNotAllowedReason: String? = null
+    var _emojiReactionNotAllowedReason: String? = null
+        private set
     //endregion
 
     //region Local data (Transient)
