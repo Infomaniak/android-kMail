@@ -28,6 +28,7 @@ import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.core.observe
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
+import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -37,6 +38,7 @@ import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -79,7 +81,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.threadMessageToExecuteAction.observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction) ->
+        threadActionsViewModel.threadMessageWithActionAndReact.observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageCanBeReactUid) ->
             folderRole = folderRoleUtils.getActionFolderRole(thread)
             isFromArchive = folderRole == FolderRole.ARCHIVE
             isFromSpam = folderRole == FolderRole.SPAM
@@ -89,6 +91,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
             setJunkUi()
             setSnoozeUi(thread.isSnoozed())
+            messageCanBeReactUid?.let {
+                setReactionUi()
+            }
 
             initOnClickListener(onActionClick(thread, messageUidToExecuteAction))
         }
@@ -113,6 +118,10 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         setTitle(text)
         setIconResource(icon)
         isVisible = true
+    }
+
+    private fun setReactionUi() = with(binding) {
+        addReaction.isVisible = true
     }
 
     private fun onActionClick(thread: Thread, messageUidToExecuteAction: String) = object : OnActionClick {
@@ -240,6 +249,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 description = getString(R.string.reportDisplayProblemDescription),
                 onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(messageUidToExecuteAction) },
             )
+        }
+
+        override fun onAddReaction() {
+            trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
+            setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUidToExecuteAction)
         }
         //endregion
     }
