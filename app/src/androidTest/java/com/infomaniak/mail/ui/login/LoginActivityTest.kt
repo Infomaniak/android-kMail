@@ -21,6 +21,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.filters.LargeTest
@@ -32,10 +33,12 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.Scenarios
 import com.infomaniak.mail.ui.Scenarios.deactivateAnimations
+import com.infomaniak.mail.ui.Scenarios.waitFor
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -65,6 +68,8 @@ class LoginActivityTest {
         onView(withId(R.id.connectButton)).perform(click())
 
         Scenarios.login(email, password)
+
+        onView(isRoot()).perform(waitFor(3.seconds))
 
         // Contacts synchronization is displayed so login worked
         onView(withId(R.id.continueButton)).check(matches(isDisplayed()))

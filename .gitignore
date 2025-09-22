@@ -5,7 +5,7 @@
 **/captures
 .cxx
 .DS_Store
-env.properties
+uitest-env.properties
 .externalNativeBuild
 .gradle
 **/.idea

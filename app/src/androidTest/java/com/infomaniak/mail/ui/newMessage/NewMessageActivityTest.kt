@@ -42,7 +42,7 @@ import com.infomaniak.mail.ui.Scenarios.startLoginWebviewActivity
 import com.infomaniak.mail.ui.Scenarios.waitFor
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.newMessage.ContactAdapter.ContactViewHolder
-import org.hamcrest.Matchers.allOf
+import org.hamcrest.core.AllOf.allOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -124,7 +124,7 @@ class NewMessageActivityTest {
                 withId(R.id.textInput),
                 isDescendantOfA(withId(fieldResId)),
             )
-        ).perform(click(), typeText("test.test@ik.me"))
+        ).perform(click(), typeText(BuildConfig.UI_TEST_ACCOUNT_EMAIL))
         onView(withId(suggestionListResId))
             .perform(RecyclerViewActions.actionOnItemAtPosition<ContactViewHolder>(0, click()))
     }
