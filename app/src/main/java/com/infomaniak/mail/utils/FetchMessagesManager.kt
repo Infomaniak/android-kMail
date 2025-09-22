@@ -222,9 +222,9 @@ class FetchMessagesManager @Inject constructor(
                     val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
                     return@let "\n${cleanedDocument.wholeText().trim()}"
                 }
-                ?: formattedPreview.content
+                ?: "\n${formattedPreview.content}"
         } else {
-            formattedPreview.content
+            "\n${formattedPreview.content}"
         }
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
