@@ -145,6 +145,7 @@ dependencies {
     implementation(project(":Core:Compose:MaterialThemeFromXml"))
     implementation(project(":Core:CrossAppLogin:Back"))
     implementation(project(":Core:CrossAppLogin:Front"))
+    implementation(project(":Core:DotLottie"))
     implementation(project(":Core:FragmentNavigation"))
     implementation(project(":Core:KSuite"))
     implementation(project(":Core:KSuite:KSuitePro"))
@@ -168,7 +169,6 @@ dependencies {
     "standardImplementation"(libs.play.services.base)
     "standardImplementation"(libs.firebase.messaging.ktx)
 
-    implementation(libs.dotlottie)
     implementation(core.lottie)
     implementation(libs.dragdropswipe.recyclerview)
     implementation(libs.dotsindicator)

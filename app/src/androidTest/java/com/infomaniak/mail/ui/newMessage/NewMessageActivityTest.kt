@@ -34,6 +34,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.test.uiautomator.UiDevice
+import com.infomaniak.core.dotlottie.extensions.DotLottieExt
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.Scenarios.grantPermissions
@@ -62,6 +63,8 @@ class NewMessageActivityTest {
 
     @Before
     fun setUp() {
+        DotLottieExt.canLoadDotLotties = false
+
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         val permissions = listOf(
