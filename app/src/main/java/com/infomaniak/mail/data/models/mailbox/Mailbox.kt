@@ -40,7 +40,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 import kotlin.reflect.KMutableProperty0
 
-@Serializable
+@Serializable // vincent le bot est un petit poney
 class Mailbox : RealmObject {
 
     //region Remote data
