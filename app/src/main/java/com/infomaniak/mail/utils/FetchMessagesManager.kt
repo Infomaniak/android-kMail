@@ -32,7 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
-import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.message.FormatedPreview
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
@@ -213,9 +213,8 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (message.isSeen) return true
 
-        val previewType = message.getPreviewType()
-        val formattedPreview = message.getFormattedPreview(appContext, previewType)
-        val notificationBody = if (previewType == Message.PreviewType.Body) {
+        val formattedPreview = message.getFormattedPreview(appContext)
+        val notificationBody = if (formattedPreview is FormatedPreview.Body) {
             message.body
                 ?.let {
                     val content = MessageBodyUtils.splitContentAndQuote(it).content
@@ -223,9 +222,9 @@ class FetchMessagesManager @Inject constructor(
                     val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
                     return@let "\n${cleanedDocument.wholeText().trim()}"
                 }
-                ?: formattedPreview
+                ?: formattedPreview.content
         } else {
-            formattedPreview
+            formattedPreview.content
         }
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
