@@ -88,6 +88,9 @@ object MessageBodyUtils {
                 if (quotes.isEmpty() || quotes.all { it.isBlank() }) SplitBody(bodyContent) else SplitBody(content, bodyContent)
             },
             onTimeout = {
+                // Timeout depends on the complexity of the processed html. A small mail has low chances of being complex.
+                // A big mail could be simple or could be complex. A big mail doesn't imply that the mail will always be complex
+                // but it can help.
                 Sentry.captureMessage("Timeout reached while displaying a Message's body", SentryLevel.WARNING) { scope ->
                     scope.setExtra("body size", "${bodyContent.toByteArray().size} bytes")
                 }
