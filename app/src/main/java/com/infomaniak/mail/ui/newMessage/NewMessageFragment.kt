@@ -49,6 +49,7 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
+import com.infomaniak.core.dotlottie.extensions.DotLottieExt.loadUiTestSafe
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -97,7 +98,6 @@ import com.infomaniak.mail.utils.SentryDebug
 import com.infomaniak.mail.utils.SignatureUtils
 import com.infomaniak.mail.utils.UiUtils.PRIMARY_COLOR_CODE
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.Utils.isRunningInTest
 import com.infomaniak.mail.utils.WebViewUtils
 import com.infomaniak.mail.utils.WebViewUtils.Companion.destroyAndClearHistory
 import com.infomaniak.mail.utils.WebViewUtils.Companion.setupNewMessageWebViewSettings
@@ -459,7 +459,7 @@ class NewMessageFragment : Fragment() {
         handleEditorPlaceholderVisibility()
 
         // Not showing the Lottie because it prevents the UI to settle which is breaking tests.
-        if (!isRunningInTest()) editorAiAnimation.load(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
+        editorAiAnimation.loadUiTestSafe(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
 
         setToolbarEnabledStatus(false)
         disableButtonsWhenFocusIsLost()
