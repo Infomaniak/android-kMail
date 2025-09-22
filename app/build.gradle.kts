@@ -68,12 +68,12 @@ android {
         buildConfigField("String", "GITHUB_REPO", "\"android-mail\"")
         buildConfigField("String", "GITHUB_REPO_URL", "\"https://github.com/Infomaniak/android-kMail\"")
 
-        val envProperties = rootProject.file("env.properties").takeIf { it.exists() }?.let { file ->
+        val uiTestEnvProperties = rootProject.file("uitest-env.properties").takeIf { it.exists() }?.let { file ->
             Properties().also { it.load(file.reader()) }
         }
 
-        val uiTestAccountEmail = envProperties?.getProperty("uiTestAccountEmail").takeUnless { it.isNullOrBlank() }
-        val uiTestAccountPassword = envProperties?.getProperty("uiTestAccountPassword").takeUnless { it.isNullOrBlank() }
+        val uiTestAccountEmail = uiTestEnvProperties?.getProperty("uiTestAccountEmail").takeUnless { it.isNullOrBlank() }
+        val uiTestAccountPassword = uiTestEnvProperties?.getProperty("uiTestAccountPassword").takeUnless { it.isNullOrBlank() }
 
         buildConfigField("String", "UI_TEST_ACCOUNT_EMAIL", "\"${System.getenv("UI_TEST_ACCOUNT_EMAIL") ?: uiTestAccountEmail}\"")
         buildConfigField("String", "UI_TEST_ACCOUNT_PASSWORD", "\"${System.getenv("UI_TEST_ACCOUNT_PASSWORD") ?: uiTestAccountPassword}\"")
