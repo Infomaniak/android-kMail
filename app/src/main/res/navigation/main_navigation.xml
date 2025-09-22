@@ -716,6 +716,9 @@
         <argument
             android:name="messageUid"
             app:argType="string" />
+        <argument
+            android:name="pickedEmojiNavigationKey"
+            app:argType="com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog$EmojiPickerSourceKey" />
     </dialog>
 
     <dialog

@@ -40,11 +40,15 @@ class EmojiPickerBottomSheetDialog : EdgeToEdgeBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.emojiPicker.setOnEmojiPickedListener {
-            setBackNavigationResult(PICKED_EMOJI, PickedEmojiPayload(it.emoji, navigationArgs.messageUid))
+            setBackNavigationResult(
+                key = navigationArgs.pickedEmojiNavigationKey.name,
+                value = PickedEmojiPayload(it.emoji, navigationArgs.messageUid)
+            )
         }
     }
 
-    companion object {
-        const val PICKED_EMOJI = "PICKED_EMOJI"
+    enum class EmojiPickerSourceKey {
+        Thread,
+        ThreadList
     }
 }
