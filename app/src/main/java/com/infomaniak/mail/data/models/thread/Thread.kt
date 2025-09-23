@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.thread
 
+import android.content.Context
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.data.LocalSettings
@@ -255,14 +256,14 @@ class Thread : RealmObject, Snoozable {
         else -> from
     }
 
-    fun computePreview(): String {
+    fun computePreview(context: Context): String {
         val message = if (folder.role == FolderRole.SENT) {
             messages.lastOrNull { it.folderId == folderId } ?: messages.last()
         } else {
             messages.last()
         }
 
-        return message.preview
+        return message.getFormattedPreview(context).content
     }
 
     fun computeThreadListDateDisplay(featureFlags: Mailbox.FeatureFlagSet?, localSettings: LocalSettings) = when {
