@@ -155,6 +155,11 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
             }
 
+            override fun onAddReaction() {
+                trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
+                setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUid)
+            }
+
             override fun onSnooze() = Unit
 
             override fun onModifySnooze() = Unit
@@ -198,11 +203,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     description = getString(R.string.reportDisplayProblemDescription),
                     onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(message.uid) },
                 )
-            }
-
-            override fun onAddReaction() {
-                trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
-                setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUid)
             }
             //endregion
         })
