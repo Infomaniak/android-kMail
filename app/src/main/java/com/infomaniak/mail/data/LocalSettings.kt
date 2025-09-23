@@ -25,7 +25,7 @@ import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
 import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor.ApiCallRecord
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.SharedValues
 import com.infomaniak.lib.core.utils.sharedValue
 import com.infomaniak.lib.core.utils.transaction
