@@ -119,7 +119,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         isVisible = true
     }
 
-    private fun onActionClick(thread: Thread, messageUidToExecuteAction: String, messageUidToReactTo: String?) = object : OnActionClick {
+    private fun onActionClick(
+        thread: Thread,
+        messageUidToExecuteAction: String,
+        messageUidToReactTo: String?
+    ) = object : OnActionClick {
         //region Main actions
         override fun onReply() {
             trackBottomSheetThreadActionsEvent(MatomoName.Reply)
