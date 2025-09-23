@@ -214,17 +214,17 @@ class FetchMessagesManager @Inject constructor(
         if (message.isSeen) return true
 
         val formattedPreview = message.getFormattedPreview(appContext)
-        val notificationBody = if (formattedPreview is FormatedPreview.Body) {
+        val notificationBody = "\n" + if (formattedPreview is FormatedPreview.Body) {
             message.body
                 ?.let {
                     val content = MessageBodyUtils.splitContentAndQuote(it).content
                     val dirtyDocument = content.removeLineBreaksFromHtml()
                     val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
-                    return@let "\n${cleanedDocument.wholeText().trim()}"
+                    return@let cleanedDocument.wholeText().trim()
                 }
-                ?: "\n${formattedPreview.content}"
+                ?: formattedPreview.content
         } else {
-            "\n${formattedPreview.content}"
+            formattedPreview.content
         }
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
