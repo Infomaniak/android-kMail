@@ -23,7 +23,7 @@ import androidx.work.WorkManager
 import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.stores.StoresSettingsRepository
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase

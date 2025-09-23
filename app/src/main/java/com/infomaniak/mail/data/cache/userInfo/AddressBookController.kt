@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.userInfo
 
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.addressBook.ContactGroup

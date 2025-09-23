@@ -18,7 +18,7 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.lib.core.api.ApiController.NetworkException
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment

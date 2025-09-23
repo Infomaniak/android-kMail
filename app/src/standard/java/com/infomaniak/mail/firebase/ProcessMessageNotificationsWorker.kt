@@ -33,7 +33,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.infomaniak.core.cancellable
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.mail.R

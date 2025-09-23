@@ -21,7 +21,7 @@ import com.infomaniak.core.cancellable
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteDataManager
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import kotlinx.serialization.ExperimentalSerializationApi

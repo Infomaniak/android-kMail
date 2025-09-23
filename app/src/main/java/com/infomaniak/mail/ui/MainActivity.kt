@@ -44,7 +44,7 @@ import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
 import com.infomaniak.lib.core.utils.hasPermissions

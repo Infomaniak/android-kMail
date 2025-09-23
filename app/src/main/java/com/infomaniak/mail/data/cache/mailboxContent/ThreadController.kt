@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.core.cancellable
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder

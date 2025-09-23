@@ -28,7 +28,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
