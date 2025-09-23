@@ -81,20 +81,21 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.threadMessageWithActionAndReact.observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageCanBeReactUid) ->
-            folderRole = folderRoleUtils.getActionFolderRole(thread)
-            isFromArchive = folderRole == FolderRole.ARCHIVE
-            isFromSpam = folderRole == FolderRole.SPAM
+        threadActionsViewModel.threadMessageWithActionAndReact
+            .observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageCanBeReactUid) ->
+                folderRole = folderRoleUtils.getActionFolderRole(thread)
+                isFromArchive = folderRole == FolderRole.ARCHIVE
+                isFromSpam = folderRole == FolderRole.SPAM
 
-            setMarkAsReadUi(thread.isSeen)
-            setArchiveUi(isFromArchive)
-            setFavoriteUi(thread.isFavorite)
-            setJunkUi()
-            setSnoozeUi(thread.isSnoozed())
-            setReactionUi(messageCanBeReactUid != null)
+                setMarkAsReadUi(thread.isSeen)
+                setArchiveUi(isFromArchive)
+                setFavoriteUi(thread.isFavorite)
+                setJunkUi()
+                setSnoozeUi(thread.isSnoozed())
+                setReactionUi(messageCanBeReactUid != null)
 
-            initOnClickListener(onActionClick(thread, messageUidToExecuteAction))
-        }
+                initOnClickListener(onActionClick(thread, messageUidToExecuteAction))
+            }
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
