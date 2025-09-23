@@ -99,7 +99,8 @@ class MessageController @Inject constructor(
                 " AND \$recipient.${Recipient::email.name} ENDSWITH '${end}'" +
                 ").@count < 1"
 
-        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe").appendNullableExtraQuery(extraQuery).last()
+        return messages.query("$isNotDraft AND $isNotScheduledDraft AND $isNotFromRealMe AND $isNotFromPlusMe")
+            .appendNullableExtraQuery(extraQuery).last()
             ?: messages.query("$isNotDraft AND $isNotScheduledDraft").appendNullableExtraQuery(extraQuery).last()
             ?: messages.query(isNotScheduledDraft).appendNullableExtraQuery(extraQuery).last()
             ?: extraQuery?.let { messages.query(extraQuery).last() }
