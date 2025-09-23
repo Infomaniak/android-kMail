@@ -33,7 +33,7 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
 
     private val navigationArgs: SnoozeBottomSheetDialogArgs by navArgs()
 
-    override val currentKSuite: KSuite by lazy { navigationArgs.currentKSuite }
+    override val currentKSuite: KSuite? by lazy { navigationArgs.currentKSuite }
 
     // Navigation args does not support nullable primitive types, so we use 0L
     // as a replacement (corresponding to Thursday 1 January 1970 00:00:00 UT).
@@ -55,10 +55,11 @@ class SnoozeBottomSheetDialog @Inject constructor() : SelectScheduleOptionBottom
     }
 
     override fun onCustomScheduleOptionClicked() {
+        val kSuite = currentKSuite
         val matomoName = MatomoName.SnoozeCustomDate.value
-        when (navigationArgs.currentKSuite) {
+        when (kSuite) {
             KSuite.Perso.Free -> openMyKSuiteUpgradeBottomSheet(matomoName)
-            KSuite.Pro.Free -> openKSuiteProBottomSheet(navigationArgs.currentKSuite, navigationArgs.isAdmin, matomoName)
+            KSuite.Pro.Free -> openKSuiteProBottomSheet(kSuite, navigationArgs.isAdmin, matomoName)
             else -> {
                 trackSnoozeEvent(MatomoName.CustomSchedule)
                 setBackNavigationResult(OPEN_SNOOZE_DATE_AND_TIME_PICKER, true)

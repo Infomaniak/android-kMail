@@ -69,13 +69,13 @@ class Mailbox : RealmObject {
     @SerialName("is_spam_filter")
     var isSpamFiltered: Boolean = false
     @SerialName("is_free")
-    var isKSuitePerso: Boolean = false // Means it's a personal Mailbox (and not a professional one), so any [KSuite.Perso.*] tier
+    var isKSuitePerso: Boolean = false // Means it's any [KSuite.Perso.*] tier
     @SerialName("is_limited")
-    var isKSuitePersoFree: Boolean = false // Means it's a free personal Mailbox, so specifically [KSuite.Perso.Free]
+    var isLimited: Boolean = false
     @SerialName("is_part_of_ksuite")
-    var isKSuitePro: Boolean = false // Means it's a professional Mailbox (and not a personal one), so any [KSuite.Pro.*] tier
+    var isKSuitePro: Boolean = false // Means it's any [KSuite.Pro.*] tier
     @SerialName("is_ksuite_essential")
-    var isKSuiteProFree: Boolean = false // Means it's a free professional Mailbox, so specifically [KSuite.Pro.Free]
+    var isKSuiteProFree: Boolean = false // Means it's a [KSuite.Pro.Free]
     @SerialName("owner_or_admin")
     var isAdmin: Boolean = false
     @Serializable(with = ZeroAsNullLongSerializer::class)
@@ -119,14 +119,14 @@ class Mailbox : RealmObject {
     val featureFlags = FeatureFlagSet(::_featureFlags)
     //endregion
 
-    inline val kSuite: KSuite
+    inline val kSuite: KSuite?
         get() = when {
             // For KSuite Pro tiers, only Free & Standard are relevant in kMail, all Pro paid tiers got the same functionalities
             isKSuitePro && isKSuiteProFree -> KSuite.Pro.Free
             isKSuitePro && !isKSuiteProFree -> KSuite.Pro.Standard
-            isKSuitePerso && isKSuitePersoFree -> KSuite.Perso.Free
-            isKSuitePerso && !isKSuitePersoFree -> KSuite.Perso.Plus
-            else -> KSuite.Pro.Enterprise // If we can't compute the KSuite, we fallback in a all-features unlocked mode
+            isKSuitePerso && isLimited -> KSuite.Perso.Free
+            isKSuitePerso && !isLimited -> KSuite.Perso.Plus
+            else -> null // It's an older offer, but it checks out.
         }
 
     inline val channelGroupId get() = "$mailboxId"
