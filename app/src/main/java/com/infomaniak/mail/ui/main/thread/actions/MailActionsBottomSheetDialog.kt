@@ -86,6 +86,7 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         move.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onMove() }
         // Not a setClosingOnClickListener because we need to send a setBackNavigationResult,
         // and setClosingOnClickListener closes before we had time to set the result
+        addReaction.setOnClickListener { onClickListener.onAddReaction() }
         snooze.setOnClickListener { onClickListener.onSnooze() }
         modifySnooze.setOnClickListener { onClickListener.onModifySnooze() }
         cancelSnooze.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onCancelSnooze() }
@@ -101,7 +102,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
         saveKDrive.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onSaveToKDrive() }
         reportDisplayProblem.setClosingOnClickListener(shouldCloseMultiSelection) { onClickListener.onReportDisplayProblem() }
-        addReaction.setOnClickListener { onClickListener.onAddReaction() }
 
         mainActions.setClosingOnClickListener(shouldCloseMultiSelection) { id: Int ->
             when (id) {
@@ -159,8 +159,8 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
     }
 
-    fun setReactionUi(canBeReact: Boolean) = with(binding.addReaction) {
-        isVisible = canBeReact
+    fun setReactionUi(canBeReactedTo: Boolean) = with(binding.addReaction) {
+        isVisible = canBeReactedTo
     }
 
     interface OnActionClick {

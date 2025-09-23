@@ -751,7 +751,7 @@ class ThreadFragment : Fragment() {
         }
 
         getBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET) { messageUid: String ->
-            navigateToReactionBottomSheet(messageUid, if (twoPaneViewModel.isThreadOpen) Thread else ThreadList)
+            navigateToEmojiPicker(messageUid, if (twoPaneViewModel.isThreadOpen) Thread else ThreadList)
         }
 
         getBackNavigationResult(SNOOZE_RESULT) { selectedScheduleEpoch: Long ->
@@ -992,10 +992,6 @@ class ThreadFragment : Fragment() {
 
     private fun navigateToSnoozeBottomSheet(snoozeScheduleType: SnoozeScheduleType?) {
         twoPaneFragment.navigateToSnoozeBottomSheet(snoozeScheduleType, threadViewModel.threadLive.value?.snoozeEndDate)
-    }
-
-    private fun navigateToReactionBottomSheet(messageUid: String, emojiPickerSourceKey: EmojiPickerSourceKey) {
-        twoPaneFragment.navigateToEmojiPicker(messageUid, emojiPickerSourceKey)
     }
 
     private fun unsnoozeThread(thread: Thread): Unit = with(binding) {

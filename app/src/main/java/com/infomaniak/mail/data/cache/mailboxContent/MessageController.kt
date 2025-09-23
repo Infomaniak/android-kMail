@@ -111,11 +111,11 @@ class MessageController @Inject constructor(
         return getLastMessageToExecuteActionWithExtraQuery(messages = messages) ?: messages.last()
     }
 
-    suspend fun getLastMessageCanBeReact(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message? {
-        val isValidReactionTarget = "${Message::_emojiReactionNotAllowedReason.name} == null"
+    suspend fun getLastMessageToExecuteReaction(thread: Thread, featureFlags: Mailbox.FeatureFlagSet?): Message? {
+        val canBeReactedTo = "${Message::_emojiReactionNotAllowedReason.name} == null"
 
         val messages = thread.getDisplayedMessages(featureFlags, this@MessageController.localSettings)
-        return getLastMessageToExecuteActionWithExtraQuery(messages, extraQuery = isValidReactionTarget)
+        return getLastMessageToExecuteActionWithExtraQuery(messages, extraQuery = canBeReactedTo)
     }
 
     suspend fun getLastMessageAndItsDuplicatesToExecuteAction(

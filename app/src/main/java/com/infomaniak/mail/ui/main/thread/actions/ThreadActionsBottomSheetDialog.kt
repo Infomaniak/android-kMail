@@ -81,8 +81,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.threadMessageWithActionAndReact
-            .observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageCanBeReactUid) ->
+        threadActionsViewModel.threadMessagesWithActionAndReact
+            .observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageUidToReactTo) ->
                 folderRole = folderRoleUtils.getActionFolderRole(thread)
                 isFromArchive = folderRole == FolderRole.ARCHIVE
                 isFromSpam = folderRole == FolderRole.SPAM
@@ -92,9 +92,9 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 setFavoriteUi(thread.isFavorite)
                 setJunkUi()
                 setSnoozeUi(thread.isSnoozed())
-                setReactionUi(messageCanBeReactUid != null)
+                setReactionUi(canBeReactedTo = messageUidToReactTo != null)
 
-                initOnClickListener(onActionClick(thread, messageUidToExecuteAction))
+                initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
             }
     }
 
@@ -119,7 +119,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         isVisible = true
     }
 
-    private fun onActionClick(thread: Thread, messageUidToExecuteAction: String) = object : OnActionClick {
+    private fun onActionClick(thread: Thread, messageUidToExecuteAction: String, messageUidToReactTo: String?) = object : OnActionClick {
         //region Main actions
         override fun onReply() {
             trackBottomSheetThreadActionsEvent(MatomoName.Reply)
@@ -185,6 +185,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
         }
 
+        override fun onAddReaction() {
+            trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
+            setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUidToReactTo)
+        }
+
         override fun onSnooze() {
             trackBottomSheetThreadActionsEvent(MatomoName.Snooze)
             setBackNavigationResult(OPEN_SNOOZE_BOTTOM_SHEET, SnoozeScheduleType.Snooze(thread.uid))
@@ -244,11 +249,6 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 description = getString(R.string.reportDisplayProblemDescription),
                 onPositiveButtonClicked = { mainViewModel.reportDisplayProblem(messageUidToExecuteAction) },
             )
-        }
-
-        override fun onAddReaction() {
-            trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
-            setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUidToExecuteAction)
         }
         //endregion
     }
