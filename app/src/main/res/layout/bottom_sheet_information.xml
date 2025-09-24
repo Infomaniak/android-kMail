@@ -39,14 +39,16 @@
             tools:visibility="visible" />
 
         <!-- We set the height at 0dp here as layout_height is required, but setting a real value must be done programmatically. -->
-        <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/info_animation"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginBottom="@dimen/marginStandardMedium"
             android:importantForAccessibility="no"
             android:maxHeight="@dimen/discoveryIllustrationHeight"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true" />
     </FrameLayout>
 
     <TextView

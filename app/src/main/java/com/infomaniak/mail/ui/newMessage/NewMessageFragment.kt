@@ -46,7 +46,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.core.dotlottie.extensions.DotLottieExt.loadUiTestSafe
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
@@ -110,7 +109,6 @@ import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.changeToolbarColorOnScroll
 import com.infomaniak.mail.utils.extensions.enableAlgorithmicDarkening
 import com.infomaniak.mail.utils.extensions.getAttributeColor
-import com.infomaniak.mail.utils.extensions.getEuriaAnimationConfig
 import com.infomaniak.mail.utils.extensions.ime
 import com.infomaniak.mail.utils.extensions.initWebViewClientAndBridge
 import com.infomaniak.mail.utils.extensions.loadCss
@@ -120,7 +118,6 @@ import com.infomaniak.mail.utils.extensions.systemBars
 import com.infomaniak.mail.utils.extensions.valueOrEmpty
 import com.infomaniak.mail.utils.openKSuiteProBottomSheet
 import com.infomaniak.mail.utils.openMyKSuiteUpgradeBottomSheet
-import com.lottiefiles.dotlottie.core.util.DotLottieSource
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -459,7 +456,7 @@ class NewMessageFragment : Fragment() {
         handleEditorPlaceholderVisibility()
 
         // Not showing the Lottie because it prevents the UI to settle which is breaking tests.
-        editorAiAnimation.loadUiTestSafe(DotLottieSource.Res(R.raw.euria).getEuriaAnimationConfig())
+        editorAiAnimation.setAnimation(R.raw.euria)
 
         setToolbarEnabledStatus(false)
         disableButtonsWhenFocusIsLost()

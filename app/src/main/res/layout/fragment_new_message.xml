@@ -618,11 +618,13 @@
                                     android:layout_height="match_parent"
                                     android:background="?android:attr/selectableItemBackgroundBorderless">
 
-                                    <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
+                                    <com.airbnb.lottie.LottieAnimationView
                                         android:id="@+id/editorAiAnimation"
                                         android:layout_width="@dimen/standardIconSize"
                                         android:layout_height="@dimen/standardIconSize"
-                                        android:layout_gravity="center" />
+                                        android:layout_gravity="center"
+                                        app:lottie_autoPlay="true"
+                                        app:lottie_loop="true" />
                                 </FrameLayout>
                             </LinearLayout>
 
