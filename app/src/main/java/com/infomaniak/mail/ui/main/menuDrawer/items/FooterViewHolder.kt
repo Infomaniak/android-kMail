@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menuDrawer.items
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -34,6 +35,7 @@ class FooterViewHolder(
 
     override val binding = super.binding as ItemMenuDrawerFooterBinding
 
+    @SuppressLint("SetTextI18n")
     fun displayFooter(
         footer: MenuDrawerFooter,
         onFeedbackClicked: () -> Unit,
@@ -53,7 +55,7 @@ class FooterViewHolder(
         storageLayout.isVisible = isLimited
         storageDivider.isVisible = isLimited
         if (isLimited) {
-            storageText.text = footer.quotas!!.getText(context)
+            storageText.text = footer.quotas.getText(context)
             storageIndicator.progress = footer.quotas.getProgress()
         }
 

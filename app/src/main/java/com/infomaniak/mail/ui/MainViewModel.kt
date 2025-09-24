@@ -464,7 +464,7 @@ class MainViewModel @Inject constructor(
             with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
                 if (isSuccess()) {
                     mailboxController.updateMailbox(mailbox.objectId) {
-                        it.quotas = data
+                        it.quotas = data?.apply { maxStorage = it.maxStorage }
                     }
                 }
             }

@@ -77,6 +77,8 @@ class Mailbox : RealmObject {
     var isKSuiteProFree: Boolean = false // Means it's a free professional Mailbox, so specifically [KSuite.Pro.Free]
     @SerialName("owner_or_admin")
     var isAdmin: Boolean = false
+    @SerialName("max_storage")
+    var maxStorage: Long = 0L // 0 means unlimited
     //endregion
 
     //region Local data (Transient)
