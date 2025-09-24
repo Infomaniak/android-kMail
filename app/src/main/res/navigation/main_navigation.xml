@@ -251,7 +251,8 @@
             app:argType="long" />
         <argument
             android:name="currentKSuite"
-            app:argType="com.infomaniak.core.ksuite.data.KSuite" />
+            app:argType="com.infomaniak.core.ksuite.data.KSuite"
+            app:nullable="true" />
         <argument
             android:name="isAdmin"
             app:argType="boolean" />
@@ -272,7 +273,8 @@
             app:argType="long" />
         <argument
             android:name="currentKSuite"
-            app:argType="com.infomaniak.core.ksuite.data.KSuite" />
+            app:argType="com.infomaniak.core.ksuite.data.KSuite"
+            app:nullable="true" />
         <argument
             android:name="isAdmin"
             app:argType="boolean" />

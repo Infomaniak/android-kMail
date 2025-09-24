@@ -461,7 +461,7 @@ class MainViewModel @Inject constructor(
     private fun updateQuotas(mailbox: Mailbox) = viewModelScope.launch(ioCoroutineContext) {
         SentryLog.d(TAG, "Force refresh Quotas")
 
-        if (mailbox.kSuite.isFreeTier()) {
+        if (mailbox.isLimited) {
             with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
                 if (isSuccess()) {
                     mailboxController.updateMailbox(mailbox.objectId) {
@@ -471,7 +471,6 @@ class MainViewModel @Inject constructor(
                 }
             }
         } else {
-            // Currently, all paid-tiers (Perso & Pro) got unlimited quotas. Unlimited = null.
             mailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = null
             }

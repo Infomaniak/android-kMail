@@ -237,10 +237,11 @@ class NewMessageAiManager @Inject constructor(
 
     fun openAiPrompt() = fragment.lifecycleScope.launch {
         val mailbox = newMessageViewModel.currentMailbox()
+        val kSuite = mailbox.kSuite
         val matomoName = MatomoName.AiWriter.value
-        when (mailbox.kSuite) {
+        when (kSuite) {
             KSuite.Perso.Free -> fragment.openMyKSuiteUpgradeBottomSheet(matomoName)
-            KSuite.Pro.Free -> fragment.openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
+            KSuite.Pro.Free -> fragment.openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
             else -> aiViewModel.aiPromptOpeningStatus.value = AiPromptOpeningStatus(isOpened = true)
         }
     }

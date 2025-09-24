@@ -40,6 +40,7 @@ val MAILBOX_INFO_MIGRATION = AutomaticSchemaMigration { migrationContext ->
     migrationContext.deleteRealmFromFirstMigration()
     migrationContext.keepDefaultValuesAfterSixthMigration()
     migrationContext.renameKSuiteRelatedBooleans()
+    migrationContext.revertKSuiteRelatedBooleanRenaming()
 }
 
 val MAILBOX_CONTENT_MIGRATION = AutomaticSchemaMigration { migrationContext ->
@@ -101,7 +102,23 @@ private fun MigrationContext.renameKSuiteRelatedBooleans() {
                 }
 
                 // Rename property without losing its previous value
-                set(propertyName = "isKSuitePersoFree", value = oldObject.getValue<Boolean>(fieldName = "isLimited"))
+                setIfPropertyExists(propertyName = "isKSuitePersoFree", value = oldObject.getValue<Boolean>(fieldName = "isLimited"))
+            }
+        }
+    }
+}
+
+// Migrate from version #11
+private fun MigrationContext.revertKSuiteRelatedBooleanRenaming() {
+
+    if (oldRealm.schemaVersion() <= 11L) {
+        enumerate(className = "Mailbox") { oldObject: DynamicRealmObject, newObject: DynamicMutableRealmObject? ->
+
+            newObject?.apply {
+                // Rename property without losing its previous value
+                oldObject.getValueOrNull<Boolean>(fieldName = "isKSuitePersoFree")?.let {
+                    set(propertyName = "isLimited", value = it)
+                }
             }
         }
     }

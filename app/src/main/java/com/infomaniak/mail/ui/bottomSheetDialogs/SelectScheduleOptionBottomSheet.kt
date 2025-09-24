@@ -65,7 +65,7 @@ abstract class SelectScheduleOptionBottomSheet : BottomSheetDialogFragment() {
 
     abstract val lastSelectedEpoch: Long?
     abstract val currentlyScheduledEpochMillis: Long?
-    abstract val currentKSuite: KSuite
+    abstract val currentKSuite: KSuite?
 
     @get:StringRes
     abstract val titleRes: Int

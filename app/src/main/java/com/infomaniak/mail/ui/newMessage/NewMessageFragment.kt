@@ -46,10 +46,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.dotlottie.extensions.DotLottieExt.loadUiTestSafe
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.ksuite.data.KSuite
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
-import com.infomaniak.core.dotlottie.extensions.DotLottieExt.loadUiTestSafe
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.getBackNavigationResult
@@ -883,10 +883,11 @@ class NewMessageFragment : Fragment() {
         if (isMailboxFull) {
             trackNewMessageEvent(MatomoName.TrySendingWithMailboxFull)
 
+            val kSuite = mailbox.kSuite
             val matomoName = MatomoKSuite.NOT_ENOUGH_STORAGE_UPGRADE_NAME
-            val onActionClicked: (() -> Unit)? = when (mailbox.kSuite) {
+            val onActionClicked: (() -> Unit)? = when (kSuite) {
                 KSuite.Perso.Free -> fun() = openMyKSuiteUpgradeBottomSheet(matomoName)
-                KSuite.Pro.Free -> fun() = openKSuiteProBottomSheet(mailbox.kSuite, mailbox.isAdmin, matomoName)
+                KSuite.Pro.Free -> fun() = openKSuiteProBottomSheet(kSuite, mailbox.isAdmin, matomoName)
                 else -> null
             }
 
