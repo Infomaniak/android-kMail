@@ -102,7 +102,7 @@ private fun MigrationContext.renameKSuiteRelatedBooleans() {
                 }
 
                 // Rename property without losing its previous value
-                set(propertyName = "isKSuitePersoFree", value = oldObject.getValue<Boolean>(fieldName = "isLimited"))
+                setIfPropertyExists(propertyName = "isKSuitePersoFree", value = oldObject.getValue<Boolean>(fieldName = "isLimited"))
             }
         }
     }
