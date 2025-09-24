@@ -172,6 +172,9 @@
     <color name="commonColor10">#E4E4E4</color>
     <color name="commonColor11">#626262</color>
 
+    <!-- Theme colors -->
+    <color name="customMaterialDynamicPrimaryContainer">@color/material_dynamic_primary20</color>
+
     <!-- Other -->
     <color name="textInputStrokeColor">@color/shark</color>
     <color name="toggleableTextFormatterBackgroundColor">@color/mouse</color>
