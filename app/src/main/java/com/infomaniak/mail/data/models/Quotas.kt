@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,22 +36,34 @@ class Quotas : EmbeddedRealmObject {
 
     //region Local data (Transient)
     @Transient
-    var maxStorage: Long = 0L // 0 means unlimited
+    private var maxStorage: Long? = null
     //endregion
 
     val size: Long get() = _size * 1_024L // Convert from KiloOctets to Octets
 
-    val isFull get() = getProgress() >= 100
+    val isFull: Boolean
+        get() {
+            val progress = getProgress()
+            return progress != null && progress >= 100
+        }
+
+    /**
+     * Stores the max storage data at the quota level to avoid having to access
+     * a mailbox instance everytime we want to compute the progress of a quota.
+     */
+    fun initMaxStorage(maxStorage: Long?) {
+        this.maxStorage = maxStorage
+    }
 
     fun getText(context: Context): String {
 
         val usedSize = context.formatShortFileSize(size)
-        val maxSize = context.formatShortFileSize(maxStorage)
+        val maxSize = maxStorage?.let { context.formatShortFileSize(it) }
 
         return context.getString(R.string.menuDrawerMailboxStorage, usedSize, maxSize)
     }
 
-    fun getProgress(): Int = ceil(100.0f * size.toFloat() / maxStorage.toFloat()).toInt()
+    fun getProgress(): Int? = maxStorage?.let { ceil(100.0f * size.toFloat() / it.toFloat()).toInt() }
 
     companion object
 }

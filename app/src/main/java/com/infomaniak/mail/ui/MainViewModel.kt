@@ -241,12 +241,13 @@ class MainViewModel @Inject constructor(
     }.asLiveData(ioCoroutineContext)
 
     val storageBannerStatus = currentQuotasLive.map { quotas ->
+        val progress = quotas?.getProgress()
         when {
             quotas == null -> null
             quotas.isFull -> {
                 if (currentMailbox.value?.kSuite is KSuite.Perso) StorageLevel.Full.Perso else StorageLevel.Full.Pro
             }
-            quotas.getProgress() > StorageLevel.WARNING_THRESHOLD -> {
+            progress != null && progress > StorageLevel.WARNING_THRESHOLD -> {
                 if (!localSettings.hasClosedStorageBanner || localSettings.storageBannerDisplayAppLaunches % 10 == 0) {
                     localSettings.hasClosedStorageBanner = false
                     if (currentMailbox.value?.kSuite is KSuite.Perso) StorageLevel.Warning.Perso else StorageLevel.Warning.Pro
@@ -464,7 +465,8 @@ class MainViewModel @Inject constructor(
             with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
                 if (isSuccess()) {
                     mailboxController.updateMailbox(mailbox.objectId) {
-                        it.quotas = data?.apply { maxStorage = it.maxStorage }
+                        data?.initMaxStorage(it.maxStorage)
+                        it.quotas = data
                     }
                 }
             }

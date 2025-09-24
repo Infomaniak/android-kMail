@@ -56,7 +56,7 @@ class FooterViewHolder(
         storageDivider.isVisible = isLimited
         if (isLimited) {
             storageText.text = footer.quotas.getText(context)
-            storageIndicator.progress = footer.quotas.getProgress()
+            storageIndicator.progress = footer.quotas.getProgress() ?: 0
         }
 
         // App version

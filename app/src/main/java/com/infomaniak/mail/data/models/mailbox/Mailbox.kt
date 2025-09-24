@@ -78,7 +78,7 @@ class Mailbox : RealmObject {
     @SerialName("owner_or_admin")
     var isAdmin: Boolean = false
     @SerialName("max_storage")
-    var maxStorage: Long = 0L // 0 means unlimited
+    var maxStorage: Long? = null
     //endregion
 
     //region Local data (Transient)
