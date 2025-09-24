@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:icon="@drawable/ic_face_smile"
-            app:title="@string/buttonAddReaction"
+            app:title="@string/actionAddReaction"
             app:visibleDivider="false"
             tools:visibility="visible"/>
 
