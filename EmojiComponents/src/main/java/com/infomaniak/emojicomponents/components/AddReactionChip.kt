@@ -51,7 +51,7 @@ internal fun AddReactionChip(
         content = {
             Icon(
                 icon,
-                stringResource(R.string.buttonAddReaction),
+                stringResource(R.string.actionAddReaction),
                 modifier = Modifier.size(Margin.Large),
             )
         },
