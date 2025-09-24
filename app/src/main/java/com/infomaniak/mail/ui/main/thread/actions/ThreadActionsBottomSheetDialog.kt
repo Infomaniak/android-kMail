@@ -28,7 +28,6 @@ import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.core.observe
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
-import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -190,7 +189,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         }
 
         override fun onAddReaction() {
-            trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
+            trackBottomSheetThreadActionsEvent(MatomoName.OpenEmojiPicker)
             setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUidToReactTo)
         }
 

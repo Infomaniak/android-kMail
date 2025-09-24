@@ -29,7 +29,6 @@ import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackBottomSheetMessageActionsEvent
 import com.infomaniak.mail.MatomoMail.trackBottomSheetThreadActionsEvent
-import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -156,7 +155,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             }
 
             override fun onAddReaction() {
-                trackEmojiReactionsEvent(MatomoName.OpenEmojiPicker)
+                trackBottomSheetMessageActionsEvent(MatomoName.OpenEmojiPicker)
                 setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUid)
             }
 
