@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2022-2024 Infomaniak Network SA
+ * Copyright (C) 2022-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,30 +23,47 @@ import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlin.math.ceil
 
 @Serializable
 class Quotas : EmbeddedRealmObject {
 
+    //region Remote data
     @SerialName("size")
     private var _size: Long = 0L
+    //endregion
+
+    //region Local data (Transient)
+    @Transient
+    private var maxStorage: Long? = null
+    //endregion
 
     val size: Long get() = _size * 1_024L // Convert from KiloOctets to Octets
 
-    val isFull get() = getProgress() >= 100
+    val isFull: Boolean
+        get() {
+            val progress = getProgress()
+            return progress != null && progress >= 100
+        }
+
+    /**
+     * Stores the max storage data at the quota level to avoid having to access
+     * a mailbox instance everytime we want to compute the progress of a quota.
+     */
+    fun initMaxStorage(maxStorage: Long?) {
+        this.maxStorage = maxStorage
+    }
 
     fun getText(context: Context): String {
 
         val usedSize = context.formatShortFileSize(size)
-        val maxSize = context.formatShortFileSize(QUOTAS_MAX_SIZE)
+        val maxSize = maxStorage?.let { context.formatShortFileSize(it) }
 
         return context.getString(R.string.menuDrawerMailboxStorage, usedSize, maxSize)
     }
 
-    fun getProgress(): Int = ceil(100.0f * size.toFloat() / QUOTAS_MAX_SIZE.toFloat()).toInt()
+    fun getProgress(): Int? = maxStorage?.let { ceil(100.0f * size.toFloat() / it.toFloat()).toInt() }
 
-    companion object {
-        // TODO: Get this value from API ? If the free IK.ME storage size change, we won't know it.
-        private const val QUOTAS_MAX_SIZE = 20L * 1_024L * 1_024L * 1_024L // 20 GB
-    }
+    companion object
 }
