@@ -423,7 +423,7 @@ class ThreadAdapter(
 
         setDetailedFieldsVisibility(message)
 
-        if (isCollapsable) handleHeaderClick(message)
+        handleHeaderClick(message, isCollapsable)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -435,19 +435,23 @@ class ThreadAdapter(
         bccGroup.isVisible = message.bcc.isNotEmpty()
     }
 
-    private fun MessageViewHolder.handleHeaderClick(message: Message) = with(threadAdapterState) {
-        binding.messageHeader.setOnClickListener {
-            if (isExpandedMap[message.uid] == true) {
-                isExpandedMap[message.uid] = false
-                onExpandOrCollapseMessage(message)
-            } else {
-                if (message.isDraft) {
-                    threadAdapterCallbacks?.onDraftClicked?.invoke(message)
-                } else {
-                    isExpandedMap[message.uid] = true
+    private fun MessageViewHolder.handleHeaderClick(message: Message, isCollapsable: Boolean) = with(threadAdapterState) {
+        if (isCollapsable) {
+            binding.messageHeader.setOnClickListener {
+                if (isExpandedMap[message.uid] == true) {
+                    isExpandedMap[message.uid] = false
                     onExpandOrCollapseMessage(message)
+                } else {
+                    if (message.isDraft) {
+                        threadAdapterCallbacks?.onDraftClicked?.invoke(message)
+                    } else {
+                        isExpandedMap[message.uid] = true
+                        onExpandOrCollapseMessage(message)
+                    }
                 }
             }
+        } else {
+            binding.messageHeader.setOnClickListener(null)
         }
     }
 
