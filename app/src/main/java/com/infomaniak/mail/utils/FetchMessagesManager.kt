@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.RefreshController.RefreshMo
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.mailbox.Mailbox
+import com.infomaniak.mail.data.models.message.FormatedPreview
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior
 import com.infomaniak.mail.utils.NotificationPayload.NotificationBehavior.NotificationType
@@ -212,22 +213,22 @@ class FetchMessagesManager @Inject constructor(
         // We can leave safely.
         if (message.isSeen) return true
 
-        val formattedPreview = message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
-        val body = if (message.body?.value.isNullOrBlank()) {
-            formattedPreview
-        } else {
+        val formattedPreview = message.getFormattedPreview(appContext)
+        val notificationBody = "\n" + if (formattedPreview is FormatedPreview.Body) {
             message.body
                 ?.let {
                     val content = MessageBodyUtils.splitContentAndQuote(it).content
                     val dirtyDocument = content.removeLineBreaksFromHtml()
                     val cleanedDocument = HtmlSanitizer.getInstance().sanitize(dirtyDocument)
-                    return@let "\n${cleanedDocument.wholeText().trim()}"
+                    return@let cleanedDocument.wholeText().trim()
                 }
-                ?: formattedPreview
+                ?: formattedPreview.content
+        } else {
+            formattedPreview.content
         }
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
-        val formattedBody = body.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
+        val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
         val description = "$subject$formattedBody".take(MAX_CHAR_LIMIT)
 
         // Show Message notification

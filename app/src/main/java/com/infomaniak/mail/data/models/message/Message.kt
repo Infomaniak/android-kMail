@@ -19,8 +19,10 @@
 
 package com.infomaniak.mail.data.models.message
 
+import android.content.Context
 import com.infomaniak.core.utils.apiEnum
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -412,6 +414,13 @@ class Message : RealmObject, Snoozable {
 
     fun updateSnoozeFlags(flags: SnoozeMessageFlags) {
         snoozeEndDate = flags.snoozeEndDate.toRealmInstant()
+    }
+
+    fun getFormattedPreview(context: Context): FormatedPreview = when {
+        isEncrypted -> FormatedPreview.Encryption(context.getString(R.string.encryptedMessageHeader))
+        isReaction -> FormatedPreview.Reaction(context.getString(R.string.previewReaction, from.first().name, emojiReaction))
+        preview.isBlank() -> FormatedPreview.Empty(context.getString(R.string.noBodyDescription))
+        else -> FormatedPreview.Body(preview.trim())
     }
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)

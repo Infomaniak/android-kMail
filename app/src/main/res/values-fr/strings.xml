@@ -433,7 +433,7 @@
     </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="nextMonday">Lundi prochain</string>
-    <string name="noBodyTitle">Ce message est vide.</string>
+    <string name="noBodyDescription">Ce message est vide.</string>
     <string name="noConversationSelected">Aucune conversation sélectionnée dans %s</string>
     <string name="noFolderTitle">Vous n’avez pas encore de dossier…</string>
     <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
@@ -466,6 +466,7 @@
     <string name="pickerNoSelection">Aucune sélection</string>
     <string name="popupDetachMailboxDescription">Êtes-vous sûr de vouloir détacher l’adresse %s ?</string>
     <string name="popupDetachMailboxTitle">Détacher l’adresse</string>
+    <string name="previewReaction">%2$s %1$s a réagi</string>
     <string name="readFAQ">Consulter les FAQ</string>
     <string name="readMore">En savoir plus</string>
     <string name="recentSearchesTitle">Recherches récentes</string>

@@ -424,7 +424,7 @@
     </plurals>
     <string name="newMessagePlaceholderTitle">Digitare il messaggio</string>
     <string name="nextMonday">Lunedì prossimo</string>
-    <string name="noBodyTitle">Questo messaggio è vuoto.</string>
+    <string name="noBodyDescription">Questo messaggio è vuoto.</string>
     <string name="noConversationSelected">Nessuna conversazione selezionata in %s</string>
     <string name="noFolderTitle">Non hai ancora nessuna cartella…</string>
     <string name="noMailboxDescription">Non hai un indirizzo e-mail associato al tuo account Infomaniak. Per aggiungere un indirizzo, toccare il pulsante sottostante.</string>
@@ -457,6 +457,7 @@
     <string name="pickerNoSelection">Nessuna selezione</string>
     <string name="popupDetachMailboxDescription">Sei sicuro di voler staccare l’indirizzo %s?</string>
     <string name="popupDetachMailboxTitle">Staccare l’indirizzo</string>
+    <string name="previewReaction">%2$s %1$s ha reagito</string>
     <string name="readFAQ">Leggi le FAQ</string>
     <string name="readMore">Per saperne di più</string>
     <string name="recentSearchesTitle">Ricerche recenti</string>
