@@ -28,7 +28,8 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.ThreadMessageToExecuteAction
+import com.infomaniak.mail.utils.ThreadMessageInteraction
+import com.infomaniak.mail.utils.ThreadMessageToExecuteInteraction
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.invoke
@@ -54,18 +56,18 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val threadUid inline get() = savedStateHandle.get<String>(ThreadActionsBottomSheetDialogArgs::threadUid.name)!!
 
-    private val threadMessageToExecuteAction: Flow<ThreadMessageToExecuteAction> = threadController.getThreadAsync(threadUid)
+    private val threadMessageToExecuteAction: Flow<ThreadMessageInteraction> = threadController.getThreadAsync(threadUid)
         .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
 
-    private val threadMessageCanBeReact: Flow<ThreadMessageToExecuteAction> = threadController.getThreadAsync(threadUid)
-        .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidCanBeReact(thread) } }
+    private val threadMessageToExecuteReaction: Flow<ThreadMessageInteraction?> = threadController.getThreadAsync(threadUid)
+        .map { it.obj?.let { thread -> getThreadAndMessageToExecuteReaction(thread) } }
 
-    val threadMessagesWithActionAndReact: SharedFlow<ThreadMessageToExecuteAction> =
-        combine(threadMessageToExecuteAction, threadMessageCanBeReact) { messageToExecuteActions, messageCanBeReact ->
-            ThreadMessageToExecuteAction(
+    val threadMessagesWithActionAndReact: SharedFlow<ThreadMessageToExecuteInteraction> =
+        combine(threadMessageToExecuteAction, threadMessageToExecuteReaction) { messageToExecuteActions, messageToExecuteReaction ->
+            ThreadMessageToExecuteInteraction(
                 messageToExecuteActions.thread,
                 messageToExecuteActions.messageUid,
-                messageCanBeReact.messageUid
+                messageToExecuteReaction?.messageUid
             )
         }
         .shareIn(scope = viewModelScope, started = SharingStarted.Eagerly, replay = 1)
@@ -77,13 +79,13 @@ class ThreadActionsViewModel @Inject constructor(
 
     private val featureFlagsLive = currentMailboxLive.map { it.featureFlags }
 
-    private suspend fun getThreadAndMessageUidToExecuteAction(thread: Thread): ThreadMessageToExecuteAction {
+    private suspend fun getThreadAndMessageUidToExecuteAction(thread: Thread): ThreadMessageInteraction {
         val messageUid = ioDispatcher { messageController.getLastMessageToExecuteAction(thread, featureFlagsLive.value).uid }
-        return ThreadMessageToExecuteAction(thread, messageUid, null)
+        return ThreadMessageInteraction.Action(thread, messageUid)
     }
 
-    private suspend fun getThreadAndMessageUidCanBeReact(thread: Thread): ThreadMessageToExecuteAction? {
+    private suspend fun getThreadAndMessageToExecuteReaction(thread: Thread): ThreadMessageInteraction? {
         val messageUid = ioDispatcher { messageController.getLastMessageToExecuteReaction(thread, featureFlagsLive.value)?.uid }
-        return messageUid?.let { ThreadMessageToExecuteAction(thread, it, it) }
+        return messageUid?.let { ThreadMessageInteraction.Reaction(thread, it) }
     }
 }
