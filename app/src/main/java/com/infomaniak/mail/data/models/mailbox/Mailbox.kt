@@ -21,6 +21,7 @@ package com.infomaniak.mail.data.models.mailbox
 
 import androidx.core.app.NotificationManagerCompat
 import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.mail.data.api.ZeroAsNullLongSerializer
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.FeatureFlag
 import com.infomaniak.mail.data.models.Quotas
@@ -77,6 +78,7 @@ class Mailbox : RealmObject {
     var isKSuiteProFree: Boolean = false // Means it's a free professional Mailbox, so specifically [KSuite.Pro.Free]
     @SerialName("owner_or_admin")
     var isAdmin: Boolean = false
+    @Serializable(with = ZeroAsNullLongSerializer::class)
     @SerialName("max_storage")
     var maxStorage: Long? = null
     //endregion
