@@ -26,10 +26,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      # Link: https://httgp.com/signing-commits-in-github-actions/
+      # Context: https://httgp.com/signing-commits-in-github-actions
+      # Link: https://github.com/crazy-max/ghaction-import-gpg/releases
       - name: Import bot's GPG key for signing commits
         id: import-gpg
-        uses: crazy-max/ghaction-import-gpg@v6.3.0
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
         with:
           gpg_private_key: ${{ secrets.BOT_MOBILE_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.BOT_MOBILE_GPG_PASSPHRASE }}
@@ -51,9 +52,10 @@ jobs:
           git push --force-with-lease
           git status
 
-      # Link: https://github.com/marketplace/actions/actions-ecosystem-remove-labels
+      # Context: https://github.com/marketplace/actions/actions-ecosystem-remove-labels
+      # Link: https://github.com/actions-ecosystem/action-remove-labels/releases
       - name: remove label
         if: always()
-        uses: actions-ecosystem/action-remove-labels@v1.3.0
+        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0 # v1.3.0
         with:
           labels: rebase
