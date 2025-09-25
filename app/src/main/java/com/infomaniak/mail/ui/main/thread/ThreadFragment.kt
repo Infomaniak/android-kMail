@@ -569,7 +569,12 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            threadAdapter.submitList(items)
+            val messageCountBeforeUpdate = threadAdapter.messageCount
+            threadAdapter.submitList(items) {
+                if (messageCountBeforeUpdate > 0 && messageCountBeforeUpdate != threadAdapter.messageCount) {
+                    threadAdapter.messageCountChange()
+                }
+            }
 
             if (messagesToFetch.isNotEmpty()) fetchMessagesHeavyData(messagesToFetch)
 
