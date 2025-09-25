@@ -50,6 +50,11 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppThemeCollapsingToolbarLayoutTheme</item>
         <item name="colorAccent">?attr/colorPrimary</item>
+        <!--Custom color to fix the material expressive palette. The tone has changed and the design of the pink and blue themes
+        expected a tone around 90/20 for light/dark. This modifies the material palette to adjust this color role which is used a
+        lot through the app-->
+        <item name="colorPrimaryContainer">@color/customMaterialDynamicPrimaryContainer</item>
+        <item name="colorOnPrimaryContainer">?attr/colorPrimary</item>
         <item name="colorControlHighlight">@color/color_primary_translucent_ripple</item>
         <item name="colorError">@color/redDestructiveAction</item>
         <item name="colorOnSurface">@color/onBottomSheetBackgroundColor</item> <!--Bottom sheet content color-->

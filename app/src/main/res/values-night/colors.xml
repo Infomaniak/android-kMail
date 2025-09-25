@@ -22,12 +22,10 @@
     <color name="pinkMailInverse">@color/pink_mail_primary_light</color>
     <color name="pinkMailOnPrimary">@color/pink_mail_on_primary_dark</color>
     <color name="pinkMailContainer">@color/pink_mail_container_dark</color>
-    <color name="pinkOnboardingSecondaryBackground">@color/bat</color>
     <color name="blueMail">@color/blue_mail_primary_dark</color>
     <color name="blueMailInverse">@color/blue_mail_primary_light</color>
     <color name="blueMailOnPrimary">@color/blue_mail_on_primary_dark</color>
     <color name="blueMailContainer">@color/blue_mail_container_dark</color>
-    <color name="blueOnboardingSecondaryBackground">@color/bat</color>
 
     <!-- Context / errors -->
     <color name="greenSuccess">@color/grass_dark</color>
@@ -173,6 +171,9 @@
     <color name="commonColor9">#EAEAEA</color>
     <color name="commonColor10">#E4E4E4</color>
     <color name="commonColor11">#626262</color>
+
+    <!-- Theme colors -->
+    <color name="customMaterialDynamicPrimaryContainer">@color/material_dynamic_primary20</color>
 
     <!-- Other -->
     <color name="textInputStrokeColor">@color/shark</color>

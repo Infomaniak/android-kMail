@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak Mail - Android
-  ~ Copyright (C) 2023-2025 Infomaniak Network SA
+  ~ Copyright (C) 2022-2025 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,6 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/colorOnPrimary" android:state_focused="true" />
-    <item android:color="?attr/colorOnPrimaryContainer" />
+    <item android:color="?attr/colorOnPrimaryContainer" android:state_checked="true" />
+    <item android:color="@color/primaryTextColor" android:state_checked="false" />
 </selector>
