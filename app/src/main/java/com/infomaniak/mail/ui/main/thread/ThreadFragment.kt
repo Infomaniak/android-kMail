@@ -84,7 +84,6 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
@@ -570,7 +569,12 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            threadAdapter.submitList(items)
+            val messageCountBeforeUpdate = threadAdapter.messageCount
+            threadAdapter.submitList(items) {
+                if (messageCountBeforeUpdate > 0 && messageCountBeforeUpdate != threadAdapter.messageCount) {
+                    threadAdapter.messageCountChange()
+                }
+            }
 
             if (messagesToFetch.isNotEmpty()) fetchMessagesHeavyData(messagesToFetch)
 

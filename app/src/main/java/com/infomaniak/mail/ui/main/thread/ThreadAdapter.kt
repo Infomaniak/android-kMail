@@ -108,6 +108,7 @@ class ThreadAdapter(
 ) : ListAdapter<Any, ThreadAdapterViewHolder>(MessageDiffCallback()) {
 
     inline val items: List<Any> get() = currentList
+    val messageCount: Int get() = runCatchingRealm { items.count { it is MessageUi } }.getOrDefault(0)
 
     //region Auto-scroll at Thread opening
     private val currentSetOfLoadedExpandedMessagesUids = mutableSetOf<String>()
@@ -175,6 +176,7 @@ class ThreadAdapter(
                 NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.message.uid)
                 NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item.message)
                 NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item)
+                NotifyType.MESSAGE_COUNT_CHANGED -> holder.handleItemsCountChangedPayload(item.message)
             }
         }
     }.getOrDefault(Unit)
@@ -199,6 +201,14 @@ class ThreadAdapter(
         emojiReactions.bindEmojiReactions(message)
     }
 
+    private fun MessageViewHolder.handleItemsCountChangedPayload(message: Message) {
+        handleHeaderClick(message, messageCount > 1)
+        if (messageCount == 1) {
+            threadAdapterState.isExpandedMap[message.uid] = true
+            onExpandOrCollapseMessage(message)
+        }
+    }
+
     private fun EmojiReactionsView.bindEmojiReactions(message: MessageUi) {
         val canBeReactedTo by lazy { message.canBeReactedTo() }
 
@@ -219,7 +229,7 @@ class ThreadAdapter(
         }
 
         if (item is MessageUi) {
-            (holder as MessageViewHolder).bindMail(item, position, isCollapsable = items.count() > 1)
+            (holder as MessageViewHolder).bindMail(item, position, isCollapsable = messageCount > 1)
         } else {
             (holder as SuperCollapsedBlockViewHolder).bindSuperCollapsedBlock(item as SuperCollapsedBlock)
         }
@@ -436,6 +446,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.handleHeaderClick(message: Message, isCollapsable: Boolean) = with(threadAdapterState) {
+        binding.messageHeader.isEnabled = isCollapsable
         if (isCollapsable) {
             binding.messageHeader.setOnClickListener {
                 if (isExpandedMap[message.uid] == true) {
@@ -891,6 +902,10 @@ class ThreadAdapter(
         indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
     }
 
+    fun messageCountChange() {
+        notifyItemRangeChanged(0, itemCount, NotifyType.MESSAGE_COUNT_CHANGED)
+    }
+
     // Only public because it's accessed inside of a test file
     enum class NotifyType {
         TOGGLE_LIGHT_MODE,
@@ -898,6 +913,7 @@ class ThreadAdapter(
         FAILED_MESSAGE,
         ONLY_REBIND_CALENDAR_ATTENDANCE,
         ONLY_REBIND_EMOJI_REACTIONS,
+        MESSAGE_COUNT_CHANGED
     }
 
     enum class ContextMenuType {
