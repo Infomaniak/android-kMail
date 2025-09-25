@@ -21,6 +21,7 @@ import android.Manifest
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
+import androidx.test.espresso.action.ViewActions.swipeDown
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -34,7 +35,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.test.uiautomator.UiDevice
-import com.infomaniak.core.dotlottie.extensions.DotLottieExt
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.Scenarios.grantPermissions
@@ -63,8 +63,6 @@ class NewMessageActivityTest {
 
     @Before
     fun setUp() {
-        DotLottieExt.canLoadDotLotties = false
-
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         val permissions = listOf(
@@ -114,7 +112,11 @@ class NewMessageActivityTest {
         onView(withId(R.id.sendButton)).perform(click())
 
         // Waiting for the email to be received
-        onView(isRoot()).perform(waitFor(15.seconds))
+        onView(isRoot()).perform(waitFor(5.seconds))
+
+        onView(withId(R.id.threadsList)).perform(swipeDown())
+
+        onView(isRoot()).perform(waitFor(5.seconds))
 
         // Checking if the email with a specific ID to be received
         onView(withId(R.id.threadsList))

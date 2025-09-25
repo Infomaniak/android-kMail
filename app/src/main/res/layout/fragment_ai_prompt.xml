@@ -54,12 +54,14 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <com.lottiefiles.dotlottie.core.widget.DotLottieAnimation
-                    android:id="@+id/euriaIcon"
+                <com.airbnb.lottie.LottieAnimationView
                     android:layout_width="@dimen/standardIconSize"
                     android:layout_height="@dimen/standardIconSize"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
-                    android:importantForAccessibility="no" />
+                    android:importantForAccessibility="no"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_rawRes="@raw/euria" />
 
                 <TextView
                     style="@style/H2"

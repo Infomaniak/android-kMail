@@ -33,7 +33,6 @@ include(
     ":Core:Compose:MaterialThemeFromXml",
     ":Core:CrossAppLogin:Back",
     ":Core:CrossAppLogin:Front",
-    ":Core:DotLottie",
     ":Core:FragmentNavigation",
     ":Core:KSuite",
     ":Core:KSuite:KSuitePro",

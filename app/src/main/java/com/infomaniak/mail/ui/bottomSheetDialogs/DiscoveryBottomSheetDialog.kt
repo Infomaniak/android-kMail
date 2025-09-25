@@ -26,12 +26,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import com.infomaniak.core.dotlottie.extensions.DotLottieExt.loadUiTestSafe
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MatomoMail.MatomoName
-import com.infomaniak.mail.utils.Utils.isRunningInTest
-import com.infomaniak.mail.utils.extensions.getEuriaAnimationConfig
-import com.lottiefiles.dotlottie.core.util.DotLottieSource
 
 abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
 
@@ -67,9 +63,6 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
     }
 
     private fun setIllustration() = with(binding) {
-        // Not showing the Lottie because it prevents the UI to settle which is breaking tests.
-        if (isRunningInTest()) return@with
-
         when (val illustration = illustration) {
             is Illustration.Static -> infoIllustration.apply {
                 isVisible = true
@@ -79,7 +72,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
                 isVisible = true
 
                 updateLayoutParams { height = illustration.heightDp.toPx() }
-                infoAnimation.loadUiTestSafe(DotLottieSource.Res(illustration.resId).getEuriaAnimationConfig())
+                infoAnimation.setAnimation(illustration.resId)
             }
         }
     }
