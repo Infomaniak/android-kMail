@@ -446,6 +446,7 @@ class ThreadAdapter(
     }
 
     private fun MessageViewHolder.handleHeaderClick(message: Message, isCollapsable: Boolean) = with(threadAdapterState) {
+        // Disable ripple animation of `messageHeader` if `isCollapsable` is false
         binding.messageHeader.isEnabled = isCollapsable
         if (isCollapsable) {
             binding.messageHeader.setOnClickListener {
