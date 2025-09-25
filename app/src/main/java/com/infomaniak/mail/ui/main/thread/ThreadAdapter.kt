@@ -176,7 +176,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 is NotifyType.MessagesCollapseStateChanged -> {
-                    holder.handleItemsCountChangedPayload(item.message, isCollapsable = payload.isCollapsable)
+                    holder.handleMessagesCollapseStateChangedPayload(item.message, isCollapsable = payload.isCollapsable)
                 }
             }
         }
@@ -202,7 +202,7 @@ class ThreadAdapter(
         emojiReactions.bindEmojiReactions(message)
     }
 
-    private fun MessageViewHolder.handleItemsCountChangedPayload(message: Message, isCollapsable: Boolean) {
+    private fun MessageViewHolder.handleMessagesCollapseStateChangedPayload(message: Message, isCollapsable: Boolean) {
         handleHeaderClick(message, isCollapsable)
         if (!isCollapsable) {
             threadAdapterState.isExpandedMap[message.uid] = true
@@ -910,13 +910,13 @@ class ThreadAdapter(
     }
 
     // Only public because it's accessed inside of a test file
-    sealed class NotifyType {
-        object ToggleLightMode : NotifyType()
-        object ReRender : NotifyType()
-        object FailedMessage : NotifyType()
-        object OnlyRebindCalendarAttendance : NotifyType()
-        object OnlyRebindEmojiReactions : NotifyType()
-        class MessagesCollapseStateChanged(val isCollapsable: Boolean) : NotifyType()
+    sealed interface NotifyType {
+        data object ToggleLightMode : NotifyType
+        data object ReRender : NotifyType
+        data object FailedMessage : NotifyType
+        data object OnlyRebindCalendarAttendance : NotifyType
+        data object OnlyRebindEmojiReactions : NotifyType
+        data class MessagesCollapseStateChanged(val isCollapsable: Boolean) : NotifyType
     }
 
     enum class ContextMenuType {
