@@ -26,6 +26,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
@@ -205,6 +206,15 @@ class ThreadViewModel @Inject constructor(
                 }
             }.getOrElse { ThreadHeaderVisibility.NONE }
         }
+
+    val isCollapsable: LiveData<Boolean> = MediatorLiveData<Boolean>()
+        .apply {
+            addSource(messagesLive) { (items, _) ->
+                val messageCount = runCatchingRealm { items.count { it is MessageUi } }.getOrDefault(0)
+                value = messageCount > 1
+            }
+        }
+        .distinctUntilChanged()
 
     init {
         viewModelScope.launch {

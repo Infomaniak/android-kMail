@@ -222,6 +222,7 @@ class ThreadFragment : Fragment() {
         observeLightThemeToggle()
         observeThreadLive()
         observeMessagesLive()
+        observeMessagesIsCollapsable()
         observeFailedMessages()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
@@ -569,17 +570,16 @@ class ThreadFragment : Fragment() {
                 return@observe
             }
 
-            val messageCountBeforeUpdate = threadAdapter.messageCount
-            threadAdapter.submitList(items) {
-                if (messageCountBeforeUpdate > 0 && messageCountBeforeUpdate != threadAdapter.messageCount) {
-                    threadAdapter.messageCountChange()
-                }
-            }
+            threadAdapter.submitList(items)
 
             if (messagesToFetch.isNotEmpty()) fetchMessagesHeavyData(messagesToFetch)
 
             fetchCalendarEvents(items)
         }
+    }
+
+    private fun observeMessagesIsCollapsable() = with(threadViewModel) {
+        isCollapsable.observe(viewLifecycleOwner, threadAdapter::messagesCollapseStateChange)
     }
 
     private fun observeFailedMessages() {
