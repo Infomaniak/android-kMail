@@ -330,14 +330,21 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 //endregion
 
 //region Folders
-suspend fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: Boolean = false): List<Folder> {
+/**
+ * This method returns instances of [Folder] that have no relations to other classes such as
+ * [com.infomaniak.mail.data.models.thread.Thread.messages] because we copy them from realm with a low depth.
+ *
+ * @param dismissHiddenChildren A children Folder is hidden if its parent is collapsed. This parameter returns the list without
+ * the hidden children when true is provided and return all folders even hidden ones when false is provided.
+ */
+fun List<Folder>.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren: Boolean = false): List<Folder> {
 
     if (isEmpty()) return this
 
     return formatFolderWithAllChildren(dismissHiddenChildren, toMutableList())
 }
 
-private tailrec suspend fun formatFolderWithAllChildren(
+private tailrec fun formatFolderWithAllChildren(
     dismissHiddenChildren: Boolean,
     inputList: MutableList<Folder>,
     outputList: MutableList<Folder> = mutableListOf(),
@@ -352,17 +359,19 @@ private tailrec suspend fun formatFolderWithAllChildren(
     *
     * We want to display the user's folders, and also the IK folders for which we handle the role.
     * IK folders where we don't handle the role are dismissed.
+    *
+    * I.e. hides all IK folders with no roles.
     */
-    fun shouldThisFolderBeAdded(): Boolean = folder.path.startsWith(IK_FOLDER).not() || folder.role != null
+    val shouldThisFolderBeAdded = folder.path.startsWith(IK_FOLDER).not() || folder.role != null
 
     val children = if (folder.isManaged()) {
-        if (shouldThisFolderBeAdded()) outputList.add(folder.copyFromRealm(depth = 1u))
+        if (shouldThisFolderBeAdded) outputList.add(folder.copyFromRealm(depth = 1u))
 
         with(folder.children) {
             (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
         }
     } else {
-        if (shouldThisFolderBeAdded()) outputList.add(folder)
+        if (shouldThisFolderBeAdded) outputList.add(folder)
 
         (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
     }
