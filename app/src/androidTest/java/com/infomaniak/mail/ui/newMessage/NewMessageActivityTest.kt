@@ -116,6 +116,8 @@ class NewMessageActivityTest {
 
         onView(withId(R.id.threadsList)).perform(swipeDown())
 
+        onView(isRoot()).perform(waitFor(5.seconds))
+
         // Checking if the email with a specific ID to be received
         onView(withId(R.id.threadsList))
             .check(matches(hasDescendant(withText(subject))))
