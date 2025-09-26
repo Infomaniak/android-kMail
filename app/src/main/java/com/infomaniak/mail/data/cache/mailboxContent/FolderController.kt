@@ -116,6 +116,7 @@ class FolderController @Inject constructor(
         }
     }
 
+    // Vincent
     private fun MutableRealm.deleteLocalFolder(mailbox: Mailbox, folder: Folder) {
         MessageController.deleteMessages(appContext, mailbox, folder.messagesBlocking(realm = this), realm = this)
         if (folder.threads.isNotEmpty()) delete(folder.threads)
