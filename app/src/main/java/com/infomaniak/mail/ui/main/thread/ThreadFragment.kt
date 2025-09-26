@@ -334,7 +334,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isSpamFilterActivated = { mainViewModel.currentMailbox.value?.isSpamFiltered ?: false },
-            messagesIsCollapsable = { threadViewModel.messagesIsCollapsableFlow.value },
+            areMessagesCollapsable = { threadViewModel.messagesIsCollapsableFlow.value },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap

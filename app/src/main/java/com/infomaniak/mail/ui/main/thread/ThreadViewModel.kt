@@ -88,7 +88,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -196,7 +195,6 @@ class ThreadViewModel @Inject constructor(
             val messageCount = runCatchingRealm { items.count { it is MessageUi } }.getOrDefault(0)
             return@map messageCount > 1
         }
-        .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
