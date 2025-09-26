@@ -47,30 +47,24 @@ class FolderController @Inject constructor(
 
     //region Get data
     fun getMenuDrawerDefaultFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(
-            realm = mailboxContentRealm(),
-            withoutTypes = listOf(FoldersType.CUSTOM),
-            withoutChildren = true,
-        ).asFlow()
+        return getVisibleRoleFoldersQuery(realm = mailboxContentRealm()).asFlow()
     }
 
     fun getMenuDrawerCustomFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(
+        return getRootFoldersQuery(
             realm = mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.DEFAULT),
-            withoutChildren = true,
         ).asFlow()
     }
 
     fun getSearchFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(mailboxContentRealm(), withoutChildren = true).asFlow()
+        return getRootFoldersQuery(mailboxContentRealm()).asFlow()
     }
 
     suspend fun getMoveFolders(): RealmResults<Folder> {
-        return getFoldersQuery(
+        return getRootFoldersQuery(
             realm = mailboxContentRealm(),
             withoutTypes = listOf(FoldersType.SNOOZED, FoldersType.SCHEDULED_DRAFTS, FoldersType.DRAFT),
-            withoutChildren = true,
         ).findSuspend()
     }
 
@@ -168,13 +162,12 @@ class FolderController @Inject constructor(
         private val isRootFolder = "${Folder.parentsPropertyName}.@count == 0"
 
         //region Queries
-        private fun getFoldersQuery(
+        private fun getRootFoldersQuery(
             realm: TypedRealm,
             withoutTypes: List<FoldersType> = emptyList(),
-            withoutChildren: Boolean = false,
             visibleFoldersOnly: Boolean = true,
         ): RealmQuery<Folder> {
-            val rootsQuery = if (withoutChildren) " AND $isRootFolder" else ""
+            val rootsQuery = " AND $isRootFolder"
             val typeQuery = withoutTypes.joinToString(separator = "") {
                 when (it) {
                     FoldersType.DEFAULT -> " AND ${Folder.rolePropertyName} == nil"
@@ -186,6 +179,16 @@ class FolderController @Inject constructor(
             }
             val visibilityQuery = if (visibleFoldersOnly) " AND ${Folder::isDisplayed.name} == true" else ""
             return realm.query<Folder>("${isNotSearch}${rootsQuery}${typeQuery}${visibilityQuery}").sortFolders()
+        }
+
+        /**
+         * Returns the complete list of folders with roles. Is used to display the special roles folders in the menu drawer. Also
+         * filters out the folders that are not visible in realm.
+         */
+        private fun getVisibleRoleFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+            val hasRole = "${Folder.rolePropertyName} != nil"
+            val isVisible = "${Folder::isDisplayed.name} == true"
+            return realm.query<Folder>("$hasRole AND $isVisible").sortFolders()
         }
 
         private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
