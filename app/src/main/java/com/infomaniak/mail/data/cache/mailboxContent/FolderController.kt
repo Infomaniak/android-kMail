@@ -198,16 +198,8 @@ class FolderController @Inject constructor(
         //endregion
 
         //region Get data
-        private fun getFoldersBlocking(
-            exceptionsFoldersIds: List<String> = emptyList(),
-            realm: TypedRealm
-        ): RealmResults<Folder> {
-            val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
-                getFoldersQuery(realm, visibleFoldersOnly = false)
-            } else {
-                getFoldersQuery(exceptionsFoldersIds, realm)
-            }
-            return realmQuery.find()
+        private fun getFoldersBlocking(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmResults<Folder> {
+            return getFoldersQuery(exceptionsFoldersIds, realm).find()
         }
 
         suspend fun getFolder(id: String, realm: Realm): Folder? {
