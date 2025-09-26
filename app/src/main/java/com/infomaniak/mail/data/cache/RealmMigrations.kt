@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache
 
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.models.SnoozeState
 import com.infomaniak.mail.utils.SentryDebug
 import io.realm.kotlin.dynamic.DynamicMutableRealmObject

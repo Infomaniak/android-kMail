@@ -20,7 +20,7 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import android.content.pm.PackageInfo
 import androidx.webkit.WebViewCompat
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 
 object WebViewVersionUtils {
     private val TAG = WebViewVersionUtils::class.java.simpleName

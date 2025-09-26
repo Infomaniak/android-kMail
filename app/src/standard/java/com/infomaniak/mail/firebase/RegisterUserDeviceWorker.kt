@@ -26,7 +26,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.infomaniak.lib.core.api.ApiController.NetworkException
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker.Companion.INITIAL_DELAY

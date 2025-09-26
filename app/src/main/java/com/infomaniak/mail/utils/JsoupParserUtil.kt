@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
