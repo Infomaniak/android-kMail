@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.isSnoozed
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.main.move.MoveFragmentArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.Companion.OPEN_REACTION_BOTTOM_SHEET
 import com.infomaniak.mail.ui.main.thread.ThreadViewModel.SnoozeScheduleType
 import com.infomaniak.mail.utils.FolderRoleUtils
 import com.infomaniak.mail.utils.SharedUtils
@@ -80,19 +81,21 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.threadMessageToExecuteAction.observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction) ->
-            folderRole = folderRoleUtils.getActionFolderRole(thread)
-            isFromArchive = folderRole == FolderRole.ARCHIVE
-            isFromSpam = folderRole == FolderRole.SPAM
+        threadActionsViewModel.threadMessagesWithActionAndReaction
+            .observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageUidToReactTo) ->
+                folderRole = folderRoleUtils.getActionFolderRole(thread)
+                isFromArchive = folderRole == FolderRole.ARCHIVE
+                isFromSpam = folderRole == FolderRole.SPAM
 
-            setMarkAsReadUi(thread.isSeen)
-            setArchiveUi(isFromArchive)
-            setFavoriteUi(thread.isFavorite)
-            setJunkUi()
-            setSnoozeUi(thread.isSnoozed())
+                setMarkAsReadUi(thread.isSeen)
+                setArchiveUi(isFromArchive)
+                setFavoriteUi(thread.isFavorite)
+                setJunkUi()
+                setSnoozeUi(thread.isSnoozed())
+                setReactionUi(canBeReactedTo = messageUidToReactTo != null)
 
-            initOnClickListener(onActionClick(thread, messageUidToExecuteAction))
-        }
+                initOnClickListener(onActionClick(thread, messageUidToExecuteAction, messageUidToReactTo))
+            }
     }
 
     private fun setSnoozeUi(isThreadSnoozed: Boolean) = with(binding) {
@@ -116,7 +119,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         isVisible = true
     }
 
-    private fun onActionClick(thread: Thread, messageUidToExecuteAction: String) = object : OnActionClick {
+    private fun onActionClick(
+        thread: Thread,
+        messageUidToExecuteAction: String,
+        messageUidToReactTo: String?
+    ) = object : OnActionClick {
         //region Main actions
         override fun onReply() {
             trackBottomSheetThreadActionsEvent(MatomoName.Reply)
@@ -180,6 +187,11 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                     currentClassName = currentClassName,
                 )
             }
+        }
+
+        override fun onAddReaction() {
+            trackBottomSheetThreadActionsEvent(MatomoName.OpenEmojiPicker)
+            setBackNavigationResult(OPEN_REACTION_BOTTOM_SHEET, messageUidToReactTo)
         }
 
         override fun onSnooze() {

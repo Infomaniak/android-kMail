@@ -53,11 +53,13 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.Sc
 import com.infomaniak.lib.core.utils.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.context
+import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.MatomoMail.MatomoName
+import com.infomaniak.mail.MatomoMail.trackEmojiReactionsEvent
 import com.infomaniak.mail.MatomoMail.trackKSuiteProEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -77,6 +79,8 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerSourceKey.ThreadList
+import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -194,6 +198,7 @@ class ThreadListFragment : TwoPaneFragment() {
         observeLoadMoreTriggers()
         observeContentDisplayMode()
         observeShareUrlResult()
+        observePickedEmoji()
     }.getOrDefault(Unit)
 
     @ColorRes
@@ -690,6 +695,17 @@ class ThreadListFragment : TwoPaneFragment() {
             repeatOnLifecycle(State.STARTED) {
                 mainViewModel.shareThreadUrlResult.collect { url ->
                     if (url.isNullOrEmpty()) showErrorShareUrl() else requireContext().shareString(url)
+                }
+            }
+        }
+    }
+
+    private fun observePickedEmoji() {
+        getBackNavigationResult<PickedEmojiPayload>(ThreadList.name) { (emoji, messageUid) ->
+            trackEmojiReactionsEvent(MatomoName.AddReactionFromEmojiPicker)
+            viewLifecycleOwner.lifecycleScope.launch {
+                threadListViewModel.getEmojiReactionsFor(messageUid)?.let { reactions ->
+                    mainViewModel.trySendEmojiReply(emoji, messageUid, reactions)
                 }
             }
         }

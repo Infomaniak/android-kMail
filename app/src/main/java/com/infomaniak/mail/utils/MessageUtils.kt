@@ -50,5 +50,14 @@ object MessageUtils {
     }
 }
 
-data class ThreadMessageToExecuteAction(val thread: Thread, val messageUid: String)
+sealed class ThreadMessageInteraction(open val messageUid: String) {
+    data class Action(val thread: Thread, override val messageUid: String) : ThreadMessageInteraction(messageUid)
+    data class Reaction(override val messageUid: String): ThreadMessageInteraction(messageUid)
+}
+
+data class ThreadMessageToExecuteInteraction(
+    val thread: Thread,
+    val messageUidToExecuteAction: String,
+    val messageUidToExecuteReaction: String?
+)
 data class JunkMessagesData(val junkMessages: List<Message>, val messagesFromUsersToBlock: Map<Recipient, Message>)
