@@ -102,7 +102,7 @@ class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
     private val isSpamFilterActivated: () -> Boolean = { false },
-    private val messagesIsCollapsable: () -> Boolean,
+    private val areMessagesCollapsable: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
@@ -207,7 +207,7 @@ class ThreadAdapter(
         handleHeaderClick(message, isCollapsable)
         if (!isCollapsable) {
             threadAdapterState.isExpandedMap[message.uid] = true
-            onExpandOrCollapseMessage(message)
+            onExpandOrCollapseMessage(message, shouldTrack = false)
         }
     }
 
@@ -231,7 +231,7 @@ class ThreadAdapter(
         }
 
         if (item is MessageUi) {
-            (holder as MessageViewHolder).bindMail(item, position, isCollapsable = messagesIsCollapsable())
+            (holder as MessageViewHolder).bindMail(item, position)
         } else {
             (holder as SuperCollapsedBlockViewHolder).bindSuperCollapsedBlock(item as SuperCollapsedBlock)
         }
@@ -247,11 +247,11 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int, isCollapsable: Boolean) {
+    private fun MessageViewHolder.bindMail(messageUi: MessageUi, position: Int) {
 
         initMapForNewMessage(messageUi.message, position)
 
-        bindHeader(messageUi.message, isCollapsable)
+        bindHeader(messageUi.message)
         bindAlerts(messageUi.message)
         bindCalendarEvent(messageUi.message)
         bindAttachments(messageUi.message)
@@ -399,7 +399,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.bindHeader(message: Message, isCollapsable: Boolean) = with(binding) {
+    private fun MessageViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.displayDate.toDate()
 
         if (message.isDraft) {
@@ -435,7 +435,7 @@ class ThreadAdapter(
 
         setDetailedFieldsVisibility(message)
 
-        handleHeaderClick(message, isCollapsable)
+        handleHeaderClick(message, areMessagesCollapsable())
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -454,13 +454,13 @@ class ThreadAdapter(
             binding.messageHeader.setOnClickListener {
                 if (isExpandedMap[message.uid] == true) {
                     isExpandedMap[message.uid] = false
-                    onExpandOrCollapseMessage(message)
+                    onExpandOrCollapseMessage(message, shouldTrack = true)
                 } else {
                     if (message.isDraft) {
                         threadAdapterCallbacks?.onDraftClicked?.invoke(message)
                     } else {
                         isExpandedMap[message.uid] = true
-                        onExpandOrCollapseMessage(message)
+                        onExpandOrCollapseMessage(message, shouldTrack = true)
                     }
                 }
             }
@@ -845,7 +845,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
+    private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean) = with(binding) {
         val isExpanded = threadAdapterState.isExpandedMap[message.uid] == true
 
         if (shouldTrack) trackMessageEvent(MatomoName.OpenMessage, isExpanded)
