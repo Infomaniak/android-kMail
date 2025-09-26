@@ -30,7 +30,7 @@ jobs:
       # Link: https://github.com/crazy-max/ghaction-import-gpg/releases
       - name: Import bot's GPG key for signing commits
         id: import-gpg
-        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
+        uses: crazy-max/ghaction-import-gpg@v6.3.0 # v6.3.0
         with:
           gpg_private_key: ${{ secrets.BOT_MOBILE_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.BOT_MOBILE_GPG_PASSPHRASE }}
@@ -41,7 +41,7 @@ jobs:
       - name: perform rebase
         run: |
           git config --global user.name "dev-mobile-bot"
-          git config --global user.email "mobile+github-bot@infomaniak-dev.ch"
+          git config --global user.email "mobile+github-bot@infomaniak-dev.ch"          
           git status
           git pull
           git checkout "$DEFAULT_BRANCH"
@@ -56,6 +56,6 @@ jobs:
       # Link: https://github.com/actions-ecosystem/action-remove-labels/releases
       - name: remove label
         if: always()
-        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0 # v1.3.0
+        uses: actions-ecosystem/action-remove-labels@v1.3.0 # v1.3.0
         with:
           labels: rebase
