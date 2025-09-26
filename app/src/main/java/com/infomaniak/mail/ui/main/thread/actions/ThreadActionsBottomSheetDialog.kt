@@ -81,7 +81,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.threadMessagesWithActionAndReact
+        threadActionsViewModel.threadMessagesWithActionAndReaction
             .observe(viewLifecycleOwner) { (thread, messageUidToExecuteAction, messageUidToReactTo) ->
                 folderRole = folderRoleUtils.getActionFolderRole(thread)
                 isFromArchive = folderRole == FolderRole.ARCHIVE
