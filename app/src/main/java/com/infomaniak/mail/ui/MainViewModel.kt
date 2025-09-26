@@ -223,7 +223,12 @@ class MainViewModel @Inject constructor(
 
     val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController.getMenuDrawerCustomFoldersAsync()
-            .map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
+            .map {
+                it.list.flattenFolderChildrenAndRemoveMessages(
+                    dismissHiddenChildren = true,
+                    excludeRoleFolderWithoutChildren = true,
+                )
+            }
     }.asLiveData(ioCoroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
