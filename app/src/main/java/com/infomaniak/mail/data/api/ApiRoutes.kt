@@ -167,8 +167,8 @@ object ApiRoutes {
         resource: String?,
     ): String {
         return if (resource.isNullOrBlank()) {
-            val hasDisplayModeThreadToOnOff = if (hasDisplayModeThread) "on" else "off"
-            "${folder(mailboxUuid, folderId)}/message?thread=${hasDisplayModeThreadToOnOff}&offset=0&$filters"
+            val threadMode = if (hasDisplayModeThread) "on" else "off"
+            "${folder(mailboxUuid, folderId)}/message?thread=${threadMode}&offset=0&$filters&with=emoji_reactions_per_message"
         } else {
             "${resource(resource)}&$filters"
         }
