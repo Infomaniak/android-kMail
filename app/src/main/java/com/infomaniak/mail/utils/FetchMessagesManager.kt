@@ -214,7 +214,7 @@ class FetchMessagesManager @Inject constructor(
         if (message.isSeen) return true
 
         val formattedPreview = message.getFormattedPreview(appContext)
-        val notificationBody = "\n" + if (formattedPreview is FormatedPreview.Body) {
+        val notificationBody = if (formattedPreview is FormatedPreview.Body) {
             message.body
                 ?.let {
                     val content = MessageBodyUtils.splitContentAndQuote(it).content
@@ -228,8 +228,8 @@ class FetchMessagesManager @Inject constructor(
         }
 
         val subject = appContext.formatSubject(message.subject).take(MAX_CHAR_LIMIT)
-        val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
-        val description = "$subject$formattedBody".take(MAX_CHAR_LIMIT)
+        val formattedBody = notificationBody.replace("\\n+\\s*".toRegex(), " ") // Ignore multiple/start whitespaces
+        val description = "$subject\n$formattedBody".take(MAX_CHAR_LIMIT)
 
         // Show Message notification
         val hasShownNotification = notificationUtils.showMessageNotification(
