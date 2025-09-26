@@ -50,10 +50,11 @@ object MessageUtils {
     }
 }
 
-sealed class ThreadMessageInteraction(open val thread: Thread, open val messageUid: String) {
-    data class Action(override val thread: Thread, override val messageUid: String) : ThreadMessageInteraction(thread, messageUid)
-    data class Reaction(override val thread: Thread, override val messageUid: String): ThreadMessageInteraction(thread, messageUid)
+sealed class ThreadMessageInteraction(open val messageUid: String) {
+    data class Action(val thread: Thread, override val messageUid: String) : ThreadMessageInteraction(messageUid)
+    data class Reaction(override val messageUid: String): ThreadMessageInteraction(messageUid)
 }
+
 data class ThreadMessageToExecuteInteraction(
     val thread: Thread,
     val messageUidToExecuteAction: String,
