@@ -102,6 +102,7 @@ class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
     private val isSpamFilterActivated: () -> Boolean = { false },
+    private val messagesIsCollapsable: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
@@ -176,7 +177,7 @@ class ThreadAdapter(
                 NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
                 NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
                 is NotifyType.MessagesCollapseStateChanged -> {
-                    holder.handleMessagesCollapseStateChangedPayload(item.message, isCollapsable = payload.isCollapsable)
+                    holder.handleMessagesCollapseStatePayload(item.message, isCollapsable = payload.isCollapsable)
                 }
             }
         }
@@ -202,7 +203,7 @@ class ThreadAdapter(
         emojiReactions.bindEmojiReactions(message)
     }
 
-    private fun MessageViewHolder.handleMessagesCollapseStateChangedPayload(message: Message, isCollapsable: Boolean) {
+    private fun MessageViewHolder.handleMessagesCollapseStatePayload(message: Message, isCollapsable: Boolean) {
         handleHeaderClick(message, isCollapsable)
         if (!isCollapsable) {
             threadAdapterState.isExpandedMap[message.uid] = true
@@ -230,8 +231,7 @@ class ThreadAdapter(
         }
 
         if (item is MessageUi) {
-            val messageCount = runCatchingRealm { items.count { it is MessageUi } }.getOrDefault(0)
-            (holder as MessageViewHolder).bindMail(item, position, isCollapsable = messageCount > 1)
+            (holder as MessageViewHolder).bindMail(item, position, isCollapsable = messagesIsCollapsable())
         } else {
             (holder as SuperCollapsedBlockViewHolder).bindSuperCollapsedBlock(item as SuperCollapsedBlock)
         }
