@@ -76,7 +76,7 @@ class CalendarEventResponseTest {
         }.toMessageUi()
         assertFalse(messageDiffCallback.areContentsTheSame(message, onlyAttendeesChanged))
         assertEquals(
-            NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE,
+            NotifyType.OnlyRebindCalendarAttendance,
             messageDiffCallback.getChangePayload(message, onlyAttendeesChanged),
         )
 

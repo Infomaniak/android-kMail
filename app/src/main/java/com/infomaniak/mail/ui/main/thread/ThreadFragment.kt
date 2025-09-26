@@ -84,7 +84,6 @@ import com.infomaniak.mail.ui.main.SnackbarManager
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
 import com.infomaniak.mail.ui.main.folder.TwoPaneViewModel
 import com.infomaniak.mail.ui.main.thread.SubjectFormatter.SubjectData
@@ -223,6 +222,7 @@ class ThreadFragment : Fragment() {
         observeLightThemeToggle()
         observeThreadLive()
         observeMessagesLive()
+        observeMessagesIsCollapsable()
         observeFailedMessages()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
@@ -334,6 +334,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isSpamFilterActivated = { mainViewModel.currentMailbox.value?.isSpamFiltered ?: false },
+            areMessagesCollapsable = { threadViewModel.messagesIsCollapsableFlow.value },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
@@ -575,6 +576,12 @@ class ThreadFragment : Fragment() {
             if (messagesToFetch.isNotEmpty()) fetchMessagesHeavyData(messagesToFetch)
 
             fetchCalendarEvents(items)
+        }
+    }
+
+    private fun observeMessagesIsCollapsable() {
+        lifecycleScope.launch {
+            threadViewModel.messagesIsCollapsableFlow.collect(threadAdapter::messagesCollapseStateChange)
         }
     }
 
