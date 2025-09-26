@@ -63,6 +63,7 @@ abstract class DiscoveryBottomSheetDialog : InformationBottomSheetDialog() {
     }
 
     private fun setIllustration() = with(binding) {
+        val i = 0
         when (val illustration = illustration) {
             is Illustration.Static -> infoIllustration.apply {
                 isVisible = true
