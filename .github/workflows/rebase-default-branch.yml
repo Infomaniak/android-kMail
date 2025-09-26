@@ -52,7 +52,7 @@ jobs:
           git pull
           git checkout "$GITHUB_HEAD_REF"
           git rebase "$DEFAULT_BRANCH"
-          git push --force-with-lease
+          git push --force-with-lease "https://${{ secrets.BOT_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git" "HEAD:$GITHUB_HEAD_REF"
           git status
 
       # Context: https://github.com/marketplace/actions/actions-ecosystem-remove-labels
