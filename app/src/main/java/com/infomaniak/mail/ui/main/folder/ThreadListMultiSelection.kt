@@ -175,7 +175,7 @@ class ThreadListMultiSelection {
         threadListFragment.requireActivity().window.updateNavigationBarColor(navBarColor)
     }
 
-    private fun updateSelectedCount(selectedThreads: MutableSet<Thread>) {
+    private fun updateSelectedCount(selectedThreads: Set<Thread>) {
         val threadCount = selectedThreads.count()
         threadListFragment.binding.selectedCount.text = threadListFragment.resources.getQuantityString(
             R.plurals.multipleSelectionCount,
@@ -189,7 +189,7 @@ class ThreadListMultiSelection {
         threadListFragment.binding.selectAll.setText(selectAllLabel)
     }
 
-    private fun updateMultiSelectActionsStatus(selectedThreads: MutableSet<Thread>) {
+    private fun updateMultiSelectActionsStatus(selectedThreads: Set<Thread>) {
         computeReadFavoriteStatus(selectedThreads).let { (shouldRead, shouldFavorite) ->
             shouldMultiselectRead = shouldRead
             shouldMultiselectFavorite = shouldFavorite
