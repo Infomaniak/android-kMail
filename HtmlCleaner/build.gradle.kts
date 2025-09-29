@@ -13,7 +13,6 @@ android {
 
     defaultConfig {
         minSdk = appMinSdk
-        targetSdk = appCompileSdk
     }
 
     compileOptions {
