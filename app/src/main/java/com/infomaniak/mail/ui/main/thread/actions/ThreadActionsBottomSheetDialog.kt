@@ -24,7 +24,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.observe
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -208,7 +207,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 trackBottomSheetThreadActionsEvent(MatomoName.Spam, value = true)
                 mainViewModel.toggleThreadSpamStatus(listOf(navigationArgs.threadUid))
             } else {
-                safelyNavigate(
+                findNavController().navigate(
                     resId = R.id.junkBottomSheetDialog,
                     args = JunkBottomSheetDialogArgs(arrayOf(thread.uid)).toBundle(),
                 )
