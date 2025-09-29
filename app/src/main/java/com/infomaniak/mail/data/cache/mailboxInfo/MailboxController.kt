@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.Companion.deleteMailNotificationChannel
+import com.infomaniak.mail.utils.extensions.findFirstSuspend
 import com.infomaniak.mail.utils.extensions.findSuspend
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -250,11 +251,11 @@ class MailboxController @Inject constructor(
         }
 
         suspend fun getMailboxWithFallback(userId: Int, mailboxId: Int, realm: TypedRealm): Mailbox? {
-            return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm).findSuspend().first()
+            return getMailbox(userId, mailboxId, realm) ?: getMailboxesQuery(userId, realm).findFirstSuspend()
         }
 
         suspend fun getFirstValidMailbox(userId: Int, realm: TypedRealm): Mailbox? {
-            return getValidMailboxesQuery(userId, realm).findSuspend().first()
+            return getValidMailboxesQuery(userId, realm).findFirstSuspend()
         }
         //endregion
     }
