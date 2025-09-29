@@ -47,6 +47,7 @@ import io.realm.kotlin.serializers.RealmListKSerializer
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -110,6 +111,12 @@ class Folder : RealmObject, Cloneable {
     var sortedName: String = name
     @Transient
     var isDisplayed: Boolean = true // Used to hide folders on specific conditions (i.e. ScheduledDrafts folder when its empty)
+    //endregion
+
+    //region UI data (Transient & Ignore)
+    @Transient
+    @Ignore
+    var depth: Int? = null
     //endregion
 
     private val _parents by backlinks(Folder::children)

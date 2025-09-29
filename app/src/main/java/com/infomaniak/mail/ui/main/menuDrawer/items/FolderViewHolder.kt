@@ -51,20 +51,20 @@ class FolderViewHolder(
     ) {
         SentryLog.d("Bind", "Bind Folder : ${folder.name}")
 
+        val depth = folder.depth ?: 0
+        val folderIndent = min(depth, MAX_SUB_FOLDERS_INDENT)
+
         val roleDependantParameters = folder.role?.let {
             RoleDependantParameters(
                 iconId = it.folderIconRes,
                 trackerName = it.matomoName,
                 trackerValue = null,
-                folderIndent = 0,
             )
         } ?: run {
-            val indentLevel = folder.path.split(folder.separator).size - 1
             RoleDependantParameters(
                 iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
                 trackerName = MatomoName.CustomFolder,
-                trackerValue = indentLevel.toFloat(),
-                folderIndent = min(indentLevel, MAX_SUB_FOLDERS_INDENT),
+                trackerValue = depth.toFloat(),
             )
         }
 
@@ -77,6 +77,7 @@ class FolderViewHolder(
         binding.root.setFolderUi(
             folder,
             roleDependantParameters,
+            folderIndent,
             unread,
             currentFolderId,
             hasCollapsableFolder,
@@ -89,6 +90,7 @@ class FolderViewHolder(
     private fun UnreadFolderItemView.setFolderUi(
         folder: Folder,
         roleDependantParameters: RoleDependantParameters,
+        folderIndent: Int,
         unread: UnreadDisplay?,
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
@@ -98,7 +100,7 @@ class FolderViewHolder(
     ) {
 
         val folderName = folder.getLocalizedName(context)
-        val (iconId, trackerName, trackerValue, folderIndent) = roleDependantParameters
+        val (iconId, trackerName, trackerValue) = roleDependantParameters
 
         setFolderUi(folder, iconId, isSelected = folder.id == currentFolderId)
 
@@ -134,7 +136,6 @@ class FolderViewHolder(
         @DrawableRes var iconId: Int,
         var trackerName: MatomoName,
         var trackerValue: Float?,
-        var folderIndent: Int,
     )
 
     companion object {

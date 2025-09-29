@@ -218,13 +218,19 @@ class MainViewModel @Inject constructor(
 
     val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController.getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
+            .map {
+                it.list
+                    .computeDepth()
+                    .flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true)
+            }
     }.asLiveData(ioCoroutineContext)
 
     val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController.getMenuDrawerCustomFoldersAsync()
             .map {
-                it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true, excludeRoleFolder = true)
+                it.list
+                    .computeDepth()
+                    .flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true, excludeRoleFolder = true)
             }
     }.asLiveData(ioCoroutineContext)
 
@@ -1672,4 +1678,17 @@ class MainViewModel @Inject constructor(
 
         private const val EMOJI_REACTION_PLACEHOLDER = "<div>__REACTION_PLACEMENT__<br></div>"
     }
+}
+
+private fun List<Folder>.computeDepth(): List<Folder> {
+    val queue = ArrayDeque<Pair<Folder, Int>>()
+    forEach { queue.add(it to 0) }
+
+    while (queue.isNotEmpty()) {
+        val (folder, depth) = queue.removeFirst()
+        folder.depth = depth
+        folder.children.forEach { queue.add(it to depth + 1) }
+    }
+
+    return this
 }
