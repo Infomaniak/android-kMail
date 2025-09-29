@@ -37,7 +37,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.work.Data
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.views.DividerItemDecorator

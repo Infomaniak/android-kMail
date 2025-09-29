@@ -35,7 +35,7 @@ import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent

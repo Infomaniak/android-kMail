@@ -22,7 +22,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.databinding.ItemMenuDrawerActionBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.ui.main.menuDrawer.items.ActionViewHolder.MenuDrawerAction.ActionType

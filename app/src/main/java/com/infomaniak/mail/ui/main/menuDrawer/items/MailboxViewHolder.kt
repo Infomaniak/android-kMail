@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.main.menuDrawer.items
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.data.models.mailbox.Mailbox

@@ -21,7 +21,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.Quotas

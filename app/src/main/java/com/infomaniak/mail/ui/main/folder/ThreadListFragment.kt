@@ -50,7 +50,7 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.Swi
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
-import com.infomaniak.lib.core.utils.SentryLog
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.context
 import com.infomaniak.lib.core.utils.safeNavigate
