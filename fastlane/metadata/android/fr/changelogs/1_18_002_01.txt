@@ -1,0 +1,2 @@
+- Amélioration du format des notifications d'e-mails et réactions pour une meilleure lisibilité
+- Correction de certaines couleurs dynamiques de Material3

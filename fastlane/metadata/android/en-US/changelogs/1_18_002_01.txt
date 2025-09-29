@@ -1,0 +1,2 @@
+- Better format mail & reactions notifications to enhance readability
+- Fix some Material3 dynamic colors
