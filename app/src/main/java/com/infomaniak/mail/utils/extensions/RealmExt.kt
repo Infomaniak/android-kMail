@@ -24,6 +24,7 @@ import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmElementQuery
+import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmScalarQuery
 import io.realm.kotlin.query.RealmSingleQuery
@@ -55,6 +56,10 @@ inline fun <reified T> RealmList<T>.replaceContent(list: List<T>) {
 suspend fun <T : BaseRealmObject> RealmElementQuery<T>.findSuspend(): RealmResults<T> {
     return Dispatchers.IO { find() }
     // We are NOT using Realm's `asFlow().map { it.list }.first()` because it is less performant.
+}
+
+suspend fun <T : BaseRealmObject> RealmQuery<T>.findFirstSuspend(): T? {
+    return Dispatchers.IO { first().find() }
 }
 
 suspend fun <T> RealmScalarQuery<T>.findSuspend(): T {
