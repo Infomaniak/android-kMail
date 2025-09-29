@@ -24,8 +24,8 @@ import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.core.extensions.goToPlayStore
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
@@ -167,7 +167,7 @@ object AttachmentExt {
                 SentryLog.d(ATTACHMENT_TAG, "Uploaded attachment uploadLocalUri: ${remoteAttachment.uploadLocalUri}")
 
                 draft.attachments.apply {
-                    delete(findSpecificAttachment(attachment = this@updateLocalAttachment)!!)
+                    findSpecificAttachment(attachment = this@updateLocalAttachment)?.let(::delete)
                     add(remoteAttachment)
                 }
 
