@@ -19,9 +19,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/new_message_navigation"
-    app:startDestination="@id/newMessageFragment">
+    app:startDestination="@id/selectMailboxFragment">
 
     <include app:graph="@navigation/my_ksuite_navigation" />
+
+    <fragment
+        android:id="@+id/selectMailboxFragment"
+        android:name="com.infomaniak.mail.ui.newMessage.mailbox.SelectMailboxFragment"
+        android:label="SelectMailboxFragment">
+    </fragment>
 
     <fragment
         android:id="@+id/newMessageFragment"
