@@ -222,6 +222,7 @@ class ThreadFragment : Fragment() {
         observeLightThemeToggle()
         observeThreadLive()
         observeMessagesLive()
+        observeMessagesIsCollapsable()
         observeFailedMessages()
         observeQuickActionBarClicks()
         observeSubjectUpdateTriggers()
@@ -333,6 +334,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.adapter = ThreadAdapter(
             shouldLoadDistantResources = shouldLoadDistantResources(),
             isSpamFilterActivated = { mainViewModel.currentMailbox.value?.isSpamFiltered ?: false },
+            areMessagesCollapsable = { threadViewModel.messagesIsCollapsableFlow.value },
             senderRestrictions = { mainViewModel.currentMailbox.value?.sendersRestrictions },
             threadAdapterState = object : ThreadAdapterState {
                 override val isExpandedMap by threadState::isExpandedMap
@@ -499,7 +501,7 @@ class ThreadFragment : Fragment() {
             threadViewModel.updateCurrentThreadUid(threadViewModel.AllMessages(threadUid))
         }
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             threadViewModel.threadFlow.collect { thread ->
                 if (thread == null) {
                     twoPaneViewModel.closeThread()
@@ -574,6 +576,12 @@ class ThreadFragment : Fragment() {
             if (messagesToFetch.isNotEmpty()) fetchMessagesHeavyData(messagesToFetch)
 
             fetchCalendarEvents(items)
+        }
+    }
+
+    private fun observeMessagesIsCollapsable() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            threadViewModel.messagesIsCollapsableFlow.collect(threadAdapter::messagesCollapseStateChange)
         }
     }
 

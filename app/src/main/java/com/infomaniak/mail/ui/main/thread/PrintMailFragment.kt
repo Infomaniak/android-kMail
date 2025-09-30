@@ -75,6 +75,7 @@ class PrintMailFragment : Fragment() {
                 override val verticalScroll by threadState::verticalScroll
                 override val isCalendarEventExpandedMap by threadState::isCalendarEventExpandedMap
             },
+            areMessagesCollapsable = { threadViewModel.messagesIsCollapsableFlow.value },
             threadAdapterCallbacks = ThreadAdapterCallbacks(
                 onBodyWebViewFinishedLoading = { startPrintingView() },
             ),

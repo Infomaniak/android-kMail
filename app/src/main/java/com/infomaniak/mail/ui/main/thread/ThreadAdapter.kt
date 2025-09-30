@@ -102,6 +102,7 @@ class ThreadAdapter(
     private val shouldLoadDistantResources: Boolean,
     private val isForPrinting: Boolean = false,
     private val isSpamFilterActivated: () -> Boolean = { false },
+    private val areMessagesCollapsable: () -> Boolean,
     private val senderRestrictions: () -> SendersRestrictions? = { null },
     private val threadAdapterState: ThreadAdapterState,
     private var threadAdapterCallbacks: ThreadAdapterCallbacks? = null,
@@ -136,7 +137,7 @@ class ThreadAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { items.count() }.getOrDefault(0)
+    override fun getItemCount(): Int = items.count()
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (items[position]) {
@@ -170,11 +171,14 @@ class ThreadAdapter(
         val item = items[position]
         if (item is MessageUi && holder is MessageViewHolder) with(holder.binding) {
             when (payload) {
-                NotifyType.TOGGLE_LIGHT_MODE -> holder.handleToggleLightModePayload(item.message.uid)
-                NotifyType.RE_RENDER -> reloadVisibleWebView()
-                NotifyType.FAILED_MESSAGE -> handleFailedMessagePayload(item.message.uid)
-                NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE -> handleCalendarAttendancePayload(item.message)
-                NotifyType.ONLY_REBIND_EMOJI_REACTIONS -> handleEmojiReactionPayload(item)
+                NotifyType.ToggleLightMode -> holder.handleToggleLightModePayload(item.message.uid)
+                NotifyType.ReRender -> reloadVisibleWebView()
+                NotifyType.FailedMessage -> handleFailedMessagePayload(item.message.uid)
+                NotifyType.OnlyRebindCalendarAttendance -> handleCalendarAttendancePayload(item.message)
+                NotifyType.OnlyRebindEmojiReactions -> handleEmojiReactionPayload(item)
+                is NotifyType.MessagesCollapseStateChanged -> {
+                    holder.handleMessagesCollapseStatePayload(item.message, isCollapsable = payload.isCollapsable)
+                }
             }
         }
     }.getOrDefault(Unit)
@@ -197,6 +201,14 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.handleEmojiReactionPayload(message: MessageUi) {
         emojiReactions.bindEmojiReactions(message)
+    }
+
+    private fun MessageViewHolder.handleMessagesCollapseStatePayload(message: Message, isCollapsable: Boolean) {
+        handleHeaderClick(message, isCollapsable)
+        if (!isCollapsable) {
+            threadAdapterState.isExpandedMap[message.uid] = true
+            onExpandOrCollapseMessage(message, shouldTrack = false)
+        }
     }
 
     private fun EmojiReactionsView.bindEmojiReactions(message: MessageUi) {
@@ -423,7 +435,7 @@ class ThreadAdapter(
 
         setDetailedFieldsVisibility(message)
 
-        handleHeaderClick(message)
+        handleHeaderClick(message, areMessagesCollapsable())
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -435,19 +447,25 @@ class ThreadAdapter(
         bccGroup.isVisible = message.bcc.isNotEmpty()
     }
 
-    private fun MessageViewHolder.handleHeaderClick(message: Message) = with(threadAdapterState) {
-        binding.messageHeader.setOnClickListener {
-            if (isExpandedMap[message.uid] == true) {
-                isExpandedMap[message.uid] = false
-                onExpandOrCollapseMessage(message)
-            } else {
-                if (message.isDraft) {
-                    threadAdapterCallbacks?.onDraftClicked?.invoke(message)
+    private fun MessageViewHolder.handleHeaderClick(message: Message, isCollapsable: Boolean) = with(threadAdapterState) {
+        // Disable ripple animation of `messageHeader` if `isCollapsable` is false
+        binding.messageHeader.isEnabled = isCollapsable
+        if (isCollapsable) {
+            binding.messageHeader.setOnClickListener {
+                if (isExpandedMap[message.uid] == true) {
+                    isExpandedMap[message.uid] = false
+                    onExpandOrCollapseMessage(message, shouldTrack = true)
                 } else {
-                    isExpandedMap[message.uid] = true
-                    onExpandOrCollapseMessage(message)
+                    if (message.isDraft) {
+                        threadAdapterCallbacks?.onDraftClicked?.invoke(message)
+                    } else {
+                        isExpandedMap[message.uid] = true
+                        onExpandOrCollapseMessage(message, shouldTrack = true)
+                    }
                 }
             }
+        } else {
+            binding.messageHeader.setOnClickListener(null)
         }
     }
 
@@ -827,7 +845,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean = true) = with(binding) {
+    private fun MessageViewHolder.onExpandOrCollapseMessage(message: Message, shouldTrack: Boolean) = with(binding) {
         val isExpanded = threadAdapterState.isExpandedMap[message.uid] == true
 
         if (shouldTrack) trackMessageEvent(MatomoName.OpenMessage, isExpanded)
@@ -864,17 +882,17 @@ class ThreadAdapter(
 
     fun toggleLightMode(message: Message) {
         val index = items.indexOfFirstOrNull { it is MessageUi && it.message == message } ?: return
-        notifyItemChanged(index, NotifyType.TOGGLE_LIGHT_MODE)
+        notifyItemChanged(index, NotifyType.ToggleLightMode)
     }
 
     fun reRenderMails() {
-        notifyItemRangeChanged(0, itemCount, NotifyType.RE_RENDER)
+        notifyItemRangeChanged(0, itemCount, NotifyType.ReRender)
     }
 
     fun updateFailedMessages(uids: List<String>) {
         uids.forEach { uid ->
             val index = items.indexOfFirst { it is MessageUi && it.message.uid == uid }
-            notifyItemChanged(index, NotifyType.FAILED_MESSAGE)
+            notifyItemChanged(index, NotifyType.FailedMessage)
         }
     }
 
@@ -884,16 +902,22 @@ class ThreadAdapter(
 
     fun undoUserAttendanceClick(message: Message) {
         val indexOfMessage = items.indexOfFirst { it is MessageUi && it.message.uid == message.uid }.takeIf { it >= 0 }
-        indexOfMessage?.let { notifyItemChanged(it, NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE) }
+        indexOfMessage?.let { notifyItemChanged(it, NotifyType.OnlyRebindCalendarAttendance) }
+    }
+
+    fun messagesCollapseStateChange(isCollapsable: Boolean) {
+        notifyItemRangeChanged(0, itemCount, NotifyType.MessagesCollapseStateChanged(isCollapsable))
     }
 
     // Only public because it's accessed inside of a test file
-    enum class NotifyType {
-        TOGGLE_LIGHT_MODE,
-        RE_RENDER,
-        FAILED_MESSAGE,
-        ONLY_REBIND_CALENDAR_ATTENDANCE,
-        ONLY_REBIND_EMOJI_REACTIONS,
+    sealed interface NotifyType {
+        data object ToggleLightMode : NotifyType
+        data object ReRender : NotifyType
+        data object FailedMessage : NotifyType
+        data object OnlyRebindCalendarAttendance : NotifyType
+        data object OnlyRebindEmojiReactions : NotifyType
+        @JvmInline
+        value class MessagesCollapseStateChanged(val isCollapsable: Boolean) : NotifyType
     }
 
     enum class ContextMenuType {
@@ -936,7 +960,7 @@ class ThreadAdapter(
             return when {
                 // null means "bind the whole item again"
                 MessageDiffAspect.AnythingElse.areDifferent(oldItem.message, newItem.message) -> null
-                MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.ONLY_REBIND_EMOJI_REACTIONS
+                MessageDiffAspect.EmojiReactions.areDifferent(oldItem, newItem) -> NotifyType.OnlyRebindEmojiReactions
                 else -> getCalendarEventPayloadOrNull(oldItem.message, newItem.message)
             }
         }
@@ -951,7 +975,7 @@ class ThreadAdapter(
                 MessageDiffAspect.Calendar.Attendees.areDifferent(
                     oldCalendarEventResponse,
                     newCalendarEventResponse,
-                ) -> NotifyType.ONLY_REBIND_CALENDAR_ATTENDANCE
+                ) -> NotifyType.OnlyRebindCalendarAttendance
                 else -> null
             }
         }

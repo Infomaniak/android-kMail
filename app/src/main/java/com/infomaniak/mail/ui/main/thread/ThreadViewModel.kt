@@ -86,6 +86,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
@@ -94,6 +95,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -102,6 +104,8 @@ import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
+/* Please note that, for the moment, the logic that uses this list assumes that the items are necessarily messages.
+If this were to change, it would be necessary to verify the types of the elements. */
 typealias ThreadAdapterItems = List<Any>
 typealias MessagesWithoutHeavyData = List<Message>
 
@@ -163,7 +167,7 @@ class ThreadViewModel @Inject constructor(
     private val fakeReactions = MutableStateFlow<Map<String, Set<String>>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
+    private val messagesFlow: Flow<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> =
         /**
          * Ideally, [ThreadState.hasSuperCollapsedBlockBeenClicked] should be passed directly to [ThreadOpeningMode.getMessages].
          *
@@ -184,7 +188,13 @@ class ThreadViewModel @Inject constructor(
             mode.getMessages(featureFlags).map { (items, messagesToFetch) ->
                 items.toUiMessages(fakeReactions, isReactionsAvailable) to messagesToFetch
             }
-        }.asLiveData(ioCoroutineContext)
+        }
+
+    val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> = messagesFlow.asLiveData(ioCoroutineContext)
+
+    val messagesIsCollapsableFlow: StateFlow<Boolean> = messagesFlow
+        .map { (items, _) -> items.count() > 1 }
+        .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()
 
