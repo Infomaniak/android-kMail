@@ -159,7 +159,14 @@ object ThreadRecomputations {
         messagesWithContent.clear()
         allMessages.forEach { message ->
             reactionsPerMessageId[message.messageId]?.let { reactions ->
-                message.emojiReactions.overrideWith(reactions)
+                // When coming from the search, threads are not managed because they are remote threads we've just fetched and
+                // have not yet saved to realm. But when recomputing threads from the thread algorithm, the threads are already
+                // stored inside of realm and are therefore managed.
+                if (message.isManaged()) {
+                    message.emojiReactions.overrideWith(reactions)
+                } else {
+                    message.emojiReactions = reactions.values.toRealmList()
+                }
             }
 
             val targetMessageIds = message.inReplyTo ?: ""
