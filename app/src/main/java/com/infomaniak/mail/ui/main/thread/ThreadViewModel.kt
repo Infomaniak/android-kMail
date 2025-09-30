@@ -104,6 +104,8 @@ import splitties.coroutines.suspendLazy
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 
+/* Please note that, for the moment, the logic that uses this list assumes that the items are necessarily messages.
+If this were to change, it would be necessary to verify the types of the elements. */
 typealias ThreadAdapterItems = List<Any>
 typealias MessagesWithoutHeavyData = List<Message>
 
@@ -191,10 +193,7 @@ class ThreadViewModel @Inject constructor(
     val messagesLive: LiveData<Pair<ThreadAdapterItems, MessagesWithoutHeavyData>> = messagesFlow.asLiveData(ioCoroutineContext)
 
     val messagesIsCollapsableFlow: StateFlow<Boolean> = messagesFlow
-        .map { (items, _) ->
-            val messageCount = runCatchingRealm { items.count { it is MessageUi } }.getOrDefault(0)
-            return@map messageCount > 1
-        }
+        .map { (items, _) -> items.count() > 1 }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 
     val quickActionBarClicks = SingleLiveEvent<QuickActionBarResult>()

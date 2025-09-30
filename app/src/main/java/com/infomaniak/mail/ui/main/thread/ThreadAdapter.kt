@@ -137,7 +137,7 @@ class ThreadAdapter(
         super.onAttachedToRecyclerView(recyclerView)
     }
 
-    override fun getItemCount(): Int = runCatchingRealm { items.count() }.getOrDefault(0)
+    override fun getItemCount(): Int = items.count()
 
     override fun getItemViewType(position: Int): Int = runCatchingRealm {
         return when (items[position]) {
