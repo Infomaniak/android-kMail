@@ -501,7 +501,7 @@ class ThreadFragment : Fragment() {
             threadViewModel.updateCurrentThreadUid(threadViewModel.AllMessages(threadUid))
         }
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             threadViewModel.threadFlow.collect { thread ->
                 if (thread == null) {
                     twoPaneViewModel.closeThread()
@@ -580,7 +580,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessagesIsCollapsable() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             threadViewModel.messagesIsCollapsableFlow.collect(threadAdapter::messagesCollapseStateChange)
         }
     }

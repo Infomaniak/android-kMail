@@ -916,7 +916,8 @@ class ThreadAdapter(
         data object FailedMessage : NotifyType
         data object OnlyRebindCalendarAttendance : NotifyType
         data object OnlyRebindEmojiReactions : NotifyType
-        data class MessagesCollapseStateChanged(val isCollapsable: Boolean) : NotifyType
+        @JvmInline
+        value class MessagesCollapseStateChanged(val isCollapsable: Boolean) : NotifyType
     }
 
     enum class ContextMenuType {
