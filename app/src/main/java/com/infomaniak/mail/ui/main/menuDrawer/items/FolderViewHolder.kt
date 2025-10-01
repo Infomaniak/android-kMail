@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemMenuDrawerFolderBinding
 import com.infomaniak.mail.ui.main.menuDrawer.MenuDrawerAdapter.MenuDrawerViewHolder
 import com.infomaniak.mail.utils.UnreadDisplay
+import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
 import com.infomaniak.mail.views.itemViews.UnreadFolderItemView
 import com.infomaniak.mail.views.itemViews.setFolderUi
 import kotlin.math.min
@@ -42,13 +43,14 @@ class FolderViewHolder(
     override val binding = super.binding as ItemMenuDrawerFolderBinding
 
     fun displayFolder(
-        folder: Folder,
+        menuDrawerFolder: MenuDrawerFolder,
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
         onFolderClicked: (folderId: String) -> Unit,
         onFolderLongClicked: (folderId: String, folderName: String, view: View) -> Unit,
         onCollapseChildrenClicked: (folderId: String, shouldCollapse: Boolean) -> Unit,
     ) {
+        val folder = menuDrawerFolder.folder
         SentryLog.d("Bind", "Bind Folder : ${folder.name}")
 
         val roleDependantParameters = folder.role?.let {
@@ -77,6 +79,7 @@ class FolderViewHolder(
         binding.root.setFolderUi(
             folder,
             roleDependantParameters,
+            menuDrawerFolder.canBeCollapsed,
             unread,
             currentFolderId,
             hasCollapsableFolder,
@@ -89,6 +92,7 @@ class FolderViewHolder(
     private fun UnreadFolderItemView.setFolderUi(
         folder: Folder,
         roleDependantParameters: RoleDependantParameters,
+        canBeCollapsed: Boolean,
         unread: UnreadDisplay?,
         currentFolderId: String?,
         hasCollapsableFolder: Boolean,
@@ -107,7 +111,7 @@ class FolderViewHolder(
         isPastilleDisplayed = unread?.shouldDisplayPastille ?: false
         unreadCount = unread?.count ?: 0
         isCollapsed = folder.isCollapsed
-        canBeCollapsed = folder.canBeCollapsed
+        this.canBeCollapsed = canBeCollapsed
 
         setIndent(
             indent = folderIndent,

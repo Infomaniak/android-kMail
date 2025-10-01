@@ -331,6 +331,66 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 
 //region Folders
 /**
+ * Returns a list of MenuDrawerFolder where each folder has a reference to its children.
+ *
+ * @param excludeRoleFolder Do not return folders with role nor their children. This is used in the menu drawer to not display
+ * role folders in the bottom custom folder section because they are already displayed on the upper section.
+ */
+fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean = false): List<MenuDrawerFolder> {
+    val resultRoots = mutableListOf<MenuDrawerFolder>()
+    val folderToMenuFolder = mutableMapOf<Folder, MenuDrawerFolder>()
+
+    // Step 1: Instantiate all MenuDrawerFolder instances and identify root folders
+    forEachNestedItem(getChildren = { it.children }) { folder, depth ->
+        if (folder.shouldBeExcluded(excludeRoleFolder) || folder.isHidden) return@forEachNestedItem
+
+        // Create placeholder (empty children for now)
+        val menu = MenuDrawerFolder(
+            folder = folder,
+            depth = depth,
+            canBeCollapsed = false, // will compute below
+            children = emptyList(),
+        )
+        folderToMenuFolder[folder] = menu
+
+        if (depth == 0) resultRoots.add(menu)
+    }
+
+    // Step 2: Link children of MenuDrawerFolder to existing instances + compute collapsibility
+    folderToMenuFolder.forEach { (folder, menuFolder) ->
+        val validChildren = folder.children
+            .filter { !(it.shouldBeExcluded(excludeRoleFolder) || it.isHidden) }
+            .mapNotNull { folderToMenuFolder[it] }
+
+        folderToMenuFolder[folder] = menuFolder.copy(
+            canBeCollapsed = (menuFolder.depth == 0 && validChildren.isNotEmpty()),
+            children = validChildren,
+        )
+    }
+
+    // Step 3: Only return root folders needed for traversal
+    return resultRoots.map { folderToMenuFolder[it.folder]!! } // TODO: Remove!!
+}
+
+data class MenuDrawerFolder(
+    val folder: Folder,
+    val children: List<MenuDrawerFolder>,
+    val depth: Int,
+    val canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
+)
+
+fun <T> List<T>.forEachNestedItem(getChildren: (T) -> List<T>, block: (T, Int) -> Unit) {
+    val stack = ArrayDeque<Pair<T, Int>>()
+    asReversed().forEach { stack.addLast(it to 0) }
+
+    while (stack.isNotEmpty()) {
+        val (item, depth) = stack.removeLast()
+        getChildren(item).asReversed().forEach { stack.addLast(it to depth + 1) }
+        block(item, depth)
+    }
+}
+
+/**
  * This method returns instances of [Folder] that have no relations to other classes such as
  * [com.infomaniak.mail.data.models.thread.Thread.messages] because we copy them from realm with a low depth.
  *
