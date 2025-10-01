@@ -73,7 +73,7 @@ enum class ButtonType(val colors: @Composable () -> ButtonColors) {
     Tertiary({
         ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.tertiary,
+            contentColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = Color.Transparent,
         )
     }),
