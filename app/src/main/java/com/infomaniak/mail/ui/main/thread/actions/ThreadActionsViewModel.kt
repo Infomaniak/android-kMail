@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.invoke
@@ -59,7 +60,8 @@ class ThreadActionsViewModel @Inject constructor(
         .mapNotNull { it.obj?.let { thread -> getThreadAndMessageUidToExecuteAction(thread) } }
 
     private val messageToExecuteReaction: Flow<ThreadMessageInteraction.Reaction?> = threadController.getThreadAsync(threadUid)
-        .mapNotNull { it.obj?.let { thread -> getMessageToExecuteReaction(thread) } }
+        .mapNotNull { it.obj }
+        .map { getMessageToExecuteReaction(it) }
 
     val threadMessagesWithActionAndReaction: SharedFlow<ThreadMessageToExecuteInteraction> =
         combine(threadMessageToExecuteAction, messageToExecuteReaction) { messageToExecuteActions, messageToExecuteReaction ->
