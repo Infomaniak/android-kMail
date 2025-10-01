@@ -153,6 +153,7 @@
     <string name="buttonSchedule">Planen Sie den Versand von E-Mails für einen späteren Zeitpunkt</string>
     <string name="buttonSee">Siehe</string>
     <string name="buttonSelectAll">Alle</string>
+    <string name="buttonSendWithDifferentAddress">Senden mit abweichender Adresse</string>
     <string name="buttonShare">Teilen Sie</string>
     <string name="buttonStart">Anfangen</string>
     <string name="buttonStartSync">Start der Synchronisierung</string>
@@ -172,6 +173,7 @@
     <string name="ccTitle">Cc:</string>
     <string name="comingSoon">Demnächst…</string>
     <string name="commercialFolder">Werbeaktionen</string>
+    <string name="composeMailboxCurrentTitle">Senden Sie eine Nachricht mit der Adresse:</string>
     <string name="confirmLogoutDescription">Sind Sie sicher, dass Sie sich von %s abmelden möchten?</string>
     <string name="confirmLogoutTitle">Abmelden</string>
     <string name="confirmationToBlockAnExpeditorText">Alle zukünftigen Nachrichten von %s werden in den Junk-Mail-Ordner verschoben.</string>

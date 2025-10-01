@@ -1,0 +1,68 @@
+<!--
+  ~ Infomaniak Mail - Android
+  ~ Copyright (C) 2025 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="113dp"
+    android:height="119dp"
+    android:viewportWidth="113"
+    android:viewportHeight="119">
+  <path
+      android:pathData="M18.92,111.93a46.79,6.24 0,1 0,93.58 0a46.79,6.24 0,1 0,-93.58 0z"
+      android:fillColor="#666666"/>
+  <path
+      android:pathData="M67.61,48.2V112.55H61.97V48.2H67.61Z"
+      android:strokeWidth="0.5"
+      android:fillColor="#333333"
+      android:strokeColor="#E0E0E0"/>
+  <path
+      android:pathData="M69.56,110.1C73.26,110.32 75.8,110.78 75.8,111.32C75.8,112.07 70.87,112.67 64.79,112.67C58.71,112.67 53.78,112.07 53.78,111.32C53.78,110.78 56.33,110.32 60.02,110.1"
+      android:strokeWidth="0.5"
+      android:fillColor="#00000000"
+      android:strokeColor="#E0E0E0"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M83.04,10.13C90.59,10.13 96.7,16.25 96.7,23.8V50.51H46.11V10.13H83.04Z"
+      android:strokeWidth="0.5"
+      android:fillColor="#666666"
+      android:strokeColor="#E0E0E0"/>
+  <path
+      android:pathData="M46.5,10.13C56.59,10.13 64.77,18.31 64.77,28.41V50.51H28.23V28.41L28.23,27.93C28.48,18.06 36.56,10.13 46.5,10.13Z"
+      android:strokeWidth="0.5"
+      android:fillColor="#333333"
+      android:strokeColor="#E0E0E0"/>
+  <path
+      android:pathData="M27.98,50.4H65.02L56.02,69.29C53.72,74.14 48.83,77.22 43.46,77.22H29.89C23.07,77.22 18.59,70.11 21.52,63.96L27.98,50.4Z"
+      android:fillColor="#666666"/>
+  <path
+      android:pathData="M64.62,50.65L55.8,69.18C53.53,73.94 48.73,76.97 43.46,76.97H29.89C23.26,76.97 18.89,70.06 21.74,64.07L28.13,50.65H64.62Z"
+      android:strokeWidth="0.5"
+      android:fillColor="#00000000"
+      android:strokeColor="#E0E0E0"/>
+  <path
+      android:pathData="M47.32,0H2.63C1.18,0 0,1.18 0,2.63V31.41C0,32.86 1.18,34.04 2.63,34.04H30.64L40.06,41.98V34.04H47.32C48.77,34.04 49.95,32.86 49.95,31.41V2.63C49.95,1.18 48.77,0 47.32,0Z"
+      android:fillColor="?attr/colorPrimary"/>
+  <path
+      android:name=""
+      android:pathData="M15.92,17.73a1.81,1.81 0,1 0,3.62 0a1.81,1.81 0,1 0,-3.62 0z"
+      android:fillColor="?attr/colorOnPrimary"/>
+  <path
+      android:pathData="M23.16,17.73a1.81,1.81 0,1 0,3.62 0a1.81,1.81 0,1 0,-3.62 0z"
+      android:fillColor="?attr/colorOnPrimary"/>
+  <path
+      android:pathData="M30.4,17.73a1.81,1.81 0,1 0,3.62 0a1.81,1.81 0,1 0,-3.62 0z"
+      android:fillColor="?attr/colorOnPrimary"/>
+</vector>
