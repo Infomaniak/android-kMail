@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2024 Infomaniak Network SA
+ * Copyright (C) 2024-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -238,6 +238,7 @@ class MenuDrawerAdapter @Inject constructor() : ListAdapter<Any, MenuDrawerViewH
             is FolderViewHolder -> holder.displayFolder(
                 folder = item as Folder,
                 currentFolderId = currentFolderId,
+                // TODO: Fix this
                 hasCollapsableFolder = if (item.role == null) hasCollapsableCustomFolder else hasCollapsableDefaultFolder,
                 onFolderClicked = callbacks.onFolderClicked,
                 onFolderLongClicked = callbacks.onFolderLongClicked,
