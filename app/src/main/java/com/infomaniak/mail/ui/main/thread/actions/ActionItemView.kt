@@ -31,9 +31,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.core.ksuite.ksuitepro.views.EvolveChipView
 import com.infomaniak.core.ksuite.myksuite.ui.views.MyKSuitePlusChipView
-import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setMarginsRelative
-import com.infomaniak.lib.core.utils.setPaddingRelative
+import com.infomaniak.core.legacy.utils.getAttributes
+import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
 import com.infomaniak.mail.utils.AccountUtils

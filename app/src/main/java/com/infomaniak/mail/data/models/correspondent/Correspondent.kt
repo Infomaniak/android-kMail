@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models.correspondent
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.firstOrEmpty
+import com.infomaniak.core.legacy.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.getStartAndEndOfPlusEmail

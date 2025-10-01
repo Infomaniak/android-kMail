@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetKSuiteProBinding
 
 class KSuiteProBottomSheetDialog : DialogFragment() {

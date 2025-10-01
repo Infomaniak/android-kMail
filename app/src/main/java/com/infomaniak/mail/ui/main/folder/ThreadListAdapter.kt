@@ -38,6 +38,10 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.card.MaterialCardView
+import com.infomaniak.core.legacy.utils.capitalizeFirstChar
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.setMarginsRelative
+import com.infomaniak.core.legacy.utils.toPx
 import com.infomaniak.core.matomo.Matomo.TrackerAction
 import com.infomaniak.core.utils.format
 import com.infomaniak.core.utils.isInTheFuture
@@ -48,10 +52,6 @@ import com.infomaniak.core.utils.isToday
 import com.infomaniak.core.utils.isYesterday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-import com.infomaniak.lib.core.utils.capitalizeFirstChar
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.setMarginsRelative
-import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
@@ -90,7 +90,7 @@ import splitties.init.appCtx
 import javax.inject.Inject
 import kotlin.math.abs
 import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here? Same for all adapters in the app?
 class ThreadListAdapter @Inject constructor(

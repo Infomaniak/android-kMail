@@ -21,9 +21,9 @@ import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
-import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.models.ApiResponseStatus
+import com.infomaniak.core.legacy.InfomaniakCore
+import com.infomaniak.core.legacy.models.ApiResponse
+import com.infomaniak.core.legacy.models.ApiResponseStatus
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.Attachment

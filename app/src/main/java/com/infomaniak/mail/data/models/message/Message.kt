@@ -20,8 +20,8 @@
 package com.infomaniak.mail.data.models.message
 
 import android.content.Context
+import com.infomaniak.core.legacy.utils.Utils.enumValueOfOrNull
 import com.infomaniak.core.utils.apiEnum
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.UnwrappingJsonListSerializer

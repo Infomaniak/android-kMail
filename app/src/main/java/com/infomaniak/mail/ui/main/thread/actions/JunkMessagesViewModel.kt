@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController

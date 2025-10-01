@@ -27,10 +27,10 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.hideProgressCatching
-import com.infomaniak.lib.core.utils.showProgressCatching
+import com.infomaniak.core.legacy.utils.Utils
+import com.infomaniak.core.legacy.utils.getAttributes
+import com.infomaniak.core.legacy.utils.hideProgressCatching
+import com.infomaniak.core.legacy.utils.showProgressCatching
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMessageAlertBinding
 

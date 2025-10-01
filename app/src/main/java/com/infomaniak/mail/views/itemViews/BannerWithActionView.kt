@@ -24,8 +24,8 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.core.legacy.utils.getAttributes
+import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBannerWithActionBinding
 

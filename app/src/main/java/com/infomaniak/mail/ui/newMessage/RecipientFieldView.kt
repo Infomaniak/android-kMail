@@ -34,11 +34,11 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.chip.Chip
-import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.hideKeyboard
-import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.toPx
-import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.core.legacy.utils.getAttributes
+import com.infomaniak.core.legacy.utils.hideKeyboard
+import com.infomaniak.core.legacy.utils.showKeyboard
+import com.infomaniak.core.legacy.utils.toPx
+import com.infomaniak.core.legacy.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
@@ -59,7 +59,7 @@ import com.infomaniak.mail.utils.extensions.toggleChevron
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.min
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
 class RecipientFieldView @JvmOverloads constructor(

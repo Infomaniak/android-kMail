@@ -23,9 +23,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.legacy.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetAttendeesBinding
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog

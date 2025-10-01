@@ -41,17 +41,17 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.work.Data
 import com.airbnb.lottie.LottieAnimationView
 import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.legacy.stores.StoreUtils
+import com.infomaniak.core.legacy.stores.StoreUtils.checkUpdateIsRequired
+import com.infomaniak.core.legacy.stores.reviewmanagers.InAppReviewManager
+import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
+import com.infomaniak.core.legacy.utils.Utils
+import com.infomaniak.core.legacy.utils.Utils.toEnumOrThrow
+import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.core.matomo.Matomo.TrackerAction
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.FORMAT_ISO_8601_WITH_TIMEZONE_SEPARATOR
 import com.infomaniak.core.utils.year
-import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.Utils.toEnumOrThrow
-import com.infomaniak.lib.core.utils.hasPermissions
-import com.infomaniak.lib.stores.StoreUtils
-import com.infomaniak.lib.stores.StoreUtils.checkUpdateIsRequired
-import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
-import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.MatomoName
@@ -105,7 +105,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {

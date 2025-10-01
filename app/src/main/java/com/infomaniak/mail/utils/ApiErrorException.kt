@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.lib.core.models.ApiError
-import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.core.legacy.models.ApiError
+import com.infomaniak.core.legacy.models.ApiResponse
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive

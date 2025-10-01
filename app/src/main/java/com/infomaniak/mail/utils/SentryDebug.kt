@@ -44,7 +44,7 @@ object SentryDebug {
         fun Bundle?.refined(): Map<String, Any?> = this?.let { args ->
             args.keySet()
                 .filter { it != NavController.KEY_DEEP_LINK_INTENT } // there's a lot of unrelated stuff
-                .associateWith { args[it] }
+                .associateWith { @Suppress("DEPRECATION") args[it] }
         } ?: emptyMap()
 
         val newDestinationName = name.substringAfter("${BuildConfig.APPLICATION_ID}:id/")

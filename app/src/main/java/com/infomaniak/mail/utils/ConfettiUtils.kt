@@ -18,14 +18,14 @@
 package com.infomaniak.mail.utils
 
 import android.view.ViewGroup
-import com.infomaniak.lib.confetti.CommonConfetti
-import com.infomaniak.lib.confetti.ConfettiSource
+import com.infomaniak.core.legacy.confetti.CommonConfetti
+import com.infomaniak.core.legacy.confetti.ConfettiSource
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackEasterEggEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.isInPortrait
 import io.sentry.Sentry
-import com.infomaniak.lib.confetti.R as RConfetti
+import com.infomaniak.core.legacy.confetti.R as RConfetti
 
 object ConfettiUtils {
 

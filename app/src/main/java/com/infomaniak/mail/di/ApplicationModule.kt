@@ -21,8 +21,8 @@ import android.app.Application
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
-import com.infomaniak.lib.stores.AppUpdateScheduler
-import com.infomaniak.lib.stores.StoresSettingsRepository
+import com.infomaniak.core.legacy.stores.AppUpdateScheduler
+import com.infomaniak.core.legacy.stores.StoresSettingsRepository
 import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.LocalSettings
 import dagger.Module

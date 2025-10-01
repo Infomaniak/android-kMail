@@ -39,8 +39,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.lib.core.utils.setMargins
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
@@ -65,7 +65,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @AndroidEntryPoint
 class AiPropositionFragment : Fragment() {

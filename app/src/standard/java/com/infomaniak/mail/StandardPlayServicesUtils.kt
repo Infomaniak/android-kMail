@@ -23,8 +23,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
+import com.infomaniak.core.legacy.utils.showToast
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker

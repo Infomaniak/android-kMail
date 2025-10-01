@@ -20,7 +20,7 @@ package com.infomaniak.mail.data.models
 import android.content.Context
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.core.legacy.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.utils.AttachableMimeTypeUtils
 import com.infomaniak.mail.utils.LocalStorageUtils

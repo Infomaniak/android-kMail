@@ -26,7 +26,7 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuItemImpl
 import androidx.appcompat.widget.PopupMenu
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 class SimpleIconPopupMenu(val context: Context, @MenuRes menuRes: Int, anchor: View, onMenuItemClicked: (Int) -> Unit) {
 

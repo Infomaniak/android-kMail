@@ -23,8 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.databinding.FragmentEmojiPickerBinding
 
 class EmojiPickerBottomSheetDialog : BottomSheetDialogFragment() {

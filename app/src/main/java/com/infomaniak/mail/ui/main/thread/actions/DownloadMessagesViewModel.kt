@@ -26,7 +26,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.cancellable
-import com.infomaniak.lib.core.utils.DownloadManagerUtils
+import com.infomaniak.core.legacy.utils.DownloadManagerUtils
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository

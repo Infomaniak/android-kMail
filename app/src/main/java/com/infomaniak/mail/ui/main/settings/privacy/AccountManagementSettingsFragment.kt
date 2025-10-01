@@ -25,10 +25,10 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.infomaniak.lib.core.BuildConfig.AUTOLOG_URL
-import com.infomaniak.lib.core.BuildConfig.TERMINATE_ACCOUNT_URL
-import com.infomaniak.lib.core.ui.WebViewActivity
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.BuildConfig.AUTOLOG_URL
+import com.infomaniak.core.legacy.BuildConfig.TERMINATE_ACCOUNT_URL
+import com.infomaniak.core.legacy.ui.WebViewActivity
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.databinding.FragmentAccountManagementSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.extensions.setSystemBarsColors

@@ -21,7 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.UiUtils
 import com.infomaniak.mail.utils.extensions.getAttributeColor

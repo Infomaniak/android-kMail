@@ -59,7 +59,7 @@
         app:layout_constraintTop_toTopOf="@id/singleLineGuide"
         tools:text="@string/bccTitle" />
 
-    <com.infomaniak.lib.core.views.EndIconTextInputLayout
+    <com.infomaniak.core.legacy.views.EndIconTextInputLayout
         android:id="@+id/textInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
             android:paddingVertical="0dp"
             android:paddingStart="@dimen/marginStandardVerySmall"
             tools:ignore="RtlSymmetry" />
-    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+    </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 
     <include
         android:id="@+id/singleChip"
@@ -159,7 +159,7 @@
             tools:visibility="visible" />
     </FrameLayout>
 
-    <com.infomaniak.lib.core.views.LoaderTextView
+    <com.infomaniak.core.legacy.views.LoaderTextView
         android:id="@+id/loader"
         style="@style/Body"
         android:layout_width="0dp"

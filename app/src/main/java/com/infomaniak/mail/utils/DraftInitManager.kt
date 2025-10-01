@@ -18,7 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.contains
+import com.infomaniak.core.legacy.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.ReplyForwardFooterManager
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController

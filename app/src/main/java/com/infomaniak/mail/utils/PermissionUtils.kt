@@ -26,7 +26,7 @@ import androidx.annotation.DeprecatedSinceApi
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.infomaniak.lib.core.utils.hasPermissions
+import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.mail.data.LocalSettings
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject

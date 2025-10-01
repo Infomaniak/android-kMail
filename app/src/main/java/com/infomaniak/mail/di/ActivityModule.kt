@@ -18,8 +18,8 @@
 package com.infomaniak.mail.di
 
 import androidx.fragment.app.FragmentActivity
-import com.infomaniak.lib.stores.reviewmanagers.InAppReviewManager
-import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
+import com.infomaniak.core.legacy.stores.reviewmanagers.InAppReviewManager
+import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import dagger.Module

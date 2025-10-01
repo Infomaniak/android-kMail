@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.core.legacy.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import kotlinx.coroutines.CoroutineScope

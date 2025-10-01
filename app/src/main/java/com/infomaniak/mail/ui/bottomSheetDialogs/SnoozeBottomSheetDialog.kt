@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.bottomSheetDialogs
 
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSnoozeEvent
 import com.infomaniak.mail.R

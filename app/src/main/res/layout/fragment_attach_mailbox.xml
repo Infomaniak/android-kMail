@@ -50,7 +50,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/attachMailboxDescription1" />
 
-            <com.infomaniak.lib.core.views.EndIconTextInputLayout
+            <com.infomaniak.core.legacy.views.EndIconTextInputLayout
                 android:id="@+id/mailInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,9 +70,9 @@
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress" />
 
-            </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+            </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 
-            <com.infomaniak.lib.core.views.EndIconTextInputLayout
+            <com.infomaniak.core.legacy.views.EndIconTextInputLayout
                 android:id="@+id/passwordInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textPassword" />
 
-            </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+            </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/attachMailboxButton"

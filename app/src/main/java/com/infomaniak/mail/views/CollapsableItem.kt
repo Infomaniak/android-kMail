@@ -20,7 +20,7 @@ package com.infomaniak.mail.views
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.viewbinding.ViewBinding
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.toggleChevron
 

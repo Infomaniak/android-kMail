@@ -26,6 +26,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.core.utils.FORMAT_DATE_DAY_MONTH_YEAR
 import com.infomaniak.core.utils.day
 import com.infomaniak.core.utils.format
@@ -38,14 +39,13 @@ import com.infomaniak.core.utils.roundUpToNextTenMinutes
 import com.infomaniak.core.utils.setHour
 import com.infomaniak.core.utils.setMinute
 import com.infomaniak.core.utils.year
-import com.infomaniak.lib.core.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogSelectDateAndTimeBinding
 import com.infomaniak.mail.utils.date.DateFormatUtils.formatTime
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 abstract class SelectDateAndTimeDialog(private val activityContext: Context) : BaseAlertDialog(activityContext) {
 

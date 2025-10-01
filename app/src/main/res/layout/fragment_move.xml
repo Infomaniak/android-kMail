@@ -84,7 +84,7 @@
                 android:layout_marginBottom="@dimen/marginStandardSmall"
                 app:cardCornerRadius="4dp">
 
-                <com.infomaniak.lib.core.views.EndIconTextInputLayout
+                <com.infomaniak.core.legacy.views.EndIconTextInputLayout
                     android:id="@+id/searchInputLayout"
                     style="@style/SearchTextInputLayoutStyle"
                     android:layout_width="match_parent"
@@ -97,7 +97,7 @@
                         style="@style/SearchTextInputEditTextStyle"
                         android:drawablePadding="@dimen/marginStandardMedium"
                         android:hint="@string/moveSearchFieldPlaceholder" />
-                </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+                </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 
             </com.google.android.material.card.MaterialCardView>
 

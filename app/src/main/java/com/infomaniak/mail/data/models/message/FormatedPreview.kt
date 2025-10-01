@@ -21,11 +21,11 @@ sealed interface FormatedPreview {
     val content: String
 
     @JvmInline
-    value class Encryption(override val content: String): FormatedPreview
+    value class Encryption(override val content: String) : FormatedPreview
     @JvmInline
-    value class Reaction(override val content: String): FormatedPreview
+    value class Reaction(override val content: String) : FormatedPreview
     @JvmInline
-    value class Empty(override val content: String): FormatedPreview
+    value class Empty(override val content: String) : FormatedPreview
     @JvmInline
-    value class Body(override val content: String): FormatedPreview
+    value class Body(override val content: String) : FormatedPreview
 }

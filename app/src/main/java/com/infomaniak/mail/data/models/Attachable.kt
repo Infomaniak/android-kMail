@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.models
 
 import android.content.Context
 import androidx.annotation.DrawableRes
-import com.infomaniak.lib.core.utils.guessMimeType
+import com.infomaniak.core.legacy.utils.guessMimeType
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.utils.AccountUtils

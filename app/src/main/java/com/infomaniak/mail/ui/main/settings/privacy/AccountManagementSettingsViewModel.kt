@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.main.settings.privacy
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.core.legacy.models.user.User
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.LogoutUser
 import dagger.hilt.android.lifecycle.HiltViewModel

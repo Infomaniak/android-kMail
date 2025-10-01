@@ -18,12 +18,12 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import com.infomaniak.lib.core.auth.CredentialManager
-import com.infomaniak.lib.core.auth.TokenAuthenticator
-import com.infomaniak.lib.core.models.ApiResponseStatus
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.room.UserDatabase
+import com.infomaniak.core.legacy.auth.CredentialManager
+import com.infomaniak.core.legacy.auth.TokenAuthenticator
+import com.infomaniak.core.legacy.models.ApiResponseStatus
+import com.infomaniak.core.legacy.models.user.User
+import com.infomaniak.core.legacy.networking.HttpClient
+import com.infomaniak.core.legacy.room.UserDatabase
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController

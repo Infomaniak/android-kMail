@@ -23,7 +23,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
-import com.infomaniak.lib.core.utils.serializableExtra
+import com.infomaniak.core.legacy.utils.serializableExtra
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNotificationActionEvent
 import com.infomaniak.mail.R

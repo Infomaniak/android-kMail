@@ -21,7 +21,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.databinding.DialogLinkContextualMenuBinding
 import com.infomaniak.mail.ui.main.SnackbarManager
 import dagger.hilt.android.qualifiers.ActivityContext
