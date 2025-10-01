@@ -66,6 +66,7 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.endOfTheWeek
 import com.infomaniak.core.utils.isEmailRfc5321Compliant
 import com.infomaniak.core.utils.startOfTheDay
@@ -74,7 +75,6 @@ import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.removeAccents
@@ -336,22 +336,22 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
  *
  * @param dismissHiddenChildren A children Folder is hidden if its parent is collapsed. This parameter returns the list without
  * the hidden children when true is provided and return all folders even hidden ones when false is provided.
- * @param excludeRoleFolderWithoutChildren Do not return folders with role if they have zero children. This is used in the menu
- * drawer to not display role folders twice (once in each half of the list) when there's no reason to.
+ * @param excludeRoleFolder Do not return folders with role nor their children. This is used in the menu drawer to not display
+ * role folders in the bottom custom folder section because they are already displayed on the upper section.
  */
 fun List<Folder>.flattenFolderChildrenAndRemoveMessages(
     dismissHiddenChildren: Boolean = false,
-    excludeRoleFolderWithoutChildren: Boolean = false,
+    excludeRoleFolder: Boolean = false,
 ): List<Folder> {
 
     if (isEmpty()) return this
 
-    return formatFolderWithAllChildren(dismissHiddenChildren, excludeRoleFolderWithoutChildren, toMutableList())
+    return formatFolderWithAllChildren(dismissHiddenChildren, excludeRoleFolder, toMutableList())
 }
 
 private tailrec fun formatFolderWithAllChildren(
     dismissHiddenChildren: Boolean,
-    excludeRoleFolderWithoutChildren: Boolean,
+    excludeRoleFolder: Boolean,
     inputList: MutableList<Folder>,
     outputList: MutableList<Folder> = mutableListOf(),
 ): List<Folder> {
@@ -368,33 +368,39 @@ private tailrec fun formatFolderWithAllChildren(
     *
     * I.e. hides all IK folders with no roles.
     */
-    val shouldThisFolderBeAdded = folder.shouldBeExcluded(excludeRoleFolderWithoutChildren).not()
+    val shouldThisFolderBeAdded = folder.shouldBeExcluded(excludeRoleFolder).not()
 
     val children = if (folder.isManaged()) {
-        if (shouldThisFolderBeAdded) outputList.add(folder.copyFromRealm(depth = 1u))
-
-        with(folder.children) {
-            (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
+        if (shouldThisFolderBeAdded) {
+            outputList.add(folder.copyFromRealm(depth = 1u))
+            with(folder.children) {
+                (if (dismissHiddenChildren) query("${Folder::isHidden.name} == false") else query()).sortFolders().find()
+            }
+        } else {
+            null
         }
     } else {
-        if (shouldThisFolderBeAdded) outputList.add(folder)
-
-        (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
+        if (shouldThisFolderBeAdded) {
+            outputList.add(folder)
+            (if (dismissHiddenChildren) folder.children.filter { !it.isHidden } else folder.children).sortFolders()
+        } else {
+            null
+        }
     }
 
-    inputList.addAll(index = 0, children)
+    children?.let { inputList.addAll(index = 0, it) }
 
     return if (inputList.isEmpty()) {
         outputList
     } else {
-        formatFolderWithAllChildren(dismissHiddenChildren, excludeRoleFolderWithoutChildren, inputList, outputList)
+        formatFolderWithAllChildren(dismissHiddenChildren, excludeRoleFolder, inputList, outputList)
     }
 }
 
-private fun Folder.shouldBeExcluded(excludeRoleFolderWithoutChildren: Boolean): Boolean {
+private fun Folder.shouldBeExcluded(excludeRoleFolder: Boolean): Boolean {
     val isHiddenIkFolder = path.startsWith(IK_FOLDER) && role == null
-    val isRoleFolderWithoutChildren = role != null && children.isEmpty()
-    return isHiddenIkFolder || (excludeRoleFolderWithoutChildren && isRoleFolderWithoutChildren)
+    val isRoleFolder = role != null
+    return isHiddenIkFolder || (excludeRoleFolder && isRoleFolder)
 }
 
 /**
