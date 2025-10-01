@@ -48,7 +48,6 @@ import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.data.models.mailbox.MailboxPermissions
@@ -67,6 +66,7 @@ import com.infomaniak.mail.utils.ConfettiUtils
 import com.infomaniak.mail.utils.ConfettiUtils.ConfettiType.INFOMANIAK
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.Shortcuts
+import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
 import com.infomaniak.mail.utils.extensions.bindAlertToViewLifecycle
 import com.infomaniak.mail.utils.extensions.getStringWithBoldArg
 import com.infomaniak.mail.utils.extensions.launchSyncAutoConfigActivityForResult
@@ -339,8 +339,8 @@ class MenuDrawerFragment : Fragment() {
                 MediatorContainer(
                     it[0] as List<Mailbox>,
                     it[1] as Boolean,
-                    it[2] as List<Folder>,
-                    it[3] as List<Folder>,
+                    it[2] as List<MenuDrawerFolder>,
+                    it[3] as List<MenuDrawerFolder>,
                     it[4] as Boolean,
                     it[5] as Boolean,
                     it[6] as MailboxPermissions?,
@@ -385,8 +385,8 @@ class MenuDrawerFragment : Fragment() {
     data class MediatorContainer(
         val mailboxes: List<Mailbox>,
         val areMailboxesExpanded: Boolean,
-        val defaultFolders: List<Folder>,
-        val customFolders: List<Folder>,
+        val defaultFolders: List<MenuDrawerFolder>,
+        val customFolders: List<MenuDrawerFolder>,
         val areCustomFoldersExpanded: Boolean,
         val areActionsExpanded: Boolean,
         val permissions: MailboxPermissions?,

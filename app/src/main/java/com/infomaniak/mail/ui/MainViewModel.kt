@@ -98,7 +98,7 @@ import com.infomaniak.mail.utils.extensions.allFailed
 import com.infomaniak.mail.utils.extensions.appContext
 import com.infomaniak.mail.utils.extensions.atLeastOneFailed
 import com.infomaniak.mail.utils.extensions.atLeastOneSucceeded
-import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
+import com.infomaniak.mail.utils.extensions.constructMenuDrawerFolderStructure
 import com.infomaniak.mail.utils.extensions.getFirstTranslatedError
 import com.infomaniak.mail.utils.extensions.getFoldersIds
 import com.infomaniak.mail.utils.extensions.getUids
@@ -218,13 +218,13 @@ class MainViewModel @Inject constructor(
 
     val defaultFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController.getMenuDrawerDefaultFoldersAsync()
-            .map { it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true) }
+            .map { it.list.constructMenuDrawerFolderStructure() }
     }.asLiveData(ioCoroutineContext)
 
     val customFoldersLive = _currentMailboxObjectId.filterNotNull().flatMapLatest {
         folderController.getMenuDrawerCustomFoldersAsync()
             .map {
-                it.list.flattenFolderChildrenAndRemoveMessages(dismissHiddenChildren = true, excludeRoleFolder = true)
+                it.list.constructMenuDrawerFolderStructure(excludeRoleFolder = true)
             }
     }.asLiveData(ioCoroutineContext)
 
