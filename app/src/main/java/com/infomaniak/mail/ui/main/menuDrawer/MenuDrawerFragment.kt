@@ -34,10 +34,10 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
-import com.infomaniak.lib.bugtracker.BugTrackerActivity
-import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.core.legacy.bugtracker.BugTrackerActivity
+import com.infomaniak.core.legacy.bugtracker.BugTrackerActivityArgs
+import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
+import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent

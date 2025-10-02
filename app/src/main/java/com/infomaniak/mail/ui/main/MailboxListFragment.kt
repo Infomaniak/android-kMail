@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.main
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.ui.bottomSheetDialogs.LockedMailboxBottomSheetDialogArgs

@@ -19,9 +19,9 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.infomaniak.html.cleaner.HtmlSanitizer
-import com.infomaniak.lib.core.api.ApiController.NetworkException
+import com.infomaniak.core.legacy.api.ApiController.NetworkException
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.html.cleaner.HtmlSanitizer
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase

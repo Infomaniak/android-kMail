@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.DialogConfirmationToBlockUserBinding
@@ -28,7 +28,7 @@ import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @ActivityScoped
 class ConfirmationToBlockUserDialog @Inject constructor(

@@ -25,7 +25,7 @@ import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSettingRadioButtonBinding
 import com.infomaniak.mail.utils.extensions.getAttributeColor

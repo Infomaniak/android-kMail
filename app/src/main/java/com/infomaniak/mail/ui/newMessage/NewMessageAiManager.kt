@@ -32,8 +32,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.infomaniak.core.ksuite.data.KSuite
-import com.infomaniak.lib.core.utils.hideKeyboard
-import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.core.legacy.utils.hideKeyboard
+import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAiWriterEvent
 import com.infomaniak.mail.R
@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 import kotlin.math.roundToInt
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @OptIn(ExperimentalSplittiesApi::class)
 @FragmentScoped

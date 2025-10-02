@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.ui.newMessage.encryption
 
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.mail.MatomoMail
 import com.infomaniak.mail.MatomoMail.MatomoName
 import splitties.init.appCtx

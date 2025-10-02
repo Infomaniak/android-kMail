@@ -28,13 +28,13 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.utils.getNextMonday
 import com.infomaniak.core.utils.getTimeAtHour
 import com.infomaniak.core.utils.isAtLeastXMinutesInTheFuture
 import com.infomaniak.core.utils.isWeekend
 import com.infomaniak.core.utils.tomorrow
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetScheduleOptionsBinding

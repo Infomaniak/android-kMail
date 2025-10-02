@@ -25,9 +25,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.hideKeyboard
-import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.hideKeyboard
+import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.di.IoDispatcher
@@ -40,7 +40,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @ActivityScoped
 open class InputAlertDialog @Inject constructor(

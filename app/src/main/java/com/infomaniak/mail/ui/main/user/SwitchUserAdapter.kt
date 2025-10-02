@@ -23,7 +23,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.core.legacy.models.user.User
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter.SwitchUserAccountViewHolder
 

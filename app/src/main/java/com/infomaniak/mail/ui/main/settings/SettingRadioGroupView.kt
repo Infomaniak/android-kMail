@@ -24,7 +24,7 @@ import android.widget.LinearLayout
 import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 
 class SettingRadioGroupView @JvmOverloads constructor(

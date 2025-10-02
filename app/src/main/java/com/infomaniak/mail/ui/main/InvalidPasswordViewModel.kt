@@ -22,9 +22,9 @@ package com.infomaniak.mail.ui.main
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.core.legacy.models.ApiResponse
+import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings

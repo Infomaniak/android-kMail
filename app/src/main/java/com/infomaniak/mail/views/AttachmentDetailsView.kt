@@ -25,12 +25,12 @@ import androidx.annotation.DimenRes
 import androidx.annotation.StyleRes
 import coil3.load
 import com.infomaniak.core.FormatterFileSize.formatShortFileSize
-import com.infomaniak.lib.core.utils.getAttributes
-import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.core.legacy.utils.getAttributes
+import com.infomaniak.core.legacy.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachable
 import com.infomaniak.mail.databinding.ViewAttachmentDetailsBinding
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 class AttachmentDetailsView @JvmOverloads constructor(
     context: Context,

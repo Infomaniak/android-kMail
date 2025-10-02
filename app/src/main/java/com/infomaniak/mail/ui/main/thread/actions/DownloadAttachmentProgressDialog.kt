@@ -26,7 +26,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.extensions.AttachmentExt
 import com.infomaniak.mail.utils.extensions.AttachmentExt.getIntentOrGoToPlayStore
 

@@ -24,8 +24,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.showKeyboard
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogInsertLinkBinding
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
@@ -33,7 +33,7 @@ import com.infomaniak.mail.utils.extensions.trimmedText
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @ActivityScoped
 class InsertLinkDialog @Inject constructor(

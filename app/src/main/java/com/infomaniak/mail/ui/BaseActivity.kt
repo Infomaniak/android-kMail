@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.lib.applock.LockActivity
+import com.infomaniak.core.legacy.applock.LockActivity
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.utils.AccountUtils

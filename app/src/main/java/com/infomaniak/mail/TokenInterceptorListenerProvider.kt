@@ -18,14 +18,14 @@
 package com.infomaniak.mail
 
 import com.infomaniak.core.auth.TokenInterceptorListener
-import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.core.legacy.models.user.User
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
-import com.infomaniak.lib.core.auth.TokenInterceptorListener as LegacyTokenInterceptorListener
+import com.infomaniak.core.legacy.auth.TokenInterceptorListener as LegacyTokenInterceptorListener
 
 /**
  * Used for the MainApplication. This object contains all the the logic to define a [TokenInterceptorListener] for authenticated

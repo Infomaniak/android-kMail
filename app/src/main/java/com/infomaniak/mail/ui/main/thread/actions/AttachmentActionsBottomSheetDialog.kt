@@ -25,8 +25,8 @@ import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAttachmentActionsEvent
 import com.infomaniak.mail.data.models.Attachable

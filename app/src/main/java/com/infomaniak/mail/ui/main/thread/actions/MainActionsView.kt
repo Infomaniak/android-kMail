@@ -40,7 +40,7 @@ import androidx.core.view.get
 import androidx.core.view.isInvisible
 import androidx.core.view.size
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMainActionsBinding
 

@@ -21,10 +21,10 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.work.WorkManager
 import com.infomaniak.core.cancellable
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.core.legacy.models.user.User
+import com.infomaniak.core.legacy.networking.HttpClient
+import com.infomaniak.core.legacy.stores.StoresSettingsRepository
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.stores.StoresSettingsRepository
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController

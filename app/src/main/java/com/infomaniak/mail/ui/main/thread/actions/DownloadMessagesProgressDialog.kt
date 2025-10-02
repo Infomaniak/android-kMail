@@ -29,7 +29,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.core.extensions.goToPlayStore
-import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.utils.LocalStorageUtils.clearEmlCacheDir
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.DRIVE_PACKAGE
 import com.infomaniak.mail.utils.SaveOnKDriveUtils.SAVE_EXTERNAL_ACTIVITY_CLASS

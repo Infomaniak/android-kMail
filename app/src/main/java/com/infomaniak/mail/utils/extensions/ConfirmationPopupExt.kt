@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils.extensions
 
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog

@@ -18,8 +18,8 @@
 package com.infomaniak.mail.ui.main.folder
 
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R

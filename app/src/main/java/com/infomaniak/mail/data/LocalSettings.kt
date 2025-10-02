@@ -24,11 +24,11 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.MaterialColors
-import com.infomaniak.lib.core.networking.AccessTokenUsageInterceptor.ApiCallRecord
+import com.infomaniak.core.legacy.networking.AccessTokenUsageInterceptor.ApiCallRecord
+import com.infomaniak.core.legacy.utils.SharedValues
+import com.infomaniak.core.legacy.utils.sharedValue
+import com.infomaniak.core.legacy.utils.transaction
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.core.utils.SharedValues
-import com.infomaniak.lib.core.utils.sharedValue
-import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.SwipeAction

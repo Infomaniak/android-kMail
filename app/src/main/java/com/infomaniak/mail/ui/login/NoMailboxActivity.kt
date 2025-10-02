@@ -18,8 +18,8 @@
 package com.infomaniak.mail.ui.login
 
 import android.os.Bundle
-import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.core.legacy.utils.Utils.lockOrientationForSmallScreens
+import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding

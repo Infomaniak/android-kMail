@@ -23,7 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.trackAutoAdvanceEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings

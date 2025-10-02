@@ -29,7 +29,7 @@ import okhttp3.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 object LocalStorageUtils {
 

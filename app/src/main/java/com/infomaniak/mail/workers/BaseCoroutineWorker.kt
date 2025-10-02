@@ -21,7 +21,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.infomaniak.lib.core.api.ApiController.NetworkException
+import com.infomaniak.core.legacy.api.ApiController.NetworkException
 import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 

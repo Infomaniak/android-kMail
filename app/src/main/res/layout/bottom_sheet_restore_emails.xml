@@ -37,7 +37,7 @@
         android:layout_margin="@dimen/marginStandardMedium"
         android:text="@string/restoreEmailsText" />
 
-    <com.infomaniak.lib.core.views.EndIconTextInputLayout
+    <com.infomaniak.core.legacy.views.EndIconTextInputLayout
         android:id="@+id/datePicker"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
@@ -52,7 +52,7 @@
             android:hint="@string/restoreEmailsBackupDate"
             android:inputType="none" />
 
-    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+    </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/restoreMailsButton"

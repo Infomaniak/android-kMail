@@ -24,8 +24,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.core.observe
-import com.infomaniak.lib.core.utils.safeBinding
 import com.infomaniak.mail.databinding.BottomSheetCrossLoginBinding
 
 class CrossLoginBottomSheetDialog : BottomSheetDialogFragment() {

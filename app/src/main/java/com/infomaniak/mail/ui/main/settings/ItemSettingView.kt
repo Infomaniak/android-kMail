@@ -25,7 +25,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.materialswitch.MaterialSwitch
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
 

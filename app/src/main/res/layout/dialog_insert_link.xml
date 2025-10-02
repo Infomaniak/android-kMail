@@ -30,7 +30,7 @@
         android:layout_marginTop="@dimen/marginStandard"
         android:text="@string/urlEntryTitle" />
 
-    <com.infomaniak.lib.core.views.EndIconTextInputLayout
+    <com.infomaniak.core.legacy.views.EndIconTextInputLayout
         android:id="@+id/displayNameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,9 +44,9 @@
             android:inputType="text"
             android:selectAllOnFocus="true" />
 
-    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+    </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 
-    <com.infomaniak.lib.core.views.EndIconTextInputLayout
+    <com.infomaniak.core.legacy.views.EndIconTextInputLayout
         android:id="@+id/urlLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,5 +59,5 @@
             android:hint="@string/urlPlaceholder"
             android:inputType="text" />
 
-    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+    </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 </LinearLayout>

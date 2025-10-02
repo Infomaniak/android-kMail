@@ -18,7 +18,7 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
 import com.infomaniak.mail.utils.extensions.shareString

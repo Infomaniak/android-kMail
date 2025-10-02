@@ -22,10 +22,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.workDataOf
 import com.infomaniak.core.cancellable
-import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
-import com.infomaniak.lib.core.api.ApiController.NetworkException
-import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.core.legacy.api.ApiController.NetworkException
+import com.infomaniak.core.legacy.models.ApiResponse
 import com.infomaniak.core.sentry.SentryLog
+import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase

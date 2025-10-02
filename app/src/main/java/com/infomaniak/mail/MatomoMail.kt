@@ -22,9 +22,9 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
 import com.infomaniak.core.ksuite.ui.utils.MatomoKSuite
+import com.infomaniak.core.legacy.utils.capitalizeFirstChar
 import com.infomaniak.core.matomo.Matomo
 import com.infomaniak.core.matomo.Matomo.TrackerAction
-import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.ui.newMessage.NewMessageEditorManager.EditorAction

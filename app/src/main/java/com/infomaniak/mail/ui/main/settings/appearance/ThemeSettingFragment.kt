@@ -25,7 +25,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R

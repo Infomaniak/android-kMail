@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.ksuite.myksuite.ui.data.MyKSuiteData
-import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher

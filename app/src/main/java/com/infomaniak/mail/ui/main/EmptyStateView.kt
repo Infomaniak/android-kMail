@@ -24,7 +24,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEmptyStateBinding
 

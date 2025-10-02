@@ -19,7 +19,7 @@
 
 package com.infomaniak.mail.data.models.calendar
 
-import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.mail.data.api.CalendarRealmInstantSerializer
 import com.infomaniak.mail.utils.extensions.toRealmInstant
 import io.realm.kotlin.ext.realmListOf

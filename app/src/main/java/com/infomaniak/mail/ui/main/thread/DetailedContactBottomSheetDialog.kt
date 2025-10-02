@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackContactActionsEvent
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding

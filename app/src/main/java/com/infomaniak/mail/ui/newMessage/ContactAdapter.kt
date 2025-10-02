@@ -25,7 +25,7 @@ import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.infomaniak.lib.core.utils.context
+import com.infomaniak.core.legacy.utils.context
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R

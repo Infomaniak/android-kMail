@@ -28,8 +28,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.legacy.utils.setBackNavigationResult
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectActionEvent
 import com.infomaniak.mail.R

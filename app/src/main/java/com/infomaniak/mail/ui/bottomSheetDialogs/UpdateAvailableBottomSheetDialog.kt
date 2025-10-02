@@ -22,14 +22,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import com.infomaniak.core.extensions.goToPlayStore
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.getAppName
-import com.infomaniak.lib.stores.StoresSettingsRepository
-import com.infomaniak.lib.stores.StoresViewModel
+import com.infomaniak.core.legacy.stores.StoresSettingsRepository
+import com.infomaniak.core.legacy.stores.StoresViewModel
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.getAppName
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAppUpdateEvent
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 class UpdateAvailableBottomSheetDialog : InformationBottomSheetDialog() {
 

@@ -23,11 +23,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.cancellable
-import com.infomaniak.lib.core.R
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.legacy.R
+import com.infomaniak.core.legacy.models.ApiResponse
+import com.infomaniak.core.legacy.models.user.User
+import com.infomaniak.core.legacy.networking.HttpClient
+import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin

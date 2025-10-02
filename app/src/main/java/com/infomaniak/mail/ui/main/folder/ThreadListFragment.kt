@@ -42,6 +42,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.core.extensions.goToPlayStore
 import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
+import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.legacy.utils.setMargins
+import com.infomaniak.core.legacy.utils.setPaddingRelative
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
@@ -50,13 +57,6 @@ import com.infomaniak.dragdropswiperecyclerview.listener.OnItemSwipeListener.Swi
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
-import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.setMargins
-import com.infomaniak.lib.core.utils.setPaddingRelative
-import com.infomaniak.lib.stores.updatemanagers.InAppUpdateManager
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackKSuiteProEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
@@ -104,8 +104,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
-import com.infomaniak.lib.core.R as RCore
-import com.infomaniak.lib.core.utils.Utils as UtilsCore
+import com.infomaniak.core.legacy.R as RCore
+import com.infomaniak.core.legacy.utils.Utils as UtilsCore
 
 @AndroidEntryPoint
 class ThreadListFragment : TwoPaneFragment() {

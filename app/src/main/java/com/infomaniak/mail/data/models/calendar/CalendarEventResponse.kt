@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.models.calendar
 
-import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.mail.data.models.calendar.CalendarEvent.CalendarEventStatus
 import com.infomaniak.mail.utils.extensions.isUserIn
 import io.realm.kotlin.types.EmbeddedRealmObject

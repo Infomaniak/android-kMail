@@ -25,10 +25,10 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.hideProgressCatching
-import com.infomaniak.lib.core.utils.initProgress
-import com.infomaniak.lib.core.utils.showProgressCatching
+import com.infomaniak.core.legacy.utils.Utils
+import com.infomaniak.core.legacy.utils.hideProgressCatching
+import com.infomaniak.core.legacy.utils.initProgress
+import com.infomaniak.core.legacy.utils.showProgressCatching
 import com.infomaniak.mail.R
 
 abstract class BaseAlertDialog(activityContext: Context) : DefaultLifecycleObserver {

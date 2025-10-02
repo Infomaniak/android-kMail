@@ -17,15 +17,15 @@
  */
 package com.infomaniak.mail
 
-import com.infomaniak.lib.stores.updaterequired.data.models.AppPublishedVersion
-import com.infomaniak.lib.stores.updaterequired.data.models.AppVersion
-import com.infomaniak.lib.stores.updaterequired.data.models.AppVersion.Companion.compareVersionTo
-import com.infomaniak.lib.stores.updaterequired.data.models.AppVersion.Companion.toVersionNumbers
+import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppPublishedVersion
+import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion
+import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion.Companion.compareVersionTo
+import com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion.Companion.toVersionNumbers
 import org.junit.Assert
 import org.junit.Test
 
 /**
- * Tests for the [com.infomaniak.lib.stores.updaterequired.data.models.AppVersion] methods to compare two App Versions
+ * Tests for the [com.infomaniak.core.legacy.stores.updaterequired.data.models.AppVersion] methods to compare two App Versions
  */
 class AppVersionCheckingTest {
 

@@ -26,7 +26,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor

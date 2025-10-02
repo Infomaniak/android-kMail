@@ -21,7 +21,7 @@ import android.Manifest
 import android.content.Context
 import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.provider.ContactsContract.CommonDataKinds.Email
-import com.infomaniak.lib.core.utils.hasPermissions
+import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.ContactAutocompletable
 import com.infomaniak.mail.data.models.correspondent.MergedContact

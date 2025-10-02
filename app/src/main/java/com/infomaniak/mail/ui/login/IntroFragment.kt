@@ -30,9 +30,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.tabs.TabLayout
-import com.infomaniak.lib.core.utils.capitalizeFirstChar
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.capitalizeFirstChar
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackOnBoardingEvent
 import com.infomaniak.mail.R

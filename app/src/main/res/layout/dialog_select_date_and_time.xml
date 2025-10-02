@@ -34,7 +34,7 @@
         android:layout_marginTop="@dimen/marginStandard"
         android:text="@string/datePickerTitle" />
 
-    <com.infomaniak.lib.core.views.EndIconTextInputLayout
+    <com.infomaniak.core.legacy.views.EndIconTextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:endIconDrawable="@drawable/ic_chevron_down"
@@ -51,9 +51,9 @@
             android:inputType="date"
             tools:text="mer. 27 nov. 2024" />
 
-    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+    </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 
-    <com.infomaniak.lib.core.views.EndIconTextInputLayout
+    <com.infomaniak.core.legacy.views.EndIconTextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:endIconDrawable="@drawable/ic_chevron_down"
@@ -70,7 +70,7 @@
             android:inputType="date"
             tools:text="08:00" />
 
-    </com.infomaniak.lib.core.views.EndIconTextInputLayout>
+    </com.infomaniak.core.legacy.views.EndIconTextInputLayout>
 
     <TextView
         android:id="@+id/errorMessage"

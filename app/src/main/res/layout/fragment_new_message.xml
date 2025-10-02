@@ -108,7 +108,7 @@
                             tools:text="myriam.rais@ik.me"
                             tools:visibility="visible" />
 
-                        <com.infomaniak.lib.core.views.LoaderTextView
+                        <com.infomaniak.core.legacy.views.LoaderTextView
                             android:id="@+id/fromLoader"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -234,7 +234,7 @@
                         app:layout_constraintTop_toTopOf="@id/subjectTextFieldGuide"
                         tools:visibility="visible" />
 
-                    <com.infomaniak.lib.core.views.LoaderTextView
+                    <com.infomaniak.core.legacy.views.LoaderTextView
                         android:id="@+id/subjectLoader"
                         style="@style/EmailAddressTextView"
                         android:layout_width="0dp"
@@ -331,35 +331,35 @@
                         app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
                         tools:visibility="gone">
 
-                        <com.infomaniak.lib.core.views.LoaderTextView
+                        <com.infomaniak.core.legacy.views.LoaderTextView
                             style="@style/Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/marginStandardVerySmall"
                             android:maxWidth="900dp" />
 
-                        <com.infomaniak.lib.core.views.LoaderTextView
+                        <com.infomaniak.core.legacy.views.LoaderTextView
                             style="@style/Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/marginStandardVerySmall"
                             android:maxWidth="900dp" />
 
-                        <com.infomaniak.lib.core.views.LoaderTextView
+                        <com.infomaniak.core.legacy.views.LoaderTextView
                             style="@style/Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/marginStandardVerySmall"
                             android:maxWidth="900dp" />
 
-                        <com.infomaniak.lib.core.views.LoaderTextView
+                        <com.infomaniak.core.legacy.views.LoaderTextView
                             style="@style/Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/marginStandardVerySmall"
                             android:maxWidth="900dp" />
 
-                        <com.infomaniak.lib.core.views.LoaderTextView
+                        <com.infomaniak.core.legacy.views.LoaderTextView
                             style="@style/Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

@@ -23,8 +23,8 @@ package com.infomaniak.mail.data.models
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.lib.core.utils.removeAccents
+import com.infomaniak.core.legacy.utils.Utils.enumValueOfOrNull
+import com.infomaniak.core.legacy.utils.removeAccents
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.annotations.TestOnly

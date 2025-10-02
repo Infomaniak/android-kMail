@@ -33,9 +33,9 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.infomaniak.core.cancellable
+import com.infomaniak.core.legacy.utils.clearStack
+import com.infomaniak.core.legacy.utils.hasPermissions
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.core.utils.clearStack
-import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController

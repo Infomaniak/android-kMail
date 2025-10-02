@@ -24,9 +24,9 @@ import android.os.Bundle
 import android.provider.MediaStore.Files.FileColumns
 import androidx.core.content.FileProvider
 import com.infomaniak.core.extensions.goToPlayStore
+import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.legacy.utils.hasSupportedApplications
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -45,7 +45,7 @@ import com.infomaniak.mail.utils.extensions.AttachmentExt.AttachmentIntentType.S
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 object AttachmentExt {
 

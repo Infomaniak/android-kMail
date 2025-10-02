@@ -27,8 +27,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.hideKeyboard
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.hideKeyboard
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackCreateFolderEvent
 import com.infomaniak.mail.MatomoMail.trackMoveSearchEvent

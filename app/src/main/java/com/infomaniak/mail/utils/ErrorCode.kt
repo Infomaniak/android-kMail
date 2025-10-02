@@ -17,10 +17,10 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.lib.core.utils.ApiErrorCode
+import com.infomaniak.core.legacy.utils.ApiErrorCode
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.EmojiReactionNotAllowedReason
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ErrorCode {

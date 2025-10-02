@@ -23,7 +23,7 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.sentry.Sentry

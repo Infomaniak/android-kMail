@@ -23,9 +23,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.setMargins
+import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackSyncAutoConfigEvent
 import com.infomaniak.mail.R

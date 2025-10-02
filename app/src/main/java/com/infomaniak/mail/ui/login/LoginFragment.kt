@@ -33,18 +33,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.core.fragmentnavigation.safelyNavigate
 import com.infomaniak.core.launchInOnLifecycle
+import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.core.legacy.utils.Utils
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.hideProgressCatching
+import com.infomaniak.core.legacy.utils.initProgress
+import com.infomaniak.core.legacy.utils.safeBinding
+import com.infomaniak.core.legacy.utils.safeNavigate
+import com.infomaniak.core.legacy.utils.showProgressCatching
+import com.infomaniak.core.legacy.utils.updateTextColor
 import com.infomaniak.core.observe
-import com.infomaniak.core.utils.awaitOneClick
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.hideProgressCatching
-import com.infomaniak.lib.core.utils.initProgress
-import com.infomaniak.lib.core.utils.safeBinding
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.showProgressCatching
-import com.infomaniak.lib.core.utils.updateTextColor
+import com.infomaniak.core.utils.awaitOneClick
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
@@ -74,7 +74,7 @@ import splitties.coroutines.repeatWhileActive
 import splitties.experimental.ExperimentalSplittiesApi
 import javax.inject.Inject
 import com.infomaniak.core.crossapplogin.front.R as RCrossLogin
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @OptIn(ExperimentalSerializationApi::class)
 @AndroidEntryPoint

@@ -19,9 +19,9 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.content.Context
 import com.infomaniak.core.cancellable
+import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.core.utils.format
-import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository

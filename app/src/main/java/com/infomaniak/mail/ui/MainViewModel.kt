@@ -30,13 +30,13 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.core.ksuite.data.KSuite
+import com.infomaniak.core.legacy.models.ApiResponse
+import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
+import com.infomaniak.core.legacy.utils.DownloadManagerUtils
+import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.core.network.NetworkAvailability
-import com.infomaniak.emojicomponents.data.Reaction
-import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.ApiErrorCode.Companion.translateError
-import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.core.sentry.SentryLog
-import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.emojicomponents.data.Reaction
 import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackMultiSelectionEvent
 import com.infomaniak.mail.R
@@ -137,7 +137,7 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.core.legacy.R as RCore
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel

@@ -27,8 +27,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.MatomoName

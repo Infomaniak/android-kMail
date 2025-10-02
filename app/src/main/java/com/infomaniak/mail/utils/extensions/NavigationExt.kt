@@ -26,9 +26,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.canNavigate
-import com.infomaniak.lib.core.utils.clearStack
-import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.core.legacy.utils.canNavigate
+import com.infomaniak.core.legacy.utils.clearStack
+import com.infomaniak.core.legacy.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.draft.Draft

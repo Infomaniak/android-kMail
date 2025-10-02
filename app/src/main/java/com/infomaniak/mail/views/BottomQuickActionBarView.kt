@@ -34,7 +34,7 @@ import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.size
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets

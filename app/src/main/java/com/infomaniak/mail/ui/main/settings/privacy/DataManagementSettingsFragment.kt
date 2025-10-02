@@ -22,9 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.core.utils.context
-import com.infomaniak.lib.core.utils.safeBinding
+import com.infomaniak.core.legacy.utils.UtilsUi.openUrl
+import com.infomaniak.core.legacy.utils.context
+import com.infomaniak.core.legacy.utils.safeBinding
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.MatomoCategory
 import com.infomaniak.mail.MatomoMail.MatomoName

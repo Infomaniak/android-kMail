@@ -25,7 +25,7 @@ import android.widget.LinearLayout
 import androidx.annotation.StringRes
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
-import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.core.legacy.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSimpleSettingBinding
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
