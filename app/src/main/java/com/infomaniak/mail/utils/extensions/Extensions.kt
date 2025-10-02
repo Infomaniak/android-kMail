@@ -358,13 +358,18 @@ fun List<Folder>.constructMenuDrawerFolderStructure(excludeRoleFolder: Boolean =
 
     // Step 2: Link children of MenuDrawerFolder to existing instances + compute collapsibility
     folderToMenuFolder.forEach { (folder, menuFolder) ->
+        // Compute canBeCollapsed using hidden folders as well
         val validChildren = folder.children
-            .filter { !(it.shouldBeExcluded(excludeRoleFolder) || it.isHidden) }
+            .filter { !(it.shouldBeExcluded(excludeRoleFolder)) }
+
+        // Only list children that are visible in the menu drawer
+        val visibleValidChildren = validChildren
+            .filter { !it.isHidden }
             .mapNotNull { folderToMenuFolder[it] }
 
         folderToMenuFolder[folder] = menuFolder.copy(
-            canBeCollapsed = (menuFolder.depth == 0 && validChildren.isNotEmpty()),
-            children = validChildren,
+            canBeCollapsed = menuFolder.depth == 0 && validChildren.isNotEmpty(),
+            children = visibleValidChildren,
         )
     }
 
