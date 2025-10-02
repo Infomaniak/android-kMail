@@ -22,7 +22,9 @@ import io.realm.kotlin.types.RealmObject
 class AppSettings : RealmObject {
 
     var currentUserId: Int = DEFAULT_ID
-    var currentMailboxId: Int = DEFAULT_ID
+    // TODO: This is TEMPORARY. Revert this whole commit when we know which usage
+    //  causes the "RealmConfiguration wrongly used Mailbox DEFAULT_ID" sentry.
+    var currentMailboxId: Int = -4 // DEFAULT_ID
 
     companion object {
         const val DEFAULT_ID = -1

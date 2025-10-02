@@ -27,7 +27,6 @@ import com.infomaniak.core.legacy.utils.ApiErrorCode.Companion.translateError
 import com.infomaniak.core.legacy.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.coroutineContext
@@ -72,7 +71,7 @@ class InvalidPasswordViewModel @Inject constructor(
         val apiResponse = ApiRepository.detachMailbox(mailbox().mailboxId)
         if (apiResponse.isSuccess()) {
             AccountUtils.switchToMailbox(
-                mailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.mailboxId ?: AppSettings.DEFAULT_ID,
+                mailboxController.getFirstValidMailbox(AccountUtils.currentUserId)?.mailboxId ?: -6, // AppSettings.DEFAULT_ID
             )
         } else {
             detachMailboxResult.postValue(apiResponse.translateError())

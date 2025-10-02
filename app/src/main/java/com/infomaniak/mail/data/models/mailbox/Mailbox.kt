@@ -50,7 +50,7 @@ class Mailbox : RealmObject {
     @SerialName("mailbox")
     var mailboxName: String = ""
     @SerialName("mailbox_id")
-    var mailboxId: Int = AppSettings.DEFAULT_ID
+    var mailboxId: Int = -3 // AppSettings.DEFAULT_ID
     @SerialName("hosting_id")
     var hostingId: Int = 0
     @SerialName("link_id")

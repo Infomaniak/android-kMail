@@ -26,7 +26,6 @@ import com.infomaniak.mail.MatomoMail.MatomoName
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.MyKSuiteDataUtils
@@ -55,7 +54,7 @@ class SwitchUserViewModel @Inject constructor(
             RealmDatabase.backupPreviousRealms()
             myKSuiteDataUtils.myKSuite = null
             AccountUtils.currentUser = user
-            AccountUtils.currentMailboxId = mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: AppSettings.DEFAULT_ID
+            AccountUtils.currentMailboxId = mailboxController.getFirstValidMailbox(user.id)?.mailboxId ?: -5 // AppSettings.DEFAULT_ID
             AccountUtils.reloadApp?.invoke()
         }
     }

@@ -137,7 +137,7 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun handleNotificationDestinationIntent() {
         navigationArgs?.let {
-            if (it.userId != AppSettings.DEFAULT_ID && it.mailboxId != AppSettings.DEFAULT_ID) {
+            if (it.userId != AppSettings.DEFAULT_ID && it.mailboxId > -1) { // DEFAULT_ID
                 if (AccountUtils.currentUserId != it.userId) AccountUtils.currentUserId = it.userId
                 if (AccountUtils.currentMailboxId != it.mailboxId) AccountUtils.currentMailboxId = it.mailboxId
                 SentryDebug.addNotificationBreadcrumb("SyncMessages notification has been clicked")

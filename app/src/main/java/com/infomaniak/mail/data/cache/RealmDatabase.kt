@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache
 import android.content.Context
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.AppSettings.Companion.DEFAULT_ID
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Bimi
 import com.infomaniak.mail.data.models.Folder
@@ -270,8 +269,11 @@ object RealmDatabase {
 
         fun mailboxContent(userId: Int, mailboxId: Int, loadDataInMemory: Boolean = false): RealmConfiguration {
 
-            if (mailboxId == DEFAULT_ID) {
-                Sentry.captureMessage("RealmConfiguration problem with mailbox content, default ID is used.", SentryLevel.ERROR)
+            if (mailboxId <= -1) { // DEFAULT_ID
+                Sentry.captureMessage("RealmConfiguration wrongly used Mailbox DEFAULT_ID") { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setTag("mailboxId", "$mailboxId")
+                }
             }
 
             return RealmConfiguration.Builder(mailboxContentSet)
