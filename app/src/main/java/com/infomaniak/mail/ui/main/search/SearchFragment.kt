@@ -38,6 +38,7 @@ import com.infomaniak.core.legacy.utils.Utils
 import com.infomaniak.core.legacy.utils.hideKeyboard
 import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.showKeyboard
+import com.infomaniak.core.observe
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -58,10 +59,11 @@ import com.infomaniak.mail.ui.main.search.SearchFolderAdapter.SearchFolderElemen
 import com.infomaniak.mail.ui.main.thread.ThreadFragment
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.Utils.Shortcuts
-import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
+import com.infomaniak.mail.utils.extensions.MenuDrawerFolder
 import com.infomaniak.mail.utils.extensions.addStickyDateDecoration
 import com.infomaniak.mail.utils.extensions.applySideAndBottomSystemInsets
 import com.infomaniak.mail.utils.extensions.applyWindowInsetsListener
+import com.infomaniak.mail.utils.extensions.flattenAndAddDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.extensions.handleEditorSearchAction
 import com.infomaniak.mail.utils.extensions.safeArea
@@ -225,10 +227,11 @@ class SearchFragment : TwoPaneFragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
-        searchViewModel.foldersLive.observe(viewLifecycleOwner) { allFolders ->
+        mainViewModel.displayedFoldersFlow.observe(viewLifecycleOwner) { allFolders ->
 
             val folders = allFolders
-                .addDividerBeforeFirstCustomFolder(dividerType = SearchFolderElement.DIVIDER)
+                .flattenAndAddDividerBeforeFirstCustomFolder(dividerType = SearchFolderElement.DIVIDER)
+                .map { if (it is MenuDrawerFolder) it.folder else it }
                 .toMutableList()
                 .apply { add(0, SearchFolderElement.ALL_FOLDERS) }
                 .toList()
