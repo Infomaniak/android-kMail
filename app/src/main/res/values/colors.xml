@@ -185,6 +185,9 @@
     <color name="threadCountBorderRead">@color/mouse</color>
     <color name="threadCountBorderUnread">@color/orca</color>
 
+    <!-- Dropdown -->
+    <color name="dropdownBorderColor">@color/mouse</color>
+
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/mouse</color>
 
