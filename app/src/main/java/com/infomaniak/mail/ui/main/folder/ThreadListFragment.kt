@@ -48,6 +48,7 @@ import com.infomaniak.core.legacy.utils.setMargins
 import com.infomaniak.core.legacy.utils.setPaddingRelative
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.core.legacy.stores.updatemanagers.InAppUpdateManager
+import com.infomaniak.core.legacy.utils.getBackNavigationResult
 import com.infomaniak.core.utils.isToday
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation
 import com.infomaniak.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
