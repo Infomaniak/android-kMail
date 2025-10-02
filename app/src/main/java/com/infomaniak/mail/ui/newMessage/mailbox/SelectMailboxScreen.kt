@@ -19,9 +19,20 @@ package com.infomaniak.mail.ui.newMessage.mailbox
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,13 +41,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.infomaniak.core.avatar.components.Avatar
+import com.infomaniak.core.avatar.getBackgroundColorResBasedOnId
+import com.infomaniak.core.avatar.models.AvatarColors
+import com.infomaniak.core.avatar.models.AvatarType
+import com.infomaniak.core.avatar.models.AvatarUrlData
+import com.infomaniak.core.coil.ImageLoaderProvider
+import com.infomaniak.core.compose.basics.Dimens
 import com.infomaniak.core.compose.basics.Typography
 import com.infomaniak.core.compose.bottomstickybuttonscaffolds.BottomStickyButtonScaffold
 import com.infomaniak.core.compose.margin.Margin
@@ -80,7 +102,8 @@ fun SelectMailboxScreen(
         },
         content = {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize()
+                    .padding(horizontal = Margin.Medium),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -93,13 +116,8 @@ fun SelectMailboxScreen(
                     maxLines = 1,
                     text = stringResource(R.string.composeMailboxCurrentTitle)
                 )
-                Text(
-                    style = Typography.h2,
-                    maxLines = 1,
-                    text = "Current User"
-                )
                 userWithMailboxSelected?.let { userWithMailbox ->
-                    Text(userWithMailbox.userEmail)
+                    SelectedMailbox(userWithMailbox)
                 }
                 usersWithMailboxes.forEach { userWithMailbox ->
                     Text("---------------")
@@ -112,7 +130,7 @@ fun SelectMailboxScreen(
         },
         topButton = {
             LargeButton(
-                modifier = it,
+                modifier = it.padding(horizontal = Margin.Medium),
                 title = stringResource(R.string.buttonContinue)
             ) {
                 // TODO: Open newMessageFragment
@@ -120,7 +138,7 @@ fun SelectMailboxScreen(
         },
         bottomButton = {
             LargeButton(
-                modifier = it,
+                modifier = it.padding(horizontal = Margin.Medium),
                 title = stringResource(R.string.buttonSendWithDifferentAddress),
                 style = ButtonType.Tertiary
             ) {
@@ -128,6 +146,47 @@ fun SelectMailboxScreen(
             }
         },
     )
+}
+
+@Composable
+fun SelectedMailbox(mailboxSelected: UserMailboxesUi) {
+    val context = LocalContext.current
+    val unauthenticatedImageLoader = remember(context) { ImageLoaderProvider.newImageLoader(context) }
+
+    Box(Modifier.padding(Margin.Medium)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(Dimens.buttonHeight)
+                .clip(shape = RoundedCornerShape(Dimens.largeCornerRadius))
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = Margin.Medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Avatar(
+                modifier = Modifier.size(Dimens.avatarSize),
+                avatarType = AvatarType.getUrlOrInitials(
+                    avatarUrlData = mailboxSelected.avatarUrl?.let { AvatarUrlData(it, unauthenticatedImageLoader) },
+                    initials = mailboxSelected.initials,
+                    colors = AvatarColors(
+                        containerColor = Color(context.getBackgroundColorResBasedOnId(mailboxSelected.userId)),
+                        contentColor = if (isSystemInDarkTheme()) Color(0xFF333333) else Color.White
+                    )
+                )
+            )
+            Text(
+                modifier = Modifier.padding(horizontal = Margin.Mini),
+                text = mailboxSelected.mailboxes.first().email
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                painter = painterResource(R.drawable.ic_check_rounded),
+                tint = colorResource(R.color.greenSuccess),
+                contentDescription = null
+            )
+        }
+
+    }
 }
 
 @Composable
