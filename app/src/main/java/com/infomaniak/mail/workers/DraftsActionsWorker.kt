@@ -37,7 +37,6 @@ import com.infomaniak.mail.MainApplication
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
@@ -66,7 +65,7 @@ class DraftsActionsWorker @AssistedInject constructor(
     private val mailboxContentRealm by lazy { RealmDatabase.newMailboxContentInstance }
 
     private lateinit var okHttpClient: OkHttpClient
-    private var mailboxId: Int = AppSettings.DEFAULT_ID
+    private var mailboxId: Int = -7 // AppSettings.DEFAULT_ID
     private lateinit var mailbox: Mailbox
     private var userId: Int by Delegates.notNull()
     private var draftLocalUuid: String? = null
@@ -79,7 +78,7 @@ class DraftsActionsWorker @AssistedInject constructor(
         SentryLog.d(TAG, "Work started")
 
         if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
-        if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@withContext Result.failure()
+        if (AccountUtils.currentMailboxId <= -1) return@withContext Result.failure() // AppSettings.DEFAULT_ID
 
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
         mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@withContext Result.failure()
@@ -125,7 +124,7 @@ class DraftsActionsWorker @AssistedInject constructor(
 
         suspend fun scheduleWork(draftLocalUuid: String? = null) {
 
-            if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
+            if (AccountUtils.currentMailboxId <= -1) return // AppSettings.DEFAULT_ID
             if (draftController.getDraftsWithActionsCount() == 0L) return
 
             SentryLog.d(TAG, "Work scheduled")

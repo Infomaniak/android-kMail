@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache.mailboxInfo
 import android.content.Context
 import com.infomaniak.core.sentry.SentryLog
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.mailbox.Mailbox
 import com.infomaniak.mail.di.MailboxInfoRealm
 import com.infomaniak.mail.utils.AccountUtils
@@ -139,7 +138,7 @@ class MailboxController @Inject constructor(
         val isCurrentMailboxDeleted = outdatedMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
             RealmDatabase.closeMailboxContent()
-            AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
+            AccountUtils.currentMailboxId = -2 // AppSettings.DEFAULT_ID
         }
         outdatedMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
         delete(outdatedMailboxes)
