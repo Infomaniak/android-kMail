@@ -384,6 +384,9 @@ data class MenuDrawerFolder(
     val canBeCollapsed: Boolean, // For parents only (only a parent can be collapsed, its children will be hidden instead)
 )
 
+/**
+ * Traverses a tree structure in a depth-first search manner.
+ */
 fun <T> List<T>.forEachNestedItem(getChildren: (T) -> List<T>, block: (T, Int) -> Unit) {
     val stack = ArrayDeque<Pair<T, Int>>()
     asReversed().forEach { stack.addLast(it to 0) }
