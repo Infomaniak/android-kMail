@@ -54,7 +54,8 @@
                 app:icon="@drawable/ic_warning"
                 app:layout_constraintTop_toBottomOf="@id/logo"
                 app:showCloseIcon="false"
-                app:title="@string/lockedMailboxViewTitle" />
+                app:title="@string/lockedMailboxViewTitle"
+                tools:layout_editor_absoluteX="24dp" />
 
             <TextView
                 android:id="@+id/invalidPasswordTitle"
