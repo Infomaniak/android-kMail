@@ -331,7 +331,8 @@ fun List<Signature>.getDefault(draftMode: DraftMode? = null): Signature? {
 
 //region Folders
 /**
- * Returns a list of MenuDrawerFolder where each folder has a reference to its children.
+ * Returns a tree-like list of MenuDrawerFolder where each folder has a reference to its children. This method automatically
+ * excludes .ik folders.
  *
  * @param excludeRoleFolder Do not return folders with role nor their children. This is used in the menu drawer to not display
  * role folders in the bottom custom folder section because they are already displayed on the upper section.
