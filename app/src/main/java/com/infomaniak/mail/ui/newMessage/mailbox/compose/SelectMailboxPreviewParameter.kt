@@ -31,6 +31,9 @@ private val usersWithMailboxesPreviewData = listOf(
     UserMailboxesUi(
         userId = 0,
         userEmail = "chef@infomaniak.com",
+        avatarUrl = "https://picsum.photos/id/140/200/200",
+        initials = "CH",
+        fullName = "Chef",
         mailboxes = listOf(
             MailboxUi(
                 mailUuid = UUID.randomUUID().toString(),
@@ -39,8 +42,11 @@ private val usersWithMailboxesPreviewData = listOf(
         )
     ),
     UserMailboxesUi(
-        userId = 0,
+        userId = 1,
         userEmail = "firstname.lastname@infomaniak.com",
+        avatarUrl = "https://picsum.photos/id/140/200/200",
+        initials = "FL",
+        fullName = "Firstname Listname",
         mailboxes = listOf(
             MailboxUi(
                 mailUuid = UUID.randomUUID().toString(),
@@ -49,8 +55,11 @@ private val usersWithMailboxesPreviewData = listOf(
         )
     ),
     UserMailboxesUi(
-        userId = 0,
+        userId = 2,
         userEmail = "android@infomaniak.com",
+        avatarUrl = "https://picsum.photos/id/140/200/200",
+        initials = "AD",
+        fullName = "Android",
         mailboxes = listOf(
             MailboxUi(
                 mailUuid = UUID.randomUUID().toString(),
