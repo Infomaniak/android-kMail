@@ -90,7 +90,7 @@ class LoginUtils @Inject constructor(
         runCatching {
             when (val returnValue = LoginActivity.authenticateUser(token, mailboxController)) {
                 is User -> {
-                    if (withRedirection) context.loginSuccess(returnValue)
+                    if (withRedirection) loginSuccess(returnValue)
                     return
                 }
                 is MailboxErrorCode -> if (withRedirection) context.mailboxError(returnValue)
@@ -130,7 +130,7 @@ class LoginUtils @Inject constructor(
         val context = requireContext()
 
         when (val returnValue = LoginActivity.authenticateUser(apiToken, mailboxController)) {
-            is User -> return@launch context.loginSuccess(returnValue)
+            is User -> return@launch loginSuccess(returnValue)
             is MailboxErrorCode -> context.mailboxError(returnValue)
             is ApiResponse<*> -> context.apiError(returnValue)
             else -> context.otherError()
@@ -139,7 +139,7 @@ class LoginUtils @Inject constructor(
         logout(infomaniakLogin, apiToken)
     }
 
-    private suspend fun Context.loginSuccess(user: User) {
+    private suspend fun loginSuccess(user: User) {
         trackAccountEvent(MatomoName.LoggedIn)
         ioDispatcher {
             mailboxController.getFirstValidMailbox(user.id)?.mailboxId?.let { AccountUtils.currentMailboxId = it }
