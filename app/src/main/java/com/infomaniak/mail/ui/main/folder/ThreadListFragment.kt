@@ -77,7 +77,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.alertDialogs.DescriptionAlertDialog
 import com.infomaniak.mail.ui.alertDialogs.TitleAlertDialog
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerSourceKey.ThreadList
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget.ThreadList
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.folder.ThreadListViewModel.ContentDisplayMode
 import com.infomaniak.mail.ui.main.thread.ThreadFragment

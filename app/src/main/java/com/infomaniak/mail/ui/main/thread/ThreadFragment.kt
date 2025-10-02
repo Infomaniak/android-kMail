@@ -82,9 +82,9 @@ import com.infomaniak.mail.ui.bottomSheetDialogs.ScheduleSendBottomSheetDialogAr
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.OPEN_SNOOZE_DATE_AND_TIME_PICKER
 import com.infomaniak.mail.ui.bottomSheetDialogs.SnoozeBottomSheetDialog.Companion.SNOOZE_RESULT
 import com.infomaniak.mail.ui.main.SnackbarManager
-import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerSourceKey
-import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerSourceKey.Thread
-import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerSourceKey.ThreadList
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget.Thread
+import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialog.EmojiPickerObserverTarget.ThreadList
 import com.infomaniak.mail.ui.main.emojiPicker.EmojiPickerBottomSheetDialogArgs
 import com.infomaniak.mail.ui.main.emojiPicker.PickedEmojiPayload
 import com.infomaniak.mail.ui.main.folder.TwoPaneFragment
@@ -1081,10 +1081,10 @@ class ThreadFragment : Fragment() {
         return direction?.let { getNextThread(startingThreadIndex, direction) }
     }
 
-    private fun Fragment.navigateToEmojiPicker(messageUid: String, emojiPickerSourceKey: EmojiPickerSourceKey) {
+    private fun Fragment.navigateToEmojiPicker(messageUid: String, emojiPickerObserverTarget: EmojiPickerObserverTarget) {
         safelyNavigate(
             resId = R.id.emojiPickerBottomSheetDialog,
-            args = EmojiPickerBottomSheetDialogArgs(messageUid, emojiPickerSourceKey).toBundle(),
+            args = EmojiPickerBottomSheetDialogArgs(messageUid, emojiPickerObserverTarget).toBundle(),
             substituteClassName = twoPaneFragment.substituteClassName,
         )
     }
