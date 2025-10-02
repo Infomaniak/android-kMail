@@ -33,7 +33,10 @@ import javax.inject.Inject
 data class UserMailboxesUi(
     val userId: Int,
     val userEmail: String,
-    val mailboxes: List<MailboxUi>
+    val avatarUrl: String?,
+    val initials: String,
+    val fullName: String,
+    val mailboxes: List<MailboxUi>,
 )
 
 data class MailboxUi(
@@ -65,6 +68,9 @@ class SelectMailboxViewModel @Inject constructor(
             UserMailboxesUi(
                 userId = user.id,
                 userEmail = user.email,
+                avatarUrl = user.avatar,
+                initials = user.getInitials(),
+                fullName = user.displayName ?: user.run { "$firstname $lastname" },
                 mailboxes = mailboxController.getMailboxes(user.id).map { mailbox ->
                     MailboxUi(
                         mailUuid = mailbox.uuid,
@@ -80,6 +86,9 @@ class SelectMailboxViewModel @Inject constructor(
             _userWithMailboxSelected.value = UserMailboxesUi(
                 userId = currentUser.id,
                 userEmail = currentUser.email,
+                avatarUrl = currentUser.avatar,
+                initials = currentUser.getInitials(),
+                fullName = currentUser.displayName ?: currentUser.run { "$firstname $lastname" },
                 mailboxes = mailboxController.getMailboxes(currentUser.id)
                     .filter { mailbox ->
                         mailbox.email == AccountUtils.currentMailboxEmail
