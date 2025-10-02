@@ -27,6 +27,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.infomaniak.core.compose.basics.Typography
 import com.infomaniak.core.compose.bottomstickybuttonscaffolds.BottomStickyButtonScaffold
 import com.infomaniak.core.compose.margin.Margin
@@ -42,12 +45,28 @@ import com.infomaniak.mail.ui.components.compose.ButtonType
 import com.infomaniak.mail.ui.components.compose.LargeButton
 import com.infomaniak.mail.ui.components.compose.MailTopAppBar
 import com.infomaniak.mail.ui.components.compose.TopAppBarButtons
+import com.infomaniak.mail.ui.newMessage.mailbox.compose.SelectMailboxPreviewParameter
 import com.infomaniak.mail.ui.theme.MailTheme
 
 @Composable
-fun SelectMailboxScreen() {
+fun SelectMailboxScreen(viewModel: SelectMailboxViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val usersWithMailboxes by viewModel.usersWithMailboxes.collectAsStateWithLifecycle()
+    val userWithMailboxSelected by viewModel.userWithMailboxSelected.collectAsStateWithLifecycle()
 
+    SelectMailboxScreen(
+        usersWithMailboxes = usersWithMailboxes,
+        userWithMailboxSelected = userWithMailboxSelected,
+        snackbarHostState = snackbarHostState
+    )
+}
+
+@Composable
+fun SelectMailboxScreen(
+    usersWithMailboxes: List<UserMailboxesUi>,
+    userWithMailboxSelected: UserMailboxesUi?,
+    snackbarHostState: SnackbarHostState? = null,
+) {
     BottomStickyButtonScaffold(
         snackbarHostState = snackbarHostState,
         topBar = {
@@ -76,6 +95,21 @@ fun SelectMailboxScreen() {
                     maxLines = 1,
                     text = stringResource(R.string.composeMailboxCurrentTitle)
                 )
+                Text(
+                    style = Typography.h2,
+                    maxLines = 1,
+                    text = "Current User"
+                )
+                userWithMailboxSelected?.let { userWithMailbox ->
+                    Text(userWithMailbox.userEmail)
+                }
+                usersWithMailboxes.forEach { userWithMailbox ->
+                    Text("---------------")
+                    Text("${userWithMailbox.userEmail} -- mailbox : ${userWithMailbox.mailboxes.size}")
+                    userWithMailbox.mailboxes.forEach { mailbox ->
+                        Text("---- email: ${mailbox.email}")
+                    }
+                }
             }
         },
         topButton = {
@@ -103,10 +137,13 @@ fun SelectMailboxScreen() {
 @Composable
 @Preview(name = "(1) Light")
 @Preview(name = "(2) Dark", uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
-private fun Preview() {
+private fun Preview(@PreviewParameter(SelectMailboxPreviewParameter::class) usersWithMailboxes: List<UserMailboxesUi>) {
     MailTheme {
         Surface(Modifier.fillMaxSize()) {
-            SelectMailboxScreen()
+            SelectMailboxScreen(
+                usersWithMailboxes = usersWithMailboxes,
+                userWithMailboxSelected = usersWithMailboxes.first()
+            )
         }
     }
 }

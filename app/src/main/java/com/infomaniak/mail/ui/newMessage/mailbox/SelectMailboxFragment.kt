@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.ui.theme.MailTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,7 +36,7 @@ class SelectMailboxFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MailTheme {
-                    SelectMailboxScreen()
+                    SelectMailboxScreen(selectMailboxViewModel)
                 }
             }
         }
