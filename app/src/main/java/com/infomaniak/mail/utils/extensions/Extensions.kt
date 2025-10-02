@@ -97,6 +97,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.alertDialogs.BaseAlertDialog
 import com.infomaniak.mail.ui.login.IlluColors.IlluColors
 import com.infomaniak.mail.ui.main.SnackbarManager
@@ -480,6 +481,22 @@ fun RealmQuery<Folder>.sortFolders() = sort(Folder::sortedName.name, Sort.ASCEND
 fun List<Folder>.sortFolders() = sortedBy { it.sortedName }
     .sortedByDescending { it.isFavorite }
     .sortedByDescending { it.roleOrder }
+
+/**
+ * @return A list of [MenuDrawerFolder] with a single divider of the provided type
+ */
+fun MainViewModel.DisplayedFolders.flattenAndAddDividerBeforeFirstCustomFolder(
+    dividerType: Any,
+    excludedFolderRoles: Set<FolderRole> = emptySet(),
+): List<Any> = buildList {
+    default.forEachNestedItem(getChildren = { it.children }) { folder, _ ->
+        if (folder.folder.role !in excludedFolderRoles) add(folder)
+    }
+    add(dividerType)
+    custom.forEachNestedItem(getChildren = { it.children }) { folder, _ ->
+        if (folder.folder.role !in excludedFolderRoles) add(folder)
+    }
+}
 
 fun List<Folder>.addDividerBeforeFirstCustomFolder(dividerType: Any): List<Any> {
     val folders = this

@@ -1,6 +1,6 @@
 /*
  * Infomaniak Mail - Android
- * Copyright (C) 2023-2024 Infomaniak Network SA
+ * Copyright (C) 2023-2025 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,11 +26,12 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.di.IoDispatcher
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.coroutineContext
-import com.infomaniak.mail.utils.extensions.addDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.appContext
-import com.infomaniak.mail.utils.extensions.flattenFolderChildrenAndRemoveMessages
+import com.infomaniak.mail.utils.extensions.flattenAndAddDividerBeforeFirstCustomFolder
 import com.infomaniak.mail.utils.extensions.standardize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -44,7 +45,6 @@ import javax.inject.Inject
 class MoveViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
-    private val folderController: FolderController,
     private val messageController: MessageController,
     private val threadController: ThreadController,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -69,12 +69,14 @@ class MoveViewModel @Inject constructor(
                 ?: threadController.getThread(threadsUids.first())!!.folderId
 
             sourceFolderIdLiveData.postValue(sourceFolderId)
-
-            allFolders = folderController.getMoveFolders()
-                .flattenFolderChildrenAndRemoveMessages()
-                .addDividerBeforeFirstCustomFolder(dividerType = Unit)
-                .also { folders -> filterResults.postValue(folders to true) }
         }
+    }
+
+    fun initFolders(folders: MainViewModel.DisplayedFolders) {
+        allFolders = folders.flattenAndAddDividerBeforeFirstCustomFolder(
+            dividerType = Unit,
+            excludedFolderRoles = setOf(FolderRole.SNOOZED, FolderRole.SCHEDULED_DRAFTS, FolderRole.DRAFT),
+        ).also { folders -> filterResults.postValue(folders to true) }
     }
 
     fun filterFolders(query: CharSequence?, shouldDebounce: Boolean) {
