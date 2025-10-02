@@ -28,8 +28,6 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.di.IoDispatcher
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.ThreadMessageInteraction
-import com.infomaniak.mail.utils.ThreadMessageToExecuteInteraction
 import com.infomaniak.mail.utils.coroutineContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -89,4 +87,15 @@ class ThreadActionsViewModel @Inject constructor(
         val messageUid = ioDispatcher { messageController.getLastMessageToExecuteReaction(thread, featureFlagsLive.value)?.uid }
         return messageUid?.let { ThreadMessageInteraction.Reaction(it) }
     }
+
+    private sealed class ThreadMessageInteraction(open val messageUid: String) {
+        data class Action(val thread: Thread, override val messageUid: String) : ThreadMessageInteraction(messageUid)
+        data class Reaction(override val messageUid: String): ThreadMessageInteraction(messageUid)
+    }
+
+    data class ThreadMessageToExecuteInteraction(
+        val thread: Thread,
+        val messageUidToExecuteAction: String,
+        val messageUidToExecuteReaction: String?
+    )
 }
