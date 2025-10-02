@@ -18,8 +18,8 @@
 package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
-import android.net.Uri
 import android.webkit.WebView
+import androidx.core.net.toUri
 import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.newMessage.NewMessageActivityArgs
@@ -37,7 +37,7 @@ class EmailContextualMenuAlertDialog @Inject constructor(
         ContextualItem(R.string.contextMenuEmailOpen) { email, _ ->
             (activityContext as MainActivity).navigateToNewMessageActivity(
                 NewMessageActivityArgs(
-                    mailToUri = Uri.parse(WebView.SCHEME_MAILTO + email),
+                    mailToUri = (WebView.SCHEME_MAILTO + email).toUri(),
                 ).toBundle(),
             )
         },
