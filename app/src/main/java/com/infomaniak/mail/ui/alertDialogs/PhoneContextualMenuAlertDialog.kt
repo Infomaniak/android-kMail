@@ -19,9 +19,9 @@ package com.infomaniak.mail.ui.alertDialogs
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.provider.ContactsContract
 import android.webkit.WebView
+import androidx.core.net.toUri
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.extensions.copyStringToClipboard
@@ -51,13 +51,13 @@ class PhoneContextualMenuAlertDialog @Inject constructor(
     )
 
     private fun Context.dialPhoneNumber(phoneNumber: String) {
-        val telUri = Uri.parse(WebView.SCHEME_TEL + phoneNumber)
+        val telUri = (WebView.SCHEME_TEL + phoneNumber).toUri()
         val dialPhoneNumberIntent = Intent(Intent.ACTION_DIAL, telUri)
         safeStartActivity(dialPhoneNumberIntent)
     }
 
     private fun Context.smsToPhoneNumber(phoneNumber: String) {
-        val smsToPhoneNumberIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(Utils.SCHEME_SMSTO + phoneNumber))
+        val smsToPhoneNumberIntent = Intent(Intent.ACTION_SENDTO, (Utils.SCHEME_SMSTO + phoneNumber).toUri())
         safeStartActivity(smsToPhoneNumberIntent)
     }
 
